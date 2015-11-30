@@ -324,7 +324,7 @@ template<unsigned gpio>
 class PortT
 {
 public:
-	PortT( void ) { RCC_AHB1ENR_B[GPIO_PORT(gpio)] = 1; }
+	PortT( void ) { BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; }
 	
 	void init  (unsigned pins, unsigned cfg) { __pinini((GPIO_TypeDef *)gpio, pins, cfg); }
 	void config(unsigned pins, unsigned cfg) { __pincfg((GPIO_TypeDef *)gpio, pins, cfg); }
