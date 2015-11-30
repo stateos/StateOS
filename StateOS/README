@@ -8,6 +8,7 @@ Features:
 - kernel can operate in tick-less mode
 - events
 - flags (one, all)
+- barriers
 - semaphores (direct, binary, limited, counting)
 - mutexes (normal, recursive, priority protect, priority inheritance)
 - condition variables

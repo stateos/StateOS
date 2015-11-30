@@ -1,7 +1,7 @@
 /******************************************************************************
- * @file    stm32f4xx_io.h
+ * @file    stm32f4_io.h
  * @author  Rajmund Szymanski
- * @date    26.11.2013
+ * @date    13.11.2015
  * @brief   This file contains macro definitions for the STM32F4XX GPIO ports.
  ******************************************************************************/
 
@@ -17,14 +17,17 @@ extern "C" {
 #endif
 
 /* -------------------------------------------------------------------------- */
-
-//	out:   1
-//	mode:  2
-//	type:  1
-//	speed: 2
-//	pull:  2
-//	af:    4
-
+/*
+struct __gpio_config
+{
+	unsigned out:    1;
+	unsigned mode:   2;
+	unsigned otype:  1;
+	unsigned ospeed: 2;
+	unsigned pupd:   2;
+	unsigned af:     4;
+};
+*/
 #define GPIO_OUT_Pos      (0)
 #define GPIO_MODE_Pos     (1)
 #define GPIO_OTYPE_Pos    (3)
@@ -177,15 +180,7 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#define GPIO_PORT(gpio)  ((((uint32_t)(gpio))-GPIOA_BASE)/(GPIOB_BASE-GPIOA_BASE))
-
-/* -------------------------------------------------------------------------- */
-
-#define bit_set(var, bit)       ((var)|= (1u<<(bit)))
-#define bit_clr(var, bit)       ((var)&=~(1u<<(bit)))
-#define bit_chg(var, bit)       ((var)^= (1u<<(bit)))
-#define bit_get(var, bit)      (((var)>>(bit))&1u)
-#define bit_aff(var, bit, val)  ((var)=(((var)&(~(1u<<(bit))))|(((val)&1u)<<(bit))))
+#define GPIO_PORT(gpio)  ((((uint32_t)(gpio))>>10)&0xF)
 
 /* -------------------------------------------------------------------------- */
 
@@ -246,10 +241,7 @@ void __pincfg( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	uint32_t high;
 
-	if (GPIO_OUT(cfg))
-	gpio->BSRR    = pins;
-	else
-	gpio->BSRR    = pins << 16;
+	gpio->BSRR    = pins << (16 * GPIO_OUT(~cfg));
 
 	gpio->OTYPER  = (gpio->OTYPER  & ~(pins * 0x1)) | (pins * GPIO_OTYPE(cfg));
 
@@ -324,14 +316,15 @@ template<unsigned gpio>
 class PortT
 {
 public:
-	PortT( void ) { BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; }
+	PortT( void ) { BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; __DSB(); }
 	
 	void init  (unsigned pins, unsigned cfg) { __pinini((GPIO_TypeDef *)gpio, pins, cfg); }
 	void config(unsigned pins, unsigned cfg) { __pincfg((GPIO_TypeDef *)gpio, pins, cfg); }
 	void lock  (unsigned pins)               { __pinlck((GPIO_TypeDef *)gpio, pins);      }
 
-	unsigned   operator ()( const unsigned number ) { return             BITBAND(((GPIO_TypeDef *)gpio)->IDR)[number]; }
-	unsigned & operator []( const unsigned number ) { return (unsigned &)BITBAND(((GPIO_TypeDef *)gpio)->ODR)[number]; }
+	unsigned   operator ()( const unsigned number ) { return BITBAND(((GPIO_TypeDef *)gpio)->IDR)[number]; }
+	volatile
+	unsigned & operator []( const unsigned number ) { return BITBAND(((GPIO_TypeDef *)gpio)->ODR)[number]; }
 };
 
 typedef PortT<GPIOA_BASE> PORTA;

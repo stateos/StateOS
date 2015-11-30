@@ -1,8 +1,8 @@
 /******************************************************************************
  * @file    system_stm32f4xx.c
  * @author  Rajmund Szymanski
- * @date    30.10.2015
- * @brief   This file provides set of configuration functions for STM32F4-Discovery Kit.
+ * @date    20.11.2015
+ * @brief   This file provides set of configuration functions for STM32F4 uC.
  ******************************************************************************/
 
 #include <stm32f4xx.h>
