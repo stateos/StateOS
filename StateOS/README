@@ -1,0 +1,85 @@
+StateOS
+---------
+Free real-time operating system (RTOS) designed for deeply embedded applications.
+It was inspired by the concept of a state machine.
+---------
+Features:
+- kernel works in preemptive or cooperative mode
+- kernel can operate in tick-less mode
+- events
+- flags (one, all)
+- semaphores (direct, binary, limited, counting)
+- mutexes (normal, recursive, priority protect, priority inheritance)
+- condition variables
+- message queues
+- mail box queues
+- timers (one-shot, periodic)
+- c++ wrapper
+---------
+0.9.3
+- add barrier (bar) object
+- add barrier example (main.c.10)
+---------
+0.9.2
+- changed 'flg' procedures
+- added 'flg' mode constants: flgAccept, flgClear
+- added blocked mask for 'flg'
+---------
+0.9.1
+- fix bug in non static objects definitions
+- add guard object in tsk_sleep function
+---------
+0.9
+- reorganization of the semaphore code
+- added semDirect constant
+- reorganization of the mutex code
+---------
+0.8.5d
+- reorganize the file structure
+- rename PRIVATE_XXX to static_XXX
+---------
+0.8.5c
+- update makefiles
+- update bitband.h
+---------
+0.8.5b
+- more improvements in tick-less mode
+- more improvements in support of virtual timers
+---------
+0.8.5a
+- improved tick-less mode
+- improved virtual timers support
+- support for armv6-m and armv7-m devices at system level
+---------
+0.8.5
+- added support for CM0, CM0+ and CM3 at system level
+---------
+0.8.4
+- updated task startup procedures
+---------
+0.8.3a
+- fixed bug in GRN_Led class
+---------
+0.8.3
+- added configuration files for STM32F4_Discovery
+- added configuration in example files
+---------
+0.8.2a
+- tasks switch optimization
+---------
+0.8.2
+- modified procedure for the preparation of the stack for new and restarted tasks
+---------
+0.8.1
+- fixed bug in kernel function: core_tsk_prio
+---------
+0.8
+- updated examples and several other changes
+- changed 'flg' procedures
+- added 'flg' mode constants: flgOne, flgAll
+---------
+0.7.3a
+- small update for mutexes and semaphores
+---------
+0.7.3
+- added some features to semaphores and mutexes
