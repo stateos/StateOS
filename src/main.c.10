@@ -1,0 +1,30 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+OS_BAR(bar, 2);
+
+void slave()
+{
+	bar_wait(bar);
+
+	LED_Tick();
+}
+
+void master()
+{
+	tsk_delay(1000*MSEC);
+
+	bar_wait(bar);
+}
+
+OS_TSK(sla, 0, slave);
+OS_TSK(mas, 0, master);
+
+int main()
+{
+	LED_Config();
+
+	tsk_start(sla);
+	tsk_start(mas);
+	tsk_stop();
+}

@@ -1,0 +1,28 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+sem_id sem;
+
+void slave()
+{
+	sem_wait(sem);
+
+	LED_Tick();
+}
+
+void master()
+{
+	tsk_delay(1000*MSEC);
+
+	sem_give(sem);
+}
+
+int main()
+{
+	LED_Config();
+
+	sem = sem_create(semNormal);
+	tsk_new(0, slave);
+	tsk_new(0, master);
+	tsk_stop();
+}

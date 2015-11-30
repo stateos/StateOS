@@ -9,7 +9,7 @@
 
 /* -------------------------------------------------------------------------- */
 
-#include <stm32f4_io.h>
+#include <stm32f4xx_io.h>
 
 #ifdef __cplusplus
 extern "C" {

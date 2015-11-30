@@ -1,0 +1,16 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+Led   led;
+Timer tmr;
+
+void proc()
+{
+	led.tick();
+}
+
+int main()
+{
+	tmr.startPeriodic(SEC, proc);
+	ThisTask::stop();
+}

@@ -1,0 +1,33 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+OS_MTX(mtx, mtxPriorityInheritance);
+OS_CND(cnd);
+
+void slave()
+{
+	mtx_wait(mtx);
+	cnd_wait(cnd, mtx);
+	LED_Tick();
+	mtx_give(mtx);
+}
+
+void master()
+{
+	tsk_delay(SEC);
+	mtx_wait(mtx);
+	cnd_give(cnd, cndOne);
+	mtx_give(mtx);
+}
+
+OS_TSK(sla, 0, slave);
+OS_TSK(mas, 0, master);
+
+int main()
+{
+	LED_Config();
+
+	tsk_start(sla);
+	tsk_start(mas);
+	tsk_stop();
+}
