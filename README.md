@@ -12,7 +12,7 @@ Features
 - events
 - flags (one, all, clear, accept)
 - barriers
-- semaphores (direct, binary, limited, normal)
+- semaphores (direct, binary, limited, counting)
 - mutexes (normal, recursive, priority protect, priority inheritance)
 - condition variables
 - message queues
