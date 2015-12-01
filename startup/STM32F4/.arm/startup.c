@@ -21,24 +21,20 @@
 #define __ram_end   0x20020000
 
 /*******************************************************************************
- Heap configuration
+ Stack and heap configuration
 *******************************************************************************/
+
+#ifndef   proc_stack_size
+#define   proc_stack_size 0
+#endif
+#define   proc_stack  (((proc_stack_size)+7)&(~7))
+
+#ifndef   main_stack_size
+#define   main_stack_size 0
+#endif
+#define   main_stack  (((main_stack_size)+7)&(~7))
 
 char    __heap_base[] __attribute__ ((used, section("HEAP")));
-
-/*******************************************************************************
- Stack configuration
-*******************************************************************************/
-
-#ifndef  proc_stack_size
-#define  proc_stack_size 0
-#endif
-#define  proc_stack  (((proc_stack_size)+7)&(~7))
-
-#ifndef  main_stack_size
-#define  main_stack_size 0
-#endif
-#define  main_stack  (((main_stack_size)+7)&(~7))
 
 __asm void __user_config_stackheap( void )
 {
@@ -54,7 +50,7 @@ __initial_sp    EQU     __initial_psp
 __initial_sp    EQU     __initial_msp
 #endif
 __heap_limit    EQU     __ram_end
-#ifndef __MICROLIB
+#ifndef  __MICROLIB
 				IMPORT  __use_two_region_memory
 #endif
                 EXPORT  __heap_limit

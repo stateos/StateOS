@@ -45,7 +45,7 @@ void *__user_perthread_libspace( void )
 __attribute__(( used ))
 int _mutex_initialize( unsigned *mutex )
 {
-	return 1;
+	return (int) mutex;
 }
 
 /* -------------------------------------------------------------------------- */
