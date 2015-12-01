@@ -7,7 +7,7 @@ Features:
 - kernel works in preemptive or cooperative mode
 - kernel can operate in tick-less mode
 - events
-- flags (one, all)
+- flags (one, all, clear, accept)
 - barriers
 - semaphores (direct, binary, limited, counting)
 - mutexes (normal, recursive, priority protect, priority inheritance)
