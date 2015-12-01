@@ -31,7 +31,7 @@ AS         := $(ARMCC)armasm
 CC         := $(ARMCC)armcc
 CXX        := $(ARMCC)armcc
 COPY       := $(ARMCC)fromelf
-DUMP       := $(GNUCC)objdump
+DUMP       := $(ARMCC)fromelf
 SIZE       := $(GNUCC)size
 LD         := $(ARMCC)armlink
 AR         := $(ARMCC)armar
@@ -207,7 +207,7 @@ $(HEX) : $(ELF)
 
 $(LSS) : $(ELF)
 	$(info Creating extended listing: $(LSS))
-	$(DUMP) -S $< > $@
+	$(DUMP) $< --text -c -z --output $@
 
 print_size :
 	$(info Size of modules:)
