@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_sem.h
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    01.12.2015
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -36,9 +36,10 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#define semDirect (  0U )
-#define semBinary (  1U )
-#define semNormal ( ~0U )
+#define semDirect   (  0U )
+#define semBinary   (  1U )
+#define semNormal   ( ~0U )
+#define semCounting ( ~0U )
 
 /* -------------------------------------------------------------------------- */
 
