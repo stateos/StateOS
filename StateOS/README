@@ -17,6 +17,9 @@ Features:
 - timers (one-shot, periodic)
 - c++ wrapper
 ---------
+0.9.4
+- current task is a guard object in tsk_sleep function
+---------
 0.9.3
 - added barrier (bar) object
 - added barrier example (main.c.10)

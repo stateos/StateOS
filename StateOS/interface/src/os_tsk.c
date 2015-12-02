@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    21.11.2015
+    @date    02.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -106,14 +106,12 @@ void tsk_force( tsk_id tsk, unsigned prio, fun_id state )
 void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	port_set_lock();
 
 //	while (System.cur->mlist) mtx_kill(System.cur->mlist);
 
 	core_tsk_remove(System.cur);
 	port_tsk_break();
-
-	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -166,13 +164,11 @@ __attribute__((always_inline)) static inline
 unsigned priv_tsk_sleep( unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
-	OS_EVT(evt);
-	
 	unsigned event;
 
 	port_sys_lock();
 
-	event = wait(evt, time);
+	event = wait(System.cur, time);
 
 	port_sys_unlock();
 
