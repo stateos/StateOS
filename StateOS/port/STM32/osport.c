@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osport.c
     @author  Rajmund Szymanski
-    @date    20.11.2015
+    @date    07.12.2015
     @brief   StateOS port file for STM32 uC.
 
  ******************************************************************************
@@ -46,7 +46,7 @@ void port_sys_init( void )
 
 #endif
 
-	RCC->APB1ENR = OS_TIM_CLK_ENABLE;
+	BB(RCC->APB1ENR, OS_TIM_CLK_ENABLE) = 1;
 
 	OS_TIM->PSC  = CPU_FREQUENCY/OS_FREQUENCY/2-1;
 	OS_TIM->ARR  = INFINITE;
@@ -66,11 +66,7 @@ void port_sys_init( void )
 
 #endif
 
-#if OS_ROBIN
-
 	NVIC_SetPriority(PendSV_IRQn, 0xFF);
-
-#endif
 
 	core_ctx_reset();
 }

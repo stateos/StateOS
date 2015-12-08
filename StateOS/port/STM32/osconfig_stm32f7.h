@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osconfig.h
     @author  Rajmund Szymanski
-    @date    30.10.2015
+    @date    07.12.2015
     @brief   StateOS config file for STM32F7 uC.
 
  ******************************************************************************
@@ -56,11 +56,9 @@
 
 // ----------------------------
 // critical sections protection level
-// OS_LOCK_LEVEL == 0 => there is no protection of critical sections (do not use system functions in interrupt procedures)
-// OS_LOCK_LEVEL == 1 => entrance to a critical section blocks all interrupts
-// OS_LOCK_LEVEL >  1 => (CM3 and above) entrance to a critical section blocks interrupts with priority lower (the priority value greater) than OS_LOCK_LEVEL
-// OS_ROBIN      >  0 => required value: 1 (critical sections must be protected)
-// else               => default  value: 0
+// OS_LOCK_LEVEL == 0 => entrance to a critical section blocks all interrupts
+// OS_LOCK_LEVEL >  0 => (CM3 and above) entrance to a critical section blocks interrupts with priority lower (the priority value greater) than OS_LOCK_LEVEL
+// default value: (1<<(__NVIC_PRIO_BITS-1))
 #define  OS_LOCK_LEVEL        0
 
 // ----------------------------

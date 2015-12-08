@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oslibc.c
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    08.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -28,9 +28,7 @@
 
 #include <oskernel.h>
 
-#ifdef  __CC_ARM
-#ifndef __MICROLIB
-#if       OS_ROBIN
+#if defined(__CC_ARM) && !defined(__MICROLIB)
 
 /* -------------------------------------------------------------------------- */
 
@@ -74,6 +72,4 @@ void _mutex_free( unsigned *mutex )
 
 /* -------------------------------------------------------------------------- */
 
-#endif //   OS_ROBIN
-#endif // __MICROLIB
-#endif // __CC_ARM
+#endif

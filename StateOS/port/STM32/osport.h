@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osport.h
     @author  Rajmund Szymanski
-    @date    20.11.2015
+    @date    07.12.2015
     @brief   StateOS port definitions for STM32 uC.
 
  ******************************************************************************
@@ -107,17 +107,11 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 #ifndef  OS_LOCK_LEVEL
-
-#if      OS_ROBIN
-#define  OS_LOCK_LEVEL        1 /* blocks all interrupts in critical sections */
-#else
-#define  OS_LOCK_LEVEL        0 /* no protection of critical sections         */
+#define  OS_LOCK_LEVEL       (1<<(__NVIC_PRIO_BITS-1))
 #endif
 
-#endif
-
-#if      OS_ROBIN && ! OS_LOCK_LEVEL
-#error   osconfig.h: Incorrect OS_LOCK_LEVEL value! Required protection of critical sections.
+#if      OS_LOCK_LEVEL >= (1<<__NVIC_PRIO_BITS)
+#error   osconfig.h: Incorrect OS_LOCK_LEVEL value! Must be less then 1<<__NVIC_PRIO_BITS.
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -139,21 +133,7 @@ extern   char               __initial_sp[];
 
 /* -------------------------------------------------------------------------- */
 
-#if      OS_LOCK_LEVEL == 0
-
-static inline unsigned port_get_lock( void )           { return 0;     }
-static inline void     port_put_lock( unsigned state ) { (void) state; }
-static inline void     port_set_lock( void )           { (void) 0;     }
-static inline void     port_clr_lock( void )           { (void) 0;     }
-
-#elif    OS_LOCK_LEVEL == 1
-
-static inline unsigned port_get_lock( void )           { return __get_PRIMASK();      }
-static inline void     port_put_lock( unsigned state ) {        __set_PRIMASK(state); }
-static inline void     port_set_lock( void )           {        __disable_irq();      }
-static inline void     port_clr_lock( void )           {         __enable_irq();      }
-
-#elif       __CORTEX_M >= 3
+#if      OS_LOCK_LEVEL && (__CORTEX_M >= 3)
 
 static inline unsigned port_get_lock( void )           { return __get_BASEPRI();                                      }
 static inline void     port_put_lock( unsigned state ) {        __set_BASEPRI(state);                                 }
@@ -162,15 +142,18 @@ static inline void     port_clr_lock( void )           {        __set_BASEPRI(0)
 
 #else
 
-#error   osconfig.h: Incorrect OS_LOCK_LEVEL value! Required 0 or 1.
+static inline unsigned port_get_lock( void )           { return __get_PRIMASK();      }
+static inline void     port_put_lock( unsigned state ) {        __set_PRIMASK(state); }
+static inline void     port_set_lock( void )           {        __disable_irq();      }
+static inline void     port_clr_lock( void )           {         __enable_irq();      }
 
 #endif
 
 #define port_sys_lock()                             do { unsigned __LOCK = port_get_lock(); port_set_lock()
 #define port_sys_unlock()                                port_put_lock(__LOCK); } while(0)
 
-#define port_isr_enable()                           do { unsigned __LOCK = port_get_lock(); port_clr_lock()
-#define port_isr_restore()                               port_put_lock(__LOCK); } while(0)
+#define port_sys_enable()                           do { unsigned __LOCK = port_get_lock(); port_clr_lock()
+#define port_sys_restore()                               port_put_lock(__LOCK); } while(0)
 
 #define port_isr_lock()                             do { port_set_lock()
 #define port_isr_unlock()                                port_clr_lock(); } while(0)
@@ -180,11 +163,7 @@ static inline void     port_clr_lock( void )           {        __set_BASEPRI(0)
 static inline
 unsigned port_isr_inside( void )
 {
-#if      OS_LOCK_LEVEL
 	return __get_IPSR();
-#else
-	return 0;
-#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -195,19 +174,16 @@ void port_ctx_reset( void )
 #if      OS_ROBIN && OS_TIMER
 	OS_TIM->CCR1 = OS_TIM->CNT + OS_FREQUENCY/OS_ROBIN;
 #endif
+	SCB->ICSR = SCB_ICSR_PENDSVCLR_Msk;
 }
 
 /* -------------------------------------------------------------------------- */
-
-#if      OS_ROBIN
 
 static inline
 void port_ctx_switch( void )
 {
 	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; __DSB();
 }
-
-#endif
 
 /* -------------------------------------------------------------------------- */
 

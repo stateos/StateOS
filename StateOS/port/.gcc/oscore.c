@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oscore.c
     @author  Rajmund Szymanski
-    @date    29.10.2015
+    @date    08.12.2015
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -30,7 +30,6 @@
 #include <stddef.h>
 
 #ifdef  __GNUC__
-#if     OS_ROBIN
 
 /* -------------------------------------------------------------------------- */
 
@@ -93,90 +92,28 @@ void PendSV_Handler( void )
 
 /* -------------------------------------------------------------------------- */
 
-#else // OS_ROBIN == 0
-
-/* -------------------------------------------------------------------------- */
-
-__attribute__(( naked ))
-void port_ctx_switch( void )
+__noreturn
+void port_tsk_break( void )
 {
 	__asm volatile
 	(
-#if __CORTEX_M < 3
-"	mov   r0,    r8                \n"
-"	mov   r1,    r9                \n"
-"	mov   r2,    r10               \n"
-"	mov   r3,    r11               \n"
-"	push       { r0  - r3, lr }    \n"
-"	push       { r4  - r7 }        \n"
-#else
-"	push       { r4  - r11, lr }   \n"
-#endif
-#if __FPU_USED
-"	vpush      { s16 - s31 }       \n"
-#endif
 "	ldr   r0,   =System            \n"
-"	ldr   r0,  [ r0, %[cur] ]      \n"
-"	mov   r1,    sp                \n"
-"	str   r1,  [ r0, %[sp]  ]      \n"
-"	bl    core_tsk_handler         \n"
-"	ldr   r1,  [ r0, %[sp]  ]      \n"
+"	ldr   r4,  [ r0, %[cur]   ]    \n"
+"	ldr   r1,  [ r4, %[top]   ]    \n"
 "	mov   sp,    r1                \n"
-#if __FPU_USED
-"	vpop       { s16 - s31 }       \n"
-#endif
-#if __CORTEX_M < 3
-"	pop        { r4  - r7 }        \n"
-"	pop        { r0  - r3 }        \n"
-"	mov   r8,    r0                \n"
-"	mov   r9,    r1                \n"
-"	mov   r10,   r2                \n"
-"	mov   r11,   r3                \n"
-"	pop        { pc }              \n"
-#else
-"	pop        { r4  - r11, pc }   \n"
-#endif
 
-::	[cur] "n" (offsetof(sys_t, cur)),
-	[sp]  "n" (offsetof(tsk_t, sp))
+"priv_tsk_break:                   \n"
 
-	);
-}
-
-/* -------------------------------------------------------------------------- */
-
-#endif // OS_ROBIN
-
-/* -------------------------------------------------------------------------- */
-
-__attribute__(( naked, noreturn ))
-void port_tsk_start( void )
-{
-	__asm volatile
-	(
-"	.global  port_tsk_break        \n"
-
-"priv_tsk_start:                   \n"
-
-"	ldr   r0,   =System            \n"
-"	ldr   r0,  [ r0, %[cur]   ]    \n"
-"	ldr   r1,  [ r0, %[top]   ]    \n"
-"	mov   sp,    r1                \n"
 #if OS_LOCK_LEVEL
-#if OS_LOCK_LEVEL == 1
-"	cpsie i                        \n"
-#else
 "	movs  r3,   #0                 \n"
 "	msr   BASEPRI, r3              \n"
+#else
+"	cpsie i                        \n"
 #endif
-#endif
-"	ldr   r3,  [ r0, %[state] ]    \n"
-"	blx   r3                       \n"
-
-"port_tsk_break:                   \n"
-
 "	bl    core_ctx_switch          \n"
-"	b     priv_tsk_start           \n"
+"	ldr   r3,  [ r4, %[state] ]    \n"
+"	blx   r3                       \n"
+"	b     priv_tsk_break           \n"
 
 ::	[cur]   "n" (offsetof(sys_t, cur)),
 	[top]   "n" (offsetof(tsk_t, top)),

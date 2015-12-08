@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    02.12.2015
+    @date    08.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -27,24 +27,6 @@
  ******************************************************************************/
 
 #include <oskernel.h>
-
-/* -------------------------------------------------------------------------- */
-
-// initial system data
-
-#ifndef MAIN_SP
-static  char     MAIN_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
-#define MAIN_SP &MAIN_STACK[ASIZE(OS_STACK_SIZE)]
-#endif
-static  char     IDLE_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
-#define IDLE_SP &IDLE_STACK[ASIZE(OS_STACK_SIZE)]
-
-static tsk_t IDLE;
-static tsk_t MAIN   = { 0, ID_READY, &IDLE, &IDLE, 0,              0, 0, 0, 0, MAIN_SP }; // main task
-static tsk_t IDLE   = { 0, ID_IDLE,  &MAIN, &MAIN, port_idle_hook, 0, 0, 0, 0, IDLE_SP }; // idle task and tasks queue
-static tmr_t HEAD   = { 0, ID_TIMER, &HEAD, &HEAD, 0,              0, INFINITE };         // timers queue
-
-       sys_t System = { &MAIN };
 
 /* -------------------------------------------------------------------------- */
 
@@ -107,17 +89,36 @@ os_id core_sys_alloc( size_t size )
 #endif
 
 /* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+// initial system data
+
+#ifndef MAIN_SP
+static  char     MAIN_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
+#define MAIN_SP &MAIN_STACK[ASIZE(OS_STACK_SIZE)]
+#endif
+static  char     IDLE_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
+#define IDLE_SP &IDLE_STACK[ASIZE(OS_STACK_SIZE)]
+
+static tsk_t IDLE;
+static tsk_t MAIN   = { 0, ID_READY, &IDLE, &IDLE, 0,              0, 0, 0, 0, MAIN_SP }; // main task
+static tsk_t IDLE   = { 0, ID_IDLE,  &MAIN, &MAIN, port_idle_hook, 0, 0, 0, 0, IDLE_SP }; // idle task and tasks queue
+static tmr_t HEAD   = { 0, ID_TIMER, &HEAD, &HEAD, 0,              0, INFINITE };         // timers queue
+
+       sys_t System = { &MAIN };
+
+/* -------------------------------------------------------------------------- */
 
 void core_ctx_switch( void )
 {
-	core_ctx_reset();
-	port_isr_enable();
+	port_sys_enable();
 	port_ctx_switch();
-	port_isr_restore();
+	port_sys_restore();
 }
 
 /* -------------------------------------------------------------------------- */
 
+__attribute__ ((noinline))
 void core_rdy_insert( os_id obj, unsigned id, os_id nxt )
 {
 	obj_id Obj = obj;
@@ -133,6 +134,7 @@ void core_rdy_insert( os_id obj, unsigned id, os_id nxt )
 
 /* -------------------------------------------------------------------------- */
 
+__attribute__ ((noinline))
 void core_rdy_remove( os_id obj )
 {
 	obj_id Obj = obj;
@@ -146,32 +148,8 @@ void core_rdy_remove( os_id obj )
 
 /* -------------------------------------------------------------------------- */
 
-static void priv_tmr_insert( tmr_id tmr, unsigned id )
-{
-	tmr_id nxt = &HEAD;
-
-	if (tmr->delay != INFINITE) for (;;)
-	{
-		nxt = nxt->next;
-
-		if (nxt->delay == INFINITE)                             break;
-		if (nxt->delay >  tmr->start + tmr->delay - nxt->start) break;
-	}
-
-	core_rdy_insert(tmr, id, nxt);
-}
-
-/* -------------------------------------------------------------------------- */
-
-void core_tmr_insert( tmr_id tmr, unsigned id )
-{
-	priv_tmr_insert(tmr, id);
-	port_tmr_force();
-}
-
-/* -------------------------------------------------------------------------- */
-
-static void priv_tsk_insert( tsk_id tsk )
+static
+void priv_tsk_insert( tsk_id tsk )
 {
 	tsk_id nxt = &IDLE;
 
@@ -236,7 +214,8 @@ void core_tsk_unlink( tsk_id tsk, unsigned event )
 
 /* -------------------------------------------------------------------------- */
 
-static unsigned priv_tsk_wait( tsk_id tsk, obj_id obj )
+static
+unsigned priv_tsk_wait( tsk_id tsk, obj_id obj )
 {
 	core_tsk_append((tsk_id)tsk, obj);
 	core_tsk_remove((tsk_id)tsk);
@@ -340,9 +319,81 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 
 /* -------------------------------------------------------------------------- */
 
+static
+void priv_tsk_prepare( tsk_id cur )
+{
+	if (cur->sp == 0) // prepare task stack if necessary
+	{
+	    ctx_id ctx = (ctx_id)cur->top - 1;
+
+		ctx->psr = 0x01000000U;
+		ctx->pc  = cur->state;
+		ctx->lr  = port_tsk_break;
+		ctx->exc_return =  ~2U; // return from psp
+
+		cur->sp  = ctx;
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+
+tsk_id core_tsk_handler( void )
+{
+	tsk_id cur;
+#if OS_ROBIN == 0
+	core_tmr_handler();
+#endif
+	port_isr_lock();
+
+	core_ctx_reset();
+
+	cur = System.cur;
+	if (cur->id == ID_READY)
+	{
+		core_tsk_remove(cur);
+		priv_tsk_insert(cur);
+	}
+	cur = System.cur = IDLE.next;
+
+	priv_tsk_prepare(cur); // prepare task stack if necessary
+
+	port_isr_unlock();
+
+	return cur;
+}
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+static
+void priv_tmr_insert( tmr_id tmr, unsigned id )
+{
+	tmr_id nxt = &HEAD;
+
+	if (tmr->delay != INFINITE) for (;;)
+	{
+		nxt = nxt->next;
+
+		if (nxt->delay == INFINITE)                             break;
+		if (nxt->delay >  tmr->start + tmr->delay - nxt->start) break;
+	}
+
+	core_rdy_insert(tmr, id, nxt);
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tmr_insert( tmr_id tmr, unsigned id )
+{
+	priv_tmr_insert(tmr, id);
+	port_tmr_force();
+}
+
+/* -------------------------------------------------------------------------- */
+
 #if OS_ROBIN && OS_TIMER
 
-static inline
+static
 bool priv_tmr_counting( tmr_id tmr )
 {
 	port_tmr_stop();
@@ -367,7 +418,7 @@ bool priv_tmr_counting( tmr_id tmr )
 
 #else
 
-static inline
+static
 bool priv_tmr_counting( tmr_id tmr )
 {
 	if (tmr->delay >= Counter - tmr->start + 1)
@@ -380,7 +431,7 @@ bool priv_tmr_counting( tmr_id tmr )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+static
 void priv_tmr_wakeup( tmr_id tmr, unsigned event )
 {
 	tmr->start += tmr->delay;
@@ -419,55 +470,6 @@ void core_tmr_handler( void )
 	System.tmr = 0;
 	
 	port_isr_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-
-static inline
-void priv_tsk_prepare( tsk_id cur )
-{
-	if (cur->sp == 0) // prepare task stack if necessary
-	{
-		os_id *sp = (os_id *) cur->top;
-#if OS_ROBIN          // kernel works in preemptive mode
-		sp -=  1; *sp = (os_id) 0x01000000;     // xpsr
-		sp -=  1; *sp = (os_id) port_tsk_start; // pc
-		sp -=  7; *sp = (os_id) 0xFFFFFFFD;     // lr, r12, r3 - r0, EXC_RETURN (from psp)
-		sp -=  8;                               // r11 - r4
-#else                 // kernel works in cooperative mode
-		sp -=  1; *sp = (os_id) port_tsk_start; // pc
-		sp -=  8;                               // r11 - r4
-#if __FPU_USED
-		sp -= 16;                               // s31 - s16
-#endif
-#endif
-		cur->sp = (os_id) sp;
-	}
-}
-
-/* -------------------------------------------------------------------------- */
-
-tsk_id core_tsk_handler( void )
-{
-	tsk_id cur;
-#if OS_ROBIN == 0
-	core_tmr_handler();
-#endif
-	port_isr_lock();
-
-	cur = System.cur;
-	if (cur->id == ID_READY)
-	{
-		core_tsk_remove(cur);
-		priv_tsk_insert(cur);
-	}
-	cur = System.cur = IDLE.next;
-
-	priv_tsk_prepare(cur); // prepare task stack if necessary
-
-	port_isr_unlock();
-
-	return cur;
 }
 
 /* -------------------------------------------------------------------------- */

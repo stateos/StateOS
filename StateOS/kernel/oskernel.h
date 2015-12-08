@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.h
     @author  Rajmund Szymanski
-    @date    06.11.2015
+    @date    07.12.2015
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -29,6 +29,7 @@
 #pragma once
 
 #include <osbase.h>
+#include <bitband.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -56,9 +57,6 @@ void core_ctx_switch( void );
 // force context switch
 void port_ctx_switch( void );
 
-// implementation of system internal loop for process call
-void port_tsk_start( void ) __noreturn;
-
 // abort and reset current process and switch system to the next
 void port_tsk_break( void ) __noreturn;
 
@@ -75,17 +73,14 @@ void port_tmr_start( unsigned timeout );
 
 /* -------------------------------------------------------------------------- */
 
+static inline
+void core_ctx_reset( void )
+{
 #if OS_ROBIN && OS_TIMER == 0
-
-static inline
-void core_ctx_reset( void ) { System.dly = 0; }
-
-#else
-
-static inline
-void core_ctx_reset( void ) { port_ctx_reset(); }
-
+	System.dly = 0;
 #endif
+	port_ctx_reset();
+}
 
 /* -------------------------------------------------------------------------- */
 

@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oslibc.c
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    08.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -35,7 +35,6 @@
 /* -------------------------------------------------------------------------- */
 
 #ifndef USE_NANO
-#if     OS_ROBIN
 
 static unsigned LCK = 0;
 static unsigned CNT = 0;
@@ -59,7 +58,6 @@ void __malloc_unlock()
 			port_put_lock(LCK);
 }
 
-#endif // OS_ROBIN
 #endif // USE_NANO
 
 /* -------------------------------------------------------------------------- */
@@ -70,6 +68,7 @@ caddr_t _sbrk_r( struct _reent *reent, size_t size )
 	extern char __heap_end[];
 	static char * heap = __heap_start;
 	       char * base;
+	      (void)  reent;
 #ifdef USE_NANO
 	port_sys_lock();
 #endif

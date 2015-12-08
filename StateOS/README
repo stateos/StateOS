@@ -18,7 +18,9 @@ Features:
 - c++ wrapper
 ---------
 0.9.4
+- in cooperative mode context switch is realized by PendSV
 - current task is a guard object in tsk_sleep function
+- fixed bug with gcc -O3 optimization
 ---------
 0.9.3
 - added barrier (bar) object

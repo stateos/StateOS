@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oscore.c
     @author  Rajmund Szymanski
-    @date    29.10.2015
+    @date    08.12.2015
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -30,7 +30,6 @@
 #include <stddef.h>
 
 #ifdef  __CC_ARM
-#if     OS_ROBIN
 
 /* -------------------------------------------------------------------------- */
 
@@ -91,89 +90,30 @@ __asm void PendSV_Handler( void )
 
 /* -------------------------------------------------------------------------- */
 
-#else // OS_ROBIN == 0
-
-/* -------------------------------------------------------------------------- */
-
-__asm void port_ctx_switch( void )
-{
-	PRESERVE8
-	IMPORT System
-	IMPORT core_tsk_handler
-
-#if __CORTEX_M < 3
-	mov   r0,    r8
-	mov   r1,    r9
-	mov   r2,    r10
-	mov   r3,    r11
-	push       { r0  - r3, lr }
-	push       { r4  - r7 }
-#else
-	push       { r4  - r11, lr }
-#endif
-#if __FPU_USED
-	vpush      { s16 - s31 }
-#endif
-	ldr   r0,   =System
-	ldr   r0,  [ r0, #__cpp(offsetof(sys_t, cur)) ]
-	mov   r1,    sp
-	str   r1,  [ r0, #__cpp(offsetof(tsk_t, sp)) ]
-	bl    core_tsk_handler
-	ldr   r1,  [ r0, #__cpp(offsetof(tsk_t, sp)) ]
-	mov   sp,    r1
-#if __FPU_USED
-	vpop       { s16 - s31 }
-#endif
-#if __CORTEX_M < 3
-	pop        { r4  - r7 }
-	pop        { r0  - r3 }
-	mov   r8,    r0
-	mov   r9,    r1
-	mov   r10,   r2
-	mov   r11,   r3
-	pop        { pc }
-#else
-	pop        { r4  - r11, pc }
-#endif
-
-	ALIGN
-}
-
-/* -------------------------------------------------------------------------- */
-
-#endif // OS_ROBIN
-
-/* -------------------------------------------------------------------------- */
-
-__attribute__(( noreturn ))
-__asm void port_tsk_start( void )
+__noreturn
+__asm void port_tsk_break( void )
 {
 	PRESERVE8
 	IMPORT System
 	IMPORT core_ctx_switch
-	EXPORT port_tsk_break
-
-priv_tsk_start
 
 	ldr   r0,   =System
-	ldr   r0,  [ r0, #__cpp(offsetof(sys_t, cur)) ]
-	ldr   r1,  [ r0, #__cpp(offsetof(tsk_t, top)) ]
+	ldr   r4,  [ r0, #__cpp(offsetof(sys_t, cur)) ]
+	ldr   r1,  [ r4, #__cpp(offsetof(tsk_t, top)) ]
 	mov   sp,    r1
+
+priv_tsk_break
+
 #if OS_LOCK_LEVEL
-#if OS_LOCK_LEVEL == 1
-	cpsie i
-#else
 	movs  r3,   #0
 	msr   BASEPRI, r3
+#else
+	cpsie i
 #endif
-#endif
-	ldr   r3,  [ r0, #__cpp(offsetof(tsk_t, state)) ]
-	blx   r3
-
-port_tsk_break
-
 	bl    core_ctx_switch
-	b     priv_tsk_start
+	ldr   r3,  [ r4, #__cpp(offsetof(tsk_t, state)) ]
+	blx   r3
+	b     priv_tsk_break
 
 	ALIGN
 }

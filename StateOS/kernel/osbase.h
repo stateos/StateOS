@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osbase.h
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    08.12.2015
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -87,7 +87,8 @@ typedef struct __msg msg_t, * msg_id; // message queue
 typedef struct __obj obj_t, * obj_id;
 typedef struct __tmr tmr_t, * tmr_id; // timer
 typedef struct __tsk tsk_t, * tsk_id; // task
-typedef struct __sys sys_t;           // system data
+typedef struct __sys sys_t, * sys_id; // system data
+typedef struct __ctx ctx_t, * ctx_id; // task context
 
 /* -------------------------------------------------------------------------- */
 
@@ -257,7 +258,7 @@ struct __tsk
 	unsigned event; // wakeup event
 	unsigned flags;
 	unsigned mode;
-#if defined(__CC_ARM) && !defined(__MICROLIB) && (OS_ROBIN)
+#if defined(__CC_ARM) && !defined(__MICROLIB)
 	char     libspace[96];
 #endif
 };
@@ -279,6 +280,33 @@ struct __sys
 	unsigned dly; // task switch counter
 #endif
 #endif
+};
+
+/* -------------------------------------------------------------------------- */
+
+// task context
+
+struct __ctx
+{
+// context saved by the software
+	unsigned r4;
+	unsigned r5;
+	unsigned r6;
+	unsigned r7;
+	unsigned r8;
+	unsigned r9;
+	unsigned r10;
+	unsigned r11;
+	unsigned exc_return;
+// context saved by the hardware
+	unsigned r0;
+	unsigned r1;
+	unsigned r2;
+	unsigned r3;
+	os_id    ip;
+	os_id    lr;
+	os_id    pc;
+	unsigned psr;
 };
 
 /* -------------------------------------------------------------------------- */
