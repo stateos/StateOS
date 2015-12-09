@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oscore.c
     @author  Rajmund Szymanski
-    @date    08.12.2015
+    @date    09.12.2015
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -84,36 +84,6 @@ __asm void PendSV_Handler( void )
 #endif
 	msr   PSP,   r1
 	bx    lr
-
-	ALIGN
-}
-
-/* -------------------------------------------------------------------------- */
-
-__noreturn
-__asm void port_tsk_break( void )
-{
-	PRESERVE8
-	IMPORT System
-	IMPORT core_ctx_switch
-
-	ldr   r0,   =System
-	ldr   r4,  [ r0, #__cpp(offsetof(sys_t, cur)) ]
-	ldr   r1,  [ r4, #__cpp(offsetof(tsk_t, top)) ]
-	mov   sp,    r1
-
-priv_tsk_break
-
-#if OS_LOCK_LEVEL
-	movs  r3,   #0
-	msr   BASEPRI, r3
-#else
-	cpsie i
-#endif
-	bl    core_ctx_switch
-	ldr   r3,  [ r4, #__cpp(offsetof(tsk_t, state)) ]
-	blx   r3
-	b     priv_tsk_break
 
 	ALIGN
 }

@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    02.12.2015
+    @date    09.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -90,7 +90,7 @@ void tsk_force( tsk_id tsk, unsigned prio, fun_id state )
 		break;
 	case ID_READY:
 		if (tsk == System.cur)
-		port_tsk_break();
+		core_tsk_break();
 		core_tsk_remove(tsk);
 		core_tsk_insert(tsk);
 		break;
@@ -111,7 +111,7 @@ void tsk_stop( void )
 //	while (System.cur->mlist) mtx_kill(System.cur->mlist);
 
 	core_tsk_remove(System.cur);
-	port_tsk_break();
+	core_ctx_switch();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -127,7 +127,7 @@ void tsk_kill( tsk_id tsk )
 	case ID_READY:
 		core_tsk_remove(tsk);
 		if (tsk == System.cur)
-		port_tsk_break();
+		core_tsk_break();
 	case ID_DELAYED:
 		core_tsk_unlink((tsk_id)tsk, E_STOPPED);
 		core_tmr_remove((tmr_id)tsk);
@@ -143,7 +143,7 @@ void tsk_flip( fun_id state )
 {
 	System.cur->state = state;
 
-	port_tsk_break();
+	core_tsk_break();
 }
 
 /* -------------------------------------------------------------------------- */

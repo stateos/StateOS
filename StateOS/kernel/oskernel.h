@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.h
     @author  Rajmund Szymanski
-    @date    07.12.2015
+    @date    09.12.2015
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -51,14 +51,28 @@ void port_idle_hook( void );
 
 /* -------------------------------------------------------------------------- */
 
+static inline
+void core_ctx_reset( void )
+{
+#if OS_ROBIN && OS_TIMER == 0
+	System.dly = 0;
+#endif
+	port_ctx_reset();
+}
+
 // save status of current process and switch system to the next
 void core_ctx_switch( void );
 
 // force context switch
 void port_ctx_switch( void );
 
+/* -------------------------------------------------------------------------- */
+
+// reset task stack pointer
+void port_set_stack( void *top );
+
 // abort and reset current process and switch system to the next
-void port_tsk_break( void ) __noreturn;
+void core_tsk_break( void ) __noreturn;
 
 /* -------------------------------------------------------------------------- */
 
@@ -70,17 +84,6 @@ void port_tmr_stop( void );
 
 // set time breakpoint
 void port_tmr_start( unsigned timeout );
-
-/* -------------------------------------------------------------------------- */
-
-static inline
-void core_ctx_reset( void )
-{
-#if OS_ROBIN && OS_TIMER == 0
-	System.dly = 0;
-#endif
-	port_ctx_reset();
-}
 
 /* -------------------------------------------------------------------------- */
 

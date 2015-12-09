@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oscore.c
     @author  Rajmund Szymanski
-    @date    08.12.2015
+    @date    09.12.2015
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -86,38 +86,6 @@ void PendSV_Handler( void )
 
 ::	[cur] "n" (offsetof(sys_t, cur)),
 	[sp]  "n" (offsetof(tsk_t, sp))
-
-	);
-}
-
-/* -------------------------------------------------------------------------- */
-
-__noreturn
-void port_tsk_break( void )
-{
-	__asm volatile
-	(
-"	ldr   r0,   =System            \n"
-"	ldr   r4,  [ r0, %[cur]   ]    \n"
-"	ldr   r1,  [ r4, %[top]   ]    \n"
-"	mov   sp,    r1                \n"
-
-"priv_tsk_break:                   \n"
-
-#if OS_LOCK_LEVEL
-"	movs  r3,   #0                 \n"
-"	msr   BASEPRI, r3              \n"
-#else
-"	cpsie i                        \n"
-#endif
-"	bl    core_ctx_switch          \n"
-"	ldr   r3,  [ r4, %[state] ]    \n"
-"	blx   r3                       \n"
-"	b     priv_tsk_break           \n"
-
-::	[cur]   "n" (offsetof(sys_t, cur)),
-	[top]   "n" (offsetof(tsk_t, top)),
-	[state] "n" (offsetof(tsk_t, state))
 
 	);
 }

@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osport.h
     @author  Rajmund Szymanski
-    @date    07.12.2015
+    @date    09.12.2015
     @brief   StateOS port definitions for STM32 uC.
 
  ******************************************************************************
@@ -183,6 +183,14 @@ static inline
 void port_ctx_switch( void )
 {
 	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; __DSB();
+}
+
+/* -------------------------------------------------------------------------- */
+
+static inline
+void port_set_stack( void *top )
+{
+	__set_PSP((unsigned)top);
 }
 
 /* -------------------------------------------------------------------------- */
