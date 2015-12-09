@@ -32,7 +32,7 @@
 
 // ----------------------------
 // cpu frequency in Hz
-// default value: 168000000
+// default value: none
 #define CPU_FREQUENCY 168000000
 
 // ----------------------------
