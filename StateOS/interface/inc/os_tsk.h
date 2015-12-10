@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    09.12.2015
+    @date    26.11.2015
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -89,7 +89,7 @@ void     tsk_start( tsk_id tsk );
 void     tsk_force( tsk_id tsk, unsigned prio, fun_id state );
 
 // zatrzymanie aktualnego procesu (usuniêcie z listy zadañ)
-void     tsk_stop( void );
+void     tsk_stop( void ) __noreturn;
 
 // zatrzymanie procesu 'tsk'
 void     tsk_kill( tsk_id tsk );
