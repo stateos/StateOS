@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    09.12.2015
+    @date    10.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -29,69 +29,8 @@
 #include <oskernel.h>
 
 /* -------------------------------------------------------------------------- */
-
-#if    (OS_HEAP_SIZE >  1)
-
-static  char       Heap[ASIZE(OS_HEAP_SIZE)] __osalign;
-#define HeapEnd  ( Heap + sizeof(Heap) )
-
-#else
-
-extern  char     __heap_base [];
-extern  char     __heap_limit[];
-#define Heap     __heap_base
-#define HeapEnd  __heap_limit
-
-#endif
-
+// SYSTEM KERNEL SERVICES
 /* -------------------------------------------------------------------------- */
-
-#if    (OS_HEAP_SIZE == 1)
-
-os_id core_sys_alloc( size_t size )
-{
-	char *base = 0;
-
-	if (!port_isr_inside()) // not allowed in ISR
-	{
-		base = calloc(size, 1);
-	}
-
-	return base;
-}
-
-/* -------------------------------------------------------------------------- */
-
-#else
-
-os_id core_sys_alloc( size_t size )
-{
-	static
-	char *heap = Heap;
-	char *base = 0;
-
-	if (!port_isr_inside()) // not allowed in ISR
-	{
-		size = ASIZE(size);
-
-		if (heap + size <= HeapEnd)
-		{
-			base = heap;
-			heap = heap + size;
-
-			for (unsigned *mem = (unsigned *)base; mem < (unsigned *)heap; *mem++ = 0);
-		}
-	}
-
-	return base;
-}
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-
-// initial system data
 
 #ifndef MAIN_SP
 static  char     MAIN_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
@@ -101,9 +40,8 @@ static  char     IDLE_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
 #define IDLE_SP &IDLE_STACK[ASIZE(OS_STACK_SIZE)]
 
 static tsk_t IDLE;
-static tsk_t MAIN   = { 0, ID_READY, &IDLE, &IDLE, 0,              0, 0, 0, 0, MAIN_SP }; // main task
-static tsk_t IDLE   = { 0, ID_IDLE,  &MAIN, &MAIN, port_idle_hook, 0, 0, 0, 0, IDLE_SP }; // idle task and tasks queue
-static tmr_t HEAD   = { 0, ID_TIMER, &HEAD, &HEAD, 0,              0, INFINITE };         // timers queue
+static tsk_t MAIN = { 0, ID_READY, &IDLE, &IDLE, 0,              0, 0, 0, 0, MAIN_SP }; // main task
+static tsk_t IDLE = { 0, ID_IDLE,  &MAIN, &MAIN, port_idle_hook, 0, 0, 0, 0, IDLE_SP }; // idle task and tasks queue
 
        sys_t System = { &MAIN };
 
@@ -345,7 +283,7 @@ void priv_tsk_prepare( tsk_id cur )
 		ctx->psr = 0x01000000U;
 		ctx->pc  = cur->state;
 		ctx->lr  = core_tsk_break;
-		ctx->exc_return =  ~2U; // return from psp
+		ctx->exc_return = ~2U; // return from psp
 
 		cur->sp  = ctx;
 	}
@@ -379,8 +317,12 @@ tsk_id core_tsk_handler( void )
 }
 
 /* -------------------------------------------------------------------------- */
+// SYSTEM TIMER SERVICES
 /* -------------------------------------------------------------------------- */
 
+static tmr_t HEAD = { 0, ID_TIMER, &HEAD, &HEAD, 0, 0, INFINITE }; // timers queue
+
+/* -------------------------------------------------------------------------- */
 static
 void priv_tmr_insert( tmr_id tmr, unsigned id )
 {
@@ -487,5 +429,67 @@ void core_tmr_handler( void )
 	
 	port_isr_unlock();
 }
+
+/* -------------------------------------------------------------------------- */
+// SYSTEM ALLOC SERVICES
+/* -------------------------------------------------------------------------- */
+
+#if    (OS_HEAP_SIZE >  1)
+
+static  char       Heap[ASIZE(OS_HEAP_SIZE)] __osalign;
+#define HeapEnd  ( Heap + sizeof(Heap) )
+
+#else
+
+extern  char     __heap_base [];
+extern  char     __heap_limit[];
+#define Heap     __heap_base
+#define HeapEnd  __heap_limit
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if    (OS_HEAP_SIZE == 1)
+
+os_id core_sys_alloc( size_t size )
+{
+	char *base = 0;
+
+	if (!port_isr_inside()) // not allowed in ISR
+	{
+		base = calloc(size, 1);
+	}
+
+	return base;
+}
+
+/* -------------------------------------------------------------------------- */
+
+#else
+
+os_id core_sys_alloc( size_t size )
+{
+	static
+	char *heap = Heap;
+	char *base = 0;
+
+	if (!port_isr_inside()) // not allowed in ISR
+	{
+		size = ASIZE(size);
+
+		if (heap + size <= HeapEnd)
+		{
+			base = heap;
+			heap = heap + size;
+
+			for (unsigned *mem = (unsigned *)base; mem < (unsigned *)heap; *mem++ = 0);
+		}
+	}
+
+	return base;
+}
+
+#endif
 
 /* -------------------------------------------------------------------------- */
