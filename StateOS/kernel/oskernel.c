@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    10.12.2015
+    @date    11.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -49,9 +49,9 @@ static tsk_t IDLE = { 0, ID_IDLE,  &MAIN, &MAIN, port_idle_hook, 0, 0, 0, 0, IDL
 
 void core_ctx_switch( void )
 {
-	port_sys_enable();
 	port_ctx_switch();
-	port_sys_restore();
+	if (port_isr_inside()) return; // executed from isr?
+	port_sys_flash();
 }
 
 /* -------------------------------------------------------------------------- */

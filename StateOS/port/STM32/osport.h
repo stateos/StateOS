@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osport.h
     @author  Rajmund Szymanski
-    @date    09.12.2015
+    @date    11.12.2015
     @brief   StateOS port definitions for STM32 uC.
 
  ******************************************************************************
@@ -152,8 +152,8 @@ static inline void     port_clr_lock( void )           {         __enable_irq();
 #define port_sys_lock()                             do { unsigned __LOCK = port_get_lock(); port_set_lock()
 #define port_sys_unlock()                                port_put_lock(__LOCK); } while(0)
 
-#define port_sys_enable()                           do { unsigned __LOCK = port_get_lock(); port_clr_lock()
-#define port_sys_restore()                               port_put_lock(__LOCK); } while(0)
+#define port_sys_flash()                            do { unsigned __LOCK = port_get_lock(); port_clr_lock(); \
+                                                         port_put_lock(__LOCK); } while(0)
 
 #define port_isr_lock()                             do { port_set_lock()
 #define port_isr_unlock()                                port_clr_lock(); } while(0)
@@ -182,7 +182,7 @@ void port_ctx_reset( void )
 static inline
 void port_ctx_switch( void )
 {
-	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk; __DSB();
+	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 }
 
 /* -------------------------------------------------------------------------- */
