@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_sem.c
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    12.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -70,15 +70,12 @@ unsigned priv_sem_wait( sem_id sem, unsigned time, unsigned(*wait)() )
 
 	port_sys_lock();
 
-	if (sem->count == 0)
-	{
-		event = wait(sem, time);
-	}
-	else
-	if (core_one_wakeup(sem, E_SUCCESS) == 0)
-	{
-		sem->count--;
-	}
+	while ((sem->count == 0) &&
+	      ((event = wait(sem, time)) == E_SUCCESS));
+
+	if ((event == E_SUCCESS) &&
+	    (sem->count-- == sem->limit))
+		core_one_wakeup(sem, E_SUCCESS);
 
 	port_sys_unlock();
 
@@ -108,16 +105,12 @@ unsigned priv_sem_send( sem_id sem, unsigned time, unsigned(*wait)() )
 
 	port_sys_lock();
 
-	if (sem->count > sem->limit - 1)
-	{
-		event = wait(sem, time);
-	}
-	else
-	if (core_one_wakeup(sem, E_SUCCESS) == 0)
-    if (sem->count < sem->limit)
-	{
-		sem->count++;
-	}
+	while ((sem->count == sem->limit) &&
+	      ((event = wait(sem, time)) == E_SUCCESS));
+
+	if ((event == E_SUCCESS) &&
+	    (sem->count++ == 0))
+		core_one_wakeup(sem, E_SUCCESS);
 
 	port_sys_unlock();
 
