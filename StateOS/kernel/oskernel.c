@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    11.12.2015
+    @date    14.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -454,14 +454,7 @@ extern  char     __heap_limit[];
 
 os_id core_sys_alloc( size_t size )
 {
-	char *base = 0;
-
-	if (!port_isr_inside()) // not allowed in ISR
-	{
-		base = calloc(size, 1);
-	}
-
-	return base;
+	return calloc(size, 1);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -474,18 +467,19 @@ os_id core_sys_alloc( size_t size )
 	char *heap = Heap;
 	char *base = 0;
 
-	if (!port_isr_inside()) // not allowed in ISR
+	port_sys_lock();
+
+	size = ASIZE(size);
+
+	if (heap + size <= HeapEnd)
 	{
-		size = ASIZE(size);
+		base = heap;
+		heap = heap + size;
 
-		if (heap + size <= HeapEnd)
-		{
-			base = heap;
-			heap = heap + size;
-
-			for (unsigned *mem = (unsigned *)base; mem < (unsigned *)heap; *mem++ = 0);
-		}
+		for (unsigned *mem = (unsigned *)base; mem < (unsigned *)heap; *mem++ = 0);
 	}
+
+	port_sys_unlock();
 
 	return base;
 }

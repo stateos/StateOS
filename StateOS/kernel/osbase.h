@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osbase.h
     @author  Rajmund Szymanski
-    @date    08.12.2015
+    @date    14.12.2015
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -138,7 +138,7 @@ struct __sem
 	unsigned limit; // semaphore's value limit
 };
 
-#define _SEM_INIT( limit ) { 0, 0, limit }
+#define _SEM_INIT( count, limit ) { 0, count, limit }
 
 /* -------------------------------------------------------------------------- */
 
@@ -234,6 +234,11 @@ struct __tmr
 
 /* -------------------------------------------------------------------------- */
 
+#ifdef __CC_ARM
+#pragma push
+#pragma anon_unions
+#endif
+
 // task
 
 struct __tsk
@@ -255,15 +260,27 @@ struct __tsk
 	mtx_id   mlist; // list of mutexes held
 
 	unsigned bprio; // basic priority
-	unsigned event; // wakeup event
+	union
+	{
 	unsigned flags;
+	unsigned msg;
+	unsigned*data;
+	};
+	union
+	{
+	unsigned event; // wakeup event
 	unsigned mode;
+	};
 #if defined(__CC_ARM) && !defined(__MICROLIB)
 	char     libspace[96];
 #endif
 };
 
 #define _TSK_INIT( prio, state, top ) { 0, 0, 0, 0, state, 0, 0, prio, 0, top }
+
+#ifdef __CC_ARM
+#pragma pop
+#endif
 
 /* -------------------------------------------------------------------------- */
 

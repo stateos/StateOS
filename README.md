@@ -16,7 +16,7 @@ Features
 - mutexes (normal, recursive, priority protect, priority inheritance)
 - condition variables
 - message queues
-- mail box queues
+- mailbox queues
 - timers (one-shot, periodic)
 - c++ wrapper
 

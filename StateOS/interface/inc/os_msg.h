@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_msg.h
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    14.12.2015
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -59,18 +59,18 @@ msg_id   msg_create( unsigned limit );
 
 void     msg_kill( msg_id msg );
 
-unsigned msg_waitUntil( msg_id msg, unsigned time );
+unsigned msg_waitUntil( msg_id msg, unsigned *data, unsigned time );
 
-unsigned msg_waitFor( msg_id msg, unsigned delay );
-
-static inline
-unsigned msg_wait( msg_id msg ) { return msg_waitFor(msg, INFINITE); }
+unsigned msg_waitFor( msg_id msg, unsigned *data, unsigned delay );
 
 static inline
-unsigned msg_take( msg_id msg ) { return msg_waitFor(msg, IMMEDIATE); }
+unsigned msg_wait( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, INFINITE); }
 
 static inline
-unsigned msg_takeISR( msg_id msg ) { return msg_waitFor(msg, IMMEDIATE); }
+unsigned msg_take( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+
+static inline
+unsigned msg_takeISR( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
 
 unsigned msg_sendUntil( msg_id msg, unsigned data, unsigned time );
 

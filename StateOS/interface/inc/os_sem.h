@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_sem.h
     @author  Rajmund Szymanski
-    @date    12.12.2015
+    @date    14.12.2015
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -45,12 +45,12 @@ extern "C" {
 // deklaracja semafora 'sem'
 // limit: maksymalna iloœæ dostêpnych ¿etonów
 
-#define OS_SEM( sem, limit )                       \
-               sem_t sem##__sem = _SEM_INIT(limit); \
+#define OS_SEM( sem, limit )                          \
+               sem_t sem##__sem = _SEM_INIT(0, limit); \
                sem_id sem = & sem##__sem
 
-#define static_SEM( sem, limit )                   \
-        static sem_t sem##__sem = _SEM_INIT(limit); \
+#define static_SEM( sem, limit )                      \
+        static sem_t sem##__sem = _SEM_INIT(0, limit); \
         static sem_id sem = & sem##__sem
 
 /* -------------------------------------------------------------------------- */
@@ -141,7 +141,7 @@ class Semaphore : public sem_t
 {
 public:
 
-	 Semaphore( unsigned _limit = semNormal ): sem_t(_SEM_INIT(_limit)) {}
+	 Semaphore( unsigned _limit = semNormal ): sem_t(_SEM_INIT(0, _limit)) {}
 
 	~Semaphore( void ) { sem_kill(this); }
 

@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_flg.c
     @author  Rajmund Szymanski
-    @date    23.11.2015
+    @date    14.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -111,7 +111,6 @@ void flg_give( flg_id flg, unsigned flags )
 			flg->flags &= ~tsk->flags | flg->mask;
 			tsk->flags &= ~flags;
 			if (tsk->flags && (tsk->mode & flgAll)) continue;
-			tsk->flags = 0;
 			core_one_wakeup(tsk = tsk->back, E_SUCCESS);
 		}
 	}

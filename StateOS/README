@@ -13,9 +13,17 @@ Features:
 - mutexes (normal, recursive, priority protect, priority inheritance)
 - condition variables
 - message queues
-- mail box queues
+- mailbox queues
 - timers (one-shot, periodic)
 - c++ wrapper
+---------
+0.9.5
+- fixed semaphore functions
+- removed semDirect constant
+- fixed message queue
+- fixed mailbox queue
+- added message queue example (main.c.12)
+- added mailbox queue example (main.c.13)
 ---------
 0.9.4
 - in cooperative mode context switch is realized by PendSV
