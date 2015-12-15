@@ -80,6 +80,7 @@ void tsk_stop( void )
 
 	core_tsk_remove(System.cur);
 	core_ctx_switch();
+	for (;;);
 }
 
 /* -------------------------------------------------------------------------- */
