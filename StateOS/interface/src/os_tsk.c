@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    10.12.2015
+    @date    15.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,8 +32,8 @@
 tsk_id tsk_create( unsigned prio, fun_id state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_id tsk;
 	size = ASIZE(sizeof(tsk_t) + size);
+	tsk_id tsk;
 
 	port_sys_lock();
 
@@ -71,38 +71,6 @@ void tsk_start( tsk_id tsk )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_force( tsk_id tsk, unsigned prio, fun_id state )
-/* -------------------------------------------------------------------------- */
-{
-	port_sys_lock();
-
-	tsk->state = state;
-	tsk->bprio = prio;
-	tsk->prio  = prio;
-	tsk->sp    = 0;
-
-//	while (tsk->mlist) mtx_kill(tsk->mlist);
-
-	switch (tsk->id)
-	{
-	case ID_STOPPED:
-		core_tsk_insert(tsk);
-		break;
-	case ID_READY:
-		if (tsk == System.cur)
-		core_tsk_break();
-		core_tsk_remove(tsk);
-		core_tsk_insert(tsk);
-		break;
-	case ID_DELAYED:
-		core_tsk_wakeup(tsk, E_STOPPED);
-		break;
-	}
-
-	port_sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
 void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
@@ -111,7 +79,7 @@ void tsk_stop( void )
 //	while (System.cur->mlist) mtx_kill(System.cur->mlist);
 
 	core_tsk_remove(System.cur);
-	core_tsk_break();
+	core_ctx_switch();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -127,7 +95,8 @@ void tsk_kill( tsk_id tsk )
 	case ID_READY:
 		core_tsk_remove(tsk);
 		if (tsk == System.cur)
-		core_tsk_break();
+		core_ctx_switch();
+		break;
 	case ID_DELAYED:
 		core_tsk_unlink((tsk_id)tsk, E_STOPPED);
 		core_tmr_remove((tmr_id)tsk);

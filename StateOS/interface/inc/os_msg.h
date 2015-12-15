@@ -52,7 +52,7 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 // obs³uga obiektu: message queue (msg),
-// który jest pochodn¹ obiektu mail box queue (box)
+// który jest pochodn¹ obiektu mailbox queue (box)
 // 'msg' jest kolejk¹ danych typu 'unsigned int'
 
 msg_id   msg_create( unsigned limit );

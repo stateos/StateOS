@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    15.12.2015
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -84,10 +84,6 @@ tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_create(prio, state,
 // reinicjacja i uruchomienie procesu 'tsk'
 void     tsk_start( tsk_id tsk );
 
-// wymoszone uruchomienie/restart procesu 'tsk' od stanu pocz¹tkowego 'state'
-// z ustawieniem priorytetu
-void     tsk_force( tsk_id tsk, unsigned prio, fun_id state );
-
 // zatrzymanie aktualnego procesu (usuniêcie z listy zadañ)
 void     tsk_stop( void ) __noreturn;
 
@@ -166,7 +162,6 @@ public:
 	void     start     ( void )                          {        tsk_start     (this);                }
 	void     start     ( fun_id   _state )               {        this->state = _state;
 	                                                              tsk_start     (this);                }
-	void     force     ( unsigned _prio, fun_id _state ) {        tsk_force     (this, _prio, _state); }
 	void     resume    ( unsigned _event )               {        tsk_resume    (this, _event);        }
 	void     resumeISR ( unsigned _event )               {        tsk_resumeISR (this, _event);        }
 };

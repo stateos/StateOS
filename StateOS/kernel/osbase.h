@@ -82,7 +82,7 @@ typedef struct __bar bar_t, * bar_id; // barrier
 typedef struct __sem sem_t, * sem_id; // semaphore
 typedef struct __mtx mtx_t, * mtx_id; // mutex
 typedef struct __cnd cnd_t, * cnd_id; // condition variable
-typedef struct __box box_t, * box_id; // mail box queue
+typedef struct __box box_t, * box_id; // mailbox queue
 typedef struct __msg msg_t, * msg_id; // message queue
 typedef struct __obj obj_t, * obj_id;
 typedef struct __tmr tmr_t, * tmr_id; // timer
@@ -168,7 +168,7 @@ struct __cnd
 
 /* -------------------------------------------------------------------------- */
 
-// mail box queue
+// mailbox queue
 
 struct __box
 {

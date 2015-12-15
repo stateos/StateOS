@@ -24,6 +24,8 @@ Features:
 - fixed mailbox queue
 - added message queue example (main.c.12)
 - added mailbox queue example (main.c.13)
+- fixed mutex
+- removed tsk_force function
 ---------
 0.9.4
 - in cooperative mode context switch is realized by PendSV

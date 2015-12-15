@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    15.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -49,19 +49,39 @@ mtx_id mtx_create( unsigned type )
 }
 
 /* -------------------------------------------------------------------------- */
-static void priv_mtx_unlink( mtx_id mtx, tsk_id tsk )
+static void priv_mtx_link( mtx_id mtx, tsk_id tsk )
 /* -------------------------------------------------------------------------- */
 {
-	if (tsk->mlist == mtx)
-		tsk->mlist = mtx->mlist;
+	mtx->owner = tsk;
 
-	for (mtx_id m = tsk->mlist; m; m = m->mlist)
-		if (m->mlist == mtx)
-			m->mlist = mtx->mlist;
+    if (tsk)
+	if (mtx->type & mtxPriorityInheritance)
+	{
+		mtx->mlist = tsk->mlist;
+		tsk->mlist = mtx;
+	}
+}
 
-	mtx->mlist = 0;
+/* -------------------------------------------------------------------------- */
+static void priv_mtx_unlink( mtx_id mtx )
+/* -------------------------------------------------------------------------- */
+{
+	if (mtx->owner)
+	{
+		tsk_id tsk = mtx->owner;
 
-	core_tsk_prio(tsk, tsk->bprio);
+		if (tsk->mlist == mtx)
+			tsk->mlist = mtx->mlist;
+
+		for (mtx_id m = tsk->mlist; m; m = m->mlist)
+			if (m->mlist == mtx)
+				m->mlist = mtx->mlist;
+
+		mtx->mlist = 0;
+		mtx->owner = 0;
+
+		core_tsk_prio(tsk, tsk->bprio);
+	}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -70,15 +90,9 @@ void mtx_kill( mtx_id mtx )
 {
 	port_sys_lock();
 
-	if (mtx->owner)
-	{
-		tsk_id tsk = mtx->owner;
-		
-		mtx->owner = 0;
-		mtx->count = 0;
+	priv_mtx_unlink(mtx);
 
-		priv_mtx_unlink(mtx, tsk);
-	}
+	mtx->count = 0;
 
 	core_all_wakeup(mtx, E_STOPPED);
 
@@ -96,32 +110,12 @@ unsigned priv_mtx_wait( mtx_id mtx, unsigned time, unsigned(*wait)() )
 
 	if (mtx->owner == 0)
 	{
-		mtx->owner = System.cur;
+		priv_mtx_link(mtx, System.cur);
+
 		event = E_SUCCESS;
-
-		if (mtx->type & mtxPriorityInheritance)
-		{
-			mtx->mlist = System.cur->mlist;
-			System.cur->mlist = mtx;
-		}
 	}
 	else
-	if (mtx->owner != System.cur)
-	{
-		if (mtx->type & mtxPriorityInheritance)
-		if (mtx->owner->prio < System.cur->prio)
-			core_tsk_prio(mtx->owner, System.cur->prio);
-
-		event = wait(mtx, time);
-
-		if (event == E_SUCCESS)
-		if (mtx->type & mtxPriorityInheritance)
-		{
-			mtx->mlist = System.cur->mlist;
-			System.cur->mlist = mtx;
-		}
-	}
-	else
+	if (mtx->owner == System.cur)
 	{
 		if (mtx->type & mtxRecursive)
 		if (mtx->count < ~0U)
@@ -129,6 +123,14 @@ unsigned priv_mtx_wait( mtx_id mtx, unsigned time, unsigned(*wait)() )
 			mtx->count++;
 			event = E_SUCCESS;
 		}
+	}
+	else
+	{
+		if (mtx->type & mtxPriorityInheritance)
+		if (mtx->owner->prio < System.cur->prio)
+			core_tsk_prio(mtx->owner, System.cur->prio);
+
+		event = wait(mtx, time);
 	}
 	
 	port_sys_unlock();
@@ -166,9 +168,8 @@ unsigned mtx_give( mtx_id mtx )
 		}
 		else
 		{
-			mtx->owner = core_one_wakeup(mtx, E_SUCCESS);
-
-			priv_mtx_unlink(mtx, System.cur);
+			priv_mtx_unlink(mtx);
+			priv_mtx_link(mtx, core_one_wakeup(mtx, E_SUCCESS));
 		}
 
 		event = E_SUCCESS;

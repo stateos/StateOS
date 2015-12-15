@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_bar.c
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    15.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -71,10 +71,8 @@ unsigned priv_bar_wait( bar_id bar, unsigned time, unsigned(*wait)() )
 
 	port_sys_lock();
 
-	if (bar->count > 1)
+	if (--bar->count > 0)
 	{
-		bar->count--;
-		
 		event = wait(bar, time);
 	}
 	else

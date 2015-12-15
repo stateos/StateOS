@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os.h
     @author  Rajmund Szymanski
-    @date    23.11.2015
+    @date    14.12.2015
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -35,7 +35,7 @@
 #include <os_sem.h> // semaphore
 #include <os_mtx.h> // mutex
 #include <os_cnd.h> // condition variable
-#include <os_box.h> // mail box queue
+#include <os_box.h> // mailbox queue
 #include <os_msg.h> // message queue
 #include <os_tmr.h> // timer
 #include <os_tsk.h> // task
