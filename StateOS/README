@@ -26,6 +26,7 @@ Features:
 - added mailbox queue example (main.c.13)
 - fixed mutex
 - removed tsk_force function
+- lock/unlock functions moved from osport to oskernel
 ---------
 0.9.4
 - in cooperative mode context switch is realized by PendSV
