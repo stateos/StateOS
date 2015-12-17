@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.h
     @author  Rajmund Szymanski
-    @date    09.12.2015
+    @date    16.12.2015
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -67,9 +67,6 @@ void core_ctx_switch( void );
 void port_ctx_switch( void );
 
 /* -------------------------------------------------------------------------- */
-
-// reset task stack pointer
-void port_set_stack( void *top );
 
 // abort and reset current process and switch system to the next
 void core_tsk_break( void ) __noreturn;
@@ -162,6 +159,51 @@ void     core_tsk_prio( tsk_id tsk, unsigned prio );
 // wybranie następnego procesu do uruchomienia z listy zadań
 // zwraca adres TCB wybranego procesu
 tsk_id   core_tsk_handler( void );
+
+/* -------------------------------------------------------------------------- */
+
+// procedure inside ISR?
+static inline
+unsigned port_isr_inside( void )
+{
+	return __get_IPSR();
+}
+
+/* -------------------------------------------------------------------------- */
+
+// reset task stack pointer
+static inline
+void port_set_stack( void *top )
+{
+	__set_PSP((unsigned)top);
+}
+
+/* -------------------------------------------------------------------------- */
+
+#if      OS_LOCK_LEVEL && (__CORTEX_M >= 3)
+
+static inline unsigned port_get_lock( void )           { return __get_BASEPRI();                                      }
+static inline void     port_put_lock( unsigned state ) {        __set_BASEPRI(state);                                 }
+static inline void     port_set_lock( void )           {        __set_BASEPRI((OS_LOCK_LEVEL)<<(8-__NVIC_PRIO_BITS)); }
+static inline void     port_clr_lock( void )           {        __set_BASEPRI(0);                                     }
+
+#else
+
+static inline unsigned port_get_lock( void )           { return __get_PRIMASK();      }
+static inline void     port_put_lock( unsigned state ) {        __set_PRIMASK(state); }
+static inline void     port_set_lock( void )           {        __disable_irq();      }
+static inline void     port_clr_lock( void )           {         __enable_irq();      }
+
+#endif
+
+#define port_sys_lock()                             do { unsigned __LOCK = port_get_lock(); port_set_lock()
+#define port_sys_unlock()                                port_put_lock(__LOCK); } while(0)
+
+#define port_sys_flash()                            do { unsigned __LOCK = port_get_lock(); port_clr_lock(); \
+                                                         port_put_lock(__LOCK); } while(0)
+
+#define port_isr_lock()                             do { port_set_lock()
+#define port_isr_unlock()                                port_clr_lock(); } while(0)
 
 /* -------------------------------------------------------------------------- */
 
