@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oscore.c
     @author  Rajmund Szymanski
-    @date    09.12.2015
+    @date    18.12.2015
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -42,11 +42,7 @@ __asm void PendSV_Handler( void )
 	ldr   r0,   =System
 	ldr   r0,  [ r0, #__cpp(offsetof(sys_t, cur)) ]
 	mrs   r1,    PSP
-#if __FPU_USED
-	tst   lr,   #16                     ; fpu used?
-	it    eq
- vstmdbeq r1!, { s16 - s31 }
-#endif
+	str   r1,  [ r0, #__cpp(offsetof(tsk_t, sp)) ]
 #if __CORTEX_M < 3
 	subs  r1,   #36
 	stm   r1!, { r4  - r7 }
@@ -56,15 +52,19 @@ __asm void PendSV_Handler( void )
 	mov   r6,    r11
 	mov   r7,    lr
 	stm   r1!, { r3  - r7 }
-	subs  r1,   #36
 #else
 	stmdb r1!, { r4  - r11, lr }
 #endif
-	str   r1,  [ r0, #__cpp(offsetof(tsk_t, sp)) ]
+#if __FPU_USED
+	tst   lr,   #16                     ; fpu used?
+	it    eq
+ vstmdbeq r1!, { s16 - s31 }
+#endif
 	bl    core_tsk_handler
 	ldr   r1,  [ r0, #__cpp(offsetof(tsk_t, sp)) ]
+	msr   PSP,   r1
 #if __CORTEX_M < 3
-	adds  r1,   #16
+	subs  r1,   #20
 	ldm   r1!, { r3  - r7 }
 	mov   r8,    r3
 	mov   r9,    r4
@@ -73,16 +73,14 @@ __asm void PendSV_Handler( void )
 	mov   lr,    r7
 	subs  r1,   #36
 	ldm   r1!, { r4  - r7 }
-	adds  r1,   #20
 #else
-	ldmia r1!, { r4  - r11, lr }
+	ldmdb r1!, { r4  - r11, lr }
 #endif
 #if __FPU_USED
 	tst   lr,   #16                     ; fpu used?
 	it    eq
  vldmiaeq r1!, { s16 - s31 }
 #endif
-	msr   PSP,   r1
 	bx    lr
 
 	ALIGN

@@ -279,11 +279,13 @@ void priv_tsk_prepare( tsk_id cur )
 	if (cur->sp == 0) // prepare task stack if necessary
 	{
 	    ctx_id ctx = (ctx_id)cur->top - 1;
+	    sft_id sft = (sft_id)ctx - 1;
 
 		ctx->psr = 0x01000000U;
 		ctx->pc  = cur->state;
 		ctx->lr  = core_tsk_loop;
-		ctx->exc_return = ~2U; // return from psp
+
+		sft->exc_return = ~2U; // return from psp
 
 		cur->sp  = ctx;
 	}

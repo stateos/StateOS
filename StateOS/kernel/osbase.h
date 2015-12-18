@@ -88,7 +88,8 @@ typedef struct __obj obj_t, * obj_id;
 typedef struct __tmr tmr_t, * tmr_id; // timer
 typedef struct __tsk tsk_t, * tsk_id; // task
 typedef struct __sys sys_t, * sys_id; // system data
-typedef struct __ctx ctx_t, * ctx_id; // task context
+typedef struct __sft sft_t, * sft_id; // task context saved by the software
+typedef struct __ctx ctx_t, * ctx_id; // task context saved by the hardware
 
 /* -------------------------------------------------------------------------- */
 
@@ -303,9 +304,8 @@ struct __sys
 
 // task context
 
-struct __ctx
+struct __sft // context saved by the software
 {
-// context saved by the software
 	unsigned r4;
 	unsigned r5;
 	unsigned r6;
@@ -315,7 +315,10 @@ struct __ctx
 	unsigned r10;
 	unsigned r11;
 	unsigned exc_return;
-// context saved by the hardware
+};
+
+struct __ctx // context saved by the hardware
+{
 	unsigned r0;
 	unsigned r1;
 	unsigned r2;

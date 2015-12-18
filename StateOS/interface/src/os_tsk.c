@@ -75,13 +75,14 @@ void tsk_start( tsk_id tsk )
 void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
-	port_set_lock();
+	port_sys_lock();
 
 //	while (System.cur->mlist) mtx_kill(System.cur->mlist);
 
 	core_tsk_remove(System.cur);
 	core_ctx_switch();
-	for (;;);
+
+	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

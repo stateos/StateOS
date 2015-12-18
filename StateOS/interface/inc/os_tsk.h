@@ -84,7 +84,7 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
               void     tsk_start( tsk_id tsk );
 
 // zatrzymanie aktualnego procesu (usuniêcie z listy zadañ)
-              void     tsk_stop( void ) __noreturn;
+              void     tsk_stop( void );
 
 // zatrzymanie procesu 'tsk'
               void     tsk_kill( tsk_id tsk );
