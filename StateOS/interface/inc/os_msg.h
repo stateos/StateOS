@@ -55,35 +55,27 @@ extern "C" {
 // który jest pochodn¹ obiektu mailbox queue (box)
 // 'msg' jest kolejk¹ danych typu 'unsigned int'
 
-msg_id   msg_create( unsigned limit );
+              msg_id   msg_create( unsigned limit );
 
-void     msg_kill( msg_id msg );
+              void     msg_kill( msg_id msg );
 
-unsigned msg_waitUntil( msg_id msg, unsigned *data, unsigned time );
+              unsigned msg_waitUntil( msg_id msg, unsigned *data, unsigned time );
 
-unsigned msg_waitFor( msg_id msg, unsigned *data, unsigned delay );
+              unsigned msg_waitFor( msg_id msg, unsigned *data, unsigned delay );
 
-static inline
-unsigned msg_wait( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, INFINITE); }
+static inline unsigned msg_wait( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, INFINITE); }
 
-static inline
-unsigned msg_take( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+static inline unsigned msg_take   ( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+static inline unsigned msg_takeISR( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
 
-static inline
-unsigned msg_takeISR( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+              unsigned msg_sendUntil( msg_id msg, unsigned data, unsigned time );
 
-unsigned msg_sendUntil( msg_id msg, unsigned data, unsigned time );
+              unsigned msg_sendFor( msg_id msg, unsigned data, unsigned delay );
 
-unsigned msg_sendFor( msg_id msg, unsigned data, unsigned delay );
+static inline unsigned msg_send( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, INFINITE); }
 
-static inline
-unsigned msg_send( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, INFINITE); }
-
-static inline
-unsigned msg_give( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
-
-static inline
-unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
+static inline unsigned msg_give   ( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
+static inline unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
 
 /* -------------------------------------------------------------------------- */
 

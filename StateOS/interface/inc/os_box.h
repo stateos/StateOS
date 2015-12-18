@@ -55,62 +55,54 @@ extern "C" {
 
 // utworzenie skrzynki fifo o rozmiarze 'limit' i wielkoœci komunikatu 'size'
 // zwraca adres utworzonego obiektu, lub 0
-box_id   box_create( unsigned limit, unsigned size );
+              box_id   box_create( unsigned limit, unsigned size );
 
 // reset obiektu 'box'
 // wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
 // zostaje do nich wys³any komunikat E_STOPPED
-void     box_kill( box_id box );
+              void     box_kill( box_id box );
 
 // zawieszenie wykonywania aktualnego procesu do czasu 'time'
 // lub do odebrania porcji danych 'data' z obiektu 'box'
 // zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
-unsigned box_waitUntil( box_id box, void *data, unsigned time );
+              unsigned box_waitUntil( box_id box, void *data, unsigned time );
 
 // zawieszenie wykonywania aktualnego procesu na czas 'delay'
 // lub do odebrania porcji danych 'data' z obiektu 'box'
 // zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
-unsigned box_waitFor( box_id box, void *data, unsigned delay );
+              unsigned box_waitFor( box_id box, void *data, unsigned delay );
 
 // zawieszenie wykonywania aktualnego procesu
 // do czasu odebrania porcji danych 'data' z obiektu 'box'
 // zwraca E_SUCCESS lub E_STOPPED
-static inline
-unsigned box_wait( box_id box, void *data ) { return box_waitFor(box, data, INFINITE); }
+static inline unsigned box_wait( box_id box, void *data ) { return box_waitFor(box, data, INFINITE); }
 
 // nie zawiesza wykonywania aktualnego procesu
 // odebiera porcjê danych 'data' z obiektu 'box' (jeœli dane s¹ dostêpne)
 // zwraca E_SUCCESS lub E_TIMEOUT
-static inline
-unsigned box_take( box_id box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
-
-static inline
-unsigned box_takeISR( box_id box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
+static inline unsigned box_take   ( box_id box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
+static inline unsigned box_takeISR( box_id box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
 
 // zawieszenie wykonywania aktualnego procesu do czasu 'time'
 // lub do wys³ania porcji danych 'data' do obiektu 'box'
 // zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
-unsigned box_sendUntil( box_id box, void *data, unsigned time );
+              unsigned box_sendUntil( box_id box, void *data, unsigned time );
 
 // zawieszenie wykonywania aktualnego procesu na czas 'delay'
 // lub do wys³ania porcji danych 'data' do obiektu 'box'
 // zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
-unsigned box_sendFor( box_id box, void *data, unsigned delay );
+              unsigned box_sendFor( box_id box, void *data, unsigned delay );
 
 // zawieszenie wykonywania aktualnego procesu
 // do czasu wys³ania porcji danych 'data' do obiektu 'box'
 // zwraca E_SUCCESS lub E_STOPPED
-static inline
-unsigned box_send( box_id box, void *data ) { return box_sendFor(box, data, INFINITE); }
+static inline unsigned box_send( box_id box, void *data ) { return box_sendFor(box, data, INFINITE); }
 
 // nie zawiesza wykonywania aktualnego procesu
 // wysy³a porcjê danych 'data' do obiektu 'box' (jeœli jest mo¿liwe wys³anie)
 // zwraca E_SUCCESS lub E_TIMEOUT
-static inline
-unsigned box_give( box_id box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
-
-static inline
-unsigned box_giveISR( box_id box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
+static inline unsigned box_give   ( box_id box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
+static inline unsigned box_giveISR( box_id box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
 
 /* -------------------------------------------------------------------------- */
 

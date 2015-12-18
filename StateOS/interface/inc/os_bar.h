@@ -50,28 +50,27 @@ extern "C" {
 
 // utworzenie obiektu typu bariera
 // zwraca adres utworzonego obiektu, lub 0
-bar_id   bar_create( unsigned limit );
+              bar_id   bar_create( unsigned limit );
 
 // reset obiektu 'bar'
 // wszystkie procesy oczekujace zostaja wybudzone
 // zostaje do nich wyslany komunikat E_STOPPED
-void     bar_kill( bar_id bar );
+              void     bar_kill( bar_id bar );
 
 // zawieszenie wykonywania aktualnego procesu do czasu 'time'
 // lub do wybudzenia przez obiekt 'bar'
 // zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
-unsigned bar_waitUntil( bar_id bar, unsigned time );
+              unsigned bar_waitUntil( bar_id bar, unsigned time );
 
 // zawieszenie wykonywania aktualnego procesu na czas 'delay'
 // lub do wybudzenia przez obiekt 'bar'
 // zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
-unsigned bar_waitFor( bar_id bar, unsigned delay );
+              unsigned bar_waitFor( bar_id bar, unsigned delay );
 
 // zawieszenie wykonywania aktualnego procesu
 // do czasu wybudzenia przez obiekt 'bar'
 // zwraca E_SUCCESS lub E_STOPPED
-static inline
-unsigned bar_wait( bar_id bar ) { return bar_waitFor(bar, INFINITE); }
+static inline unsigned bar_wait( bar_id bar ) { return bar_waitFor(bar, INFINITE); }
 
 /* -------------------------------------------------------------------------- */
 

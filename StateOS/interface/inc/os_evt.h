@@ -50,34 +50,31 @@ extern "C" {
 
 // utworzenie obiektu typu zdarzenie
 // zwraca adres utworzonego obiektu, lub 0
-evt_id   evt_create( void );
+              evt_id   evt_create( void );
 
 // reset obiektu 'evt'
 // wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
 // zostaje do nich wys³any komunikat E_STOPPED
-void     evt_kill( evt_id evt );
+              void     evt_kill( evt_id evt );
 
 // zawieszenie wykonywania aktualnego procesu do czasu 'time'
 // lub do wybudzenia przez obiekt 'evt'
 // zwraca odebrany komunikat o zdarzeniu, E_STOPPED lub E_TIMEOUT
-unsigned evt_waitUntil( evt_id evt, unsigned time );
+              unsigned evt_waitUntil( evt_id evt, unsigned time );
 
 // zawieszenie wykonywania aktualnego procesu na czas 'delay'
 // lub do wybudzenia przez obiekt 'evt'
 // zwraca odebrany komunikat o zdarzeniu, E_STOPPED lub E_TIMEOUT
-unsigned evt_waitFor( evt_id evt, unsigned delay );
+              unsigned evt_waitFor( evt_id evt, unsigned delay );
 
 // zawieszenie wykonywania aktualnego procesu
 // do czasu wybudzenia przez obiekt 'evt'
 // zwraca odebrany komunikat o zdarzeniu lub E_STOPPED
-static inline
-unsigned evt_wait( evt_id evt ) { return evt_waitFor(evt, INFINITE); }
+static inline unsigned evt_wait( evt_id evt ) { return evt_waitFor(evt, INFINITE); }
 
 // wys³anie komunikatu o zdarzeniu 'event' do obiektu 'evt'
-void     evt_give( evt_id evt, unsigned event );
-
-static inline
-void     evt_giveISR( evt_id evt, unsigned event ) { evt_give(evt, event); }
+              void     evt_give   ( evt_id evt, unsigned event );
+static inline void     evt_giveISR( evt_id evt, unsigned event ) { evt_give(evt, event); }
 
 /* -------------------------------------------------------------------------- */
 

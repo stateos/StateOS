@@ -63,44 +63,38 @@ extern "C" {
 // utworzenie obiektu typu flaga (flg)
 // 'mask' zabezpiecza flagi, które nie mog¹ byæ kasowane (mog¹ byæ tylko ustawiane)
 // zwraca adres utworzonego obiektu, lub 0
-flg_id   flg_create( unsigned mask );
+              flg_id   flg_create( unsigned mask );
 
 // reset obiektu 'flg'
 // wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
 // zostaje do nich wys³any komunikat E_STOPPED
-void     flg_kill( flg_id flg );
+              void     flg_kill( flg_id flg );
 
 // zawieszenie wykonywania aktualnego procesu do czasu 'time'
 // lub do wybudzenia przez oczekiwan¹ flagê lub wszystkie flagi (all)
 // all: flgOne, flgAll
 // zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
-unsigned flg_waitUntil( flg_id flg, unsigned flags, unsigned mode, unsigned time );
+              unsigned flg_waitUntil( flg_id flg, unsigned flags, unsigned mode, unsigned time );
 
 // zawieszenie wykonywania aktualnego procesu na czas 'delay'
 // lub do wybudzenia przez oczekiwan¹ flagê lub wszystkie flagi (all)
 // zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
-unsigned flg_waitFor( flg_id flg, unsigned flags, unsigned mode, unsigned delay );
+              unsigned flg_waitFor( flg_id flg, unsigned flags, unsigned mode, unsigned delay );
 
 // zawieszenie wykonywania aktualnego procesu
 // do czasu wybudzenia przez oczekiwan¹ flagê lub wszystkie flagi (all)
 // zwraca E_SUCCESS lub E_STOPPED
-static inline
-unsigned flg_wait( flg_id flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
+static inline unsigned flg_wait( flg_id flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
 
 // nie zawieszenie wykonywania aktualnego procesu
 // sprawdza oczekiwan¹ flagê lub wszystkie flagi (all)
 // zwraca E_SUCCESS lub E_TIMEOUT
-static inline
-unsigned flg_take( flg_id flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
-
-static inline
-unsigned flg_takeISR( flg_id flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
+static inline unsigned flg_take   ( flg_id flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
+static inline unsigned flg_takeISR( flg_id flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
 
 // wysy³a flagê lub flagi do obiektu 'flg'
-void     flg_give( flg_id flg, unsigned flags );
-
-static inline
-void     flg_giveISR( flg_id flg, unsigned flags ) { flg_give(flg, flags); }
+              void     flg_give   ( flg_id flg, unsigned flags );
+static inline void     flg_giveISR( flg_id flg, unsigned flags ) { flg_give(flg, flags); }
 
 /* -------------------------------------------------------------------------- */
 

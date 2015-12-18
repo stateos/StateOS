@@ -73,64 +73,54 @@ extern "C" {
 // utworzenie przestrzeni roboczej dla procesu ze stosem 'size'
 // i uruchomienie z priorytetem 'prio', od stanu pocz¹tkowego 'state'
 // zwraca adres TCB (task control block) utworzonego procesu
-tsk_id   tsk_create( unsigned prio, fun_id state, unsigned size );
+              tsk_id   tsk_create( unsigned prio, fun_id state, unsigned size );
 
 // utworzenie przestrzeni roboczej dla procesu ze stosem 'OS_STACK_SIZE'
 // i uruchomienie z priorytetem 'prio', od stanu pocz¹tkowego 'state'
 // zwraca adres TCB (task control block) utworzonego procesu
-static inline
-tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_create(prio, state, OS_STACK_SIZE); }
+static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_create(prio, state, OS_STACK_SIZE); }
 
 // reinicjacja i uruchomienie procesu 'tsk'
-void     tsk_start( tsk_id tsk );
+              void     tsk_start( tsk_id tsk );
 
 // zatrzymanie aktualnego procesu (usuniêcie z listy zadañ)
-void     tsk_stop( void ) __noreturn;
+              void     tsk_stop( void ) __noreturn;
 
 // zatrzymanie procesu 'tsk'
-void     tsk_kill( tsk_id tsk );
+              void     tsk_kill( tsk_id tsk );
 
 // przekazanie sterowania do schedulera (nastêpnego procesu)
-static inline
-void     tsk_pass( void ) { core_ctx_switch(); }
-
-// przekazanie sterowania do schedulera (nastêpnego procesu)
-static inline
-void     tsk_yield( void ) { core_ctx_switch(); }
+static inline void     tsk_pass ( void ) { core_ctx_switch(); }
+static inline void     tsk_yield( void ) { core_ctx_switch(); }
 
 // przekazanie sterowania do schedulera (nastêpnego procesu)
 // restart procesu ze zmian¹ stanu/procedury wykonywanej przez proces
-void     tsk_flip( fun_id state ) __noreturn;
+              void     tsk_flip( fun_id state ) __noreturn;
 
 // ustawienie priorytetu aktualnego procesu z ewentualnym przekazaniem
 // sterowania do innego procesu (o wy¿szym priorytecie)
-void     tsk_prio( unsigned prio );
+              void     tsk_prio( unsigned prio );
 
 // zawieszenie wykonywania aktualnego procesu do czasu 'time'
-unsigned tsk_sleepUntil( unsigned time );
+              unsigned tsk_sleepUntil( unsigned time );
 
 // zawieszenie wykonywania aktualnego procesu na czas 'delay'
-unsigned tsk_sleepFor( unsigned delay );
+              unsigned tsk_sleepFor( unsigned delay );
 
 // zawieszenie wykonywania aktualnego procesu
-static inline
-unsigned tsk_sleep( void ) { return tsk_sleepFor(INFINITE); }
+static inline unsigned tsk_sleep( void ) { return tsk_sleepFor(INFINITE); }
 
 // zawieszenie wykonywania aktualnego procesu na czas 'delay'
 // (delay != 0) => przekazanie sterowania do schedulera
-static inline
-unsigned tsk_delay( unsigned delay ) { return tsk_sleepFor(delay); }
+static inline unsigned tsk_delay( unsigned delay ) { return tsk_sleepFor(delay); }
 
 // zawieszenie wykonywania aktualnego procesu na czas nieokreœlony
 // i przekazanie sterowania do schedulera
-static inline
-unsigned tsk_suspend( void ) { return tsk_sleep(); }
+static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
 
 // wznowienie wykonywania zawieszonego procesu 'tsk' z komunikatem 'event'
-void     tsk_resume( tsk_id tsk, unsigned event );
-
-static inline
-void     tsk_resumeISR( tsk_id tsk, unsigned event ) { tsk_resume(tsk, event); }
+              void     tsk_resume   ( tsk_id tsk, unsigned event );
+static inline void     tsk_resumeISR( tsk_id tsk, unsigned event ) { tsk_resume(tsk, event); }
 
 
 /* -------------------------------------------------------------------------- */
