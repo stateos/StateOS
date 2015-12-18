@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    14.12.2015
+    @date    18.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -467,8 +467,6 @@ os_id core_sys_alloc( size_t size )
 	char *heap = Heap;
 	char *base = 0;
 
-	port_sys_lock();
-
 	size = ASIZE(size);
 
 	if (heap + size <= HeapEnd)
@@ -478,8 +476,6 @@ os_id core_sys_alloc( size_t size )
 
 		for (unsigned *mem = (unsigned *)base; mem < (unsigned *)heap; *mem++ = 0);
 	}
-
-	port_sys_unlock();
 
 	return base;
 }
