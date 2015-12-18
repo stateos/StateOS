@@ -113,7 +113,7 @@ void tsk_flip( fun_id state )
 {
 	System.cur->state = state;
 
-	core_tsk_break();
+	core_tsk_loop();
 }
 
 /* -------------------------------------------------------------------------- */

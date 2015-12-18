@@ -56,7 +56,7 @@ void core_ctx_switch( void )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_break( void )
+void core_tsk_loop( void )
 {
     tsk_id cur = System.cur;
 	
@@ -282,7 +282,7 @@ void priv_tsk_prepare( tsk_id cur )
 
 		ctx->psr = 0x01000000U;
 		ctx->pc  = cur->state;
-		ctx->lr  = core_tsk_break;
+		ctx->lr  = core_tsk_loop;
 		ctx->exc_return = ~2U; // return from psp
 
 		cur->sp  = ctx;

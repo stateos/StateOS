@@ -69,7 +69,7 @@ void port_ctx_switch( void );
 /* -------------------------------------------------------------------------- */
 
 // abort and reset current process and switch system to the next
-void core_tsk_break( void ) __noreturn;
+void core_tsk_loop( void ) __noreturn;
 
 /* -------------------------------------------------------------------------- */
 
