@@ -81,7 +81,7 @@ void SysTick_Handler( void )
 #if OS_ROBIN
 	core_tmr_handler();
 	if (++System.dly >= OS_FREQUENCY/OS_ROBIN)
-	core_ctx_switch();
+	port_ctx_switch();
 #endif
 }
 
@@ -97,7 +97,7 @@ void OS_TIM_IRQHandler( void )
 	unsigned state = OS_TIM->SR;
 	OS_TIM->SR = ~state;
 	if (state & TIM_SR_CC2IF) core_tmr_handler();
-	if (state & TIM_SR_CC1IF) core_ctx_switch();
+	if (state & TIM_SR_CC1IF) port_ctx_switch();
 }
 
 #endif

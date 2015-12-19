@@ -50,7 +50,6 @@ static tsk_t IDLE = { 0, ID_IDLE,  &MAIN, &MAIN, port_idle_hook, 0, 0, 0, 0, IDL
 void core_ctx_switch( void )
 {
 	port_ctx_switch();
-	if (port_isr_inside()) return; // executed from isr?
 	port_sys_flash();
 }
 
@@ -64,8 +63,8 @@ void core_tsk_loop( void )
 
 	for (;;)
 	{
+		port_ctx_switch();
 		port_clr_lock();
-		core_ctx_switch();
 		cur->state();
 	}
 }
@@ -124,7 +123,7 @@ void core_tsk_insert( tsk_id tsk )
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
 	if (IDLE.next->prio > System.cur->prio)
-	core_ctx_switch();
+	port_ctx_switch();
 #endif
 }
 
