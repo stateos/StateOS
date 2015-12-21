@@ -93,10 +93,10 @@ void tsk_kill( tsk_id tsk )
 
 //	while (tsk->mlist) mtx_kill(tsk->mlist);
 
-	if (tsk != System.cur) // instead use tsk_stop
 	switch (tsk->id)
 	{
 	case ID_READY:
+		if (tsk != System.cur) // instead use tsk_stop
 		core_tsk_remove(tsk);
 		break;
 	case ID_DELAYED:
