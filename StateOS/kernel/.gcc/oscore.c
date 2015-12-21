@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oscore.c
     @author  Rajmund Szymanski
-    @date    18.12.2015
+    @date    21.12.2015
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -33,7 +33,7 @@
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__(( naked ))
+__attribute__((naked))
 void PendSV_Handler( void )
 {
 	__asm volatile
@@ -43,7 +43,7 @@ void PendSV_Handler( void )
 "	mrs   r1,    PSP               \n"
 "	str   r1,  [ r0, %[sp]  ]      \n"
 #if __CORTEX_M < 3
-"	subs  r1,   #36                \n"
+"	sub   r1,   #36                \n"
 "	stm   r1!, { r4  - r7 }        \n"
 "	mov   r3,    r8                \n"
 "	mov   r4,    r9                \n"
@@ -63,14 +63,14 @@ void PendSV_Handler( void )
 "	ldr   r1,  [ r0, %[sp]  ]      \n"
 "	msr   PSP,   r1                \n"
 #if __CORTEX_M < 3
-"	subs  r1,   #20                \n"
+"	sub   r1,   #20                \n"
 "	ldm   r1!, { r3  - r7 }        \n"
 "	mov   r8,    r3                \n"
 "	mov   r9,    r4                \n"
 "	mov   r10,   r5                \n"
 "	mov   r11,   r6                \n"
 "	mov   lr,    r7                \n"
-"	subs  r1,   #36                \n"
+"	sub   r1,   #36                \n"
 "	ldm   r1!, { r4  - r7 }        \n"
 #else
 "	ldmdb r1!, { r4  - r11, lr }   \n"

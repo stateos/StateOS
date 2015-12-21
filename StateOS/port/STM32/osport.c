@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osport.c
     @author  Rajmund Szymanski
-    @date    07.12.2015
+    @date    21.12.2015
     @brief   StateOS port file for STM32 uC.
 
  ******************************************************************************
@@ -30,7 +30,7 @@
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__ (( constructor ))
+__attribute__((constructor))
 void port_sys_init( void )
 {
 #if OS_TIMER
@@ -105,7 +105,7 @@ void OS_TIM_IRQHandler( void )
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__ (( weak ))
+__attribute__((weak))
 void port_idle_hook( void )
 {
 #if OS_ROBIN || OS_TIMER == 0

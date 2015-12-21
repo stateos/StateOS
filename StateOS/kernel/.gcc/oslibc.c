@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oslibc.c
     @author  Rajmund Szymanski
-    @date    08.12.2015
+    @date    21.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -108,15 +108,15 @@ static int __enosys()
 
 /* -------------------------------------------------------------------------- */
 
-int   _open_r( struct _reent *reent, const char *path, int flags, int mode ) __attribute__(( weak, alias("__enosys") ));
-int  _close_r( struct _reent *reent, int file )                              __attribute__(( weak, alias("__enosys") ));
-int  _lseek_r( struct _reent *reent, int file, int pos, int whence )         __attribute__(( weak, alias("__enosys") ));
-int   _read_r( struct _reent *reent, int file, char *buf, size_t size )      __attribute__(( weak, alias("__enosys") ));
-int  _write_r( struct _reent *reent, int file, char *buf, size_t size )      __attribute__(( weak, alias("__enosys") ));
-int _isatty_r( struct _reent *reent, int file )                              __attribute__(( weak, alias("__enosys") ));
-int  _fstat_r( struct _reent *reent, int file, struct stat *st )             __attribute__(( weak, alias("__enosys") ));
-int _getpid_r( struct _reent *reent )                                        __attribute__(( weak, alias("__enosys") ));
-int   _kill_r( struct _reent *reent, int pid, int sig )                      __attribute__(( weak, alias("__enosys") ));
+int   _open_r( struct _reent *reent, const char *path, int flags, int mode ) __attribute__((weak, alias("__enosys")));
+int  _close_r( struct _reent *reent, int file )                              __attribute__((weak, alias("__enosys")));
+int  _lseek_r( struct _reent *reent, int file, int pos, int whence )         __attribute__((weak, alias("__enosys")));
+int   _read_r( struct _reent *reent, int file, char *buf, size_t size )      __attribute__((weak, alias("__enosys")));
+int  _write_r( struct _reent *reent, int file, char *buf, size_t size )      __attribute__((weak, alias("__enosys")));
+int _isatty_r( struct _reent *reent, int file )                              __attribute__((weak, alias("__enosys")));
+int  _fstat_r( struct _reent *reent, int file, struct stat *st )             __attribute__((weak, alias("__enosys")));
+int _getpid_r( struct _reent *reent )                                        __attribute__((weak, alias("__enosys")));
+int   _kill_r( struct _reent *reent, int pid, int sig )                      __attribute__((weak, alias("__enosys")));
 
 /* -------------------------------------------------------------------------- */
 

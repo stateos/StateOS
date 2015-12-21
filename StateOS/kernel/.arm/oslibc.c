@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oslibc.c
     @author  Rajmund Szymanski
-    @date    08.12.2015
+    @date    21.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -32,7 +32,7 @@
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__(( used ))
+__attribute__((used))
 void *__user_perthread_libspace( void )
 {
 	return &System.cur->libspace;  /* provide separate libspace for each task */
@@ -40,7 +40,7 @@ void *__user_perthread_libspace( void )
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__(( used ))
+__attribute__((used))
 int _mutex_initialize( unsigned *mutex )
 {
 	return (int) mutex;
@@ -48,7 +48,7 @@ int _mutex_initialize( unsigned *mutex )
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__(( used ))
+__attribute__((used))
 void _mutex_acquire( unsigned *mutex )
 {
 	unsigned lock = port_get_lock();
@@ -58,7 +58,7 @@ void _mutex_acquire( unsigned *mutex )
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__(( used ))
+__attribute__((used))
 void _mutex_release( unsigned *mutex )
 {
 	port_put_lock(*mutex);

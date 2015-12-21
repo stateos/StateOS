@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    15.12.2015
+    @date    21.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -100,7 +100,7 @@ void mtx_kill( mtx_id mtx )
 }
 
 /* -------------------------------------------------------------------------- */
-__attribute__((always_inline)) static inline
+static inline __attribute__((always_inline))
 unsigned priv_mtx_wait( mtx_id mtx, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

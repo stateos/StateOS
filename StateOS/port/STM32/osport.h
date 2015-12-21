@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osport.h
     @author  Rajmund Szymanski
-    @date    16.12.2015
+    @date    21.12.2015
     @brief   StateOS port definitions for STM32 uC.
 
  ******************************************************************************
@@ -187,9 +187,9 @@ void port_tmr_force( void )
 /* -------------------------------------------------------------------------- */
 
 #if     defined(__CC_ARM)
-#define __noreturn  __attribute__(( noreturn ))
+#define __noreturn  __attribute__((noreturn))
 #elif   defined(__GNUC__)
-#define __noreturn  __attribute__(( noreturn, naked ))
+#define __noreturn  __attribute__((noreturn, naked))
 #endif
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_evt.c
     @author  Rajmund Szymanski
-    @date    14.10.2015
+    @date    21.10.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -55,7 +55,7 @@ void evt_kill( evt_id evt )
 }
 
 /* -------------------------------------------------------------------------- */
-__attribute__((always_inline)) static inline
+static inline __attribute__((always_inline))
 unsigned priv_evt_wait( evt_id evt, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

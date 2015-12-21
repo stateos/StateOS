@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_box.c
     @author  Rajmund Szymanski
-    @date    14.12.2015
+    @date    21.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -90,7 +90,7 @@ static void priv_box_put( box_id box, void *data )
 }
 
 /* -------------------------------------------------------------------------- */
-__attribute__((always_inline)) static inline
+static inline __attribute__((always_inline))
 unsigned priv_box_wait( box_id box, void *data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
@@ -136,7 +136,7 @@ unsigned box_waitFor( box_id box, void *data, unsigned delay )
 }
 
 /* -------------------------------------------------------------------------- */
-__attribute__((always_inline)) static inline
+static inline __attribute__((always_inline))
 unsigned priv_box_send( box_id box, void *data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

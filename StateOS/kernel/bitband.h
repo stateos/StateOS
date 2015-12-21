@@ -2,7 +2,7 @@
 
     @file    State Machine OS: bitband.h
     @author  Rajmund Szymanski
-    @date    15.12.2015
+    @date    21.12.2015
     @brief   This file contains macro definitions for the Cortex-M devices.
 
  ******************************************************************************
@@ -48,7 +48,7 @@ extern "C" {
 
 #ifdef __CC_ARM
 
-static inline __attribute__(( always_inline, const ))
+static inline __attribute__((always_inline, const))
 int __builtin_ctz( unsigned mask )
 {
 	int result = 0;

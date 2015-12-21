@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osbase.h
     @author  Rajmund Szymanski
-    @date    14.12.2015
+    @date    21.12.2015
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -65,7 +65,7 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 #define __osalign \
-        __attribute__(( aligned( OS_ALIGN ) ))
+        __attribute__((aligned(OS_ALIGN)))
 
 /* -------------------------------------------------------------------------- */
 

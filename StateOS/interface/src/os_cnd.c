@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_cnd.c
     @author  Rajmund Szymanski
-    @date    16.10.2015
+    @date    21.10.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -55,7 +55,7 @@ void cnd_kill( cnd_id cnd )
 }
 
 /* -------------------------------------------------------------------------- */
-__attribute__((always_inline)) static inline
+static inline __attribute__((always_inline))
 unsigned priv_cnd_wait( cnd_id cnd, mtx_id mtx, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

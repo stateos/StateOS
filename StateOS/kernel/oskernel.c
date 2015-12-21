@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    18.12.2015
+    @date    21.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -71,7 +71,7 @@ void core_tsk_loop( void )
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__ ((noinline))
+__attribute__((noinline))
 void core_rdy_insert( os_id obj, unsigned id, os_id nxt )
 {
 	obj_id Obj = obj;
@@ -87,7 +87,7 @@ void core_rdy_insert( os_id obj, unsigned id, os_id nxt )
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__ ((noinline))
+__attribute__((noinline))
 void core_rdy_remove( os_id obj )
 {
 	obj_id Obj = obj;

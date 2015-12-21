@@ -54,11 +54,11 @@ __asm void PendSV_Handler( void )
 	stm   r1!, { r3  - r7 }
 #else
 	stmdb r1!, { r4  - r11, lr }
-#endif
 #if __FPU_USED
 	tst   lr,   #16                     ; fpu used?
 	it    eq
  vstmdbeq r1!, { s16 - s31 }
+#endif
 #endif
 	bl    core_tsk_handler
 	ldr   r1,  [ r0, #__cpp(offsetof(tsk_t, sp)) ]
@@ -75,11 +75,11 @@ __asm void PendSV_Handler( void )
 	ldm   r1!, { r4  - r7 }
 #else
 	ldmdb r1!, { r4  - r11, lr }
-#endif
 #if __FPU_USED
 	tst   lr,   #16                     ; fpu used?
 	it    eq
  vldmiaeq r1!, { s16 - s31 }
+#endif
 #endif
 	bx    lr
 
