@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    21.12.2015
+    @date    22.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -75,14 +75,12 @@ void tsk_start( tsk_id tsk )
 void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	port_set_lock();
 
 //	while (System.cur->mlist) mtx_kill(System.cur->mlist);
 
 	core_tsk_remove(System.cur);
-	core_ctx_switch();
-
-	port_sys_unlock();
+	core_tsk_loop();
 }
 
 /* -------------------------------------------------------------------------- */
