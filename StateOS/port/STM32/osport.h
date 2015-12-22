@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osport.h
     @author  Rajmund Szymanski
-    @date    21.12.2015
+    @date    22.12.2015
     @brief   StateOS port definitions for STM32 uC.
 
  ******************************************************************************
@@ -34,10 +34,16 @@
 extern "C" {
 #endif
 
-/* Some useful macros ------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
 #define GLUE( a, b, c )            a##b##c
 #define  CAT( a, b, c )       GLUE(a, b, c)
+
+/* -------------------------------------------------------------------------- */
+
+#ifndef  __CORTEX_M
+#error   osconfig.h: Include CMSIS device peripheral access layer header file!
+#endif
 
 /* -------------------------------------------------------------------------- */
 
@@ -111,7 +117,7 @@ extern "C" {
 #endif
 
 #if      OS_LOCK_LEVEL >= (1<<__NVIC_PRIO_BITS)
-#error   osconfig.h: Incorrect OS_LOCK_LEVEL value! Must be less then 1<<__NVIC_PRIO_BITS.
+#error   osconfig.h: Incorrect OS_LOCK_LEVEL value! Must be less then (1<<__NVIC_PRIO_BITS).
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -124,12 +130,6 @@ extern "C" {
 
 extern   char               __initial_sp[];
 #define  MAIN_SP            __initial_sp
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef  __CORTEX_M
-#error   osconfig.h: Include CMSIS device peripheral access layer header file!
-#endif
 
 /* -------------------------------------------------------------------------- */
 
