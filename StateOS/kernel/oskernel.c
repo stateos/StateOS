@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    21.12.2015
+    @date    22.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -395,9 +395,14 @@ void priv_tmr_wakeup( tmr_id tmr, unsigned event )
 {
 	tmr->start += tmr->delay;
 	tmr->delay  = tmr->period;
+	fun_id proc = tmr->state;
 
-	if (tmr->state)
-		tmr->state();
+	if (proc)
+	{
+		port_isr_enable();
+		proc();
+		port_isr_disable();
+	}
 
 	core_tmr_remove(tmr);
 	if (tmr->delay)

@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.h
     @author  Rajmund Szymanski
-    @date    16.12.2015
+    @date    22.12.2015
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -180,7 +180,7 @@ void port_set_stack( void *top )
 
 /* -------------------------------------------------------------------------- */
 
-#if      OS_LOCK_LEVEL && (__CORTEX_M >= 3)
+#if OS_LOCK_LEVEL && (__CORTEX_M >= 3)
 
 static inline unsigned port_get_lock( void )           { return __get_BASEPRI();                                      }
 static inline void     port_put_lock( unsigned state ) {        __set_BASEPRI(state);                                 }
@@ -199,11 +199,23 @@ static inline void     port_clr_lock( void )           {         __enable_irq();
 #define port_sys_lock()                             do { unsigned __LOCK = port_get_lock(); port_set_lock()
 #define port_sys_unlock()                                port_put_lock(__LOCK); } while(0)
 
-#define port_sys_flash()                            do { unsigned __LOCK = port_get_lock(); port_clr_lock(); \
-                                                         port_put_lock(__LOCK); } while(0)
+#define port_sys_enable()                           do { unsigned __LOCK = port_get_lock(); port_clr_lock()
+#define port_sys_disable()                               port_put_lock(__LOCK); } while(0)
 
 #define port_isr_lock()                             do { port_set_lock()
 #define port_isr_unlock()                                port_clr_lock(); } while(0)
+
+#define port_isr_enable()                           do { port_clr_lock()
+#define port_isr_disable()                               port_set_lock(); } while(0)
+
+/* -------------------------------------------------------------------------- */
+
+static inline
+void port_sys_flash( void )
+{
+	port_sys_enable();
+	port_sys_disable();
+}
 
 /* -------------------------------------------------------------------------- */
 

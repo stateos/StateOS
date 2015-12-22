@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    22.12.2015
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -88,6 +88,7 @@ extern "C" {
 static inline unsigned tmr_wait( tmr_id tmr ) { return tmr_waitFor(tmr, INFINITE); }
 
 // czy zegar zakoñczy³ odliczanie?
+// zwraca E_SUCCESS, E_TIMEOUT
 static inline unsigned tmr_take   ( tmr_id tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
 static inline unsigned tmr_takeISR( tmr_id tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
 
