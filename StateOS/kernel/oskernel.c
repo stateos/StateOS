@@ -63,7 +63,7 @@ void core_tsk_loop( void )
 
 	for (;;)
 	{
-		port_ctx_switch();
+		core_ctx_switch();
 		port_clr_lock();
 		cur->state();
 	}
@@ -123,7 +123,7 @@ void core_tsk_insert( tsk_id tsk )
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
 	if (IDLE.next->prio > System.cur->prio)
-	port_ctx_switch();
+	core_ctx_switch();
 #endif
 }
 
