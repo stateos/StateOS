@@ -66,7 +66,8 @@ void box_kill( box_id box )
 }
 
 /* -------------------------------------------------------------------------- */
-static void priv_box_get( box_id box, void *data )
+static
+void priv_box_get( box_id box, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i;
@@ -78,7 +79,8 @@ static void priv_box_get( box_id box, void *data )
 }
 
 /* -------------------------------------------------------------------------- */
-static void priv_box_put( box_id box, void *data )
+static
+void priv_box_put( box_id box, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i;

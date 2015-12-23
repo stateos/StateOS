@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    22.12.2015
+    @date    23.12.2015
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -63,7 +63,7 @@ void core_tsk_loop( void )
 
 	for (;;)
 	{
-		core_ctx_switch();
+		port_ctx_switch();
 		port_clr_lock();
 		cur->state();
 	}
@@ -123,7 +123,7 @@ void core_tsk_insert( tsk_id tsk )
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
 	if (IDLE.next->prio > System.cur->prio)
-	core_ctx_switch();
+	port_ctx_switch();
 #endif
 }
 
@@ -395,14 +395,9 @@ void priv_tmr_wakeup( tmr_id tmr, unsigned event )
 {
 	tmr->start += tmr->delay;
 	tmr->delay  = tmr->period;
-	fun_id proc = tmr->state;
 
-	if (proc)
-	{
-		port_isr_enable();
-		proc();
-		port_isr_disable();
-	}
+	if (tmr->state)
+		tmr->state();
 
 	core_tmr_remove(tmr);
 	if (tmr->delay)

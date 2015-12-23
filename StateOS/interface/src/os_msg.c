@@ -65,7 +65,8 @@ void msg_kill( msg_id msg )
 }
 
 /* -------------------------------------------------------------------------- */
-static void priv_msg_get( msg_id msg, unsigned *data )
+static
+void priv_msg_get( msg_id msg, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
 	*data = msg->data[msg->first];
@@ -74,7 +75,8 @@ static void priv_msg_get( msg_id msg, unsigned *data )
 }
 
 /* -------------------------------------------------------------------------- */
-static void priv_msg_put( msg_id msg, unsigned data )
+static
+void priv_msg_put( msg_id msg, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
 	msg->data[msg->next] = data;

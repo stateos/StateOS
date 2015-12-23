@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.h
     @author  Rajmund Szymanski
-    @date    22.12.2015
+    @date    23.12.2015
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -63,7 +63,7 @@ void core_ctx_reset( void )
 // save status of current process and switch system to the next
 void core_ctx_switch( void );
 
-// force context switch
+// enable context switch
 void port_ctx_switch( void );
 
 /* -------------------------------------------------------------------------- */

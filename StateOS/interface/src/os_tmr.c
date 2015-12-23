@@ -59,7 +59,8 @@ void tmr_kill( tmr_id tmr )
 }
 
 /* -------------------------------------------------------------------------- */
-static void priv_tmr_start( tmr_id tmr )
+static
+void priv_tmr_start( tmr_id tmr )
 /* -------------------------------------------------------------------------- */
 {
 	if (tmr->id != ID_STOPPED)

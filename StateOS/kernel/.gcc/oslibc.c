@@ -99,7 +99,8 @@ void _exit( int code )
 
 /* -------------------------------------------------------------------------- */
 
-static int __enosys()
+static
+int __enosys()
 {
 	errno = ENOSYS; // procedure not implemented
 
