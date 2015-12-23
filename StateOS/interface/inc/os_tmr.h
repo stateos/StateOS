@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    22.12.2015
+    @date    23.12.2015
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************

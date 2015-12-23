@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osport.c
     @author  Rajmund Szymanski
-    @date    21.12.2015
+    @date    23.12.2015
     @brief   StateOS port file for STM32 uC.
 
  ******************************************************************************

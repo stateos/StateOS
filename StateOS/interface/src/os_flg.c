@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_flg.c
     @author  Rajmund Szymanski
-    @date    21.12.2015
+    @date    23.12.2015
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************

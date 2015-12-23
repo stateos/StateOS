@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_bar.h
     @author  Rajmund Szymanski
-    @date    26.11.2015
+    @date    23.12.2015
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************

@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oscore.c
     @author  Rajmund Szymanski
-    @date    18.12.2015
+    @date    23.12.2015
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
