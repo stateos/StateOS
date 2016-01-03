@@ -38,11 +38,11 @@ extern "C" {
  *                                                                                                                    *
  * Name              : OS_BAR                                                                                         *
  *                                                                                                                    *
- * Description       : define a barrier object                                                                        *
+ * Description       : define and initilize a barrier object                                                          *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   bar             : name of a pointer to barrier object                                                            *
- *   limit           : maximum count of barrier                                                                       *
+ *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object      *
  *                                                                                                                    *
  **********************************************************************************************************************/
 #define     OS_BAR( bar, limit )                   \
@@ -53,11 +53,11 @@ extern "C" {
  *                                                                                                                    *
  * Name              : static_BAR                                                                                     *
  *                                                                                                                    *
- * Description       : define a static barrier object                                                                 *
+ * Description       : define and initilize a static barrier object                                                   *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   bar             : name of a pointer to barrier object                                                            *
- *   limit           : maximum count of barrier                                                                       *
+ *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object      *
  *                                                                                                                    *
  **********************************************************************************************************************/
 #define static_BAR( bar, limit )                   \
@@ -68,10 +68,10 @@ extern "C" {
  *                                                                                                                    *
  * Name              : bar_create                                                                                     *
  *                                                                                                                    *
- * Description       : create a new barrier object                                                                    *
+ * Description       : create and initilize a new barrier object                                                      *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   limit           : maximum count of barrier                                                                       *
+ *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object      *
  *                                                                                                                    *
  * Return            : pointer to barrier object (barrier successfully created)                                       *
  *   0               : barrier not created (not enough free memory)                                                   *
@@ -85,7 +85,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : bar_kill                                                                                       *
  *                                                                                                                    *
- * Description       : reset barrier object and wake up all waiting tasks with 'E_STOPPED' event value                *
+ * Description       : reset the barrier object and wake up all waiting tasks with 'E_STOPPED' event value            *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   bar             : pointer to barrier object                                                                      *
@@ -101,7 +101,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : bar_waitUntil                                                                                  *
  *                                                                                                                    *
- * Description       : wait for barrier object until given timepoint                                                  *
+ * Description       : wait for the barrier object until given timepoint                                              *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   bar             : pointer to barrier object                                                                      *
@@ -122,7 +122,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : bar_waitFor                                                                                    *
  *                                                                                                                    *
- * Description       : wait for barrier object for given duration of time                                             *
+ * Description       : wait for the barrier object for given duration of time                                         *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   bar             : pointer to barrier object                                                                      *
@@ -145,7 +145,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : bar_wait                                                                                       *
  *                                                                                                                    *
- * Description       : wait for barrier object                                                                        *
+ * Description       : wait indefinitly until the barrier object have been released                                   *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   bar             : pointer to barrier object                                                                      *
