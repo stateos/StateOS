@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    03.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -44,30 +44,74 @@
 extern "C" {
 #endif
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sys_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initialize system timer and enabled services                                                   *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Notes             : function port_sys_init is usually invoked as a constructor                                     *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+static inline void     sys_init( void ) { port_sys_init(); }
 
-// zainicjowanie i uruchomienie zegara systemowego (system timer)
-// funkcja port_sys_init jest standardowo wywoływana jako konstruktor
-static inline
-void   sys_init( void )                   { port_sys_init(); }
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sys_lock                                                                                       *
+ *                                                                                                                    *
+ * Description       : disable interrupts / enter into critical section                                               *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Notes             : function called from thread mode                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+#define sys_lock       port_sys_lock
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sys_lockISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : disable interrupts / enter into critical section                                               *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Notes             : function called from handler mode                                                              *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+#define sys_lockISR    port_sys_lock
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sys_unlock                                                                                     *
+ *                                                                                                                    *
+ * Description       : enable interrupts / exit from critical section                                                 *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Notes             : function called from thread mode                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+#define sys_unlock     port_sys_unlock
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sys_unlockISR                                                                                  *
+ *                                                                                                                    *
+ * Description       : enable interrupts / exit from critical section                                                 *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Notes             : function called from handler mode                                                              *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+#define sys_unlockISR  port_sys_unlock
 
 #ifdef __cplusplus
 }
 #endif
-
-/* -------------------------------------------------------------------------- */
-
-// disable interrupts / enter into critical section
-#define sys_lock       port_sys_lock
-
-#define sys_lockISR    port_sys_lock
-
-// enable interrupts / exit from critical section
-#define sys_unlock     port_sys_unlock
-
-#define sys_unlockISR  port_sys_unlock
 
 /* -------------------------------------------------------------------------- */
 
