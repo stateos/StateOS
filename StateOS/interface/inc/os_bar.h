@@ -126,7 +126,7 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   bar             : pointer to barrier object                                                                      *
- *   delay           : duration of time (maximum number of ticks to wait for release of the barrier object)           *
+ *   delay           : duration of time (maximum number of ticks to wait for release the barrier object)              *
  *                     IMMEDIATE: don't wait if the barrier object can't be released                                  *
  *                     INFINITE:  wait indefinitly until the barrier object have been released                        *
  *                                                                                                                    *
