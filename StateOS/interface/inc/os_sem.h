@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_sem.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    04.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -34,87 +34,289 @@
 extern "C" {
 #endif
 
-/* -------------------------------------------------------------------------- */
+#define semBinary   (  1U ) // binary semaphore
+#define semNormal   ( ~0U ) // counting semaphore
+#define semCounting ( ~0U ) // counting semaphore
 
-#define semBinary   (  1U )
-#define semNormal   ( ~0U )
-#define semCounting ( ~0U )
-
-/* -------------------------------------------------------------------------- */
-
-// deklaracja semafora 'sem'
-// limit: maksymalna iloœæ dostêpnych ¿etonów
-
-#define OS_SEM( sem, limit )                          \
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : OS_SEM                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize a semaphore object                                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : name of a pointer to semaphore object                                                          *
+ *   limit           : maximum value of semaphore counter                                                             *
+ *                     semBinary: binary semaphore                                                                    *
+ *                     semNormal, semCounting: counting semaphore                                                     *
+ *                     otherwise: limited semaphore                                                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+#define     OS_SEM( sem, limit )                      \
                sem_t sem##__sem = _SEM_INIT(0, limit); \
                sem_id sem = & sem##__sem
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_SEM                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize a static semaphore object                                                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : name of a pointer to semaphore object                                                          *
+ *   limit           : maximum value of semaphore counter                                                             *
+ *                     semBinary: binary semaphore                                                                    *
+ *                     semNormal, semCounting: counting semaphore                                                     *
+ *                     otherwise: limited semaphore                                                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 #define static_SEM( sem, limit )                      \
         static sem_t sem##__sem = _SEM_INIT(0, limit); \
         static sem_id sem = & sem##__sem
 
-/* -------------------------------------------------------------------------- */
-
-// utworzenie obiektu typu semafor (sem)
-// z maksymaln¹ liczb¹ ¿etonów 'limit'
-// limit: semNormal, semBinary, other unsigned
-// zwraca adres utworzonego obiektu, lub 0
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_create                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a new semaphore object                                                    *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : maximum value of semaphore counter                                                             *
+ *                     semBinary: binary semaphore                                                                    *
+ *                     semNormal, semCounting: counting semaphore                                                     *
+ *                     otherwise: limited semaphore                                                                   *
+ *                                                                                                                    *
+ * Return            : pointer to semaphore object (semaphore successfully created)                                   *
+ *   0               : semaphore not created (not enough free memory)                                                 *
+ *                                                                                                                    *
+ * Notes             : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
               sem_id   sem_create( unsigned limit );
 
-// reset obiektu 'sem'
-// wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
-// zostaje do nich wys³any komunikat E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_kill                                                                                       *
+ *                                                                                                                    *
+ * Description       : reset the semaphore object and wake up all waiting tasks with 'E_STOPPED' event value          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Notes             : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
               void     sem_kill( sem_id sem );
 
-// zawieszenie wykonywania aktualnego procesu do czasu 'time'
-// lub do wybudzenia przez obiekt 'sem'
-// jeœli liczba ¿etonów jest wiêksza od zera, to nastêpuje zajêcie obiektu 'sem'
-// zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_waitUntil                                                                                  *
+ *                                                                                                                    *
+ * Description       : try lock the semaphore object,                                                                 *
+ *                     wait until given timepoint if the semaphore object can't be locked immediately                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : semaphore object was successfully locked                                                       *
+ *   E_STOPPED       : semaphore object was killed before the specified timeout expired                               *
+ *   E_TIMEOUT       : semaphore object was not locked before the specified timeout expired                           *
+ *   'another'       : task was resumed with 'another' event                                                          *
+ *                                                                                                                    *
+ * Notes             : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
               unsigned sem_waitUntil( sem_id sem, unsigned time );
 
-// zawieszenie wykonywania aktualnego procesu na czas 'delay'
-// lub do wybudzenia przez obiekt 'sem'
-// jeœli liczba ¿etonów jest wiêksza od zera, to nastêpuje zajêcie obiektu 'sem'
-// zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_waitFor                                                                                    *
+ *                                                                                                                    *
+ * Description       : try lock the semaphore object,                                                                 *
+ *                     wait for given duration of time if the semaphore object can't be locked immediately            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *   delay           : duration of time (maximum number of ticks to wait for lock the semaphore object)               *
+ *                     IMMEDIATE: don't wait if the semaphore object can't be locked immediately                      *
+ *                     INFINITE:  wait indefinitly until the semaphore object have been locked                        *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : semaphore object was successfully locked                                                       *
+ *   E_STOPPED       : semaphore object was killed before the specified timeout expired                               *
+ *   E_TIMEOUT       : semaphore object was not locked before the specified timeout expired                           *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Notes             : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
               unsigned sem_waitFor( sem_id sem, unsigned delay );
 
-// zawieszenie wykonywania aktualnego procesu
-// do czasu wybudzenia przez obiekt 'sem'
-// jeœli liczba ¿etonów jest wiêksza od zera, to nastêpuje zajêcie obiektu 'sem'
-// zwraca E_SUCCESS lub E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_wait                                                                                       *
+ *                                                                                                                    *
+ * Description       : try lock the semaphore object,                                                                 *
+ *                     wait indefinitly if the semaphore object can't be locked immediately                           *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : semaphore object was successfully locked                                                       *
+ *   E_STOPPED       : semaphore object was killed                                                                    *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Notes             : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 static inline unsigned sem_wait( sem_id sem ) { return sem_waitFor(sem, INFINITE); }
 
-// nie zawiesza aktualnie wykonywanego procesu
-// jeœli liczba ¿etonów jest wiêksza od zera, to nastêpuje zajêcie obiektu 'sem'
-// zwraca E_SUCCESS lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_take                                                                                       *
+ *                                                                                                                    *
+ * Description       : try lock the semaphore object,                                                                 *
+ *                     don't wait if the semaphore object can't be locked immediately                                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : semaphore object was successfully locked                                                       *
+ *   E_TIMEOUT       : semaphore object can't be locked immediately                                                   *
+ *                                                                                                                    *
+ * Notes             : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 static inline unsigned sem_take   ( sem_id sem ) { return sem_waitFor(sem, IMMEDIATE); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_takeISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : try lock the semaphore object,                                                                 *
+ *                     don't wait if the semaphore object can't be locked immediately                                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : semaphore object was successfully locked                                                       *
+ *   E_TIMEOUT       : semaphore object can't be locked immediately                                                   *
+ *                                                                                                                    *
+ * Notes             : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMEDIATE); }
 
-// zawieszenie wykonywania aktualnego procesu do czasu 'time'
-// lub do wybudzenia przez obiekt 'sem'
-// jeœli liczba ¿etonów jest mniejsza od maksymalnej, to nastêpuje zwolnienie obiektu 'sem'
-// zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_sendUntil                                                                                  *
+ *                                                                                                                    *
+ * Description       : try unlock the semaphore object,                                                               *
+ *                     wait until given timepoint if the semaphore object can't be unlocked immediately               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : semaphore object was successfully unlocked                                                     *
+ *   E_STOPPED       : semaphore object was killed before the specified timeout expired                               *
+ *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired                         *
+ *   'another'       : task was resumed with 'another' event                                                          *
+ *                                                                                                                    *
+ * Notes             : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
               unsigned sem_sendUntil( sem_id sem, unsigned time );
 
-// zawieszenie wykonywania aktualnego procesu na czas 'delay'
-// lub do wybudzenia przez obiekt 'sem'
-// jeœli liczba ¿etonów jest mniejsza od maksymalnej, to nastêpuje zwolnienie obiektu 'sem'
-// zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_sendFor                                                                                    *
+ *                                                                                                                    *
+ * Description       : try unlock the semaphore object,                                                               *
+ *                     wait for given duration of time if the semaphore object can't be unlocked immediately          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *   delay           : duration of time (maximum number of ticks to wait for unlock the semaphore object)             *
+ *                     IMMEDIATE: don't wait if the semaphore object can't be unlocked immediately                    *
+ *                     INFINITE:  wait indefinitly until the semaphore object have been unlocked                      *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : semaphore object was successfully unlocked                                                     *
+ *   E_STOPPED       : semaphore object was killed before the specified timeout expired                               *
+ *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired                         *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Notes             : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
               unsigned sem_sendFor( sem_id sem, unsigned delay );
 
-// zawieszenie wykonywania aktualnego procesu
-// do wybudzenia przez obiekt 'sem'
-// jeœli liczba ¿etonów jest mniejsza od maksymalnej, to nastêpuje zwolnienie obiektu 'sem'
-// zwraca E_SUCCESS lub E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_send                                                                                       *
+ *                                                                                                                    *
+ * Description       : try unlock the semaphore object,                                                               *
+ *                     wait indefinitly if the semaphore object can't be unlocked immediately                         *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : semaphore object was successfully unlocked                                                     *
+ *   E_STOPPED       : semaphore object was killed                                                                    *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Notes             : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 static inline unsigned sem_send( sem_id sem ) { return sem_sendFor(sem, INFINITE); }
 
-// nie zawiesza aktualnie wykonywanego procesu
-// jeœli liczba ¿etonów jest mniejsza od maksymalnej, to nastêpuje zwolnienie obiektu 'sem'
-// zwraca E_SUCCESS lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_give                                                                                       *
+ *                                                                                                                    *
+ * Description       : try unlock the semaphore object,                                                               *
+ *                     don't wait if the semaphore object can't be unlocked immediately                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : semaphore object was successfully unlocked                                                     *
+ *   E_TIMEOUT       : semaphore object can't be unlocked immediately                                                 *
+ *                                                                                                                    *
+ * Notes             : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 static inline unsigned sem_give   ( sem_id sem ) { return sem_sendFor(sem, IMMEDIATE); }
-static inline unsigned sem_giveISR( sem_id sem ) { return sem_sendFor(sem, IMMEDIATE); }
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_giveISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : try unlock the semaphore object,                                                               *
+ *                     don't wait if the semaphore object can't be unlocked immediately                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : semaphore object was successfully unlocked                                                     *
+ *   E_TIMEOUT       : semaphore object can't be unlocked immediately                                                 *
+ *                                                                                                                    *
+ * Notes             : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+static inline unsigned sem_giveISR( sem_id sem ) { return sem_sendFor(sem, IMMEDIATE); }
 
 #ifdef __cplusplus
 }
