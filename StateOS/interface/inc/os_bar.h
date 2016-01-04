@@ -76,7 +76,7 @@ extern "C" {
  * Return            : pointer to barrier object (barrier successfully created)                                       *
  *   0               : barrier not created (not enough free memory)                                                   *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
               bar_id   bar_create( unsigned limit );
@@ -92,7 +92,7 @@ extern "C" {
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
               void     bar_kill( bar_id bar );
@@ -113,7 +113,7 @@ extern "C" {
  *   E_TIMEOUT       : barrier object was not released before the specified timeout expired                           *
  *   'another'       : task was resumed with 'another' event                                                          *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
               unsigned bar_waitUntil( bar_id bar, unsigned time );
@@ -136,7 +136,7 @@ extern "C" {
  *   E_TIMEOUT       : barrier object was not released before the specified timeout expired                           *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
               unsigned bar_waitFor( bar_id bar, unsigned delay );
@@ -155,7 +155,7 @@ extern "C" {
  *   E_STOPPED       : barrier object was killed                                                                      *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 static inline unsigned bar_wait( bar_id bar ) { return bar_waitFor(bar, INFINITE); }
