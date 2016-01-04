@@ -110,7 +110,7 @@ extern "C" {
  * Return            : pointer to mutex object (mutex successfully created)                                           *
  *   0               : mutex not created (not enough free memory)                                                     *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
               mtx_id   mtx_create( unsigned type );
@@ -126,7 +126,7 @@ extern "C" {
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
               void     mtx_kill( mtx_id mtx );
@@ -148,7 +148,7 @@ extern "C" {
  *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired                               *
  *   'another'       : task was resumed with 'another' event                                                          *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
               unsigned mtx_waitUntil( mtx_id mtx, unsigned time );
@@ -172,7 +172,7 @@ extern "C" {
  *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired                               *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
               unsigned mtx_waitFor( mtx_id mtx, unsigned delay );
@@ -192,7 +192,7 @@ extern "C" {
  *   E_STOPPED       : mutex object was killed                                                                        *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 static inline unsigned mtx_wait( mtx_id mtx ) { return mtx_waitFor(mtx, INFINITE); }
@@ -211,7 +211,7 @@ static inline unsigned mtx_wait( mtx_id mtx ) { return mtx_waitFor(mtx, INFINITE
  *   E_SUCCESS       : mutex object was successfully locked                                                           *
  *   E_TIMEOUT       : mutex object can't be locked immediately                                                       *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 static inline unsigned mtx_take( mtx_id mtx ) { return mtx_waitFor(mtx, IMMEDIATE); }
@@ -230,7 +230,7 @@ static inline unsigned mtx_take( mtx_id mtx ) { return mtx_waitFor(mtx, IMMEDIAT
  *   E_SUCCESS       : mutex object was successfully unlocked                                                         *
  *   E_TIMEOUT       : mutex object can't be unlocked                                                                 *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
               unsigned mtx_give( mtx_id mtx );
