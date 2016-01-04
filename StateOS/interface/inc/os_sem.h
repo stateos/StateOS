@@ -34,6 +34,12 @@
 extern "C" {
 #endif
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Definitions                                                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 #define semBinary   (  1U ) // binary semaphore
 #define semNormal   ( ~0U ) // counting semaphore
 #define semCounting ( ~0U ) // counting semaphore
@@ -52,6 +58,7 @@ extern "C" {
  *                     otherwise: limited semaphore                                                                   *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
 #define     OS_SEM( sem, limit )                      \
                sem_t sem##__sem = _SEM_INIT(0, limit); \
                sem_id sem = & sem##__sem
@@ -70,6 +77,7 @@ extern "C" {
  *                     otherwise: limited semaphore                                                                   *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
 #define static_SEM( sem, limit )                      \
         static sem_t sem##__sem = _SEM_INIT(0, limit); \
         static sem_id sem = & sem##__sem
@@ -92,6 +100,7 @@ extern "C" {
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
               sem_id   sem_create( unsigned limit );
 
 /**********************************************************************************************************************
@@ -108,6 +117,7 @@ extern "C" {
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
               void     sem_kill( sem_id sem );
 
 /**********************************************************************************************************************
@@ -130,6 +140,7 @@ extern "C" {
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
               unsigned sem_waitUntil( sem_id sem, unsigned time );
 
 /**********************************************************************************************************************
@@ -154,6 +165,7 @@ extern "C" {
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
               unsigned sem_waitFor( sem_id sem, unsigned delay );
 
 /**********************************************************************************************************************
@@ -174,6 +186,7 @@ extern "C" {
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
 static inline unsigned sem_wait( sem_id sem ) { return sem_waitFor(sem, INFINITE); }
 
 /**********************************************************************************************************************
@@ -193,6 +206,7 @@ static inline unsigned sem_wait( sem_id sem ) { return sem_waitFor(sem, INFINITE
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
 static inline unsigned sem_take   ( sem_id sem ) { return sem_waitFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
@@ -212,6 +226,7 @@ static inline unsigned sem_take   ( sem_id sem ) { return sem_waitFor(sem, IMMED
  * Note              : use only in handler mode                                                                       *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
 static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
@@ -234,6 +249,7 @@ static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMED
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
               unsigned sem_sendUntil( sem_id sem, unsigned time );
 
 /**********************************************************************************************************************
@@ -258,6 +274,7 @@ static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMED
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
               unsigned sem_sendFor( sem_id sem, unsigned delay );
 
 /**********************************************************************************************************************
@@ -278,6 +295,7 @@ static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMED
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
 static inline unsigned sem_send( sem_id sem ) { return sem_sendFor(sem, INFINITE); }
 
 /**********************************************************************************************************************
@@ -297,6 +315,7 @@ static inline unsigned sem_send( sem_id sem ) { return sem_sendFor(sem, INFINITE
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
 static inline unsigned sem_give   ( sem_id sem ) { return sem_sendFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
@@ -316,6 +335,7 @@ static inline unsigned sem_give   ( sem_id sem ) { return sem_sendFor(sem, IMMED
  * Note              : use only in handler mode                                                                       *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
 static inline unsigned sem_giveISR( sem_id sem ) { return sem_sendFor(sem, IMMEDIATE); }
 
 #ifdef __cplusplus
