@@ -101,7 +101,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : bar_waitUntil                                                                                  *
  *                                                                                                                    *
- * Description       : wait for the barrier object until given timepoint                                              *
+ * Description       : wait for release the barrier object until given timepoint                                      *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   bar             : pointer to barrier object                                                                      *
@@ -109,7 +109,7 @@ extern "C" {
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : barrier object was successfully released                                                       *
- *   E_STOPPED       : barrier object has been killed                                                                 *
+ *   E_STOPPED       : barrier object was killed before the specified timeout expired                                 *
  *   E_TIMEOUT       : barrier object was not released before the specified timeout expired                           *
  *   'another'       : task was resumed with 'another' event                                                          *
  *                                                                                                                    *
@@ -122,7 +122,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : bar_waitFor                                                                                    *
  *                                                                                                                    *
- * Description       : wait for the barrier object for given duration of time                                         *
+ * Description       : wait for release the barrier object for given duration of time                                 *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   bar             : pointer to barrier object                                                                      *
@@ -132,7 +132,7 @@ extern "C" {
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : barrier object was successfully released                                                       *
- *   E_STOPPED       : barrier object has been killed                                                                 *
+ *   E_STOPPED       : barrier object was killed before the specified timeout expired                                 *
  *   E_TIMEOUT       : barrier object was not released before the specified timeout expired                           *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
@@ -152,7 +152,7 @@ extern "C" {
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : barrier object was successfully released                                                       *
- *   E_STOPPED       : barrier object has been killed                                                                 *
+ *   E_STOPPED       : barrier object was killed                                                                      *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Notes             : use only in thread mode                                                                        *
