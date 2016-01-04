@@ -170,8 +170,6 @@ static inline unsigned bar_wait( bar_id bar ) { return bar_waitFor(bar, INFINITE
 
 #include <string.h>
 
-// definicja klasy bariery
-
 class Barrier : public bar_t
 {
 public:
