@@ -328,9 +328,6 @@ static inline unsigned sem_giveISR( sem_id sem ) { return sem_sendFor(sem, IMMED
 
 #include <string.h>
 
-// definicja klasy semafora
-// limit: maksymalna iloœæ dostêpnych ¿etonów
-
 class Semaphore : public sem_t
 {
 public:
