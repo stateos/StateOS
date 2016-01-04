@@ -52,7 +52,7 @@ extern "C" {
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
- * Notes             : function port_sys_init should be invoked as a constructor                                      *
+ * Note              : function port_sys_init should be invoked as a constructor                                      *
  *                   : otherwise, call sys_init as the first instruction in function main                             *
  *                                                                                                                    *
  **********************************************************************************************************************/
@@ -66,7 +66,7 @@ static inline void     sys_init( void ) { port_sys_init(); }
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 #define sys_lock()     port_sys_lock()
@@ -79,7 +79,7 @@ static inline void     sys_init( void ) { port_sys_init(); }
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
- * Notes             : use only in handler mode                                                                       *
+ * Note              : use only in handler mode                                                                       *
  *                                                                                                                    *
  **********************************************************************************************************************/
 #define sys_lockISR()  port_sys_lock()
@@ -92,7 +92,7 @@ static inline void     sys_init( void ) { port_sys_init(); }
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
- * Notes             : use only in thread mode                                                                        *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 #define sys_unlock()   port_sys_unlock()
@@ -105,7 +105,7 @@ static inline void     sys_init( void ) { port_sys_init(); }
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
- * Notes             : use only in handler mode                                                                       *
+ * Note              : use only in handler mode                                                                       *
  *                                                                                                                    *
  **********************************************************************************************************************/
 #define sys_unlockISR() port_sys_unlock()
