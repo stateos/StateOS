@@ -50,6 +50,8 @@ extern "C" {
  *                                                                                                                    *
  * Description       : initialize system timer and enabled services                                                   *
  *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
  * Note              : function port_sys_init should be invoked as a constructor                                      *
@@ -65,6 +67,8 @@ static inline void     sys_init( void ) { port_sys_init(); }
  *                                                                                                                    *
  * Description       : disable interrupts / enter into critical section (in thread mode)                              *
  *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
@@ -78,6 +82,8 @@ static inline void     sys_init( void ) { port_sys_init(); }
  * Name              : sys_lockISR                                                                                    *
  *                                                                                                                    *
  * Description       : disable interrupts / enter into critical section (in handler mode)                             *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -93,6 +99,8 @@ static inline void     sys_init( void ) { port_sys_init(); }
  *                                                                                                                    *
  * Description       : enable interrupts / exit from critical section (in thread mode)                                *
  *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
@@ -106,6 +114,8 @@ static inline void     sys_init( void ) { port_sys_init(); }
  * Name              : sys_unlockISR                                                                                  *
  *                                                                                                                    *
  * Description       : enable interrupts / exit from critical section (in handler mode)                               *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
