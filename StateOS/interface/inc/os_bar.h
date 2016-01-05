@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_bar.h
     @author  Rajmund Szymanski
-    @date    04.01.2016
+    @date    05.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -115,7 +115,7 @@ extern "C" {
  *   E_SUCCESS       : barrier object was successfully released                                                       *
  *   E_STOPPED       : barrier object was killed before the specified timeout expired                                 *
  *   E_TIMEOUT       : barrier object was not released before the specified timeout expired                           *
- *   'another'       : task was resumed with 'another' event                                                          *
+ *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
