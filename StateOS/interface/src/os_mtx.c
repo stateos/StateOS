@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    07.01.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
