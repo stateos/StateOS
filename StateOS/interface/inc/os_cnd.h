@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    07.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -29,60 +29,196 @@
 #pragma once
 
 #include <oskernel.h>
-#include <os_mtx.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : condition variable                                                                             *
+ *                     like a POSIX pthread_cond_t                                                                    *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-#define cndOne ( false )
-#define cndAll ( true  )
+#define cndOne ( false ) // notify one task
+#define cndAll ( true  ) // notify all tasks
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : OS_CND                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize a condition variable object                                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   cnd             : name of a pointer to condition variable object                                                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// deklaracja 'cnd'
-
-#define OS_CND( cnd )                         \
+#define     OS_CND( cnd )                     \
                cnd_t cnd##__cnd = _CND_INIT(); \
                cnd_id cnd = & cnd##__cnd
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_CND                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize a static condition variable object                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   cnd             : name of a pointer to condition variable object                                                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 #define static_CND( cnd )                     \
         static cnd_t cnd##__cnd = _CND_INIT(); \
         static cnd_id cnd = & cnd##__cnd
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : cnd_create                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a new condition variable object                                           *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : pointer to condition variable object (condition variable successfully created)                 *
+ *   0               : condition variable not created (not enough free memory)                                        *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// utworzenie obiektu typu zmienna warunkowa
-// zwraca adres utworzonego obiektu, lub 0
               cnd_id   cnd_create( void );
 
-// reset obiektu 'cnd'
-// wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
-// zostaje do nich wys³any komunikat E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : cnd_kill                                                                                       *
+ *                                                                                                                    *
+ * Description       : reset the condition variable object and wake up all waiting tasks with 'E_STOPPED' event value *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   cnd             : pointer to condition variable object                                                           *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     cnd_kill( cnd_id cnd );
 
-// zawieszenie wykonywania aktualnego procesu do czasu 'time'
-// lub do wybudzenia przez obiekt 'cnd' i zajêcia obiektu 'mtx'
-// zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : cnd_waitUntil                                                                                  *
+ *                                                                                                                    *
+ * Description       : wait until given timepoint on the condition variable releasing the currently owned mutex,      *
+ *                     and finally lock the mutex again                                                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   cnd             : pointer to condition variable object                                                           *
+ *   mtx             : currently owned mutex                                                                          *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again              *
+ *   E_STOPPED       : condition variable object was killed before the specified timeout expired                      *
+ *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired               *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned cnd_waitUntil( cnd_id cnd, mtx_id mtx, unsigned time );
 
-// zawieszenie wykonywania aktualnego procesu na czas 'delay'
-// lub do wybudzenia przez obiekt 'cnd' i zajêcia obiektu 'mtx'
-// zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : cnd_waitFor                                                                                    *
+ *                                                                                                                    *
+ * Description       : wait for given duration of time on the condition variable releasing the currently owned mutex, *
+ *                     and finally lock the mutex again                                                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   cnd             : pointer to condition variable object                                                           *
+ *   mtx             : currently owned mutex                                                                          *
+ *   delay           : duration of time (maximum number of ticks to wait on the condition variable object)            *
+ *                     IMMEDIATE: don't wait on the condition variable object                                         *
+ *                     INFINITE:  wait indefinitly on the condition variable object                                   *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again              *
+ *   E_STOPPED       : condition variable object was killed before the specified timeout expired                      *
+ *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired               *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned cnd_waitFor( cnd_id cnd, mtx_id mtx, unsigned delay );
 
-// zawieszenie wykonywania aktualnego procesu
-// do czasu przez obiekt 'cnd' i zajêcia obiektu 'mtx'
-// zwraca E_SUCCESS lub E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : cnd_wait                                                                                       *
+ *                                                                                                                    *
+ * Description       : wait indefinitly on the condition variable releasing the currently owned mutex,                *
+ *                     and finally lock the mutex again                                                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   cnd             : pointer to condition variable object                                                           *
+ *   mtx             : currently owned mutex                                                                          *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again              *
+ *   E_STOPPED       : condition variable object was killed                                                           *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned cnd_wait( cnd_id cnd, mtx_id mtx ) { return cnd_waitFor(cnd, mtx, INFINITE); }
 
-// uwolnienie jednego lub wszytkich ('all') obiektów oczekuj¹cych
-              void     cnd_give   ( cnd_id cnd, bool all );
-static inline void     cnd_giveISR( cnd_id cnd, bool all ) { cnd_give(cnd, all); }
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : cnd_give                                                                                       *
+ *                                                                                                                    *
+ * Description       : signal one or all tasks that are waiting on the condition variable                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   cnd             : pointer to condition variable object                                                           *
+ *   all             : signal receiver                                                                                *
+ *                     cndOne: notify one task that is waiting on the condition variable                              *
+ *                     cndAll: notify all tasks that are waiting on the condition variable                            *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-/* -------------------------------------------------------------------------- */
+              void     cnd_give   ( cnd_id cnd, bool all );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : cnd_giveISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : signal one or all tasks that are waiting on the condition variable                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   cnd             : pointer to condition variable object                                                           *
+ *   all             : signal receiver                                                                                *
+ *                     cndOne: notify one task that is waiting on the condition variable                              *
+ *                     cndAll: notify all tasks that are waiting on the condition variable                            *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline void     cnd_giveISR( cnd_id cnd, bool all ) { cnd_give(cnd, all); }
 
 #ifdef __cplusplus
 }
@@ -93,8 +229,6 @@ static inline void     cnd_giveISR( cnd_id cnd, bool all ) { cnd_give(cnd, all);
 #ifdef __cplusplus
 
 #include <string.h>
-
-// definicja klasy zdarzenia
 
 class ConditionVariable : public cnd_t
 {
