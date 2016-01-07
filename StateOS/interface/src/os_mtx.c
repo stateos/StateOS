@@ -55,7 +55,7 @@ void priv_mtx_link( mtx_id mtx, tsk_id tsk )
 {
 	mtx->owner = tsk;
 
-    if (tsk)
+	if (tsk)
 	if (mtx->type & mtxPriorityInheritance)
 	{
 		mtx->mlist = tsk->mlist;
