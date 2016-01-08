@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_msg.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    08.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -34,50 +34,309 @@
 extern "C" {
 #endif
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : message queue                                                                                  *
+ *                     message is an 'unsigned int' data type; for other data types use mailbox queue                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// deklaracja kolejki komunikatów 'msg'
-// limit: rozmiar kolejki (maksymalna iloœæ komunikatów)
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : OS_MSG                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize a message queue object                                                    *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : name of a pointer to message queue object                                                      *
+ *   limit           : size of the queue (max number of stored messages)                                              *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-#define OS_MSG( msg, limit )                                   \
+#define     OS_MSG( msg, limit )                               \
                unsigned msg##__data[limit];                     \
                msg_t msg##__msg = _MSG_INIT(limit, msg##__data); \
                msg_id msg = & msg##__msg
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_MSG                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize a static message queue object                                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : name of a pointer to message queue object                                                      *
+ *   limit           : size of the queue (max number of stored messages)                                              *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 #define static_MSG( msg, limit )                               \
         static unsigned msg##__data[limit];                     \
         static msg_t msg##__msg = _MSG_INIT(limit, msg##__data); \
         static msg_id msg = & msg##__msg
 
-/* -------------------------------------------------------------------------- */
-
-// obs³uga obiektu: message queue (msg),
-// który jest pochodn¹ obiektu mailbox queue (box)
-// 'msg' jest kolejk¹ danych typu 'unsigned int'
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_create                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a new message queue object                                                *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : size of the queue (max number of stored messages)                                              *
+ *                                                                                                                    *
+ * Return            : pointer to message queue object (message queue successfully created)                           *
+ *   0               : message queue not created (not enough free memory)                                             *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
               msg_id   msg_create( unsigned limit );
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_kill                                                                                       *
+ *                                                                                                                    *
+ * Description       : reset the message queue object and wake up all waiting tasks with 'E_STOPPED' event value      *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     msg_kill( msg_id msg );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_waitUntil                                                                                  *
+ *                                                                                                                    *
+ * Description       : try to transfer message data from the message queue object,                                    *
+ *                     wait until given timepoint while the message queue object is empty                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   data            : pointer to store massage data                                                                  *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
+ *   E_STOPPED       : message queue object was killed before the specified timeout expired                           *
+ *   E_TIMEOUT       : message queue object is empty and was not received data before the specified timeout expired   *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
               unsigned msg_waitUntil( msg_id msg, unsigned *data, unsigned time );
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_waitFor                                                                                    *
+ *                                                                                                                    *
+ * Description       : try to transfer message data from the message queue object,                                    *
+ *                     wait for given duration of time while the message queue object is empty                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   data            : pointer to store massage data                                                                  *
+ *   delay           : duration of time (maximum number of ticks to wait while the message queue object is empty)     *
+ *                     IMMEDIATE: don't wait if the message queue object is empty                                     *
+ *                     INFINITE:  wait indefinitly while the message queue object is empty                            *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
+ *   E_STOPPED       : message queue object was killed before the specified timeout expired                           *
+ *   E_TIMEOUT       : message queue object is empty and was not received data before the specified timeout expired   *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned msg_waitFor( msg_id msg, unsigned *data, unsigned delay );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_wait                                                                                       *
+ *                                                                                                                    *
+ * Description       : try to transfer message data from the message queue object,                                    *
+ *                     wait indefinitly while the message queue object is empty                                       *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   data            : pointer to store massage data                                                                  *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
+ *   E_STOPPED       : message queue object was killed                                                                *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 static inline unsigned msg_wait( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, INFINITE); }
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_take                                                                                       *
+ *                                                                                                                    *
+ * Description       : try to transfer message data from the message queue object,                                    *
+ *                     don't wait if the message queue object is empty                                                *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   data            : pointer to store massage data                                                                  *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
+ *   E_TIMEOUT       : message queue object is empty                                                                  *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned msg_take   ( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_takeISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : try to transfer message data from the message queue object,                                    *
+ *                     don't wait if the message queue object is empty                                                *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   data            : pointer to store massage data                                                                  *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
+ *   E_TIMEOUT       : message queue object is empty                                                                  *
+ *                                                                                                                    *
+ * Note              : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned msg_takeISR( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_sendUntil                                                                                  *
+ *                                                                                                                    *
+ * Description       : try to transfer message data to the message queue object,                                      *
+ *                     wait until given timepoint while the message queue object is full                              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   data            : massage data                                                                                   *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
+ *   E_STOPPED       : message queue object was killed before the specified timeout expired                           *
+ *   E_TIMEOUT       : message queue object is full and was not issued data before the specified timeout expired      *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
               unsigned msg_sendUntil( msg_id msg, unsigned data, unsigned time );
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_sendFor                                                                                    *
+ *                                                                                                                    *
+ * Description       : try to transfer message data to the message queue object,                                      *
+ *                     wait for given duration of time while the message queue object is full                         *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   data            : massage data                                                                                   *
+ *   delay           : duration of time (maximum number of ticks to wait while the message queue object is full)      *
+ *                     IMMEDIATE: don't wait if the message queue object is full                                      *
+ *                     INFINITE:  wait indefinitly while the message queue object is full                             *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
+ *   E_STOPPED       : message queue object was killed before the specified timeout expired                           *
+ *   E_TIMEOUT       : message queue object is full and was not issued data before the specified timeout expired      *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned msg_sendFor( msg_id msg, unsigned data, unsigned delay );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_send                                                                                       *
+ *                                                                                                                    *
+ * Description       : try to transfer message data to the message queue object,                                      *
+ *                     wait indefinitly while the message queue object is full                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   data            : massage data                                                                                   *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
+ *   E_STOPPED       : message queue object was killed                                                                *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 static inline unsigned msg_send( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, INFINITE); }
 
-static inline unsigned msg_give   ( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
-static inline unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_give                                                                                       *
+ *                                                                                                                    *
+ * Description       : try to transfer message data to the message queue object,                                      *
+ *                     don't wait if the message queue object is full                                                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   data            : massage data                                                                                   *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
+ *   E_TIMEOUT       : message queue object is full                                                                   *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-/* -------------------------------------------------------------------------- */
+static inline unsigned msg_give   ( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_giveISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : try to transfer message data to the message queue object,                                      *
+ *                     don't wait if the message queue object is full                                                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   data            : massage data                                                                                   *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
+ *   E_TIMEOUT       : message queue object is full                                                                   *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
 
 #ifdef __cplusplus
 }
@@ -88,9 +347,6 @@ static inline unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sen
 #ifdef __cplusplus
 
 #include <string.h>
-
-// definicja klasy kolejki komunikatów
-// limit: rozmiar kolejki (ilosc porcji danych)
 
 template<unsigned _limit>
 class MessageQueueT : public msg_t
