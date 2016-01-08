@@ -14,7 +14,7 @@ Features
 - kernel works in preemptive or cooperative mode
 - kernel can operate in tick-less mode (32-bit timer required)
 - events
-- flags (one, all, clear, accept)
+- flags (one, all, accept)
 - barriers
 - semaphores (binary, limited, counting)
 - mutexes (normal, recursive, priority protect, priority inheritance)

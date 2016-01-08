@@ -34,69 +34,255 @@
 extern "C" {
 #endif
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flag                                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 #define flgOne       ( 0U << 0 )
 #define flgAll       ( 1U << 0 )
-#define flgClear     ( 0U << 1 )
 #define flgAccept    ( 1U << 1 )
 
-#define flgOneClear  ( flgOne | flgClear  )
-#define flgAllClear  ( flgAll | flgClear  )
 #define flgOneAccept ( flgOne | flgAccept )
 #define flgAllAccept ( flgAll | flgAccept )
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : OS_FLG                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize a flag object                                                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : name of a pointer to flag object                                                               *
+ *   mask            : mask of write only flags in flag object (these flags can't be cleared after accepting)         *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// deklaracja flagi 'flg'
-
-#define OS_FLG( flg, mask )                       \
+#define     OS_FLG( flg, mask )                   \
                flg_t flg##__flg = _FLG_INIT(mask); \
                flg_id flg = & flg##__flg
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_FLG                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize a static flag object                                                      *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : name of a pointer to flag object                                                               *
+ *   mask            : mask of write only flags in flag object (these flags can't be cleared after accepting)         *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 #define static_FLG( flg, mask )                   \
         static flg_t flg##__flg = _FLG_INIT(mask); \
         static flg_id flg = & flg##__flg
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_create                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a new flag object                                                         *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mask            : mask of write only flags in flag object (these flags can't be cleared after accepting)         *
+ *                                                                                                                    *
+ * Return            : pointer to flag object (flag successfully created)                                             *
+ *   0               : flag not created (not enough free memory)                                                      *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// utworzenie obiektu typu flaga (flg)
-// 'mask' zabezpiecza flagi, które nie mog¹ byæ kasowane (mog¹ byæ tylko ustawiane)
-// zwraca adres utworzonego obiektu, lub 0
               flg_id   flg_create( unsigned mask );
 
-// reset obiektu 'flg'
-// wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
-// zostaje do nich wys³any komunikat E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_kill                                                                                       *
+ *                                                                                                                    *
+ * Description       : reset the flag object and wake up all waiting tasks with 'E_STOPPED' event value               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : pointer to flag object                                                                         *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     flg_kill( flg_id flg );
 
-// zawieszenie wykonywania aktualnego procesu do czasu 'time'
-// lub do wybudzenia przez oczekiwan¹ flagê lub wszystkie flagi (all)
-// all: flgOne, flgAll
-// zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_waitUntil                                                                                  *
+ *                                                                                                                    *
+ * Description       : wait on flag object for given flags until given timepoint                                      *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : pointer to flag object                                                                         *
+ *   flags           : all flags to wait                                                                              *
+ *   mode            : waiting mode                                                                                   *
+ *                     flgOne:    wait for any flags to be set                                                        *
+ *                     flgAll:    wait for all flags to be set                                                        *
+ *                     flgAccept: accept flags that are set and not accepted before                                   *
+ *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : requested flags have been set before the specified timeout expired                             *
+ *   E_STOPPED       : flag object was killed before the specified timeout expired                                    *
+ *   E_TIMEOUT       : requested flags have not been set before the specified timeout expired                         *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned flg_waitUntil( flg_id flg, unsigned flags, unsigned mode, unsigned time );
 
-// zawieszenie wykonywania aktualnego procesu na czas 'delay'
-// lub do wybudzenia przez oczekiwan¹ flagê lub wszystkie flagi (all)
-// zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_waitFor                                                                                    *
+ *                                                                                                                    *
+ * Description       : wait on flag object for given flags for given duration of time                                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : pointer to flag object                                                                         *
+ *   flags           : all flags to wait                                                                              *
+ *   mode            : waiting mode                                                                                   *
+ *                     flgOne:    wait for any flags to be set                                                        *
+ *                     flgAll:    wait for all flags to be set                                                        *
+ *                     flgAccept: accept flags that are set and not accepted before                                   *
+ *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
+ *   delay           : duration of time (maximum number of ticks to wait on flag object for given flags)              *
+ *                     IMMEDIATE: don't wait until requested flags have been set                                      *
+ *                     INFINITE:  wait indefinitly until requested flags have been set                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : requested flags have been set before the specified timeout expired                             *
+ *   E_STOPPED       : flag object was killed before the specified timeout expired                                    *
+ *   E_TIMEOUT       : requested flags have not been set before the specified timeout expired                         *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned flg_waitFor( flg_id flg, unsigned flags, unsigned mode, unsigned delay );
 
-// zawieszenie wykonywania aktualnego procesu
-// do czasu wybudzenia przez oczekiwan¹ flagê lub wszystkie flagi (all)
-// zwraca E_SUCCESS lub E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_wait                                                                                       *
+ *                                                                                                                    *
+ * Description       : wait indefinitly on flag object until requested flags have been set                            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : pointer to flag object                                                                         *
+ *   flags           : all flags to wait                                                                              *
+ *   mode            : waiting mode                                                                                   *
+ *                     flgOne:    wait for any flags to be set                                                        *
+ *                     flgAll:    wait for all flags to be set                                                        *
+ *                     flgAccept: accept flags that are set and not accepted before                                   *
+ *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : requested flags have been set                                                                  *
+ *   E_STOPPED       : flag object was killed                                                                         *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned flg_wait( flg_id flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
 
-// nie zawieszenie wykonywania aktualnego procesu
-// sprawdza oczekiwan¹ flagê lub wszystkie flagi (all)
-// zwraca E_SUCCESS lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_take                                                                                       *
+ *                                                                                                                    *
+ * Description       : don't wait on flag object until requested flags have been set                                  *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : pointer to flag object                                                                         *
+ *   flags           : all flags to wait                                                                              *
+ *   mode            : waiting mode                                                                                   *
+ *                     flgOne:    wait for any flags to be set                                                        *
+ *                     flgAll:    wait for all flags to be set                                                        *
+ *                     flgAccept: accept flags that are set and not accepted before                                   *
+ *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : requested flags have been set                                                                  *
+ *   E_TIMEOUT       : requested flags have not been set                                                              *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned flg_take   ( flg_id flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_takeISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : don't wait on flag object until requested flags have been set                                  *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : pointer to flag object                                                                         *
+ *   flags           : all flags to wait                                                                              *
+ *   mode            : waiting mode                                                                                   *
+ *                     flgOne:    wait for any flags to be set                                                        *
+ *                     flgAll:    wait for all flags to be set                                                        *
+ *                     flgAccept: accept flags that are set and not accepted before                                   *
+ *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : requested flags have been set                                                                  *
+ *   E_TIMEOUT       : requested flags have not been set                                                              *
+ *                                                                                                                    *
+ * Note              : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned flg_takeISR( flg_id flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
 
-// wysy³a flagê lub flagi do obiektu 'flg'
-              void     flg_give   ( flg_id flg, unsigned flags );
-static inline void     flg_giveISR( flg_id flg, unsigned flags ) { flg_give(flg, flags); }
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_give                                                                                       *
+ *                                                                                                                    *
+ * Description       : set given flags in flag object                                                                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : pointer to flag object                                                                         *
+ *   flags           : all flags to set                                                                               *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-/* -------------------------------------------------------------------------- */
+              void     flg_give   ( flg_id flg, unsigned flags );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_giveISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : set given flags in flag object                                                                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : pointer to flag object                                                                         *
+ *   flags           : all flags to set                                                                               *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline void     flg_giveISR( flg_id flg, unsigned flags ) { flg_give(flg, flags); }
 
 #ifdef __cplusplus
 }
@@ -107,8 +293,6 @@ static inline void     flg_giveISR( flg_id flg, unsigned flags ) { flg_give(flg,
 #ifdef __cplusplus
 
 #include <string.h>
-
-// definicja klasy flagi
 
 class Flag : public flg_t
 {
