@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    08.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -34,27 +34,74 @@
 extern "C" {
 #endif
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : timer                                                                                          *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// deklaracja zegara 'tmr'
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : OS_TMR                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize a timer object                                                            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : name of a pointer to timer object                                                              *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-#define OS_TMR( tmr )                         \
+#define     OS_TMR( tmr )                     \
                tmr_t tmr##__tmr = _TMR_INIT(); \
                tmr_id tmr = & tmr##__tmr
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_TMR                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize a static timer object                                                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : name of a pointer to timer object                                                              *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 #define static_TMR( tmr )                     \
         static tmr_t tmr##__tmr = _TMR_INIT(); \
         static tmr_id tmr = & tmr##__tmr
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_create                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a new timer object                                                        *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : pointer to timer object (timer successfully created)                                           *
+ *   0               : timer not created (not enough free memory)                                                     *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// utworzenie obiektu typu zegar
-// zwraca adres utworzonego obiektu, lub 0
               tmr_id   tmr_create( void );
 
-// zatrzymanie zegara 'tmr'
-// wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
-// zostaje do nich wys³any komunikat E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_kill                                                                                       *
+ *                                                                                                                    *
+ * Description       : reset the timer object and wake up all waiting tasks with 'E_STOPPED' event value              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     tmr_kill( tmr_id tmr );
 
 // uruchomienie zegara 'tmr'
@@ -113,8 +160,6 @@ static inline void     tmr_delayISR( unsigned delay ) { System.tmr->delay = dela
 
 #include <string.h>
 
-// definicja klasy zegara
-
 class Timer : public tmr_t
 {
 public:
@@ -145,7 +190,6 @@ public:
 
 namespace ThisTimer
 {
-// poni¿sze funkcje mog¹ byæ wywo³ywana tylko z poziomu procedury obs³ugi zegara
 	void flipISR      ( fun_id   _state )                 {        tmr_flipISR            (_state);               }
 	void delayISR     ( unsigned _delay )                 {        tmr_delayISR           (_delay);               }
 };

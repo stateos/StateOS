@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_flg.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    08.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
