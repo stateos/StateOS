@@ -126,7 +126,7 @@ extern "C" {
  *   mode            : waiting mode                                                                                   *
  *                     flgOne:    wait for any flags to be set                                                        *
  *                     flgAll:    wait for all flags to be set                                                        *
- *                     flgAccept: accept flags that are set and not accepted before                                   *
+ *                     flgAccept: accept flags that have been set and not accepted before                             *
  *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
@@ -154,7 +154,7 @@ extern "C" {
  *   mode            : waiting mode                                                                                   *
  *                     flgOne:    wait for any flags to be set                                                        *
  *                     flgAll:    wait for all flags to be set                                                        *
- *                     flgAccept: accept flags that are set and not accepted before                                   *
+ *                     flgAccept: accept flags that have been set and not accepted before                             *
  *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
  *   delay           : duration of time (maximum number of ticks to wait on flag object for given flags)              *
  *                     IMMEDIATE: don't wait until requested flags have been set                                      *
@@ -184,7 +184,7 @@ extern "C" {
  *   mode            : waiting mode                                                                                   *
  *                     flgOne:    wait for any flags to be set                                                        *
  *                     flgAll:    wait for all flags to be set                                                        *
- *                     flgAccept: accept flags that are set and not accepted before                                   *
+ *                     flgAccept: accept flags that have been set and not accepted before                             *
  *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
  *                                                                                                                    *
  * Return                                                                                                             *
@@ -210,7 +210,7 @@ static inline unsigned flg_wait( flg_id flg, unsigned flags, unsigned mode ) { r
  *   mode            : waiting mode                                                                                   *
  *                     flgOne:    wait for any flags to be set                                                        *
  *                     flgAll:    wait for all flags to be set                                                        *
- *                     flgAccept: accept flags that are set and not accepted before                                   *
+ *                     flgAccept: accept flags that have been set and not accepted before                             *
  *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
  *                                                                                                                    *
  * Return                                                                                                             *
@@ -235,7 +235,7 @@ static inline unsigned flg_take   ( flg_id flg, unsigned flags, unsigned mode ) 
  *   mode            : waiting mode                                                                                   *
  *                     flgOne:    wait for any flags to be set                                                        *
  *                     flgAll:    wait for all flags to be set                                                        *
- *                     flgAccept: accept flags that are set and not accepted before                                   *
+ *                     flgAccept: accept flags that have been set and not accepted before                             *
  *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
  *                                                                                                                    *
  * Return                                                                                                             *
