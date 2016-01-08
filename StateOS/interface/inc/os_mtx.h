@@ -176,7 +176,7 @@ extern "C" {
  *   mtx             : pointer to mutex object                                                                        *
  *   delay           : duration of time (maximum number of ticks to wait for lock the mutex object)                   *
  *                     IMMEDIATE: don't wait if the mutex object can't be locked immediately                          *
- *                     INFINITE:  wait indefinitly until the mutex object have been locked                            *
+ *                     INFINITE:  wait indefinitly until the mutex object has been locked                             *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : mutex object was successfully locked                                                           *

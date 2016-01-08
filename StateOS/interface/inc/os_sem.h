@@ -155,7 +155,7 @@ extern "C" {
  *   sem             : pointer to semaphore object                                                                    *
  *   delay           : duration of time (maximum number of ticks to wait for lock the semaphore object)               *
  *                     IMMEDIATE: don't wait if the semaphore object can't be locked immediately                      *
- *                     INFINITE:  wait indefinitly until the semaphore object have been locked                        *
+ *                     INFINITE:  wait indefinitly until the semaphore object has been locked                         *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : semaphore object was successfully locked                                                       *
@@ -264,7 +264,7 @@ static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMED
  *   sem             : pointer to semaphore object                                                                    *
  *   delay           : duration of time (maximum number of ticks to wait for unlock the semaphore object)             *
  *                     IMMEDIATE: don't wait if the semaphore object can't be unlocked immediately                    *
- *                     INFINITE:  wait indefinitly until the semaphore object have been unlocked                      *
+ *                     INFINITE:  wait indefinitly until the semaphore object has been unlocked                       *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : semaphore object was successfully unlocked                                                     *

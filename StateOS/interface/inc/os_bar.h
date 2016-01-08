@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_bar.h
     @author  Rajmund Szymanski
-    @date    07.01.2016
+    @date    08.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -140,7 +140,7 @@ extern "C" {
  *   bar             : pointer to barrier object                                                                      *
  *   delay           : duration of time (maximum number of ticks to wait for release the barrier object)              *
  *                     IMMEDIATE: don't wait if the barrier object can't be released                                  *
- *                     INFINITE:  wait indefinitly until the barrier object have been released                        *
+ *                     INFINITE:  wait indefinitly until the barrier object has been released                         *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : barrier object was successfully released                                                       *
@@ -158,7 +158,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : bar_wait                                                                                       *
  *                                                                                                                    *
- * Description       : wait indefinitly until the barrier object have been released                                   *
+ * Description       : wait indefinitly until the barrier object has been released                                    *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   bar             : pointer to barrier object                                                                      *
