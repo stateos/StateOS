@@ -49,7 +49,7 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : name of a pointer to message queue object                                                      *
- *   limit           : size of the queue (max number of stored messages)                                              *
+ *   limit           : size of a queue (max number of stored messages)                                                *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -66,7 +66,7 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : name of a pointer to message queue object                                                      *
- *   limit           : size of the queue (max number of stored messages)                                              *
+ *   limit           : size of a queue (max number of stored messages)                                                *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -82,7 +82,7 @@ extern "C" {
  * Description       : create and initilize a new message queue object                                                *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   limit           : size of the queue (max number of stored messages)                                              *
+ *   limit           : size of a queue (max number of stored messages)                                                *
  *                                                                                                                    *
  * Return            : pointer to message queue object (message queue successfully created)                           *
  *   0               : message queue not created (not enough free memory)                                             *
@@ -119,7 +119,7 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : pointer to message queue object                                                                *
- *   data            : pointer to store massage data                                                                  *
+ *   data            : pointer to store message data                                                                  *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
@@ -143,7 +143,7 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : pointer to message queue object                                                                *
- *   data            : pointer to store massage data                                                                  *
+ *   data            : pointer to store message data                                                                  *
  *   delay           : duration of time (maximum number of ticks to wait while the message queue object is empty)     *
  *                     IMMEDIATE: don't wait if the message queue object is empty                                     *
  *                     INFINITE:  wait indefinitly while the message queue object is empty                            *
@@ -169,7 +169,7 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : pointer to message queue object                                                                *
- *   data            : pointer to store massage data                                                                  *
+ *   data            : pointer to store message data                                                                  *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
@@ -191,7 +191,7 @@ static inline unsigned msg_wait( msg_id msg, unsigned *data ) { return msg_waitF
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : pointer to message queue object                                                                *
- *   data            : pointer to store massage data                                                                  *
+ *   data            : pointer to store message data                                                                  *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
@@ -212,7 +212,7 @@ static inline unsigned msg_take   ( msg_id msg, unsigned *data ) { return msg_wa
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : pointer to message queue object                                                                *
- *   data            : pointer to store massage data                                                                  *
+ *   data            : pointer to store message data                                                                  *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
@@ -233,7 +233,7 @@ static inline unsigned msg_takeISR( msg_id msg, unsigned *data ) { return msg_wa
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : pointer to message queue object                                                                *
- *   data            : massage data                                                                                   *
+ *   data            : message data                                                                                   *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
@@ -257,7 +257,7 @@ static inline unsigned msg_takeISR( msg_id msg, unsigned *data ) { return msg_wa
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : pointer to message queue object                                                                *
- *   data            : massage data                                                                                   *
+ *   data            : message data                                                                                   *
  *   delay           : duration of time (maximum number of ticks to wait while the message queue object is full)      *
  *                     IMMEDIATE: don't wait if the message queue object is full                                      *
  *                     INFINITE:  wait indefinitly while the message queue object is full                             *
@@ -283,7 +283,7 @@ static inline unsigned msg_takeISR( msg_id msg, unsigned *data ) { return msg_wa
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : pointer to message queue object                                                                *
- *   data            : massage data                                                                                   *
+ *   data            : message data                                                                                   *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
@@ -305,7 +305,7 @@ static inline unsigned msg_send( msg_id msg, unsigned data ) { return msg_sendFo
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : pointer to message queue object                                                                *
- *   data            : massage data                                                                                   *
+ *   data            : message data                                                                                   *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
@@ -326,13 +326,13 @@ static inline unsigned msg_give   ( msg_id msg, unsigned data ) { return msg_sen
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   msg             : pointer to message queue object                                                                *
- *   data            : massage data                                                                                   *
+ *   data            : message data                                                                                   *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
  *   E_TIMEOUT       : message queue object is full                                                                   *
  *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
+ * Note              : use only in handler mode                                                                       *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
