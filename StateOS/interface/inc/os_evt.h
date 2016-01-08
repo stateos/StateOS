@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_evt.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    08.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -34,46 +34,173 @@
 extern "C" {
 #endif
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : event                                                                                          *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// deklaracja zdarzenia 'evt'
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : OS_EVT                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize a event object                                                            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   evt             : name of a pointer to event object                                                              *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-#define OS_EVT( evt )                         \
+#define     OS_EVT( evt )                     \
                evt_t evt##__evt = _EVT_INIT(); \
                evt_id evt = & evt##__evt
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_EVT                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize a static event object                                                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   evt             : name of a pointer to event object                                                              *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 #define static_EVT( evt )                     \
         static evt_t evt##__evt = _EVT_INIT(); \
         static evt_id evt = & evt##__evt
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : evt_create                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a new event object                                                        *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : pointer to event object (event successfully created)                                           *
+ *   0               : event not created (not enough free memory)                                                     *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// utworzenie obiektu typu zdarzenie
-// zwraca adres utworzonego obiektu, lub 0
               evt_id   evt_create( void );
 
-// reset obiektu 'evt'
-// wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
-// zostaje do nich wys³any komunikat E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : evt_kill                                                                                       *
+ *                                                                                                                    *
+ * Description       : reset the event object and wake up all waiting tasks with 'E_STOPPED' event value              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   evt             : pointer to event object                                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     evt_kill( evt_id evt );
 
-// zawieszenie wykonywania aktualnego procesu do czasu 'time'
-// lub do wybudzenia przez obiekt 'evt'
-// zwraca odebrany komunikat o zdarzeniu, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : evt_waitUntil                                                                                  *
+ *                                                                                                                    *
+ * Description       : wait for release the event object until given timepoint                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   evt             : pointer to event object                                                                        *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_STOPPED       : event object was killed before the specified timeout expired                                   *
+ *   E_TIMEOUT       : event object was not released before the specified timeout expired                             *
+ *   'another'       : event object was successfully released or task was resumed with 'another' event value          *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned evt_waitUntil( evt_id evt, unsigned time );
 
-// zawieszenie wykonywania aktualnego procesu na czas 'delay'
-// lub do wybudzenia przez obiekt 'evt'
-// zwraca odebrany komunikat o zdarzeniu, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : evt_waitFor                                                                                    *
+ *                                                                                                                    *
+ * Description       : wait for release the event object for given duration of time                                   *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   evt             : pointer to event object                                                                        *
+ *   delay           : duration of time (maximum number of ticks to wait for release the event object)                *
+ *                     IMMEDIATE: don't wait until the event object has been released                                 *
+ *                     INFINITE:  wait indefinitly until the event object has been released                           *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_STOPPED       : event object was killed before the specified timeout expired                                   *
+ *   E_TIMEOUT       : event object was not released before the specified timeout expired                             *
+ *   'another'       : event object was successfully released or task was resumed with 'another' event value          *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned evt_waitFor( evt_id evt, unsigned delay );
 
-// zawieszenie wykonywania aktualnego procesu
-// do czasu wybudzenia przez obiekt 'evt'
-// zwraca odebrany komunikat o zdarzeniu lub E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : evt_wait                                                                                       *
+ *                                                                                                                    *
+ * Description       : wait indefinitly until the event object has been released                                      *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   evt             : pointer to event object                                                                        *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_STOPPED       : event object was killed                                                                        *
+ *   'another'       : event object was successfully released or task was resumed with 'another' event value          *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned evt_wait( evt_id evt ) { return evt_waitFor(evt, INFINITE); }
 
-// wys³anie komunikatu o zdarzeniu 'event' do obiektu 'evt'
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : evt_give                                                                                       *
+ *                                                                                                                    *
+ * Description       : resume all tasks that are waiting on the event object                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   evt             : pointer to event object                                                                        *
+ *   event           : all waiting tasks are resumed with the 'event' value                                           *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     evt_give   ( evt_id evt, unsigned event );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : evt_giveISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : resume all tasks that are waiting on the event object                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   evt             : pointer to event object                                                                        *
+ *   event           : all waiting tasks are resumed with the 'event' value                                           *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline void     evt_giveISR( evt_id evt, unsigned event ) { evt_give(evt, event); }
 
 /* -------------------------------------------------------------------------- */
@@ -87,8 +214,6 @@ static inline void     evt_giveISR( evt_id evt, unsigned event ) { evt_give(evt,
 #ifdef __cplusplus
 
 #include <string.h>
-
-// definicja klasy zdarzenia
 
 class Event : public evt_t
 {
