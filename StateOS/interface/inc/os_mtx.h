@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    07.01.2016
+    @date    08.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -146,7 +146,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : mtx_waitUntil                                                                                  *
  *                                                                                                                    *
- * Description       : try lock the mutex object,                                                                     *
+ * Description       : try to lock the mutex object,                                                                  *
  *                     wait until given timepoint if the mutex object can't be locked immediately                     *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -169,7 +169,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : mtx_waitFor                                                                                    *
  *                                                                                                                    *
- * Description       : try lock the mutex object,                                                                     *
+ * Description       : try to lock the mutex object,                                                                  *
  *                     wait for given duration of time if the mutex object can't be locked immediately                *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -194,7 +194,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : mtx_wait                                                                                       *
  *                                                                                                                    *
- * Description       : try lock the mutex object,                                                                     *
+ * Description       : try to lock the mutex object,                                                                  *
  *                     wait indefinitly if the mutex object can't be locked immediately                               *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -215,7 +215,7 @@ static inline unsigned mtx_wait( mtx_id mtx ) { return mtx_waitFor(mtx, INFINITE
  *                                                                                                                    *
  * Name              : mtx_take                                                                                       *
  *                                                                                                                    *
- * Description       : try lock the mutex object,                                                                     *
+ * Description       : try to lock the mutex object,                                                                  *
  *                     don't wait if the mutex object can't be locked immediately                                     *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -235,7 +235,7 @@ static inline unsigned mtx_take( mtx_id mtx ) { return mtx_waitFor(mtx, IMMEDIAT
  *                                                                                                                    *
  * Name              : mtx_give                                                                                       *
  *                                                                                                                    *
- * Description       : try unlock the mutex object (only owner task can unlock mutex object),                         *
+ * Description       : try to unlock the mutex object (only owner task can unlock mutex object),                      *
  *                     don't wait if the mutex object can't be unlocked                                               *
  *                                                                                                                    *
  * Parameters                                                                                                         *
