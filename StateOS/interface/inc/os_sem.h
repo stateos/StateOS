@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_sem.h
     @author  Rajmund Szymanski
-    @date    07.01.2016
+    @date    08.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -125,7 +125,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : sem_waitUntil                                                                                  *
  *                                                                                                                    *
- * Description       : try lock the semaphore object,                                                                 *
+ * Description       : try to lock the semaphore object,                                                              *
  *                     wait until given timepoint if the semaphore object can't be locked immediately                 *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -148,7 +148,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : sem_waitFor                                                                                    *
  *                                                                                                                    *
- * Description       : try lock the semaphore object,                                                                 *
+ * Description       : try to lock the semaphore object,                                                              *
  *                     wait for given duration of time if the semaphore object can't be locked immediately            *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -173,7 +173,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : sem_wait                                                                                       *
  *                                                                                                                    *
- * Description       : try lock the semaphore object,                                                                 *
+ * Description       : try to lock the semaphore object,                                                              *
  *                     wait indefinitly if the semaphore object can't be locked immediately                           *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -194,7 +194,7 @@ static inline unsigned sem_wait( sem_id sem ) { return sem_waitFor(sem, INFINITE
  *                                                                                                                    *
  * Name              : sem_take                                                                                       *
  *                                                                                                                    *
- * Description       : try lock the semaphore object,                                                                 *
+ * Description       : try to lock the semaphore object,                                                              *
  *                     don't wait if the semaphore object can't be locked immediately                                 *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -214,7 +214,7 @@ static inline unsigned sem_take   ( sem_id sem ) { return sem_waitFor(sem, IMMED
  *                                                                                                                    *
  * Name              : sem_takeISR                                                                                    *
  *                                                                                                                    *
- * Description       : try lock the semaphore object,                                                                 *
+ * Description       : try to lock the semaphore object,                                                              *
  *                     don't wait if the semaphore object can't be locked immediately                                 *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -234,7 +234,7 @@ static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMED
  *                                                                                                                    *
  * Name              : sem_sendUntil                                                                                  *
  *                                                                                                                    *
- * Description       : try unlock the semaphore object,                                                               *
+ * Description       : try to unlock the semaphore object,                                                            *
  *                     wait until given timepoint if the semaphore object can't be unlocked immediately               *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -257,7 +257,7 @@ static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMED
  *                                                                                                                    *
  * Name              : sem_sendFor                                                                                    *
  *                                                                                                                    *
- * Description       : try unlock the semaphore object,                                                               *
+ * Description       : try to unlock the semaphore object,                                                            *
  *                     wait for given duration of time if the semaphore object can't be unlocked immediately          *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -282,7 +282,7 @@ static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMED
  *                                                                                                                    *
  * Name              : sem_send                                                                                       *
  *                                                                                                                    *
- * Description       : try unlock the semaphore object,                                                               *
+ * Description       : try to unlock the semaphore object,                                                            *
  *                     wait indefinitly if the semaphore object can't be unlocked immediately                         *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -303,7 +303,7 @@ static inline unsigned sem_send( sem_id sem ) { return sem_sendFor(sem, INFINITE
  *                                                                                                                    *
  * Name              : sem_give                                                                                       *
  *                                                                                                                    *
- * Description       : try unlock the semaphore object,                                                               *
+ * Description       : try to unlock the semaphore object,                                                            *
  *                     don't wait if the semaphore object can't be unlocked immediately                               *
  *                                                                                                                    *
  * Parameters                                                                                                         *
@@ -323,7 +323,7 @@ static inline unsigned sem_give   ( sem_id sem ) { return sem_sendFor(sem, IMMED
  *                                                                                                                    *
  * Name              : sem_giveISR                                                                                    *
  *                                                                                                                    *
- * Description       : try unlock the semaphore object,                                                               *
+ * Description       : try to unlock the semaphore object,                                                            *
  *                     don't wait if the semaphore object can't be unlocked immediately                               *
  *                                                                                                                    *
  * Parameters                                                                                                         *
