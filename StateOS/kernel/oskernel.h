@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    11.01.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -60,7 +60,7 @@ void core_ctx_reset( void )
 	port_ctx_reset();
 }
 
-// save status of current process and switch system to the next
+// save status of current process and force yield system control to the next
 void core_ctx_switch( void );
 
 // enable context switch
@@ -68,7 +68,7 @@ void port_ctx_switch( void );
 
 /* -------------------------------------------------------------------------- */
 
-// abort and reset current process and switch system to the next
+// abort and reset current process and force yield system control to the next
 void core_tsk_loop( void ) __noreturn;
 
 /* -------------------------------------------------------------------------- */
@@ -84,80 +84,95 @@ void port_tmr_start( unsigned timeout );
 
 /* -------------------------------------------------------------------------- */
 
-// procedura alokacji pamięci na stercie
+// system calloc procedure
 os_id core_sys_alloc( size_t size );
 
 /* -------------------------------------------------------------------------- */
 
-// wstawienie obiektu 'obj' do kolejki procesów / zegarów przed obiektem 'nxt'
-// i ustawienie id obiektu 'obj'
+// insert object 'obj' into tasks/timers READY queue before the 'nxt' object
+// set object id to 'id'
 void core_rdy_insert( os_id obj, unsigned id, os_id nxt );
 
-// usunięcie obiektu 'obj' z kolejki procesów / zegarów
-// i ustawienie id obiektu 'obj' na ID_STOPPED
+// remove object 'obj' from tasks/timers READY queue
+// set object id to ID_STOPPED
 void core_rdy_remove( os_id obj );
 
 /* -------------------------------------------------------------------------- */
 
-// dodanie zegara 'tmr' do listy zadań
-// ewentualne uruchomienie odliczania
+// add timer 'tmr' to timers READY queue with id 'id'
+// start countdown
 void core_tmr_insert( tmr_id tmr, unsigned id );
 
-// usuniecie zegara 'tmr' z listy zadań
+// remove timer 'tmr' from timers READY queue
 static inline
 void core_tmr_remove( tmr_id tmr ) { core_rdy_remove(tmr); }
 
-// obsługa przerwania zegarowego
+// timers queue handler procedure
 void core_tmr_handler( void );
 
 /* -------------------------------------------------------------------------- */
 
-// dodanie procesu 'tsk' do listy zadań i ustawienie id = ID_READY procesu 'tsk'
-// ewentualna zmiana kontekstu (jeśli kernel pracuje w trybie wywłaszczania)
+// add task 'tsk' to tasks READY queue with id ID_READY
+// force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
 void     core_tsk_insert( tsk_id tsk );
 
-// usunięcie procesu 'tsk' z listy zadań
+// remove task 'tsk' from tasks READY queue
 static inline
 void     core_tsk_remove( tsk_id tsk ) { core_rdy_remove(tsk); }
 
-// dodanie procesu 'tsk' do kolejki obiektu nadzorującego 'obj'
+// append task 'tsk' to object 'obj' delayed queue
 void     core_tsk_append( tsk_id tsk, os_id obj );
 
-// usunięcie procesu 'tsk' z kolejki obiektu nadzorującego
-// oraz listy aktywnych zegarów
-// do procesu zostaje przesyłany komunikat o zdarzeniu 'event'
+// remove task 'tsk' from object 'obj' delayed queue
+// with 'event' event value
 void     core_tsk_unlink( tsk_id tsk, unsigned event );
 
-// zawieszenie wykonywania procesu 'tsk' do czasu 'time'
-// i dołączenie do kolejki obiektu nadzorującego 'obj'
-// zwraca wartość komunikatu o zdarzeniu 'event'
+// delay execution of current task until given timepoint 'time'
+// append current task to object 'obj' delayed queue
+// remove current task from tasks READY queue
+// add current task to timers READY queue
+// force context switch
+// return event value
 unsigned core_tsk_waitUntil( os_id obj, unsigned time );
 
-// zawieszenie wykonywania procesu 'tsk' na czas 'delay'
-// i dołączenie do kolejki obiektu nadzorującego 'obj'
-// zwraca wartość komunikatu o zdarzeniu 'event'
+// delay execution of current task for given duration of time 'delay'
+// append current task to object 'obj' delayed queue
+// remove current task from tasks READY queue
+// add current task to timers READY queue
+// force context switch
+// return event value
 unsigned core_tsk_waitFor( os_id obj, unsigned delay );
 
-// uwolnienie procesu 'tsk' z kolejki obiektu nadzorującego
-// do procesu zostaje przesyłany komunikat o zdarzeniu 'event'
-// zwraca wskaźnik do uwolnionego procesu lub 0
+// resume execution of delayed task 'tsk' with 'event' event value
+// remove task 'tsk' from guard object delayed queue
+// remove task 'tsk' from timers READY queue
+// add task 'tsk' to tasks READY queue
+// force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
+// return 'tsk'
 tsk_id   core_tsk_wakeup( tsk_id tsk, unsigned event );
 
-// uwolnienie pierwszego procesu oczekującego z kolejki obiektu 'obj'
-// do procesu zostaje przesyłany komunikat o zdarzeniu 'event'
-// zwraca wskaźnik do uwolnionego procesu lub 0
+// resume execution of first task from object 'obj' delayed queue with 'event' event value
+// remove first task from object 'obj' delayed queue
+// remove resumed task from timers READY queue
+// add resumed task to tasks READY queue
+// force context switch if priority of resumed task is greater then priority of current task and kernel works in preemptive mode
+// return pointer to resumed task
 tsk_id   core_one_wakeup( os_id obj, unsigned event );
 
-// uwolnienie wszystkich procesów oczekujących z kolejki obiektu 'obj'
-// do procesów zostaje przesyłany komunikat o zdarzeniu 'event'
+// resume execution of all tasks from object 'obj' delayed queue with 'event' event value
+// remove all tasks from object 'obj' delayed queue
+// remove all resumed tasks from timers READY queue
+// add all resumed tasks to tasks READY queue
+// force context switch if priority of any resumed task is greater then priority of current task and kernel works in preemptive mode
 void     core_all_wakeup( os_id obj, unsigned event );
 
-// ustawienie priorytetu procesu 'tsk' z ewentualnym przekazaniem
-// sterowania do innego procesu (o wyÂższym priorytecie)
+// set task 'tsk' priority
+// force context switch if new priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
 void     core_tsk_prio( tsk_id tsk, unsigned prio );
 
-// wybranie następnego procesu do uruchomienia z listy zadań
-// zwraca adres TCB wybranego procesu
+// tasks queue handler procedure
+// reset context switch timer counter
+// return a pointer to next READY task the highest priority
 tsk_id   core_tsk_handler( void );
 
 /* -------------------------------------------------------------------------- */
