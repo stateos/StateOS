@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    08.01.2016
+    @date    11.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -104,51 +104,207 @@ extern "C" {
 
               void     tmr_kill( tmr_id tmr );
 
-// uruchomienie zegara 'tmr'
-// o czasie 'time' wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
-// i zostanie wykonana procedura 'proc' (jeœli 'proc' != 0)
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_startUntil                                                                                 *
+ *                                                                                                                    *
+ * Description       : start/restart one-shot timer until given timepoint and then launch the callback procedure      *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *   time            : timepoint value                                                                                *
+ *   proc            : callback procedure                                                                             *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     tmr_startUntil( tmr_id tmr, unsigned time, fun_id proc );
 
-// uruchomienie zegara 'tmr'
-// po czasie 'delay' wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
-// i zostanie wykonana procedura 'proc' (jeœli 'proc' != 0)
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_startFor                                                                                   *
+ *                                                                                                                    *
+ * Description       : start/restart one-shot timer for given duration of time and then launch the callback procedure *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *   delay           : duration of time (maximum number of ticks to countdownd)                                       *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *   proc            : callback procedure                                                                             *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     tmr_startFor( tmr_id tmr, unsigned delay, fun_id proc );
 
-// uruchomienie zegara 'tmr' z okresem 'period'
-// po czasie 'period' wszystkie procesy oczekuj¹ce zostaj¹ wybudzone
-// i zostanie wykonana procedura 'proc' (jeœli 'proc' != 0)
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_startPeriodic                                                                              *
+ *                                                                                                                    *
+ * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure *
+ *                     do this periodically                                                                           *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *   period          : duration of time (maximum number of ticks to countdownd)                                       *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *   proc            : callback procedure                                                                             *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     tmr_startPeriodic( tmr_id tmr, unsigned period, fun_id proc );
 
-// zawieszenie wykonywania aktualnego procesu do czas 'time'
-// lub do wybudzenia przez obiekt 'tmr'
-// zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_waitUntil                                                                                  *
+ *                                                                                                                    *
+ * Description       : wait until given timepoint until the timer finishes countdown                                  *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : timer object successfully finished countdown                                                   *
+ *   E_STOPPED       : timer object was killed before the specified timeout expired                                   *
+ *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired                   *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned tmr_waitUntil( tmr_id tmr, unsigned time );
 
-// zawieszenie wykonywania aktualnego procesu na czas 'delay'
-// lub do wybudzenia przez obiekt 'tmr'
-// zwraca E_SUCCESS, E_STOPPED lub E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_waitFor                                                                                    *
+ *                                                                                                                    *
+ * Description       : wait for given duration of time until the timer finishes countdown                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *   delay           : duration of time (maximum number of ticks to wait for the timer finishes countdown)            *
+ *                     IMMEDIATE: don't wait for the timer finishes countdown                                         *
+ *                     INFINITE:  wait indefinitly until the timer finishes countdown                                 *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : timer object successfully finished countdown                                                   *
+ *   E_STOPPED       : timer object was killed before the specified timeout expired                                   *
+ *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired                   *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned tmr_waitFor( tmr_id tmr, unsigned delay );
 
-// zawieszenie wykonywania aktualnego procesu
-// do czasu wybudzenia przez obiekt 'tmr'
-// zwraca E_SUCCESS lub E_STOPPED
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_wait                                                                                       *
+ *                                                                                                                    *
+ * Description       : wait indefinitly until the timer finishes countdown                                            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : timer object successfully finished countdown                                                   *
+ *   E_STOPPED       : timer object was killed before the specified timeout expired                                   *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned tmr_wait( tmr_id tmr ) { return tmr_waitFor(tmr, INFINITE); }
 
-// czy zegar zakoñczy³ odliczanie?
-// zwraca E_SUCCESS, E_TIMEOUT
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_take                                                                                       *
+ *                                                                                                                    *
+ * Description       : check if the timer finishes countdown                                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : timer object successfully finished countdown                                                   *
+ *   E_TIMEOUT       : timer object has not yet completed counting                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned tmr_take   ( tmr_id tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_takeISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : check if the timer finishes countdown                                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : timer object successfully finished countdown                                                   *
+ *   E_TIMEOUT       : timer object has not yet completed counting                                                    *
+ *                                                                                                                    *
+ * Note              : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned tmr_takeISR( tmr_id tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
 
-// zmiana procedury aktualnie uruchomionego zegara
-// funkcja mo¿e byc wywo³ana tylko i wy³¹cznie z wnêtrza procedury zegara
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_flipISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : change callback procedure for current periodic timer (available in next period)                *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   proc            : callback procedure                                                                             *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in timer callback procedure                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline void     tmr_flipISR( fun_id proc ) { System.tmr->state = proc; }
 
-// zmiana parametrów czasowych aktualnie uruchomionego zegara
-// funkcja mo¿e byc wywo³ana tylko i wy³¹cznie z wnêtrza procedury zegara
-// (delay == 0) => zegar zostanie zatrzymany
-static inline void     tmr_delayISR( unsigned delay ) { System.tmr->delay = delay; }
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_delayISR                                                                                   *
+ *                                                                                                                    *
+ * Description       : change delay time for current timer                                                            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   delay           : duration of time (maximum number of ticks to countdownd)                                       *
+ *                     0:         current timer is stopped even if it was periodic                                    *
+ *                     otherwise: current timer is restarted even if it was been one-shot                             *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in timer callback procedure                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-/* -------------------------------------------------------------------------- */
+static inline void     tmr_delayISR( unsigned delay ) { System.tmr->delay = delay; }
 
 #ifdef __cplusplus
 }
