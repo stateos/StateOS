@@ -300,7 +300,7 @@ static inline void     tmr_flipISR( fun_id proc ) { System.tmr->state = proc; }
  * Parameters                                                                                                         *
  *   delay           : duration of time (maximum number of ticks to countdownd)                                       *
  *                     0:         current timer is stopped even if it was periodic                                    *
- *                     otherwise: current timer is restarted even if it was been one-shot                             *
+ *                     otherwise: current timer is restarted even if it was one-shot                                  *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
