@@ -22,6 +22,10 @@ Features:
 - c++ wrapper
 - all documentation is contained within the source files
 ---------
+1.1
+- all comments have been translated into English and rewritten in interface files as documentation
+- definitions and functions for creating semaphore now include the initial value of the semaphore counter
+---------
 1.0
 - first stable version
 - to do: translate comments into English

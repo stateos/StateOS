@@ -280,7 +280,7 @@ static inline unsigned tmr_takeISR( tmr_id tmr ) { return tmr_waitFor(tmr, IMMED
  * Description       : change callback procedure for current periodic timer (available in next period)                *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   proc            : callback procedure                                                                             *
+ *   proc            : new callback procedure                                                                         *
  *                     0: no callback                                                                                 *
  *                                                                                                                    *
  * Return            : none                                                                                           *
