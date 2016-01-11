@@ -21,7 +21,7 @@ int main()
 {
 	LED_Config();
 
-	sem = sem_create(semNormal);
+	sem = sem_create(0, semNormal);
 	tsk_new(0, slave);
 	tsk_new(0, master);
 	tsk_stop();
