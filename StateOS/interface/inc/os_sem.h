@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_sem.h
     @author  Rajmund Szymanski
-    @date    08.01.2016
+    @date    11.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,6 +53,7 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   sem             : name of a pointer to semaphore object                                                          *
+ *   init            : initial value of semaphore counter                                                             *
  *   limit           : maximum value of semaphore counter                                                             *
  *                     semBinary: binary semaphore                                                                    *
  *                     semNormal, semCounting: counting semaphore                                                     *
@@ -60,8 +61,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_SEM( sem, limit )                      \
-               sem_t sem##__sem = _SEM_INIT(0, limit); \
+#define     OS_SEM( sem, init, limit )                   \
+               sem_t sem##__sem = _SEM_INIT(init, limit); \
                sem_id sem = & sem##__sem
 
 /**********************************************************************************************************************
@@ -72,6 +73,7 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   sem             : name of a pointer to semaphore object                                                          *
+ *   init            : initial value of semaphore counter                                                             *
  *   limit           : maximum value of semaphore counter                                                             *
  *                     semBinary: binary semaphore                                                                    *
  *                     semNormal, semCounting: counting semaphore                                                     *
@@ -79,8 +81,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_SEM( sem, limit )                      \
-        static sem_t sem##__sem = _SEM_INIT(0, limit); \
+#define static_SEM( sem, init, limit )                   \
+        static sem_t sem##__sem = _SEM_INIT(init, limit); \
         static sem_id sem = & sem##__sem
 
 /**********************************************************************************************************************
@@ -90,6 +92,7 @@ extern "C" {
  * Description       : create and initilize a new semaphore object                                                    *
  *                                                                                                                    *
  * Parameters                                                                                                         *
+ *   init            : initial value of semaphore counter                                                             *
  *   limit           : maximum value of semaphore counter                                                             *
  *                     semBinary: binary semaphore                                                                    *
  *                     semNormal, semCounting: counting semaphore                                                     *
@@ -102,7 +105,7 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              sem_id   sem_create( unsigned limit );
+              sem_id   sem_create( unsigned init, unsigned limit );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -353,7 +356,7 @@ class Semaphore : public sem_t
 {
 public:
 
-	 Semaphore( unsigned _limit = semNormal ): sem_t(_SEM_INIT(0, _limit)) {}
+	 Semaphore( unsigned _init, unsigned _limit = semNormal ): sem_t(_SEM_INIT(_init, _limit)) {}
 
 	~Semaphore( void ) { sem_kill(this); }
 

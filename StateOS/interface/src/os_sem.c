@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_sem.c
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    11.01.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-sem_id sem_create( unsigned limit )
+sem_id sem_create( unsigned init, unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
 	sem_id sem;
@@ -40,6 +40,7 @@ sem_id sem_create( unsigned limit )
 
 	if (sem)
 	{
+		sem->count = init;
 		sem->limit = limit;
 	}
 

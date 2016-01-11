@@ -2,7 +2,7 @@
 #include <os.h>
 
 Led       led;
-Semaphore sem;
+Semaphore sem(0);
 
 void slave()
 {
