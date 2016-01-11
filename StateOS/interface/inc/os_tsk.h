@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    11.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -34,96 +34,411 @@
 extern "C" {
 #endif
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : task (thread)                                                                                  *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// deklaracja procesu 'tsk'
-// state: stan procesu (procedura wykonywana przez proces)
-// size:  wielkoœæ przydzielonego stosu (w bajtach)
-// procedura nie musi byæ typu 'noreturn'; dziêki implementacji wewnêtrznej
-// pêtli systemowej, procedura wracaj¹ca (return) bêdzie wywo³ywana ponownie
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : OS_WRK                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize complete work area for task object                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : name of a pointer to task object                                                               *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *   size            : size of task private stack (in bytes)                                                          *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-#define OS_WRK( tsk, prio, state, size )                                            \
+#define     OS_WRK( tsk, prio, state, size )                                        \
                char tsk##__stack[ASIZE(size)] __osalign;                             \
                tsk_t tsk##__tsk = _TSK_INIT(prio, state, &tsk##__stack[ASIZE(size)]); \
                tsk_id tsk = & tsk##__tsk
 
-#define OS_TSK( tsk, prio, state ) \
-        OS_WRK( tsk, prio, state, OS_STACK_SIZE )
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : OS_TSK                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize complete work area for task obj. with stack size defined by OS_STACK_SIZE *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : name of a pointer to task object                                                               *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-#define OS_DEF( tsk, prio )                \
+#define     OS_TSK( tsk, prio, state ) \
+            OS_WRK( tsk, prio, state, OS_STACK_SIZE )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : OS_DEF                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize complete work area for task obj. with stack size defined by OS_STACK_SIZE *
+ *                     task state (function body) must be defined immediately below                                   *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : name of a pointer to task object                                                               *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define     OS_DEF( tsk, prio )                \
         static void tsk##__startup( void ); \
-        OS_TSK( tsk, prio, tsk##__startup ); \
+            OS_TSK( tsk, prio, tsk##__startup ); \
         static void tsk##__startup( void )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_WRK                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize static work area for task object                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : name of a pointer to task object                                                               *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *   size            : size of task private stack (in bytes)                                                          *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 #define static_WRK( tsk, prio, state, size )                                        \
         static char tsk##__stack[ASIZE(size)] __osalign;                             \
         static tsk_t tsk##__tsk = _TSK_INIT(prio, state, &tsk##__stack[ASIZE(size)]); \
         static tsk_id tsk = & tsk##__tsk
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_TSK                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize static work area for task object with stack size defined by OS_STACK_SIZE *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : name of a pointer to task object                                                               *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 #define static_TSK( tsk, prio, state ) \
         static_WRK( tsk, prio, state, OS_STACK_SIZE )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_DEF                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize static work area for task object with stack size defined by OS_STACK_SIZE *
+ *                     task state (function body) must be defined immediately below                                   *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : name of a pointer to task object                                                               *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 #define static_DEF( tsk, prio )                \
         static void tsk##__startup( void );     \
         static_TSK( tsk, prio, tsk##__startup ); \
         static void tsk##__startup( void )
 
-/* -------------------------------------------------------------------------- */
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_create                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize complete work area for task object                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *   size            : size of task private stack (in bytes)                                                          *
+ *                                                                                                                    *
+ * Return            : pointer to task object (task successfully created)                                             *
+ *   0               : task not created (not enough free memory)                                                      *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
-// utworzenie przestrzeni roboczej dla procesu ze stosem 'size'
-// i uruchomienie z priorytetem 'prio', od stanu pocz¹tkowego 'state'
-// zwraca adres TCB (task control block) utworzonego procesu
               tsk_id   tsk_create( unsigned prio, fun_id state, unsigned size );
 
-// utworzenie przestrzeni roboczej dla procesu ze stosem 'OS_STACK_SIZE'
-// i uruchomienie z priorytetem 'prio', od stanu pocz¹tkowego 'state'
-// zwraca adres TCB (task control block) utworzonego procesu
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_new                                                                                        *
+ *                                                                                                                    *
+ * Description       : create and initilize complete work area for task obj. with stack size defined by OS_STACK_SIZE *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *                                                                                                                    *
+ * Return            : pointer to task object (task successfully created)                                             *
+ *   0               : task not created (not enough free memory)                                                      *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_create(prio, state, OS_STACK_SIZE); }
 
-// reinicjacja i uruchomienie procesu 'tsk'
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_start                                                                                      *
+ *                                                                                                                    *
+ * Description       : start previously defined/created task object                                                   *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to task object                                                                         *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     tsk_start( tsk_id tsk );
 
-// zatrzymanie aktualnego procesu (usuniêcie z listy zadañ)
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_stop                                                                                       *
+ *                                                                                                                    *
+ * Description       : stop current task and remove it from READY queue                                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to current task object                                                                 *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     tsk_stop( void ) __noreturn;
 
-// zatrzymanie procesu 'tsk'
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_kill                                                                                       *
+ *                                                                                                                    *
+ * Description       : reset the task object (not current task) and remove it from READY/DELAYED queue                *
+ *                     for current task use tsk_stop instead                                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to task object                                                                         *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     tsk_kill( tsk_id tsk );
 
-// przekazanie sterowania do schedulera (nastêpnego procesu)
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_pass                                                                                       *
+ *                                                                                                                    *
+ * Description       : yield system control to the next task with the same priority in READY queue                    *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline void     tsk_pass ( void ) { core_ctx_switch(); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_yield                                                                                      *
+ *                                                                                                                    *
+ * Description       : the same as tsk_pass (force context switch)                                                    *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline void     tsk_yield( void ) { core_ctx_switch(); }
 
-// przekazanie sterowania do schedulera (nastêpnego procesu)
-// restart procesu ze zmian¹ stanu/procedury wykonywanej przez proces
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_flip                                                                                       *
+ *                                                                                                                    *
+ * Description       : restart current task with the new state (task function)                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   proc            : new task state (task function)                                                                 *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     tsk_flip( fun_id state ) __noreturn;
 
-// ustawienie priorytetu aktualnego procesu z ewentualnym przekazaniem
-// sterowania do innego procesu (o wy¿szym priorytecie)
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_prio                                                                                       *
+ *                                                                                                                    *
+ * Description       : set current task priority                                                                      *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   prio            : new task priority value                                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     tsk_prio( unsigned prio );
 
-// zawieszenie wykonywania aktualnego procesu do czasu 'time'
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_sleepUntil                                                                                 *
+ *                                                                                                                    *
+ * Description       : delay execution of current task until given timepoint                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_TIMEOUT       : task object successfully finished countdown                                                    *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned tsk_sleepUntil( unsigned time );
 
-// zawieszenie wykonywania aktualnego procesu na czas 'delay'
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_sleepFor                                                                                   *
+ *                                                                                                                    *
+ * Description       : delay execution of current task for given duration of time                                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   delay           : duration of time (maximum number of ticks to delay execution of current task)                  *
+ *                     IMMEDIATE: don't delay execution of current task                                               *
+ *                     INFINITE:  delay indefinitly execution of current task                                         *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_TIMEOUT       : task object successfully finished countdown                                                    *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               unsigned tsk_sleepFor( unsigned delay );
 
-// zawieszenie wykonywania aktualnego procesu
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_sleep                                                                                      *
+ *                                                                                                                    *
+ * Description       : delay indefinitly execution of current task                                                    *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned tsk_sleep( void ) { return tsk_sleepFor(INFINITE); }
 
-// zawieszenie wykonywania aktualnego procesu na czas 'delay'
-// (delay != 0) => przekazanie sterowania do schedulera
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_delay                                                                                      *
+ *                                                                                                                    *
+ * Description       : the same as tsk_sleepFor, delay execution of current task for given duration of time           *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   delay           : duration of time (maximum number of ticks to delay execution of current task)                  *
+ *                     IMMEDIATE: don't delay execution of current task                                               *
+ *                     INFINITE:  delay indefinitly execution of current task                                         *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_TIMEOUT       : task object successfully finished countdown                                                    *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned tsk_delay( unsigned delay ) { return tsk_sleepFor(delay); }
 
-// zawieszenie wykonywania aktualnego procesu na czas nieokreœlony
-// i przekazanie sterowania do schedulera
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_suspend                                                                                    *
+ *                                                                                                                    *
+ * Description       : the same as tsk_sleep, delay indefinitly execution of current task                             *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
 
-// wznowienie wykonywania zawieszonego procesu 'tsk' z komunikatem 'event'
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_resume                                                                                     *
+ *                                                                                                                    *
+ * Description       : resume execution of given delayed task                                                         *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to delayed task object                                                                 *
+ *   event           : the value at which the given task is woken up                                                  *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
               void     tsk_resume   ( tsk_id tsk, unsigned event );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_resumeISR                                                                                  *
+ *                                                                                                                    *
+ * Description       : resume execution of given delayed task                                                         *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to delayed task object                                                                 *
+ *   event           : the value at which the given task is woken up                                                  *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 static inline void     tsk_resumeISR( tsk_id tsk, unsigned event ) { tsk_resume(tsk, event); }
-
-
-/* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
 }
@@ -134,12 +449,6 @@ static inline void     tsk_resumeISR( tsk_id tsk, unsigned event ) { tsk_resume(
 #ifdef __cplusplus
 
 #include <string.h>
-
-// definicja klasy procesu
-// state: stan procesu (procedura wykonywana przez proces)
-// size:  wielkoœæ przydzielonego stosu (w bajtach)
-// procedura nie musi byæ typu 'noreturn'; dziêki implementacji wewnêtrznej
-// pêtli systemowej, procedura wracaj¹ca (return) bêdzie wywo³ywana ponownie
 
 class TaskBase : public tsk_t
 {
