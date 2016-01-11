@@ -114,6 +114,7 @@ extern "C" {
  *   tmr             : pointer to timer object                                                                        *
  *   time            : timepoint value                                                                                *
  *   proc            : callback procedure                                                                             *
+ *                     0: no callback                                                                                 *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -135,6 +136,7 @@ extern "C" {
  *                     IMMEDIATE: don't countdown                                                                     *
  *                     INFINITE:  countdown indefinitly                                                               *
  *   proc            : callback procedure                                                                             *
+ *                     0: no callback                                                                                 *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -157,6 +159,7 @@ extern "C" {
  *                     IMMEDIATE: don't countdown                                                                     *
  *                     INFINITE:  countdown indefinitly                                                               *
  *   proc            : callback procedure                                                                             *
+ *                     0: no callback                                                                                 *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -278,6 +281,7 @@ static inline unsigned tmr_takeISR( tmr_id tmr ) { return tmr_waitFor(tmr, IMMED
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   proc            : callback procedure                                                                             *
+ *                     0: no callback                                                                                 *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
