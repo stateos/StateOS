@@ -358,7 +358,7 @@ bool priv_tmr_counting( tmr_id tmr )
 	port_tmr_stop();
 
 	if (tmr->delay == INFINITE)
-	return true;
+	return true;  // return if timer counting indefinitly
 
 	if (tmr->delay <= Counter - tmr->start)
 	return false; // return if timer finished counting
@@ -381,7 +381,7 @@ static
 bool priv_tmr_counting( tmr_id tmr )
 {
 	if (tmr->delay >= Counter - tmr->start + 1)
-	return true;  // return if timer still counts or tmr->delay==INFINITE
+	return true;  // return if timer still counts or counting indefinitly
 
 	return false; // timer finished counting
 }
