@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    12.01.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -162,7 +162,7 @@ void core_tsk_unlink( tsk_id tsk, unsigned event )
 	if (nxt)
 	nxt->back  = prv;
 	prv->queue = nxt;
-	tsk->queue = 0;
+	tsk->queue = 0; // necessary because of the tsk_sleep[Until|For] functions
 }
 
 /* -------------------------------------------------------------------------- */
