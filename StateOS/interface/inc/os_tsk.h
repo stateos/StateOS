@@ -195,7 +195,7 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  *                                                                                                                    *
  * Name              : tsk_start                                                                                      *
  *                                                                                                                    *
- * Description       : start previously defined/created task object                                                   *
+ * Description       : start previously defined/created/stopped task object                                           *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   tsk             : pointer to task object                                                                         *
