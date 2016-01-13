@@ -58,7 +58,7 @@ void core_ctx_switch( void )
 void core_tsk_loop( void )
 {
 	tsk_id cur = System.cur;
-	
+
 	for (;;)
 	{
 		port_ctx_switch();
