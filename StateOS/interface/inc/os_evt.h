@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_evt.h
     @author  Rajmund Szymanski
-    @date    08.01.2016
+    @date    15.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -69,6 +69,42 @@ extern "C" {
 #define static_EVT( evt )                     \
         static evt_t evt##__evt = _EVT_INIT(); \
         static evt_id evt = & evt##__evt
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : EVT_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize an event object                                                           *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : pointer to event object                                                                        *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                EVT_INIT( ) \
+                      _EVT_INIT()
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : EVT_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize an event object                                                           *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : event object                                                                                   *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                EVT_CREATE( ) \
+               &(evt_t)EVT_INIT()
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *

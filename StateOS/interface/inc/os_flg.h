@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_flg.h
     @author  Rajmund Szymanski
-    @date    08.01.2016
+    @date    15.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -78,6 +78,44 @@ extern "C" {
 #define static_FLG( flg, mask )                   \
         static flg_t flg##__flg = _FLG_INIT(mask); \
         static flg_id flg = & flg##__flg
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : FLG_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize a flag object                                                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mask            : mask of write only flags in flag object (these flags can't be cleared after accepting)         *
+ *                                                                                                                    *
+ * Return            : flag object                                                                                    *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                FLG_INIT( mask ) \
+                      _FLG_INIT(mask)
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : FLG_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a flag object                                                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mask            : mask of write only flags in flag object (these flags can't be cleared after accepting)         *
+ *                                                                                                                    *
+ * Return            : pointer to flag object                                                                         *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                FLG_CREATE( mask ) \
+               &(flg_t)FLG_INIT(mask)
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *

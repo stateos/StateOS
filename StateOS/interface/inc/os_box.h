@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_box.h
     @author  Rajmund Szymanski
-    @date    08.01.2016
+    @date    15.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -76,6 +76,46 @@ extern "C" {
         static char box##__data[limit*size];                          \
         static box_t box##__box = _BOX_INIT(limit, size, box##__data); \
         static box_id box = & box##__box
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : BOX_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize a mailbox queue object                                                    *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : size of a queue (max number of stored mails)                                                   *
+ *   size            : size of a single mail (in bytes)                                                               *
+ *                                                                                                                    *
+ * Return            : mailbox queue object                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                BOX_INIT( limit, size ) \
+                      _BOX_INIT(limit, size, _BOX_DATA(limit, size))
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : BOX_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a mailbox queue object                                                    *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : size of a queue (max number of stored mails)                                                   *
+ *   size            : size of a single mail (in bytes)                                                               *
+ *                                                                                                                    *
+ * Return            : pointer to mailbox queue object                                                                *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                BOX_CREATE( limit, size ) \
+               &(box_t)BOX_INIT(limit, size)
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *

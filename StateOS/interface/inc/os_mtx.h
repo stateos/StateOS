@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    08.01.2016
+    @date    15.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -98,6 +98,60 @@ extern "C" {
 #define static_MTX( mtx, type )                   \
         static mtx_t mtx##__mtx = _MTX_INIT(type); \
         static mtx_id mtx = & mtx##__mtx
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : MTX_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize a mutex object                                                            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   type            : mutex type                                                                                     *
+ *                     mtxNormal:                       normal    priority protect     mutex                          *
+ *                     mtxRecursive:                    recursive priority protect     mutex                          *
+ *                     mtxPriorityProtect:              normal    priority protect     mutex                          *
+ *                     mtxPriorityInheritance:          normal    priority inheritance mutex                          *
+ *                     mtxNormalPriorityProtect:        normal    priority protect     mutex                          *
+ *                     mtxRecursivePriorityProtect:     recursive priority protect     mutex                          *
+ *                     mtxNormalPriorityInheritance:    normal    priority inheritance mutex                          *
+ *                     mtxRecursivePriorityInheritance: recursive priority inheritance mutex                          *
+ *                                                                                                                    *
+ * Return            : mutex object                                                                                   *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                MTX_INIT( type ) \
+                      _MTX_INIT(type)
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : MTX_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a mutex object                                                            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   type            : mutex type                                                                                     *
+ *                     mtxNormal:                       normal    priority protect     mutex                          *
+ *                     mtxRecursive:                    recursive priority protect     mutex                          *
+ *                     mtxPriorityProtect:              normal    priority protect     mutex                          *
+ *                     mtxPriorityInheritance:          normal    priority inheritance mutex                          *
+ *                     mtxNormalPriorityProtect:        normal    priority protect     mutex                          *
+ *                     mtxRecursivePriorityProtect:     recursive priority protect     mutex                          *
+ *                     mtxNormalPriorityInheritance:    normal    priority inheritance mutex                          *
+ *                     mtxRecursivePriorityInheritance: recursive priority inheritance mutex                          *
+ *                                                                                                                    *
+ * Return            : pointer to mutex object                                                                        *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                MTX_CREATE( type ) \
+               &(mtx_t)MTX_INIT(type)
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *

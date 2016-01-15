@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_msg.h
     @author  Rajmund Szymanski
-    @date    08.01.2016
+    @date    15.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -74,6 +74,44 @@ extern "C" {
         static unsigned msg##__data[limit];                     \
         static msg_t msg##__msg = _MSG_INIT(limit, msg##__data); \
         static msg_id msg = & msg##__msg
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : MSG_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize a message queue object                                                    *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : size of a queue (max number of stored messages)                                                *
+ *                                                                                                                    *
+ * Return            : message queue object                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                MSG_INIT( limit ) \
+                      _MSG_INIT(limit, _MSG_DATA(limit))
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : MSG_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a message queue object                                                    *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : size of a queue (max number of stored messages)                                                *
+ *                                                                                                                    *
+ * Return            : pointer to message queue object                                                                *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                MSG_CREATE( limit ) \
+               &(msg_t)MSG_INIT(limit)
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *

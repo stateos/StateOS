@@ -22,6 +22,10 @@ Features:
 - c++ wrapper
 - all documentation is contained within the source files
 ---------
+1.2
+- added new features for use in 'C' code only
+- added examples (main.c.14-17) for some of new features
+---------
 1.1
 - all comments have been translated into English and rewritten in interface files as documentation
 - definitions and functions for creating semaphore now include the initial value of the semaphore counter

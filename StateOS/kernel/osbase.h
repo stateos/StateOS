@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osbase.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    14.01.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -185,6 +185,8 @@ struct __box
 
 #define _BOX_INIT( limit, size, data ) { 0, 0, limit, size, data }
 
+#define _BOX_DATA( limit, size )           (char[limit*size]){ 0 }
+
 /* -------------------------------------------------------------------------- */
 
 // message queue
@@ -201,6 +203,8 @@ struct __msg
 };
 
 #define _MSG_INIT( limit, data ) { 0, 0, limit, data }
+
+#define _MSG_DATA( limit )      (unsigned[limit]){ 0 }
 
 /* -------------------------------------------------------------------------- */
 
@@ -278,6 +282,8 @@ struct __tsk
 };
 
 #define _TSK_INIT( prio, state, top ) { 0, 0, 0, 0, state, 0, 0, prio, 0, top }
+
+#define _TSK_STACK( size )     (__osalign char[ASIZE(size)]){ 0 } + ASIZE(size)
 
 #ifdef __CC_ARM
 #pragma pop

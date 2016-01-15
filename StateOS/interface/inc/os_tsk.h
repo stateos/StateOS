@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    11.01.2016
+    @date    15.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -149,6 +149,92 @@ extern "C" {
         static void tsk##__startup( void );     \
         static_TSK( tsk, prio, tsk##__startup ); \
         static void tsk##__startup( void )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : WRK_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize complete work area for task object                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *   size            : size of task private stack (in bytes)                                                          *
+ *                                                                                                                    *
+ * Return            : task object                                                                                    *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                WRK_INIT( prio, state, size ) \
+                      _TSK_INIT(prio, state, _TSK_STACK(size))
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : WRK_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize complete work area for task object                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *   size            : size of task private stack (in bytes)                                                          *
+ *                                                                                                                    *
+ * Return            : pointer to task object                                                                         *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                WRK_CREATE( prio, state, size ) \
+               &(tsk_t)WRK_INIT(prio, state, size)
+#endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : TSK_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize complete work area for task obj. with stack size defined by OS_STACK_SIZE *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *                                                                                                                    *
+ * Return            : task object                                                                                    *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                TSK_INIT( prio, state ) \
+                       WRK_INIT(prio, state, OS_STACK_SIZE)
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : TSK_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize complete work area for task obj. with stack size defined by OS_STACK_SIZE *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *                                                                                                                    *
+ * Return            : pointer to task object                                                                         *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                TSK_CREATE( prio, state ) \
+               &(tsk_t)TSK_INIT(prio, state)
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *

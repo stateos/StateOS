@@ -1,0 +1,42 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+box_id box = BOX_CREATE(1, sizeof(unsigned));
+
+void slave()
+{
+	unsigned x;
+
+	for (;;)
+	{
+		box_wait(box, &x);
+
+		LEDs = x;
+	}
+}
+
+void master()
+{
+	unsigned x = 0;
+
+	for (;;)
+	{
+		tsk_delay(SEC);
+
+		x++;
+
+		box_give(box, &x);
+	}
+}
+
+tsk_id sla = WRK_CREATE(0, slave,  256);
+tsk_id mas = WRK_CREATE(0, master, 256);
+
+int main()
+{
+	LED_Config();
+
+	tsk_start(sla);
+	tsk_start(mas);
+	tsk_stop();
+}

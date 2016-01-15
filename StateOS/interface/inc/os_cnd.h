@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    07.01.2016
+    @date    15.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -73,6 +73,42 @@ extern "C" {
 #define static_CND( cnd )                     \
         static cnd_t cnd##__cnd = _CND_INIT(); \
         static cnd_id cnd = & cnd##__cnd
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : CND_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize a condition variable object                                               *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : condition variable object                                                                      *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                CND_INIT( ) \
+                      _CND_INIT()
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : CND_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a condition variable object                                               *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : pointer to condition variable object                                                           *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                CND_CREATE( ) \
+               &(cnd_t)CND_INIT()
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *

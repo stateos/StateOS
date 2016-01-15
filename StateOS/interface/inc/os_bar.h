@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_bar.h
     @author  Rajmund Szymanski
-    @date    08.01.2016
+    @date    15.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -72,6 +72,44 @@ extern "C" {
 #define static_BAR( bar, limit )                   \
         static bar_t bar##__bar = _BAR_INIT(limit); \
         static bar_id bar = & bar##__bar
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : BAR_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : define and initilize a barrier object                                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object      *
+ *                                                                                                                    *
+ * Return            : barrier object                                                                                 *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                BAR_INIT( limit ) \
+                      _BAR_INIT(limit)
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : BAR_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize a barrier object                                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object      *
+ *                                                                                                                    *
+ * Return            : pointer to barrier object                                                                      *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                BAR_CREATE( limit ) \
+               &(bar_t)BAR_INIT(limit)
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *

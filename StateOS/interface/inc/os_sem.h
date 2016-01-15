@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_sem.h
     @author  Rajmund Szymanski
-    @date    11.01.2016
+    @date    15.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -84,6 +84,52 @@ extern "C" {
 #define static_SEM( sem, init, limit )                   \
         static sem_t sem##__sem = _SEM_INIT(init, limit); \
         static sem_id sem = & sem##__sem
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : SEM_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize a semaphore object                                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   init            : initial value of semaphore counter                                                             *
+ *   limit           : maximum value of semaphore counter                                                             *
+ *                     semBinary: binary semaphore                                                                    *
+ *                     semNormal, semCounting: counting semaphore                                                     *
+ *                     otherwise: limited semaphore                                                                   *
+ *                                                                                                                    *
+ * Return            : semaphore object                                                                               *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                SEM_INIT( init, limit ) \
+                      _SEM_INIT(init, limit)
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : SEM_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a semaphore object                                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   init            : initial value of semaphore counter                                                             *
+ *   limit           : maximum value of semaphore counter                                                             *
+ *                     semBinary: binary semaphore                                                                    *
+ *                     semNormal, semCounting: counting semaphore                                                     *
+ *                     otherwise: limited semaphore                                                                   *
+ *                                                                                                                    *
+ * Return            : pointer to semaphore object                                                                    *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                SEM_CREATE( init, limit ) \
+               &(sem_t)SEM_INIT(init, limit)
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *

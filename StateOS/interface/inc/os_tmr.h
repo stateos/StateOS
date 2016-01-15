@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    11.01.2016
+    @date    15.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -69,6 +69,42 @@ extern "C" {
 #define static_TMR( tmr )                     \
         static tmr_t tmr##__tmr = _TMR_INIT(); \
         static tmr_id tmr = & tmr##__tmr
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : TMR_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize a timer object                                                            *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : timer object                                                                                   *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                TMR_INIT( ) \
+                      _TMR_INIT()
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : TMR_CREATE                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a timer object                                                            *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : pointer to timer object                                                                        *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#ifndef __cplusplus
+#define                TMR_CREATE( ) \
+               &(tmr_t)TMR_INIT()
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
