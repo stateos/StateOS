@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osconfig.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    16.01.2016
     @brief   StateOS config file for STM32F3 uC.
 
  ******************************************************************************
@@ -63,9 +63,8 @@
 
 // ----------------------------
 // os heap size in bytes
-// OS_HEAP_SIZE == 0 => functions 'xxx_create' use of a simplified procedure memory allocation on the heap that is not compatible with 'calloc'
-// OS_HEAP_SIZE == 1 => functions 'xxx_create' use 'calloc' provided with the compiler libraries
-// OS_HEAP_SIZE >  1 => functions 'xxx_create' allocate memory on a dedicated system heap, OS_HEAP_SIZE indicates size of the heap
+// OS_HEAP_SIZE == 0 => functions 'xxx_create' use 'malloc' provided with the compiler libraries
+// OS_HEAP_SIZE >  0 => functions 'xxx_create' allocate memory on a dedicated system heap, OS_HEAP_SIZE indicates size of the heap
 // default value: 0
 #define  OS_HEAP_SIZE         0
 

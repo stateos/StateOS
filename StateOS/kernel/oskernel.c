@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    13.01.2016
+    @date    16.01.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -434,27 +434,31 @@ void core_tmr_handler( void )
 // SYSTEM ALLOC SERVICES
 /* -------------------------------------------------------------------------- */
 
-#if    (OS_HEAP_SIZE >  1)
+#if OS_HEAP_SIZE
 
-static  char       Heap[ASIZE(OS_HEAP_SIZE)] __osalign;
-#define HeapEnd  ( Heap + sizeof(Heap) )
-
-#else
-
-extern  char     __heap_base [];
-extern  char     __heap_limit[];
-#define Heap     __heap_base
-#define HeapEnd  __heap_limit
-
-#endif
+static  char     Heap[ASIZE(OS_HEAP_SIZE)] __osalign;
+#define HeapEnd (Heap+ASIZE(OS_HEAP_SIZE))
 
 /* -------------------------------------------------------------------------- */
 
-#if    (OS_HEAP_SIZE == 1)
-
 os_id core_sys_alloc( size_t size )
 {
-	return calloc(size, 1);
+	static
+	char *heap = Heap;
+
+	size = ASIZE(size);
+
+	char *base = 0;
+
+	if (heap + size <= HeapEnd)
+	{
+		base = heap;
+		heap = heap + size;
+
+		for (unsigned *mem = (unsigned *)base; mem < (unsigned *)(base + size); *mem++ = 0);
+	}
+
+	return base;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -463,18 +467,13 @@ os_id core_sys_alloc( size_t size )
 
 os_id core_sys_alloc( size_t size )
 {
-	static
-	char *heap = Heap;
-	char *base = 0;
-
 	size = ASIZE(size);
 
-	if (heap + size <= HeapEnd)
-	{
-		base = heap;
-		heap = heap + size;
+	char *base = malloc(size);
 
-		for (unsigned *mem = (unsigned *)base; mem < (unsigned *)heap; *mem++ = 0);
+	if (base)
+	{
+		for (unsigned *mem = (unsigned *)base; mem < (unsigned *)(base + size); *mem++ = 0);
 	}
 
 	return base;

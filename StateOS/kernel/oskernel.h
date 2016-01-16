@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.h
     @author  Rajmund Szymanski
-    @date    11.01.2016
+    @date    16.01.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -84,7 +84,7 @@ void port_tmr_start( unsigned timeout );
 
 /* -------------------------------------------------------------------------- */
 
-// system calloc procedure
+// system malloc procedure
 os_id core_sys_alloc( size_t size );
 
 /* -------------------------------------------------------------------------- */
