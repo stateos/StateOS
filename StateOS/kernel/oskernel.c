@@ -436,13 +436,11 @@ void core_tmr_handler( void )
 
 #if OS_HEAP_SIZE
 
-static  char     Heap[ASIZE(OS_HEAP_SIZE)] __osalign;
-#define HeapEnd (Heap+ASIZE(OS_HEAP_SIZE))
-
-/* -------------------------------------------------------------------------- */
-
 os_id core_sys_alloc( size_t size )
 {
+	static  char     Heap[ASIZE(OS_HEAP_SIZE)] __osalign;
+	#define HeapEnd (Heap+ASIZE(OS_HEAP_SIZE))
+
 	static
 	char *heap = Heap;
 
