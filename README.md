@@ -1,7 +1,7 @@
 StateOS
 =======
 
-Free, tiny and simple real-time operating system (RTOS) designed for deeply embedded applications.
+Free, extremely simple and amazingly tiny real-time operating system (RTOS) designed for deeply embedded applications.
 Target: ARM Cortex-M family.
 It was inspired by the concept of a state machine.
 Procedure executed by the task (task state) doesn't have to be noreturn-type.
