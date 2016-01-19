@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_flg.h
     @author  Rajmund Szymanski
-    @date    15.01.2016
+    @date    19.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -343,6 +343,8 @@ public:
 	unsigned waitUntil( unsigned _flags, bool _mode, unsigned _time )    { return flg_waitUntil(this, _flags, _mode, _time);  }
 	unsigned waitFor  ( unsigned _flags, bool _mode, unsigned _delay )   { return flg_waitFor  (this, _flags, _mode, _delay); }
 	unsigned wait     ( unsigned _flags, bool _mode = flgAll+flgAccept ) { return flg_wait     (this, _flags, _mode);         }
+	unsigned take     ( unsigned _flags, bool _mode = flgAll+flgAccept ) { return flg_take     (this, _flags, _mode);         }
+	unsigned takeISR  ( unsigned _flags, bool _mode = flgAll+flgAccept ) { return flg_takeISR  (this, _flags, _mode);         }
 	void     give     ( unsigned _flags )                                {        flg_give     (this, _flags);                }
 	void     giveISR  ( unsigned _flags )                                {        flg_giveISR  (this, _flags);                }
 };
