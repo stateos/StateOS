@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     30.11.2015
+@date     20.01.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -34,9 +34,8 @@
 #endif
 #define   main_stack  (((main_stack_size)+7)&(~7))
 
-char    __heap_base[] __attribute__ ((used, section("HEAP")));
-
-__asm void __user_config_stackheap( void )
+__attribute__((section("STACK")))
+__asm void __user_config_stack( void )
 {
 __initial_psp   EQU     __ram_start + proc_stack
 #if main_stack_size > 0
@@ -45,18 +44,27 @@ __initial_msp   EQU     __ram_start + proc_stack + main_stack
 __initial_msp   EQU     __ram_end
 #endif
 #if proc_stack_size > 0
+#ifndef  __MICROLIB
+				IMPORT  __use_two_region_memory
+#endif
 __initial_sp    EQU     __initial_psp
 #else
 __initial_sp    EQU     __initial_msp
 #endif
-__heap_limit    EQU     __ram_end
-#ifndef  __MICROLIB
-				IMPORT  __use_two_region_memory
-#endif
-                EXPORT  __heap_limit
                 EXPORT  __initial_psp
                 EXPORT  __initial_msp
                 EXPORT  __initial_sp
+}
+
+__attribute__((section("HEAP")))
+__asm void __user_config_heap( void )
+{
+                SPACE   0
+__heap_base
+__heap_limit    EQU     __ram_end
+
+                EXPORT  __heap_base
+                EXPORT  __heap_limit
 }
 
 extern  char  __initial_psp[];
