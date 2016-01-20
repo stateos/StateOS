@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_sem.h
     @author  Rajmund Szymanski
-    @date    15.01.2016
+    @date    20.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -395,8 +395,6 @@ static inline unsigned sem_giveISR( sem_id sem ) { return sem_sendFor(sem, IMMED
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
-
-#include <string.h>
 
 class Semaphore : public sem_t
 {

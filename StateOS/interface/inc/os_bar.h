@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_bar.h
     @author  Rajmund Szymanski
-    @date    15.01.2016
+    @date    20.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -219,8 +219,6 @@ static inline unsigned bar_wait( bar_id bar ) { return bar_waitFor(bar, INFINITE
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
-
-#include <string.h>
 
 class Barrier : public bar_t
 {

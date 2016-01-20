@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_flg.h
     @author  Rajmund Szymanski
-    @date    19.01.2016
+    @date    20.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -329,8 +329,6 @@ static inline void     flg_giveISR( flg_id flg, unsigned flags ) { flg_give(flg,
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
-
-#include <string.h>
 
 class Flag : public flg_t
 {

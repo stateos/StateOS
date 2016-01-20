@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    15.01.2016
+    @date    20.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -353,8 +353,6 @@ static inline void     tmr_delayISR( unsigned delay ) { System.tmr->delay = dela
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
-
-#include <string.h>
 
 class Timer : public tmr_t
 {

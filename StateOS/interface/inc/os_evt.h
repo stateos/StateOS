@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_evt.h
     @author  Rajmund Szymanski
-    @date    15.01.2016
+    @date    20.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -248,8 +248,6 @@ static inline void     evt_giveISR( evt_id evt, unsigned event ) { evt_give(evt,
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
-
-#include <string.h>
 
 class Event : public evt_t
 {

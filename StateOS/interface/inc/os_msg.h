@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_msg.h
     @author  Rajmund Szymanski
-    @date    15.01.2016
+    @date    20.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -383,8 +383,6 @@ static inline unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sen
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
-
-#include <string.h>
 
 template<unsigned _limit>
 class MessageQueueT : public msg_t

@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_box.h
     @author  Rajmund Szymanski
-    @date    15.01.2016
+    @date    20.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -388,8 +388,6 @@ static inline unsigned box_giveISR( box_id box, void *data ) { return box_sendFo
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
-
-#include <string.h>
 
 template<class T, unsigned _limit>
 class MailBoxQueueT : public box_t

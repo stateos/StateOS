@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    15.01.2016
+    @date    20.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -533,8 +533,6 @@ static inline void     tsk_resumeISR( tsk_id tsk, unsigned event ) { tsk_resume(
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
-
-#include <string.h>
 
 class TaskBase : public tsk_t
 {
