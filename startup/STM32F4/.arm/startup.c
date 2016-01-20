@@ -45,7 +45,7 @@ __initial_msp   EQU     __ram_end
 #endif
 #if proc_stack_size > 0
 #ifndef  __MICROLIB
-				IMPORT  __use_two_region_memory
+                IMPORT  __use_two_region_memory
 #endif
 __initial_sp    EQU     __initial_psp
 #else
