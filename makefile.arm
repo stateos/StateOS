@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     17.11.2015
+#date     22.01.2016
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -238,18 +238,18 @@ else
 	$(RM) $(GENERATED)
 endif
 
-flash : make_output_dir $(ELF) print_elf_size
+flash : all
 	$(info Programing device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_EXEC) $(OOCD_EXIT)
+
+debug : all
+	$(info Debugging device...)
+	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_DEBG) $(OOCD_EXEC)
 
 reset :
 	$(info Reseting device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_EXEC) $(OOCD_EXIT)
 
-debug :
-	$(info Debugging device...)
-	$(OPENOCD) $(OOCD_INIT) $(OOCD_DEBG) $(OOCD_EXEC)
-
-.PHONY : all clean flash lib reset debug
+.PHONY : all lib clean flash debug reset
 
 -include $(DEPS)
