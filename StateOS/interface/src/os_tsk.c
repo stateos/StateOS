@@ -63,7 +63,8 @@ void tsk_start( tsk_id tsk )
 
 	if (tsk->id == ID_STOPPED)
 	{
-		tsk->sp = 0;    // necessary because of the tsk_kill function
+		tsk->sp = 0; // necessary because of the tsk_kill function
+
 		core_tsk_insert(tsk);
 	}
 
@@ -79,7 +80,7 @@ void tsk_startFrom( tsk_id tsk, fun_id state )
 	if (tsk->id == ID_STOPPED)
 	{
 		tsk->state = state;
-		tsk->sp    = 0; // necessary because of the tsk_kill function
+		tsk->sp = 0; // necessary because of the tsk_kill function
 
 		core_tsk_insert(tsk);
 	}
