@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    20.01.2016
+    @date    25.01.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -296,6 +296,25 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : tsk_startFrom                                                                                  *
+ *                                                                                                                    *
+ * Description       : start previously defined/created/stopped task object                                           *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to task object                                                                         *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+              void     tsk_startFrom( tsk_id tsk, fun_id state );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : tsk_stop                                                                                       *
  *                                                                                                                    *
  * Description       : stop current task and remove it from READY queue                                               *
@@ -543,8 +562,7 @@ public:
 	~TaskBase( void ) { tsk_kill(this); }
 
 	void     start     ( void )                          {        tsk_start     (this);                }
-	void     start     ( fun_id   _state )               {        this->state = _state;
-	                                                              tsk_start     (this);                }
+	void     startFrom ( fun_id   _state )               {        tsk_start     (this, _state);        }
 	void     resume    ( unsigned _event )               {        tsk_resume    (this, _event);        }
 	void     resumeISR ( unsigned _event )               {        tsk_resumeISR (this, _event);        }
 };

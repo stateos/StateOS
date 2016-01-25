@@ -162,7 +162,7 @@ void core_tsk_unlink( tsk_id tsk, unsigned event )
 	if (nxt)
 	nxt->back  = prv;
 	prv->queue = nxt;
-	tsk->queue = 0; // necessary because of the tsk_sleep[Until|For] functions
+	tsk->queue = 0; // necessary because of tsk_sleep[Until|For] functions
 }
 
 /* -------------------------------------------------------------------------- */

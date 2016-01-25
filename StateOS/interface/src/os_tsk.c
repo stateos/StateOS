@@ -63,7 +63,23 @@ void tsk_start( tsk_id tsk )
 
 	if (tsk->id == ID_STOPPED)
 	{
-		tsk->sp = 0;
+		tsk->sp = 0;    // necessary because of the tsk_kill function
+		core_tsk_insert(tsk);
+	}
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_startFrom( tsk_id tsk, fun_id state )
+/* -------------------------------------------------------------------------- */
+{
+	port_sys_lock();
+
+	if (tsk->id == ID_STOPPED)
+	{
+		tsk->state = state;
+		tsk->sp    = 0; // necessary because of the tsk_kill function
 
 		core_tsk_insert(tsk);
 	}
