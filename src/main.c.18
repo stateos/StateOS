@@ -1,0 +1,30 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+tsk_t tsk = TSK_INIT(0, 0);
+
+void slave()
+{
+	LED_Tick();
+
+	tsk_stop();
+}
+
+void master()
+{
+	unsigned time = 0;
+
+	for (;;)
+	{
+		tsk_sleepUntil(time += SEC);
+
+		tsk_startFrom(&tsk, slave);
+	}
+}
+
+int main()
+{
+	LED_Config();
+
+	tsk_flip(master);
+}
