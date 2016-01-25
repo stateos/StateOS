@@ -2,7 +2,7 @@
 
     @file    State Machine OS: oskernel.c
     @author  Rajmund Szymanski
-    @date    16.01.2016
+    @date    25.01.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -55,15 +55,16 @@ void core_ctx_switch( void )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_loop( void )
+void core_tsk_break( void )
 {
 	tsk_id cur = System.cur;
+
+	port_set_stack(cur->top);
 
 	for (;;)
 	{
 		port_ctx_switch();
 		port_clr_lock();
-		port_set_stack(cur->top);
 		cur->state();
 	}
 }
@@ -281,7 +282,7 @@ void priv_tsk_prepare( tsk_id cur )
 
 		ctx->psr = 0x01000000U;
 		ctx->pc  = cur->state;
-		ctx->lr  = core_tsk_loop;
+		ctx->lr  = core_tsk_break;
 
 		sft->exc_return = ~2U; // return from psp
 

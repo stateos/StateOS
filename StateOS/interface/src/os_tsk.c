@@ -2,7 +2,7 @@
 
     @file    State Machine OS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    25.01.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -80,7 +80,7 @@ void tsk_stop( void )
 //	while (System.cur->mlist) mtx_kill(System.cur->mlist);
 
 	core_tsk_remove(System.cur);
-	core_tsk_loop();
+	core_tsk_break();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -112,7 +112,7 @@ void tsk_flip( fun_id state )
 {
 	System.cur->state = state;
 
-	core_tsk_loop();
+	core_tsk_break();
 }
 
 /* -------------------------------------------------------------------------- */
