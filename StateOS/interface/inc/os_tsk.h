@@ -562,7 +562,7 @@ public:
 	~TaskBase( void ) { tsk_kill(this); }
 
 	void     start     ( void )                          {        tsk_start     (this);                }
-	void     startFrom ( fun_id   _state )               {        tsk_start     (this, _state);        }
+	void     startFrom ( fun_id   _state )               {        tsk_startFrom (this, _state);        }
 	void     resume    ( unsigned _event )               {        tsk_resume    (this, _event);        }
 	void     resumeISR ( unsigned _event )               {        tsk_resumeISR (this, _event);        }
 };
