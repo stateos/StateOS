@@ -24,6 +24,7 @@ Features:
 ---------
 1.3
 - rewritten memory allocation functions
+- add tsk_startFrom function
 ---------
 1.2
 - added new features for use in 'C' code only
