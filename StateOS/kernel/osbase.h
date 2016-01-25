@@ -2,7 +2,7 @@
 
     @file    State Machine OS: osbase.h
     @author  Rajmund Szymanski
-    @date    14.01.2016
+    @date    25.01.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -263,16 +263,13 @@ struct __tsk
 	tsk_id   back;  // previous process in the DELAYED queue
 	obj_id   guard; // object that controls the pending process
 	mtx_id   mlist; // list of mutexes held
-
 	unsigned bprio; // basic priority
-	union
-	{
+	union  {
 	unsigned flags;
+	void   * data;
 	unsigned msg;
-	unsigned*data;
 	};
-	union
-	{
+	union  {
 	unsigned event; // wakeup event
 	unsigned mode;
 	};
