@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: osport.h
+    @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    03.02.2016
     @brief   StateOS port definitions for STM32 uC.
 
  ******************************************************************************

@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: os_evt.c
+    @file    StateOS: os_evt.c
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    03.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************

@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: bitband.h
+    @file    StateOS: bitband.h
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    03.02.2016
     @brief   This file contains macro definitions for the Cortex-M devices.
 
  ******************************************************************************

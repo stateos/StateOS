@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: oskernel.c
+    @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    25.01.2016
+    @date    03.02.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************

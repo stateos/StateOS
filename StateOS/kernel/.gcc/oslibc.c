@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: oslibc.c
+    @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    23.12.2015
+    @date    03.02.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************

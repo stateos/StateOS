@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: os_mtx.h
+    @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    20.01.2016
+    @date    03.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************

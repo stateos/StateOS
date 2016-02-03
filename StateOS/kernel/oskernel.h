@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: oskernel.h
+    @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    25.01.2016
+    @date    03.02.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************

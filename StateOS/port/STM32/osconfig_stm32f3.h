@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: osconfig.h
+    @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    16.01.2016
+    @date    03.02.2016
     @brief   StateOS config file for STM32F3 uC.
 
  ******************************************************************************

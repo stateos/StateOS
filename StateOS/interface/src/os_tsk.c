@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: os_tsk.c
+    @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    25.01.2016
+    @date    03.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************

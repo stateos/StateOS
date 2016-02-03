@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: os_cnd.h
+    @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    20.01.2016
+    @date    03.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
