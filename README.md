@@ -13,6 +13,7 @@ Features
 
 - kernel works in preemptive or cooperative mode
 - kernel can operate in tick-less mode (32-bit timer required)
+- signals (normal, auto clearing)
 - events
 - flags (one, all, accept)
 - barriers

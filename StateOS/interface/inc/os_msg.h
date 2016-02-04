@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    04.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -239,7 +239,7 @@ static inline unsigned msg_wait( msg_id msg, unsigned *data ) { return msg_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned msg_take   ( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+static inline unsigned msg_take( msg_id msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -353,7 +353,7 @@ static inline unsigned msg_send( msg_id msg, unsigned data ) { return msg_sendFo
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned msg_give   ( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
+static inline unsigned msg_give( msg_id msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

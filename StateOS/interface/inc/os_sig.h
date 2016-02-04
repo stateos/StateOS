@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    @file    StateOS: os_cnd.h
+    @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
     @date    04.02.2016
     @brief   This file contains definitions for StateOS.
@@ -36,105 +36,119 @@ extern "C" {
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : condition variable                                                                             *
- *                     like a POSIX pthread_cond_t                                                                    *
+ * Name              : signal                                                                                         *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define cndOne ( false ) // notify one task
-#define cndAll ( true  ) // notify all tasks
+#define sigNormal  ( 0U ) // normal signal
+#define sigAuto    ( 1U ) // auto clearing signal
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : OS_CND                                                                                         *
+ * Name              : OS_SIG                                                                                         *
  *                                                                                                                    *
- * Description       : define and initilize a condition variable object                                               *
+ * Description       : define and initilize a signal object                                                           *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   cnd             : name of a pointer to condition variable object                                                 *
+ *   sig             : name of a pointer to signal object                                                             *
+ *   type            : signal type                                                                                    *
+ *                     sigNormal: normal signal                                                                       *
+ *                     sigAuto:   auto clearing signal                                                                *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_CND( cnd )                     \
-               cnd_t cnd##__cnd = _CND_INIT(); \
-               cnd_id cnd = & cnd##__cnd
+#define     OS_SIG( sig, type )                   \
+               sig_t sig##__sig = _SIG_INIT(type); \
+               sig_id sig = & sig##__sig
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : static_CND                                                                                     *
+ * Name              : static_SIG                                                                                     *
  *                                                                                                                    *
- * Description       : define and initilize a static condition variable object                                        *
+ * Description       : define and initilize a static signal object                                                    *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   cnd             : name of a pointer to condition variable object                                                 *
+ *   sig             : name of a pointer to signal object                                                             *
+ *   type            : signal type                                                                                    *
+ *                     sigNormal: normal signal                                                                       *
+ *                     sigAuto:   auto clearing signal                                                                *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_CND( cnd )                     \
-        static cnd_t cnd##__cnd = _CND_INIT(); \
-        static cnd_id cnd = & cnd##__cnd
+#define static_SIG( sig, type )                   \
+        static sig_t sig##__sig = _SIG_INIT(type); \
+        static sig_id sig = & sig##__sig
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : CND_INIT                                                                                       *
+ * Name              : SIG_INIT                                                                                       *
  *                                                                                                                    *
- * Description       : create and initilize a condition variable object                                               *
+ * Description       : create and initilize an signal object                                                          *
  *                                                                                                                    *
- * Parameters        : none                                                                                           *
+ * Parameters                                                                                                         *
+ *   type            : signal type                                                                                    *
+ *                     sigNormal: normal signal                                                                       *
+ *                     sigAuto:   auto clearing signal                                                                *
  *                                                                                                                    *
- * Return            : condition variable object                                                                      *
+ * Return            : signal object                                                                                  *
  *                                                                                                                    *
  * Note              : use only in 'C' code                                                                           *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define                CND_INIT( ) \
-                      _CND_INIT()
+#define                SIG_INIT( type ) \
+                      _SIG_INIT(type)
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : CND_CREATE                                                                                     *
+ * Name              : SIG_CREATE                                                                                     *
  *                                                                                                                    *
- * Description       : create and initilize a condition variable object                                               *
+ * Description       : create and initilize a signal object                                                           *
  *                                                                                                                    *
- * Parameters        : none                                                                                           *
+ * Parameters                                                                                                         *
+ *   type            : signal type                                                                                    *
+ *                     sigNormal: normal signal                                                                       *
+ *                     sigAuto:   auto clearing signal                                                                *
  *                                                                                                                    *
- * Return            : pointer to condition variable object                                                           *
+ * Return            : pointer to signal object                                                                       *
  *                                                                                                                    *
  * Note              : use only in 'C' code                                                                           *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
 #ifndef __cplusplus
-#define                CND_CREATE( ) \
-               &(cnd_t)CND_INIT()
+#define                SIG_CREATE( type ) \
+               &(sig_t)SIG_INIT(type)
 #endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : cnd_create                                                                                     *
+ * Name              : sig_create                                                                                     *
  *                                                                                                                    *
- * Description       : create and initilize a new condition variable object                                           *
+ * Description       : create and initilize a new signal object                                                       *
  *                                                                                                                    *
- * Parameters        : none                                                                                           *
+ * Parameters                                                                                                         *
+ *   type            : signal type                                                                                    *
+ *                     sigNormal: normal signal                                                                       *
+ *                     sigAuto:   auto clearing signal                                                                *
  *                                                                                                                    *
- * Return            : pointer to condition variable object (condition variable successfully created)                 *
- *   0               : condition variable not created (not enough free memory)                                        *
+ * Return            : pointer to signal object (signal successfully created)                                         *
+ *   0               : signal not created (not enough free memory)                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              cnd_id   cnd_create( void );
+              sig_id   sig_create( unsigned type );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : cnd_kill                                                                                       *
+ * Name              : sig_kill                                                                                       *
  *                                                                                                                    *
- * Description       : reset the condition variable object and wake up all waiting tasks with 'E_STOPPED' event value *
+ * Description       : reset the signal object and wake up all waiting tasks with 'E_STOPPED' signal value              *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   cnd             : pointer to condition variable object                                                           *
+ *   sig             : pointer to signal object                                                                        *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -142,91 +156,79 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     cnd_kill( cnd_id cnd );
+              void     sig_kill( sig_id sig );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : cnd_waitUntil                                                                                  *
+ * Name              : sig_waitUntil                                                                                  *
  *                                                                                                                    *
- * Description       : wait until given timepoint on the condition variable releasing the currently owned mutex,      *
- *                     and finally lock the mutex again                                                               *
+ * Description       : wait for release the signal object until given timepoint                                       *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   cnd             : pointer to condition variable object                                                           *
- *   mtx             : currently owned mutex                                                                          *
+ *   sig             : pointer to signal object                                                                       *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again              *
- *   E_STOPPED       : condition variable object was killed before the specified timeout expired                      *
- *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired               *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   E_STOPPED       : signal object was killed before the specified timeout expired                                  *
+ *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
+ *   'another'       : signal object was successfully released or task was resumed with 'another' event value         *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned cnd_waitUntil( cnd_id cnd, mtx_id mtx, unsigned time );
+              unsigned sig_waitUntil( sig_id sig, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : cnd_waitFor                                                                                    *
+ * Name              : sig_waitFor                                                                                    *
  *                                                                                                                    *
- * Description       : wait for given duration of time on the condition variable releasing the currently owned mutex, *
- *                     and finally lock the mutex again                                                               *
+ * Description       : wait for release the signal object for given duration of time                                  *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   cnd             : pointer to condition variable object                                                           *
- *   mtx             : currently owned mutex                                                                          *
- *   delay           : duration of time (maximum number of ticks to wait on the condition variable object)            *
- *                     IMMEDIATE: don't wait on the condition variable object                                         *
- *                     INFINITE:  wait indefinitly on the condition variable object                                   *
+ *   sig             : pointer to signal object                                                                       *
+ *   delay           : duration of time (maximum number of ticks to wait for release the signal object)               *
+ *                     IMMEDIATE: don't wait until the signal object has been released                                *
+ *                     INFINITE:  wait indefinitly until the signal object has been released                          *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again              *
- *   E_STOPPED       : condition variable object was killed before the specified timeout expired                      *
- *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired               *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   E_STOPPED       : signal object was killed before the specified timeout expired                                  *
+ *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
+ *   'another'       : signal object was successfully released or task was resumed with 'another' event value         *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned cnd_waitFor( cnd_id cnd, mtx_id mtx, unsigned delay );
+              unsigned sig_waitFor( sig_id sig, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : cnd_wait                                                                                       *
+ * Name              : sig_wait                                                                                       *
  *                                                                                                                    *
- * Description       : wait indefinitly on the condition variable releasing the currently owned mutex,                *
- *                     and finally lock the mutex again                                                               *
+ * Description       : wait indefinitly until the signal object has been released                                     *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   cnd             : pointer to condition variable object                                                           *
- *   mtx             : currently owned mutex                                                                          *
+ *   sig             : pointer to signal object                                                                       *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again              *
- *   E_STOPPED       : condition variable object was killed                                                           *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   E_STOPPED       : signal object was killed                                                                       *
+ *   'another'       : signal object was successfully released or task was resumed with 'another' event value         *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned cnd_wait( cnd_id cnd, mtx_id mtx ) { return cnd_waitFor(cnd, mtx, INFINITE); }
+static inline unsigned sig_wait( sig_id sig ) { return sig_waitFor(sig, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : cnd_give                                                                                       *
+ * Name              : sig_give                                                                                       *
  *                                                                                                                    *
- * Description       : signal one or all tasks that are waiting on the condition variable                             *
+ * Description       : resume one (sigAuto) or all (sigNormal) tasks that are waiting on the signal object            *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   cnd             : pointer to condition variable object                                                           *
- *   all             : signal receiver                                                                                *
- *                     cndOne: notify one task that is waiting on the condition variable                              *
- *                     cndAll: notify all tasks that are waiting on the condition variable                            *
+ *   sig             : pointer to signal object                                                                       *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -234,19 +236,17 @@ static inline unsigned cnd_wait( cnd_id cnd, mtx_id mtx ) { return cnd_waitFor(c
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     cnd_give( cnd_id cnd, bool all );
+              void     sig_give( sig_id sig );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : cnd_giveISR                                                                                    *
+ * Name              : sig_giveISR                                                                                    *
  *                                                                                                                    *
- * Description       : signal one or all tasks that are waiting on the condition variable                             *
+ * Description       : resume one (for auto clearing signals) or all (for normal signals) tasks                       *
+ *                     that are waiting on the signal object                                                          *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   cnd             : pointer to condition variable object                                                           *
- *   all             : signal receiver                                                                                *
- *                     cndOne: notify one task that is waiting on the condition variable                              *
- *                     cndAll: notify all tasks that are waiting on the condition variable                            *
+ *   sig             : pointer to signal object                                                                       *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -254,7 +254,41 @@ static inline unsigned cnd_wait( cnd_id cnd, mtx_id mtx ) { return cnd_waitFor(c
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     cnd_giveISR( cnd_id cnd, bool all ) { cnd_give(cnd, all); }
+static inline void     sig_giveISR( sig_id sig ) { sig_give(sig); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sig_clear                                                                                      *
+ *                                                                                                                    *
+ * Description       : reset the signal object                                                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sig             : pointer to signal object                                                                       *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+              void     sig_clear( sig_id sig );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sig_clearISR                                                                                   *
+ *                                                                                                                    *
+ * Description       : reset the signal object                                                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sig             : pointer to signal object                                                                       *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline void     sig_clearISR( sig_id sig ) { sig_clear(sig); }
 
 #ifdef __cplusplus
 }
@@ -264,19 +298,21 @@ static inline void     cnd_giveISR( cnd_id cnd, bool all ) { cnd_give(cnd, all);
 
 #ifdef __cplusplus
 
-class ConditionVariable : public cnd_t
+class Signal : public sig_t
 {
 public:
 
-	 ConditionVariable( void ): cnd_t(_CND_INIT()) {}
+	 Signal( unsigned type = sigNormal ): sig_t(_SIG_INIT(type)) {}
 
-	~ConditionVariable( void ) { cnd_kill(this); }
+	~Signal( void ) { sig_kill(this); }
 
-	unsigned waitUntil( mtx_id _mtx, unsigned _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
-	unsigned waitFor  ( mtx_id _mtx, unsigned _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
-	unsigned wait     ( mtx_id _mtx )                  { return cnd_wait     (this, _mtx);         }
-	void     give     ( bool   _all = cndAll )         {        cnd_give     (this, _all);         }
-	void     giveISR  ( bool   _all = cndAll )         {        cnd_giveISR  (this, _all);         }
+	unsigned waitUntil( unsigned _time  ) { return sig_waitUntil(this, _time);  }
+	unsigned waitFor  ( unsigned _delay ) { return sig_waitFor  (this, _delay); }
+	unsigned wait     ( void )            { return sig_wait     (this);         }
+	void     give     ( void )            {        sig_give     (this);         }
+	void     giveISR  ( void )            {        sig_giveISR  (this);         }
+	void     clear    ( void )            {        sig_clear    (this);         }
+	void     clearISR ( void )            {        sig_clearISR (this);         }
 };
 
 #endif

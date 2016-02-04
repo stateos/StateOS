@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    04.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -257,7 +257,7 @@ static inline unsigned sem_wait( sem_id sem ) { return sem_waitFor(sem, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_take   ( sem_id sem ) { return sem_waitFor(sem, IMMEDIATE); }
+static inline unsigned sem_take( sem_id sem ) { return sem_waitFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -366,7 +366,7 @@ static inline unsigned sem_send( sem_id sem ) { return sem_sendFor(sem, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_give   ( sem_id sem ) { return sem_sendFor(sem, IMMEDIATE); }
+static inline unsigned sem_give( sem_id sem ) { return sem_sendFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

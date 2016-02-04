@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    04.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -244,7 +244,7 @@ static inline unsigned box_wait( box_id box, void *data ) { return box_waitFor(b
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned box_take   ( box_id box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
+static inline unsigned box_take( box_id box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -358,7 +358,7 @@ static inline unsigned box_send( box_id box, void *data ) { return box_sendFor(b
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned box_give   ( box_id box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
+static inline unsigned box_give( box_id box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

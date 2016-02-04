@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    04.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -525,7 +525,7 @@ static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_resume   ( tsk_id tsk, unsigned event );
+              void     tsk_resume( tsk_id tsk, unsigned event );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

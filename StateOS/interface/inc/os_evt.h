@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    04.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -44,7 +44,7 @@ extern "C" {
  *                                                                                                                    *
  * Name              : OS_EVT                                                                                         *
  *                                                                                                                    *
- * Description       : define and initilize a event object                                                            *
+ * Description       : define and initilize an event object                                                           *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   evt             : name of a pointer to event object                                                              *
@@ -72,13 +72,13 @@ extern "C" {
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : EVT_CREATE                                                                                     *
+ * Name              : EVT_INIT                                                                                       *
  *                                                                                                                    *
  * Description       : create and initilize an event object                                                           *
  *                                                                                                                    *
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
- * Return            : pointer to event object                                                                        *
+ * Return            : event object                                                                                   *
  *                                                                                                                    *
  * Note              : use only in 'C' code                                                                           *
  *                                                                                                                    *
@@ -89,13 +89,13 @@ extern "C" {
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : EVT_INIT                                                                                       *
+ * Name              : EVT_CREATE                                                                                     *
  *                                                                                                                    *
  * Description       : create and initilize an event object                                                           *
  *                                                                                                                    *
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
- * Return            : event object                                                                                   *
+ * Return            : pointer to event object                                                                        *
  *                                                                                                                    *
  * Note              : use only in 'C' code                                                                           *
  *                                                                                                                    *
@@ -219,7 +219,7 @@ static inline unsigned evt_wait( evt_id evt ) { return evt_waitFor(evt, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     evt_give   ( evt_id evt, unsigned event );
+              void     evt_give( evt_id evt, unsigned event );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -238,8 +238,6 @@ static inline unsigned evt_wait( evt_id evt ) { return evt_waitFor(evt, INFINITE
  **********************************************************************************************************************/
 
 static inline void     evt_giveISR( evt_id evt, unsigned event ) { evt_give(evt, event); }
-
-/* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
 }

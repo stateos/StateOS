@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    04.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -29,6 +29,7 @@
 #pragma once
 
 #include <oskernel.h>
+#include <os_sig.h> // signal
 #include <os_evt.h> // event
 #include <os_flg.h> // flag
 #include <os_bar.h> // barrier

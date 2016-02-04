@@ -22,6 +22,10 @@ Features:
 - c++ wrapper
 - all documentation is contained within the source files
 ---------
+1.4
+- added signal object
+- added example (main.c.19) for new feature
+---------
 1.3
 - rewritten memory allocation functions
 - added tsk_startFrom function

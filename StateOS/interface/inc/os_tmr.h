@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    04.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -288,7 +288,7 @@ static inline unsigned tmr_wait( tmr_id tmr ) { return tmr_waitFor(tmr, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tmr_take   ( tmr_id tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
+static inline unsigned tmr_take( tmr_id tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    04.02.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -76,6 +76,7 @@ extern "C" {
 
 typedef void                *  os_id;
 typedef void               (* fun_id)( void );
+typedef struct __sig sig_t, * sig_id; // signal
 typedef struct __evt evt_t, * evt_id; // event
 typedef struct __flg flg_t, * flg_id; // flag
 typedef struct __bar bar_t, * bar_id; // barrier
@@ -90,6 +91,19 @@ typedef struct __tsk tsk_t, * tsk_id; // task
 typedef struct __sys sys_t, * sys_id; // system data
 typedef struct __sft sft_t, * sft_id; // task context saved by the software
 typedef struct __ctx ctx_t, * ctx_id; // task context saved by the hardware
+
+/* -------------------------------------------------------------------------- */
+
+// signal
+
+struct __sig
+{
+	tsk_id   queue; // next process in the DELAYED queue
+	unsigned flag;  // signal's current value
+	unsigned type;  // signal type: sigNormal, sigAuto
+};
+
+#define _SIG_INIT( type ) { 0, false, type }
 
 /* -------------------------------------------------------------------------- */
 
