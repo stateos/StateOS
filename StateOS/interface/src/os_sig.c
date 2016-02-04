@@ -105,18 +105,16 @@ void sig_give( sig_id sig )
 {
 	port_sys_lock();
 
-	if (sig->flag == 0)
+	sig->flag = 1;
+
+	if (sig->type == sigAuto)
 	{
-		if (sig->type == sigAuto)
-		{
-			if (core_one_wakeup(sig, E_SUCCESS) == 0)
-			sig->flag = 1;
-		}
-		else
-		{
-			core_all_wakeup(sig, E_SUCCESS);
-			sig->flag = 1;
-		}
+		if (core_one_wakeup(sig, E_SUCCESS))
+		sig->flag = 0;
+	}
+	else
+	{
+		core_all_wakeup(sig, E_SUCCESS);
 	}
 
 	port_sys_unlock();
