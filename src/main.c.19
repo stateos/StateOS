@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-sig_t sig = SIG_INIT(sigAuto);
+sig_t sig = SIG_INIT(sigClear);
 
 void slave()
 {

@@ -100,7 +100,7 @@ struct __sig
 {
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned flag;  // signal's current value
-	unsigned type;  // signal type: sigNormal, sigAuto
+	unsigned type;  // signal type: sigNormal, sigClear
 };
 
 #define _SIG_INIT( type ) { 0, false, type }

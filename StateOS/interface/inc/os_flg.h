@@ -40,12 +40,12 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define flgOne      ( 0U << 0 )
-#define flgAll      ( 1U << 0 )
-#define flgClear    ( 1U << 1 )
+#define flgOne       ( 0U << 0 )
+#define flgAll       ( 1U << 0 )
+#define flgClear     ( 1U << 1 )
 
-#define flgOneClear ( flgOne | flgClear )
-#define flgAllClear ( flgAll | flgClear )
+#define flgOneClear  ( flgOne | flgClear )
+#define flgAllClear  ( flgAll | flgClear )
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -41,9 +41,9 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define semBinary   (  1U ) // binary semaphore
-#define semNormal   ( ~0U ) // counting semaphore
-#define semCounting ( ~0U ) // counting semaphore
+#define semBinary    (  1U ) // binary semaphore
+#define semNormal    ( ~0U ) // counting semaphore
+#define semCounting  ( ~0U ) // counting semaphore
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -40,8 +40,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define sigNormal  ( 0U ) // normal signal
-#define sigAuto    ( 1U ) // auto clearing signal
+#define sigNormal    ( 0U << 0 ) // normal signal
+#define sigClear     ( 1U << 0 ) // auto clearing signal
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -53,7 +53,7 @@ extern "C" {
  *   sig             : name of a pointer to signal object                                                             *
  *   type            : signal type                                                                                    *
  *                     sigNormal: normal signal                                                                       *
- *                     sigAuto:   auto clearing signal                                                                *
+ *                     sigClear:  auto clearing signal                                                                *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -71,7 +71,7 @@ extern "C" {
  *   sig             : name of a pointer to signal object                                                             *
  *   type            : signal type                                                                                    *
  *                     sigNormal: normal signal                                                                       *
- *                     sigAuto:   auto clearing signal                                                                *
+ *                     sigClear:  auto clearing signal                                                                *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -88,7 +88,7 @@ extern "C" {
  * Parameters                                                                                                         *
  *   type            : signal type                                                                                    *
  *                     sigNormal: normal signal                                                                       *
- *                     sigAuto:   auto clearing signal                                                                *
+ *                     sigClear:  auto clearing signal                                                                *
  *                                                                                                                    *
  * Return            : signal object                                                                                  *
  *                                                                                                                    *
@@ -108,7 +108,7 @@ extern "C" {
  * Parameters                                                                                                         *
  *   type            : signal type                                                                                    *
  *                     sigNormal: normal signal                                                                       *
- *                     sigAuto:   auto clearing signal                                                                *
+ *                     sigClear:  auto clearing signal                                                                *
  *                                                                                                                    *
  * Return            : pointer to signal object                                                                       *
  *                                                                                                                    *
@@ -130,7 +130,7 @@ extern "C" {
  * Parameters                                                                                                         *
  *   type            : signal type                                                                                    *
  *                     sigNormal: normal signal                                                                       *
- *                     sigAuto:   auto clearing signal                                                                *
+ *                     sigClear:  auto clearing signal                                                                *
  *                                                                                                                    *
  * Return            : pointer to signal object (signal successfully created)                                         *
  *   0               : signal not created (not enough free memory)                                                    *
@@ -145,10 +145,10 @@ extern "C" {
  *                                                                                                                    *
  * Name              : sig_kill                                                                                       *
  *                                                                                                                    *
- * Description       : reset the signal object and wake up all waiting tasks with 'E_STOPPED' signal value              *
+ * Description       : reset the signal object and wake up all waiting tasks with 'E_STOPPED' event value             *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                        *
+ *   sig             : pointer to signal object                                                                       *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -225,7 +225,7 @@ static inline unsigned sig_wait( sig_id sig ) { return sig_waitFor(sig, INFINITE
  *                                                                                                                    *
  * Name              : sig_give                                                                                       *
  *                                                                                                                    *
- * Description       : resume one (sigAuto) or all (sigNormal) tasks that are waiting on the signal object            *
+ * Description       : resume one (sigClear) or all (sigNormal) tasks that are waiting on the signal object           *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   sig             : pointer to signal object                                                                       *

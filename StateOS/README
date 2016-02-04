@@ -10,8 +10,9 @@ There's a dedicated function for immediate change the task state.
 Features:
 - kernel works in preemptive or cooperative mode
 - kernel can operate in tick-less mode (32-bit timer required)
+- signals (normal, auto clearing)
 - events
-- flags (one, all, accept)
+- flags (one, all, clear)
 - barriers
 - semaphores (binary, limited, counting)
 - mutexes (normal, recursive, priority protect, priority inheritance)

@@ -41,8 +41,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define cndOne ( false ) // notify one task
-#define cndAll ( true  ) // notify all tasks
+#define cndOne       ( false ) // notify one task
+#define cndAll       ( true  ) // notify all tasks
 
 /**********************************************************************************************************************
  *                                                                                                                    *

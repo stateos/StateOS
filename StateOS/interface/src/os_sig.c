@@ -72,7 +72,7 @@ unsigned priv_sig_wait( sig_id sig, unsigned time, unsigned(*wait)() )
 
 	if (sig->flag != 0)
 	{
-		if (sig->type == sigAuto)
+		if (sig->type == sigClear)
 		sig->flag = 0;
 	}
 	else
@@ -107,7 +107,7 @@ void sig_give( sig_id sig )
 
 	sig->flag = 1;
 
-	if (sig->type == sigAuto)
+	if (sig->type == sigClear)
 	{
 		if (core_one_wakeup(sig, E_SUCCESS))
 		sig->flag = 0;
