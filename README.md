@@ -15,7 +15,7 @@ Features
 - kernel can operate in tick-less mode (32-bit timer required)
 - signals (normal, auto clearing)
 - events
-- flags (one, all, accept)
+- flags (one, all, clear)
 - barriers
 - semaphores (binary, limited, counting)
 - mutexes (normal, recursive, priority protect, priority inheritance)

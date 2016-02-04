@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    04.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-flg_id flg_create( unsigned mask )
+flg_id flg_create( void )
 /* -------------------------------------------------------------------------- */
 {
 	flg_id flg;
@@ -37,11 +37,6 @@ flg_id flg_create( unsigned mask )
 	port_sys_lock();
 
 	flg = core_sys_alloc(sizeof(flg_t));
-
-	if (flg)
-	{
-		flg->mask = mask;
-	}
 
 	port_sys_unlock();
 
@@ -70,9 +65,9 @@ unsigned priv_flg_wait( flg_id flg, unsigned flags, unsigned mode, unsigned time
 
 	tsk_id tsk = System.cur;
 
-	tsk->mode  =  mode;
-	tsk->flags = (mode & flgAccept) ? flags & ~flg->flags : flags;
-	flg->flags &= ~flags | flg->mask;
+	tsk->mode   =  mode;
+	tsk->flags  = (mode & flgClear) ? flags : flags & ~flg->flags;
+	flg->flags &= ~flags;
 
 	if (tsk->flags && ((mode & flgAll) || (tsk->flags == flags)))
 	event = wait(flg, time);
@@ -108,7 +103,7 @@ void flg_give( flg_id flg, unsigned flags )
 	{
 		if (tsk->flags & flags)
 		{
-			flg->flags &= ~tsk->flags | flg->mask;
+			flg->flags &= ~tsk->flags;
 			tsk->flags &= ~flags;
 			if (tsk->flags && (tsk->mode & flgAll)) continue;
 			core_one_wakeup(tsk = tsk->back, E_SUCCESS);

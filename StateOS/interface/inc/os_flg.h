@@ -40,12 +40,12 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define flgOne       ( 0U << 0 )
-#define flgAll       ( 1U << 0 )
-#define flgAccept    ( 1U << 1 )
+#define flgOne      ( 0U << 0 )
+#define flgAll      ( 1U << 0 )
+#define flgClear    ( 1U << 1 )
 
-#define flgOneAccept ( flgOne | flgAccept )
-#define flgAllAccept ( flgAll | flgAccept )
+#define flgOneClear ( flgOne | flgClear )
+#define flgAllClear ( flgAll | flgClear )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -55,12 +55,11 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   flg             : name of a pointer to flag object                                                               *
- *   mask            : mask of write only flags in flag object (these flags can't be cleared after accepting)         *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_FLG( flg, mask )                   \
-               flg_t flg##__flg = _FLG_INIT(mask); \
+#define     OS_FLG( flg )                     \
+               flg_t flg##__flg = _FLG_INIT(); \
                flg_id flg = & flg##__flg
 
 /**********************************************************************************************************************
@@ -71,12 +70,11 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   flg             : name of a pointer to flag object                                                               *
- *   mask            : mask of write only flags in flag object (these flags can't be cleared after accepting)         *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_FLG( flg, mask )                   \
-        static flg_t flg##__flg = _FLG_INIT(mask); \
+#define static_FLG( flg )                     \
+        static flg_t flg##__flg = _FLG_INIT(); \
         static flg_id flg = & flg##__flg
 
 /**********************************************************************************************************************
@@ -85,8 +83,7 @@ extern "C" {
  *                                                                                                                    *
  * Description       : create and initilize a flag object                                                             *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   mask            : mask of write only flags in flag object (these flags can't be cleared after accepting)         *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return            : flag object                                                                                    *
  *                                                                                                                    *
@@ -94,8 +91,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define                FLG_INIT( mask ) \
-                      _FLG_INIT(mask)
+#define                FLG_INIT( ) \
+                      _FLG_INIT()
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -103,8 +100,7 @@ extern "C" {
  *                                                                                                                    *
  * Description       : create and initilize a flag object                                                             *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   mask            : mask of write only flags in flag object (these flags can't be cleared after accepting)         *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return            : pointer to flag object                                                                         *
  *                                                                                                                    *
@@ -113,8 +109,8 @@ extern "C" {
  **********************************************************************************************************************/
 
 #ifndef __cplusplus
-#define                FLG_CREATE( mask ) \
-               &(flg_t)FLG_INIT(mask)
+#define                FLG_CREATE( ) \
+               &(flg_t)FLG_INIT()
 #endif
 
 /**********************************************************************************************************************
@@ -123,8 +119,7 @@ extern "C" {
  *                                                                                                                    *
  * Description       : create and initilize a new flag object                                                         *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   mask            : mask of write only flags in flag object (these flags can't be cleared after accepting)         *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return            : pointer to flag object (flag successfully created)                                             *
  *   0               : flag not created (not enough free memory)                                                      *
@@ -133,7 +128,7 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              flg_id   flg_create( unsigned mask );
+              flg_id   flg_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -162,10 +157,10 @@ extern "C" {
  *   flg             : pointer to flag object                                                                         *
  *   flags           : all flags to wait                                                                              *
  *   mode            : waiting mode                                                                                   *
- *                     flgOne:    wait for any flags to be set                                                        *
- *                     flgAll:    wait for all flags to be set                                                        *
- *                     flgAccept: accept flags that have been set and not accepted before                             *
- *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
+ *                     flgOne:   wait for any flags to be set                                                         *
+ *                     flgAll:   wait for all flags to be set                                                         *
+ *                     flgClear: clear flags that have been set and not accepted before                               *
+ *                     ( either flgOne or flgAll can be OR'ed with flgClear )                                         *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
@@ -190,10 +185,10 @@ extern "C" {
  *   flg             : pointer to flag object                                                                         *
  *   flags           : all flags to wait                                                                              *
  *   mode            : waiting mode                                                                                   *
- *                     flgOne:    wait for any flags to be set                                                        *
- *                     flgAll:    wait for all flags to be set                                                        *
- *                     flgAccept: accept flags that have been set and not accepted before                             *
- *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
+ *                     flgOne:   wait for any flags to be set                                                         *
+ *                     flgAll:   wait for all flags to be set                                                         *
+ *                     flgClear: clear flags that have been set and not accepted before                               *
+ *                     ( either flgOne or flgAll can be OR'ed with flgClear )                                         *
  *   delay           : duration of time (maximum number of ticks to wait on flag object for given flags)              *
  *                     IMMEDIATE: don't wait until requested flags have been set                                      *
  *                     INFINITE:  wait indefinitly until requested flags have been set                                *
@@ -220,10 +215,10 @@ extern "C" {
  *   flg             : pointer to flag object                                                                         *
  *   flags           : all flags to wait                                                                              *
  *   mode            : waiting mode                                                                                   *
- *                     flgOne:    wait for any flags to be set                                                        *
- *                     flgAll:    wait for all flags to be set                                                        *
- *                     flgAccept: accept flags that have been set and not accepted before                             *
- *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
+ *                     flgOne:   wait for any flags to be set                                                         *
+ *                     flgAll:   wait for all flags to be set                                                         *
+ *                     flgClear: clear flags that have been set and not accepted before                               *
+ *                     ( either flgOne or flgAll can be OR'ed with flgClear )                                         *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : requested flags have been set                                                                  *
@@ -246,10 +241,10 @@ static inline unsigned flg_wait( flg_id flg, unsigned flags, unsigned mode ) { r
  *   flg             : pointer to flag object                                                                         *
  *   flags           : all flags to wait                                                                              *
  *   mode            : waiting mode                                                                                   *
- *                     flgOne:    wait for any flags to be set                                                        *
- *                     flgAll:    wait for all flags to be set                                                        *
- *                     flgAccept: accept flags that have been set and not accepted before                             *
- *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
+ *                     flgOne:   wait for any flags to be set                                                         *
+ *                     flgAll:   wait for all flags to be set                                                         *
+ *                     flgClear: clear flags that have been set and not accepted before                               *
+ *                     ( either flgOne or flgAll can be OR'ed with flgClear )                                         *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : requested flags have been set                                                                  *
@@ -271,10 +266,10 @@ static inline unsigned flg_take( flg_id flg, unsigned flags, unsigned mode ) { r
  *   flg             : pointer to flag object                                                                         *
  *   flags           : all flags to wait                                                                              *
  *   mode            : waiting mode                                                                                   *
- *                     flgOne:    wait for any flags to be set                                                        *
- *                     flgAll:    wait for all flags to be set                                                        *
- *                     flgAccept: accept flags that have been set and not accepted before                             *
- *                     ( either flgOne or flgAll can be OR'ed with flgAccept )                                        *
+ *                     flgOne:   wait for any flags to be set                                                         *
+ *                     flgAll:   wait for all flags to be set                                                         *
+ *                     flgClear: clear flags that have been set and not accepted before                               *
+ *                     ( either flgOne or flgAll can be OR'ed with flgClear )                                         *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : requested flags have been set                                                                  *
@@ -334,17 +329,17 @@ class Flag : public flg_t
 {
 public:
 
-	 Flag( unsigned _mask = 0 ): flg_t(_FLG_INIT(_mask)) {}
+	 Flag( void ): flg_t(_FLG_INIT()) {}
 
 	~Flag( void ) { flg_kill(this); }
 
-	unsigned waitUntil( unsigned _flags, bool _mode, unsigned _time )    { return flg_waitUntil(this, _flags, _mode, _time);  }
-	unsigned waitFor  ( unsigned _flags, bool _mode, unsigned _delay )   { return flg_waitFor  (this, _flags, _mode, _delay); }
-	unsigned wait     ( unsigned _flags, bool _mode = flgAll+flgAccept ) { return flg_wait     (this, _flags, _mode);         }
-	unsigned take     ( unsigned _flags, bool _mode = flgAll+flgAccept ) { return flg_take     (this, _flags, _mode);         }
-	unsigned takeISR  ( unsigned _flags, bool _mode = flgAll+flgAccept ) { return flg_takeISR  (this, _flags, _mode);         }
-	void     give     ( unsigned _flags )                                {        flg_give     (this, _flags);                }
-	void     giveISR  ( unsigned _flags )                                {        flg_giveISR  (this, _flags);                }
+	unsigned waitUntil( unsigned _flags, unsigned _mode, unsigned _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
+	unsigned waitFor  ( unsigned _flags, unsigned _mode, unsigned _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
+	unsigned wait     ( unsigned _flags, unsigned _mode = flgAll )         { return flg_wait     (this, _flags, _mode);         }
+	unsigned take     ( unsigned _flags, unsigned _mode = flgAll )         { return flg_take     (this, _flags, _mode);         }
+	unsigned takeISR  ( unsigned _flags, unsigned _mode = flgAll )         { return flg_takeISR  (this, _flags, _mode);         }
+	void     give     ( unsigned _flags )                                  {        flg_give     (this, _flags);                }
+	void     giveISR  ( unsigned _flags )                                  {        flg_giveISR  (this, _flags);                }
 };
 
 #endif

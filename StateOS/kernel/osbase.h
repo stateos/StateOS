@@ -124,10 +124,9 @@ struct __flg
 {
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned flags; // flag's current value
-	unsigned mask;  // mask for blocked flags
 };
 
-#define _FLG_INIT( mask ) { 0, 0, mask }
+#define _FLG_INIT( ) { 0 }
 
 /* -------------------------------------------------------------------------- */
 
