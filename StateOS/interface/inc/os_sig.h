@@ -223,6 +223,44 @@ static inline unsigned sig_wait( sig_id sig ) { return sig_waitFor(sig, INFINITE
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : sig_take                                                                                       *
+ *                                                                                                                    *
+ * Description       : don't wait until the signal object has been released                                           *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sig             : pointer to signal object                                                                       *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : signal object was successfully released                                                        *
+ *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline unsigned sig_take( sig_id sig ) { return sig_waitFor(sig, IMMEDIATE); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sig_takeISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : don't wait until the signal object has been released                                           *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sig             : pointer to signal object                                                                       *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : signal object was successfully released                                                        *
+ *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
+ *                                                                                                                    *
+ * Note              : use only in handler mode                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline unsigned sig_takeISR( sig_id sig ) { return sig_waitFor(sig, IMMEDIATE); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : sig_give                                                                                       *
  *                                                                                                                    *
  * Description       : resume one (sigClear) or all (sigProtect) tasks that are waiting on the signal object          *
