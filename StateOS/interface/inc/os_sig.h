@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    04.02.2016
+    @date    05.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,8 +40,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define sigNormal    ( 0U << 0 ) // normal signal
-#define sigClear     ( 1U << 0 ) // auto clearing signal
+#define sigClear     ( 0U << 0 ) // auto clearing signal
+#define sigProtect   ( 1U << 0 ) // protected signal
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -52,8 +52,8 @@ extern "C" {
  * Parameters                                                                                                         *
  *   sig             : name of a pointer to signal object                                                             *
  *   type            : signal type                                                                                    *
- *                     sigNormal: normal signal                                                                       *
- *                     sigClear:  auto clearing signal                                                                *
+ *                     sigClear:   auto clearing signal                                                               *
+ *                     sigProtect: protected signal                                                                   *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -70,8 +70,8 @@ extern "C" {
  * Parameters                                                                                                         *
  *   sig             : name of a pointer to signal object                                                             *
  *   type            : signal type                                                                                    *
- *                     sigNormal: normal signal                                                                       *
- *                     sigClear:  auto clearing signal                                                                *
+ *                     sigClear:   auto clearing signal                                                               *
+ *                     sigProtect: protected signal                                                                   *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -87,8 +87,8 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   type            : signal type                                                                                    *
- *                     sigNormal: normal signal                                                                       *
- *                     sigClear:  auto clearing signal                                                                *
+ *                     sigClear:   auto clearing signal                                                               *
+ *                     sigProtect: protected signal                                                                   *
  *                                                                                                                    *
  * Return            : signal object                                                                                  *
  *                                                                                                                    *
@@ -107,8 +107,8 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   type            : signal type                                                                                    *
- *                     sigNormal: normal signal                                                                       *
- *                     sigClear:  auto clearing signal                                                                *
+ *                     sigClear:   auto clearing signal                                                               *
+ *                     sigProtect: protected signal                                                                   *
  *                                                                                                                    *
  * Return            : pointer to signal object                                                                       *
  *                                                                                                                    *
@@ -129,8 +129,8 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   type            : signal type                                                                                    *
- *                     sigNormal: normal signal                                                                       *
- *                     sigClear:  auto clearing signal                                                                *
+ *                     sigClear:   auto clearing signal                                                               *
+ *                     sigProtect: protected signal                                                                   *
  *                                                                                                                    *
  * Return            : pointer to signal object (signal successfully created)                                         *
  *   0               : signal not created (not enough free memory)                                                    *
@@ -225,7 +225,7 @@ static inline unsigned sig_wait( sig_id sig ) { return sig_waitFor(sig, INFINITE
  *                                                                                                                    *
  * Name              : sig_give                                                                                       *
  *                                                                                                                    *
- * Description       : resume one (sigClear) or all (sigNormal) tasks that are waiting on the signal object           *
+ * Description       : resume one (sigClear) or all (sigProtect) tasks that are waiting on the signal object          *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   sig             : pointer to signal object                                                                       *
@@ -302,7 +302,7 @@ class Signal : public sig_t
 {
 public:
 
-	 Signal( unsigned type = sigNormal ): sig_t(_SIG_INIT(type)) {}
+	 Signal( unsigned type = sigClear ): sig_t(_SIG_INIT(type)) {}
 
 	~Signal( void ) { sig_kill(this); }
 

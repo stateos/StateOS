@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    04.02.2016
+    @date    05.02.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -100,10 +100,10 @@ struct __sig
 {
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned flag;  // signal's current value
-	unsigned type;  // signal type: sigNormal, sigClear
+	unsigned type;  // signal type: sigClear, sigProtect
 };
 
-#define _SIG_INIT( type ) { 0, false, type }
+#define _SIG_INIT( type ) { 0, 0, type }
 
 /* -------------------------------------------------------------------------- */
 
