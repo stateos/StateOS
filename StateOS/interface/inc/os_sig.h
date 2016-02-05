@@ -347,6 +347,8 @@ public:
 	unsigned waitUntil( unsigned _time  ) { return sig_waitUntil(this, _time);  }
 	unsigned waitFor  ( unsigned _delay ) { return sig_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return sig_wait     (this);         }
+	unsigned take     ( void )            { return sig_take     (this);         }
+	unsigned takeISR  ( void )            { return sig_takeISR  (this);         }
 	void     give     ( void )            {        sig_give     (this);         }
 	void     giveISR  ( void )            {        sig_giveISR  (this);         }
 	void     clear    ( void )            {        sig_clear    (this);         }
