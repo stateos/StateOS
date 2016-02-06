@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    04.02.2016
+    @date    06.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -66,7 +66,7 @@ unsigned priv_flg_wait( flg_id flg, unsigned flags, unsigned mode, unsigned time
 	tsk_id tsk = System.cur;
 
 	tsk->mode   =  mode;
-	tsk->flags  = (mode & flgClear) ? flags : flags & ~flg->flags;
+	tsk->flags  = (mode & flgIgnore) ? flags : flags & ~flg->flags;
 	flg->flags &= ~flags;
 
 	if (tsk->flags && ((mode & flgAll) || (tsk->flags == flags)))
