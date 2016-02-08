@@ -1,15 +1,15 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     30.11.2015
+@date     07.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
 *******************************************************************************/
 
-#include <stm32f4xx.h>
-
 #ifdef  __GNUC__
+
+#include <stm32f4xx.h>
 
 /*******************************************************************************
  Symbols defined in linker script

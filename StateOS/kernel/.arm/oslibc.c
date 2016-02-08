@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    07.02.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -26,9 +26,9 @@
 
  ******************************************************************************/
 
-#include <oskernel.h>
-
 #if defined(__CC_ARM) && !defined(__MICROLIB)
+
+#include <oskernel.h>
 
 /* -------------------------------------------------------------------------- */
 
@@ -72,4 +72,4 @@ void _mutex_free( unsigned *mutex )
 
 /* -------------------------------------------------------------------------- */
 
-#endif
+#endif // __CC_ARM
