@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    05.02.2016
+    @date    11.02.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -103,7 +103,7 @@ struct __sig
 	unsigned type;  // signal type: sigClear, sigProtect
 };
 
-#define _SIG_INIT( type ) { 0, 0, type }
+#define _SIG_INIT( t ) { .type=t }
 
 /* -------------------------------------------------------------------------- */
 
@@ -139,7 +139,7 @@ struct __bar
 	unsigned limit; // barrier's value limit
 };
 
-#define _BAR_INIT( limit ) { 0, limit, limit }
+#define _BAR_INIT( l ) { .count=l, .limit=l }
 
 /* -------------------------------------------------------------------------- */
 
@@ -152,7 +152,7 @@ struct __sem
 	unsigned limit; // semaphore's value limit
 };
 
-#define _SEM_INIT( count, limit ) { 0, count, limit }
+#define _SEM_INIT( c, l ) { .count=c, .limit=l }
 
 /* -------------------------------------------------------------------------- */
 
@@ -167,7 +167,7 @@ struct __mtx
 	mtx_id   mlist; // list of mutexes held by owner
 };
 
-#define _MTX_INIT( type ) { 0, 0, type }
+#define _MTX_INIT( t ) { .type=t }
 
 /* -------------------------------------------------------------------------- */
 
@@ -196,9 +196,9 @@ struct __box
 	unsigned next;
 };
 
-#define _BOX_INIT( limit, size, data ) { 0, 0, limit, size, data }
+#define _BOX_INIT( l, s, d ) { .limit=l, .size=s, .data=d }
 
-#define _BOX_DATA( limit, size )           (char[limit*size]){ 0 }
+#define _BOX_DATA( limit, size ) (char[limit*size]){ 0 }
 
 /* -------------------------------------------------------------------------- */
 
@@ -215,9 +215,9 @@ struct __msg
 	unsigned next;
 };
 
-#define _MSG_INIT( limit, data ) { 0, 0, limit, data }
+#define _MSG_INIT( l, d ) { .limit=l, .data=d }
 
-#define _MSG_DATA( limit )      (unsigned[limit]){ 0 }
+#define _MSG_DATA( limit ) (unsigned[limit]){ 0 }
 
 /* -------------------------------------------------------------------------- */
 
@@ -291,9 +291,9 @@ struct __tsk
 #endif
 };
 
-#define _TSK_INIT( prio, state, top ) { 0, 0, 0, 0, state, 0, 0, prio, 0, top }
+#define _TSK_INIT( p, s, t ) { .state=s, .prio=p, .top=t }
 
-#define _TSK_STACK( size )     (__osalign char[ASIZE(size)]){ 0 } + ASIZE(size)
+#define _TSK_STACK( size ) (__osalign char[ASIZE(size)]){ 0 } + ASIZE(size)
 
 #ifdef __CC_ARM
 #pragma pop
