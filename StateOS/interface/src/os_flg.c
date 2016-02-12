@@ -63,13 +63,13 @@ unsigned priv_flg_wait( flg_id flg, unsigned flags, unsigned mode, unsigned time
 
 	port_sys_lock();
 
-	tsk_id tsk = System.cur;
+	tsk_id cur = Current;
 
-	tsk->all    =  mode & flgAll;
-	tsk->flags  = (mode & flgIgnore) ? flags : (flags & ~flg->flags);
+	cur->all    =  mode & flgAll;
+	cur->flags  = (mode & flgIgnore) ? flags : (flags & ~flg->flags);
 	flg->flags &= ~flags;
 
-	if (tsk->flags && (tsk->all || (tsk->flags == flags)))
+	if (cur->flags && (cur->all || (cur->flags == flags)))
 	event = wait(flg, time);
 
 	port_sys_unlock();

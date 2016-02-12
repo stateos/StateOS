@@ -94,9 +94,9 @@ void tsk_stop( void )
 {
 	port_set_lock();
 
-//	while (System.cur->list) mtx_kill(System.cur->list);
+//	while (Current->list) mtx_kill(Current->list);
 
-	core_tsk_remove(System.cur);
+	core_tsk_remove(Current);
 	core_tsk_break();
 }
 
@@ -111,7 +111,7 @@ void tsk_kill( tsk_id tsk )
 	switch (tsk->id)
 	{
 	case ID_READY:
-		if (tsk != System.cur) // instead use tsk_stop
+		if (tsk != Current) // instead use tsk_stop
 		core_tsk_remove(tsk);
 		break;
 	case ID_DELAYED:
@@ -127,7 +127,7 @@ void tsk_kill( tsk_id tsk )
 void tsk_flip( fun_id state )
 /* -------------------------------------------------------------------------- */
 {
-	System.cur->state = state;
+	Current->state = state;
 
 	core_tsk_break();
 }
@@ -138,9 +138,9 @@ void tsk_prio( unsigned prio )
 {
 	port_sys_lock();
 
-	System.cur->basic = prio;
+	Current->basic = prio;
 
-	core_tsk_prio(System.cur, prio);
+	core_tsk_prio(Current, prio);
 
 	port_sys_unlock();
 }
@@ -154,7 +154,7 @@ unsigned priv_tsk_sleep( unsigned time, unsigned(*wait)() )
 
 	port_sys_lock();
 
-	event = wait(System.cur, time);
+	event = wait(Current, time);
 
 	port_sys_unlock();
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    07.02.2016
+    @date    12.02.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -35,7 +35,7 @@
 __attribute__((used))
 void *__user_perthread_libspace( void )
 {
-	return &System.cur->libspace;  /* provide separate libspace for each task */
+	return &Current->libspace;  /* provide separate libspace for each task */
 }
 
 /* -------------------------------------------------------------------------- */

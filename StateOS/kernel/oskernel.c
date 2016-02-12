@@ -57,7 +57,7 @@ void core_ctx_switch( void )
 
 void core_tsk_break( void )
 {
-	tsk_id cur = System.cur;
+	tsk_id cur = Current;
 
 	port_set_stack(cur->top);
 
@@ -122,7 +122,7 @@ void core_tsk_insert( tsk_id tsk )
 {
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
-	if (IDLE.next->prio > System.cur->prio)
+	if (IDLE.next->prio > Current->prio)
 	port_ctx_switch();
 #endif
 }
@@ -183,7 +183,7 @@ unsigned priv_tsk_wait( tsk_id tsk, obj_id obj )
 
 unsigned core_tsk_waitUntil( os_id obj, unsigned time )
 {
-	tsk_id cur = System.cur;
+	tsk_id cur = Current;
 
 	cur->start = Counter;
 	cur->delay = time - cur->start;
@@ -198,7 +198,7 @@ unsigned core_tsk_waitUntil( os_id obj, unsigned time )
 
 unsigned core_tsk_waitFor( os_id obj, unsigned delay )
 {
-	tsk_id cur = System.cur;
+	tsk_id cur = Current;
 
 	cur->start = Counter;
 	cur->delay = delay;
@@ -302,13 +302,13 @@ tsk_id core_tsk_handler( void )
 
 	core_ctx_reset();
 
-	cur = System.cur;
+	cur = Current;
 	if (cur->id == ID_READY)
 	{
 		core_tsk_remove(cur);
 		priv_tsk_insert(cur);
 	}
-	cur = System.cur = IDLE.next;
+	cur = Current = IDLE.next;
 
 	priv_tsk_prepare(cur); // prepare task stack if necessary
 

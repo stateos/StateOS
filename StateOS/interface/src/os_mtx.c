@@ -112,12 +112,12 @@ unsigned priv_mtx_wait( mtx_id mtx, unsigned time, unsigned(*wait)() )
 
 	if (mtx->owner == 0)
 	{
-		priv_mtx_link(mtx, System.cur);
+		priv_mtx_link(mtx, Current);
 
 		event = E_SUCCESS;
 	}
 	else
-	if (mtx->owner == System.cur)
+	if (mtx->owner == Current)
 	{
 		if (mtx->type & mtxRecursive)
 		if (mtx->count < ~0U)
@@ -129,8 +129,8 @@ unsigned priv_mtx_wait( mtx_id mtx, unsigned time, unsigned(*wait)() )
 	else
 	{
 		if (mtx->type & mtxPriorityInheritance)
-		if (mtx->owner->prio < System.cur->prio)
-			core_tsk_prio(mtx->owner, System.cur->prio);
+		if (mtx->owner->prio < Current->prio)
+			core_tsk_prio(mtx->owner, Current->prio);
 
 		event = wait(mtx, time);
 	}
@@ -162,7 +162,7 @@ unsigned mtx_give( mtx_id mtx )
 	
 	port_sys_lock();
 
-	if (mtx->owner == System.cur)
+	if (mtx->owner == Current)
 	{
 		if (mtx->count)
 		{
