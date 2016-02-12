@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    12.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -43,7 +43,7 @@ tsk_id tsk_create( unsigned prio, fun_id state, unsigned size )
 	if (tsk)
 	{
 		tsk->prio  = prio;
-		tsk->bprio = prio;
+		tsk->basic = prio;
 		tsk->state = state;
 		tsk->top   = (char *)tsk + size;
 
@@ -94,7 +94,7 @@ void tsk_stop( void )
 {
 	port_set_lock();
 
-//	while (System.cur->mlist) mtx_kill(System.cur->mlist);
+//	while (System.cur->list) mtx_kill(System.cur->list);
 
 	core_tsk_remove(System.cur);
 	core_tsk_break();
@@ -106,7 +106,7 @@ void tsk_kill( tsk_id tsk )
 {
 	port_sys_lock();
 
-//	while (tsk->mlist) mtx_kill(tsk->mlist);
+//	while (tsk->list) mtx_kill(tsk->list);
 
 	switch (tsk->id)
 	{
@@ -138,7 +138,7 @@ void tsk_prio( unsigned prio )
 {
 	port_sys_lock();
 
-	System.cur->bprio = prio;
+	System.cur->basic = prio;
 
 	core_tsk_prio(System.cur, prio);
 

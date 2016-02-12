@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    06.02.2016
+    @date    12.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -65,11 +65,11 @@ unsigned priv_flg_wait( flg_id flg, unsigned flags, unsigned mode, unsigned time
 
 	tsk_id tsk = System.cur;
 
-	tsk->mode   =  mode;
-	tsk->flags  = (mode & flgIgnore) ? flags : flags & ~flg->flags;
+	tsk->all    =  mode & flgAll;
+	tsk->flags  = (mode & flgIgnore) ? flags : (flags & ~flg->flags);
 	flg->flags &= ~flags;
 
-	if (tsk->flags && ((mode & flgAll) || (tsk->flags == flags)))
+	if (tsk->flags && (tsk->all || (tsk->flags == flags)))
 	event = wait(flg, time);
 
 	port_sys_unlock();
@@ -105,7 +105,7 @@ void flg_give( flg_id flg, unsigned flags )
 		{
 			flg->flags &= ~tsk->flags;
 			tsk->flags &= ~flags;
-			if (tsk->flags && (tsk->mode & flgAll)) continue;
+			if (tsk->flags && tsk->all) continue;
 			core_one_wakeup(tsk = tsk->back, E_SUCCESS);
 		}
 	}

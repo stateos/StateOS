@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    11.02.2016
+    @date    12.02.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -245,7 +245,7 @@ void core_all_wakeup( os_id obj, unsigned event )
 
 void core_tsk_prio( tsk_id tsk, unsigned prio )
 {
-	for (mtx_id mtx = tsk->mlist; mtx; mtx = mtx->mlist)
+	for (mtx_id mtx = tsk->list; mtx; mtx = mtx->list)
 	{
 		if (mtx->queue)
 		if (prio < mtx->queue->prio)

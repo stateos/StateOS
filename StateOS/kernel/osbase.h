@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    11.02.2016
+    @date    12.02.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,11 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifdef __CC_ARM
+#pragma push
+#pragma anon_unions
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -74,23 +79,23 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-typedef void                *  os_id;
-typedef void               (* fun_id)( void );
-typedef struct __sig sig_t, * sig_id; // signal
-typedef struct __evt evt_t, * evt_id; // event
-typedef struct __flg flg_t, * flg_id; // flag
-typedef struct __bar bar_t, * bar_id; // barrier
-typedef struct __sem sem_t, * sem_id; // semaphore
-typedef struct __mtx mtx_t, * mtx_id; // mutex
-typedef struct __cnd cnd_t, * cnd_id; // condition variable
-typedef struct __box box_t, * box_id; // mailbox queue
-typedef struct __msg msg_t, * msg_id; // message queue
-typedef struct __obj obj_t, * obj_id;
-typedef struct __tmr tmr_t, * tmr_id; // timer
-typedef struct __tsk tsk_t, * tsk_id; // task
-typedef struct __sys sys_t, * sys_id; // system data
-typedef struct __sft sft_t, * sft_id; // task context saved by the software
-typedef struct __ctx ctx_t, * ctx_id; // task context saved by the hardware
+typedef void                 *os_id;
+typedef void               (*fun_id)(void);
+typedef struct __sig sig_t, *sig_id; // signal
+typedef struct __evt evt_t, *evt_id; // event
+typedef struct __flg flg_t, *flg_id; // flag
+typedef struct __bar bar_t, *bar_id; // barrier
+typedef struct __sem sem_t, *sem_id; // semaphore
+typedef struct __mtx mtx_t, *mtx_id; // mutex
+typedef struct __cnd cnd_t, *cnd_id; // condition variable
+typedef struct __box box_t, *box_id; // mailbox queue
+typedef struct __msg msg_t, *msg_id; // message queue
+typedef struct __obj obj_t, *obj_id;
+typedef struct __tmr tmr_t, *tmr_id; // timer
+typedef struct __tsk tsk_t, *tsk_id; // task
+typedef struct __sys sys_t, *sys_id; // system data
+typedef struct __sft sft_t, *sft_id; // task context saved by the software
+typedef struct __ctx ctx_t, *ctx_id; // task context saved by the hardware
 
 /* -------------------------------------------------------------------------- */
 
@@ -103,7 +108,7 @@ struct __sig
 	unsigned type;  // signal type: sigClear, sigProtect
 };
 
-#define _SIG_INIT( t ) { .type=t }
+#define _SIG_INIT( _type ) { /*queue*/0, /*flag*/0, /*type*/_type }
 
 /* -------------------------------------------------------------------------- */
 
@@ -114,7 +119,7 @@ struct __evt
 	tsk_id   queue; // next process in the DELAYED queue
 };
 
-#define _EVT_INIT( ) { 0 }
+#define _EVT_INIT() { 0 }
 
 /* -------------------------------------------------------------------------- */
 
@@ -126,7 +131,7 @@ struct __flg
 	unsigned flags; // flag's current value
 };
 
-#define _FLG_INIT( ) { 0 }
+#define _FLG_INIT() { 0 }
 
 /* -------------------------------------------------------------------------- */
 
@@ -139,7 +144,7 @@ struct __bar
 	unsigned limit; // barrier's value limit
 };
 
-#define _BAR_INIT( l ) { .count=l, .limit=l }
+#define _BAR_INIT( _limit ) { /*queue*/0, /*count*/_limit, /*limit*/_limit }
 
 /* -------------------------------------------------------------------------- */
 
@@ -152,7 +157,7 @@ struct __sem
 	unsigned limit; // semaphore's value limit
 };
 
-#define _SEM_INIT( c, l ) { .count=c, .limit=l }
+#define _SEM_INIT( _count, _limit ) { /*queue*/0, /*count*/_count, /*limit*/_limit }
 
 /* -------------------------------------------------------------------------- */
 
@@ -161,13 +166,13 @@ struct __sem
 struct __mtx
 {
 	tsk_id   queue; // next process in the DELAYED queue
-	unsigned count;
-	unsigned type;  // mutex type: mtxNormal, mtxRecursive, mtxPriorityProtect, mtxPriorityInheritance
 	tsk_id   owner; // owner task
-	mtx_id   mlist; // list of mutexes held by owner
+	mtx_id   list;  // used by priority inheritance mutexes: list of mutexes held by owner
+	unsigned count; // used by recursive mutexes
+	unsigned type;  // mutex type: mtxNormal, mtxRecursive, mtxPriorityProtect, mtxPriorityInheritance
 };
 
-#define _MTX_INIT( t ) { .type=t }
+#define _MTX_INIT( _type ) { /*queue*/0, /*owner*/0, /*list*/0, /*count*/0, /*type*/_type }
 
 /* -------------------------------------------------------------------------- */
 
@@ -175,10 +180,10 @@ struct __mtx
 
 struct __cnd
 {
-	tsk_id   queue;
+	tsk_id   queue; // next process in the DELAYED queue
 };
 
-#define _CND_INIT( ) { 0 }
+#define _CND_INIT() { 0 }
 
 /* -------------------------------------------------------------------------- */
 
@@ -190,15 +195,15 @@ struct __box
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
-	unsigned size;
-	char   * data;
-	unsigned first;
-	unsigned next;
+	unsigned first; // first element to read from queue
+	unsigned next;  // next element to write into queue
+	char    *data;  // queue data
+	unsigned size;  // size of a single mail (in bytes)
 };
 
-#define _BOX_INIT( l, s, d ) { .limit=l, .size=s, .data=d }
+#define _BOX_INIT( _limit, _size, _data ) { /*queue*/0, /*count*/0, /*limit*/_limit, /*first*/0, /*next*/0, /*data*/_data, /*size*/_size }
 
-#define _BOX_DATA( limit, size ) (char[limit*size]){ 0 }
+#define _BOX_DATA( _limit, _size ) (char[_limit*_size]){ 0 }
 
 /* -------------------------------------------------------------------------- */
 
@@ -210,14 +215,14 @@ struct __msg
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
-	unsigned * data;
-	unsigned first;
-	unsigned next;
+	unsigned first; // first element to read from queue
+	unsigned next;  // next element to write into queue
+	unsigned*data;  // queue data
 };
 
-#define _MSG_INIT( l, d ) { .limit=l, .data=d }
+#define _MSG_INIT( _limit, _data ) { /*queue*/0, /*count*/0, /*limit*/_limit, /*first*/0, /*next*/0, /*data*/_data }
 
-#define _MSG_DATA( limit ) (unsigned[limit]){ 0 }
+#define _MSG_DATA( _limit ) (unsigned[_limit]){ 0 }
 
 /* -------------------------------------------------------------------------- */
 
@@ -226,7 +231,7 @@ struct __msg
 struct __obj
 {
 	tsk_id   queue; // next process in the DELAYED queue
-	unsigned id;    // ID_STOPPED, ID_READY, ID_DELAYED, ID_TIMER
+	unsigned id;    // object id: ID_STOPPED, ID_READY, ID_DELAYED, ID_TIMER, ID_IDLE
 	obj_id   next;  // next object in the READY queue
 	obj_id   prev;  // previous object in the READY queue
 };
@@ -242,20 +247,15 @@ struct __tmr
 	tmr_id   next;  // inherited from object
 	tmr_id   prev;  // inherited from object
 
-	fun_id   state;
+	fun_id   state; // callback procedure
 	unsigned start;
 	unsigned delay;
 	unsigned period;
 };
 
-#define _TMR_INIT( ) { 0 }
+#define _TMR_INIT() { 0 }
 
 /* -------------------------------------------------------------------------- */
-
-#ifdef __CC_ARM
-#pragma push
-#pragma anon_unions
-#endif
 
 // task
 
@@ -269,35 +269,32 @@ struct __tsk
 	fun_id   state; // inherited from timer
 	unsigned start; // inherited from timer
 	unsigned delay; // inherited from timer
-	unsigned prio;
+	unsigned prio;  // current priority
 
-	 os_id   sp;    // stack pointer
-	 os_id   top;   // top of stack
+	void    *sp;    // stack pointer
+	void    *top;   // top of stack
 	tsk_id   back;  // previous process in the DELAYED queue
-	obj_id   guard; // object that controls the pending process
-	mtx_id   mlist; // list of mutexes held
-	unsigned bprio; // basic priority
+	unsigned basic; // basic priority
+
+	void    *guard; // object that controls the pending process
+	mtx_id   list;  // used by mutex object: list of mutexes held
 	union  {
-	unsigned flags;
-	void   * data;
-	unsigned msg;
+	unsigned all;   // used by flag object: wait for all flags to be set
+	void    *data;  // used by mailbox queue object
+	unsigned msg;   // used by message queue object
 	};
 	union  {
+	unsigned flags; // used by flag object: all flags to wait
 	unsigned event; // wakeup event
-	unsigned mode;
 	};
 #if defined(__CC_ARM) && !defined(__MICROLIB)
 	char     libspace[96];
 #endif
 };
 
-#define _TSK_INIT( p, s, t ) { .state=s, .prio=p, .top=t }
+#define _TSK_INIT( _prio, _state, _top ) { /*queue*/0, /*id*/0, /*next*/0, /*prev*/0, /*state*/_state, /*start*/0, /*delay*/0, /*prio*/_prio, /*sp*/0, /*top*/_top }
 
-#define _TSK_STACK( size ) (__osalign char[ASIZE(size)]){ 0 } + ASIZE(size)
-
-#ifdef __CC_ARM
-#pragma pop
-#endif
+#define _TSK_STACK( _size ) (__osalign char[ASIZE(_size)]){ 0 } + ASIZE(_size)
 
 /* -------------------------------------------------------------------------- */
 
@@ -305,13 +302,13 @@ struct __tsk
 
 struct __sys
 {
-	tsk_id   cur; // pointer to the current task control block
-	tmr_id   tmr; // pointer to the current timer control block
+	tsk_id   cur;   // pointer to the current task control block
+	tmr_id   tmr;   // pointer to the current timer control block
 #if OS_TIMER == 0
 	volatile
-	unsigned cnt; // system timer counter
+	unsigned cnt;   // system timer counter
 #if OS_ROBIN
-	unsigned dly; // task switch counter
+	unsigned dly;   // task switch counter
 #endif
 #endif
 };
@@ -339,13 +336,17 @@ struct __ctx // context saved by the hardware
 	unsigned r1;
 	unsigned r2;
 	unsigned r3;
-	os_id    ip;
-	os_id    lr;
-	os_id    pc;
+	void    *ip;
+	void    *lr;
+	void    *pc;
 	unsigned psr;
 };
 
 /* -------------------------------------------------------------------------- */
+
+#ifdef __CC_ARM
+#pragma pop
+#endif
 
 #ifdef __cplusplus
 }

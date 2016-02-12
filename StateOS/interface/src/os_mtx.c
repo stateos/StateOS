@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    12.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -58,8 +58,8 @@ void priv_mtx_link( mtx_id mtx, tsk_id tsk )
 	if (tsk)
 	if (mtx->type & mtxPriorityInheritance)
 	{
-		mtx->mlist = tsk->mlist;
-		tsk->mlist = mtx;
+		mtx->list = tsk->list;
+		tsk->list = mtx;
 	}
 }
 
@@ -72,17 +72,17 @@ void priv_mtx_unlink( mtx_id mtx )
 	{
 		tsk_id tsk = mtx->owner;
 
-		if (tsk->mlist == mtx)
-			tsk->mlist = mtx->mlist;
+		if (tsk->list == mtx)
+			tsk->list = mtx->list;
 
-		for (mtx_id m = tsk->mlist; m; m = m->mlist)
-			if (m->mlist == mtx)
-				m->mlist = mtx->mlist;
+		for (mtx_id m = tsk->list; m; m = m->list)
+			if (m->list == mtx)
+				m->list = mtx->list;
 
-		mtx->mlist = 0;
+		mtx->list  = 0;
 		mtx->owner = 0;
 
-		core_tsk_prio(tsk, tsk->bprio);
+		core_tsk_prio(tsk, tsk->basic);
 	}
 }
 
