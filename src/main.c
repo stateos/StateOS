@@ -1,30 +1,30 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-OS_SEM(sem, 0, semNormal);
+sig_t sig = SIG_INIT(sigClear);
 
 void slave()
 {
-	sem_wait(sem);
+	sig_wait(&sig);
 
 	LED_Tick();
 }
 
 void master()
 {
-	tsk_delay(1000*MSEC);
+	tsk_delay(SEC);
 
-	sem_give(sem);
+	sig_give(&sig);
 }
 
-OS_WRK(sla, 0, slave,  256);
-OS_WRK(mas, 0, master, 256);
+tsk_t sla = TSK_INIT(0, slave);
+tsk_t mas = TSK_INIT(0, master);
 
 int main()
 {
 	LED_Config();
 
-	tsk_start(sla);
-	tsk_start(mas);
+	tsk_start(&sla);
+	tsk_start(&mas);
 	tsk_stop();
 }
