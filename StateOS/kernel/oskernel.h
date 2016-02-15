@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    15.02.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -190,7 +190,11 @@ unsigned port_isr_inside( void )
 static inline
 void port_set_stack( void *top )
 {
+#if defined(__GNUC__)
+	__asm volatile ("mov sp, %0" :: "r" (top) : "memory");
+#else
 	__set_PSP((unsigned)top);
+#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -222,15 +226,6 @@ static inline void     port_clr_lock( void )           {         __enable_irq();
 
 #define port_isr_enable()                           do { port_clr_lock()
 #define port_isr_disable()                               port_set_lock(); } while(0)
-
-/* -------------------------------------------------------------------------- */
-
-static inline
-void port_sys_flash( void )
-{
-	port_sys_enable();
-	port_sys_disable();
-}
 
 /* -------------------------------------------------------------------------- */
 
