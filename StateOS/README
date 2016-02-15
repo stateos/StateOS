@@ -26,6 +26,7 @@ Features:
 1.5
 - added sig_take function
 - changed flag mode constants
+- added some optimizations
 ---------
 1.4
 - added signal object
