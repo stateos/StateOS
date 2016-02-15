@@ -190,7 +190,7 @@ unsigned port_isr_inside( void )
 static inline
 void port_set_stack( void *top )
 {
-#if defined(__GNUC__)
+#if defined(__GNUC__) || ( defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050) )
 	__asm volatile ("mov sp, %0" :: "r" (top) : "memory");
 #else
 	__set_PSP((unsigned)top);
