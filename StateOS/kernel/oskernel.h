@@ -44,7 +44,7 @@ extern sys_t System; // system data
 
 // initiating and running the system timer
 // the port_sys_init procedure is normally called as a constructor
-void port_sys_init( void );
+void port_sys_init( void ) __attribute__(( constructor ));
 
 // procedure performed in the 'idle' task; waiting for an interrupt
 void port_idle_hook( void );

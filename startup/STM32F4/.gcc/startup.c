@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     07.02.2016
+@date     15.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -80,14 +80,16 @@ void call_array( unsigned *dst_, unsigned *end_ )
  External function prototypes
 *******************************************************************************/
 
-void __libc_init_array( void ); /* Global & static constructors               */
-void __libc_fini_array( void ); /* Global & static destructors                */
+#ifndef __NOSTARTFILES
+__attribute__(( weak )) void _init( void ) {}
+__attribute__(( weak )) void _fini( void ) {}
+
+void __libc_init_array( void );               /* global & static constructors */
+void __libc_fini_array( void );               /* global & static destructors  */
+#endif
 
 void        SystemInit( void );                          /* system clock init */
 int               main( void );                                /* entry point */
-
-void             _init( void ) __attribute__ ((weak));
-void             _fini( void ) __attribute__ ((weak));
 
 /*******************************************************************************
  Default reset handler
@@ -111,7 +113,7 @@ void Reset_Handler( void )
 	/* Initialize the data segment */
 	copy_mem(__data_start, __data_end, __data_init_start);
 	/* Zero fill the bss segment */
-	fill_mem(__bss_start, __bss_end, 0);
+	fill_mem( __bss_start,  __bss_end, 0);
 #ifndef __NOSTARTFILES
 	/* Call global & static constructors */
 	__libc_init_array();
@@ -120,7 +122,7 @@ void Reset_Handler( void )
 	/* Call global & static constructors */
 	call_array(__preinit_array_start, __preinit_array_end);
 //	_init();
-	call_array(__init_array_start, __init_array_end);
+	call_array(   __init_array_start,    __init_array_end);
 #endif
 #endif
 	/* Call the application's entry point */
@@ -131,7 +133,7 @@ void Reset_Handler( void )
 #else
 #ifdef  USE_DTORS
 	/* Call global & static destructors */
-	call_array(__fini_array_start, __fini_array_end);
+	call_array(   __fini_array_start,    __fini_array_end);
 //	_fini();
 #endif
 #endif

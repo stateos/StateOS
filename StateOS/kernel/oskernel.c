@@ -34,10 +34,10 @@
 
 #ifndef MAIN_SP
 static  char     MAIN_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
-#define MAIN_SP &MAIN_STACK[ASIZE(OS_STACK_SIZE)]
+#define MAIN_SP (MAIN_STACK+ASIZE(OS_STACK_SIZE))
 #endif
 static  char     IDLE_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
-#define IDLE_SP &IDLE_STACK[ASIZE(OS_STACK_SIZE)]
+#define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
 static tsk_t IDLE;
 static tsk_t MAIN = { .id=ID_READY, .next=&IDLE, .prev=&IDLE, .top=MAIN_SP };                        // main task
