@@ -12,40 +12,16 @@
 #include <stm32f4xx.h>
 
 /*******************************************************************************
- Chip specific definitions
+ Configuration of stacks and heap
 *******************************************************************************/
 
-#define __ccm_start 0x10000000
-#define __ccm_end   0x10010000
-#define __ram_start 0x20000000
-#define __ram_end   0x20020000
+#include "startup.h"
 
-/*******************************************************************************
- Stack and heap configuration
-*******************************************************************************/
-
-#ifndef   proc_stack_size
-#define   proc_stack_size 1024
-#endif
-#define   proc_stack  (((proc_stack_size)+7)&(~7))
-
-#ifndef   main_stack_size
-#define   main_stack_size 1024
-#endif
-#define   main_stack  (((main_stack_size)+7)&(~7))
-
-#if proc_stack_size > 0
-__attribute__((section("STACK"), used))
-char    __proc_stack[proc_stack];
-#endif
-
-__attribute__((section("HEAP")))
+__attribute__ ((const, section("HEAP")))
 __asm void __user_config_stackheap( void )
 {
-                SPACE     0
-__heap_base
+__heap_base     SPACE     0
                 EXPORT  __heap_base
-__main_stack    SPACE     main_stack
 __heap_limit    EQU     __ram_end - main_stack
                 EXPORT  __heap_limit
 __initial_msp   EQU     __ram_end
@@ -67,7 +43,7 @@ extern  char  __initial_psp[];
 extern  char  __initial_msp[];
 
 /*******************************************************************************
- External function prototypes
+ Prototypes of external functions
 *******************************************************************************/
 
 void        SystemInit( void );                          /* system clock init */
@@ -107,7 +83,7 @@ void Fault_Handler( void )
 }
 
 /*******************************************************************************
- Declaration of the exception handlers
+ Declaration of exception handlers
 *******************************************************************************/
 
 /* Core exceptions */

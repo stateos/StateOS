@@ -11,7 +11,7 @@ OPENOCD    := c:/sys/tools/openocd/bin-x64/openocd
 #----------------------------------------------------------#
 
 PROJECT    :=
-DEFS       := USE_NANO USE_CTORS
+DEFS       := USE_NANO
 LIBS       :=
 DIRS       :=
 KEYS       :=

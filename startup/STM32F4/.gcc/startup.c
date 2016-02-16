@@ -15,44 +15,37 @@
  Symbols defined in linker script
 *******************************************************************************/
 
-extern unsigned     __data_init_start[];
-extern unsigned          __data_start[];
-extern unsigned          __data_end  [];
-extern unsigned          __data_size [];
-extern unsigned           __bss_start[];
-extern unsigned           __bss_end  [];
-extern unsigned           __bss_size [];
-extern unsigned __preinit_array_start[];
-extern unsigned __preinit_array_end  [];
-extern unsigned    __init_array_start[];
-extern unsigned    __init_array_end  [];
-extern unsigned    __fini_array_start[];
-extern unsigned    __fini_array_end  [];
+extern unsigned  __data_init_start[];
+extern unsigned       __data_start[];
+extern unsigned       __data_end  [];
+extern unsigned       __data_size [];
+extern unsigned        __bss_start[];
+extern unsigned        __bss_end  [];
+extern unsigned        __bss_size [];
+
+extern void(*__preinit_array_start[])();
+extern void(*__preinit_array_end  [])();
+extern void(*   __init_array_start[])();
+extern void(*   __init_array_end  [])();
+extern void(*   __fini_array_start[])();
+extern void(*   __fini_array_end  [])();
+
+extern unsigned    __initial_psp  [];
+extern unsigned    __initial_msp  [];
 
 /*******************************************************************************
- Stack configuration
+ Configuration of stacks
 *******************************************************************************/
 
-#ifndef  proc_stack_size
-#define  proc_stack_size 1024
-#endif
-#define  proc_stack  (((proc_stack_size)+7)&(~7))
+#include "startup.h"
 
-#ifndef  main_stack_size
-#define  main_stack_size 1024
-#endif
-#define  main_stack  (((main_stack_size)+7)&(~7))
-
-#if      proc_stack_size > 0
-char   __proc_stack[proc_stack] __attribute__ ((used, section(".proc_stack")));
+#if    proc_stack_size > 0
+char __proc_stack[proc_stack] __attribute__ ((used, section(".proc_stack")));
 #endif
 
-#if      main_stack_size > 0
-char   __main_stack[main_stack] __attribute__ ((used, section(".main_stack")));
+#if    main_stack_size > 0
+char __main_stack[main_stack] __attribute__ ((used, section(".main_stack")));
 #endif
-
-extern  char  __initial_psp[];
-extern  char  __initial_msp[];
 
 /*******************************************************************************
  Default reset procedures
@@ -71,22 +64,17 @@ void fill_mem( unsigned *dst_, unsigned *end_, unsigned val_ )
 }
 
 static inline
-void call_array( unsigned *dst_, unsigned *end_ )
+void call_array( void(**dst_)(), void(**end_)() )
 {
-	while (dst_ < end_) ((void(*)(void))*(dst_++))();
+	while (dst_ < end_) (*(dst_++))();
 }
 
 /*******************************************************************************
- External function prototypes
+ Prototypes of external functions
 *******************************************************************************/
-
-#ifndef __NOSTARTFILES
-__attribute__(( weak )) void _init( void ) {}
-__attribute__(( weak )) void _fini( void ) {}
 
 void __libc_init_array( void );               /* global & static constructors */
 void __libc_fini_array( void );               /* global & static destructors  */
-#endif
 
 void        SystemInit( void );                          /* system clock init */
 int               main( void );                                /* entry point */
@@ -118,12 +106,10 @@ void Reset_Handler( void )
 	/* Call global & static constructors */
 	__libc_init_array();
 #else
-#ifdef  USE_CTORS
 	/* Call global & static constructors */
 	call_array(__preinit_array_start, __preinit_array_end);
 //	_init();
 	call_array(   __init_array_start,    __init_array_end);
-#endif
 #endif
 	/* Call the application's entry point */
 	main();
@@ -131,11 +117,9 @@ void Reset_Handler( void )
 	/* Call global & static destructors */
 	__libc_fini_array();
 #else
-#ifdef  USE_DTORS
 	/* Call global & static destructors */
 	call_array(   __fini_array_start,    __fini_array_end);
 //	_fini();
-#endif
 #endif
 	/* Go into an infinite loop */
 	for(;;);
@@ -152,7 +136,7 @@ void Fault_Handler( void )
 }
 
 /*******************************************************************************
- Declaration of the exception handlers
+ Declaration of exception handlers
 *******************************************************************************/
 
 /* Core exceptions */
