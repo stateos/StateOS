@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     22.01.2016
+#date     16.02.2016
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -12,7 +12,7 @@ OPENOCD    := c:/sys/tools/openocd/bin-x64/openocd
 #----------------------------------------------------------#
 
 PROJECT    :=
-DEFS       := __MICROLIB proc_stack_size=256
+DEFS       := __MICROLIB
 LIBS       :=
 DIRS       :=
 KEYS       :=

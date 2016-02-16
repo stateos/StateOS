@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     07.02.2016
+@date     16.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -25,46 +25,42 @@
 *******************************************************************************/
 
 #ifndef   proc_stack_size
-#define   proc_stack_size 0
+#define   proc_stack_size 1024
 #endif
 #define   proc_stack  (((proc_stack_size)+7)&(~7))
 
 #ifndef   main_stack_size
-#define   main_stack_size 0
+#define   main_stack_size 100024
 #endif
 #define   main_stack  (((main_stack_size)+7)&(~7))
 
-__attribute__((section("STACK")))
-__asm void __user_config_stack( void )
-{
-__initial_psp   EQU     __ram_start + proc_stack
-#if main_stack_size > 0
-__initial_msp   EQU     __ram_start + proc_stack + main_stack
-#else
-__initial_msp   EQU     __ram_end
-#endif
 #if proc_stack_size > 0
-#ifndef  __MICROLIB
+__attribute__((section("STACK"), used))
+char    __proc_stack[proc_stack];
+#endif
+
+__attribute__((section("HEAP")))
+__asm void __user_config_stackheap( void )
+{
+                SPACE     0
+__heap_base
+                EXPORT  __heap_base
+__main_stack    SPACE     main_stack
+__heap_limit    EQU     __ram_end - main_stack
+                EXPORT  __heap_limit
+__initial_msp   EQU     __ram_end
+                EXPORT  __initial_msp
+__initial_psp   EQU     __ram_start + proc_stack
+                EXPORT  __initial_psp
+#if proc_stack_size > 0
+#ifndef __MICROLIB
                 IMPORT  __use_two_region_memory
 #endif
 __initial_sp    EQU     __initial_psp
 #else
 __initial_sp    EQU     __initial_msp
 #endif
-                EXPORT  __initial_psp
-                EXPORT  __initial_msp
                 EXPORT  __initial_sp
-}
-
-__attribute__((section("HEAP")))
-__asm void __user_config_heap( void )
-{
-                SPACE   0
-__heap_base
-__heap_limit    EQU     __ram_end
-
-                EXPORT  __heap_base
-                EXPORT  __heap_limit
 }
 
 extern  char  __initial_psp[];

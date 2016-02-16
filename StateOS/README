@@ -27,6 +27,7 @@ Features:
 - added sig_take function
 - changed flag mode constants
 - added some optimizations
+- changed startup files
 ---------
 1.4
 - added signal object

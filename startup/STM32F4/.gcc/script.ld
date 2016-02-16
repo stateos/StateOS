@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     stm32f4xx.ld
 @author   Rajmund Szymanski
-@date     28.09.2015
+@date     16.02.2016
 @brief    Linker script for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -91,11 +91,6 @@ SECTIONS
 		. = ALIGN(8);
 		__proc_stack_end   = .;
 
-		__main_stack_start = .;
-		KEEP (*(.main_stack))
-		. = ALIGN(8);
-		__main_stack_end   = .;
-
 		__stack_end = .;
 	} > RAM
 
@@ -121,18 +116,25 @@ SECTIONS
 	.heap (NOLOAD): ALIGN(8)
 	{
 		__heap_start = .;
-		__heap_end   = ABSOLUTE(__ram_end);
-	} > RAM
 
-	__text_size  = __text_end - __text_start;
-	__ccm_size   = SIZEOF(.ccm);
-	__stack_size = SIZEOF(.stack);
-	__data_size  = SIZEOF(.data);
-	__bss_size   = SIZEOF(.bss);
-	__heap_size  = __heap_end - __heap_start;
+		__main_stack_start = .;
+		KEEP (*(.main_stack))
+		. = ALIGN(8);
+		__main_stack_end   = .;
+
+	} > RAM
 
 	__proc_stack_size = __proc_stack_end - __proc_stack_start;
 	__main_stack_size = __main_stack_end - __main_stack_start;
+
+	__text_size   = __text_end - __text_start;
+	__ccm_size    = SIZEOF(.ccm);
+	__stack_size  = SIZEOF(.stack);
+	__data_size   = SIZEOF(.data);
+	__bss_size    = SIZEOF(.bss);
+
+	__heap_end    =  __ram_end - __main_stack_size;
+	__heap_size   = __heap_end - __heap_start;
 
 	PROVIDE(__process_stack_start = __proc_stack_start);
 	PROVIDE(__process_stack_size  = __proc_stack_size);
@@ -143,6 +145,6 @@ SECTIONS
 	PROVIDE(__heap_limit  = __heap_end);
 
 	PROVIDE(__initial_psp = __proc_stack_end);
-	PROVIDE(__initial_msp = __main_stack_size ? __main_stack_end : __ram_end);
-	PROVIDE(__initial_sp  = __proc_stack_size ? __proc_stack_end : __initial_msp);
+	PROVIDE(__initial_msp = __ram_end);
+	PROVIDE(__initial_sp  = __proc_stack_size ? __initial_psp : __initial_msp);
 }

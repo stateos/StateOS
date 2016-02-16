@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    15.02.2016
+    @date    16.02.2016
     @brief   StateOS port file for STM32 uC.
 
  ******************************************************************************
@@ -32,21 +32,6 @@
 
 void port_sys_init( void )
 {
-#ifdef OS_CHECK_STACKS
-
-	static char STACK[ASIZE(OS_STACK_SIZE)] __osalign;
-
-	if (__get_CONTROL() == 0)
-	{
-	    __disable_irq();
-		__set_PSP(__get_MSP());
-		__set_CONTROL(CONTROL_SPSEL_Msk);
-		__set_MSP((size_t)STACK+sizeof(STACK));
-	    __enable_irq();
-	}
-
-#endif
-
 #if OS_TIMER
 
 #if	CPU_FREQUENCY/OS_FREQUENCY/2-1 > UINT16_MAX

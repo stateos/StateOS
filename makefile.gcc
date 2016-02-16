@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     22.01.2016
+#date     16.02.2016
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -11,7 +11,7 @@ OPENOCD    := c:/sys/tools/openocd/bin-x64/openocd
 #----------------------------------------------------------#
 
 PROJECT    :=
-DEFS       := USE_NANO USE_CTORS proc_stack_size=256
+DEFS       := USE_NANO USE_CTORS
 LIBS       :=
 DIRS       :=
 KEYS       :=

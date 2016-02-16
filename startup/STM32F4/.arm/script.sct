@@ -3,7 +3,7 @@
 /*******************************************************************************
 @file     stm32f4xx.sct
 @author   Rajmund Szymanski
-@date     30.11.2015
+@date     16.02.2016
 @brief    Scatter file for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -17,16 +17,6 @@
 #define __ram_size  0x00020000
 #define __ram_end  (__ram_start+__ram_size)
 
-#ifndef   proc_stack_size
-#define   proc_stack_size 0
-#endif
-#define   proc_stack (((proc_stack_size)+7)AND(~7))
-
-#ifndef   main_stack_size
-#define   main_stack_size 0
-#endif
-#define   main_stack (((main_stack_size)+7)AND(~7))
-
 FLASH __rom_start __rom_size
 {
 	ROM +0
@@ -36,22 +26,23 @@ FLASH __rom_start __rom_size
 		.ANY(+RO)
 	}
 
-	CCM __ccm_start UNINIT __ccm_size
+	CCM   __ccm_start     NOCOMPRESS UNINIT __ccm_size
 	{
 		.ANY(CCM)
 	}
 
-	STACK __ram_start EMPTY (proc_stack + main_stack)
+	STACK __ram_start     NOCOMPRESS UNINIT __ram_size
 	{
+		.ANY(STACK, +FIRST)
 	}
 
-	RAM ALIGNEXPR(+0, 8) NOCOMPRESS (__ram_size - proc_stack - main_stack)
+	RAM  ALIGNEXPR(+0, 8) NOCOMPRESS
 	{
 		.ANY(+RW, +ZI)
 	}
 
-	HEAP ALIGNEXPR(+0, 8) UNINIT
+	HEAP ALIGNEXPR(+0, 8) NOCOMPRESS UNINIT
 	{
-		.ANY(HEAP)
+		.ANY(HEAP, +LAST)
 	}
 }
