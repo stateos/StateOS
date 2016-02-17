@@ -101,21 +101,20 @@ LD_FLAGS    = -Wl,-T$(SCRIPT),-Map=$(MAP),--cref,--no-warn-mismatch,--gc-section
 
 #----------------------------------------------------------#
 
-ifeq  ($(CXX_SRCS),)
-LD_FLAGS   +=  -nostartfiles
-DEFS       += __NOSTARTFILES
-else
+ifneq ($(CXX_SRCS),)
 DEFS       += __USES_CXX
+else
+DEFS       += __NOSTARTFILES
+LD_FLAGS   +=  -nostartfiles
 endif
 ifneq ($(filter USE_NANO,$(DEFS)),)
 LD_FLAGS   += --specs=nano.specs
 endif
 ifneq ($(filter USE_NOHOST,$(DEFS)),)
-LIBS       += c nosys
+LD_FLAGS   += --specs=nosys.specs
 endif
 ifneq ($(filter USE_SEMIHOST,$(DEFS)),)
 LD_FLAGS   += --specs=rdimon.specs
-LIBS       += c rdimon
 endif
 
 #----------------------------------------------------------#
