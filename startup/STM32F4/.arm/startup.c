@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     16.02.2016
+@date     17.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -12,12 +12,41 @@
 #include <stm32f4xx.h>
 
 /*******************************************************************************
+ Specific definitions for the chip
+*******************************************************************************/
+
+#define __rom_start 0x08000000
+#define __rom_size  0x00100000
+#define __rom_end  (__rom_start+__rom_size)
+#define __ccm_start 0x10000000
+#define __ccm_size  0x00010000
+#define __ccm_end  (__ccm_start+__ccm_size)
+#define __ram_start 0x20000000
+#define __ram_size  0x00020000
+#define __ram_end  (__ram_start+__ram_size)
+
+/*******************************************************************************
+ Configuration of stacks
+*******************************************************************************/
+
+#ifndef proc_stack_size
+#define proc_stack_size 1024 // <- default size of process stack
+#endif
+#define proc_stack (((proc_stack_size)+7)&(~7))
+
+#if     proc_stack_size > 0
+char  __proc_stack[proc_stack] __attribute__ ((used, section("STACK"), zero_init));
+#endif
+
+#ifndef main_stack_size
+#define main_stack_size 1024 // <- default size of main stack
+#endif
+#define main_stack (((main_stack_size)+7)&(~7))
+
+/*******************************************************************************
  Configuration of stacks and heap
 *******************************************************************************/
 
-#include "startup.h"
-
-__attribute__ ((const, section("HEAP")))
 __asm void __user_config_stackheap( void )
 {
 __heap_base     SPACE     0
@@ -33,10 +62,11 @@ __initial_psp   EQU     __ram_start + proc_stack
                 IMPORT  __use_two_region_memory
 #endif
 __initial_sp    EQU     __initial_psp
+                EXPORT  __initial_sp
 #else
 __initial_sp    EQU     __initial_msp
-#endif
                 EXPORT  __initial_sp
+#endif
 }
 
 extern  char  __initial_psp[];
