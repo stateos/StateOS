@@ -46,8 +46,8 @@ extern  char  __initial_msp[];
  Prototypes of external functions
 *******************************************************************************/
 
-void        SystemInit( void );                          /* system clock init */
-void            __main( void ) __attribute__ ((noreturn));     /* entry point */
+void SystemInit( void );                                 /* system clock init */
+void     __main( void ) __attribute__ ((noreturn));            /* entry point */
 
 /*******************************************************************************
  Default reset handler

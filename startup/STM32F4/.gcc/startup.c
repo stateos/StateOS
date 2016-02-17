@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     16.02.2016
+@date     17.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -37,14 +37,22 @@ extern unsigned    __initial_msp  [];
  Configuration of stacks
 *******************************************************************************/
 
-#include "startup.h"
+#ifndef proc_stack_size
+#define proc_stack_size 1024 // <- default size of process stack
+#endif
+#define proc_stack (((proc_stack_size)+7)&(~7))
 
-#if    proc_stack_size > 0
-char __proc_stack[proc_stack] __attribute__ ((used, section(".proc_stack")));
+#if     proc_stack_size > 0
+char  __proc_stack[proc_stack] __attribute__ ((used, section(".proc_stack")));
 #endif
 
-#if    main_stack_size > 0
-char __main_stack[main_stack] __attribute__ ((used, section(".main_stack")));
+#ifndef main_stack_size
+#define main_stack_size 1024 // <- default size of main stack
+#endif
+#define main_stack (((main_stack_size)+7)&(~7))
+
+#if     main_stack_size > 0
+char  __main_stack[main_stack] __attribute__ ((used, section(".main_stack")));
 #endif
 
 /*******************************************************************************
@@ -52,32 +60,66 @@ char __main_stack[main_stack] __attribute__ ((used, section(".main_stack")));
 *******************************************************************************/
 
 static inline
-void copy_mem( unsigned *dst_, unsigned *end_, unsigned *src_ )
+void MemCpy( unsigned *dst_, unsigned *end_, unsigned *src_ )
 {
-	while (dst_ < end_) *(dst_++) = *(src_++);
+	while (dst_ < end_) *dst_++ = *src_++;
 }
 
 static inline
-void fill_mem( unsigned *dst_, unsigned *end_, unsigned val_ )
+void MemSet( unsigned *dst_, unsigned *end_, unsigned val_ )
 {
-	while (dst_ < end_) *(dst_++) = val_;
+	while (dst_ < end_) *dst_++ = val_;
 }
 
 static inline
-void call_array( void(**dst_)(), void(**end_)() )
+void DataInit( void )
 {
-	while (dst_ < end_) (*(dst_++))();
+	/* Initialize the data segment */
+	MemCpy(__data_start, __data_end, __data_init_start);
+	/* Zero fill the bss segment */
+	MemSet(__bss_start, __bss_end, 0);
 }
+
+#ifndef __NOSTARTFILES
+
+void __libc_init_array( void );               /* global & static constructors */
+void __libc_fini_array( void );               /* global & static destructors  */
+
+#else
+
+static inline
+void CallArray( void(**dst_)(), void(**end_)() )
+{
+	while (dst_ < end_)(*dst_++)();
+}
+
+static inline
+void __libc_init_array( void )
+{
+#ifndef __NOSTARTFILES
+	CallArray(__preinit_array_start, __preinit_array_end);
+	_init();
+#endif
+	CallArray(__init_array_start, __init_array_end);
+}
+
+static inline
+void __libc_fini_array( void )
+{
+	CallArray(__fini_array_start, __fini_array_end);
+#ifndef __NOSTARTFILES
+	_fini();
+#endif
+}
+
+#endif
 
 /*******************************************************************************
  Prototypes of external functions
 *******************************************************************************/
 
-void __libc_init_array( void );               /* global & static constructors */
-void __libc_fini_array( void );               /* global & static destructors  */
-
-void        SystemInit( void );                          /* system clock init */
-int               main( void );                                /* entry point */
+void SystemInit( void );                                 /* system clock init */
+int        main( void );                                       /* entry point */
 
 /*******************************************************************************
  Default reset handler
@@ -98,29 +140,14 @@ void Reset_Handler( void )
 	/* Call the system clock intitialization function */
 	SystemInit();
 #endif
-	/* Initialize the data segment */
-	copy_mem(__data_start, __data_end, __data_init_start);
-	/* Zero fill the bss segment */
-	fill_mem( __bss_start,  __bss_end, 0);
-#ifndef __NOSTARTFILES
+	/* Initialize data segments */
+	DataInit();
 	/* Call global & static constructors */
 	__libc_init_array();
-#else
-	/* Call global & static constructors */
-	call_array(__preinit_array_start, __preinit_array_end);
-//	_init();
-	call_array(   __init_array_start,    __init_array_end);
-#endif
 	/* Call the application's entry point */
 	main();
-#ifndef __NOSTARTFILES
 	/* Call global & static destructors */
 	__libc_fini_array();
-#else
-	/* Call global & static destructors */
-	call_array(   __fini_array_start,    __fini_array_end);
-//	_fini();
-#endif
 	/* Go into an infinite loop */
 	for(;;);
 }
