@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     16.02.2016
+#date     17.02.2016
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -105,7 +105,7 @@ ifeq  ($(CXX_SRCS),)
 LD_FLAGS   +=  -nostartfiles
 DEFS       += __NOSTARTFILES
 else
-DEFS       += __CXX_USED
+DEFS       += __USES_CXX
 endif
 ifneq ($(filter USE_NANO,$(DEFS)),)
 LD_FLAGS   += --specs=nano.specs

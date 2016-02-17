@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     16.02.2016
+#date     17.02.2016
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -109,7 +109,7 @@ LD_FLAGS   += --map --info common,sizes,summarysizes,totals,veneers,unused --lis
 #----------------------------------------------------------#
 
 ifneq ($(CXX_SRCS),)
-DEFS       += __CXX_USED
+DEFS       += __USES_CXX
 endif
 ifneq ($(filter __MICROLIB,$(DEFS)),)
 LD_FLAGS   += --library_type=microlib
