@@ -34,6 +34,11 @@ FLASH __rom_start __rom_size
 		.ANY(CCM)
 	}
 
+	BKP __bkp_start UNINIT __bkp_size
+	{
+		.ANY(BKP)
+	}
+
 	STACK __ram_start UNINIT NOCOMPRESS __ram_size
 	{
 		.ANY(STACK, +FIRST)
@@ -47,10 +52,5 @@ FLASH __rom_start __rom_size
 	HEAP ALIGNEXPR(+0, 8) UNINIT
 	{
 		.ANY(HEAP, +LAST)
-	}
-
-	BKP __bkp_start UNINIT __bkp_size
-	{
-		.ANY(BKP)
 	}
 }
