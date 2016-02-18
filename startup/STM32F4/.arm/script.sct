@@ -3,7 +3,7 @@
 /*******************************************************************************
 @file     stm32f4xx.sct
 @author   Rajmund Szymanski
-@date     17.02.2016
+@date     18.02.2016
 @brief    Scatter file for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -16,6 +16,9 @@
 #define __ram_start 0x20000000
 #define __ram_size  0x00020000
 #define __ram_end  (__ram_start+__ram_size)
+#define __bkp_start 0x40024000
+#define __bkp_size  0x00001000
+#define __bkp_end  (__bkp_start+__bkp_size)
 
 FLASH __rom_start __rom_size
 {
@@ -44,5 +47,10 @@ FLASH __rom_start __rom_size
 	HEAP ALIGNEXPR(+0, 8) UNINIT
 	{
 		.ANY(HEAP, +LAST)
+	}
+
+	BKP __bkp_start UNINIT __bkp_size
+	{
+		.ANY(BKP)
 	}
 }

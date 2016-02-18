@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     17.02.2016
+@date     18.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -24,6 +24,9 @@
 #define __ram_start 0x20000000
 #define __ram_size  0x00020000
 #define __ram_end  (__ram_start+__ram_size)
+#define __bkp_start 0x40024000
+#define __bkp_size  0x00001000
+#define __bkp_end  (__bkp_start+__bkp_size)
 
 /*******************************************************************************
  Configuration of stacks

@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     stm32f4xx.ld
 @author   Rajmund Szymanski
-@date     17.02.2016
+@date     18.02.2016
 @brief    Linker script for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -78,12 +78,13 @@ SECTIONS
 
 	.ccm (NOLOAD):
 	{
-		__ccm_start = .;
 		*(.ccm)
-		__ccm_end   = .;
 	} > CCM
 
-	__ccm_size = SIZEOF(.ccm);
+	.bkp (NOLOAD):
+	{
+		*(.bkp)
+	} > BKP
 
 	.stack (NOLOAD): ALIGN(8)
 	{
