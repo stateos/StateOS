@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    04.02.2016
+    @date    18.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -44,6 +44,7 @@ extern "C" {
 #define semBinary    (  1U ) // binary semaphore
 #define semNormal    ( ~0U ) // counting semaphore
 #define semCounting  ( ~0U ) // counting semaphore
+#define semMASK      ( ~0U )
 
 /**********************************************************************************************************************
  *                                                                                                                    *

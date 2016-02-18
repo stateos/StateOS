@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    18.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -45,6 +45,7 @@ extern "C" {
 #define mtxRecursive                    ( 1U << 0 ) // recursive mutex
 #define mtxPriorityProtect              ( 0U << 1 ) // priority protect mutex
 #define mtxPriorityInheritance          ( 1U << 1 ) // priority inheritance mutex
+#define mtxMASK                         ( 3U )
 
 #define mtxNormalPriorityProtect        ( mtxNormal    | mtxPriorityProtect     )
 #define mtxRecursivePriorityProtect     ( mtxRecursive | mtxPriorityProtect     )
@@ -71,8 +72,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_MTX( mtx, type )                   \
-               mtx_t mtx##__mtx = _MTX_INIT(type); \
+#define     OS_MTX( mtx, type )                             \
+               mtx_t mtx##__mtx = _MTX_INIT((type)&mtxMASK); \
                mtx_id mtx = & mtx##__mtx
 
 /**********************************************************************************************************************
@@ -95,8 +96,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_MTX( mtx, type )                   \
-        static mtx_t mtx##__mtx = _MTX_INIT(type); \
+#define static_MTX( mtx, type )                             \
+        static mtx_t mtx##__mtx = _MTX_INIT((type)&mtxMASK); \
         static mtx_id mtx = & mtx##__mtx
 
 /**********************************************************************************************************************
@@ -123,7 +124,7 @@ extern "C" {
  **********************************************************************************************************************/
 
 #define                MTX_INIT( type ) \
-                      _MTX_INIT(type)
+                      _MTX_INIT((type)&mtxMASK)
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -150,7 +151,7 @@ extern "C" {
 
 #ifndef __cplusplus
 #define                MTX_CREATE( type ) \
-               &(mtx_t)MTX_INIT(type)
+               &(mtx_t)MTX_INIT((type)&mtxMASK)
 #endif
 
 /**********************************************************************************************************************
@@ -317,7 +318,7 @@ class Mutex : public mtx_t
 {
 public:
 
-	 Mutex( unsigned _type = mtxRecursive|mtxPriorityInheritance ): mtx_t(_MTX_INIT(_type)) {}
+	 Mutex( unsigned _type = mtxRecursive|mtxPriorityInheritance ): mtx_t(_MTX_INIT(_type&mtxMASK)) {}
 
 	~Mutex( void ) { mtx_kill(this); }
 

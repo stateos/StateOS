@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    12.02.2016
+    @date    18.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -40,7 +40,7 @@ mtx_id mtx_create( unsigned type )
 
 	if (mtx)
 	{
-		mtx->type = type;
+		mtx->type = type & mtxMASK;
 	}
 
 	port_sys_unlock();

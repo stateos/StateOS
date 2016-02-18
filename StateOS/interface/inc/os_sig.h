@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    05.02.2016
+    @date    18.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,6 +42,7 @@ extern "C" {
 
 #define sigClear     ( 0U << 0 ) // auto clearing signal
 #define sigProtect   ( 1U << 0 ) // protected signal
+#define sigMASK      ( 1U )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -57,8 +58,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_SIG( sig, type )                   \
-               sig_t sig##__sig = _SIG_INIT(type); \
+#define     OS_SIG( sig, type )                             \
+               sig_t sig##__sig = _SIG_INIT((type)&sigMASK); \
                sig_id sig = & sig##__sig
 
 /**********************************************************************************************************************
@@ -75,8 +76,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_SIG( sig, type )                   \
-        static sig_t sig##__sig = _SIG_INIT(type); \
+#define static_SIG( sig, type )                             \
+        static sig_t sig##__sig = _SIG_INIT((type)&sigMASK); \
         static sig_id sig = & sig##__sig
 
 /**********************************************************************************************************************
@@ -97,7 +98,7 @@ extern "C" {
  **********************************************************************************************************************/
 
 #define                SIG_INIT( type ) \
-                      _SIG_INIT(type)
+                      _SIG_INIT((type)&sigMASK)
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -118,7 +119,7 @@ extern "C" {
 
 #ifndef __cplusplus
 #define                SIG_CREATE( type ) \
-               &(sig_t)SIG_INIT(type)
+               &(sig_t)SIG_INIT((type)&sigMASK)
 #endif
 
 /**********************************************************************************************************************
@@ -340,7 +341,7 @@ class Signal : public sig_t
 {
 public:
 
-	 Signal( unsigned type = sigClear ): sig_t(_SIG_INIT(type)) {}
+	 Signal( unsigned _type = sigClear ): sig_t(_SIG_INIT(_type&sigMASK)) {}
 
 	~Signal( void ) { sig_kill(this); }
 

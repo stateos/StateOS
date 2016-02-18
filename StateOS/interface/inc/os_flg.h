@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    06.02.2016
+    @date    18.02.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -44,6 +44,7 @@ extern "C" {
 #define flgAll       ( 1U << 0 )
 #define flgAccept    ( 0U << 1 )
 #define flgIgnore    ( 1U << 1 )
+#define flgMASK      ( 3U )
 
 #define flgOneAccept ( flgOne | flgAccept )
 #define flgAllAccept ( flgAll | flgAccept )
