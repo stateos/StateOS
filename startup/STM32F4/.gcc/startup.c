@@ -138,7 +138,7 @@ void Reset_Handler( void )
 #endif
 #if __FPU_USED
     /* Set CP10 and CP11 Full Access */
-	SCB->CPACR = 0x00F00000;
+	SCB->CPACR = 0x00F00000U;
 #endif
 #ifndef __NO_SYSTEM_INIT
 	/* Call the system clock intitialization function */

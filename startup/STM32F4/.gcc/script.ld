@@ -7,10 +7,11 @@
 
 MEMORY
 {
-	ROM (rx)  : ORIGIN = 0x08000000, LENGTH = 1024K
-	CCM (rwx) : ORIGIN = 0x10000000, LENGTH =   64K
-	RAM (rwx) : ORIGIN = 0x20000000, LENGTH =  128K
-	BKP (rwx) : ORIGIN = 0x40024000, LENGTH =    4k
+	ROM (rx)  : ORIGIN = 0x08000000, LENGTH = 1024k
+	CCM (rwx) : ORIGIN = 0x10000000, LENGTH =   64k
+	RAM (rwx) : ORIGIN = 0x20000000, LENGTH =  128k
+/*	AUX (rwx) : ORIGIN = 0x2001C000, LENGTH =   16k
+*/	BKP (rwx) : ORIGIN = 0x40024000, LENGTH =    4k
 }
 
 __ccm_start = ORIGIN(CCM);
@@ -37,12 +38,12 @@ SECTIONS
 	{
 		__preinit_array_start = .;
 		KEEP (*(.preinit_array))
-		__preinit_array_end   = .;
+		__preinit_array_end = .;
 
 		__init_array_start = .;
 		KEEP (*(SORT(.init_array.*)))
 		KEEP (*(.init_array))
-		__init_array_end   = .;
+		__init_array_end = .;
 
 		KEEP (*(.init))
 	} > ROM
@@ -52,7 +53,7 @@ SECTIONS
 		__fini_array_start = .;
 		KEEP (*(.fini_array))
 		KEEP (*(SORT(.fini_array.*)))
-		__fini_array_end   = .;
+		__fini_array_end = .;
 
 		KEEP (*(.fini))
 	} > ROM
@@ -63,14 +64,13 @@ SECTIONS
 		*(.gcc_except_table)
 		*(.eh_frame_hdr)
 		*(.eh_frame)
-
 	} > ROM
 
 	.ARM.exidx : ALIGN(4)
 	{
 		__exidx_start = .;
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
-		__exidx_end   = .;
+		__exidx_end = .;
 	} > ROM
 
 	__text_end  = .;
@@ -94,20 +94,21 @@ SECTIONS
 		KEEP (*(.proc_stack))
 		. = ALIGN(8);
 		__proc_stack_end   = .;
+		__proc_stack_size  = ABSOLUTE(. - __proc_stack_start);
 
-		__stack_end   = .;
+		__stack_end = .;
 	} > RAM
 
 	__stack_size = SIZEOF(.stack);
 
 	.data : ALIGN(4)
 	{
-		__data_init_start = LOADADDR (.data);
+		__data_init_start = LOADADDR(.data);
 
 		__data_start = .;
 		*(.data* .gnu.linkonce.d.*)
 		. = ALIGN(4);
-		__data_end   = .;
+		__data_end = .;
 	} > RAM AT > ROM
 
 	__data_size = SIZEOF(.data);
@@ -118,27 +119,23 @@ SECTIONS
 		*(.bss* .gnu.linkonce.b.*)
 		*(COMMON)
 		. = ALIGN(4);
-		__bss_end   = .;
+		__bss_end = .;
 	} > RAM
 
 	__bss_size = SIZEOF(.bss);
 
 	.heap (NOLOAD): ALIGN(8)
 	{
-		__heap_start = .;
-
 		__main_stack_start = .;
 		KEEP (*(.main_stack))
 		. = ALIGN(8);
 		__main_stack_end   = .;
-
+		__main_stack_size  = ABSOLUTE(. - __main_stack_start);
 	} > RAM
 
-	__proc_stack_size = __proc_stack_end - __proc_stack_start;
-	__main_stack_size = __main_stack_end - __main_stack_start;
-
-	__heap_end  =  __ram_end - __main_stack_size;
-	__heap_size = __heap_end - __heap_start;
+	__heap_start = ADDR(.heap);
+	__heap_end   =  __ram_end - __main_stack_size;
+	__heap_size  = __heap_end - __heap_start;
 
 	PROVIDE(__initial_psp = __proc_stack_end);
 	PROVIDE(__initial_msp = __ram_end);
