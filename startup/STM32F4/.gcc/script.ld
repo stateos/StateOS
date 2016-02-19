@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     stm32f4xx.ld
 @author   Rajmund Szymanski
-@date     18.02.2016
+@date     19.02.2016
 @brief    Linker script for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -140,15 +140,18 @@ SECTIONS
 	__heap_end  =  __ram_end - __main_stack_size;
 	__heap_size = __heap_end - __heap_start;
 
-	PROVIDE(__process_stack_start = __proc_stack_start);
-	PROVIDE(__process_stack_size  = __proc_stack_size);
+	PROVIDE(__initial_psp = __proc_stack_end);
+	PROVIDE(__initial_msp = __ram_end);
+	PROVIDE(__initial_sp  = __proc_stack_size ? __initial_psp : __initial_msp);
 
+	PROVIDE(__bss_start__ = __bss_start);
+	PROVIDE(__bss_end__   = __bss_end);
 	PROVIDE(__heap_base__ = __heap_start);
 	PROVIDE(__heap_end__  = __heap_end);
 	PROVIDE(__heap_base   = __heap_start);
 	PROVIDE(__heap_limit  = __heap_end);
+	PROVIDE(__stack       = __initial_sp);
 
-	PROVIDE(__initial_psp = __proc_stack_end);
-	PROVIDE(__initial_msp = __ram_end);
-	PROVIDE(__initial_sp  = __proc_stack_size ? __initial_psp : __initial_msp);
+	PROVIDE(__process_stack_start = __proc_stack_start);
+	PROVIDE(__process_stack_size  = __proc_stack_size);
 }

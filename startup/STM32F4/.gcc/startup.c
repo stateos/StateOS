@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     17.02.2016
+@date     19.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -56,7 +56,7 @@ char  __main_stack[main_stack] __attribute__ ((used, section(".main_stack")));
 #endif
 
 /*******************************************************************************
- Default reset procedures
+ Internal reset procedures
 *******************************************************************************/
 
 static inline
@@ -80,18 +80,22 @@ void DataInit( void )
 	MemSet(__bss_start, __bss_end, 0);
 }
 
-#ifndef __NOSTARTFILES
-
-void __libc_init_array( void );               /* global & static constructors */
-void __libc_fini_array( void );               /* global & static destructors  */
-
-#else
-
 static inline
 void CallArray( void(**dst_)(), void(**end_)() )
 {
 	while (dst_ < end_)(*dst_++)();
 }
+
+/*******************************************************************************
+ Default reset procedures
+*******************************************************************************/
+
+#ifndef __NOSTARTFILES
+
+void __libc_init_array( void );               /* global & static constructors */
+void __libc_fini_array( void );               /* global & static destructors  */
+
+#else //__NOSTARTFILES
 
 static inline
 void __libc_init_array( void )
@@ -112,7 +116,7 @@ void __libc_fini_array( void )
 #endif
 }
 
-#endif
+#endif//__NOSTARTFILES
 
 /*******************************************************************************
  Prototypes of external functions
@@ -409,9 +413,9 @@ void (* const vectors[])(void) __attribute__ ((used, section(".vectors"))) =
 	FMPI2C1_ER_IRQHandler,
 #endif
 
-#endif
+#endif//__NO_EXTERNAL_INTERRUPTS
 };
 
 /******************************************************************************/
 
-#endif // __GNUC__
+#endif//__GNUC__
