@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     stm32f4xx.ld
 @author   Rajmund Szymanski
-@date     19.02.2016
+@date     21.02.2016
 @brief    Linker script for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -14,6 +14,8 @@ MEMORY
 */	BKP (rwx) : ORIGIN = 0x40024000, LENGTH =    4k
 }
 
+REGION_ALIAS("TEXT", ROM);
+
 __ccm_start = ORIGIN(CCM);
 __ccm_end   = ORIGIN(CCM) + LENGTH(CCM);
 __ram_start = ORIGIN(RAM);
@@ -23,7 +25,7 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
-	__text_start = ORIGIN(ROM);
+	__text_start = ORIGIN(TEXT);
 
 	.text :
 	{
@@ -32,7 +34,7 @@ SECTIONS
 		*(.text   .text.*   .gnu.linkonce.t.*)
 		*(.rodata .rodata.* .gnu.linkonce.r.*)
 		*(.glue_7 .glue_7t)
-	} > ROM
+	} > TEXT
 
 	.init : ALIGN(4)
 	{
@@ -46,7 +48,7 @@ SECTIONS
 		__init_array_end = .;
 
 		KEEP (*(.init))
-	} > ROM
+	} > TEXT
 
 	.fini : ALIGN(4)
 	{
@@ -56,7 +58,7 @@ SECTIONS
 		__fini_array_end = .;
 
 		KEEP (*(.fini))
-	} > ROM
+	} > TEXT
 
 	.ARM.extab : ALIGN(4)
 	{
@@ -64,14 +66,14 @@ SECTIONS
 		*(.gcc_except_table)
 		*(.eh_frame_hdr)
 		*(.eh_frame)
-	} > ROM
+	} > TEXT
 
 	.ARM.exidx : ALIGN(4)
 	{
 		__exidx_start = .;
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		__exidx_end = .;
-	} > ROM
+	} > TEXT
 
 	__text_end  = .;
 	__text_size = . - __text_start;
@@ -109,7 +111,7 @@ SECTIONS
 		*(.data* .gnu.linkonce.d.*)
 		. = ALIGN(4);
 		__data_end = .;
-	} > RAM AT > ROM
+	} > RAM AT > TEXT
 
 	__data_size = SIZEOF(.data);
 

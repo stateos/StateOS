@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     19.02.2016
+@date     20.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -79,8 +79,7 @@ extern  char  __initial_msp[];
  Prototypes of external functions
 *******************************************************************************/
 
-void SystemInit( void );                                 /* system clock init */
-void     __main( void ) __attribute__ ((noreturn));            /* entry point */
+void __main( void ) __attribute__ ((noreturn));                /* entry point */
 
 /*******************************************************************************
  Default reset handler
@@ -95,7 +94,7 @@ void Reset_Handler( void )
 #endif
 #if __FPU_USED
     /* Set CP10 and CP11 Full Access */
-	SCB->CPACR = 0x00F00000;
+	SCB->CPACR = 0x00F00000U;
 #endif
 #ifndef __NO_SYSTEM_INIT
 	/* Call the system clock intitialization function */
