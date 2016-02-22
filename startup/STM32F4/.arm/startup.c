@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     20.02.2016
+@date     22.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -32,6 +32,15 @@
  Configuration of stacks
 *******************************************************************************/
 
+#ifndef main_stack_size
+#define main_stack_size 1024 // <- default size of main stack
+#endif
+#define main_stack (((main_stack_size)+7)&(~7))
+
+#if     main_stack_size > 0
+char  __main_stack[main_stack] __attribute__ ((used, section("STACK"), zero_init));
+#endif
+
 #ifndef proc_stack_size
 #define proc_stack_size 1024 // <- default size of process stack
 #endif
@@ -41,10 +50,8 @@
 char  __proc_stack[proc_stack] __attribute__ ((used, section("STACK"), zero_init));
 #endif
 
-#ifndef main_stack_size
-#define main_stack_size 1024 // <- default size of main stack
-#endif
-#define main_stack (((main_stack_size)+7)&(~7))
+extern  char  __initial_msp[];
+extern  char  __initial_psp[];
 
 /*******************************************************************************
  Configuration of stacks and heap
@@ -54,16 +61,18 @@ __asm void __user_config_stackheap( void )
 {
 __heap_base     SPACE     0
                 EXPORT  __heap_base
-__heap_limit    EQU     __ram_end - main_stack
+__heap_limit    EQU     __ram_end
                 EXPORT  __heap_limit
+#if main_stack_size > 0
+__initial_msp   EQU     __ram_start + main_stack
+                EXPORT  __initial_msp
+#else
 __initial_msp   EQU     __ram_end
                 EXPORT  __initial_msp
-__initial_psp   EQU     __ram_start + proc_stack
+#endif
+__initial_psp   EQU     __ram_start + main_stack + proc_stack
                 EXPORT  __initial_psp
 #if proc_stack_size > 0
-#ifndef __MICROLIB
-                IMPORT  __use_two_region_memory
-#endif
 __initial_sp    EQU     __initial_psp
                 EXPORT  __initial_sp
 #else
@@ -72,8 +81,14 @@ __initial_sp    EQU     __initial_msp
 #endif
 }
 
-extern  char  __initial_psp[];
 extern  char  __initial_msp[];
+extern  char  __initial_psp[];
+
+#ifndef __MICROLIB
+#if proc_stack_size > 0
+#pragma import(__use_two_region_memory)
+#endif
+#endif
 
 /*******************************************************************************
  Prototypes of external functions

@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     20.02.2016
+@date     22.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -30,12 +30,18 @@ extern void(*   __init_array_end  [])();
 extern void(*   __fini_array_start[])();
 extern void(*   __fini_array_end  [])();
 
-extern unsigned    __initial_psp  [];
-extern unsigned    __initial_msp  [];
-
 /*******************************************************************************
  Configuration of stacks
 *******************************************************************************/
+
+#ifndef main_stack_size
+#define main_stack_size 1024 // <- default size of main stack
+#endif
+#define main_stack (((main_stack_size)+7)&(~7))
+
+#if     main_stack_size > 0
+char  __main_stack[main_stack] __attribute__ ((used, section(".main_stack")));
+#endif
 
 #ifndef proc_stack_size
 #define proc_stack_size 1024 // <- default size of process stack
@@ -46,14 +52,8 @@ extern unsigned    __initial_msp  [];
 char  __proc_stack[proc_stack] __attribute__ ((used, section(".proc_stack")));
 #endif
 
-#ifndef main_stack_size
-#define main_stack_size 1024 // <- default size of main stack
-#endif
-#define main_stack (((main_stack_size)+7)&(~7))
-
-#if     main_stack_size > 0
-char  __main_stack[main_stack] __attribute__ ((used, section(".main_stack")));
-#endif
+extern  char  __initial_msp[];
+extern  char  __initial_psp[];
 
 /*******************************************************************************
  Internal reset procedures
