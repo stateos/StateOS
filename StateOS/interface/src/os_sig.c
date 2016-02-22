@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.c
     @author  Rajmund Szymanski
-    @date    18.02.2016
+    @date    22.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -70,7 +70,7 @@ unsigned priv_sig_wait( sig_id sig, unsigned time, unsigned(*wait)() )
 
 	port_sys_lock();
 
-	if (sig->flag != 0)
+	if (sig->flag)
 	{
 		sig->flag = sig->type;
 	}
@@ -123,11 +123,7 @@ void sig_give( sig_id sig )
 void sig_clear( sig_id sig )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
-
 	sig->flag = 0;
-
-	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

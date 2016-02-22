@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    18.02.2016
+    @date    22.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -49,7 +49,7 @@ mtx_id mtx_create( unsigned type )
 }
 
 /* -------------------------------------------------------------------------- */
-static
+static inline
 void priv_mtx_link( mtx_id mtx, tsk_id tsk )
 /* -------------------------------------------------------------------------- */
 {
@@ -64,7 +64,7 @@ void priv_mtx_link( mtx_id mtx, tsk_id tsk )
 }
 
 /* -------------------------------------------------------------------------- */
-static
+static inline
 void priv_mtx_unlink( mtx_id mtx )
 /* -------------------------------------------------------------------------- */
 {

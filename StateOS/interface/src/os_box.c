@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    12.02.2016
+    @date    22.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -66,7 +66,7 @@ void box_kill( box_id box )
 }
 
 /* -------------------------------------------------------------------------- */
-static
+static inline
 void priv_box_get( box_id box, void *data )
 /* -------------------------------------------------------------------------- */
 {
@@ -76,10 +76,11 @@ void priv_box_get( box_id box, void *data )
 	for (i = 0; i < box->size; i++) ((char*)data)[i] = buf[i];
 
 	box->first = (box->first + 1) % box->limit;
+	box->count--;
 }
 
 /* -------------------------------------------------------------------------- */
-static
+static inline
 void priv_box_put( box_id box, void *data )
 /* -------------------------------------------------------------------------- */
 {
@@ -89,6 +90,7 @@ void priv_box_put( box_id box, void *data )
 	for (i = 0; i < box->size; i++) buf[i] = ((char*)data)[i];
 
 	box->next = (box->next + 1) % box->limit;
+	box->count++;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -110,12 +112,9 @@ unsigned priv_box_wait( box_id box, void *data, unsigned time, unsigned(*wait)()
 	{
 		priv_box_get(box, data);
 
-	    tsk_id tsk = core_one_wakeup(box, E_SUCCESS);
+		tsk_id tsk = core_one_wakeup(box, E_SUCCESS);
 
-	    if (tsk)
-			priv_box_put(box, tsk->data);
-	    else
-			box->count--;
+		if (tsk) priv_box_put(box, tsk->data);
 	}
 
 	port_sys_unlock();
@@ -156,12 +155,9 @@ unsigned priv_box_send( box_id box, void *data, unsigned time, unsigned(*wait)()
 	{
 		priv_box_put(box, data);
 
-	    tsk_id tsk = core_one_wakeup(box, E_SUCCESS);
+		tsk_id tsk = core_one_wakeup(box, E_SUCCESS);
 
-	    if (tsk)
-			priv_box_get(box, tsk->data);
-	    else
-			box->count++;
+		if (tsk) priv_box_get(box, tsk->data);
 	}
 
 	port_sys_unlock();

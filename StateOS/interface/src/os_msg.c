@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    12.02.2016
+    @date    22.02.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -65,23 +65,25 @@ void msg_kill( msg_id msg )
 }
 
 /* -------------------------------------------------------------------------- */
-static
+static inline
 void priv_msg_get( msg_id msg, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
 	*data = msg->data[msg->first];
 
 	msg->first = (msg->first + 1) % msg->limit;
+	msg->count--;
 }
 
 /* -------------------------------------------------------------------------- */
-static
+static inline
 void priv_msg_put( msg_id msg, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
 	msg->data[msg->next] = data;
 
 	msg->next = (msg->next + 1) % msg->limit;
+	msg->count++;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -103,12 +105,9 @@ unsigned priv_msg_wait( msg_id msg, unsigned *data, unsigned time, unsigned(*wai
 	{
 		priv_msg_get(msg, data);
 
-	    tsk_id tsk = core_one_wakeup(msg, E_SUCCESS);
+		tsk_id tsk = core_one_wakeup(msg, E_SUCCESS);
 
-	    if (tsk)
-			priv_msg_put(msg, tsk->msg);
-	    else
-			msg->count--;
+		if (tsk) priv_msg_put(msg, tsk->msg);
 	}
 
 	port_sys_unlock();
@@ -149,12 +148,9 @@ unsigned priv_msg_send( msg_id msg, unsigned data, unsigned time, unsigned(*wait
 	{
 		priv_msg_put(msg, data);
 
-	    tsk_id tsk = core_one_wakeup(msg, E_SUCCESS);
+		tsk_id tsk = core_one_wakeup(msg, E_SUCCESS);
 
-	    if (tsk)
-			priv_msg_get(msg, tsk->data);
-	    else
-			msg->count++;
+		if (tsk) priv_msg_get(msg, tsk->data);
 	}
 
 	port_sys_unlock();
