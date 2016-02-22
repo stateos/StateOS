@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    18.02.2016
+    @date    22.02.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -93,7 +93,7 @@ void core_rdy_remove( os_id obj )
 
 /* -------------------------------------------------------------------------- */
 
-static
+static inline
 void priv_tsk_insert( tsk_id tsk )
 {
 	tsk_id nxt = &IDLE;
@@ -159,7 +159,7 @@ void core_tsk_unlink( tsk_id tsk, unsigned event )
 
 /* -------------------------------------------------------------------------- */
 
-static
+static inline
 unsigned priv_tsk_wait( tsk_id tsk, obj_id obj )
 {
 	core_tsk_append((tsk_id)tsk, obj);
@@ -264,7 +264,7 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 
 /* -------------------------------------------------------------------------- */
 
-static
+static inline
 void priv_tsk_prepare( tsk_id cur )
 {
 	if (cur->sp == 0) // prepare task stack if necessary
@@ -316,7 +316,7 @@ tsk_id core_tsk_handler( void )
 static tmr_t HEAD = { .id=ID_TIMER, .next=&HEAD, .prev=&HEAD, .delay=INFINITE }; // timers queue
 
 /* -------------------------------------------------------------------------- */
-static
+static inline
 void priv_tmr_insert( tmr_id tmr, unsigned id )
 {
 	tmr_id nxt = &HEAD;
@@ -344,7 +344,7 @@ void core_tmr_insert( tmr_id tmr, unsigned id )
 
 #if OS_ROBIN && OS_TIMER
 
-static
+static inline
 bool priv_tmr_counting( tmr_id tmr )
 {
 	port_tmr_stop();
@@ -369,7 +369,7 @@ bool priv_tmr_counting( tmr_id tmr )
 
 #else
 
-static
+static inline
 bool priv_tmr_counting( tmr_id tmr )
 {
 	if (tmr->delay >= Counter - tmr->start + 1)
@@ -382,7 +382,7 @@ bool priv_tmr_counting( tmr_id tmr )
 
 /* -------------------------------------------------------------------------- */
 
-static
+static inline
 void priv_tmr_wakeup( tmr_id tmr, unsigned event )
 {
 	tmr->start += tmr->delay;
