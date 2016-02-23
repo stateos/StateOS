@@ -48,19 +48,18 @@ __asm void PendSV_Handler( void )
 	mov   r6,    r11
 	mov   r7,    lr
 	stm   r0!, { r3  - r7 }
+	subs  r0,   #36
 #else
-	mov   r1,    r0
-	stmdb r1!, { r4  - r11, lr }
 #if __FPU_USED
 	tst   lr,   #16                     ; fpu used?
 	it    eq
- vstmdbeq r1!, { s16 - s31 }
+ vstmdbeq r0!, { s16 - s31 }
 #endif
+	stmdb r0!, { r4  - r11, lr }
 #endif
 	bl    core_tsk_handler
-	msr   PSP,   r0
 #if __CORTEX_M < 3
-	subs  r0,   #20
+	adds  r0,   #16
 	ldm   r0!, { r3  - r7 }
 	mov   r8,    r3
 	mov   r9,    r4
@@ -69,14 +68,16 @@ __asm void PendSV_Handler( void )
 	mov   lr,    r7
 	subs  r0,   #36
 	ldm   r0!, { r4  - r7 }
+	adds  r0,   #20
 #else
-	ldmdb r0!, { r4  - r11, lr }
+	ldmia r0!, { r4  - r11, lr }
 #if __FPU_USED
 	tst   lr,   #16                     ; fpu used?
 	it    eq
- vldmdbeq r0!, { s16 - s31 }
+ vldmiaeq r0!, { s16 - s31 }
 #endif
 #endif
+	msr   PSP,   r0
 	bx    lr
 
 	ALIGN

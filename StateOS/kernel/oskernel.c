@@ -280,7 +280,7 @@ os_id priv_tsk_prepare( tsk_id cur )
 
 		sft->exc_return = ~2U; // return from psp
 
-		sp = ctx;
+		sp = sft;
 	}
 
 	return sp;

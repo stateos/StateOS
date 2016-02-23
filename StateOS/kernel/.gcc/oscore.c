@@ -48,19 +48,18 @@ void PendSV_Handler( void )
 "	mov   r6,    r11               \n"
 "	mov   r7,    lr                \n"
 "	stm   r0!, { r3  - r7 }        \n"
+"	sub   r0,   #36                \n"
 #else
-"	mov   r1,    r0                \n"
-"	stmdb r1!, { r4  - r11, lr }   \n"
 #if __FPU_USED
 "	tst   lr,   #16                \n"
 "	it    eq                       \n"
-"vstmdbeq r1!, { s16 - s31 }       \n"
+"vstmdbeq r0!, { s16 - s31 }       \n"
 #endif
+"	stmdb r0!, { r4  - r11, lr }   \n"
 #endif
 "	bl    core_tsk_handler         \n"
-"	msr   PSP,   r0                \n"
 #if __CORTEX_M < 3
-"	sub   r0,   #20                \n"
+"	add   r0,   #16                \n"
 "	ldm   r0!, { r3  - r7 }        \n"
 "	mov   r8,    r3                \n"
 "	mov   r9,    r4                \n"
@@ -69,14 +68,16 @@ void PendSV_Handler( void )
 "	mov   lr,    r7                \n"
 "	sub   r0,   #36                \n"
 "	ldm   r0!, { r4  - r7 }        \n"
+"	add   r0,   #20                \n"
 #else
-"	ldmdb r0!, { r4  - r11, lr }   \n"
+"	ldmia r0!, { r4  - r11, lr }   \n"
 #if __FPU_USED
 "	tst   lr,   #16                \n"
 "	it    eq                       \n"
-"vldmdbeq r0!, { s16 - s31 }       \n"
+"vldmiaeq r0!, { s16 - s31 }       \n"
 #endif
 #endif
+"	msr   PSP,   r0                \n"
 "	bx    lr                       \n"
 
 :::	"memory"
