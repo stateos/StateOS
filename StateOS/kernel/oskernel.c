@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    22.02.2016
+    @date    23.02.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -265,9 +265,11 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 /* -------------------------------------------------------------------------- */
 
 static inline
-void priv_tsk_prepare( tsk_id cur )
+os_id priv_tsk_prepare( tsk_id cur )
 {
-	if (cur->sp == 0) // prepare task stack if necessary
+	os_id sp = cur->sp;
+	
+	if (sp == 0) // prepare task stack if necessary
 	{
 	    ctx_id ctx = (ctx_id)cur->top - 1;
 	    sft_id sft = (sft_id)ctx - 1;
@@ -278,15 +280,19 @@ void priv_tsk_prepare( tsk_id cur )
 
 		sft->exc_return = ~2U; // return from psp
 
-		cur->sp  = ctx;
+		sp = ctx;
 	}
+
+	return sp;
 }
 
 /* -------------------------------------------------------------------------- */
 
-tsk_id core_tsk_handler( void )
+os_id core_tsk_handler( os_id sp )
 {
-	tsk_id cur;
+	tsk_id cur = Current;
+
+	cur->sp = sp;
 #if OS_ROBIN == 0
 	core_tmr_handler();
 #endif
@@ -294,7 +300,6 @@ tsk_id core_tsk_handler( void )
 
 	core_ctx_reset();
 
-	cur = Current;
 	if (cur->id == ID_READY)
 	{
 		core_tsk_remove(cur);
@@ -302,11 +307,11 @@ tsk_id core_tsk_handler( void )
 	}
 	cur = Current = IDLE.next;
 
-	priv_tsk_prepare(cur); // prepare task stack if necessary
+	sp = priv_tsk_prepare(cur); // prepare task stack if necessary
 
 	port_isr_unlock();
 
-	return cur;
+	return sp;
 }
 
 /* -------------------------------------------------------------------------- */

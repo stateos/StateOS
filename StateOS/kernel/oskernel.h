@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    18.02.2016
+    @date    23.02.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -173,9 +173,10 @@ void     core_all_wakeup( os_id obj, unsigned event );
 void     core_tsk_prio( tsk_id tsk, unsigned prio );
 
 // tasks queue handler procedure
+// save stack pointer 'sp' of the current task
 // reset context switch timer counter
-// return a pointer to next READY task the highest priority
-tsk_id   core_tsk_handler( void );
+// return a pointer to the stack pointer of the next READY task the highest priority
+os_id    core_tsk_handler( os_id sp );
 
 /* -------------------------------------------------------------------------- */
 

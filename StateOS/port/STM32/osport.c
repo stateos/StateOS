@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    18.02.2016
+    @date    23.02.2016
     @brief   StateOS port file for STM32 uC.
 
  ******************************************************************************
@@ -39,18 +39,15 @@ void port_sys_init( void )
 #endif
 
 #if OS_ROBIN
-
 	NVIC_SetPriority(OS_TIM_IRQn, 0xFF);
 	NVIC_EnableIRQ  (OS_TIM_IRQn);
-
 #endif
-
 	BB(RCC->APB1ENR, OS_TIM_CLK_ENABLE) = 1;
 
 	OS_TIM->PSC  = CPU_FREQUENCY/OS_FREQUENCY/2-1;
-	OS_TIM->ARR  = INFINITE;
 #if OS_ROBIN
 	OS_TIM->DIER = TIM_DIER_CC1IE;
+	OS_TIM->CCR1 = OS_FREQUENCY/OS_ROBIN;
 #endif
 	OS_TIM->EGR  = TIM_EGR_UG;
 	OS_TIM->CR1  = TIM_CR1_CEN;

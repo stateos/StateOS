@@ -23,6 +23,10 @@ Features:
 - c++ wrapper
 - all documentation is contained within the source files
 ---------
+1.6
+- fixed bug in tick-less mode
+- optimized kernel
+---------
 1.5
 - added sig_take function
 - changed flag mode constants
