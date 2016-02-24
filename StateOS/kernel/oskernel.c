@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    23.02.2016
+    @date    24.02.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -267,32 +267,28 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 static inline
 os_id priv_tsk_prepare( tsk_id cur )
 {
-	os_id sp = cur->sp;
+	if (cur->sp) return cur->sp;
 	
-	if (sp == 0) // prepare task stack if necessary
-	{
-	    ctx_id ctx = (ctx_id)cur->top - 1;
-	    sft_id sft = (sft_id)ctx - 1;
+	// prepare task stack if necessary
 
-		ctx->psr = 0x01000000U;
-		ctx->pc  = cur->state;
-		ctx->lr  = core_tsk_break;
+	ctx_id ctx = (ctx_id)cur->top - 1;
 
-		sft->exc_return = ~2U; // return from psp
+	ctx->psr = 0x01000000U;
+	ctx->pc  = cur->state;
+	ctx->lr  = core_tsk_break;
 
-		sp = sft;
-	}
+	sft_id sft = (sft_id)ctx - 1;
 
-	return sp;
+	sft->exc_return = ~2U; // return from psp
+
+	return sft;
 }
 
 /* -------------------------------------------------------------------------- */
 
 os_id core_tsk_handler( os_id sp )
 {
-	tsk_id cur = Current;
-
-	cur->sp = sp;
+	tsk_id cur;
 #if OS_ROBIN == 0
 	core_tmr_handler();
 #endif
@@ -300,11 +296,16 @@ os_id core_tsk_handler( os_id sp )
 
 	core_ctx_reset();
 
+	cur = Current;
+
+	cur->sp = sp;
+
 	if (cur->id == ID_READY)
 	{
 		core_tsk_remove(cur);
 		priv_tsk_insert(cur);
 	}
+
 	cur = Current = IDLE.next;
 
 	sp = priv_tsk_prepare(cur); // prepare task stack if necessary
