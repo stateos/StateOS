@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    23.02.2016
+    @date    25.02.2016
     @brief   StateOS port file for STM32 uC.
 
  ******************************************************************************
@@ -34,50 +34,84 @@ void port_sys_init( void )
 {
 #if OS_TIMER
 
-#if	CPU_FREQUENCY/OS_FREQUENCY/2-1 > UINT16_MAX
-#error Incorrect Timer frequency!
-#endif
+	/******************************************************************************
+	 Put here configuration of system timer for tick-less mode
+	*******************************************************************************/
 
-#if OS_ROBIN
+	#if	CPU_FREQUENCY/OS_FREQUENCY/2-1 > UINT16_MAX
+	#error Incorrect Timer frequency!
+	#endif
+
+	#if OS_ROBIN
 	NVIC_SetPriority(OS_TIM_IRQn, 0xFF);
 	NVIC_EnableIRQ  (OS_TIM_IRQn);
-#endif
+	#endif
 	BB(RCC->APB1ENR, OS_TIM_CLK_ENABLE) = 1;
 
 	OS_TIM->PSC  = CPU_FREQUENCY/OS_FREQUENCY/2-1;
-#if OS_ROBIN
-	OS_TIM->DIER = TIM_DIER_CC1IE;
-	OS_TIM->CCR1 = OS_FREQUENCY/OS_ROBIN;
-#endif
 	OS_TIM->EGR  = TIM_EGR_UG;
 	OS_TIM->CR1  = TIM_CR1_CEN;
+	#if OS_ROBIN
+	OS_TIM->CCR1 = OS_FREQUENCY/OS_ROBIN;
+	OS_TIM->DIER = TIM_DIER_CC1IE;
+	#endif
+
+	/******************************************************************************
+	 End of configuration
+	*******************************************************************************/
 
 #else
 
-#if	CPU_FREQUENCY/OS_FREQUENCY-1 > SysTick_LOAD_RELOAD_Msk
-#error Incorrect SysTick frequency!
-#endif
+	/******************************************************************************
+	 Put here configuration of system timer for non-tick-less mode
+	*******************************************************************************/
+
+	#if	CPU_FREQUENCY/OS_FREQUENCY-1 > SysTick_LOAD_RELOAD_Msk
+	#error Incorrect SysTick frequency!
+	#endif
 
 	SysTick_Config(CPU_FREQUENCY/OS_FREQUENCY);
 
+	/******************************************************************************
+	 End of configuration
+	*******************************************************************************/
+
 #endif
 
+	/******************************************************************************
+	 Put here configuration of interrupt for context switch
+	*******************************************************************************/
+
 	NVIC_SetPriority(PendSV_IRQn, 0xFF);
+
+	/******************************************************************************
+	 End of configuration
+	*******************************************************************************/
 }
 
 /* -------------------------------------------------------------------------- */
 
 #if  OS_TIMER == 0
 
+/******************************************************************************
+ Put here the procedure of interrupt handler of system timer for non-tick-less mode
+*******************************************************************************/
+
 void SysTick_Handler( void )
 {
-	    ++System.cnt;
+//	TIMx->SR = 0; // if timer != SysTick -> clear timer's status register
+	System.cnt++;
 #if OS_ROBIN
 	core_tmr_handler();
-	if (++System.dly >= OS_FREQUENCY/OS_ROBIN)
+	System.dly++;
+	if (System.dly >= OS_FREQUENCY/OS_ROBIN)
 	port_ctx_switch();
 #endif
 }
+
+/******************************************************************************
+ End of the procedure of interrupt handler
+*******************************************************************************/
 
 #endif
 
@@ -86,18 +120,30 @@ void SysTick_Handler( void )
 #if OS_TIMER != 0
 #if OS_ROBIN
 
+/******************************************************************************
+ Put here the procedure of interrupt handler of system timer for tick-less mode witch preemption
+*******************************************************************************/
+
 void OS_TIM_IRQHandler( void )
 {
 	unsigned state = OS_TIM->SR;
-	OS_TIM->SR = ~state;
+	OS_TIM->SR = 0;
 	if (state & TIM_SR_CC2IF) core_tmr_handler();
 	if (state & TIM_SR_CC1IF) port_ctx_switch();
 }
+
+/******************************************************************************
+ End of the procedure of interrupt handler
+*******************************************************************************/
 
 #endif
 #endif
 
 /* -------------------------------------------------------------------------- */
+
+/******************************************************************************
+ Put here the procedure of idle process
+*******************************************************************************/
 
 __attribute__((weak))
 void port_idle_hook( void )
@@ -106,5 +152,9 @@ void port_idle_hook( void )
 	__WFI();
 #endif
 }
+
+/******************************************************************************
+ End of the procedure of idle process
+*******************************************************************************/
 
 /* -------------------------------------------------------------------------- */
