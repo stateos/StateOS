@@ -34,9 +34,9 @@ void port_sys_init( void )
 {
 #if OS_TIMER
 
-	/******************************************************************************
-	 Put here configuration of system timer for tick-less mode
-	*******************************************************************************/
+/******************************************************************************
+ Put here configuration of system timer for tick-less mode
+*******************************************************************************/
 
 	#if	CPU_FREQUENCY/OS_FREQUENCY/2-1 > UINT16_MAX
 	#error Incorrect Timer frequency!
@@ -56,15 +56,28 @@ void port_sys_init( void )
 	OS_TIM->DIER = TIM_DIER_CC1IE;
 	#endif
 
-	/******************************************************************************
-	 End of configuration
-	*******************************************************************************/
+/******************************************************************************
+ End of configuration
+*******************************************************************************/
 
-#else
+#else //OS_TIMER == 0
 
-	/******************************************************************************
-	 Put here configuration of system timer for non-tick-less mode
-	*******************************************************************************/
+/******************************************************************************
+ Put here configuration of system timer for non-tick-less mode
+
+ Example for TIM1:
+
+	NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 0xFF);
+	NVIC_EnableIRQ  (TIM1_UP_TIM10_IRQn);
+	BB(RCC->APB2ENR, RCC_APB2ENR_TIM1EN) = 1;
+
+	TIM1->PSC  = CPU_FREQUENCY / 10000 - 1;
+	TIM1->ARR  = 10000 /  OS_FREQUENCY - 1;
+	TIM1->EGR  = TIM_EGR_UG;
+	TIM1->CR1  = TIM_CR1_CEN;
+	TIM1->DIER = TIM_DIER_UIE;
+
+*******************************************************************************/
 
 	#if	CPU_FREQUENCY/OS_FREQUENCY-1 > SysTick_LOAD_RELOAD_Msk
 	#error Incorrect SysTick frequency!
@@ -72,21 +85,21 @@ void port_sys_init( void )
 
 	SysTick_Config(CPU_FREQUENCY/OS_FREQUENCY);
 
-	/******************************************************************************
-	 End of configuration
-	*******************************************************************************/
+/******************************************************************************
+ End of configuration
+*******************************************************************************/
 
-#endif
+#endif//OS_TIMER
 
-	/******************************************************************************
-	 Put here configuration of interrupt for context switch
-	*******************************************************************************/
+/******************************************************************************
+ Put here configuration of interrupt for context switch
+*******************************************************************************/
 
 	NVIC_SetPriority(PendSV_IRQn, 0xFF);
 
-	/******************************************************************************
-	 End of configuration
-	*******************************************************************************/
+/******************************************************************************
+ End of configuration
+*******************************************************************************/
 }
 
 /* -------------------------------------------------------------------------- */
@@ -95,11 +108,25 @@ void port_sys_init( void )
 
 /******************************************************************************
  Put here the procedure of interrupt handler of system timer for non-tick-less mode
+
+ Example for TIM1:
+
+void TIM1_UP_TIM10_IRQHandler( void )
+{
+	TIM1->SR = 0; // clear timer's status register
+	System.cnt++;
+#if OS_ROBIN
+	core_tmr_handler();
+	System.dly++;
+	if (System.dly >= OS_FREQUENCY/OS_ROBIN)
+	port_ctx_switch();
+#endif
+}
+
 *******************************************************************************/
 
 void SysTick_Handler( void )
 {
-//	TIMx->SR = 0; // if timer != SysTick -> clear timer's status register
 	System.cnt++;
 #if OS_ROBIN
 	core_tmr_handler();
@@ -142,7 +169,7 @@ void OS_TIM_IRQHandler( void )
 /* -------------------------------------------------------------------------- */
 
 /******************************************************************************
- Put here the procedure of idle process
+ Put here the default procedure of idle process
 *******************************************************************************/
 
 __attribute__((weak))
@@ -154,7 +181,7 @@ void port_idle_hook( void )
 }
 
 /******************************************************************************
- End of the procedure of idle process
+ End of the default procedure of idle process
 *******************************************************************************/
 
 /* -------------------------------------------------------------------------- */
