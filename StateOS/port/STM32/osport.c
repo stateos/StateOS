@@ -41,16 +41,11 @@ void port_sys_init( void )
 	#if	CPU_FREQUENCY/OS_FREQUENCY/2-1 > UINT16_MAX
 	#error Incorrect Timer frequency!
 	#endif
-	/*
-	Direct writing into register, because ARMCC compiler can't properly
-	optimize the NVIC_SetPriority function
-	NVIC_SetPriority(OS_TIM_IRQn, 0xFF);
-	*/
 	#if OS_ROBIN
-	NVIC->IP[OS_TIM_IRQn] = 0xFF;       /* set priority for OS_TIM interrupts */
-	NVIC_EnableIRQ(OS_TIM_IRQn);                  /* enable OS_TIM interrupts */
+	NVIC_SetPriority(OS_TIM_IRQn, 0xFF);
+	NVIC_EnableIRQ(OS_TIM_IRQn);
 	#endif
-	BB(RCC->APB1ENR, OS_TIM_CLK_ENABLE) = 1;          /* enable OS_TIM device */
+	BB(RCC->APB1ENR, OS_TIM_CLK_ENABLE) = 1;
 
 	OS_TIM->PSC  = CPU_FREQUENCY/OS_FREQUENCY/2-1;
 	OS_TIM->EGR  = TIM_EGR_UG;
@@ -86,8 +81,7 @@ void port_sys_init( void )
 	#if	CPU_FREQUENCY/OS_FREQUENCY/8-1 > SysTick_LOAD_RELOAD_Msk
 	#error Incorrect SysTick frequency!
 	#endif
-
-	SCB->SHP[12 + SysTick_IRQn] = 0xFF; /* set priority for SysTick interrupt */
+	NVIC_SetPriority(SysTick_IRQn, 0xFF);
 
 	SysTick->LOAD = CPU_FREQUENCY / OS_FREQUENCY / 8 - 1;
 	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk |
@@ -103,7 +97,7 @@ void port_sys_init( void )
  Put here configuration of interrupt for context switch
 *******************************************************************************/
 
-    SCB->SHP[12 + PendSV_IRQn] = 0xFF;   /* set priority for PendSV interrupt */
+	NVIC_SetPriority(PendSV_IRQn, 0xFF);
 
 /******************************************************************************
  End of configuration
