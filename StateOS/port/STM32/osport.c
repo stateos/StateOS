@@ -41,6 +41,7 @@ void port_sys_init( void )
 	#if	CPU_FREQUENCY/OS_FREQUENCY/2-1 > UINT16_MAX
 	#error Incorrect Timer frequency!
 	#endif
+
 	#if OS_ROBIN
 	NVIC_SetPriority(OS_TIM_IRQn, 0xFF);
 	NVIC_EnableIRQ(OS_TIM_IRQn);
@@ -81,6 +82,7 @@ void port_sys_init( void )
 	#if	CPU_FREQUENCY/OS_FREQUENCY/8-1 > SysTick_LOAD_RELOAD_Msk
 	#error Incorrect SysTick frequency!
 	#endif
+
 	NVIC_SetPriority(SysTick_IRQn, 0xFF);
 
 	SysTick->LOAD = CPU_FREQUENCY / OS_FREQUENCY / 8 - 1;
