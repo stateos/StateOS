@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    07.02.2016
+    @date    26.02.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -86,15 +86,6 @@ caddr_t _sbrk_r( struct _reent *reent, size_t size )
 	port_sys_unlock();
 #endif
 	return base;
-}
-
-/* -------------------------------------------------------------------------- */
-
-void _exit( int code )
-{
-	(void) code;
-	
-	for (;;);
 }
 
 /* -------------------------------------------------------------------------- */

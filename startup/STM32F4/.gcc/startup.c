@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     22.02.2016
+@date     26.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -164,6 +164,12 @@ void Fault_Handler( void )
 	/* Go into an infinite loop */
 	for (;;);
 }
+
+/*******************************************************************************
+ Default exit handler
+*******************************************************************************/
+
+void _exit( int )                        __attribute__ ((weak, alias("Fault_Handler")));
 
 /*******************************************************************************
  Declaration of exception handlers
