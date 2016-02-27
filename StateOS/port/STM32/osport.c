@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    25.02.2016
+    @date    27.02.2016
     @brief   StateOS port file for STM32 uC.
 
  ******************************************************************************
@@ -79,15 +79,11 @@ void port_sys_init( void )
 
 *******************************************************************************/
 
-	#if	CPU_FREQUENCY/OS_FREQUENCY/8-1 > SysTick_LOAD_RELOAD_Msk
+	#if	CPU_FREQUENCY/OS_FREQUENCY-1 > SysTick_LOAD_RELOAD_Msk
 	#error Incorrect SysTick frequency!
 	#endif
 
-	NVIC_SetPriority(SysTick_IRQn, 0xFF);
-
-	SysTick->LOAD = CPU_FREQUENCY / OS_FREQUENCY / 8 - 1;
-	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk |
-	                SysTick_CTRL_ENABLE_Msk;
+	SysTick_Config(CPU_FREQUENCY/OS_FREQUENCY);
 
 /******************************************************************************
  End of configuration

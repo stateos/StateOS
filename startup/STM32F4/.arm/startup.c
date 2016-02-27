@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     26.02.2016
+@date     27.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -91,16 +91,36 @@ extern  char  __initial_psp[];
 #endif
 
 /*******************************************************************************
+ Default fault handler
+*******************************************************************************/
+
+__attribute__ ((weak, noreturn)) void Fault_Handler( void )
+{
+	/* Go into an infinite loop */
+	for (;;);
+}
+
+/*******************************************************************************
+ Default exit handlers
+*******************************************************************************/
+
+#ifndef __MICROLIB
+void      _sys_exit( void ) __attribute__ ((weak, noreturn, alias("Fault_Handler")));
+#else
+void _microlib_exit( void ) __attribute__ ((weak, noreturn, alias("Fault_Handler")));
+#endif
+
+/*******************************************************************************
  Prototypes of external functions
 *******************************************************************************/
 
-void __main( void ) __attribute__ ((noreturn));                /* entry point */
+void         __main( void ) __attribute__ ((noreturn));
 
 /*******************************************************************************
  Default reset handler
 *******************************************************************************/
 
-void Reset_Handler( void )
+__attribute__ ((weak, noreturn)) void Reset_Handler( void )
 {
 #if proc_stack_size > 0
 	/* Initialize the process stack pointer */
@@ -120,31 +140,10 @@ void Reset_Handler( void )
 }
 
 /*******************************************************************************
- Default fault handler
-*******************************************************************************/
-
-void Fault_Handler( void )
-{
-	/* Go into an infinite loop */
-	for (;;);
-}
-
-/*******************************************************************************
- Default exit handlers
-*******************************************************************************/
-
-#ifndef __MICROLIB
-void      _sys_exit( void )              __attribute__ ((weak, alias("Fault_Handler")));
-#else
-void _microlib_exit( void )              __attribute__ ((weak, alias("Fault_Handler")));
-#endif
-
-/*******************************************************************************
  Declaration of exception handlers
 *******************************************************************************/
 
 /* Core exceptions */
-void Reset_Handler                (void) __attribute__ ((weak, noreturn));
 void NMI_Handler                  (void) __attribute__ ((weak, alias("Fault_Handler")));
 void HardFault_Handler            (void) __attribute__ ((weak, alias("Fault_Handler")));
 void MemManage_Handler            (void) __attribute__ ((weak, alias("Fault_Handler")));

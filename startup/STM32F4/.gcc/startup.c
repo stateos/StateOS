@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     26.02.2016
+@date     27.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -56,8 +56,37 @@ extern  char  __initial_msp[];
 extern  char  __initial_psp[];
 
 /*******************************************************************************
- Internal reset procedures
+ Default fault handler
 *******************************************************************************/
+
+__attribute__ ((weak, noreturn, naked)) void Fault_Handler( void )
+{
+	/* Go into an infinite loop */
+	for (;;);
+}
+
+/*******************************************************************************
+ Default exit handler
+*******************************************************************************/
+
+void _exit( int ) __attribute__ ((weak, alias("Fault_Handler")));
+
+/*******************************************************************************
+ Prototypes of external functions
+*******************************************************************************/
+
+int   main( void );
+
+/*******************************************************************************
+ Default reset procedures
+*******************************************************************************/
+
+#ifndef __NOSTARTFILES
+
+void __libc_init_array( void );
+void __libc_fini_array( void );
+
+#else //__NOSTARTFILES
 
 static inline
 void MemCpy( unsigned *dst_, unsigned *end_, unsigned *src_ )
@@ -86,17 +115,6 @@ void CallArray( void(**dst_)(), void(**end_)() )
 	while (dst_ < end_)(*dst_++)();
 }
 
-/*******************************************************************************
- Default reset procedures
-*******************************************************************************/
-
-#ifndef __NOSTARTFILES
-
-void __libc_init_array( void );               /* global & static constructors */
-void __libc_fini_array( void );               /* global & static destructors  */
-
-#else //__NOSTARTFILES
-
 static inline
 void __libc_init_array( void )
 {
@@ -119,16 +137,10 @@ void __libc_fini_array( void )
 #endif//__NOSTARTFILES
 
 /*******************************************************************************
- Prototypes of external functions
-*******************************************************************************/
-
-int  main( void );                                             /* entry point */
-
-/*******************************************************************************
  Default reset handler
 *******************************************************************************/
 
-void Reset_Handler( void )
+__attribute__ ((weak, noreturn, naked)) void Reset_Handler( void )
 {
 #if proc_stack_size > 0
 	/* Initialize the process stack pointer */
@@ -152,31 +164,14 @@ void Reset_Handler( void )
 	/* Call global & static destructors */
 	__libc_fini_array();
 	/* Go into an infinite loop */
-	for(;;);
+	_exit(0);
 }
-
-/*******************************************************************************
- Default fault handler
-*******************************************************************************/
-
-void Fault_Handler( void )
-{
-	/* Go into an infinite loop */
-	for (;;);
-}
-
-/*******************************************************************************
- Default exit handler
-*******************************************************************************/
-
-void _exit( int )                        __attribute__ ((weak, alias("Fault_Handler")));
 
 /*******************************************************************************
  Declaration of exception handlers
 *******************************************************************************/
 
 /* Core exceptions */
-void Reset_Handler                (void) __attribute__ ((weak, noreturn, naked));
 void NMI_Handler                  (void) __attribute__ ((weak, alias("Fault_Handler")));
 void HardFault_Handler            (void) __attribute__ ((weak, alias("Fault_Handler")));
 void MemManage_Handler            (void) __attribute__ ((weak, alias("Fault_Handler")));
