@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    28.02.2016
+    @date    29.02.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -66,13 +66,6 @@ extern "C" {
 
 #define IMMEDIATE  ( 0U) // no waiting
 #define INFINITE   (~0U) // infinite waiting
-
-/* -------------------------------------------------------------------------- */
-
-#define MINPRIO    ( 0U)
-#define IDLEPRIO   ( 0U)
-#define MAINPRIO   ( 0U)
-#define MAXPRIO    (~0U)
 
 /* -------------------------------------------------------------------------- */
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    23.02.2016
+    @date    29.02.2016
     @brief   StateOS port definitions for STM32 uC.
 
  ******************************************************************************
@@ -120,6 +120,12 @@ extern "C" {
 
 #if      OS_LOCK_LEVEL >= (1<<__NVIC_PRIO_BITS)
 #error   osconfig.h: Incorrect OS_LOCK_LEVEL value! Must be less then (1<<__NVIC_PRIO_BITS).
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#ifndef  OS_MAIN_PRIO
+#define  OS_MAIN_PRIO         0 /* priority of main process */
 #endif
 
 /* -------------------------------------------------------------------------- */

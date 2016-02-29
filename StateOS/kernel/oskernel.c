@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    28.02.2016
+    @date    29.02.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -40,8 +40,8 @@ static  char     IDLE_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
 #define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
 static tsk_t IDLE;
-static tsk_t MAIN = { .id=ID_READY, .next=&IDLE, .prev=&IDLE, .prio=MAINPRIO, .top=MAIN_SP };                        // main task
-static tsk_t IDLE = { .id=ID_IDLE,  .next=&MAIN, .prev=&MAIN, .prio=IDLEPRIO, .top=IDLE_SP, .state=port_idle_hook }; // idle task and tasks queue
+static tsk_t MAIN = { .id=ID_READY, .next=&IDLE, .prev=&IDLE, .top=MAIN_SP, .prio=OS_MAIN_PRIO };    // main task
+static tsk_t IDLE = { .id=ID_IDLE,  .next=&MAIN, .prev=&MAIN, .top=IDLE_SP, .state=port_idle_hook }; // idle task and tasks queue
 
        sys_t System = { .cur=&MAIN };
 

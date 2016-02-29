@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    State Machine OS: osconfig.h
+    @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    16.01.2016
+    @date    29.02.2016
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -60,6 +60,11 @@
 // OS_LOCK_LEVEL >  0 and __CORTEX_M >= 3 => entrance to a critical section blocks interrupts with urgency lower or equal (the priority value greater or equal) than OS_LOCK_LEVEL
 // default value: (1<<(__NVIC_PRIO_BITS-1))
 #define  OS_LOCK_LEVEL        0
+
+// ----------------------------
+// priority of main process
+// default value: 0 (the same as priority of idle process)
+#define  OS_MAIN_PRIO         0
 
 // ----------------------------
 // os heap size in bytes
