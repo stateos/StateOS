@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     27.02.2016
+@date     29.02.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -81,13 +81,6 @@ int   main( void );
  Default reset procedures
 *******************************************************************************/
 
-#ifndef __NOSTARTFILES
-
-void __libc_init_array( void );
-void __libc_fini_array( void );
-
-#else //__NOSTARTFILES
-
 static inline
 void MemCpy( unsigned *dst_, unsigned *end_, unsigned *src_ )
 {
@@ -114,6 +107,13 @@ void CallArray( void(**dst_)(), void(**end_)() )
 {
 	while (dst_ < end_)(*dst_++)();
 }
+
+#ifndef __NOSTARTFILES
+
+void __libc_init_array( void );
+void __libc_fini_array( void );
+
+#else //__NOSTARTFILES
 
 static inline
 void __libc_init_array( void )
