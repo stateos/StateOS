@@ -26,6 +26,7 @@ Features:
 1.7
 - the priority of main process is configurable
 - fixed bug in startup file for armcc compiler
+- fixed bug in core_sys_alloc function
 ---------
 1.6
 - fixed bug in tick-less mode
