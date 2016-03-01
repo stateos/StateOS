@@ -23,6 +23,9 @@ Features:
 - c++ wrapper
 - all documentation is contained within the source files
 ---------
+1.7
+- the priority of main process is configurable
+---------
 1.6
 - fixed bug in tick-less mode
 - optimized kernel
