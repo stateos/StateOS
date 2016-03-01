@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    29.02.2016
+    @date    01.03.2016
     @brief   StateOS port definitions for STM32 uC.
 
  ******************************************************************************
@@ -126,12 +126,6 @@ extern "C" {
 
 #ifndef  OS_MAIN_PRIO
 #define  OS_MAIN_PRIO         0 /* priority of main process */
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef  OS_ALIGN
-#define  OS_ALIGN             8 /* stack alignment                            */
 #endif
 
 /* -------------------------------------------------------------------------- */

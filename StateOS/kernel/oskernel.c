@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    29.02.2016
+    @date    01.03.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -442,17 +442,21 @@ os_id core_sys_alloc( size_t size )
 
 	static
 	char *heap = Heap;
-
-	size = ASIZE(size);
-
 	char *base = 0;
 
-	if (heap + size <= HeapEnd)
+	if (size)
 	{
-		base = heap;
-		heap = heap + size;
+		size = ASIZE(size);
 
-		for (unsigned *mem = (unsigned *)base; mem < (unsigned *)(base + size); *mem++ = 0);
+		if (heap + size <= HeapEnd)
+		{
+			base = heap;
+			heap = base + size;
+
+			uint64_t *_mem = (uint64_t *)(base);
+			uint64_t *_end = (uint64_t *)(heap);
+			do *_mem++ = 0; while (_mem < _end);
+		}
 	}
 
 	return base;
@@ -464,13 +468,20 @@ os_id core_sys_alloc( size_t size )
 
 os_id core_sys_alloc( size_t size )
 {
-	size = ASIZE(size);
+	char *base = 0;
 
-	char *base = malloc(size);
-
-	if (base)
+	if (size)
 	{
-		for (unsigned *mem = (unsigned *)base; mem < (unsigned *)(base + size); *mem++ = 0);
+		size = ASIZE(size);
+
+		base = malloc(size);
+
+		if (base)
+		{
+			uint64_t *_mem = (uint64_t *)(base);
+			uint64_t *_end = (uint64_t *)(base + size);
+			do *_mem++ = 0; while (_mem < _end);
+		}
 	}
 
 	return base;

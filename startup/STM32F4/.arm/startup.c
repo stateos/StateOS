@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     27.02.2016
+@date     01.03.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -57,6 +57,7 @@ extern  char  __initial_psp[];
  Configuration of stacks and heap
 *******************************************************************************/
 
+__attribute__ ((section("HEAP")))
 __asm void __user_config_stackheap( void )
 {
 __heap_base     SPACE     0
