@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    18.02.2016
+    @date    01.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -62,9 +62,9 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_SEM( sem, init, limit )                   \
-               sem_t sem##__sem = _SEM_INIT(init, limit); \
-               sem_id sem = & sem##__sem
+#define             OS_SEM( sem, init, limit )                     \
+                       sem_t sem##__sem = _SEM_INIT( init, limit ); \
+                       sem_id sem = & sem##__sem
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -82,9 +82,9 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_SEM( sem, init, limit )                   \
-        static sem_t sem##__sem = _SEM_INIT(init, limit); \
-        static sem_id sem = & sem##__sem
+#define         static_SEM( sem, init, limit )                     \
+                static sem_t sem##__sem = _SEM_INIT( init, limit ); \
+                static sem_id sem = & sem##__sem
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -106,7 +106,7 @@ extern "C" {
  **********************************************************************************************************************/
 
 #define                SEM_INIT( init, limit ) \
-                      _SEM_INIT(init, limit)
+                      _SEM_INIT( init, limit )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -129,7 +129,7 @@ extern "C" {
 
 #ifndef __cplusplus
 #define                SEM_CREATE( init, limit ) \
-               &(sem_t)SEM_INIT(init, limit)
+               &(sem_t)SEM_INIT( init, limit )
 #endif
 
 /**********************************************************************************************************************

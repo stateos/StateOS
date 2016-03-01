@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    04.02.2016
+    @date    01.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,10 +53,10 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_BOX( box, limit, size )                               \
-               char box##__data[limit*size];                          \
-               box_t box##__box = _BOX_INIT(limit, size, box##__data); \
-               box_id box = & box##__box
+#define             OS_BOX( box, limit, size )                                \
+                       char box##__buf[limit*size];                            \
+                       box_t box##__box = _BOX_INIT( limit, size, box##__buf ); \
+                       box_id box = & box##__box
 
 
 /**********************************************************************************************************************
@@ -72,10 +72,10 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_BOX( box, limit, size )                               \
-        static char box##__data[limit*size];                          \
-        static box_t box##__box = _BOX_INIT(limit, size, box##__data); \
-        static box_id box = & box##__box
+#define         static_BOX( box, limit, size )                                \
+                static char box##__buf[limit*size];                            \
+                static box_t box##__box = _BOX_INIT( limit, size, box##__buf ); \
+                static box_id box = & box##__box
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -94,7 +94,7 @@ extern "C" {
  **********************************************************************************************************************/
 
 #define                BOX_INIT( limit, size ) \
-                      _BOX_INIT(limit, size, _BOX_DATA(limit, size))
+                      _BOX_INIT( limit, size, _BOX_DATA( limit, size ) )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -114,7 +114,7 @@ extern "C" {
 
 #ifndef __cplusplus
 #define                BOX_CREATE( limit, size ) \
-               &(box_t)BOX_INIT(limit, size)
+               &(box_t)BOX_INIT( limit, size )
 #endif
 
 /**********************************************************************************************************************

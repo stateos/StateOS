@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    04.02.2016
+    @date    01.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -55,10 +55,10 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_WRK( tsk, prio, state, size )                                        \
-               char tsk##__stack[ASIZE(size)] __osalign;                             \
-               tsk_t tsk##__tsk = _TSK_INIT(prio, state, &tsk##__stack[ASIZE(size)]); \
-               tsk_id tsk = & tsk##__tsk
+#define             OS_WRK( tsk, prio, state, size )                                        \
+                       char tsk##__stk[ASIZE( size )] __osalign;                             \
+                       tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk+ASIZE( size ) ); \
+                       tsk_id tsk = & tsk##__tsk
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -74,8 +74,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_TSK( tsk, prio, state ) \
-            OS_WRK( tsk, prio, state, OS_STACK_SIZE )
+#define             OS_TSK( tsk, prio, state ) \
+                    OS_WRK( tsk, prio, state, OS_STACK_SIZE )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -90,10 +90,10 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_DEF( tsk, prio )                \
-               void tsk##__startup( void );     \
-            OS_TSK( tsk, prio, tsk##__startup ); \
-               void tsk##__startup( void )
+#define             OS_DEF( tsk, prio )            \
+                       void tsk##__fun( void );     \
+                    OS_TSK( tsk, prio, tsk##__fun ); \
+                       void tsk##__fun( void )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -110,10 +110,10 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_WRK( tsk, prio, state, size )                                        \
-        static char tsk##__stack[ASIZE(size)] __osalign;                             \
-        static tsk_t tsk##__tsk = _TSK_INIT(prio, state, &tsk##__stack[ASIZE(size)]); \
-        static tsk_id tsk = & tsk##__tsk
+#define         static_WRK( tsk, prio, state, size )                                        \
+                static char tsk##__stk[ASIZE( size )] __osalign;                             \
+                static tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk+ASIZE( size ) ); \
+                static tsk_id tsk = & tsk##__tsk
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -129,8 +129,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_TSK( tsk, prio, state ) \
-        static_WRK( tsk, prio, state, OS_STACK_SIZE )
+#define         static_TSK( tsk, prio, state ) \
+                static_WRK( tsk, prio, state, OS_STACK_SIZE )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -145,10 +145,10 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_DEF( tsk, prio )                \
-        static void tsk##__startup( void );     \
-        static_TSK( tsk, prio, tsk##__startup ); \
-        static void tsk##__startup( void )
+#define         static_DEF( tsk, prio )            \
+                static void tsk##__fun( void );     \
+                static_TSK( tsk, prio, tsk##__fun ); \
+                static void tsk##__fun( void )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -169,7 +169,7 @@ extern "C" {
  **********************************************************************************************************************/
 
 #define                WRK_INIT( prio, state, size ) \
-                      _TSK_INIT(prio, state, _TSK_STACK(size))
+                      _TSK_INIT( prio, state, _TSK_STACK( size ) )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -191,7 +191,7 @@ extern "C" {
 
 #ifndef __cplusplus
 #define                WRK_CREATE( prio, state, size ) \
-               &(tsk_t)WRK_INIT(prio, state, size)
+               &(tsk_t)WRK_INIT( prio, state, size )
 #endif
 
 /**********************************************************************************************************************
@@ -212,7 +212,7 @@ extern "C" {
  **********************************************************************************************************************/
 
 #define                TSK_INIT( prio, state ) \
-                       WRK_INIT(prio, state, OS_STACK_SIZE)
+                       WRK_INIT( prio, state, OS_STACK_SIZE )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -233,7 +233,7 @@ extern "C" {
 
 #ifndef __cplusplus
 #define                TSK_CREATE( prio, state ) \
-               &(tsk_t)TSK_INIT(prio, state)
+                       WRK_CREATE( prio, state, OS_STACK_SIZE )
 #endif
 
 /**********************************************************************************************************************

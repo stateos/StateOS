@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    04.02.2016
+    @date    01.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,10 +53,10 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_MSG( msg, limit )                               \
-               unsigned msg##__data[limit];                     \
-               msg_t msg##__msg = _MSG_INIT(limit, msg##__data); \
-               msg_id msg = & msg##__msg
+#define             OS_MSG( msg, limit )                                \
+                       unsigned msg##__buf[limit];                       \
+                       msg_t msg##__msg = _MSG_INIT( limit, msg##__buf ); \
+                       msg_id msg = & msg##__msg
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -70,10 +70,10 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_MSG( msg, limit )                               \
-        static unsigned msg##__data[limit];                     \
-        static msg_t msg##__msg = _MSG_INIT(limit, msg##__data); \
-        static msg_id msg = & msg##__msg
+#define         static_MSG( msg, limit )                                \
+                static unsigned msg##__buf[limit];                       \
+                static msg_t msg##__msg = _MSG_INIT( limit, msg##__buf ); \
+                static msg_id msg = & msg##__msg
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -91,7 +91,7 @@ extern "C" {
  **********************************************************************************************************************/
 
 #define                MSG_INIT( limit ) \
-                      _MSG_INIT(limit, _MSG_DATA(limit))
+                      _MSG_INIT( limit, _MSG_DATA( limit ) )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -110,7 +110,7 @@ extern "C" {
 
 #ifndef __cplusplus
 #define                MSG_CREATE( limit ) \
-               &(msg_t)MSG_INIT(limit)
+               &(msg_t)MSG_INIT( limit )
 #endif
 
 /**********************************************************************************************************************

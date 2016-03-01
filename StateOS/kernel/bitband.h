@@ -2,7 +2,7 @@
 
     @file    StateOS: bitband.h
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    01.03.2016
     @brief   This file contains macro definitions for the Cortex-M devices.
 
  ******************************************************************************
@@ -36,10 +36,10 @@ extern "C" {
 
 /* Exported macros ---------------------------------------------------------- */
 
-#define BB_BASE(var)  ((((unsigned)&(var))&0xF0000000U)+0x02000000U)
+#define BB_BASE(var)  ((((unsigned)&(var))&0xFFF00000U)+0x02000000U)
 #define BB_OFFS(var)  ((((unsigned)&(var))&0x000FFFFFU)*32)
 
-#define BITBAND(var)  ((volatile unsigned *)(BB_BASE(var)+BB_OFFS(var)))
+#define BITBAND(var)  ((volatile unsigned *)(((BB_BASE(var)==0x22000000U)||(BB_BASE(var)==0x42000000U))?(BB_BASE(var)+BB_OFFS(var)):0U))
 
 // bit-banding example:
 // #define green_led BITBAND(GPIOA->ODR)[9]
@@ -48,7 +48,7 @@ extern "C" {
 
 #ifdef __CC_ARM
 
-static inline __attribute__((always_inline, const))
+static inline __attribute__(( always_inline, const ))
 int __builtin_ctz( unsigned mask )
 {
 	int result = 0;

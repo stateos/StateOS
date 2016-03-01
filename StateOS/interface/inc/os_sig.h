@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    18.02.2016
+    @date    01.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -58,9 +58,9 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define     OS_SIG( sig, type )                             \
-               sig_t sig##__sig = _SIG_INIT((type)&sigMASK); \
-               sig_id sig = & sig##__sig
+#define             OS_SIG( sig, type )                               \
+                       sig_t sig##__sig = _SIG_INIT( (type)&sigMASK ); \
+                       sig_id sig = & sig##__sig
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -76,9 +76,9 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define static_SIG( sig, type )                             \
-        static sig_t sig##__sig = _SIG_INIT((type)&sigMASK); \
-        static sig_id sig = & sig##__sig
+#define         static_SIG( sig, type )                               \
+                static sig_t sig##__sig = _SIG_INIT( (type)&sigMASK ); \
+                static sig_id sig = & sig##__sig
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -98,7 +98,7 @@ extern "C" {
  **********************************************************************************************************************/
 
 #define                SIG_INIT( type ) \
-                      _SIG_INIT((type)&sigMASK)
+                      _SIG_INIT( (type)&sigMASK )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -119,7 +119,7 @@ extern "C" {
 
 #ifndef __cplusplus
 #define                SIG_CREATE( type ) \
-               &(sig_t)SIG_INIT((type)&sigMASK)
+               &(sig_t)SIG_INIT( type )
 #endif
 
 /**********************************************************************************************************************

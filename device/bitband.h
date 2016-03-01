@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    bitband.h
  * @author  Rajmund Szymanski
- * @date    29.02.2016
+   @date    01.03.2016
  * @brief   This file contains macro definitions for the Cortex-M devices.
  ******************************************************************************/
 
@@ -17,6 +17,7 @@ extern "C" {
 
 #define BB_BASE(var)  ((((unsigned)&(var))&0xFFF00000U)+0x02000000U)
 #define BB_OFFS(var)  ((((unsigned)&(var))&0x000FFFFFU)*32)
+
 #define BITBAND(var)  ((volatile unsigned *)(((BB_BASE(var)==0x22000000U)||(BB_BASE(var)==0x42000000U))?(BB_BASE(var)+BB_OFFS(var)):0U))
 
 // bit-banding example:
