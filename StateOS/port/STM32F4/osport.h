@@ -2,8 +2,8 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    01.03.2016
-    @brief   StateOS port definitions for STM32 uC.
+    @date    03.03.2016
+    @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
 
