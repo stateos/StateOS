@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    03.03.2016
+    @date    07.03.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -138,10 +138,9 @@ extern   char               __initial_sp[];
 static inline
 void port_ctx_reset( void )
 {
-#if      OS_ROBIN && OS_TIMER
-	OS_TIM->CCR1 = OS_TIM->CNT + OS_FREQUENCY/OS_ROBIN;
+#if OS_ROBIN && OS_TIMER
+	SysTick->VAL = 0;
 #endif
-	SCB->ICSR = SCB_ICSR_PENDSVCLR_Msk;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -157,20 +156,19 @@ void port_ctx_switch( void )
 static inline
 void port_tmr_stop( void )
 {
-#if      OS_ROBIN && OS_TIMER
-	OS_TIM->DIER = TIM_DIER_CC1IE;
+#if OS_ROBIN && OS_TIMER
+	OS_TIM->DIER = 0;
 #endif
 }
 	
-
 /* -------------------------------------------------------------------------- */
 
 static inline
 void port_tmr_start( unsigned timeout )
 {
-#if      OS_ROBIN && OS_TIMER
-	OS_TIM->CCR2 = timeout;
-	OS_TIM->DIER = TIM_DIER_CC1IE | TIM_DIER_CC2IE;
+#if OS_ROBIN && OS_TIMER
+	OS_TIM->CCR1 = timeout;
+	OS_TIM->DIER = TIM_DIER_CC1IE;
 #else
 	(void) timeout;
 #endif
@@ -181,9 +179,9 @@ void port_tmr_start( unsigned timeout )
 static inline
 void port_tmr_force( void )
 {
-#if      OS_ROBIN && OS_TIMER
-	OS_TIM->DIER = TIM_DIER_CC1IE | TIM_DIER_CC2IE;
-	OS_TIM->EGR  = TIM_EGR_CC2G;
+#if OS_ROBIN && OS_TIMER
+	OS_TIM->DIER = TIM_DIER_CC1IE;
+	OS_TIM->EGR  = TIM_EGR_CC1G;
 #endif
 }
 

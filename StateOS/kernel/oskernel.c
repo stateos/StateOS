@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    01.03.2016
+    @date    07.03.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -40,8 +40,8 @@ static  char     IDLE_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
 #define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
 static tsk_t IDLE;
-static tsk_t MAIN = { .id=ID_READY, .next=&IDLE, .prev=&IDLE, .top=MAIN_SP, .prio=OS_MAIN_PRIO };    // main task
-static tsk_t IDLE = { .id=ID_IDLE,  .next=&MAIN, .prev=&MAIN, .top=IDLE_SP, .state=port_idle_hook }; // idle task and tasks queue
+static tsk_t MAIN = { .id=ID_READY, .next=&IDLE, .prev=&IDLE, .top=MAIN_SP, .prio=OS_MAIN_PRIO, .basic=OS_MAIN_PRIO }; // main task
+static tsk_t IDLE = { .id=ID_IDLE,  .next=&MAIN, .prev=&MAIN, .top=IDLE_SP, .state=port_idle_hook };   // idle task and tasks queue
 
        sys_t System = { .cur=&MAIN };
 
@@ -49,7 +49,7 @@ static tsk_t IDLE = { .id=ID_IDLE,  .next=&MAIN, .prev=&MAIN, .top=IDLE_SP, .sta
 
 void core_tsk_break( void )
 {
-	tsk_id cur = Current;
+	tsk_id cur = System.cur;
 
 	port_set_stack(cur->top);
 
@@ -114,7 +114,7 @@ void core_tsk_insert( tsk_id tsk )
 {
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
-	if (IDLE.next->prio > Current->prio)
+	if (IDLE.next->prio > System.cur->prio)
 	port_ctx_switch();
 #endif
 }
@@ -175,7 +175,7 @@ unsigned priv_tsk_wait( tsk_id tsk, obj_id obj )
 
 unsigned core_tsk_waitUntil( os_id obj, unsigned time )
 {
-	tsk_id cur = Current;
+	tsk_id cur = System.cur;
 
 	cur->start = Counter;
 	cur->delay = time - cur->start;
@@ -190,7 +190,7 @@ unsigned core_tsk_waitUntil( os_id obj, unsigned time )
 
 unsigned core_tsk_waitFor( os_id obj, unsigned delay )
 {
-	tsk_id cur = Current;
+	tsk_id cur = System.cur;
 
 	cur->start = Counter;
 	cur->delay = delay;
@@ -296,7 +296,7 @@ os_id core_tsk_handler( os_id sp )
 
 	core_ctx_reset();
 
-	cur = Current;
+	cur = System.cur;
 
 	cur->sp = sp;
 
@@ -306,7 +306,7 @@ os_id core_tsk_handler( os_id sp )
 		priv_tsk_insert(cur);
 	}
 
-	cur = Current = IDLE.next;
+	cur = System.cur = IDLE.next;
 
 	sp = priv_tsk_prepare(cur); // prepare task stack if necessary
 

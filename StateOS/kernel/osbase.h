@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    01.03.2016
+    @date    07.03.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -292,7 +292,9 @@ struct __tsk
 #endif
 };
 
-#define _TSK_INIT( _prio, _state, _top ) { /*queue*/0, /*id*/0, /*next*/0, /*prev*/0, /*state*/_state, /*start*/0, /*delay*/0, /*prio*/_prio, /*sp*/0, /*top*/_top }
+#define _TSK_INIT( _prio, _state, _top ) { /*queue*/0,      /*id*/   0,    /*next*/ 0, /*prev*/ 0,   \
+                                           /*state*/_state, /*start*/0,    /*delay*/0, /*prio*/ _prio,\
+                                           /*sp*/   0,      /*top*/  _top, /*back*/ 0, /*basic*/_prio }
 
 #define _TSK_STACK( _size ) (__osalign char[ASIZE(_size)]){ 0 } + ASIZE(_size)
 

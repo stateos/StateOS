@@ -23,6 +23,10 @@ Features:
 - c++ wrapper
 - all documentation is contained within the source files
 ---------
+1.8
+- fixed bug in task initialisation
+- SysTick is used for triggering context switch in tick-less mode
+---------
 1.7
 - the priority of main process is configurable
 - fixed bug in startup file for armcc compiler
