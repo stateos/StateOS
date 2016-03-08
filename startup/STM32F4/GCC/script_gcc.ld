@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     stm32f4xx.ld
 @author   Rajmund Szymanski
-@date     22.02.2016
+@date     08.03.2016
 @brief    Linker script for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -150,6 +150,7 @@ SECTIONS
 	PROVIDE(__heap_base   = __heap_start);
 	PROVIDE(__heap_limit  = __heap_end);
 	PROVIDE(__stack       = __initial_sp);
+	PROVIDE(__end__       = __bss_end);
 
 	PROVIDE(__process_stack_start = __proc_stack_start);
 	PROVIDE(__process_stack_size  = __proc_stack_size);

@@ -38,7 +38,7 @@ void port_sys_init( void )
  Put here configuration of system timer for tick-less mode
 *******************************************************************************/
 
-	#if	CPU_FREQUENCY/OS_FREQUENCY/2-1 > UINT16_MAX
+	#if CPU_FREQUENCY/OS_FREQUENCY/2-1 > UINT16_MAX
 	#error Incorrect Timer frequency!
 	#endif
 
@@ -62,7 +62,7 @@ void port_sys_init( void )
 
 	#if OS_ROBIN
 
-	#if	(CPU_FREQUENCY/OS_ROBIN-1 <= SysTick_LOAD_RELOAD_Msk)
+	#if (CPU_FREQUENCY/OS_ROBIN-1 <= SysTick_LOAD_RELOAD_Msk)
 
 	SysTick_Config(CPU_FREQUENCY/OS_ROBIN);
 
@@ -90,7 +90,7 @@ void port_sys_init( void )
  Put here configuration of system timer for non-tick-less mode
 *******************************************************************************/
 
-	#if	(CPU_FREQUENCY/OS_FREQUENCY-1 <= SysTick_LOAD_RELOAD_Msk)
+	#if (CPU_FREQUENCY/OS_FREQUENCY-1 <= SysTick_LOAD_RELOAD_Msk)
 
 	SysTick_Config(CPU_FREQUENCY/OS_FREQUENCY);
 
