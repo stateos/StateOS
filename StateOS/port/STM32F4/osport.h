@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    07.03.2016
+    @date    08.03.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -98,6 +98,10 @@ extern "C" {
 
 #ifndef  OS_ROBIN
 #define  OS_ROBIN             0 /* system works in cooperative mode           */
+#endif
+
+#if     (OS_ROBIN > OS_FREQUENCY)
+#error   osconfig.h: Incorrect OS_ROBIN value!
 #endif
 
 /* -------------------------------------------------------------------------- */
