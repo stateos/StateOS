@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    07.03.2016
+    @date    08.03.2016
     @brief   StateOS port file for STM32F4 uC.
 
  ******************************************************************************
@@ -60,15 +60,25 @@ void port_sys_init( void )
  Put here configuration of interrupt for context switch triggering
 *******************************************************************************/
 
-#if OS_ROBIN
+	#if OS_ROBIN
 
-	#if	CPU_FREQUENCY/OS_ROBIN-1 > SysTick_LOAD_RELOAD_Msk
-	#error Incorrect SysTick frequency!
-	#endif
+	#if	(CPU_FREQUENCY/OS_ROBIN-1 <= SysTick_LOAD_RELOAD_Msk)
 
 	SysTick_Config(CPU_FREQUENCY/OS_ROBIN);
 
-#endif//OS_ROBIN
+	#elif defined(ST_FREQUENCY) && (ST_FREQUENCY/OS_ROBIN-1 <= SysTick_LOAD_RELOAD_Msk)
+
+	NVIC_SetPriority(SysTick_IRQn, 0xFF);
+
+	SysTick->LOAD = ST_FREQUENCY/OS_ROBIN-1;
+	SysTick->VAL  = 0U;
+	SysTick->CTRL = SysTick_CTRL_ENABLE_Msk|SysTick_CTRL_TICKINT_Msk;
+
+	#else
+	#error Incorrect SysTick frequency!
+	#endif
+	
+	#endif//OS_ROBIN
 
 /******************************************************************************
  End of configuration
@@ -80,11 +90,21 @@ void port_sys_init( void )
  Put here configuration of system timer for non-tick-less mode
 *******************************************************************************/
 
-	#if	CPU_FREQUENCY/OS_FREQUENCY-1 > SysTick_LOAD_RELOAD_Msk
-	#error Incorrect SysTick frequency!
-	#endif
+	#if	(CPU_FREQUENCY/OS_FREQUENCY-1 <= SysTick_LOAD_RELOAD_Msk)
 
 	SysTick_Config(CPU_FREQUENCY/OS_FREQUENCY);
+
+	#elif defined(ST_FREQUENCY) && (ST_FREQUENCY/OS_FREQUENCY-1 <= SysTick_LOAD_RELOAD_Msk)
+
+	NVIC_SetPriority(SysTick_IRQn, 0xFF);
+
+	SysTick->LOAD = ST_FREQUENCY/OS_FREQUENCY-1;
+	SysTick->VAL  = 0U;
+	SysTick->CTRL = SysTick_CTRL_ENABLE_Msk|SysTick_CTRL_TICKINT_Msk;
+
+	#else
+	#error Incorrect SysTick frequency!
+	#endif
 
 /******************************************************************************
  End of configuration

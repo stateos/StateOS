@@ -96,6 +96,10 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+#define  ST_FREQUENCY (CPU_FREQUENCY/8) /* alternate clock source for SysTick */
+
+/* -------------------------------------------------------------------------- */
+
 #ifndef  OS_ROBIN
 #define  OS_ROBIN             0 /* system works in cooperative mode           */
 #endif
