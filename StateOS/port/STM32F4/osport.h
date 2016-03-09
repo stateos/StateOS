@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    08.03.2016
+    @date    09.03.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -188,8 +188,7 @@ static inline
 void port_tmr_force( void )
 {
 #if OS_ROBIN && OS_TIMER
-	OS_TIM->DIER = TIM_DIER_CC1IE;
-	OS_TIM->EGR  = TIM_EGR_CC1G;
+	NVIC_SetPendingIRQ(OS_TIM_IRQn);
 #endif
 }
 
