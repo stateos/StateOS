@@ -40,7 +40,7 @@ sem_id sem_create( unsigned init, unsigned limit )
 
 	if (sem)
 	{
-		sem->count = init < limit ? init : limit;
+		sem->count = UMIN(init, limit);
 		sem->limit = limit;
 	}
 

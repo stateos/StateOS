@@ -79,6 +79,11 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+#define UMIN( a, b ) \
+ ((unsigned)( a )<(unsigned)( b )?(unsigned)( a ):(unsigned)( b ))
+
+/* -------------------------------------------------------------------------- */
+
 typedef void                 *os_id;
 typedef void               (*fun_id)();
 typedef struct __sig sig_t, *sig_id; // signal
@@ -158,7 +163,7 @@ struct __sem
 	unsigned limit; // semaphore's value limit
 };
 
-#define _SEM_INIT( _count, _limit ) { /*queue*/0, /*count*/(_count)<(_limit)?(_count):(_limit), /*limit*/_limit }
+#define _SEM_INIT( _count, _limit ) { /*queue*/0, /*count*/UMIN(_count,_limit), /*limit*/_limit }
 
 /* -------------------------------------------------------------------------- */
 
