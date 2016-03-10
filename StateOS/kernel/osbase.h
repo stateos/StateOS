@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    09.03.2016
+    @date    10.03.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -158,7 +158,7 @@ struct __sem
 	unsigned limit; // semaphore's value limit
 };
 
-#define _SEM_INIT( _count, _limit ) { /*queue*/0, /*count*/_count, /*limit*/_limit }
+#define _SEM_INIT( _count, _limit ) { /*queue*/0, /*count*/(_count)<(_limit)?(_count):(_limit), /*limit*/_limit }
 
 /* -------------------------------------------------------------------------- */
 

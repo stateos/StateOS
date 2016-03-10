@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    03.02.2016
+    @date    10.03.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -40,7 +40,7 @@ sem_id sem_create( unsigned init, unsigned limit )
 
 	if (sem)
 	{
-		sem->count = init;
+		sem->count = init < limit ? init : limit;
 		sem->limit = limit;
 	}
 
