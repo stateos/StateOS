@@ -26,9 +26,10 @@ Features:
 1.9
 - added fast mutex object
 - added example for new feature
+- fixed bug in semaphore initialization
 ---------
 1.8
-- fixed bug in task initialisation
+- fixed bug in task initialization
 - SysTick is used for triggering context switch in tick-less mode
 ---------
 1.7
