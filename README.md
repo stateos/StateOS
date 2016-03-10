@@ -19,12 +19,14 @@ Features
 - barriers
 - semaphores (binary, limited, counting)
 - mutexes (normal, recursive, priority protect, priority inheritance)
+- fast mutexes
 - condition variables
 - message queues
 - mailbox queues
 - timers (one-shot, periodic)
 - c++ wrapper
 - all documentation is contained within the source files
+- examples and templates are in separate repositories
 
 Targets
 -------

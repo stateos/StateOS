@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    07.03.2016
+    @date    09.03.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -87,6 +87,7 @@ typedef struct __flg flg_t, *flg_id; // flag
 typedef struct __bar bar_t, *bar_id; // barrier
 typedef struct __sem sem_t, *sem_id; // semaphore
 typedef struct __mtx mtx_t, *mtx_id; // mutex
+typedef struct __mut mut_t, *mut_id; // fast mutex
 typedef struct __cnd cnd_t, *cnd_id; // condition variable
 typedef struct __box box_t, *box_id; // mailbox queue
 typedef struct __msg msg_t, *msg_id; // message queue
@@ -173,6 +174,18 @@ struct __mtx
 };
 
 #define _MTX_INIT( _type ) { /*queue*/0, /*owner*/0, /*list*/0, /*count*/0, /*type*/_type }
+
+/* -------------------------------------------------------------------------- */
+
+// fast mutex
+
+struct __mut
+{
+	tsk_id   queue; // next process in the DELAYED queue
+	tsk_id   owner; // owner task
+};
+
+#define _MUT_INIT() { 0 }
 
 /* -------------------------------------------------------------------------- */
 

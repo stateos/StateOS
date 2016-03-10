@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    04.02.2016
+    @date    09.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -35,6 +35,7 @@
 #include <os_bar.h> // barrier
 #include <os_sem.h> // semaphore
 #include <os_mtx.h> // mutex
+#include <os_mut.h> // fast mutex
 #include <os_cnd.h> // condition variable
 #include <os_box.h> // mailbox queue
 #include <os_msg.h> // message queue
