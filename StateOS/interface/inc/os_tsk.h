@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    01.03.2016
+    @date    12.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -319,8 +319,7 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  *                                                                                                                    *
  * Description       : stop current task and remove it from READY queue                                               *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tsk             : pointer to current task object                                                                 *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
