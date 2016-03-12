@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    22.02.2016
+    @date    13.03.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -98,6 +98,20 @@ void tsk_stop( void )
 
 	core_tsk_remove(Current);
 	core_tsk_break();
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_detach( void )
+/* -------------------------------------------------------------------------- */
+{
+	port_set_lock();
+
+//	while (Current->list) mtx_kill(Current->list);
+
+	core_tsk_remove(Current);
+	port_ctx_switch();
+
+	port_clr_lock();
 }
 
 /* -------------------------------------------------------------------------- */
