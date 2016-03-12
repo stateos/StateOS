@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    10.03.2016
+    @date    12.03.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -173,12 +173,11 @@ struct __mtx
 {
 	tsk_id   queue; // next process in the DELAYED queue
 	tsk_id   owner; // owner task
-	mtx_id   list;  // used by priority inheritance mutexes: list of mutexes held by owner
-	unsigned count; // used by recursive mutexes
-	unsigned type;  // mutex type: mtxNormal, mtxRecursive, mtxPriorityProtect, mtxPriorityInheritance
+	unsigned count; // mutex's curent value
+	mtx_id   list;  // list of mutexes held by owner
 };
 
-#define _MTX_INIT( _type ) { /*queue*/0, /*owner*/0, /*list*/0, /*count*/0, /*type*/_type }
+#define _MTX_INIT() { 0 }
 
 /* -------------------------------------------------------------------------- */
 
@@ -295,7 +294,7 @@ struct __tsk
 	unsigned basic; // basic priority
 
 	void    *guard; // object that controls the pending process
-	mtx_id   list;  // used by mutex object: list of mutexes held
+	mtx_id   list;  // list of mutexes held
 	union  {
 	unsigned all;   // used by flag object: wait for all flags to be set
 	void    *data;  // used by mailbox queue object

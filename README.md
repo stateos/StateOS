@@ -18,8 +18,8 @@ Features
 - flags (one, all, accept, ignore)
 - barriers
 - semaphores (binary, limited, counting)
-- mutexes (normal, recursive, priority protect, priority inheritance)
-- fast mutexes
+- mutexes (recursive and priority inheritance)
+- fast mutexes (non-recursive and non-priority-inheritance)
 - condition variables
 - message queues
 - mailbox queues

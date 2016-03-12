@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    01.03.2016
+    @date    12.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,17 +41,6 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define mtxNormal                       ( 0U << 0 ) // normal mutex
-#define mtxRecursive                    ( 1U << 0 ) // recursive mutex
-#define mtxPriorityProtect              ( 0U << 1 ) // priority protect mutex
-#define mtxPriorityInheritance          ( 1U << 1 ) // priority inheritance mutex
-#define mtxMASK                         ( 3U )
-
-#define mtxNormalPriorityProtect        ( mtxNormal    | mtxPriorityProtect     )
-#define mtxRecursivePriorityProtect     ( mtxRecursive | mtxPriorityProtect     )
-#define mtxNormalPriorityInheritance    ( mtxNormal    | mtxPriorityInheritance )
-#define mtxRecursivePriorityInheritance ( mtxRecursive | mtxPriorityInheritance )
-
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : OS_MTX                                                                                         *
@@ -60,20 +49,11 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   mtx             : name of a pointer to mutex object                                                              *
- *   type            : mutex type                                                                                     *
- *                     mtxNormal:                       normal    priority protect     mutex                          *
- *                     mtxRecursive:                    recursive priority protect     mutex                          *
- *                     mtxPriorityProtect:              normal    priority protect     mutex                          *
- *                     mtxPriorityInheritance:          normal    priority inheritance mutex                          *
- *                     mtxNormalPriorityProtect:        normal    priority protect     mutex                          *
- *                     mtxRecursivePriorityProtect:     recursive priority protect     mutex                          *
- *                     mtxNormalPriorityInheritance:    normal    priority inheritance mutex                          *
- *                     mtxRecursivePriorityInheritance: recursive priority inheritance mutex                          *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_MTX( mtx, type )                               \
-                       mtx_t mtx##__mtx = _MTX_INIT( (type)&mtxMASK ); \
+#define             OS_MTX( mtx )                     \
+                       mtx_t mtx##__mtx = _MTX_INIT(); \
                        mtx_id mtx = & mtx##__mtx
 
 /**********************************************************************************************************************
@@ -84,20 +64,11 @@ extern "C" {
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   mtx             : name of a pointer to mutex object                                                              *
- *   type            : mutex type                                                                                     *
- *                     mtxNormal:                       normal    priority protect     mutex                          *
- *                     mtxRecursive:                    recursive priority protect     mutex                          *
- *                     mtxPriorityProtect:              normal    priority protect     mutex                          *
- *                     mtxPriorityInheritance:          normal    priority inheritance mutex                          *
- *                     mtxNormalPriorityProtect:        normal    priority protect     mutex                          *
- *                     mtxRecursivePriorityProtect:     recursive priority protect     mutex                          *
- *                     mtxNormalPriorityInheritance:    normal    priority inheritance mutex                          *
- *                     mtxRecursivePriorityInheritance: recursive priority inheritance mutex                          *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_MTX( mtx, type )                               \
-                static mtx_t mtx##__mtx = _MTX_INIT( (type)&mtxMASK ); \
+#define         static_MTX( mtx )                     \
+                static mtx_t mtx##__mtx = _MTX_INIT(); \
                 static mtx_id mtx = & mtx##__mtx
 
 /**********************************************************************************************************************
@@ -106,16 +77,7 @@ extern "C" {
  *                                                                                                                    *
  * Description       : create and initilize a mutex object                                                            *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   type            : mutex type                                                                                     *
- *                     mtxNormal:                       normal    priority protect     mutex                          *
- *                     mtxRecursive:                    recursive priority protect     mutex                          *
- *                     mtxPriorityProtect:              normal    priority protect     mutex                          *
- *                     mtxPriorityInheritance:          normal    priority inheritance mutex                          *
- *                     mtxNormalPriorityProtect:        normal    priority protect     mutex                          *
- *                     mtxRecursivePriorityProtect:     recursive priority protect     mutex                          *
- *                     mtxNormalPriorityInheritance:    normal    priority inheritance mutex                          *
- *                     mtxRecursivePriorityInheritance: recursive priority inheritance mutex                          *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return            : mutex object                                                                                   *
  *                                                                                                                    *
@@ -123,8 +85,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define                MTX_INIT( type ) \
-                      _MTX_INIT( (type)&mtxMASK )
+#define                MTX_INIT() \
+                      _MTX_INIT()
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -132,16 +94,7 @@ extern "C" {
  *                                                                                                                    *
  * Description       : create and initilize a mutex object                                                            *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   type            : mutex type                                                                                     *
- *                     mtxNormal:                       normal    priority protect     mutex                          *
- *                     mtxRecursive:                    recursive priority protect     mutex                          *
- *                     mtxPriorityProtect:              normal    priority protect     mutex                          *
- *                     mtxPriorityInheritance:          normal    priority inheritance mutex                          *
- *                     mtxNormalPriorityProtect:        normal    priority protect     mutex                          *
- *                     mtxRecursivePriorityProtect:     recursive priority protect     mutex                          *
- *                     mtxNormalPriorityInheritance:    normal    priority inheritance mutex                          *
- *                     mtxRecursivePriorityInheritance: recursive priority inheritance mutex                          *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return            : pointer to mutex object                                                                        *
  *                                                                                                                    *
@@ -150,8 +103,8 @@ extern "C" {
  **********************************************************************************************************************/
 
 #ifndef __cplusplus
-#define                MTX_CREATE( type ) \
-               &(mtx_t)MTX_INIT( type )
+#define                MTX_CREATE() \
+               &(mtx_t)MTX_INIT()
 #endif
 
 /**********************************************************************************************************************
@@ -160,16 +113,7 @@ extern "C" {
  *                                                                                                                    *
  * Description       : create and initilize a new mutex object                                                        *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   type            : mutex type                                                                                     *
- *                     mtxNormal:                       normal    priority protect     mutex                          *
- *                     mtxRecursive:                    recursive priority protect     mutex                          *
- *                     mtxPriorityProtect:              normal    priority protect     mutex                          *
- *                     mtxPriorityInheritance:          normal    priority inheritance mutex                          *
- *                     mtxNormalPriorityProtect:        normal    priority protect     mutex                          *
- *                     mtxRecursivePriorityProtect:     recursive priority protect     mutex                          *
- *                     mtxNormalPriorityInheritance:    normal    priority inheritance mutex                          *
- *                     mtxRecursivePriorityInheritance: recursive priority inheritance mutex                          *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return            : pointer to mutex object (mutex successfully created)                                           *
  *   0               : mutex not created (not enough free memory)                                                     *
@@ -178,7 +122,7 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              mtx_id   mtx_create( unsigned type );
+              mtx_id   mtx_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -318,7 +262,7 @@ class Mutex : public mtx_t
 {
 public:
 
-	 Mutex( unsigned _type = mtxRecursive|mtxPriorityInheritance ): mtx_t(_MTX_INIT(_type&mtxMASK)) {}
+	 Mutex( void ): mtx_t(_MTX_INIT()) {}
 
 	~Mutex( void ) { mtx_kill(this); }
 

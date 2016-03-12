@@ -25,8 +25,11 @@ Features:
 ---------
 1.9
 - added fast mutex object
+- fast mutex is non-recursive and non-priority-inheritance
 - added example for new feature
 - fixed bug in semaphore initialization
+- removed mutex type from mutex initializer
+- mutex is recursive and priority inheritance
 ---------
 1.8
 - fixed bug in task initialization

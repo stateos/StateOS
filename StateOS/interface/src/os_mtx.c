@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    22.02.2016
+    @date    12.03.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-mtx_id mtx_create( unsigned type )
+mtx_id mtx_create( void )
 /* -------------------------------------------------------------------------- */
 {
 	mtx_id mtx;
@@ -37,11 +37,6 @@ mtx_id mtx_create( unsigned type )
 	port_sys_lock();
 
 	mtx = core_sys_alloc(sizeof(mtx_t));
-
-	if (mtx)
-	{
-		mtx->type = type & mtxMASK;
-	}
 
 	port_sys_unlock();
 
@@ -56,7 +51,6 @@ void priv_mtx_link( mtx_id mtx, tsk_id tsk )
 	mtx->owner = tsk;
 
 	if (tsk)
-	if (mtx->type & mtxPriorityInheritance)
 	{
 		mtx->list = tsk->list;
 		tsk->list = mtx;
@@ -119,7 +113,6 @@ unsigned priv_mtx_wait( mtx_id mtx, unsigned time, unsigned(*wait)() )
 	else
 	if (mtx->owner == Current)
 	{
-		if (mtx->type & mtxRecursive)
 		if (mtx->count < ~0U)
 		{
 			mtx->count++;
@@ -128,7 +121,6 @@ unsigned priv_mtx_wait( mtx_id mtx, unsigned time, unsigned(*wait)() )
 	}
 	else
 	{
-		if (mtx->type & mtxPriorityInheritance)
 		if (mtx->owner->prio < Current->prio)
 			core_tsk_prio(mtx->owner, Current->prio);
 
