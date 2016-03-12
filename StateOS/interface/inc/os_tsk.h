@@ -595,6 +595,7 @@ namespace ThisTask
 	void     yield     ( void )                          {        tsk_yield     ();                    }
 	void     flip      ( fun_id   _state )               {        tsk_flip      (_state);              }
 	void     stop      ( void )                          {        tsk_stop      ();                    }
+	void     detach    ( void )                          {        tsk_detach    ();                    }
 	void     prio      ( unsigned _prio )                {        tsk_prio      (_prio);               }
 
 	unsigned sleepUntil( unsigned _time )                { return tsk_sleepUntil(_time);               }
