@@ -26,7 +26,7 @@ Features
 - timers (one-shot, periodic)
 - c++ wrapper
 - all documentation is contained within the source files
-- examples and templates are in separate repositories [GitHub](https://github.com/stateos)
+- examples and templates are in separate repositories on [GitHub](https://github.com/stateos)
 
 Targets
 -------
