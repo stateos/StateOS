@@ -331,23 +331,6 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : tsk_detach                                                                                     *
- *                                                                                                                    *
- * Description       : stop current task and remove it from READY queue                                               *
- *                     all allocated resources remain in memory                                                       *
- *                                                                                                                    *
- * Parameters        : none                                                                                           *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-              void     tsk_detach( void );
-
-/**********************************************************************************************************************
- *                                                                                                                    *
  * Name              : tsk_kill                                                                                       *
  *                                                                                                                    *
  * Description       : reset the task object (not current task) and remove it from READY/DELAYED queue                *
@@ -595,7 +578,6 @@ namespace ThisTask
 	void     yield     ( void )                          {        tsk_yield     ();                    }
 	void     flip      ( fun_id   _state )               {        tsk_flip      (_state);              }
 	void     stop      ( void )                          {        tsk_stop      ();                    }
-	void     detach    ( void )                          {        tsk_detach    ();                    }
 	void     prio      ( unsigned _prio )                {        tsk_prio      (_prio);               }
 
 	unsigned sleepUntil( unsigned _time )                { return tsk_sleepUntil(_time);               }

@@ -32,8 +32,6 @@ Features:
 - fixed bug in semaphore initialization
 - removed mutex type from mutex initializer
 - mutex is recursive and priority inheritance
-- added tsk_detach function
-- added example for new feature
 ---------
 1.8
 - fixed bug in task initialization
