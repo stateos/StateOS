@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    01.03.2016
+    @date    14.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -391,7 +391,8 @@ class MessageQueueT : public msg_t
 
 public:
 
-	 MessageQueueT( void ): msg_t(_MSG_INIT(_limit, _data)) {}
+	constexpr explicit
+	MessageQueueT( void ): msg_t(_MSG_INIT(_limit, _data)) {}
 
 	~MessageQueueT( void ) { msg_kill(this); }
 

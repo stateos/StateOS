@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    01.03.2016
+    @date    14.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -268,7 +268,8 @@ class ConditionVariable : public cnd_t
 {
 public:
 
-	 ConditionVariable( void ): cnd_t(_CND_INIT()) {}
+	constexpr explicit
+	ConditionVariable( void ): cnd_t(_CND_INIT()) {}
 
 	~ConditionVariable( void ) { cnd_kill(this); }
 

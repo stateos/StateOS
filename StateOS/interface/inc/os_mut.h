@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    10.03.2016
+    @date    14.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -263,7 +263,8 @@ class FastMutex : public mut_t
 {
 public:
 
-	 FastMutex( void ): mut_t(_MUT_INIT()) {}
+	constexpr explicit
+	FastMutex( void ): mut_t(_MUT_INIT()) {}
 
 	~FastMutex( void ) { mut_kill(this); }
 

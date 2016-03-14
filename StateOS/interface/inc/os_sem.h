@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    01.03.2016
+    @date    14.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -401,7 +401,8 @@ class Semaphore : public sem_t
 {
 public:
 
-	 Semaphore( unsigned _init, unsigned _limit = semNormal ): sem_t(_SEM_INIT(_init, _limit)) {}
+	constexpr explicit
+	Semaphore( const unsigned _init, const unsigned _limit = semNormal ): sem_t(_SEM_INIT(_init, _limit)) {}
 
 	~Semaphore( void ) { sem_kill(this); }
 

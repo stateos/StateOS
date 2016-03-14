@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    01.03.2016
+    @date    14.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -251,7 +251,8 @@ class Event : public evt_t
 {
 public:
 
-	 Event( void ): evt_t(_EVT_INIT()) {}
+	constexpr explicit
+	Event( void ): evt_t(_EVT_INIT()) {}
 
 	~Event( void ) { evt_kill(this); }
 

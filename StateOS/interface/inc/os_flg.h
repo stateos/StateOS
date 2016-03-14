@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    01.03.2016
+    @date    14.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -338,7 +338,8 @@ class Flag : public flg_t
 {
 public:
 
-	 Flag( void ): flg_t(_FLG_INIT()) {}
+	constexpr explicit
+	Flag( void ): flg_t(_FLG_INIT()) {}
 
 	~Flag( void ) { flg_kill(this); }
 

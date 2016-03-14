@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    01.03.2016
+    @date    14.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -396,7 +396,8 @@ class MailBoxQueueT : public box_t
 
 public:
 
-	 MailBoxQueueT( void ): box_t(_BOX_INIT(_limit, sizeof(T), _data)) {}
+	constexpr explicit
+	MailBoxQueueT( void ): box_t(_BOX_INIT(_limit, sizeof(T), _data)) {}
 
 	~MailBoxQueueT( void ) { box_kill(this); }
 
