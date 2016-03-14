@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    12.03.2016
+    @date    14.03.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -270,7 +270,7 @@ struct __tmr
 	unsigned period;
 };
 
-#define _TMR_INIT() { 0 }
+#define _TMR_INIT( _state ) { /*queue*/0, /*id*/0, /*next*/0, /*prev*/0, /*state*/_state }
 
 /* -------------------------------------------------------------------------- */
 
