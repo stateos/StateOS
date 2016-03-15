@@ -220,15 +220,14 @@ static inline unsigned bar_wait( bar_id bar ) { return bar_waitFor(bar, INFINITE
 
 #ifdef __cplusplus
 
-class Barrier : public bar_t
+class Barrier : public __bar, private SafeEvent<__bar>
 {
 public:
 
 	constexpr explicit
-	Barrier( const unsigned _limit ): bar_t(_BAR_INIT(_limit)) {}
+	Barrier( const unsigned _limit ): __bar(_BAR_INIT(_limit)) {}
 
-	~Barrier( void ) { bar_kill(this); }
-
+	void     kill     ( void )            {        bar_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return bar_waitUntil(this, _time);  }
 	unsigned waitFor  ( unsigned _delay ) { return bar_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return bar_wait     (this);         }

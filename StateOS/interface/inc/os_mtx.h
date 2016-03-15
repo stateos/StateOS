@@ -258,15 +258,14 @@ static inline unsigned mtx_take( mtx_id mtx ) { return mtx_waitFor(mtx, IMMEDIAT
 
 #ifdef __cplusplus
 
-class Mutex : public mtx_t
+class Mutex : public __mtx, private SafeEvent<__mtx>
 {
 public:
 
 	constexpr explicit
-	Mutex( void ): mtx_t(_MTX_INIT()) {}
+	Mutex( void ): __mtx(_MTX_INIT()) {}
 
-	~Mutex( void ) { mtx_kill(this); }
-
+	void     kill     ( void )            {        mtx_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return mtx_waitUntil(this, _time);  }
 	unsigned waitFor  ( unsigned _delay ) { return mtx_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return mtx_wait     (this);         }

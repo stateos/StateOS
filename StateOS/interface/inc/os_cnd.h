@@ -264,15 +264,14 @@ static inline void     cnd_giveISR( cnd_id cnd, bool all ) { cnd_give(cnd, all);
 
 #ifdef __cplusplus
 
-class ConditionVariable : public cnd_t
+class ConditionVariable : public __cnd, private SafeEvent<__cnd>
 {
 public:
 
 	constexpr explicit
-	ConditionVariable( void ): cnd_t(_CND_INIT()) {}
+	ConditionVariable( void ): __cnd(_CND_INIT()) {}
 
-	~ConditionVariable( void ) { cnd_kill(this); }
-
+	void     kill     ( void )                         {        cnd_kill     (this);               }
 	unsigned waitUntil( mtx_id _mtx, unsigned _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
 	unsigned waitFor  ( mtx_id _mtx, unsigned _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
 	unsigned wait     ( mtx_id _mtx )                  { return cnd_wait     (this, _mtx);         }

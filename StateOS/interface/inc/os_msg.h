@@ -385,17 +385,16 @@ static inline unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sen
 #ifdef __cplusplus
 
 template<unsigned _limit>
-class MessageQueueT : public msg_t
+class MessageQueueT : public __msg, private SafeEvent<__msg>
 {
 	unsigned _data[_limit];
 
 public:
 
 	constexpr explicit
-	MessageQueueT( void ): msg_t(_MSG_INIT(_limit, _data)) {}
+	MessageQueueT( void ): __msg(_MSG_INIT(_limit, _data)) {}
 
-	~MessageQueueT( void ) { msg_kill(this); }
-
+	void     kill     ( void )                            {        msg_kill     (this);                }
 	unsigned waitUntil( unsigned _time  )                 { return msg_waitUntil(this,        _time);  }
 	unsigned waitFor  ( unsigned _delay )                 { return msg_waitFor  (this,        _delay); }
 	unsigned wait     ( void )                            { return msg_wait     (this);                }

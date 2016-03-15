@@ -25,6 +25,10 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+2.0
+- added some features to c++ code
+- added c++ examples
+---------
 1.9
 - added fast mutex object
 - fast mutex is non-recursive and non-priority-inheritance

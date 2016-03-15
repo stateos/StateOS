@@ -259,15 +259,14 @@ static inline unsigned mut_take( mut_id mut ) { return mut_waitFor(mut, IMMEDIAT
 
 #ifdef __cplusplus
 
-class FastMutex : public mut_t
+class FastMutex : public __mut, private SafeEvent<__mut>
 {
 public:
 
 	constexpr explicit
-	FastMutex( void ): mut_t(_MUT_INIT()) {}
+	FastMutex( void ): __mut(_MUT_INIT()) {}
 
-	~FastMutex( void ) { mut_kill(this); }
-
+	void     kill     ( void )            {        mut_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return mut_waitUntil(this, _time);  }
 	unsigned waitFor  ( unsigned _delay ) { return mut_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return mut_wait     (this);         }

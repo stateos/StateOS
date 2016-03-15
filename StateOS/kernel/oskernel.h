@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    07.03.2016
+    @date    14.03.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -205,3 +205,33 @@ void port_set_stack( void *top )
 #ifdef __cplusplus
 }
 #endif
+
+/* -------------------------------------------------------------------------- */
+
+#ifdef __cplusplus
+
+template <class T>
+class SafeEvent
+{
+public:
+	// an event can be safely destroyed if there are no tasks in the DELAYED queue
+	~SafeEvent( void )
+	{
+		while (reinterpret_cast<volatile T *>(this)->queue != nullptr);
+	}
+};
+
+template <class T>
+class SafeObject
+{
+public:
+	// an object can be safely destroyed if it is stopped
+	~SafeObject( void )
+	{
+		while (reinterpret_cast<volatile T *>(this)->id != ID_STOPPED);
+	}
+};
+
+#endif
+
+/* -------------------------------------------------------------------------- */

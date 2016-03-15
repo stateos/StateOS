@@ -397,15 +397,14 @@ static inline unsigned sem_giveISR( sem_id sem ) { return sem_sendFor(sem, IMMED
 
 #ifdef __cplusplus
 
-class Semaphore : public sem_t
+class Semaphore : public __sem, private SafeEvent<__sem>
 {
 public:
 
 	constexpr explicit
-	Semaphore( const unsigned _init, const unsigned _limit = semNormal ): sem_t(_SEM_INIT(_init, _limit)) {}
+	Semaphore( const unsigned _init, const unsigned _limit = semNormal ): __sem(_SEM_INIT(_init, _limit)) {}
 
-	~Semaphore( void ) { sem_kill(this); }
-
+	void     kill     ( void )            {        sem_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return sem_waitUntil(this, _time);  }
 	unsigned waitFor  ( unsigned _delay ) { return sem_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return sem_wait     (this);         }

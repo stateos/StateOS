@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    15.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -552,15 +552,14 @@ static inline void     tsk_resumeISR( tsk_id tsk, unsigned event ) { tsk_resume(
 
 #ifdef __cplusplus
 
-class TaskBase : public tsk_t
+class TaskBase : public __tsk, private SafeObject<__tsk>
 {
 public:
 
 	constexpr explicit
-	TaskBase( const unsigned _prio, const fun_id _state, const os_id _top ): tsk_t(_TSK_INIT(_prio, _state, _top)) {}
+	TaskBase( const unsigned _prio, const fun_id _state, const os_id _top ): __tsk(_TSK_INIT(_prio, _state, _top)) {}
 
-	~TaskBase( void ) { tsk_kill(this); }
-
+	void     kill      ( void )                          {        tsk_kill      (this);                }
 	void     start     ( void )                          {        tsk_start     (this);                }
 	void     startFrom ( fun_id   _state )               {        tsk_startFrom (this, _state);        }
 	void     resume    ( unsigned _event )               {        tsk_resume    (this, _event);        }
@@ -605,13 +604,23 @@ public:
 	TaskT( const unsigned _prio, const fun_id _state ): TaskBase(_prio, _state, _stack+ASIZE(_size)) {}
 };
 
+typedef TaskT<OS_STACK_SIZE> Task;
+
 #endif
 
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
 
-typedef TaskT<OS_STACK_SIZE> Task;
+template<unsigned _size>
+class startTaskT : public TaskT<_size>
+{
+public:
+
+	startTaskT( const unsigned _prio, const fun_id _state ): TaskT<_size>(_prio, _state) { tsk_start(this); }
+};
+
+typedef startTaskT<OS_STACK_SIZE> startTask;
 
 #endif
 

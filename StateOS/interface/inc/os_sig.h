@@ -337,15 +337,15 @@ static inline void     sig_clearISR( sig_id sig ) { sig_clear(sig); }
 
 #ifdef __cplusplus
 
-class Signal : public sig_t
+
+class Signal : public __sig, private SafeEvent<__sig>
 {
 public:
 
 	constexpr explicit
-	Signal( const unsigned _type = sigClear ): sig_t(_SIG_INIT(_type & sigMASK)) {}
+	Signal( const unsigned _type = sigClear ): __sig(_SIG_INIT(_type & sigMASK)) {}
 
-	~Signal( void ) { sig_kill(this); }
-
+	void     kill     ( void )            {        sig_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return sig_waitUntil(this, _time);  }
 	unsigned waitFor  ( unsigned _delay ) { return sig_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return sig_wait     (this);         }

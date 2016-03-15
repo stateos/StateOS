@@ -390,17 +390,16 @@ static inline unsigned box_giveISR( box_id box, void *data ) { return box_sendFo
 #ifdef __cplusplus
 
 template<class T, unsigned _limit>
-class MailBoxQueueT : public box_t
+class MailBoxQueueT : public __box, private SafeEvent<__box>
 {
 	T _data[_limit];
 
 public:
 
 	constexpr explicit
-	MailBoxQueueT( void ): box_t(_BOX_INIT(_limit, sizeof(T), _data)) {}
+	MailBoxQueueT( void ): __box(_BOX_INIT(_limit, sizeof(T), _data)) {}
 
-	~MailBoxQueueT( void ) { box_kill(this); }
-
+	void     kill     ( void )                      {        box_kill     (this);                }
 	unsigned waitUntil( T *_data, unsigned _time  ) { return box_waitUntil(this, _data, _time);  }
 	unsigned waitFor  ( T *_data, unsigned _delay ) { return box_waitFor  (this, _data, _delay); }
 	unsigned wait     ( T *_data )                  { return box_wait     (this, _data);         }

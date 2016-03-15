@@ -247,15 +247,14 @@ static inline void     evt_giveISR( evt_id evt, unsigned event ) { evt_give(evt,
 
 #ifdef __cplusplus
 
-class Event : public evt_t
+class Event : public __evt, private SafeEvent<__evt>
 {
 public:
 
 	constexpr explicit
-	Event( void ): evt_t(_EVT_INIT()) {}
+	Event( void ): __evt(_EVT_INIT()) {}
 
-	~Event( void ) { evt_kill(this); }
-
+	void     kill     ( void )            {        evt_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return evt_waitUntil(this, _time);  }
 	unsigned waitFor  ( unsigned _delay ) { return evt_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return evt_wait     (this);         }

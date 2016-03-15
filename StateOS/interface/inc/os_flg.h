@@ -334,15 +334,14 @@ static inline void     flg_giveISR( flg_id flg, unsigned flags ) { flg_give(flg,
 
 #ifdef __cplusplus
 
-class Flag : public flg_t
+class Flag : public __flg, private SafeEvent<__flg>
 {
 public:
 
 	constexpr explicit
-	Flag( void ): flg_t(_FLG_INIT()) {}
+	Flag( void ): __flg(_FLG_INIT()) {}
 
-	~Flag( void ) { flg_kill(this); }
-
+	void     kill     ( void )                                             {        flg_kill     (this);                        }
 	unsigned waitUntil( unsigned _flags, unsigned _mode, unsigned _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
 	unsigned waitFor  ( unsigned _flags, unsigned _mode, unsigned _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
 	unsigned wait     ( unsigned _flags, unsigned _mode = flgAllAccept )   { return flg_wait     (this, _flags, _mode);         }

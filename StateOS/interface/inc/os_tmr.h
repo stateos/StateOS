@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    15.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -354,15 +354,14 @@ static inline void     tmr_delayISR( unsigned delay ) { System.tmr->delay = dela
 
 #ifdef __cplusplus
 
-class Timer : public tmr_t
+class Timer : public __tmr, private SafeObject<__tmr>
 {
 public:
 
 	constexpr explicit
-	Timer( const fun_id _state = 0 ): tmr_t(_TMR_INIT(_state)) {}
+	Timer( const fun_id _state = 0 ): __tmr(_TMR_INIT(_state)) {}
 
-	~Timer( void ) { tmr_kill(this); }
-
+	void kill         ( void )                            {        tmr_kill         (this);                       }
 	void startUntil   ( unsigned _time   )                {        tmr_startUntil   (this, _time,   this->state); }
 	void startUntil   ( unsigned _time,   fun_id _state ) {        tmr_startUntil   (this, _time,        _state); }
 	void startFor     ( unsigned _delay  )                {        tmr_startFor     (this, _delay,  this->state); }
@@ -385,8 +384,47 @@ public:
 
 namespace ThisTimer
 {
-	void flipISR      ( fun_id   _state )                 {        tmr_flipISR            (_state);               }
-	void delayISR     ( unsigned _delay )                 {        tmr_delayISR           (_delay);               }
+	void flipISR ( fun_id   _state ) { tmr_flipISR (_state); }
+	void delayISR( unsigned _delay ) { tmr_delayISR(_delay); }
+};
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#ifdef __cplusplus
+
+class startTimerUntil : public Timer
+{
+public:
+
+	startTimerUntil( const unsigned _time, const fun_id _state ): Timer() { tmr_startUntil(this, _time, _state); }
+};
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#ifdef __cplusplus
+
+class startTimerFor : public Timer
+{
+public:
+
+	startTimerFor( const unsigned _delay, const fun_id _state ): Timer() { tmr_startFor(this, _delay, _state); }
+};
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#ifdef __cplusplus
+
+class startTimerPeriodic : public Timer
+{
+public:
+
+	startTimerPeriodic( const unsigned _period, const fun_id _state ): Timer() { tmr_startPeriodic(this, _period, _state); }
 };
 
 #endif
