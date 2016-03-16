@@ -1,0 +1,32 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+auto led = Led();
+auto mtx = Mutex();
+auto cnd = ConditionVariable();
+
+void slave()
+{
+	mtx.wait();
+	cnd.wait(&mtx);
+	led.tick();
+	mtx.give();
+}
+
+void master()
+{
+	ThisTask::delay(SEC);
+	mtx.wait();
+	cnd.give(cndOne);
+	mtx.give();
+}
+
+auto sla = Task(0, slave);
+auto mas = Task(0, master);
+
+int main()
+{
+	sla.start();
+	mas.start();
+	ThisTask::stop();
+}

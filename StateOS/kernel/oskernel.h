@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    16.03.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -220,6 +220,12 @@ public:
 		while (reinterpret_cast<volatile T *>(this)->queue != nullptr);
 	}
 };
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#ifdef __cplusplus
 
 template <class T>
 class SafeObject
