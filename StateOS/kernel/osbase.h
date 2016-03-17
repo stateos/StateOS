@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    17.03.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -346,7 +346,7 @@ struct __sft // context saved by the software
 	unsigned r9;
 	unsigned r10;
 	unsigned r11;
-	unsigned exc_return;
+	unsigned lr; // EXC_RETURN
 };
 
 struct __ctx // context saved by the hardware

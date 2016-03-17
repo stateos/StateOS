@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    07.03.2016
+    @date    17.03.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -279,7 +279,7 @@ os_id priv_tsk_prepare( tsk_id cur )
 
 	sft_id sft = (sft_id)ctx - 1;
 
-	sft->exc_return = ~2U; // return from psp
+	sft->lr  = ~2U; // EXC_RETURN: return from psp
 
 	return sft;
 }

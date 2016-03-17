@@ -28,5 +28,6 @@ int main()
 {
 	sla.start();
 	mas.start();
+
 	ThisTask::stop();
 }
