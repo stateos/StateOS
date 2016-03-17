@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    17.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -247,7 +247,7 @@ static inline void     evt_giveISR( evt_id evt, unsigned event ) { evt_give(evt,
 
 #ifdef __cplusplus
 
-class Event : public __evt, private SafeEvent<__evt>
+class Event : public __evt, private EventGuard<__evt>
 {
 public:
 

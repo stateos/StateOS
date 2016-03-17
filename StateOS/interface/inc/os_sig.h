@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    17.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -338,7 +338,7 @@ static inline void     sig_clearISR( sig_id sig ) { sig_clear(sig); }
 #ifdef __cplusplus
 
 
-class Signal : public __sig, private SafeEvent<__sig>
+class Signal : public __sig, private EventGuard<__sig>
 {
 public:
 

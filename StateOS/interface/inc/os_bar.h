@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    17.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -220,7 +220,7 @@ static inline unsigned bar_wait( bar_id bar ) { return bar_waitFor(bar, INFINITE
 
 #ifdef __cplusplus
 
-class Barrier : public __bar, private SafeEvent<__bar>
+class Barrier : public __bar, private EventGuard<__bar>
 {
 public:
 

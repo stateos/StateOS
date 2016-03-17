@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    17.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -264,7 +264,7 @@ static inline void     cnd_giveISR( cnd_id cnd, bool all ) { cnd_give(cnd, all);
 
 #ifdef __cplusplus
 
-class ConditionVariable : public __cnd, private SafeEvent<__cnd>
+class ConditionVariable : public __cnd, private EventGuard<__cnd>
 {
 public:
 

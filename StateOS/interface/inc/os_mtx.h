@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    17.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -258,7 +258,7 @@ static inline unsigned mtx_take( mtx_id mtx ) { return mtx_waitFor(mtx, IMMEDIAT
 
 #ifdef __cplusplus
 
-class Mutex : public __mtx, private SafeEvent<__mtx>
+class Mutex : public __mtx, private MutexGuard<__mtx>
 {
 public:
 

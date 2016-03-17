@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    16.03.2016
+    @date    17.03.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -211,13 +211,14 @@ void port_set_stack( void *top )
 #ifdef __cplusplus
 
 template <class T>
-class SafeEvent
+class EventGuard
 {
 public:
 	// an event can be safely destroyed if there are no tasks in the DELAYED queue
-	~SafeEvent( void )
+	~EventGuard( void )
 	{
-		while (reinterpret_cast<volatile T *>(this)->queue != nullptr);
+		auto obj = reinterpret_cast<volatile T *>(this);
+		while (obj->queue != nullptr);
 	}
 };
 
@@ -228,13 +229,32 @@ public:
 #ifdef __cplusplus
 
 template <class T>
-class SafeObject
+class MutexGuard
 {
 public:
-	// an object can be safely destroyed if it is stopped
-	~SafeObject( void )
+	// a mutex (Mutex, FastMutex) can be safely destroyed if it has no owner
+	~MutexGuard( void )
 	{
-		while (reinterpret_cast<volatile T *>(this)->id != ID_STOPPED);
+		auto obj = reinterpret_cast<volatile T *>(this);
+		while (obj->owner != nullptr);
+	}
+};
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#ifdef __cplusplus
+
+template <class T>
+class ObjectGuard
+{
+public:
+	// an object (Timer, Task) can be safely destroyed if it is stopped
+	~ObjectGuard( void )
+	{
+		auto obj = reinterpret_cast<volatile T *>(this);
+		while (obj->id != ID_STOPPED);
 	}
 };
 

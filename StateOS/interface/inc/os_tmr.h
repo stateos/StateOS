@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    15.03.2016
+    @date    17.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -354,7 +354,7 @@ static inline void     tmr_delayISR( unsigned delay ) { System.tmr->delay = dela
 
 #ifdef __cplusplus
 
-class Timer : public __tmr, private SafeObject<__tmr>
+class Timer : public __tmr, private ObjectGuard<__tmr>
 {
 public:
 

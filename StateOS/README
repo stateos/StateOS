@@ -28,6 +28,7 @@ Features:
 2.0
 - added some features to c++ code
 - added c++ examples
+- added c++ class destructors guarding
 ---------
 1.9
 - added fast mutex object

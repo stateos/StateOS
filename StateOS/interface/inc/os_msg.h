@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    17.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -385,7 +385,7 @@ static inline unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sen
 #ifdef __cplusplus
 
 template<unsigned _limit>
-class MessageQueueT : public __msg, private SafeEvent<__msg>
+class MessageQueueT : public __msg, private EventGuard<__msg>
 {
 	unsigned _data[_limit];
 

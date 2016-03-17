@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    14.03.2016
+    @date    17.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -259,7 +259,7 @@ static inline unsigned mut_take( mut_id mut ) { return mut_waitFor(mut, IMMEDIAT
 
 #ifdef __cplusplus
 
-class FastMutex : public __mut, private SafeEvent<__mut>
+class FastMutex : public __mut, private MutexGuard<__mut>
 {
 public:
 
