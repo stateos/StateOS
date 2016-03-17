@@ -264,6 +264,17 @@ static inline void     cnd_giveISR( cnd_id cnd, bool all ) { cnd_give(cnd, all);
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : ConditionVariable                                                                              *
+ *                                                                                                                    *
+ * Description       : create and initilize a condition variable object                                               *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *                   : none                                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 class ConditionVariable : public __cnd, private EventGuard<__cnd>
 {
 public:

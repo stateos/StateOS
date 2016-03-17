@@ -354,6 +354,17 @@ static inline void     tmr_delayISR( unsigned delay ) { System.tmr->delay = dela
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : Timer                                                                                          *
+ *                                                                                                                    *
+ * Description       : create and initilize a timer object                                                            *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *                   : none                                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 class Timer : public __tmr, private ObjectGuard<__tmr>
 {
 public:
@@ -382,6 +393,14 @@ public:
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Namespace         : ThisTimer                                                                                      *
+ *                                                                                                                    *
+ * Description       : provide set of functions for Timer classes                                                     *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 namespace ThisTimer
 {
 	void flipISR ( fun_id   _state ) { tmr_flipISR (_state); }
@@ -393,6 +412,20 @@ namespace ThisTimer
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : startTimerUntil                                                                                *
+ *                                                                                                                    *
+ * Description       : create and initilize a timer object                                                            *
+ *                     and start one-shot timer until given timepoint and then launch the callback procedure          *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   time            : timepoint value                                                                                *
+ *   state           : callback procedure                                                                             *
+ *                     0: no callback                                                                                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 class startTimerUntil : public Timer
 {
@@ -407,6 +440,22 @@ public:
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : startTimerFor                                                                                  *
+ *                                                                                                                    *
+ * Description       : create and initilize a timer object                                                            *
+ *                     and start one-shot timer for given duration of time and then launch the callback procedure     *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   delay           : duration of time (maximum number of ticks to countdownd)                                       *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *   state           : callback procedure                                                                             *
+ *                     0: no callback                                                                                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 class startTimerFor : public Timer
 {
 public:
@@ -419,6 +468,23 @@ public:
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : startTimerPeriodic                                                                             *
+ *                                                                                                                    *
+ * Description       : create and initilize a timer object                                                            *
+ *                     and start periodic timer for given duration of time and then launch the callback procedure     *
+ *                     do this periodically                                                                           *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   period          : duration of time (maximum number of ticks to countdownd)                                       *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *   state           : callback procedure                                                                             *
+ *                     0: no callback                                                                                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 class startTimerPeriodic : public Timer
 {

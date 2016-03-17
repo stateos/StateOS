@@ -247,6 +247,17 @@ static inline void     evt_giveISR( evt_id evt, unsigned event ) { evt_give(evt,
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : Event                                                                                          *
+ *                                                                                                                    *
+ * Description       : create and initilize an event object                                                           *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *                   : none                                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 class Event : public __evt, private EventGuard<__evt>
 {
 public:

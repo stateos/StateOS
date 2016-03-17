@@ -384,6 +384,17 @@ static inline unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sen
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : MessageQueue                                                                                   *
+ *                                                                                                                    *
+ * Description       : create and initilize a message queue object                                                    *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   limit           : size of a queue (max number of stored messages)                                                *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 template<unsigned _limit>
 class MessageQueueT : public __msg, private EventGuard<__msg>
 {

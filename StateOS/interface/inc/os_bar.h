@@ -220,6 +220,17 @@ static inline unsigned bar_wait( bar_id bar ) { return bar_waitFor(bar, INFINITE
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : Barrier                                                                                        *
+ *                                                                                                                    *
+ * Description       : create and initilize a barrier object                                                          *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   limit           : number of tasks that must call wait[Until|For] function to release the barrier object          *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 class Barrier : public __bar, private EventGuard<__bar>
 {
 public:

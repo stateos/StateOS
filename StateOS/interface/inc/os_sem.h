@@ -397,6 +397,21 @@ static inline unsigned sem_giveISR( sem_id sem ) { return sem_sendFor(sem, IMMED
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : Semaphore                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a semaphore object                                                        *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   init            : initial value of semaphore counter                                                             *
+ *   limit           : maximum value of semaphore counter                                                             *
+ *                     semBinary: binary semaphore                                                                    *
+ *                     semNormal, semCounting: counting semaphore (default)                                           *
+ *                     otherwise: limited semaphore                                                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 class Semaphore : public __sem, private EventGuard<__sem>
 {
 public:

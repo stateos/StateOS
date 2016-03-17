@@ -552,6 +552,20 @@ static inline void     tsk_resumeISR( tsk_id tsk, unsigned event ) { tsk_resume(
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : TaskBase                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize a task object, internal                                                   *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *   top             : initial value of task's stack pointer                                                          *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 class TaskBase : public __tsk, private ObjectGuard<__tsk>
 {
 public:
@@ -571,6 +585,14 @@ public:
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Namespace         : ThisTask                                                                                       *
+ *                                                                                                                    *
+ * Description       : provide set of functions for Task classes                                                      *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 namespace ThisTask
 {
@@ -593,6 +615,20 @@ namespace ThisTask
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : TaskT                                                                                          *
+ *                                                                                                                    *
+ * Description       : create and initilize complete work area for task object                                        *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   size            : size of task private stack (in bytes)                                                          *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 template<unsigned _size>
 class TaskT : public TaskBase
 {
@@ -604,6 +640,19 @@ public:
 	TaskT( const unsigned _prio, const fun_id _state ): TaskBase(_prio, _state, _stack+ASIZE(_size)) {}
 };
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : Task                                                                                           *
+ *                                                                                                                    *
+ * Description       : create and initilize complete work area for task object with default stack size                *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 typedef TaskT<OS_STACK_SIZE> Task;
 
 #endif
@@ -612,6 +661,21 @@ typedef TaskT<OS_STACK_SIZE> Task;
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : startTaskT                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize complete work area for task object                                        *
+ *                     and start task object                                                                          *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   size            : size of task private stack (in bytes)                                                          *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 template<unsigned _size>
 class startTaskT : public TaskT<_size>
 {
@@ -619,6 +683,20 @@ public:
 
 	startTaskT( const unsigned _prio, const fun_id _state ): TaskT<_size>(_prio, _state) { tsk_start(this); }
 };
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : startTask                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize complete work area for task object with default stack size                *
+ *                     and start task object                                                                          *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 typedef startTaskT<OS_STACK_SIZE> startTask;
 

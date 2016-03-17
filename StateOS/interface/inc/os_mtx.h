@@ -258,6 +258,17 @@ static inline unsigned mtx_take( mtx_id mtx ) { return mtx_waitFor(mtx, IMMEDIAT
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : Mutex                                                                                          *
+ *                                                                                                                    *
+ * Description       : create and initilize a mutex object                                                            *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *                   : none                                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 class Mutex : public __mtx, private MutexGuard<__mtx>
 {
 public:

@@ -259,6 +259,17 @@ static inline unsigned mut_take( mut_id mut ) { return mut_waitFor(mut, IMMEDIAT
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : FastMutex                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a fast mutex object                                                       *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *                   : none                                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 class FastMutex : public __mut, private MutexGuard<__mut>
 {
 public:

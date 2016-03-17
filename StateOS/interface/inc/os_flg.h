@@ -334,6 +334,17 @@ static inline void     flg_giveISR( flg_id flg, unsigned flags ) { flg_give(flg,
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : Flag                                                                                           *
+ *                                                                                                                    *
+ * Description       : create and initilize a flag object                                                             *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *                   : none                                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 class Flag : public __flg, private EventGuard<__flg>
 {
 public:

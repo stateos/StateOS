@@ -337,6 +337,18 @@ static inline void     sig_clearISR( sig_id sig ) { sig_clear(sig); }
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : Signal                                                                                         *
+ *                                                                                                                    *
+ * Description       : create and initilize a signal object                                                           *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   type            : signal type                                                                                    *
+ *                     sigClear:   auto clearing signal (default)                                                     *
+ *                     sigProtect: protected signal                                                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
 
 class Signal : public __sig, private EventGuard<__sig>
 {

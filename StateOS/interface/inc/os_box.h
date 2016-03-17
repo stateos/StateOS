@@ -389,6 +389,18 @@ static inline unsigned box_giveISR( box_id box, void *data ) { return box_sendFo
 
 #ifdef __cplusplus
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : MailBoxQueue                                                                                   *
+ *                                                                                                                    *
+ * Description       : create and initilize a mailbox queue object                                                    *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   T               : class of a single mail                                                                         *
+ *   limit           : size of a queue (max number of stored mails)                                                   *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
 template<class T, unsigned _limit>
 class MailBoxQueueT : public __box, private EventGuard<__box>
 {
