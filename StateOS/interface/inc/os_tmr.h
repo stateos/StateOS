@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -39,6 +39,37 @@ extern "C" {
  * Name              : timer                                                                                          *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
+struct __tmr
+{
+	tsk_id   queue; // inherited from object
+	unsigned id;    // inherited from object
+	tmr_id   next;  // inherited from object
+	tmr_id   prev;  // inherited from object
+
+	fun_id   state; // callback procedure
+	unsigned start;
+	unsigned delay;
+	unsigned period;
+};
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _TMR_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a timer object                                                            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   state           : callback procedure                                                                             *
+ *                     0: no callback                                                                                 *
+ *                                                                                                                    *
+ * Return            : timer object                                                                                   *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _TMR_INIT( _state ) { 0, 0, 0, 0, _state, 0, 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -369,7 +400,7 @@ class Timer : public __tmr, private ObjectGuard<__tmr>
 {
 public:
 
-	constexpr explicit
+	explicit
 	Timer( const fun_id _state = 0 ): __tmr(_TMR_INIT(_state)) {}
 
 	void kill         ( void )                            {        tmr_kill         (this);                       }
@@ -397,7 +428,7 @@ public:
  *                                                                                                                    *
  * Namespace         : ThisTimer                                                                                      *
  *                                                                                                                    *
- * Description       : provide set of functions for Timer classes                                                     *
+ * Description       : provide set of functions for Current Timer                                                     *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -405,7 +436,7 @@ namespace ThisTimer
 {
 	void flipISR ( fun_id   _state ) { tmr_flipISR (_state); }
 	void delayISR( unsigned _delay ) { tmr_delayISR(_delay); }
-};
+}
 
 #endif
 
@@ -431,6 +462,7 @@ class startTimerUntil : public Timer
 {
 public:
 
+	explicit
 	startTimerUntil( const unsigned _time, const fun_id _state ): Timer() { tmr_startUntil(this, _time, _state); }
 };
 
@@ -460,6 +492,7 @@ class startTimerFor : public Timer
 {
 public:
 
+	explicit
 	startTimerFor( const unsigned _delay, const fun_id _state ): Timer() { tmr_startFor(this, _delay, _state); }
 };
 
@@ -490,6 +523,7 @@ class startTimerPeriodic : public Timer
 {
 public:
 
+	explicit
 	startTimerPeriodic( const unsigned _period, const fun_id _state ): Timer() { tmr_startPeriodic(this, _period, _state); }
 };
 

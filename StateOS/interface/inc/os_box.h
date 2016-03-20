@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -39,6 +39,56 @@ extern "C" {
  * Name              : mailbox queue                                                                                  *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
+typedef struct __box
+{
+	tsk_id   queue; // inherited from semaphore
+	unsigned count; // inherited from semaphore
+	unsigned limit; // inherited from semaphore
+
+	unsigned first; // first element to read from queue
+	unsigned next;  // next element to write into queue
+	char    *data;  // queue data
+	unsigned size;  // size of a single mail (in bytes)
+
+}	box_t, *box_id;
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _BOX_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a mailbox queue object                                                    *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : size of a queue (max number of stored mails)                                                   *
+ *   size            : size of a single mail (in bytes)                                                               *
+ *   data            : mailbox queue data buffer                                                                      *
+ *                                                                                                                    *
+ * Return            : mailbox queue object                                                                           *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _BOX_INIT( _limit, _size, _data ) { 0, 0, _limit, 0, 0, _data, _size }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _BOX_DATA                                                                                      *
+ *                                                                                                                    *
+ * Description       : create a mailbox queue data buffer                                                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : size of a queue (max number of stored mails)                                                   *
+ *   size            : size of a single mail (in bytes)                                                               *
+ *                                                                                                                    *
+ * Return            : mailbox queue data buffer                                                                      *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _BOX_DATA( _limit, _size ) (char[_limit*_size]){ 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -408,7 +458,7 @@ class MailBoxQueueT : public __box, private EventGuard<__box>
 
 public:
 
-	constexpr explicit
+	explicit
 	MailBoxQueueT( void ): __box(_BOX_INIT(_limit, sizeof(T), _data)) {}
 
 	void     kill     ( void )                      {        box_kill     (this);                }

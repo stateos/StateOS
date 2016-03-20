@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,6 +40,31 @@ extern "C" {
  *                     like a POSIX pthread_barrier_t                                                                 *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
+typedef struct __bar
+{
+	tsk_id   queue; // next process in the DELAYED queue
+	unsigned count; // barrier's current value
+	unsigned limit; // barrier's value limit
+
+}	bar_t, *bar_id;
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _BAR_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a barrier object                                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object      *
+ *                                                                                                                    *
+ * Return            : barrier object                                                                                 *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _BAR_INIT( _limit ) { 0, _limit, _limit }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -235,7 +260,7 @@ class Barrier : public __bar, private EventGuard<__bar>
 {
 public:
 
-	constexpr explicit
+	explicit
 	Barrier( const unsigned _limit ): __bar(_BAR_INIT(_limit)) {}
 
 	void     kill     ( void )            {        bar_kill     (this);         }

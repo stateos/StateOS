@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,6 +40,15 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __flg
+{
+	tsk_id   queue; // next process in the DELAYED queue
+	unsigned flags; // flag's current value
+
+}	flg_t, *flg_id;
+
+/* -------------------------------------------------------------------------- */
+
 #define flgOne       ( 0U << 0 )
 #define flgAll       ( 1U << 0 )
 #define flgAccept    ( 0U << 1 )
@@ -50,6 +59,22 @@ extern "C" {
 #define flgAllAccept ( flgAll | flgAccept )
 #define flgOneIgnore ( flgOne | flgIgnore )
 #define flgAllIgnore ( flgAll | flgIgnore )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _FLG_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a flag object                                                             *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : flag object                                                                                    *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _FLG_INIT() { 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -349,7 +374,7 @@ class Flag : public __flg, private EventGuard<__flg>
 {
 public:
 
-	constexpr explicit
+	explicit
 	Flag( void ): __flg(_FLG_INIT()) {}
 
 	void     kill     ( void )                                             {        flg_kill     (this);                        }

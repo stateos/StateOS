@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,6 +40,53 @@ extern "C" {
  *                     message is an 'unsigned int' data type; for other data types use mailbox queue                 *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
+typedef struct __msg
+{
+	tsk_id   queue; // inherited from semaphore
+	unsigned count; // inherited from semaphore
+	unsigned limit; // inherited from semaphore
+
+	unsigned first; // first element to read from queue
+	unsigned next;  // next element to write into queue
+	unsigned*data;  // queue data
+
+}	msg_t, *msg_id;
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _MSG_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a message queue object                                                    *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : size of a queue (max number of stored messages)                                                *
+ *   data            : message queue data buffer                                                                      *
+ *                                                                                                                    *
+ * Return            : message queue object                                                                           *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _MSG_INIT( _limit, _data ) { 0, 0, _limit, 0, 0, _data }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _MSG_DATA                                                                                      *
+ *                                                                                                                    *
+ * Description       : create a message queue data buffer                                                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : size of a queue (max number of stored messages)                                                *
+ *                                                                                                                    *
+ * Return            : message queue data buffer                                                                      *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _MSG_DATA( _limit ) (unsigned[_limit]){ 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -402,7 +449,7 @@ class MessageQueueT : public __msg, private EventGuard<__msg>
 
 public:
 
-	constexpr explicit
+	explicit
 	MessageQueueT( void ): __msg(_MSG_INIT(_limit, _data)) {}
 
 	void     kill     ( void )                            {        msg_kill     (this);                }

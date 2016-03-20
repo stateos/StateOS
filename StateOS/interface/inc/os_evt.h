@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -39,6 +39,28 @@ extern "C" {
  * Name              : event                                                                                          *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
+typedef struct __evt
+{
+	tsk_id   queue; // next process in the DELAYED queue
+
+}	evt_t, *evt_id;
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _EVT_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize an event object                                                           *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : event object                                                                                   *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _EVT_INIT() { 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -262,7 +284,7 @@ class Event : public __evt, private EventGuard<__evt>
 {
 public:
 
-	constexpr explicit
+	explicit
 	Event( void ): __evt(_EVT_INIT()) {}
 
 	void     kill     ( void )            {        evt_kill     (this);         }

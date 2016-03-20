@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,9 +40,38 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __sig
+{
+	tsk_id   queue; // next process in the DELAYED queue
+	unsigned flag;  // signal's current value
+	unsigned type;  // signal type: sigClear, sigProtect
+
+}	sig_t, *sig_id;
+
+/* -------------------------------------------------------------------------- */
+
 #define sigClear     ( 0U << 0 ) // auto clearing signal
 #define sigProtect   ( 1U << 0 ) // protected signal
 #define sigMASK      ( 1U )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _SIG_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize an signal object                                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   type            : signal type                                                                                    *
+ *                     sigClear:   auto clearing signal                                                               *
+ *                     sigProtect: protected signal                                                                   *
+ *                                                                                                                    *
+ * Return            : signal object                                                                                  *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _SIG_INIT( _type ) { 0, 0, (_type)&sigMASK }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -58,8 +87,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_SIG( sig, type )                               \
-                       sig_t sig##__sig = _SIG_INIT( (type)&sigMASK ); \
+#define             OS_SIG( sig, type )                     \
+                       sig_t sig##__sig = _SIG_INIT( type ); \
                        sig_id sig = & sig##__sig
 
 /**********************************************************************************************************************
@@ -76,8 +105,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_SIG( sig, type )                               \
-                static sig_t sig##__sig = _SIG_INIT( (type)&sigMASK ); \
+#define         static_SIG( sig, type )                     \
+                static sig_t sig##__sig = _SIG_INIT( type ); \
                 static sig_id sig = & sig##__sig
 
 /**********************************************************************************************************************
@@ -98,7 +127,7 @@ extern "C" {
  **********************************************************************************************************************/
 
 #define                SIG_INIT( type ) \
-                      _SIG_INIT( (type)&sigMASK )
+                      _SIG_INIT( type )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -354,8 +383,8 @@ class Signal : public __sig, private EventGuard<__sig>
 {
 public:
 
-	constexpr explicit
-	Signal( const unsigned _type = sigClear ): __sig(_SIG_INIT(_type & sigMASK)) {}
+	explicit
+	Signal( const unsigned _type = sigClear ): __sig(_SIG_INIT(_type)) {}
 
 	void     kill     ( void )            {        sig_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return sig_waitUntil(this, _time);  }

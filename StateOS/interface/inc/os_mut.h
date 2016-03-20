@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,14 +42,37 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __mut
+{
+	tsk_id   queue; // next process in the DELAYED queue
+	tsk_id   owner; // owner task
+
+}	mut_t, *mut_id;
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _MUT_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a fast mutex object                                                       *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : fast mutex object                                                                              *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _MUT_INIT() { 0, 0 }
+
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : OS_MUT                                                                                         *
  *                                                                                                                    *
- * Description       : define and initilize a mutex object                                                            *
+ * Description       : define and initilize a fast mutex object                                                       *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mut             : name of a pointer to mutex object                                                              *
+ *   mut             : name of a pointer to fast mutex object                                                         *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -61,10 +84,10 @@ extern "C" {
  *                                                                                                                    *
  * Name              : static_MUT                                                                                     *
  *                                                                                                                    *
- * Description       : define and initilize a static mutex object                                                     *
+ * Description       : define and initilize a static fast mutex object                                                *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mut             : name of a pointer to mutex object                                                              *
+ *   mut             : name of a pointer to fast mutex object                                                         *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -76,11 +99,11 @@ extern "C" {
  *                                                                                                                    *
  * Name              : MUT_INIT                                                                                       *
  *                                                                                                                    *
- * Description       : create and initilize a mutex object                                                            *
+ * Description       : create and initilize a fast mutex object                                                       *
  *                                                                                                                    *
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
- * Return            : mutex object                                                                                   *
+ * Return            : fast mutex object                                                                              *
  *                                                                                                                    *
  * Note              : use only in 'C' code                                                                           *
  *                                                                                                                    *
@@ -93,11 +116,11 @@ extern "C" {
  *                                                                                                                    *
  * Name              : MUT_CREATE                                                                                     *
  *                                                                                                                    *
- * Description       : create and initilize a mutex object                                                            *
+ * Description       : create and initilize a fast mutex object                                                       *
  *                                                                                                                    *
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
- * Return            : pointer to mutex object                                                                        *
+ * Return            : pointer to fast mutex object                                                                   *
  *                                                                                                                    *
  * Note              : use only in 'C' code                                                                           *
  *                                                                                                                    *
@@ -112,12 +135,12 @@ extern "C" {
  *                                                                                                                    *
  * Name              : mut_create                                                                                     *
  *                                                                                                                    *
- * Description       : create and initilize a new mutex object                                                        *
+ * Description       : create and initilize a new fast mutex object                                                   *
  *                                                                                                                    *
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
- * Return            : pointer to mutex object (mutex successfully created)                                           *
- *   0               : mutex not created (not enough free memory)                                                     *
+ * Return            : pointer to fast mutex object (fast mutex successfully created)                                 *
+ *   0               : fast mutex not created (not enough free memory)                                                *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -129,10 +152,10 @@ extern "C" {
  *                                                                                                                    *
  * Name              : mut_kill                                                                                       *
  *                                                                                                                    *
- * Description       : reset the mutex object and wake up all waiting tasks with 'E_STOPPED' event value              *
+ * Description       : reset the fast mutex object and wake up all waiting tasks with 'E_STOPPED' event value         *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mut             : pointer to mutex object                                                                        *
+ *   mut             : pointer to fast mutex object                                                                   *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -146,17 +169,17 @@ extern "C" {
  *                                                                                                                    *
  * Name              : mut_waitUntil                                                                                  *
  *                                                                                                                    *
- * Description       : try to lock the mutex object,                                                                  *
- *                     wait until given timepoint if the mutex object can't be locked immediately                     *
+ * Description       : try to lock the fast mutex object,                                                             *
+ *                     wait until given timepoint if the fast mutex object can't be locked immediately                *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mut             : pointer to mutex object                                                                        *
+ *   mut             : pointer to fast mutex object                                                                   *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : mutex object was successfully locked                                                           *
- *   E_STOPPED       : mutex object was killed before the specified timeout expired                                   *
- *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired                               *
+ *   E_SUCCESS       : fast mutex object was successfully locked                                                      *
+ *   E_STOPPED       : fast mutex object was killed before the specified timeout expired                              *
+ *   E_TIMEOUT       : fast mutex object was not locked before the specified timeout expired                          *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
@@ -169,19 +192,19 @@ extern "C" {
  *                                                                                                                    *
  * Name              : mut_waitFor                                                                                    *
  *                                                                                                                    *
- * Description       : try to lock the mutex object,                                                                  *
- *                     wait for given duration of time if the mutex object can't be locked immediately                *
+ * Description       : try to lock the fast mutex object,                                                             *
+ *                     wait for given duration of time if the fast mutex object can't be locked immediately           *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mut             : pointer to mutex object                                                                        *
- *   delay           : duration of time (maximum number of ticks to wait for lock the mutex object)                   *
- *                     IMMEDIATE: don't wait if the mutex object can't be locked immediately                          *
- *                     INFINITE:  wait indefinitly until the mutex object has been locked                             *
+ *   mut             : pointer to fast mutex object                                                                   *
+ *   delay           : duration of time (maximum number of ticks to wait for lock the fast mutex object)              *
+ *                     IMMEDIATE: don't wait if the fast mutex object can't be locked immediately                     *
+ *                     INFINITE:  wait indefinitly until the fast mutex object has been locked                        *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : mutex object was successfully locked                                                           *
- *   E_STOPPED       : mutex object was killed before the specified timeout expired                                   *
- *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired                               *
+ *   E_SUCCESS       : fast mutex object was successfully locked                                                      *
+ *   E_STOPPED       : fast mutex object was killed before the specified timeout expired                              *
+ *   E_TIMEOUT       : fast mutex object was not locked before the specified timeout expired                          *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
@@ -194,15 +217,15 @@ extern "C" {
  *                                                                                                                    *
  * Name              : mut_wait                                                                                       *
  *                                                                                                                    *
- * Description       : try to lock the mutex object,                                                                  *
- *                     wait indefinitly if the mutex object can't be locked immediately                               *
+ * Description       : try to lock the fast mutex object,                                                             *
+ *                     wait indefinitly if the fast mutex object can't be locked immediately                          *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mut             : pointer to mutex object                                                                        *
+ *   mut             : pointer to fast mutex object                                                                   *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : mutex object was successfully locked                                                           *
- *   E_STOPPED       : mutex object was killed                                                                        *
+ *   E_SUCCESS       : fast mutex object was successfully locked                                                      *
+ *   E_STOPPED       : fast mutex object was killed                                                                   *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
@@ -215,15 +238,15 @@ static inline unsigned mut_wait( mut_id mut ) { return mut_waitFor(mut, INFINITE
  *                                                                                                                    *
  * Name              : mut_take                                                                                       *
  *                                                                                                                    *
- * Description       : try to lock the mutex object,                                                                  *
- *                     don't wait if the mutex object can't be locked immediately                                     *
+ * Description       : try to lock the fast mutex object,                                                             *
+ *                     don't wait if the fast mutex object can't be locked immediately                                *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mut             : pointer to mutex object                                                                        *
+ *   mut             : pointer to fast mutex object                                                                   *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : mutex object was successfully locked                                                           *
- *   E_TIMEOUT       : mutex object can't be locked immediately                                                       *
+ *   E_SUCCESS       : fast mutex object was successfully locked                                                      *
+ *   E_TIMEOUT       : fast mutex object can't be locked immediately                                                  *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -235,15 +258,15 @@ static inline unsigned mut_take( mut_id mut ) { return mut_waitFor(mut, IMMEDIAT
  *                                                                                                                    *
  * Name              : mut_give                                                                                       *
  *                                                                                                                    *
- * Description       : try to unlock the mutex object (only owner task can unlock mutex object),                      *
- *                     don't wait if the mutex object can't be unlocked                                               *
+ * Description       : try to unlock the fast mutex object (only owner task can unlock fast mutex object),            *
+ *                     don't wait if the fast mutex object can't be unlocked                                          *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mut             : pointer to mutex object                                                                        *
+ *   mut             : pointer to fast mutex object                                                                   *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : mutex object was successfully unlocked                                                         *
- *   E_TIMEOUT       : mutex object can't be unlocked                                                                 *
+ *   E_SUCCESS       : fast mutex object was successfully unlocked                                                    *
+ *   E_TIMEOUT       : fast mutex object can't be unlocked                                                            *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -274,7 +297,7 @@ class FastMutex : public __mut, private MutexGuard<__mut>
 {
 public:
 
-	constexpr explicit
+	explicit
 	FastMutex( void ): __mut(_MUT_INIT()) {}
 
 	void     kill     ( void )            {        mut_kill     (this);         }

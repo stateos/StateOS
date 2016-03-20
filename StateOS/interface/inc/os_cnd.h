@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,8 +41,32 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __cnd
+{
+	tsk_id   queue; // next process in the DELAYED queue
+
+}	cnd_t, *cnd_id;
+
+/* -------------------------------------------------------------------------- */
+
 #define cndOne       ( false ) // notify one task
 #define cndAll       ( true  ) // notify all tasks
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _CND_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a condition variable object                                               *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : condition variable object                                                                      *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _CND_INIT() { 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -279,7 +303,7 @@ class ConditionVariable : public __cnd, private EventGuard<__cnd>
 {
 public:
 
-	constexpr explicit
+	explicit
 	ConditionVariable( void ): __cnd(_CND_INIT()) {}
 
 	void     kill     ( void )                         {        cnd_kill     (this);               }

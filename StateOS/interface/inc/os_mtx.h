@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,6 +40,30 @@ extern "C" {
  *                     like a POSIX pthread_mutex_t                                                                   *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
+struct __mtx
+{
+	tsk_id   queue; // next process in the DELAYED queue
+	tsk_id   owner; // owner task
+	unsigned count; // mutex's curent value
+	mtx_id   list;  // list of mutexes held by owner
+};
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _MTX_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a mutex object                                                            *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : mutex object                                                                                   *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _MTX_INIT() { 0, 0, 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -273,7 +297,7 @@ class Mutex : public __mtx, private MutexGuard<__mtx>
 {
 public:
 
-	constexpr explicit
+	explicit
 	Mutex( void ): __mtx(_MTX_INIT()) {}
 
 	void     kill     ( void )            {        mtx_kill     (this);         }

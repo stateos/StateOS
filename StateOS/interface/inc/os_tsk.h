@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -39,6 +39,85 @@ extern "C" {
  * Name              : task (thread)                                                                                  *
  *                                                                                                                    *
  **********************************************************************************************************************/
+
+#ifdef __CC_ARM
+#pragma push
+#pragma anon_unions
+#endif
+
+struct __tsk
+{
+	tsk_id   queue; // inherited from timer
+	unsigned id;    // inherited from timer
+	tsk_id   next;  // inherited from timer
+	tsk_id   prev;  // inherited from timer
+
+	fun_id   state; // inherited from timer
+	unsigned start; // inherited from timer
+	unsigned delay; // inherited from timer
+	unsigned prio;  // current priority
+
+	void    *sp;    // stack pointer
+	void    *top;   // top of stack
+	tsk_id   back;  // previous process in the DELAYED queue
+	unsigned basic; // basic priority
+
+	void    *guard; // object that controls the pending process
+	mtx_id   list;  // list of mutexes held
+	union  {
+	unsigned all;   // used by flag object: wait for all flags to be set
+	void    *data;  // used by mailbox queue object
+	unsigned msg;   // used by message queue object
+	};
+	union  {
+	unsigned flags; // used by flag object: all flags to wait
+	unsigned event; // wakeup event
+	};
+#if defined(__CC_ARM) && !defined(__MICROLIB)
+	char     libspace[96];
+#endif
+};
+
+#ifdef __CC_ARM
+#pragma pop
+#endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _TSK_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a task object                                                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *   top             : top of task's private stack storage                                                            *
+ *                                                                                                                    *
+ * Return            : task object                                                                                    *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _TSK_INIT( _prio, _state, _top ) { 0, 0, 0, 0, _state, 0, 0, _prio, 0, _top, 0, _prio, 0, 0, { 0 }, { 0 } }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _TSK_STACK                                                                                     *
+ *                                                                                                                    *
+ * Description       : create task's private stack storage                                                            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   size            : size of task's private stack storage (in bytes)                                                *
+ *                                                                                                                    *
+ * Return            : top of task's private stack storage                                                            *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _TSK_STACK( _size ) (__osalign char[ASIZE(_size)]){ 0 } + ASIZE(_size)
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -570,7 +649,7 @@ class TaskBase : public __tsk, private ObjectGuard<__tsk>
 {
 public:
 
-	constexpr explicit
+	explicit
 	TaskBase( const unsigned _prio, const fun_id _state, const os_id _top ): __tsk(_TSK_INIT(_prio, _state, _top)) {}
 
 	void     kill      ( void )                          {        tsk_kill      (this);                }
@@ -590,7 +669,7 @@ public:
  *                                                                                                                    *
  * Namespace         : ThisTask                                                                                       *
  *                                                                                                                    *
- * Description       : provide set of functions for Task classes                                                      *
+ * Description       : provide set of functions for Current Task                                                      *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -607,7 +686,7 @@ namespace ThisTask
 	unsigned sleep     ( void )                          { return tsk_sleep     ();                    }
 	unsigned delay     ( unsigned _delay )               { return tsk_delay     (_delay);              }
 	unsigned suspend   ( void )                          { return tsk_suspend   ();                    }
-};
+}
 
 #endif
 
@@ -636,7 +715,7 @@ class TaskT : public TaskBase
 
 public:
 
-	constexpr explicit
+	explicit
 	TaskT( const unsigned _prio, const fun_id _state ): TaskBase(_prio, _state, _stack+ASIZE(_size)) {}
 };
 
@@ -681,6 +760,7 @@ class startTaskT : public TaskT<_size>
 {
 public:
 
+	explicit
 	startTaskT( const unsigned _prio, const fun_id _state ): TaskT<_size>(_prio, _state) { tsk_start(this); }
 };
 

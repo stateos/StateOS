@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     17.02.2016
+#date     18.03.2016
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -94,6 +94,7 @@ TXTS       := $(OBJS:.o=.txt)
 CORE_F     := --cpu=cortex-m4 --fpu=fpv4-sp --apcs=/hardfp/interwork
 
 COMMON_F    = # --debug
+COMMON_F   += -W
 COMMON_F   += --md --depend=$(@:.o=.d)
 
 OPTIM_F    := -Ospace --split_sections --interleave

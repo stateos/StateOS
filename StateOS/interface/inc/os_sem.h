@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    20.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,10 +41,41 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __sem
+{
+	tsk_id   queue; // next process in the DELAYED queue
+	unsigned count; // semaphore's current value
+	unsigned limit; // semaphore's value limit
+
+}	sem_t, *sem_id;
+
+/* -------------------------------------------------------------------------- */
+
 #define semBinary    (  1U ) // binary semaphore
 #define semNormal    ( ~0U ) // counting semaphore
 #define semCounting  ( ~0U ) // counting semaphore
 #define semMASK      ( ~0U )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : _SEM_INIT                                                                                      *
+ *                                                                                                                    *
+ * Description       : create and initilize a semaphore object                                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   init            : initial value of semaphore counter                                                             *
+ *   limit           : maximum value of semaphore counter                                                             *
+ *                     semBinary: binary semaphore                                                                    *
+ *                     semNormal, semCounting: counting semaphore                                                     *
+ *                     otherwise: limited semaphore                                                                   *
+ *                                                                                                                    *
+ * Return            : semaphore object                                                                               *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define               _SEM_INIT( _init, _limit ) { 0, UMIN(_init,_limit), _limit }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -416,7 +447,7 @@ class Semaphore : public __sem, private EventGuard<__sem>
 {
 public:
 
-	constexpr explicit
+	explicit
 	Semaphore( const unsigned _init, const unsigned _limit = semNormal ): __sem(_SEM_INIT(_init, _limit)) {}
 
 	void     kill     ( void )            {        sem_kill     (this);         }

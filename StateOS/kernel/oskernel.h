@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    17.03.2016
+    @date    19.03.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <osbase.h>
-#include <bitband.h>
 #include <stdlib.h>
+#include <bitband.h>
+#include <osbase.h>
 
 #ifdef __cplusplus
 extern "C" {

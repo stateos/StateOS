@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    26.02.2016
+    @date    18.03.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -30,7 +30,7 @@
 
 #include <errno.h>
 #include <sys/stat.h>
-#include <oskernel.h>
+#include <os.h>
 
 /* -------------------------------------------------------------------------- */
 

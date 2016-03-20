@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     17.02.2016
+#date     18.03.2016
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -90,7 +90,7 @@ CORE_F     := -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffast-
 
 COMMON_F    = # -g -ggdb
 COMMON_F   += -Os -ffunction-sections -fdata-sections # -flto
-COMMON_F   += -Wall # -Wextra
+COMMON_F   += -Wall -Wextra # -Wpedantic
 COMMON_F   += -MMD -MP
 COMMON_F   += # -Wa,-amhls=$(@:.o=.lst)
 
