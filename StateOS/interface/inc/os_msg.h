@@ -453,11 +453,11 @@ public:
 	MessageQueueT( void ): __msg(_MSG_INIT(_limit, _data)) {}
 
 	void     kill     ( void )                            {        msg_kill     (this);                }
-	unsigned waitUntil( unsigned _time  )                 { return msg_waitUntil(this,        _time);  }
-	unsigned waitFor  ( unsigned _delay )                 { return msg_waitFor  (this,        _delay); }
-	unsigned wait     ( void )                            { return msg_wait     (this);                }
-	unsigned take     ( void )                            { return msg_take     (this);                }
-	unsigned takeISR  ( void )                            { return msg_takeISR  (this);                }
+	unsigned waitUntil( unsigned*_data, unsigned _time  ) { return msg_waitUntil(this, _data, _time);  }
+	unsigned waitFor  ( unsigned*_data, unsigned _delay ) { return msg_waitFor  (this, _data, _delay); }
+	unsigned wait     ( unsigned*_data )                  { return msg_wait     (this, _data);         }
+	unsigned take     ( unsigned*_data )                  { return msg_take     (this, _data);         }
+	unsigned takeISR  ( unsigned*_data )                  { return msg_takeISR  (this, _data);         }
 	unsigned sendUntil( unsigned _data, unsigned _time  ) { return msg_sendUntil(this, _data, _time);  }
 	unsigned sendFor  ( unsigned _data, unsigned _delay ) { return msg_sendFor  (this, _data, _delay); }
 	unsigned send     ( unsigned _data )                  { return msg_send     (this, _data);         }
