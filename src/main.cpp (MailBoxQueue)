@@ -1,0 +1,42 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+auto led = Led();
+auto box = MailBoxQueueT<unsigned, 1>();
+
+void slave()
+{
+	unsigned x;
+
+	for (;;)
+	{
+		box.wait(&x);
+
+		led = x;
+	}
+}
+
+void master()
+{
+	unsigned x = 0;
+
+	for (;;)
+	{
+		ThisTask::delay(SEC);
+
+		x++;
+		
+		box.give(&x);
+	}
+}
+
+auto sla = Task(0, slave);
+auto mas = Task(0, master);
+
+int main()
+{
+	sla.start();
+	mas.start();
+
+	ThisTask::stop();
+}
