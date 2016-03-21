@@ -28,6 +28,7 @@ Features:
 2.1
 - reorganization of the c++ code
 - fixed bug in MessageQueueT<> class
+- fixed bug in MailBoxQueueT<> class
 ---------
 2.0
 - added some features to c++ code
