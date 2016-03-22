@@ -30,16 +30,7 @@ extern "C" {
 static inline __attribute__(( always_inline, const ))
 int __builtin_ctz( unsigned mask )
 {
-	int result = 0;
-
-	if ((mask & 0x0000FFFF) == 0) { result += 16; mask >>= 16; }
-	if ((mask & 0x000000FF) == 0) { result +=  8; mask >>=  8; }
-	if ((mask & 0x0000000F) == 0) { result +=  4; mask >>=  4; }
-	if ((mask & 0x00000003) == 0) { result +=  2; mask >>=  2; }
-	if ((mask & 0x00000001) == 0) { result +=  1; mask >>=  1; }
-	if ((mask & 0x00000001) == 0) { result +=  1; }
-
-	return result;
+	return (mask == 0) ? 32 : (mask & 1U) ? 0 : 1 + __builtin_ctz(mask >> 1);
 }
 
 #endif

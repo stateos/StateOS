@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    stm32f4_discovery_leds.h
  * @author  Rajmund Szymanski
- * @date    10.11.2015
+ * @date    22.03.2016
  * @brief   This file contains definitions for STM32F4-Discovery Kit.
  ******************************************************************************/
 
@@ -75,31 +75,31 @@ void LED_Tick( void )
 
 /* -------------------------------------------------------------------------- */
 
-class GRN_Led
+class GreenLed
 {
 public:
-	GRN_Led( void ) { GRN_Config(); }
+	GreenLed( void ) { GRN_Config(); }
 
-	unsigned   operator = ( const unsigned status ) { return   GRN=status; }
-	unsigned   operator ++( void ) /* ++grn */      { return ++GRN;        }
-	unsigned   operator ++( int  ) /* grn++ */      { return   GRN++;      }
+	operator   unsigned & ( void )                  { return (unsigned &)GRN; }
+	unsigned   operator = ( const unsigned status ) { return   GRN = status; }
+	unsigned   operator ++( void ) /* ++grn */      { return ++GRN;   }
+	unsigned   operator ++( int  ) /* grn++ */      { return   GRN++; }
 };
 
 /* -------------------------------------------------------------------------- */
 
 class Led
 {
-	unsigned get( void )            { return (GPIOD->ODR >> 12); }
-	void     set( unsigned status ) { GPIOD->BSRR = ((status << 12) & 0xFFFF) | (~status << 28); }
+	unsigned get( void )            {    return ((GPIOD->ODR & 0xFFFF) >> 12); }
+	void     set( unsigned status ) { GPIOD->BSRR = ((status & 0xFFFF) << 12) | (~status << 28); }
 
 public:
 	Led( void ) { LED_Config(); }
 
-	volatile
-	unsigned & operator []( const unsigned number ) { return LED[number]; }
-	unsigned   operator = ( const unsigned status ) {                            set(status);   return status & 0xF; }
-	unsigned   operator ++( void ) /* ++led */      { unsigned status = get()+1; set(status);   return status & 0xF; }
-	unsigned   operator ++( int  ) /* led++ */      { unsigned status = get();   set(status+1); return status & 0xF; }
+	unsigned & operator []( const unsigned number ) { return (unsigned &)LED[number]; }
+	unsigned   operator = ( const unsigned status ) {                              set(status); return status & 0xF; }
+	unsigned   operator ++( void ) /* ++led */      { unsigned status = get() + 1; set(status); return status & 0xF; }
+	unsigned   operator ++( int  ) /* led++ */      { unsigned status = get(); set(status + 1); return status; }
 
 	void tick( void ) { LED_Tick(); }
 };
