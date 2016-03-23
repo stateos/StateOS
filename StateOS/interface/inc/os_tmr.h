@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    20.03.2016
+    @date    23.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -418,12 +418,6 @@ public:
 	unsigned takeISR  ( void )                            { return tmr_takeISR      (this);                       }
 };
 
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifdef __cplusplus
-
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Namespace         : ThisTimer                                                                                      *
@@ -437,12 +431,6 @@ namespace ThisTimer
 	void flipISR ( fun_id   _state ) { tmr_flipISR (_state); }
 	void delayISR( unsigned _delay ) { tmr_delayISR(_delay); }
 }
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifdef __cplusplus
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -465,12 +453,6 @@ public:
 	explicit
 	startTimerUntil( const unsigned _time, const fun_id _state ): Timer() { tmr_startUntil(this, _time, _state); }
 };
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifdef __cplusplus
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -495,12 +477,6 @@ public:
 	explicit
 	startTimerFor( const unsigned _delay, const fun_id _state ): Timer() { tmr_startFor(this, _delay, _state); }
 };
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifdef __cplusplus
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -527,6 +503,6 @@ public:
 	startTimerPeriodic( const unsigned _period, const fun_id _state ): Timer() { tmr_startPeriodic(this, _period, _state); }
 };
 
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */

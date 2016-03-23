@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    20.03.2016
+    @date    23.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -659,12 +659,6 @@ public:
 	void     resumeISR ( unsigned _event )               {        tsk_resumeISR (this, _event);        }
 };
 
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifdef __cplusplus
-
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Namespace         : ThisTask                                                                                       *
@@ -687,12 +681,6 @@ namespace ThisTask
 	unsigned delay     ( unsigned _delay )               { return tsk_delay     (_delay);              }
 	unsigned suspend   ( void )                          { return tsk_suspend   ();                    }
 }
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifdef __cplusplus
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -732,13 +720,13 @@ public:
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef TaskT<OS_STACK_SIZE> Task;
+class Task: public TaskT<OS_STACK_SIZE>
+{
+public:
 
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifdef __cplusplus
+	explicit
+	Task( const unsigned _prio, const fun_id _state ): TaskT<OS_STACK_SIZE>(_prio, _state) {}
+};
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -778,8 +766,14 @@ public:
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef startTaskT<OS_STACK_SIZE> startTask;
+class startTask : public Task
+{
+public:
 
-#endif
+	explicit
+	startTask( const unsigned _prio, const fun_id _state ): Task(_prio, _state) { tsk_start(this); }
+};
+
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
