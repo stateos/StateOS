@@ -54,8 +54,8 @@ void core_tsk_break( void )
 	for (;;)
 	{
 		port_ctx_switch();
-		port_set_stack(cur->top);
 		port_clr_lock();
+		port_set_stack(cur->top);
 		cur->state();
 	}
 }
