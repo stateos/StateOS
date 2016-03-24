@@ -3,6 +3,7 @@
 
 // NOTE: in makefile add 'proc_stack_size=2048' to DEFS
 
+volatile
 unsigned *l[] = { &LED[0],  &LED[1],  &LED[2],  &LED[3],  &GRN };
 unsigned  t[] = { 500*MSEC, 625*MSEC, 750*MSEC, 875*MSEC, 1000*MSEC };
 
