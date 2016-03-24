@@ -27,7 +27,8 @@ Features:
 ---------
 2.2
 - minor update
-- added c++ examples
+- added c and c++ examples
+- tsk_stop function doesn't destroy the stack storage
 ---------
 2.1
 - reorganization of the c++ code

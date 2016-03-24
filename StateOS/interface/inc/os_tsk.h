@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    23.03.2016
+    @date    24.03.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -397,6 +397,8 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  * Name              : tsk_stop                                                                                       *
  *                                                                                                                    *
  * Description       : stop current task and remove it from READY queue                                               *
+ *                     function doesn't destroy the stack storage                                                     *
+ *                     all allocated resources remain intact until restarting the task                                *
  *                                                                                                                    *
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
