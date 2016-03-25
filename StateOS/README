@@ -25,6 +25,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+2.3
+- example files moved to dedicated folder
+---------
 2.2
 - minor update
 - added c and c++ examples
