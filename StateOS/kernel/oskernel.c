@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    23.03.2016
+    @date    29.03.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -62,7 +62,6 @@ void core_tsk_break( void )
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__((noinline))
 void core_rdy_insert( os_id item, unsigned id, os_id next )
 {
 	obj_id obj = item;
@@ -78,7 +77,6 @@ void core_rdy_insert( os_id item, unsigned id, os_id next )
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__((noinline))
 void core_rdy_remove( os_id item )
 {
 	obj_id obj = item;
@@ -88,6 +86,8 @@ void core_rdy_remove( os_id item )
 	nxt->prev = prv;
 	prv->next = nxt;
 	obj->id   = ID_STOPPED;
+
+	port_mem_barrier(); // necessary because of some gcc optimizations
 }
 
 /* -------------------------------------------------------------------------- */
