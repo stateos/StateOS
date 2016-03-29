@@ -73,14 +73,14 @@ void core_rdy_insert( os_id item, unsigned id, os_id next )
 	obj->next = nxt;
 	nxt->prev = obj;
 	prv->next = obj;
+
+	port_mem_barrier(); // necessary because of some gcc optimizations
 }
 
 /* -------------------------------------------------------------------------- */
 
 void core_rdy_remove( os_id item )
 {
-	port_mem_barrier(); // necessary because of some gcc optimizations
-
 	obj_id obj = item;
 	obj_id nxt = obj->next;
 	obj_id prv = obj->prev;
