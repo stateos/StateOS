@@ -208,7 +208,7 @@ void port_mem_barrier( void )
 #if defined(__GNUC__) || ( defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050) )
 	__asm volatile ("":::"memory");
 #else
-	__schedule_barrier();
+	__memory_changed();
 #endif
 }
 
