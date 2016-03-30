@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    29.03.2016
+    @date    30.03.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -62,39 +62,10 @@ void core_tsk_break( void )
 
 /* -------------------------------------------------------------------------- */
 
-void core_rdy_insert( os_id item, unsigned id, os_id next )
-{
-	obj_id obj = item;
-	obj_id nxt = next;
-	obj_id prv = nxt->prev;
-
-	obj->id   = id;
-	obj->prev = prv;
-	obj->next = nxt;
-	nxt->prev = obj;
-	prv->next = obj;
-
-	port_mem_barrier(); // necessary because of some gcc optimizations
-}
-
-/* -------------------------------------------------------------------------- */
-
-void core_rdy_remove( os_id item )
-{
-	obj_id obj = item;
-	obj_id nxt = obj->next;
-	obj_id prv = obj->prev;
-
-	nxt->prev = prv;
-	prv->next = nxt;
-	obj->id   = ID_STOPPED;
-}
-
-/* -------------------------------------------------------------------------- */
-
 static inline
 void priv_tsk_insert( tsk_id tsk )
 {
+	tsk_id prv;
 	tsk_id nxt = &IDLE;
 
 	if (tsk->prio > 0) for (;;)
@@ -104,7 +75,13 @@ void priv_tsk_insert( tsk_id tsk )
 		if (tsk->prio > nxt->prio) break;
 	}
 
-	core_rdy_insert(tsk, ID_READY, nxt);
+	prv = nxt->prev;
+
+	tsk->id   = ID_READY;
+	tsk->prev = prv;
+	tsk->next = nxt;
+	nxt->prev = tsk;
+	prv->next = tsk;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -116,6 +93,18 @@ void core_tsk_insert( tsk_id tsk )
 	if (IDLE.next->prio > System.cur->prio)
 	port_ctx_switch();
 #endif
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tsk_remove( tsk_id tsk )
+{
+	tsk_id nxt = tsk->next;
+	tsk_id prv = tsk->prev;
+
+	nxt->prev = prv;
+	prv->next = nxt;
+	tsk->id   = ID_STOPPED;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -324,6 +313,7 @@ static tmr_t HEAD = { .id=ID_TIMER, .next=&HEAD, .prev=&HEAD, .delay=INFINITE };
 static inline
 void priv_tmr_insert( tmr_id tmr, unsigned id )
 {
+    tmr_id prv;
 	tmr_id nxt = &HEAD;
 
 	if (tmr->delay != INFINITE) for (;;)
@@ -334,7 +324,13 @@ void priv_tmr_insert( tmr_id tmr, unsigned id )
 		if (nxt->delay >  tmr->start + tmr->delay - nxt->start) break;
 	}
 
-	core_rdy_insert(tmr, id, nxt);
+	prv = nxt->prev;
+
+	tmr->id   = id;
+	tmr->prev = prv;
+	tmr->next = nxt;
+	nxt->prev = tmr;
+	prv->next = tmr;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -343,6 +339,18 @@ void core_tmr_insert( tmr_id tmr, unsigned id )
 {
 	priv_tmr_insert(tmr, id);
 	port_tmr_force();
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tmr_remove( tmr_id tmr )
+{
+	tmr_id nxt = tmr->next;
+	tmr_id prv = tmr->prev;
+
+	nxt->prev = prv;
+	prv->next = nxt;
+	tmr->id   = ID_STOPPED;
 }
 
 /* -------------------------------------------------------------------------- */

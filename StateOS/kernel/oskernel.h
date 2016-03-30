@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    29.03.2016
+    @date    30.03.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -70,11 +70,6 @@ void core_ctx_reset( void )
 
 /* -------------------------------------------------------------------------- */
 
-// abort and reset current process and force yield system control to the next
-void core_tsk_break( void ) __noreturn;
-
-/* -------------------------------------------------------------------------- */
-
 // force timer interrupt
 void port_tmr_force( void );
 
@@ -91,36 +86,27 @@ os_id core_sys_alloc( size_t size );
 
 /* -------------------------------------------------------------------------- */
 
-// insert object 'obj' into tasks/timers READY queue before the 'nxt' object
-// set object id to 'id'
-void core_rdy_insert( os_id obj, unsigned id, os_id nxt );
-
-// remove object 'obj' from tasks/timers READY queue
-// set object id to ID_STOPPED
-void core_rdy_remove( os_id obj );
-
-/* -------------------------------------------------------------------------- */
-
 // add timer 'tmr' to timers READY queue with id 'id'
 // start countdown
 void core_tmr_insert( tmr_id tmr, unsigned id );
 
 // remove timer 'tmr' from timers READY queue
-static inline
-void core_tmr_remove( tmr_id tmr ) { core_rdy_remove(tmr); }
+void core_tmr_remove( tmr_id tmr );
 
 // timers queue handler procedure
 void core_tmr_handler( void );
 
 /* -------------------------------------------------------------------------- */
 
+// abort and reset current process and force yield system control to the next
+void     core_tsk_break( void ) __noreturn;
+
 // add task 'tsk' to tasks READY queue with id ID_READY
 // force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
 void     core_tsk_insert( tsk_id tsk );
 
 // remove task 'tsk' from tasks READY queue
-static inline
-void     core_tsk_remove( tsk_id tsk ) { core_rdy_remove(tsk); }
+void     core_tsk_remove( tsk_id tsk );
 
 // append task 'tsk' to object 'obj' delayed queue
 void     core_tsk_append( tsk_id tsk, os_id obj );
@@ -197,18 +183,6 @@ void port_set_stack( void *top )
 	__asm volatile ("mov sp, %0" :: "r" (top) : "memory");
 #else
 	__set_PSP((unsigned)top);
-#endif
-}
-
-/* -------------------------------------------------------------------------- */
-
-static inline
-void port_mem_barrier( void )
-{
-#if defined(__GNUC__) || ( defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050) )
-	__asm volatile ("":::"memory");
-#else
-	__memory_changed();
 #endif
 }
 
