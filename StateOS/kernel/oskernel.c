@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    30.03.2016
+    @date    03.04.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,35 @@ static tsk_t IDLE = { .id=ID_IDLE,  .next=&MAIN, .prev=&MAIN, .top=IDLE_SP, .sta
 
 /* -------------------------------------------------------------------------- */
 
+static inline
+void priv_rdy_insert( obj_id obj, unsigned id, obj_id nxt )
+{
+	obj_id prv = nxt->prev;
+
+	obj->id   = id;
+	obj->prev = prv;
+	obj->next = nxt;
+	nxt->prev = obj;
+	prv->next = obj;
+
+	port_mem_barrier(); // necessary because of some gcc optimazations
+}
+
+/* -------------------------------------------------------------------------- */
+
+static inline
+void priv_rdy_remove( obj_id obj )
+{
+	obj_id nxt = obj->next;
+	obj_id prv = obj->prev;
+
+	nxt->prev = prv;
+	prv->next = nxt;
+	obj->id   = ID_STOPPED;
+}
+
+/* -------------------------------------------------------------------------- */
+
 void core_tsk_break( void )
 {
 	tsk_id cur = System.cur;
@@ -65,7 +94,6 @@ void core_tsk_break( void )
 static inline
 void priv_tsk_insert( tsk_id tsk )
 {
-	tsk_id prv;
 	tsk_id nxt = &IDLE;
 
 	if (tsk->prio > 0) for (;;)
@@ -75,13 +103,7 @@ void priv_tsk_insert( tsk_id tsk )
 		if (tsk->prio > nxt->prio) break;
 	}
 
-	prv = nxt->prev;
-
-	tsk->id   = ID_READY;
-	tsk->prev = prv;
-	tsk->next = nxt;
-	nxt->prev = tsk;
-	prv->next = tsk;
+	priv_rdy_insert((obj_id)tsk, ID_READY, (obj_id)nxt);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -99,12 +121,7 @@ void core_tsk_insert( tsk_id tsk )
 
 void core_tsk_remove( tsk_id tsk )
 {
-	tsk_id nxt = tsk->next;
-	tsk_id prv = tsk->prev;
-
-	nxt->prev = prv;
-	prv->next = nxt;
-	tsk->id   = ID_STOPPED;
+	priv_rdy_remove((obj_id)tsk);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -313,7 +330,6 @@ static tmr_t HEAD = { .id=ID_TIMER, .next=&HEAD, .prev=&HEAD, .delay=INFINITE };
 static inline
 void priv_tmr_insert( tmr_id tmr, unsigned id )
 {
-    tmr_id prv;
 	tmr_id nxt = &HEAD;
 
 	if (tmr->delay != INFINITE) for (;;)
@@ -324,13 +340,7 @@ void priv_tmr_insert( tmr_id tmr, unsigned id )
 		if (nxt->delay >  tmr->start + tmr->delay - nxt->start) break;
 	}
 
-	prv = nxt->prev;
-
-	tmr->id   = id;
-	tmr->prev = prv;
-	tmr->next = nxt;
-	nxt->prev = tmr;
-	prv->next = tmr;
+	priv_rdy_insert((obj_id)tmr, id, (obj_id)nxt);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -345,12 +355,7 @@ void core_tmr_insert( tmr_id tmr, unsigned id )
 
 void core_tmr_remove( tmr_id tmr )
 {
-	tmr_id nxt = tmr->next;
-	tmr_id prv = tmr->prev;
-
-	nxt->prev = prv;
-	prv->next = nxt;
-	tmr->id   = ID_STOPPED;
+	priv_rdy_remove((obj_id)tmr);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -419,6 +424,11 @@ void core_tmr_handler( void )
 
 	for (;;)
 	{
+//		port_mem_barrier();
+/*
+		memory barrier is necessary because of some gcc (linaro gcc-arm-embedded 5.2.1) optimazations
+		instead use a memory barrier at the end of the 'priv_rdy_insert' function
+*/
 		tmr_id tmr = System.tmr = HEAD.next;
 
 		if (priv_tmr_counting(tmr))

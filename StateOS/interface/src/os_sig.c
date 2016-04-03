@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.c
     @author  Rajmund Szymanski
-    @date    22.02.2016
+    @date    03.04.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -62,7 +62,7 @@ void sig_kill( sig_id sig )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline __attribute__((always_inline))
+static inline
 unsigned priv_sig_wait( sig_id sig, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

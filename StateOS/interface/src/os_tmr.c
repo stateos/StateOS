@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    22.02.2016
+    @date    03.04.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -117,7 +117,7 @@ void tmr_startPeriodic( tmr_id tmr, unsigned period, fun_id proc )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline __attribute__((always_inline))
+static inline
 unsigned priv_tmr_wait( tmr_id tmr, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

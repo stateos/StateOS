@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    12.03.2016
+    @date    03.04.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -96,7 +96,7 @@ void mtx_kill( mtx_id mtx )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline __attribute__((always_inline))
+static inline
 unsigned priv_mtx_wait( mtx_id mtx, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

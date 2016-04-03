@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    13.03.2016
+    @date    03.04.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -148,7 +148,7 @@ void tsk_prio( unsigned prio )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline __attribute__((always_inline))
+static inline
 unsigned priv_tsk_sleep( unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

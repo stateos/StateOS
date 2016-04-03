@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    22.02.2016
+    @date    03.04.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -87,7 +87,7 @@ void priv_msg_put( msg_id msg, unsigned data )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline __attribute__((always_inline))
+static inline
 unsigned priv_msg_wait( msg_id msg, unsigned *data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
@@ -130,7 +130,7 @@ unsigned msg_waitFor( msg_id msg, unsigned *data, unsigned delay )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline __attribute__((always_inline))
+static inline
 unsigned priv_msg_send( msg_id msg, unsigned data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

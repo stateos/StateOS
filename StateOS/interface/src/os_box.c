@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    22.02.2016
+    @date    03.04.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -94,7 +94,7 @@ void priv_box_put( box_id box, void *data )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline __attribute__((always_inline))
+static inline
 unsigned priv_box_wait( box_id box, void *data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
@@ -137,7 +137,7 @@ unsigned box_waitFor( box_id box, void *data, unsigned delay )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline __attribute__((always_inline))
+static inline
 unsigned priv_box_send( box_id box, void *data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
