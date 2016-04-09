@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    19.03.2016
+    @date    09.04.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -90,14 +90,14 @@ typedef struct __tsk tsk_t, *tsk_id; // task
 
 /* -------------------------------------------------------------------------- */
 
-// object header (timer, task)
+// object (timer, task) header
 
 typedef struct __obj
 {
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned id;    // object id: ID_STOPPED, ID_READY, ID_DELAYED, ID_TIMER, ID_IDLE
-	struct __obj*next; // next object in the READY queue
-	struct __obj*prev; // previous object in the READY queue
+	void    *prev;  // previous object (timer, task) in the READY queue
+	void    *next;  // next object (timer, task) in the READY queue
 
 }	obj_t, *obj_id;
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    03.04.2016
+    @date    09.04.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -49,7 +49,7 @@ void tmr_kill( tmr_id tmr )
 {
 	port_sys_lock();
 
-	if (tmr->id != ID_STOPPED)
+	if (tmr->obj.id != ID_STOPPED)
 	{
 		core_all_wakeup(tmr, E_STOPPED);
 		core_tmr_remove(tmr);
@@ -63,7 +63,7 @@ static inline
 void priv_tmr_start( tmr_id tmr )
 /* -------------------------------------------------------------------------- */
 {
-	if (tmr->id != ID_STOPPED)
+	if (tmr->obj.id != ID_STOPPED)
 	core_tmr_remove(tmr);
 	core_tmr_insert(tmr, ID_TIMER);
 }
@@ -125,7 +125,7 @@ unsigned priv_tmr_wait( tmr_id tmr, unsigned time, unsigned(*wait)() )
 
 	port_sys_lock();
 
-	if (tmr->id != ID_STOPPED)
+	if (tmr->obj.id != ID_STOPPED)
 	{
 		event = wait(tmr, time);
 	}

@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    03.04.2016
+    @date    09.04.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -183,19 +183,6 @@ void port_set_stack( void *top )
 	__asm volatile ("mov sp, %0" :: "r" (top) : "memory");
 #else
 	__set_PSP((unsigned)top);
-#endif
-}
-
-/* -------------------------------------------------------------------------- */
-
-// insert memory barrier
-static inline
-void port_mem_barrier( void )
-{
-#if defined(__GNUC__) || ( defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050) )
-	__asm volatile ("":::"memory");
-#else
-	__memory_changed();
 #endif
 }
 

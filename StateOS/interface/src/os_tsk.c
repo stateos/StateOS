@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    03.04.2016
+    @date    09.04.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -42,10 +42,10 @@ tsk_id tsk_create( unsigned prio, fun_id state, unsigned size )
 
 	if (tsk)
 	{
-		tsk->prio  = prio;
-		tsk->basic = prio;
 		tsk->state = state;
 		tsk->top   = (char *)tsk + size;
+		tsk->prio  = prio;
+		tsk->basic = prio;
 
 		core_tsk_insert(tsk);
 	}
@@ -61,7 +61,7 @@ void tsk_start( tsk_id tsk )
 {
 	port_sys_lock();
 
-	if (tsk->id == ID_STOPPED)
+	if (tsk->obj.id == ID_STOPPED)
 	{
 		tsk->sp = 0; // necessary because of the tsk_kill function
 
@@ -77,7 +77,7 @@ void tsk_startFrom( tsk_id tsk, fun_id state )
 {
 	port_sys_lock();
 
-	if (tsk->id == ID_STOPPED)
+	if (tsk->obj.id == ID_STOPPED)
 	{
 		tsk->state = state;
 		tsk->sp = 0; // necessary because of the tsk_kill function
@@ -108,11 +108,11 @@ void tsk_kill( tsk_id tsk )
 
 //	while (tsk->list) mtx_kill(tsk->list);
 
-	switch (tsk->id)
+	switch (tsk->obj.id)
 	{
 	case ID_READY:
 		if (tsk != Current) // instead use tsk_stop
-		core_tsk_remove(tsk);
+		core_tsk_remove((tsk_id)tsk);
 		break;
 	case ID_DELAYED:
 		core_tsk_unlink((tsk_id)tsk, E_STOPPED);
@@ -183,7 +183,7 @@ void tsk_resume( tsk_id tsk, unsigned event )
 {
 	port_sys_lock();
 
-	if (tsk->id == ID_DELAYED)
+	if (tsk->obj.id == ID_DELAYED)
 	core_tsk_wakeup(tsk, event);
 
 	port_sys_unlock();

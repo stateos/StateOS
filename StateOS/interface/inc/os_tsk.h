@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    24.03.2016
+    @date    09.04.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -47,23 +47,22 @@ extern "C" {
 
 struct __tsk
 {
-	tsk_id   queue; // inherited from timer
-	unsigned id;    // inherited from timer
-	tsk_id   next;  // inherited from timer
-	tsk_id   prev;  // inherited from timer
+	obj_t    obj;   // object header
 
-	fun_id   state; // inherited from timer
-	unsigned start; // inherited from timer
-	unsigned delay; // inherited from timer
-	unsigned prio;  // current priority
+	fun_id   state; // callback procedure
+	unsigned start;
+	unsigned delay;
+	tsk_id   back;  // previous process in the DELAYED queue
 
 	void    *sp;    // stack pointer
 	void    *top;   // top of stack
-	tsk_id   back;  // previous process in the DELAYED queue
+
 	unsigned basic; // basic priority
+	unsigned prio;  // current priority
 
 	void    *guard; // object that controls the pending process
 	mtx_id   list;  // list of mutexes held
+
 	union  {
 	unsigned all;   // used by flag object: wait for all flags to be set
 	void    *data;  // used by mailbox queue object
@@ -100,7 +99,7 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _TSK_INIT( _prio, _state, _top ) { 0, 0, 0, 0, _state, 0, 0, _prio, 0, _top, 0, _prio, 0, 0, { 0 }, { 0 } }
+#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, { 0 }, { 0 } }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -647,7 +646,7 @@ static inline void     tsk_resumeISR( tsk_id tsk, unsigned event ) { tsk_resume(
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class TaskBase : public __tsk, private ObjectGuard<__tsk>
+class TaskBase : public __tsk, private ObjectGuard<__obj>
 {
 public:
 

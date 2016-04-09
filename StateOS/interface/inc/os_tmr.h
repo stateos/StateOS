@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    23.03.2016
+    @date    09.04.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,10 +42,7 @@ extern "C" {
 
 struct __tmr
 {
-	tsk_id   queue; // inherited from object
-	unsigned id;    // inherited from object
-	tmr_id   next;  // inherited from object
-	tmr_id   prev;  // inherited from object
+	obj_t    obj;   // object header
 
 	fun_id   state; // callback procedure
 	unsigned start;
@@ -69,7 +66,7 @@ struct __tmr
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _TMR_INIT( _state ) { 0, 0, 0, 0, _state, 0, 0, 0 }
+#define               _TMR_INIT( _state ) { { 0, 0, 0, 0 }, _state, 0, 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -396,7 +393,7 @@ static inline void     tmr_delayISR( unsigned delay ) { System.tmr->delay = dela
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Timer : public __tmr, private ObjectGuard<__tmr>
+class Timer : public __tmr, private ObjectGuard<__obj>
 {
 public:
 

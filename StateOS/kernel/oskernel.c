@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    03.04.2016
+    @date    09.04.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -40,8 +40,8 @@ static  char     IDLE_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
 #define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
 static tsk_t IDLE;
-static tsk_t MAIN = { .id=ID_READY, .next=&IDLE, .prev=&IDLE, .top=MAIN_SP, .prio=OS_MAIN_PRIO, .basic=OS_MAIN_PRIO }; // main task
-static tsk_t IDLE = { .id=ID_IDLE,  .next=&MAIN, .prev=&MAIN, .top=IDLE_SP, .state=port_idle_hook };   // idle task and tasks queue
+static tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
+static tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=port_idle_hook }; // idle task and tasks queue
 
        sys_t System = { .cur=&MAIN };
 
@@ -57,8 +57,6 @@ void priv_rdy_insert( obj_id obj, unsigned id, obj_id nxt )
 	obj->next = nxt;
 	nxt->prev = obj;
 	prv->next = obj;
-
-	port_mem_barrier(); // necessary because of some gcc optimazations
 }
 
 /* -------------------------------------------------------------------------- */
@@ -98,12 +96,12 @@ void priv_tsk_insert( tsk_id tsk )
 
 	if (tsk->prio > 0) for (;;)
 	{
-		nxt = nxt->next;
+		nxt = nxt->obj.next;
 
 		if (tsk->prio > nxt->prio) break;
 	}
 
-	priv_rdy_insert((obj_id)tsk, ID_READY, (obj_id)nxt);
+	priv_rdy_insert(&tsk->obj, ID_READY, &nxt->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -112,7 +110,8 @@ void core_tsk_insert( tsk_id tsk )
 {
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
-	if (IDLE.next->prio > System.cur->prio)
+    tsk_id nxt = IDLE.obj.next;
+	if (nxt->prio > System.cur->prio)
 	port_ctx_switch();
 #endif
 }
@@ -121,7 +120,7 @@ void core_tsk_insert( tsk_id tsk )
 
 void core_tsk_remove( tsk_id tsk )
 {
-	priv_rdy_remove((obj_id)tsk);
+	priv_rdy_remove(&tsk->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -135,7 +134,7 @@ void core_tsk_append( tsk_id tsk, os_id obj )
 	for (;;)
 	{
 		prv = nxt;
-		nxt = nxt->queue;
+		nxt = nxt->obj.queue;
 
 		if (nxt == 0)              break;
 		if (tsk->prio > nxt->prio) break;
@@ -144,8 +143,8 @@ void core_tsk_append( tsk_id tsk, os_id obj )
 	if (nxt)
 	nxt->back  = tsk;
 	tsk->back  = prv;
-	tsk->queue = nxt;
-	prv->queue = tsk;
+	tsk->obj.queue = nxt;
+	prv->obj.queue = tsk;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -153,13 +152,13 @@ void core_tsk_append( tsk_id tsk, os_id obj )
 void core_tsk_unlink( tsk_id tsk, unsigned event )
 {
 	tsk_id prv = tsk->back;
-	tsk_id nxt = tsk->queue;
+	tsk_id nxt = tsk->obj.queue;
 	tsk->event = event;
 
 	if (nxt)
-	nxt->back  = prv;
-	prv->queue = nxt;
-	tsk->queue = 0; // necessary because of tsk_sleep[Until|For] functions
+	nxt->back = prv;
+	prv->obj.queue = nxt;
+	tsk->obj.queue = 0; // necessary because of tsk_sleep[Until|For] functions
 }
 
 /* -------------------------------------------------------------------------- */
@@ -253,13 +252,13 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 	{
 		tsk->prio = prio;
 
-		if (tsk->id == ID_READY)
+		if (tsk->obj.id == ID_READY)
 		{
 			core_tsk_remove(tsk);
 			core_tsk_insert(tsk);
 		}
 		else
-		if (tsk->id == ID_DELAYED)
+		if (tsk->obj.id == ID_DELAYED)
 		{
 			core_tsk_unlink(tsk, 0);
 			core_tsk_append(tsk, tsk->guard);
@@ -305,13 +304,13 @@ os_id core_tsk_handler( os_id sp )
 
 	cur->sp = sp;
 
-	if (cur->id == ID_READY)
+	if (cur->obj.id == ID_READY)
 	{
 		core_tsk_remove(cur);
 		priv_tsk_insert(cur);
 	}
 
-	cur = System.cur = IDLE.next;
+	cur = System.cur = IDLE.obj.next;
 
 	sp = priv_tsk_prepare(cur); // prepare task stack if necessary
 
@@ -324,7 +323,7 @@ os_id core_tsk_handler( os_id sp )
 // SYSTEM TIMER SERVICES
 /* -------------------------------------------------------------------------- */
 
-static tmr_t HEAD = { .id=ID_TIMER, .next=&HEAD, .prev=&HEAD, .delay=INFINITE }; // timers queue
+static tmr_t HEAD = { { .id=ID_TIMER, .prev=&HEAD, .next=&HEAD }, .delay=INFINITE }; // timers queue
 
 /* -------------------------------------------------------------------------- */
 static inline
@@ -334,13 +333,13 @@ void priv_tmr_insert( tmr_id tmr, unsigned id )
 
 	if (tmr->delay != INFINITE) for (;;)
 	{
-		nxt = nxt->next;
+		nxt = nxt->obj.next;
 
-		if (nxt->delay == INFINITE)                             break;
+		if (nxt->delay == INFINITE) break;
 		if (nxt->delay >  tmr->start + tmr->delay - nxt->start) break;
 	}
 
-	priv_rdy_insert((obj_id)tmr, id, (obj_id)nxt);
+	priv_rdy_insert(&tmr->obj, id, &nxt->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -355,7 +354,7 @@ void core_tmr_insert( tmr_id tmr, unsigned id )
 
 void core_tmr_remove( tmr_id tmr )
 {
-	priv_rdy_remove((obj_id)tmr);
+	priv_rdy_remove(&tmr->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -424,17 +423,12 @@ void core_tmr_handler( void )
 
 	for (;;)
 	{
-//		port_mem_barrier();
-/*
-		memory barrier is necessary because of some gcc (linaro gcc-arm-embedded 5.2.1) optimazations
-		instead use a memory barrier at the end of the 'priv_rdy_insert' function
-*/
-		tmr_id tmr = System.tmr = HEAD.next;
+		tmr_id tmr = System.tmr = HEAD.obj.next;
 
 		if (priv_tmr_counting(tmr))
 			break;
 
-		if (tmr->id == ID_TIMER)
+		if (tmr->obj.id == ID_TIMER)
 			priv_tmr_wakeup((tmr_id)tmr, E_SUCCESS);
 
 		else  /* id == ID_DELAYED */
