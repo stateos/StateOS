@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    09.04.2016
+    @date    11.04.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -45,9 +45,6 @@ extern sys_t System; // system data
 // initiating and running the system timer
 // the port_sys_init procedure is normally called as a constructor
 void port_sys_init( void ) __attribute__(( constructor ));
-
-// procedure performed in the 'idle' task; waiting for an interrupt
-void port_idle_hook( void );
 
 /* -------------------------------------------------------------------------- */
 

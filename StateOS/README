@@ -25,6 +25,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+2.5
+- idle_hook procedure moved to oskernel
+---------
 2.4
 - kernel optimalization
 ---------
