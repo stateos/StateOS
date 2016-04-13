@@ -3,22 +3,26 @@
 
 // NOTE: in makefile add 'proc_stack_size=2048' to DEFS
 
-volatile
-unsigned *l[] = { &LED[0],  &LED[1],  &LED[2],  &LED[3],  &GRN };
-unsigned  t[] = { 500*MSEC, 625*MSEC, 750*MSEC, 875*MSEC, 1000*MSEC };
-
 void proc()
 {
-	static
-	unsigned i = 0;
-	unsigned n = i++;
-	unsigned d = t[n];
+	static 	 unsigned i = 0;
+	volatile unsigned*led;
+	         unsigned timePoint;
+
+	switch (i++)
+	{
+		case  0: led = &LED[0]; timePoint =  500*MSEC; break;
+		case  1: led = &LED[1]; timePoint =  625*MSEC; break;
+		case  2: led = &LED[2]; timePoint =  750*MSEC; break;
+		case  3: led = &LED[3]; timePoint =  875*MSEC; break;
+		default: led = &GRN;    timePoint = 1000*MSEC; break;
+	}
 
 	for (;;)
 	{
-		tsk_sleepUntil(d);
-		d += SEC/2;
-		l[n][0]++;
+		tsk_sleepUntil(timePoint);
+		timePoint += SEC/2;
+		led[0]++;
 	}
 }
 
