@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    09.04.2016
+    @date    21.04.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -429,7 +429,7 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : tsk_pass                                                                                       *
+ * Name              : tsk_yield                                                                                      *
  *                                                                                                                    *
  * Description       : yield system control to the next task with the same priority in READY queue                    *
  *                                                                                                                    *
@@ -441,13 +441,13 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tsk_pass ( void ) { core_ctx_switch(); }
+static inline void     tsk_yield( void ) { core_ctx_switch(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : tsk_yield                                                                                      *
+ * Name              : tsk_pass                                                                                       *
  *                                                                                                                    *
- * Description       : the same as tsk_pass (force context switch)                                                    *
+ * Description       : the same as tsk_yield (force context switch)                                                   *
  *                                                                                                                    *
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
@@ -457,7 +457,7 @@ static inline void     tsk_pass ( void ) { core_ctx_switch(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tsk_yield( void ) { core_ctx_switch(); }
+static inline void     tsk_pass ( void ) { core_ctx_switch(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

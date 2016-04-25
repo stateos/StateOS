@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    11.04.2016
+    @date    22.04.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,20 @@
 // SYSTEM KERNEL SERVICES
 /* -------------------------------------------------------------------------- */
 
+static
+void priv_idle_hook( void )
+{
+#if OS_ROBIN || OS_TIMER == 0
+	__WFI();
+#endif
+}
+
+/* -------------------------------------------------------------------------- */
+
+void idle_hook( void ) __attribute__ ((weak, alias("priv_idle_hook")));
+
+/* -------------------------------------------------------------------------- */
+
 #ifndef MAIN_SP
 static  char     MAIN_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
 #define MAIN_SP (MAIN_STACK+ASIZE(OS_STACK_SIZE))
@@ -44,20 +58,6 @@ static tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, 
 static tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_hook }; // idle task and tasks queue
 
        sys_t System = { .cur=&MAIN };
-
-/* -------------------------------------------------------------------------- */
-
-static
-void priv_idle_hook( void )
-{
-#if OS_ROBIN || OS_TIMER == 0
-	__WFI();
-#endif
-}
-
-/* -------------------------------------------------------------------------- */
-
-void idle_hook( void ) __attribute__ ((weak, alias("priv_idle_hook")));
 
 /* -------------------------------------------------------------------------- */
 
@@ -124,8 +124,8 @@ void core_tsk_insert( tsk_id tsk )
 {
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
-    tsk_id nxt = IDLE.obj.next;
-	if (nxt->prio > System.cur->prio)
+	tsk_id nxt = IDLE.obj.next;
+	if (nxt->prio > System.cur->prio) // necessary because of the tsk_prio function
 	port_ctx_switch();
 #endif
 }
@@ -311,11 +311,9 @@ os_id core_tsk_handler( os_id sp )
 	core_tmr_handler();
 #endif
 	port_isr_lock();
-
 	core_ctx_reset();
 
 	cur = System.cur;
-
 	cur->sp = sp;
 
 	if (cur->obj.id == ID_READY)
@@ -325,8 +323,7 @@ os_id core_tsk_handler( os_id sp )
 	}
 
 	cur = System.cur = IDLE.obj.next;
-
-	sp = priv_tsk_prepare(cur); // prepare task stack if necessary
+	sp  = priv_tsk_prepare(cur); // prepare task stack if necessary
 
 	port_isr_unlock();
 

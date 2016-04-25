@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    11.04.2016
+    @date    21.04.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -56,6 +56,7 @@ void core_ctx_switch( void )
 	port_sys_enable(); port_sys_disable();
 }
 
+// reset context switch indicator
 static inline
 void core_ctx_reset( void )
 {
