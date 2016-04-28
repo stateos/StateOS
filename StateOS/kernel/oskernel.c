@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    26.04.2016
+    @date    28.04.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -32,17 +32,13 @@
 // SYSTEM KERNEL SERVICES
 /* -------------------------------------------------------------------------- */
 
-static
-void priv_idle_hook( void )
+__attribute__ ((weak))
+void idle_hook( void )
 {
 #if OS_ROBIN || OS_TIMER == 0
 	__WFI();
 #endif
 }
-
-/* -------------------------------------------------------------------------- */
-
-void idle_hook( void ) __attribute__ ((weak, alias("priv_idle_hook")));
 
 /* -------------------------------------------------------------------------- */
 
@@ -56,7 +52,6 @@ static  char     IDLE_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
 static tsk_t IDLE;
 static tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
 static tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_hook }; // idle task and tasks queue
-
        sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
@@ -108,7 +103,7 @@ void priv_tsk_insert( tsk_id tsk )
 {
 	tsk_id nxt = &IDLE;
 
-	if (tsk->prio > 0)
+	if (tsk->prio)
 	do nxt = nxt->obj.next;
 	while (tsk->prio <= nxt->prio);
 
@@ -439,7 +434,7 @@ void core_tmr_handler( void )
 		if (tmr->obj.id == ID_TIMER)
 			priv_tmr_wakeup((tmr_id)tmr, E_SUCCESS);
 
-		else  /* id == ID_DELAYED */
+		else      /* id == ID_DELAYED */
 			core_tsk_wakeup((tsk_id)tmr, E_TIMEOUT);
 	}
 
