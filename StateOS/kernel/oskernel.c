@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    28.04.2016
+    @date    04.05.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -137,14 +137,8 @@ void core_tsk_append( tsk_id tsk, os_id obj )
 	tsk_id nxt = obj;
 	tsk->guard = obj;
 
-	for (;;)
-	{
-		prv = nxt;
-		nxt = nxt->obj.queue;
-
-		if (nxt == 0)              break;
-		if (tsk->prio > nxt->prio) break;
-	}
+	do prv = nxt, nxt = nxt->obj.queue;
+	while (nxt && tsk->prio <= nxt->prio);
 
 	if (nxt)
 	nxt->back  = tsk;
