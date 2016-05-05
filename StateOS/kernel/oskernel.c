@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    04.05.2016
+    @date    05.05.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -103,8 +103,8 @@ void priv_tsk_insert( tsk_id tsk )
 {
 	tsk_id nxt = &IDLE;
 
-	if (tsk->prio)
-	do nxt = nxt->obj.next;
+	if    (tsk->prio)
+	do     nxt = nxt->obj.next;
 	while (tsk->prio <= nxt->prio);
 
 	priv_rdy_insert(&tsk->obj, ID_READY, &nxt->obj);
@@ -328,13 +328,10 @@ void priv_tmr_insert( tmr_id tmr, unsigned id )
 {
 	tmr_id nxt = &HEAD;
 
-	if (tmr->delay != INFINITE) for (;;)
-	{
-		nxt = nxt->obj.next;
-
-		if (nxt->delay == INFINITE) break;
-		if (nxt->delay >  tmr->start + tmr->delay - nxt->start) break;
-	}
+	if    (tmr->delay != INFINITE)
+	do     nxt = nxt->obj.next;
+	while (nxt->delay != INFINITE &&
+	       nxt->delay <= tmr->start + tmr->delay - nxt->start);
 
 	priv_rdy_insert(&tmr->obj, id, &nxt->obj);
 }
