@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    05.05.2016
+    @date    06.05.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -320,13 +320,13 @@ os_id core_tsk_handler( os_id sp )
 // SYSTEM TIMER SERVICES
 /* -------------------------------------------------------------------------- */
 
-static tmr_t HEAD = { { .id=ID_TIMER, .prev=&HEAD, .next=&HEAD }, .delay=INFINITE }; // timers queue
+static tmr_t WAIT = { { .id=ID_TIMER, .prev=&WAIT, .next=&WAIT }, .delay=INFINITE }; // timers queue
 
 /* -------------------------------------------------------------------------- */
 static inline
 void priv_tmr_insert( tmr_id tmr, unsigned id )
 {
-	tmr_id nxt = &HEAD;
+	tmr_id nxt = &WAIT;
 
 	if    (tmr->delay != INFINITE)
 	do     nxt = nxt->obj.next;
@@ -417,7 +417,7 @@ void core_tmr_handler( void )
 
 	for (;;)
 	{
-		tmr_id tmr = System.tmr = HEAD.obj.next;
+		tmr_id tmr = System.tmr = WAIT.obj.next;
 
 		if (priv_tmr_counting(tmr))
 			break;
