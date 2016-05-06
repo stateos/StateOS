@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    09.04.2016
+    @date    06.05.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -353,7 +353,7 @@ static inline unsigned tmr_takeISR( tmr_id tmr ) { return tmr_waitFor(tmr, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tmr_flipISR( fun_id proc ) { System.tmr->state = proc; }
+              void     tmr_flipISR( fun_id proc );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -372,7 +372,7 @@ static inline void     tmr_flipISR( fun_id proc ) { System.tmr->state = proc; }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tmr_delayISR( unsigned delay ) { System.tmr->delay = delay; }
+              void     tmr_delayISR( unsigned delay );
 
 #ifdef __cplusplus
 }

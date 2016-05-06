@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    21.04.2016
+    @date    06.05.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -38,6 +38,8 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+extern tsk_t IDLE;
+extern tmr_t WAIT;
 extern sys_t System; // system data
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    21.04.2016
+    @date    06.05.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************

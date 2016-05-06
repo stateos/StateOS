@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    21.03.2016
+    @date    06.05.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************

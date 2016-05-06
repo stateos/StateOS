@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    11.04.2016
+    @date    06.05.2016
     @brief   StateOS port file for STM32F4 uC.
 
  ******************************************************************************

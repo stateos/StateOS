@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.c
     @author  Rajmund Szymanski
-    @date    03.04.2016
+    @date    06.05.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************

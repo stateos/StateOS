@@ -27,6 +27,7 @@ Features:
 ---------
 2.5
 - idle_hook procedure moved to oskernel
+- simplified kernel code
 ---------
 2.4
 - kernel optimalization

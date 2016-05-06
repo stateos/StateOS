@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    09.04.2016
+    @date    06.05.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -109,7 +109,6 @@ typedef struct __obj
 typedef struct __sys
 {
 	tsk_id   cur;   // pointer to the current task control block
-	tmr_id   tmr;   // pointer to the current timer control block
 #if OS_TIMER == 0
 	volatile
 	unsigned cnt;   // system timer counter

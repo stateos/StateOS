@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    18.03.2016
+    @date    06.05.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************

@@ -49,10 +49,10 @@ static  char     MAIN_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
 static  char     IDLE_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
 #define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
-static tsk_t IDLE;
-static tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-static tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_hook }; // idle task and tasks queue
-       sys_t System = { .cur=&MAIN };
+static
+tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
+tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_hook }; // idle task and tasks queue
+sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
 
@@ -83,6 +83,20 @@ void priv_rdy_remove( obj_id obj )
 
 /* -------------------------------------------------------------------------- */
 
+static inline
+void priv_tsk_insert( tsk_id tsk )
+{
+	tsk_id nxt = &IDLE;
+
+	if    (tsk->prio)
+	do     nxt = nxt->obj.next;
+	while (tsk->prio <= nxt->prio);
+
+	priv_rdy_insert(&tsk->obj, ID_READY, &nxt->obj);
+}
+
+/* -------------------------------------------------------------------------- */
+
 void core_tsk_break( void )
 {
 	tsk_id cur = System.cur;
@@ -94,20 +108,6 @@ void core_tsk_break( void )
 		port_set_stack(cur->top);
 		cur->state();
 	}
-}
-
-/* -------------------------------------------------------------------------- */
-
-static inline
-void priv_tsk_insert( tsk_id tsk )
-{
-	tsk_id nxt = &IDLE;
-
-	if    (tsk->prio)
-	do     nxt = nxt->obj.next;
-	while (tsk->prio <= nxt->prio);
-
-	priv_rdy_insert(&tsk->obj, ID_READY, &nxt->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -320,7 +320,7 @@ os_id core_tsk_handler( os_id sp )
 // SYSTEM TIMER SERVICES
 /* -------------------------------------------------------------------------- */
 
-static tmr_t WAIT = { { .id=ID_TIMER, .prev=&WAIT, .next=&WAIT }, .delay=INFINITE }; // timers queue
+tmr_t WAIT = { { .id=ID_TIMER, .prev=&WAIT, .next=&WAIT }, .delay=INFINITE }; // timers queue
 
 /* -------------------------------------------------------------------------- */
 static inline
@@ -356,24 +356,24 @@ void core_tmr_remove( tmr_id tmr )
 #if OS_ROBIN && OS_TIMER
 
 static inline
-bool priv_tmr_counting( tmr_id tmr )
+bool priv_tmr_expired( tmr_id tmr )
 {
 	port_tmr_stop();
 
 	if (tmr->delay == INFINITE)
-	return true;  // return if timer counting indefinitly
+	return false; // return if timer counting indefinitly
 
 	if (tmr->delay <= Counter - tmr->start)
-	return false; // return if timer finished counting
+	return true;  // return if timer finished counting
 
 	port_tmr_start(tmr->start + tmr->delay);
 
 	if (tmr->delay >  Counter - tmr->start)
-	return true;  // return if timer still counts
+	return false; // return if timer still counts
 
 	port_tmr_stop();
 
-	return false; // however timer finished counting
+	return true;  // however timer finished counting
 }
 
 /* -------------------------------------------------------------------------- */
@@ -381,12 +381,12 @@ bool priv_tmr_counting( tmr_id tmr )
 #else
 
 static inline
-bool priv_tmr_counting( tmr_id tmr )
+bool priv_tmr_expired( tmr_id tmr )
 {
 	if (tmr->delay >= Counter - tmr->start + 1)
-	return true;  // return if timer still counts or counting indefinitly
+	return false; // return if timer still counts or counting indefinitly
 
-	return false; // timer finished counting
+	return true;  // timer finished counting
 }
 
 #endif
@@ -413,15 +413,12 @@ void priv_tmr_wakeup( tmr_id tmr, unsigned event )
 
 void core_tmr_handler( void )
 {
+	tmr_id tmr;
+
 	port_isr_lock();
 
-	for (;;)
+	while (priv_tmr_expired(tmr = WAIT.obj.next))
 	{
-		tmr_id tmr = System.tmr = WAIT.obj.next;
-
-		if (priv_tmr_counting(tmr))
-			break;
-
 		if (tmr->obj.id == ID_TIMER)
 			priv_tmr_wakeup((tmr_id)tmr, E_SUCCESS);
 
@@ -429,8 +426,6 @@ void core_tmr_handler( void )
 			core_tsk_wakeup((tsk_id)tmr, E_TIMEOUT);
 	}
 
-	System.tmr = 0;
-	
 	port_isr_unlock();
 }
 
