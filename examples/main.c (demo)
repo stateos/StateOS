@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-// NOTE: in makefile add 'proc_stack_size=2048' to DEFS
+// NOTE: in makefile add 'proc_stack_size=4096' to DEFS
 
 void proc()
 {
