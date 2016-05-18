@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    06.05.2016
+    @date    18.05.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -26,7 +26,7 @@
 
  ******************************************************************************/
 
-#ifdef  __GNUC__
+#if defined(__GNUC__) && !defined(__ARMCC_VERSION)
 
 #include <stddef.h>
 #include <oskernel.h>
@@ -86,4 +86,4 @@ void PendSV_Handler( void )
 
 /* -------------------------------------------------------------------------- */
 
-#endif // __GNUC__
+#endif // __GNUC__ && !__ARMCC_VERSION

@@ -26,63 +26,64 @@
 
  ******************************************************************************/
 
-#if defined(__CC_ARM)
+#if defined(__ARMCOMPILER_VERSION)
 
 #include <stddef.h>
 #include <oskernel.h>
 
 /* -------------------------------------------------------------------------- */
 
-__asm void PendSV_Handler( void )
+__attribute__((naked))
+void PendSV_Handler( void )
 {
-	PRESERVE8
-	IMPORT core_tsk_handler
-
-	mrs   r0,    PSP
+	__asm volatile
+	(
+"	mrs   r0,    PSP               \n"
 #if __CORTEX_M < 3
-	subs  r0,   #36
-	stm   r0!, { r4  - r7 }
-	mov   r3,    r8
-	mov   r4,    r9
-	mov   r5,    r10
-	mov   r6,    r11
-	mov   r7,    lr
-	stm   r0!, { r3  - r7 }
-	subs  r0,   #36
+"	sub   r0,   #36                \n"
+"	stm   r0!, { r4  - r7 }        \n"
+"	mov   r3,    r8                \n"
+"	mov   r4,    r9                \n"
+"	mov   r5,    r10               \n"
+"	mov   r6,    r11               \n"
+"	mov   r7,    lr                \n"
+"	stm   r0!, { r3  - r7 }        \n"
+"	sub   r0,   #36                \n"
 #else
 #if __FPU_USED
-	tst   lr,   #16                     ; fpu used?
-	it    eq
- vstmdbeq r0!, { s16 - s31 }
+"	tst   lr,   #16                \n"
+"	it    eq                       \n"
+"vstmdbeq r0!, { s16 - s31 }       \n"
 #endif
-	stmdb r0!, { r4  - r11, lr }
+"	stmdb r0!, { r4  - r11, lr }   \n"
 #endif
-	bl    core_tsk_handler
+"	bl    core_tsk_handler         \n"
 #if __CORTEX_M < 3
-	adds  r0,   #16
-	ldm   r0!, { r3  - r7 }
-	mov   r8,    r3
-	mov   r9,    r4
-	mov   r10,   r5
-	mov   r11,   r6
-	mov   lr,    r7
-	subs  r0,   #36
-	ldm   r0!, { r4  - r7 }
-	adds  r0,   #20
+"	add   r0,   #16                \n"
+"	ldm   r0!, { r3  - r7 }        \n"
+"	mov   r8,    r3                \n"
+"	mov   r9,    r4                \n"
+"	mov   r10,   r5                \n"
+"	mov   r11,   r6                \n"
+"	mov   lr,    r7                \n"
+"	sub   r0,   #36                \n"
+"	ldm   r0!, { r4  - r7 }        \n"
+"	add   r0,   #20                \n"
 #else
-	ldmia r0!, { r4  - r11, lr }
+"	ldmia r0!, { r4  - r11, lr }   \n"
 #if __FPU_USED
-	tst   lr,   #16                     ; fpu used?
-	it    eq
- vldmiaeq r0!, { s16 - s31 }
+"	tst   lr,   #16                \n"
+"	it    eq                       \n"
+"vldmiaeq r0!, { s16 - s31 }       \n"
 #endif
 #endif
-	msr   PSP,   r0
-	bx    lr
+"	msr   PSP,   r0                \n"
+"	bx    lr                       \n"
 
-	ALIGN
+:::	"memory"
+	);
 }
 
 /* -------------------------------------------------------------------------- */
 
-#endif // __CC_ARM
+#endif // __ARMCOMPILER_VERSION

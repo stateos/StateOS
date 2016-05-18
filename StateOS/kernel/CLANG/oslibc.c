@@ -1,9 +1,9 @@
 /******************************************************************************
 
-    @file    StateOS: oscore.c
+    @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
     @date    18.05.2016
-    @brief   StateOS port file for ARM Cotrex-M uC.
+    @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
 
@@ -26,63 +26,51 @@
 
  ******************************************************************************/
 
-#if defined(__CC_ARM)
+#if defined(__ARMCOMPILER_VERSION) && !defined(__MICROLIB)
 
-#include <stddef.h>
-#include <oskernel.h>
+#include <os.h>
 
 /* -------------------------------------------------------------------------- */
 
-__asm void PendSV_Handler( void )
+__attribute__((used))
+void *__user_perthread_libspace( void )
 {
-	PRESERVE8
-	IMPORT core_tsk_handler
-
-	mrs   r0,    PSP
-#if __CORTEX_M < 3
-	subs  r0,   #36
-	stm   r0!, { r4  - r7 }
-	mov   r3,    r8
-	mov   r4,    r9
-	mov   r5,    r10
-	mov   r6,    r11
-	mov   r7,    lr
-	stm   r0!, { r3  - r7 }
-	subs  r0,   #36
-#else
-#if __FPU_USED
-	tst   lr,   #16                     ; fpu used?
-	it    eq
- vstmdbeq r0!, { s16 - s31 }
-#endif
-	stmdb r0!, { r4  - r11, lr }
-#endif
-	bl    core_tsk_handler
-#if __CORTEX_M < 3
-	adds  r0,   #16
-	ldm   r0!, { r3  - r7 }
-	mov   r8,    r3
-	mov   r9,    r4
-	mov   r10,   r5
-	mov   r11,   r6
-	mov   lr,    r7
-	subs  r0,   #36
-	ldm   r0!, { r4  - r7 }
-	adds  r0,   #20
-#else
-	ldmia r0!, { r4  - r11, lr }
-#if __FPU_USED
-	tst   lr,   #16                     ; fpu used?
-	it    eq
- vldmiaeq r0!, { s16 - s31 }
-#endif
-#endif
-	msr   PSP,   r0
-	bx    lr
-
-	ALIGN
+	return &System.cur->libspace;  /* provide separate libspace for each task */
 }
 
 /* -------------------------------------------------------------------------- */
 
-#endif // __CC_ARM
+__attribute__((used))
+int _mutex_initialize( unsigned *mutex )
+{
+	return (int) mutex;
+}
+
+/* -------------------------------------------------------------------------- */
+
+__attribute__((used))
+void _mutex_acquire( unsigned *mutex )
+{
+	unsigned lock = port_get_lock();
+	port_set_lock();
+	*mutex = lock;
+}
+
+/* -------------------------------------------------------------------------- */
+
+__attribute__((used))
+void _mutex_release( unsigned *mutex )
+{
+	port_put_lock(*mutex);
+}
+
+/* -------------------------------------------------------------------------- */
+
+void _mutex_free( unsigned *mutex )
+{
+	(void) mutex;
+}
+
+/* -------------------------------------------------------------------------- */
+
+#endif // __ARMCOMPILER_VERSION && !__MICROLIB
