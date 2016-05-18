@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    system_stm32f4xx.c
  * @author  Rajmund Szymanski
- * @date    03.03.2016
+ * @date    03.04.2016
  * @brief   This file provides set of configuration functions for STM32F4 uC.
  ******************************************************************************/
 

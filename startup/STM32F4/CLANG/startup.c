@@ -7,7 +7,7 @@
           priority is privileged, and the stack is set to main.
 *******************************************************************************/
 
-#if defined(__CC_ARM)
+#if defined(__ARMCOMPILER_VERSION)
 
 #include <stm32f4xx.h>
 
@@ -27,55 +27,61 @@
 #ifndef main_stack_size
 #define main_stack_size 1024 // <- default size of main stack
 #endif
-#define main_stack (((main_stack_size)+7)&(~7))
-
-#if     main_stack_size > 0
-char  __main_stack[main_stack] __attribute__ ((used, section(".stack"), zero_init));
-#endif
 
 #ifndef proc_stack_size
 #define proc_stack_size 1024 // <- default size of process stack
-#endif
-#define proc_stack (((proc_stack_size)+7)&(~7))
-
-#if     proc_stack_size > 0
-char  __proc_stack[proc_stack] __attribute__ ((used, section(".stack"), zero_init));
 #endif
 
 /*******************************************************************************
  Configuration of stacks and heap
 *******************************************************************************/
 
-__attribute__ ((section(".stack")))
-__asm void __user_stack_config( void )
-{
-#if main_stack_size > 0
-__initial_msp   EQU     __ram_start + main_stack
-#else
-__initial_msp   EQU     __ram_end
-#endif
-__initial_psp   EQU     __ram_start + main_stack + proc_stack
-#if proc_stack_size > 0
-#ifndef __MICROLIB
-                IMPORT  __use_two_region_memory
-#endif
-__initial_sp    EQU     __initial_psp
-#else
-__initial_sp    EQU     __initial_msp
-#endif
-                EXPORT  __initial_msp
-                EXPORT  __initial_psp
-                EXPORT  __initial_sp
-}
+#define NUM(n) #n
+#define STR(n) NUM(n) "\n"
 
-__attribute__ ((section(".heap")))
-__asm void __user_heap_config( void )
+void __user_stackheap_config( void )
 {
-__heap_base     EQU     .
-__heap_limit    EQU     __ram_end
+	__asm volatile
+	(
+"		.pushsection .stack, \"aw\", %progbits \n"
 
-                EXPORT  __heap_base
-                EXPORT  __heap_limit
+		#if main_stack_size > 0
+"		.space  " STR(main_stack_size)
+"		.align  3               \n"
+"__initial_msp  = .             \n"
+		#else
+"__initial_msp  = " STR(__ram_end)
+		#endif
+
+		#if proc_stack_size > 0
+		#ifndef __MICROLIB
+"		.global __use_two_region_memory \n"
+		#endif
+"		.space  " STR(proc_stack_size)
+"		.align  3               \n"
+"__initial_psp  = .             \n"
+"__initial_sp   = __initial_psp \n"
+		#else
+"__initial_psp  = .             \n"
+"__initial_sp   = __initial_msp \n"
+		#endif
+
+"		.popsection             \n"
+
+"		.global __initial_msp   \n"
+"		.global __initial_psp   \n"
+"		.global __initial_sp    \n"
+
+"		.pushsection .heap, \"aw\", %progbits \n"
+
+"__heap_base    = .             \n"
+"__heap_limit   = " STR(__ram_end)
+
+"		.popsection             \n"
+
+"		.global __heap_base     \n"
+"		.global __heap_limit    \n"
+	);
 }
 
 /*******************************************************************************
@@ -115,4 +121,4 @@ void Reset_Handler( void )
 
 /******************************************************************************/
 
-#endif // __CC_ARM
+#endif // __ARMCOMPILER_VERSION

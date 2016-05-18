@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    06.05.2016
+    @date    10.05.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -72,7 +72,7 @@ struct __tsk
 	unsigned flags; // used by flag object: all flags to wait
 	unsigned event; // wakeup event
 	};
-#if defined(__CC_ARM) && !defined(__MICROLIB)
+#if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 	char     libspace[96];
 #endif
 };
@@ -99,7 +99,11 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
+#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, { 0 }, { 0 }, { 0 } }
+#else
 #define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, { 0 }, { 0 } }
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *

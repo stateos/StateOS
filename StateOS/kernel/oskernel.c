@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    06.05.2016
+    @date    17.05.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -105,7 +105,6 @@ void core_tsk_break( void )
 	{
 		port_ctx_switch();
 		port_clr_lock();
-		port_set_stack(cur->top);
 		cur->state();
 	}
 }

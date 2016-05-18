@@ -7,18 +7,9 @@
           priority is privileged, and the stack is set to main.
 *******************************************************************************/
 
-#if defined(__CC_ARM)
+#if defined(__GNUC__) && !defined(__ARMCC_VERSION)
 
 #include <stm32f4xx.h>
-
-/*******************************************************************************
- Specific definitions for the chip
-*******************************************************************************/
-
-#define __ccm_start 0x10000000
-#define __ccm_end   0x10010000
-#define __ram_start 0x20000000
-#define __ram_end   0x20020000
 
 /*******************************************************************************
  Configuration of stacks
@@ -30,7 +21,7 @@
 #define main_stack (((main_stack_size)+7)&(~7))
 
 #if     main_stack_size > 0
-char  __main_stack[main_stack] __attribute__ ((used, section(".stack"), zero_init));
+char  __main_stack[main_stack] __attribute__ ((used, section(".main_stack")));
 #endif
 
 #ifndef proc_stack_size
@@ -39,44 +30,86 @@ char  __main_stack[main_stack] __attribute__ ((used, section(".stack"), zero_ini
 #define proc_stack (((proc_stack_size)+7)&(~7))
 
 #if     proc_stack_size > 0
-char  __proc_stack[proc_stack] __attribute__ ((used, section(".stack"), zero_init));
+char  __proc_stack[proc_stack] __attribute__ ((used, section(".proc_stack")));
 #endif
 
 /*******************************************************************************
- Configuration of stacks and heap
+ Symbols defined in linker script
 *******************************************************************************/
 
-__attribute__ ((section(".stack")))
-__asm void __user_stack_config( void )
+extern unsigned  __data_init_start[];
+extern unsigned       __data_start[];
+extern unsigned       __data_end  [];
+extern unsigned       __data_size [];
+extern unsigned        __bss_start[];
+extern unsigned        __bss_end  [];
+extern unsigned        __bss_size [];
+
+extern void(*__preinit_array_start[])();
+extern void(*__preinit_array_end  [])();
+extern void(*   __init_array_start[])();
+extern void(*   __init_array_end  [])();
+extern void(*   __fini_array_start[])();
+extern void(*   __fini_array_end  [])();
+
+/*******************************************************************************
+ Default reset procedures
+*******************************************************************************/
+
+static inline
+void MemCpy( unsigned *dst_, unsigned *end_, unsigned *src_ )
 {
-#if main_stack_size > 0
-__initial_msp   EQU     __ram_start + main_stack
-#else
-__initial_msp   EQU     __ram_end
-#endif
-__initial_psp   EQU     __ram_start + main_stack + proc_stack
-#if proc_stack_size > 0
-#ifndef __MICROLIB
-                IMPORT  __use_two_region_memory
-#endif
-__initial_sp    EQU     __initial_psp
-#else
-__initial_sp    EQU     __initial_msp
-#endif
-                EXPORT  __initial_msp
-                EXPORT  __initial_psp
-                EXPORT  __initial_sp
+	while (dst_ < end_) *dst_++ = *src_++;
 }
 
-__attribute__ ((section(".heap")))
-__asm void __user_heap_config( void )
+static inline
+void MemSet( unsigned *dst_, unsigned *end_, unsigned val_ )
 {
-__heap_base     EQU     .
-__heap_limit    EQU     __ram_end
-
-                EXPORT  __heap_base
-                EXPORT  __heap_limit
+	while (dst_ < end_) *dst_++ = val_;
 }
+
+static inline
+void DataInit( void )
+{
+	/* Initialize the data segment */
+	MemCpy(__data_start, __data_end, __data_init_start);
+	/* Zero fill the bss segment */
+	MemSet(__bss_start, __bss_end, 0);
+}
+
+static inline
+void CallArray( void(**dst_)(), void(**end_)() )
+{
+	while (dst_ < end_)(*dst_++)();
+}
+
+#ifndef __NOSTARTFILES
+
+void __libc_init_array( void );
+void __libc_fini_array( void );
+
+#else //__NOSTARTFILES
+
+static inline
+void __libc_init_array( void )
+{
+#ifndef __NOSTARTFILES
+	CallArray(__preinit_array_start, __preinit_array_end);
+	_init();
+#endif
+	CallArray(__init_array_start, __init_array_end);
+}
+
+static inline
+void __libc_fini_array( void )
+{
+	CallArray(__fini_array_start, __fini_array_end);
+#ifndef __NOSTARTFILES
+	_fini();
+#endif
+}
+
+#endif//__NOSTARTFILES
 
 /*******************************************************************************
  Initial process stack pointer
@@ -88,7 +121,7 @@ extern char __initial_psp[];
  Prototypes of external functions
 *******************************************************************************/
 
-void __main( void ) __attribute__ ((noreturn));
+int  main( void );
 
 /*******************************************************************************
  Default reset handler
@@ -109,10 +142,18 @@ void Reset_Handler( void )
 	/* Call the system clock intitialization function */
 	SystemInit();
 #endif
+	/* Initialize data segments */
+	DataInit();
+	/* Call global & static constructors */
+	__libc_init_array();
 	/* Call the application's entry point */
-	__main();
+	main();
+	/* Call global & static destructors */
+	__libc_fini_array();
+	/* Go into an infinite loop */
+	for (;;);
 }
 
 /******************************************************************************/
 
-#endif // __CC_ARM
+#endif // __GNUC__ && !__ARMCC_VERSION

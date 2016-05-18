@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    06.05.2016
+    @date    10.05.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -26,7 +26,7 @@
 
  ******************************************************************************/
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__ARMCC_VERSION)
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -112,4 +112,4 @@ int   _kill_r( struct _reent *reent, int pid, int sig )                      __a
 
 /* -------------------------------------------------------------------------- */
 
-#endif // __GNUC__
+#endif // __GNUC__ && !__ARMCC_VERSION
