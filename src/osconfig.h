@@ -76,4 +76,4 @@
 // ----------------------------
 // default task stack size in bytes
 // default value: 256
-#define  OS_STACK_SIZE      256
+#define  OS_STACK_SIZE      512
