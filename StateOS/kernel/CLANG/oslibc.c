@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    18.05.2016
+    @date    19.05.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -66,9 +66,20 @@ void _mutex_release( unsigned *mutex )
 
 /* -------------------------------------------------------------------------- */
 
+__attribute__((used))
 void _mutex_free( unsigned *mutex )
 {
 	(void) mutex;
+}
+
+/* -------------------------------------------------------------------------- */
+
+__attribute__((weak))
+char *_sys_command_string( char *cmd, int len )
+{
+	(void) len;
+
+	return cmd;
 }
 
 /* -------------------------------------------------------------------------- */
