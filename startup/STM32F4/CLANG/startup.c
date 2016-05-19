@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     18.05.2016
+@date     19.05.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -43,7 +43,7 @@ void __user_stackheap_config( void )
 {
 	__asm volatile
 	(
-"		.pushsection .stack, \"aw\", %progbits \n"
+"		.pushsection .stack, \"aw\", %nobits \n"
 
 		#if main_stack_size > 0
 "		.space  " STR(main_stack_size)
@@ -72,7 +72,7 @@ void __user_stackheap_config( void )
 "		.global __initial_psp   \n"
 "		.global __initial_sp    \n"
 
-"		.pushsection .heap, \"aw\", %progbits \n"
+"		.pushsection .heap, \"aw\", %nobits \n"
 
 "__heap_base    = .             \n"
 "__heap_limit   = " STR(__ram_end)
@@ -108,7 +108,7 @@ void Reset_Handler( void )
 	__set_CONTROL(CONTROL_SPSEL_Msk);
 #endif
 #if __FPU_USED
-    /* Set CP10 and CP11 Full Access */
+	/* Set CP10 and CP11 Full Access */
 	SCB->CPACR = 0x00F00000U;
 #endif
 #ifndef __NO_SYSTEM_INIT

@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     10.05.2016
+#date     19.05.2016
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -73,6 +73,7 @@ AS_SRCS    := $(AS_SRCS:%.s=)
 BIN        := $(PROJECT).bin
 ELF        := $(PROJECT).axf
 HEX        := $(PROJECT).hex
+HTM        := $(PROJECT).htm
 LIB        := $(PROJECT).lib
 LSS        := $(PROJECT).lss
 MAP        := $(PROJECT).map
@@ -90,7 +91,7 @@ COMMON_F    = --target=arm-arm-none-eabi -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d
 COMMON_F   += -Oz -ffunction-sections -fdata-sections # -flto
 COMMON_F   += -Wall -Wextra # -Wpedantic
 COMMON_F   += -MD -MP
-COMMON_F   += #--debug
+COMMON_F   += # --debug
 
 AS_FLAGS    =
 C_FLAGS     = -std=gnu11
@@ -206,7 +207,7 @@ print_elf_size : print_size
 	$(info Size of target file:)
 	$(SIZE) -B $(ELF)
 
-GENERATED = $(BIN) $(ELF) $(HEX) $(LIB) $(LSS) $(MAP) $(DEPS) $(LSTS) $(OBJS) $(TXTS)
+GENERATED = $(BIN) $(ELF) $(HEX) $(HTM) $(LIB) $(LSS) $(MAP) $(DEPS) $(LSTS) $(OBJS) $(TXTS)
 
 clean :
 	$(info Removing all generated output files)
