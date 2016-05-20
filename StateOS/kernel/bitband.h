@@ -2,7 +2,7 @@
 
     @file    StateOS: bitband.h
     @author  Rajmund Szymanski
-    @date    06.05.2016
+    @date    20.05.2016
     @brief   This file contains macro definitions for the Cortex-M devices.
 
  ******************************************************************************
@@ -46,7 +46,7 @@ extern "C" {
 // green_led = 1;
 /* -------------------------------------------------------------------------- */
 
-#ifdef __CC_ARM
+#ifndef __GNUC__
 
 static inline __attribute__(( always_inline, const ))
 int __builtin_ctz( unsigned mask )

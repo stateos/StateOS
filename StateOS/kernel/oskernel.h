@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    16.05.2016
+    @date    20.05.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -179,12 +179,10 @@ unsigned port_isr_inside( void )
 static inline __attribute__(( always_inline ))
 void port_set_stack( void *top )
 {
-#if   defined(__GNUC__)
-	__asm volatile ("mov sp, %0" :: "r" (top) : "memory");
-#elif defined(__CC_ARM)
+#if   defined(__CC_ARM)
 	__set_PSP((unsigned)top);
-#else
-	#error Unknown compiler!
+#elif defined(__GNUC__)
+	__asm volatile ("mov sp, %0" :: "r" (top) : "memory");
 #endif
 }
 
