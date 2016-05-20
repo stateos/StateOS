@@ -27,6 +27,8 @@ Features:
 ---------
 2.6
 - added support for arm clang
+- fixed bugs in arm clang code
+- fixed stack alignment
 ---------
 2.5
 - idle_hook procedure moved to oskernel

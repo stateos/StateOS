@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    10.05.2016
+    @date    20.05.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -120,7 +120,7 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _TSK_STACK( _size ) (__osalign char[ASIZE(_size)]){ 0 } + ASIZE(_size)
+#define               _TSK_STACK( _size ) (stk_t[ASIZE(_size)]){ 0 } + ASIZE(_size)
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -138,7 +138,7 @@ struct __tsk
  **********************************************************************************************************************/
 
 #define             OS_WRK( tsk, prio, state, size )                                        \
-                       char tsk##__stk[ASIZE( size )] __osalign;                             \
+                       stk_t tsk##__stk[ASIZE( size )];                                      \
                        tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk+ASIZE( size ) ); \
                        tsk_id tsk = & tsk##__tsk
 
@@ -193,7 +193,7 @@ struct __tsk
  **********************************************************************************************************************/
 
 #define         static_WRK( tsk, prio, state, size )                                        \
-                static char tsk##__stk[ASIZE( size )] __osalign;                             \
+                static stk_t tsk##__stk[ASIZE( size )];                                      \
                 static tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk+ASIZE( size ) ); \
                 static tsk_id tsk = & tsk##__tsk
 
@@ -704,7 +704,7 @@ namespace ThisTask
 template<unsigned _size>
 class TaskT : public TaskBase
 {
-	char _stack[ASIZE(_size)] __osalign;
+	stk_t _stack[ASIZE(_size)];
 
 public:
 

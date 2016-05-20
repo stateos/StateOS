@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    06.05.2016
+    @date    20.05.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -29,6 +29,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <osport.h>
 
 #ifdef __cplusplus
@@ -64,13 +65,12 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#define __osalign \
-        __attribute__((aligned(8)))
+typedef uint64_t stk_t;
 
 /* -------------------------------------------------------------------------- */
 
 #define ASIZE( size ) \
- (((unsigned)( size )+7U)&~7U)
+ (((unsigned)( size )+(sizeof(stk_t)-1))/sizeof(stk_t))
 
 /* -------------------------------------------------------------------------- */
 

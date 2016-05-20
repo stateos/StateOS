@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    17.05.2016
+    @date    20.05.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -43,10 +43,10 @@ void idle_hook( void )
 /* -------------------------------------------------------------------------- */
 
 #ifndef MAIN_SP
-static  char     MAIN_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
+static  stk_t    MAIN_STACK[ASIZE(OS_STACK_SIZE)];
 #define MAIN_SP (MAIN_STACK+ASIZE(OS_STACK_SIZE))
 #endif
-static  char     IDLE_STACK[ASIZE(OS_STACK_SIZE)] __osalign;
+static  stk_t    IDLE_STACK[ASIZE(OS_STACK_SIZE)];
 #define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
 static
@@ -99,13 +99,11 @@ void priv_tsk_insert( tsk_id tsk )
 
 void core_tsk_break( void )
 {
-	tsk_id cur = System.cur;
-
 	for (;;)
 	{
 		port_ctx_switch();
 		port_clr_lock();
-		cur->state();
+		System.cur->state();
 	}
 }
 
@@ -436,12 +434,12 @@ void core_tmr_handler( void )
 
 os_id core_sys_alloc( size_t size )
 {
-	static  char     Heap[ASIZE(OS_HEAP_SIZE)] __osalign;
+	static  stk_t    Heap[ASIZE(OS_HEAP_SIZE)];
 	#define HeapEnd (Heap+ASIZE(OS_HEAP_SIZE))
 
 	static
-	char *heap = Heap;
-	char *base = 0;
+	stk_t *heap = Heap;
+	stk_t *base = 0;
 
 	if (size)
 	{
@@ -452,8 +450,8 @@ os_id core_sys_alloc( size_t size )
 			base = heap;
 			heap = base + size;
 
-			uint64_t *_mem = (uint64_t *)(base);
-			uint64_t *_end = (uint64_t *)(heap);
+			stk_t *_mem = base;
+			stk_t *_end = heap;
 			do *_mem++ = 0; while (_mem < _end);
 		}
 	}
@@ -467,18 +465,18 @@ os_id core_sys_alloc( size_t size )
 
 os_id core_sys_alloc( size_t size )
 {
-	char *base = 0;
+	stk_t *base = 0;
 
 	if (size)
 	{
 		size = ASIZE(size);
 
-		base = malloc(size);
+		base = malloc(size * sizeof(stk_t));
 
 		if (base)
 		{
-			uint64_t *_mem = (uint64_t *)(base);
-			uint64_t *_end = (uint64_t *)(base + size);
+			stk_t *_mem = base;
+			stk_t *_end = base + size;
 			do *_mem++ = 0; while (_mem < _end);
 		}
 	}
