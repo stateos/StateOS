@@ -183,6 +183,8 @@ void port_set_stack( void *top )
 	__set_PSP((unsigned)top);
 #elif defined(__GNUC__)
 	__asm volatile ("mov sp, %0" :: "r" (top) : "memory");
+#else
+	#error Unknown compiler!
 #endif
 }
 
