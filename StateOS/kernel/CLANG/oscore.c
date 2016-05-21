@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    18.05.2016
+    @date    21.05.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -40,7 +40,7 @@ void PendSV_Handler( void )
 	(
 "	mrs   r0,    PSP               \n"
 #if __CORTEX_M < 3
-"	sub   r0,   #36                \n"
+"	subs  r0,   #36                \n"
 "	stm   r0!, { r4  - r7 }        \n"
 "	mov   r3,    r8                \n"
 "	mov   r4,    r9                \n"
@@ -48,7 +48,7 @@ void PendSV_Handler( void )
 "	mov   r6,    r11               \n"
 "	mov   r7,    lr                \n"
 "	stm   r0!, { r3  - r7 }        \n"
-"	sub   r0,   #36                \n"
+"	subs  r0,   #36                \n"
 #else
 #if __FPU_USED
 "	tst   lr,   #16                \n"
@@ -59,16 +59,16 @@ void PendSV_Handler( void )
 #endif
 "	bl    core_tsk_handler         \n"
 #if __CORTEX_M < 3
-"	add   r0,   #16                \n"
+"	adds  r0,   #16                \n"
 "	ldm   r0!, { r3  - r7 }        \n"
 "	mov   r8,    r3                \n"
 "	mov   r9,    r4                \n"
 "	mov   r10,   r5                \n"
 "	mov   r11,   r6                \n"
 "	mov   lr,    r7                \n"
-"	sub   r0,   #36                \n"
+"	subs  r0,   #36                \n"
 "	ldm   r0!, { r4  - r7 }        \n"
-"	add   r0,   #20                \n"
+"	adds  r0,   #20                \n"
 #else
 "	ldmia r0!, { r4  - r11, lr }   \n"
 #if __FPU_USED
