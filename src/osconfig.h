@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    29.02.2016
+    @date    21.05.2016
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
