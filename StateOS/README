@@ -29,6 +29,7 @@ Features:
 - fixed some bugs in arm clang code
 - fixed stack alignment
 - fixed some bugs
+- changed startup files
 ---------
 2.6
 - added support for arm clang

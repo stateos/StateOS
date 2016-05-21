@@ -1,17 +1,44 @@
 /*******************************************************************************
-@file     vectors.c
+@file     startup.c
 @author   Rajmund Szymanski
-@date     18.05.2016
-@brief    STM32F4xx vector table.
+@date     21.05.2016
+@brief    STM32F4xx startup file.
+          After reset the Cortex-M4 processor is in thread mode,
+          priority is privileged, and the stack is set to main.
 *******************************************************************************/
 
 #include <stm32f4xx.h>
 
 /*******************************************************************************
- Initial main stack pointer
+ Specific definitions for the chip
+*******************************************************************************/
+
+#define __ccm_start 0x10000000
+#define __ccm_end   0x10010000
+#define __ram_start 0x20000000
+#define __ram_end   0x20020000
+
+/*******************************************************************************
+ Configuration of stacks
+*******************************************************************************/
+
+#ifndef main_stack_size
+#define main_stack_size 1024 // <- default size of main stack
+#endif
+
+#ifndef proc_stack_size
+#define proc_stack_size 1024 // <- default size of process stack
+#endif
+
+#define main_stack (((main_stack_size)+7)&(~7))
+#define proc_stack (((proc_stack_size)+7)&(~7))
+
+/*******************************************************************************
+ Initial stacks' pointers
 *******************************************************************************/
 
 extern char __initial_msp[];
+extern char __initial_psp[];
 
 /*******************************************************************************
  Default fault handler
@@ -31,7 +58,7 @@ static __attribute__ ((used, noreturn)) void Fault_Handler( void )
 void _microlib_exit( void ) __attribute__ ((weak, noreturn, alias("Fault_Handler")));
 #elif defined(__ARMCC_VERSION)
 void      _sys_exit( void ) __attribute__ ((weak, noreturn, alias("Fault_Handler")));
-#else
+#elif defined(__GNUC__)
 void          _exit( int  ) __attribute__ ((weak, noreturn, alias("Fault_Handler")));
 #endif
 
@@ -40,7 +67,7 @@ void          _exit( int  ) __attribute__ ((weak, noreturn, alias("Fault_Handler
 *******************************************************************************/
 
 /* Core exceptions */
-void Reset_Handler                (void) __attribute__ ((weak, alias("Fault_Handler")));
+void Reset_Handler                (void) __attribute__ ((weak, noreturn));
 void NMI_Handler                  (void) __attribute__ ((weak, alias("Fault_Handler")));
 void HardFault_Handler            (void) __attribute__ ((weak, alias("Fault_Handler")));
 void MemManage_Handler            (void) __attribute__ ((weak, alias("Fault_Handler")));
@@ -284,3 +311,42 @@ void (* const vectors[])(void) __attribute__ ((used, section(".vectors"))) =
 
 #endif//__NO_EXTERNAL_INTERRUPTS
 };
+
+/*******************************************************************************
+ Specific definitions for the compiler
+*******************************************************************************/
+
+#if   defined(__CC_ARM)
+#include "ARMCC/startup.h"
+#elif defined(__ARMCOMPILER_VERSION)
+#include "CLANG/startup.h"
+#elif defined(__GNUC__)
+#include "GNUCC/startup.h"
+#else
+#error Unknown compiler!
+#endif
+
+/*******************************************************************************
+ Default reset handler
+*******************************************************************************/
+
+void Reset_Handler( void )
+{
+#if proc_stack_size > 0
+	/* Initialize the process stack pointer */
+	__set_PSP((unsigned)__initial_psp);
+	__set_CONTROL(CONTROL_SPSEL_Msk);
+#endif
+#if __FPU_USED
+	/* Set CP10 and CP11 Full Access */
+	SCB->CPACR = 0x00F00000U;
+#endif
+#ifndef __NO_SYSTEM_INIT
+	/* Call the system clock intitialization function */
+	SystemInit();
+#endif
+	/* Call the application's entry point */
+	__main();
+}
+
+/******************************************************************************/
