@@ -27,6 +27,7 @@ Features:
 ---------
 2.8
 - changed startup files
+- fixed bug in core_ctx_switch for armclang and Cortex-M0
 ---------
 2.7
 - fixed some bugs in arm clang code
