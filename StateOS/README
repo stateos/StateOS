@@ -25,11 +25,13 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+2.8
+- changed startup files
+---------
 2.7
 - fixed some bugs in arm clang code
 - fixed stack alignment
 - fixed some bugs
-- changed startup files
 ---------
 2.6
 - added support for arm clang
