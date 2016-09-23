@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    06.05.2016
+    @date    23.09.2016
     @brief   StateOS port file for STM32F4 uC.
 
  ******************************************************************************
@@ -42,7 +42,7 @@ void port_sys_init( void )
 	#error Incorrect Timer frequency!
 	#endif
 
-	BB(RCC->APB1ENR, OS_TIM_CLK_ENABLE) = 1;
+	RCC->APB1ENR |= OS_TIM_CLK_ENABLE;
 	#if OS_ROBIN
 	NVIC_SetPriority(OS_TIM_IRQn, 0xFF);
 	NVIC_EnableIRQ(OS_TIM_IRQn);

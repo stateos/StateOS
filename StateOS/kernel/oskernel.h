@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    20.05.2016
+    @date    23.09.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,6 @@
 #pragma once
 
 #include <stdlib.h>
-#include <bitband.h>
 #include <osbase.h>
 
 #ifdef __cplusplus
@@ -46,7 +45,7 @@ extern sys_t System; // system data
 
 // initiating and running the system timer
 // the port_sys_init procedure is normally called as a constructor
-void port_sys_init( void ) __attribute__(( constructor ));
+void port_sys_init( void ) __constructor;
 
 /* -------------------------------------------------------------------------- */
 

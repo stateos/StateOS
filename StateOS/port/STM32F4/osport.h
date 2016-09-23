@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    10.05.2016
+    @date    23.09.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <osconfig.h>
 
 #ifdef __cplusplus
@@ -138,8 +139,12 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-extern   char               __initial_sp[];
-#define  MAIN_SP            __initial_sp
+typedef  uint64_t          stk_t;
+
+/* -------------------------------------------------------------------------- */
+
+extern   char            __initial_sp[];
+#define  MAIN_SP         __initial_sp
 
 /* -------------------------------------------------------------------------- */
 
@@ -195,40 +200,43 @@ void port_tmr_force( void )
 /* -------------------------------------------------------------------------- */
 
 #if   defined(__ARMCC_VERSION)
-#define __noreturn  __attribute__((noreturn))
+#define  __noreturn      __attribute__((noreturn))
 #elif defined(__GNUC__)
-#define __noreturn  __attribute__((noreturn, naked))
+#define  __noreturn      __attribute__((noreturn, naked))
 #endif
+#define  __constructor   __attribute__((constructor))
 
 /* -------------------------------------------------------------------------- */
 
 #if OS_LOCK_LEVEL && (__CORTEX_M >= 3)
 
-static inline unsigned port_get_lock( void )           { return __get_BASEPRI();                                      }
-static inline void     port_put_lock( unsigned state ) {        __set_BASEPRI(state);                                 }
-static inline void     port_set_lock( void )           {        __set_BASEPRI((OS_LOCK_LEVEL)<<(8-__NVIC_PRIO_BITS)); }
-static inline void     port_clr_lock( void )           {        __set_BASEPRI(0);                                     }
+#define  port_get_lock()            __get_BASEPRI()
+#define  port_put_lock(state)       __set_BASEPRI(state)
+
+#define  port_set_lock()            __set_BASEPRI((OS_LOCK_LEVEL)<<(8-__NVIC_PRIO_BITS))
+#define  port_clr_lock()            __set_BASEPRI(0)
 
 #else
 
-static inline unsigned port_get_lock( void )           { return __get_PRIMASK();      }
-static inline void     port_put_lock( unsigned state ) {        __set_PRIMASK(state); }
-static inline void     port_set_lock( void )           {        __disable_irq();      }
-static inline void     port_clr_lock( void )           {         __enable_irq();      }
+#define  port_get_lock()            __get_PRIMASK()
+#define  port_put_lock(state)       __set_PRIMASK(state)
+
+#define  port_set_lock()            __disable_irq()
+#define  port_clr_lock()            __enable_irq()
 
 #endif
 
-#define port_sys_lock()                             do { unsigned __LOCK = port_get_lock(); port_set_lock()
-#define port_sys_unlock()                                port_put_lock(__LOCK); } while(0)
+#define  port_sys_lock()       do { unsigned __LOCK = port_get_lock(); port_set_lock()
+#define  port_sys_unlock()          port_put_lock(__LOCK); } while(0)
 
-#define port_sys_enable()                           do { unsigned __LOCK = port_get_lock(); port_clr_lock()
-#define port_sys_disable()                               port_put_lock(__LOCK); } while(0)
+#define  port_sys_enable()     do { unsigned __LOCK = port_get_lock(); port_clr_lock()
+#define  port_sys_disable()         port_put_lock(__LOCK); } while(0)
 
-#define port_isr_lock()                             do { port_set_lock()
-#define port_isr_unlock()                                port_clr_lock(); } while(0)
+#define  port_isr_lock()       do { port_set_lock()
+#define  port_isr_unlock()          port_clr_lock(); } while(0)
 
-#define port_isr_enable()                           do { port_clr_lock()
-#define port_isr_disable()                               port_set_lock(); } while(0)
+#define  port_isr_enable()     do { port_clr_lock()
+#define  port_isr_disable()         port_set_lock(); } while(0)
 
 /* -------------------------------------------------------------------------- */
 
