@@ -1,19 +1,18 @@
 /******************************************************************************
  * @file    stm32f4_discovery_btns.h
  * @author  Rajmund Szymanski
- * @date    10.11.2015
+ * @date    04.10.2016
  * @brief   This file contains definitions for STM32F4-Discovery Kit.
  ******************************************************************************/
 
-#pragma once
-
-/* -------------------------------------------------------------------------- */
+#ifndef __STM32F4_DISCOVERY_BTNS_H
+#define __STM32F4_DISCOVERY_BTNS_H
 
 #include <stm32f4_io.h>
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 extern "C" {
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 
@@ -23,7 +22,7 @@ extern "C" {
 
 // config user button (PA0)
 
-static inline
+__STATIC_INLINE
 void BTN_Config( void )
 {
 	GPIO_Init(GPIOA, GPIO_Pin_0, GPIO_Input_PullDown);
@@ -31,13 +30,13 @@ void BTN_Config( void )
 
 /* -------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 }
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 
 /* -------------------------------------------------------------------------- */
 
@@ -51,4 +50,6 @@ public:
 
 /* -------------------------------------------------------------------------- */
 
-#endif
+#endif//__cplusplus
+
+#endif//__STM32F4_DISCOVERY_BTNS_H

@@ -1,13 +1,14 @@
 /******************************************************************************
  * @file    stm32f4_discovery.h
  * @author  Rajmund Szymanski
- * @date    23.10.2015
+ * @date    04.10.2016
  * @brief   This file contains definitions for STM32F4-Discovery Kit.
  ******************************************************************************/
 
-#pragma once
-
-/* -------------------------------------------------------------------------- */
+#ifndef __STM32F4_DISCOVERY_H
+#define __STM32F4_DISCOVERY_H
 
 #include <stm32f4_discovery_btns.h>
 #include <stm32f4_discovery_leds.h>
+
+#endif//__STM32F4_DISCOVERY_H

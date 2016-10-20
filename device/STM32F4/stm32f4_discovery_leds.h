@@ -1,19 +1,18 @@
 /******************************************************************************
  * @file    stm32f4_discovery_leds.h
  * @author  Rajmund Szymanski
- * @date    22.03.2016
+ * @date    04.10.2016
  * @brief   This file contains definitions for STM32F4-Discovery Kit.
  ******************************************************************************/
 
-#pragma once
-
-/* -------------------------------------------------------------------------- */
+#ifndef __STM32F4_DISCOVERY_LEDS_H
+#define __STM32F4_DISCOVERY_LEDS_H
 
 #include <stm32f4_io.h>
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 extern "C" {
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 
@@ -33,7 +32,7 @@ struct  __LEDs { uint16_t: 12; volatile uint16_t f: 4; uint16_t: 0; };
 
 // config usb green led (PA9)
 
-static inline
+__STATIC_INLINE
 void GRN_Config( void )
 {
 	GPIO_Init(GPIOA, GPIO_Pin_9, GPIO_Output_PushPull);
@@ -43,7 +42,7 @@ void GRN_Config( void )
 
 // config leds (PD12..PD15) as pushpull output
 
-static inline
+__STATIC_INLINE
 void LED_Config( void )
 {
 	GPIO_Init(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15, GPIO_Output_PushPull);
@@ -53,25 +52,23 @@ void LED_Config( void )
 
 // rotate leds
 
-static inline
+__STATIC_INLINE
 void LED_Tick( void )
 {
-	static unsigned value = 0x11111111;
-
-	GPIOD->BSRR = ( value & 0xF000F000 ) ^ 0xF0000000;
-
-	value = __ROR ( value , 31 );
+	unsigned leds = (GPIOD->ODR << 1) & 0xE000;
+	GPIOD->BSRR = 0xF0000000;
+	GPIOD->BSRR = leds ? leds : 0x1000;
 }
 
 /* -------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 }
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 
 /* -------------------------------------------------------------------------- */
 
@@ -82,6 +79,7 @@ public:
 
 	operator   unsigned & ( void )                  { return (unsigned &)GRN; }
 	unsigned   operator = ( const unsigned status ) { return   GRN = status; }
+	unsigned   operator ! ( void ) /* ++grn */      { return   GRN ^ 1U; }
 	unsigned   operator ++( void ) /* ++grn */      { return ++GRN;   }
 	unsigned   operator ++( int  ) /* grn++ */      { return   GRN++; }
 };
@@ -90,8 +88,8 @@ public:
 
 class Led
 {
-	unsigned get( void )            {    return ((GPIOD->ODR & 0xFFFF) >> 12); }
-	void     set( unsigned status ) { GPIOD->BSRR = ((status & 0xFFFF) << 12) | (~status << 28); }
+	unsigned get( void )            { return GPIOD->ODR >> 12; }
+	void     set( unsigned status ) { GPIOD->BSRR = (~status << 28) | (uint16_t)(status << 12); }
 
 public:
 	Led( void ) { LED_Config(); }
@@ -106,4 +104,6 @@ public:
 
 /* -------------------------------------------------------------------------- */
 
-#endif
+#endif//__cplusplus
+
+#endif//__STM32F4_DISCOVERY_LEDS_H

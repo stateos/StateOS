@@ -1,20 +1,19 @@
 /******************************************************************************
  * @file    stm32f4_io.h
  * @author  Rajmund Szymanski
- * @date    10.05.2016
+ * @date    04.10.2016
  * @brief   This file contains macro definitions for the STM32F4XX GPIO ports.
  ******************************************************************************/
 
-#pragma once
-
-/* -------------------------------------------------------------------------- */
+#ifndef __STM32F4_IO_H
+#define __STM32F4_IO_H
 
 #include <stm32f4xx.h>
 #include <bitband.h>
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 extern "C" {
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 /*
@@ -184,36 +183,27 @@ struct __gpio_config
 
 /* -------------------------------------------------------------------------- */
 
-static inline __attribute__(( always_inline, const ))
-uint32_t __stretch( uint32_t pins )
-{
-	uint32_t result = 0;
-
-	pins <<= 16;
-	
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-	result <<= 2; result |= pins >> 31; pins <<= 1;
-
-	return result;
-}
+#define __stretch( pins )    ( \
+	((pins & 0x0001u) <<  0) | \
+	((pins & 0x0002u) <<  1) | \
+	((pins & 0x0004u) <<  2) | \
+	((pins & 0x0008u) <<  3) | \
+	((pins & 0x0010u) <<  4) | \
+	((pins & 0x0020u) <<  5) | \
+	((pins & 0x0040u) <<  6) | \
+	((pins & 0x0080u) <<  7) | \
+	((pins & 0x0100u) <<  8) | \
+	((pins & 0x0200u) <<  9) | \
+	((pins & 0x0400u) << 10) | \
+	((pins & 0x0800u) << 11) | \
+	((pins & 0x1000u) << 12) | \
+	((pins & 0x2000u) << 13) | \
+	((pins & 0x4000u) << 14) | \
+	((pins & 0x8000u) << 15) )
 
 /* -------------------------------------------------------------------------- */
 
-static inline __attribute__(( always_inline ))
+__STATIC_INLINE
 void __pinini( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	uint32_t high;
@@ -221,14 +211,14 @@ void __pinini( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 	if (pins*GPIO_OUT(cfg))    gpio->BSRR    = (pins&GPIO_Pin_All)*GPIO_OUT(cfg);
 	if (pins*GPIO_OTYPE(cfg))  gpio->OTYPER  |= pins*GPIO_OTYPE(cfg);
 
-	pins = __stretch(pins);
+	pins = __stretch((unsigned)(pins));
 
 	if (pins*GPIO_MODE(cfg))   gpio->MODER   |= pins*GPIO_MODE(cfg);
 	if (pins*GPIO_OSPEED(cfg)) gpio->OSPEEDR |= pins*GPIO_OSPEED(cfg);
 	if (pins*GPIO_PUPD(cfg))   gpio->PUPDR   |= pins*GPIO_PUPD(cfg);
 
-	high = __stretch(pins>>16);
-	pins = __stretch(pins);
+	high = __stretch((unsigned)(pins) >> 16);
+	pins = __stretch((unsigned)(pins));
 
 	if (pins*GPIO_AF(cfg))     gpio->AFR[0]  |= pins*GPIO_AF(cfg);
 	if (high*GPIO_AF(cfg))     gpio->AFR[1]  |= high*GPIO_AF(cfg);
@@ -236,7 +226,7 @@ void __pinini( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 
 /* -------------------------------------------------------------------------- */
 
-static inline __attribute__(( always_inline ))
+__STATIC_INLINE
 void __pincfg( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	uint32_t high;
@@ -262,7 +252,7 @@ void __pincfg( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 
 /* -------------------------------------------------------------------------- */
 
-static inline __attribute__(( always_inline ))
+__STATIC_INLINE
 void __pinlck( GPIO_TypeDef *gpio, uint32_t pins )
 {
 	gpio->LCKR    = pins | 0x00010000;
@@ -274,7 +264,7 @@ void __pinlck( GPIO_TypeDef *gpio, uint32_t pins )
 
 /* -------------------------------------------------------------------------- */
 
-static inline __attribute__(( always_inline ))
+__STATIC_INLINE
 void GPIO_Init( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; __DSB();
@@ -284,7 +274,7 @@ void GPIO_Init( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 
 /* -------------------------------------------------------------------------- */
 
-static inline __attribute__(( always_inline ))
+__STATIC_INLINE
 void GPIO_Config( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; __DSB();
@@ -294,7 +284,7 @@ void GPIO_Config( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 
 /* -------------------------------------------------------------------------- */
 
-static inline __attribute__(( always_inline ))
+__STATIC_INLINE
 void GPIO_Lock( GPIO_TypeDef *gpio, uint32_t pins )
 {
 	__pinlck(gpio, pins);
@@ -302,13 +292,13 @@ void GPIO_Lock( GPIO_TypeDef *gpio, uint32_t pins )
 
 /* -------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 }
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 
 /* -------------------------------------------------------------------------- */
 
@@ -377,4 +367,6 @@ public:
 
 /* -------------------------------------------------------------------------- */
 
-#endif
+#endif//__cplusplus
+
+#endif//__STM32F4_IO_H
