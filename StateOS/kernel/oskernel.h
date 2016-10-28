@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    23.09.2016
+    @date    27.10.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -66,17 +66,6 @@ void core_ctx_reset( void )
 #endif
 	port_ctx_reset();
 }
-
-/* -------------------------------------------------------------------------- */
-
-// force timer interrupt
-void port_tmr_force( void );
-
-// clear time breakpoint
-void port_tmr_stop( void );
-
-// set time breakpoint
-void port_tmr_start( unsigned timeout );
 
 /* -------------------------------------------------------------------------- */
 

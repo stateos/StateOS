@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    23.09.2016
+    @date    27.10.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -165,7 +165,7 @@ void port_ctx_switch( void )
 }
 
 /* -------------------------------------------------------------------------- */
-
+// clear time breakpoint
 static inline
 void port_tmr_stop( void )
 {
@@ -175,7 +175,7 @@ void port_tmr_stop( void )
 }
 	
 /* -------------------------------------------------------------------------- */
-
+// set time breakpoint
 static inline
 void port_tmr_start( unsigned timeout )
 {
@@ -188,7 +188,7 @@ void port_tmr_start( unsigned timeout )
 }
 
 /* -------------------------------------------------------------------------- */
-
+// force timer interrupt
 static inline
 void port_tmr_force( void )
 {
@@ -199,12 +199,18 @@ void port_tmr_force( void )
 
 /* -------------------------------------------------------------------------- */
 
-#if   defined(__ARMCC_VERSION)
-#define  __noreturn      __attribute__((noreturn))
-#elif defined(__GNUC__)
-#define  __noreturn      __attribute__((noreturn, naked))
-#endif
+#if   defined(__CC_ARM)
 #define  __constructor   __attribute__((constructor))
+#define  __noreturn      __attribute__((noreturn))
+#elif defined(__ARMCC_VERSION)
+#define  __constructor   __attribute__((constructor))
+#define  __noreturn      __attribute__((noreturn))
+#define  __weak          __attribute__((weak))
+#elif defined(__GNUC__)
+#define  __constructor   __attribute__((constructor))
+#define  __noreturn      __attribute__((noreturn, naked))
+#define  __weak          __attribute__((weak))
+#endif
 
 /* -------------------------------------------------------------------------- */
 

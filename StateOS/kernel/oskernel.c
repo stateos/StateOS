@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    20.05.2016
+    @date    27.10.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -32,7 +32,7 @@
 // SYSTEM KERNEL SERVICES
 /* -------------------------------------------------------------------------- */
 
-__attribute__ ((weak))
+__weak
 void idle_hook( void )
 {
 #if OS_ROBIN || OS_TIMER == 0
@@ -238,7 +238,9 @@ void core_all_wakeup( os_id obj, unsigned event )
 
 void core_tsk_prio( tsk_id tsk, unsigned prio )
 {
-	for (mtx_id mtx = tsk->list; mtx; mtx = mtx->list)
+	mtx_id mtx;
+	
+	for (mtx = tsk->list; mtx; mtx = mtx->list)
 	{
 		if (mtx->queue)
 		if (prio < mtx->queue->prio)
@@ -268,17 +270,20 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 static inline
 os_id priv_tsk_prepare( tsk_id cur )
 {
+	ctx_id ctx;
+	sft_id sft;
+
 	if (cur->sp) return cur->sp;
 	
 	// prepare task stack if necessary
 
-	ctx_id ctx = (ctx_id)cur->top - 1;
+	ctx = (ctx_id)cur->top - 1;
 
 	ctx->psr = 0x01000000U;
 	ctx->pc  = cur->state;
 	ctx->lr  = core_tsk_break;
 
-	sft_id sft = (sft_id)ctx - 1;
+	sft = (sft_id)ctx - 1;
 
 	sft->lr  = ~2U; // EXC_RETURN: return from psp
 
