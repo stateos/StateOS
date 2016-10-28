@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    06.05.2016
+    @date    28.10.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -26,7 +26,8 @@
 
  ******************************************************************************/
 
-#pragma once
+#ifndef __STATEOS_MUT_H
+#define __STATEOS_MUT_H
 
 #include <oskernel.h>
 
@@ -311,3 +312,5 @@ public:
 #endif
 
 /* -------------------------------------------------------------------------- */
+
+#endif//__STATEOS_MUT_H

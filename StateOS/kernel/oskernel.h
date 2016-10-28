@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    27.10.2016
+    @date    28.10.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -26,7 +26,8 @@
 
  ******************************************************************************/
 
-#pragma once
+#ifndef __STATEOSKERNEL_H
+#define __STATEOSKERNEL_H
 
 #include <stdlib.h>
 #include <osbase.h>
@@ -237,3 +238,5 @@ public:
 #endif
 
 /* -------------------------------------------------------------------------- */
+
+#endif//__STATEOSKERNEL_H

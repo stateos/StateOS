@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    06.05.2016
+    @date    28.10.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************

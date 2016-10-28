@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    20.05.2016
+    @date    28.10.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -26,7 +26,8 @@
 
  ******************************************************************************/
 
-#pragma once
+#ifndef __STATEOS_TSK_H
+#define __STATEOS_TSK_H
 
 #include <oskernel.h>
 
@@ -782,3 +783,5 @@ public:
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
+
+#endif//__STATEOS_TSK_H

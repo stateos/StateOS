@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    27.10.2016
+    @date    28.10.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -26,7 +26,8 @@
 
  ******************************************************************************/
 
-#pragma once
+#ifndef __STATEOSPORT_H
+#define __STATEOSPORT_H
 
 #include <stdint.h>
 #include <osconfig.h>
@@ -249,3 +250,7 @@ void port_tmr_force( void )
 #ifdef __cplusplus
 }
 #endif
+
+/* -------------------------------------------------------------------------- */
+
+#endif//__STATEOSPORT_H

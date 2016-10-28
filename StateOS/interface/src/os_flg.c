@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    06.05.2016
+    @date    28.10.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -95,11 +95,13 @@ unsigned flg_waitFor( flg_id flg, unsigned flags, unsigned mode, unsigned delay 
 void flg_give( flg_id flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
+	tsk_id tsk;
+	
 	port_sys_lock();
 
 	flags = flg->flags |= flags;
 
-	for (tsk_id tsk = flg->queue; tsk; tsk = tsk->obj.queue)
+	for (tsk = flg->queue; tsk; tsk = tsk->obj.queue)
 	{
 		if (tsk->flags & flags)
 		{

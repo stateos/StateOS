@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    23.09.2016
+    @date    28.10.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -26,7 +26,8 @@
 
  ******************************************************************************/
 
-#pragma once
+#ifndef __STATEOSBASE_H
+#define __STATEOSBASE_H
 
 #include <stdbool.h>
 #include <osport.h>
@@ -149,3 +150,7 @@ typedef struct __ctx // context saved by the hardware
 #ifdef __cplusplus
 }
 #endif
+
+/* -------------------------------------------------------------------------- */
+
+#endif//__STATEOSBASE_H
