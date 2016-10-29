@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    stm32f4_io.h
  * @author  Rajmund Szymanski
- * @date    04.10.2016
+ * @date    24.10.2016
  * @brief   This file contains macro definitions for the STM32F4XX GPIO ports.
  ******************************************************************************/
 
@@ -183,27 +183,31 @@ struct __gpio_config
 
 /* -------------------------------------------------------------------------- */
 
-#define __stretch( pins )    ( \
-	((pins & 0x0001u) <<  0) | \
-	((pins & 0x0002u) <<  1) | \
-	((pins & 0x0004u) <<  2) | \
-	((pins & 0x0008u) <<  3) | \
-	((pins & 0x0010u) <<  4) | \
-	((pins & 0x0020u) <<  5) | \
-	((pins & 0x0040u) <<  6) | \
-	((pins & 0x0080u) <<  7) | \
-	((pins & 0x0100u) <<  8) | \
-	((pins & 0x0200u) <<  9) | \
-	((pins & 0x0400u) << 10) | \
-	((pins & 0x0800u) << 11) | \
-	((pins & 0x1000u) << 12) | \
-	((pins & 0x2000u) << 13) | \
-	((pins & 0x4000u) << 14) | \
-	((pins & 0x8000u) << 15) )
+static inline
+uint32_t __stretch( uint32_t pins )
+{
+	return 
+	((pins & 0x0001u) * 0x0001u) |
+	((pins & 0x0002u) * 0x0002u) |
+	((pins & 0x0004u) * 0x0004u) |
+	((pins & 0x0008u) * 0x0008u) |
+	((pins & 0x0010u) * 0x0010u) |
+	((pins & 0x0020u) * 0x0020u) |
+	((pins & 0x0040u) * 0x0040u) |
+	((pins & 0x0080u) * 0x0080u) |
+	((pins & 0x0100u) * 0x0100u) |
+	((pins & 0x0200u) * 0x0200u) |
+	((pins & 0x0400u) * 0x0400u) |
+	((pins & 0x0800u) * 0x0800u) |
+	((pins & 0x1000u) * 0x1000u) |
+	((pins & 0x2000u) * 0x2000u) |
+	((pins & 0x4000u) * 0x4000u) |
+	((pins & 0x8000u) * 0x8000u) ;
+}
 
 /* -------------------------------------------------------------------------- */
 
-__STATIC_INLINE
+static inline
 void __pinini( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	uint32_t high;
@@ -211,14 +215,14 @@ void __pinini( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 	if (pins*GPIO_OUT(cfg))    gpio->BSRR    = (pins&GPIO_Pin_All)*GPIO_OUT(cfg);
 	if (pins*GPIO_OTYPE(cfg))  gpio->OTYPER  |= pins*GPIO_OTYPE(cfg);
 
-	pins = __stretch((unsigned)(pins));
+	pins = __stretch(pins);
 
 	if (pins*GPIO_MODE(cfg))   gpio->MODER   |= pins*GPIO_MODE(cfg);
 	if (pins*GPIO_OSPEED(cfg)) gpio->OSPEEDR |= pins*GPIO_OSPEED(cfg);
 	if (pins*GPIO_PUPD(cfg))   gpio->PUPDR   |= pins*GPIO_PUPD(cfg);
 
-	high = __stretch((unsigned)(pins) >> 16);
-	pins = __stretch((unsigned)(pins));
+	high = __stretch(pins >> 16);
+	pins = __stretch(pins);
 
 	if (pins*GPIO_AF(cfg))     gpio->AFR[0]  |= pins*GPIO_AF(cfg);
 	if (high*GPIO_AF(cfg))     gpio->AFR[1]  |= high*GPIO_AF(cfg);
@@ -226,7 +230,7 @@ void __pinini( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 
 /* -------------------------------------------------------------------------- */
 
-__STATIC_INLINE
+static inline
 void __pincfg( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	uint32_t high;
@@ -252,7 +256,7 @@ void __pincfg( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 
 /* -------------------------------------------------------------------------- */
 
-__STATIC_INLINE
+static inline
 void __pinlck( GPIO_TypeDef *gpio, uint32_t pins )
 {
 	gpio->LCKR    = pins | 0x00010000;
@@ -264,7 +268,7 @@ void __pinlck( GPIO_TypeDef *gpio, uint32_t pins )
 
 /* -------------------------------------------------------------------------- */
 
-__STATIC_INLINE
+static inline
 void GPIO_Init( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; __DSB();
@@ -274,7 +278,7 @@ void GPIO_Init( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 
 /* -------------------------------------------------------------------------- */
 
-__STATIC_INLINE
+static inline
 void GPIO_Config( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; __DSB();
@@ -284,7 +288,7 @@ void GPIO_Config( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 
 /* -------------------------------------------------------------------------- */
 
-__STATIC_INLINE
+static inline
 void GPIO_Lock( GPIO_TypeDef *gpio, uint32_t pins )
 {
 	__pinlck(gpio, pins);

@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     19.05.2016
+#date     08.06.2016
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -9,6 +9,7 @@ ARMCC      := c:/sys/arm/armclang/bin/
 GNUCC      := c:/sys/gcc/bin/arm-none-eabi-
 OPENOCD    := c:/sys/tools/openocd/bin-x64/openocd
 STLINK     := c:/sys/tools/st-link/st-link_cli -Q -c SWD UR
+QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
 
 #----------------------------------------------------------#
 
@@ -53,6 +54,7 @@ CXX_EXT    := .cpp
 INC_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $d*.h $d*.hpp))))
 LIB_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $d*.lib))))
 MAKE_FILES :=     $(notdir $(foreach d,$(VPATH),$(wildcard $d*makefile* $d*.mk)))
+OBJ_SRCS   :=              $(foreach d,$(VPATH),$(wildcard $d*.o))
 AS_SRCS    :=              $(foreach d,$(VPATH),$(wildcard $d*$(AS_EXT)))
 C_SRCS     :=              $(foreach d,$(VPATH),$(wildcard $d*$(C_EXT)))
 CXX_SRCS   :=              $(foreach d,$(VPATH),$(wildcard $d*$(CXX_EXT)))
@@ -87,7 +89,10 @@ TXTS       := $(OBJS:.o=.txt)
 
 #----------------------------------------------------------#
 
-COMMON_F    = --target=arm-arm-none-eabi -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffast-math
+COMMON_F    = --target=arm-arm-none-eabi -mthumb -mcpu=cortex-m4
+ifeq ($(filter qemu,$(MAKECMDGOALS)),)
+COMMON_F   += -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffast-math
+endif
 COMMON_F   += -Oz -ffunction-sections -fdata-sections # -flto
 COMMON_F   += -Wall -Wextra # -Wpedantic
 COMMON_F   += -MD -MP
@@ -123,7 +128,7 @@ ARM_LIB    := $(ARMCC)../lib
 DEFS_F     := $(DEFS:%=-D%)
 LIBS_F     := $(LIBS:%=%.lib)
 LIBS_F     += $(LIB_SRCS)
-
+OBJS_ALL   := $(sort $(OBJ_SRCS) $(OBJS))
 INC_DIRS   += $(INCS:%=%/)
 INC_DIRS   += $(ARMCC)../../RV31/INC/
 INC_DIRS_F := $(INC_DIRS:%=-I%)
@@ -162,14 +167,14 @@ all : $(LSS) print_elf_size
 
 lib : $(LIB) print_size
 
-$(ELF) : $(OBJS) $(SCRIPT)
+$(ELF) : $(OBJS_ALL) $(SCRIPT)
 	$(info Linking target: $(ELF))
 ifeq ($(strip $(SCRIPT)),)
 	$(error No scatter file in project)
 endif
-	$(LD) $(LD_FLAGS) $(OBJS) $(LIBS_F) $(LIB_DIRS_F) -o $@
+	$(LD) $(LD_FLAGS) $(OBJS_ALL) $(LIBS_F) $(LIB_DIRS_F) -o $@
 
-$(LIB) : $(OBJS)
+$(LIB) : $(OBJS_ALL)
 	$(info Building library: $(LIB))
 	$(AR) -r $@ $?
 
@@ -201,7 +206,7 @@ $(LSS) : $(ELF)
 
 print_size :
 	$(info Size of modules:)
-	$(SIZE) -B -t --common $(OBJS)
+	$(SIZE) -B -t --common $(OBJS_ALL)
 
 print_elf_size : print_size
 	$(info Size of target file:)
@@ -213,7 +218,7 @@ clean :
 	$(info Removing all generated output files)
 	$(RM) $(GENERATED)
 
-flash : all # $(HEX)
+flash : all $(HEX)
 	$(info Programing device...)
 #	$(STLINK) -P $(HEX) -V -Rst
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_EXEC) $(OOCD_EXIT)
@@ -222,11 +227,15 @@ debug : all
 	$(info Debugging device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_DEBG) $(OOCD_EXEC)
 
+qemu : all
+	$(info Emulating device...)
+	$(QEMU) -image $(ELF)
+
 reset :
 	$(info Reseting device...)
 #	$(STLINK) -HardRst
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_EXEC) $(OOCD_EXIT)
 
-.PHONY : all lib clean flash debug reset
+.PHONY : all lib clean flash debug reset qemu
 
 -include $(DEPS)

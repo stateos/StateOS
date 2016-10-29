@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     21.05.2016
+@date     27.10.2016
 @brief    Startup file header for armclang compiler.
 *******************************************************************************/
 
@@ -30,20 +30,20 @@ void __user_stack_config( void )
                 #endif
 
                 #if     proc_stack_size > 0
+"               .space "STR(proc_stack_size)
+"               .align  3               \n"
+"__initial_sp   =       .               \n"
+                #else
+"__initial_sp   =      "STR(__ram_end)
+                #endif
+
+                #if     main_stack_size + proc_stack_size > 0
                 #ifndef __MICROLIB
 "               .global __use_two_region_memory \n"
                 #endif
-"               .space "STR(proc_stack_size)
-"               .align  3               \n"
-"__initial_psp  =       .               \n"
-"__initial_sp   =       __initial_psp   \n"
-                #else
-"__initial_psp  =       .               \n"
-"__initial_sp   =       __initial_msp   \n"
                 #endif
 
 "               .global __initial_msp   \n"
-"               .global __initial_psp   \n"
 "               .global __initial_sp    \n"
 
 "               .popsection             \n"

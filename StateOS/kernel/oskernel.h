@@ -165,15 +165,13 @@ unsigned port_isr_inside( void )
 /* -------------------------------------------------------------------------- */
 
 // reset task stack pointer
-static inline __attribute__(( always_inline ))
+static inline __always
 void port_set_stack( void *top )
 {
-#if   defined(__CC_ARM)
-	__set_PSP((unsigned)top);
-#elif defined(__GNUC__)
+#ifdef __GNUC__
 	__asm volatile ("mov sp, %0" :: "r" (top) : "memory");
 #else
-	#error Unknown compiler!
+	__set_PSP((unsigned)top);
 #endif
 }
 

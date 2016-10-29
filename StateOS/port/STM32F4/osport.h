@@ -144,6 +144,10 @@ typedef  uint64_t          stk_t;
 
 /* -------------------------------------------------------------------------- */
 
+#if   defined(__CSMC__)
+#define  __initial_sp     _stack
+#endif
+
 extern   char            __initial_sp[];
 #define  MAIN_SP         __initial_sp
 
@@ -166,6 +170,7 @@ void port_ctx_switch( void )
 }
 
 /* -------------------------------------------------------------------------- */
+
 // clear time breakpoint
 static inline
 void port_tmr_stop( void )
@@ -176,6 +181,7 @@ void port_tmr_stop( void )
 }
 	
 /* -------------------------------------------------------------------------- */
+
 // set time breakpoint
 static inline
 void port_tmr_start( unsigned timeout )
@@ -189,6 +195,7 @@ void port_tmr_start( unsigned timeout )
 }
 
 /* -------------------------------------------------------------------------- */
+
 // force timer interrupt
 static inline
 void port_tmr_force( void )
@@ -201,19 +208,33 @@ void port_tmr_force( void )
 /* -------------------------------------------------------------------------- */
 
 #if   defined(__CC_ARM)
+#define  __always        __attribute__((always_inline))
 #define  __constructor   __attribute__((constructor))
 #define  __noreturn      __attribute__((noreturn))
 #elif defined(__ARMCC_VERSION)
+#define  __always        __attribute__((always_inline))
 #define  __constructor   __attribute__((constructor))
 #define  __noreturn      __attribute__((noreturn))
 #define  __weak          __attribute__((weak))
 #elif defined(__GNUC__)
+#define  __always        __attribute__((always_inline))
 #define  __constructor   __attribute__((constructor))
 #define  __noreturn      __attribute__((noreturn, naked))
 #define  __weak          __attribute__((weak))
+#elif defined(__CSMC__)
+#define  __always
+#define  __constructor
+#define  __noreturn
+#else
+#error   Unknown compiler!
 #endif
 
 /* -------------------------------------------------------------------------- */
+
+#if   defined(__CSMC__)
+#define  __disable_irq()             _asm("cpsid i")
+#define  __enable_irq()              _asm("cpsie i")
+#endif
 
 #if OS_LOCK_LEVEL && (__CORTEX_M >= 3)
 

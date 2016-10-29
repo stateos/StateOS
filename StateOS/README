@@ -25,6 +25,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+3.0
+- added support for COSMIC Software CORTEX-M C Cross Compiler
+---------
 2.9
 - program code cleaned
 ---------

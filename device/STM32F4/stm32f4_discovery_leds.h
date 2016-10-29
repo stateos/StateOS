@@ -32,7 +32,7 @@ struct  __LEDs { uint16_t: 12; volatile uint16_t f: 4; uint16_t: 0; };
 
 // config usb green led (PA9)
 
-__STATIC_INLINE
+static inline
 void GRN_Config( void )
 {
 	GPIO_Init(GPIOA, GPIO_Pin_9, GPIO_Output_PushPull);
@@ -42,7 +42,7 @@ void GRN_Config( void )
 
 // config leds (PD12..PD15) as pushpull output
 
-__STATIC_INLINE
+static inline
 void LED_Config( void )
 {
 	GPIO_Init(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15, GPIO_Output_PushPull);
@@ -52,7 +52,7 @@ void LED_Config( void )
 
 // rotate leds
 
-__STATIC_INLINE
+static inline
 void LED_Tick( void )
 {
 	unsigned leds = (GPIOD->ODR << 1) & 0xE000;

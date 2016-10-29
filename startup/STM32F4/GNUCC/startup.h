@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     21.05.2016
+@date     24.10.2016
 @brief    Startup file header for gcc compiler.
 *******************************************************************************/
 
@@ -115,6 +115,11 @@ void __main( void )
 {
 	/* Initialize data segments */
 	__startup_data_init();
+#ifdef USE_SEMIHOST
+	void
+	initialise_monitor_handles();
+	initialise_monitor_handles();
+#endif
 	/* Call the application's entry point */
 	_start();
 }

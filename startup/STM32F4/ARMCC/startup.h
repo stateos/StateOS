@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     21.05.2016
+@date     27.10.2016
 @brief    Startup file header for armcc compiler.
 *******************************************************************************/
 
@@ -32,18 +32,19 @@ __initial_msp   EQU     __ram_start + main_stack
 __initial_msp   EQU     __ram_end
                 #endif
 
-__initial_psp   EQU     __ram_start + main_stack + proc_stack
-                #if     proc_stack_size > 0
+				#if     proc_stack_size > 0
+__initial_sp    EQU     __ram_start + main_stack + proc_stack
+                #else
+__initial_sp    EQU     __ram_end
+                #endif
+
+                #if     main_stack_size + proc_stack_size > 0
                 #ifndef __MICROLIB
                 IMPORT  __use_two_region_memory
                 #endif
-__initial_sp    EQU     __initial_psp
-                #else
-__initial_sp    EQU     __initial_msp
                 #endif
 
                 EXPORT  __initial_msp
-                EXPORT  __initial_psp
                 EXPORT  __initial_sp
 }
 

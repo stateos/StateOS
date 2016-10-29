@@ -22,7 +22,7 @@ extern "C" {
 
 // config user button (PA0)
 
-__STATIC_INLINE
+static inline
 void BTN_Config( void )
 {
 	GPIO_Init(GPIOA, GPIO_Pin_0, GPIO_Input_PullDown);

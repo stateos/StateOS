@@ -1,8 +1,6 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-// NOTE: in makefile add 'proc_stack_size=4096' to DEFS
-
 void proc()
 {
 	static 	 unsigned i = 0;
