@@ -5,8 +5,7 @@ void proc( unsigned &led, unsigned timePoint )
 {
 	for (;;)
 	{
-		ThisTask::sleepUntil(timePoint);
-		timePoint += SEC/2;
+		ThisTask::sleepUntil(timePoint += SEC/2);
 		led++;
 	}
 }
@@ -14,11 +13,11 @@ void proc( unsigned &led, unsigned timePoint )
 auto led = Led();
 auto grn = GreenLed();
 
-auto t1 = startTask(0, []{ proc(led[0], 500*MSEC); });
-auto t2 = startTask(0, []{ proc(led[1], 625*MSEC); });
-auto t3 = startTask(0, []{ proc(led[2], 750*MSEC); });
-auto t4 = startTask(0, []{ proc(led[3], 875*MSEC); });
-auto t5 = startTask(0, []{ proc(grn,   1000*MSEC); });
+auto t1 = startTask(0, []{ proc(led[0], SEC/8*0); });
+auto t2 = startTask(0, []{ proc(led[1], SEC/8*1); });
+auto t3 = startTask(0, []{ proc(led[2], SEC/8*2); });
+auto t4 = startTask(0, []{ proc(led[3], SEC/8*3); });
+auto t5 = startTask(0, []{ proc(grn,    SEC/8*4); });
 
 int main()
 {

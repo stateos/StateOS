@@ -9,18 +9,17 @@ void proc()
 
 	switch (i++)
 	{
-		case  0: led = &LED[0]; timePoint =  500*MSEC; break;
-		case  1: led = &LED[1]; timePoint =  625*MSEC; break;
-		case  2: led = &LED[2]; timePoint =  750*MSEC; break;
-		case  3: led = &LED[3]; timePoint =  875*MSEC; break;
-		default: led = &GRN;    timePoint = 1000*MSEC; break;
+		case  0: led = &LED[0]; timePoint = SEC/8*0; break;
+		case  1: led = &LED[1]; timePoint = SEC/8*1; break;
+		case  2: led = &LED[2]; timePoint = SEC/8*2; break;
+		case  3: led = &LED[3]; timePoint = SEC/8*3; break;
+		default: led = &GRN;    timePoint = SEC/8*4; break;
 	}
 
 	for (;;)
 	{
-		tsk_sleepUntil(timePoint);
-		timePoint += SEC/2;
-		led[0]++;
+		tsk_sleepUntil(timePoint += SEC/2);
+		(*led)++;
 	}
 }
 
@@ -34,6 +33,5 @@ int main()
 	tsk_start(TSK_CREATE(0, proc));
 	tsk_start(TSK_CREATE(0, proc));
 	tsk_start(TSK_CREATE(0, proc));
-	
 	tsk_stop();
 }

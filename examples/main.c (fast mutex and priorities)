@@ -1,0 +1,33 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+OS_MUT(mut);
+
+OS_DEF(mas, 2)
+{
+	mut_wait(mut);
+	mut_give(mut);
+
+	LEDG = 1;
+	for (;;); // BREAKPOINT: 1
+}
+
+OS_DEF(sla, 1)
+{
+	tsk_start(mas);
+
+	LEDR = 1;
+	for (;;); // BREAKPOINT: 2
+}
+
+int main()
+{
+	LED_Config();
+	
+	mut_wait(mut);
+	tsk_start(sla);
+	mut_give(mut);
+
+	LEDB = 1;
+	for (;;); // BREAKPOINT: 3
+}
