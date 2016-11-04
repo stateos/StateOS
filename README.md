@@ -25,6 +25,7 @@ Features
 - message queues
 - mailbox queues
 - timers (one-shot, periodic)
+- cmsis-rtos api
 - c++ wrapper
 - all documentation is contained within the source files
 - examples and templates are in separate repositories on [GitHub](https://github.com/stateos)
