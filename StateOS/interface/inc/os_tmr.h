@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -399,7 +399,7 @@ class Timer : public __tmr, private ObjectGuard<__obj>
 public:
 
 	explicit
-	Timer( const fun_id _state = 0 ): __tmr(_TMR_INIT(_state)) {}
+	Timer( const fun_id _state = 0 ): __tmr _TMR_INIT(_state) {}
 
 	void kill         ( void )                            {        tmr_kill         (this);                       }
 	void startUntil   ( unsigned _time   )                {        tmr_startUntil   (this, _time,   this->state); }

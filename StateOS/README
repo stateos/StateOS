@@ -18,12 +18,18 @@ Features:
 - mutexes (recursive and priority inheritance)
 - fast mutexes (non-recursive and non-priority-inheritance)
 - condition variables
+- memory pools
 - message queues
 - mailbox queues
 - timers (one-shot, periodic)
 - c++ wrapper
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
+---------
+3.1
+- added CMSIS-RTOS API
+- added CMSIS-RTOS example
+- added memory pool object
 ---------
 3.0
 - added support for COSMIC Software CORTEX-M C Cross Compiler

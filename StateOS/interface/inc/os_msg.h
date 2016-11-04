@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -451,7 +451,7 @@ class MessageQueueT : public __msg, private EventGuard<__msg>
 public:
 
 	explicit
-	MessageQueueT( void ): __msg(_MSG_INIT(_limit, _data)) {}
+	MessageQueueT( void ): __msg _MSG_INIT(_limit, _data) {}
 
 	void     kill     ( void )                            {        msg_kill     (this);                }
 	unsigned waitUntil( unsigned*_data, unsigned _time  ) { return msg_waitUntil(this, _data, _time);  }

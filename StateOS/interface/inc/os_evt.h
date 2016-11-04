@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -286,7 +286,7 @@ class Event : public __evt, private EventGuard<__evt>
 public:
 
 	explicit
-	Event( void ): __evt(_EVT_INIT()) {}
+	Event( void ): __evt _EVT_INIT() {}
 
 	void     kill     ( void )            {        evt_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return evt_waitUntil(this, _time);  }

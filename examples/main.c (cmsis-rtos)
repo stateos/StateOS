@@ -1,0 +1,41 @@
+#include <stm32f4_discovery.h>
+#include <cmsis_os.h>
+
+osSemaphoreId  sem;
+osSemaphoreDef(sem);
+
+void slave(void const *arg)
+{
+	(void) arg;
+	
+	for (;;)
+	{
+		osSemaphoreWait(sem, osWaitForever);
+		LED_Tick();
+	}
+}
+
+void master(void const *arg)
+{
+	(void) arg;
+	
+	for (;;)
+	{
+		osDelay(1000);
+		osSemaphoreRelease(sem);
+	}
+}
+
+osThreadDef(slave,  osPriorityNormal, 1, 0);
+osThreadDef(master, osPriorityNormal, 1, 0);
+
+int main(void)
+{
+	LED_Config();
+
+	osKernelInitialize();
+	sem = osSemaphoreCreate(osSemaphore(sem), 0);
+	osThreadCreate(osThread(slave),  0);
+	osThreadCreate(osThread(master), 0);
+	osThreadTerminate(0);
+}

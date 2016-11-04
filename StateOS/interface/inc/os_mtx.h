@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -299,7 +299,7 @@ class Mutex : public __mtx, private MutexGuard<__mtx>
 public:
 
 	explicit
-	Mutex( void ): __mtx(_MTX_INIT()) {}
+	Mutex( void ): __mtx _MTX_INIT() {}
 
 	void     kill     ( void )            {        mtx_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return mtx_waitUntil(this, _time);  }

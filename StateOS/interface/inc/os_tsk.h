@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -656,7 +656,7 @@ class TaskBase : public __tsk, private ObjectGuard<__obj>
 public:
 
 	explicit
-	TaskBase( const unsigned _prio, const fun_id _state, const os_id _top ): __tsk(_TSK_INIT(_prio, _state, _top)) {}
+	TaskBase( const unsigned _prio, const fun_id _state, void *_top ): __tsk _TSK_INIT(_prio, _state, _top) {}
 
 	void     kill      ( void )                          {        tsk_kill      (this);                }
 	void     start     ( void )                          {        tsk_start     (this);                }

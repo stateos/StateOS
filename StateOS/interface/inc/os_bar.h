@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -262,7 +262,7 @@ class Barrier : public __bar, private EventGuard<__bar>
 public:
 
 	explicit
-	Barrier( const unsigned _limit ): __bar(_BAR_INIT(_limit)) {}
+	Barrier( const unsigned _limit ): __bar _BAR_INIT(_limit) {}
 
 	void     kill     ( void )            {        bar_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return bar_waitUntil(this, _time);  }

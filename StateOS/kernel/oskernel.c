@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -129,7 +129,7 @@ void core_tsk_remove( tsk_id tsk )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_append( tsk_id tsk, os_id obj )
+void core_tsk_append( tsk_id tsk, void *obj )
 {
 	tsk_id prv;
 	tsk_id nxt = obj;
@@ -175,7 +175,7 @@ unsigned priv_tsk_wait( tsk_id tsk, obj_id obj )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitUntil( os_id obj, unsigned time )
+unsigned core_tsk_waitUntil( void *obj, unsigned time )
 {
 	tsk_id cur = System.cur;
 
@@ -190,7 +190,7 @@ unsigned core_tsk_waitUntil( os_id obj, unsigned time )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitFor( os_id obj, unsigned delay )
+unsigned core_tsk_waitFor( void *obj, unsigned delay )
 {
 	tsk_id cur = System.cur;
 
@@ -219,7 +219,7 @@ tsk_id core_tsk_wakeup( tsk_id tsk, unsigned event )
 
 /* -------------------------------------------------------------------------- */
 
-tsk_id core_one_wakeup( os_id obj, unsigned event )
+tsk_id core_one_wakeup( void *obj, unsigned event )
 {
 	obj_id lst = obj;
 
@@ -228,7 +228,7 @@ tsk_id core_one_wakeup( os_id obj, unsigned event )
 
 /* -------------------------------------------------------------------------- */
 
-void core_all_wakeup( os_id obj, unsigned event )
+void core_all_wakeup( void *obj, unsigned event )
 {
 	obj_id lst = obj;
 
@@ -269,7 +269,7 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 /* -------------------------------------------------------------------------- */
 
 static inline
-os_id priv_tsk_prepare( tsk_id cur )
+void *priv_tsk_prepare( tsk_id cur )
 {
 	ctx_id ctx;
 	sft_id sft;
@@ -293,7 +293,7 @@ os_id priv_tsk_prepare( tsk_id cur )
 
 /* -------------------------------------------------------------------------- */
 
-os_id core_tsk_handler( os_id sp )
+void *core_tsk_handler( void *sp )
 {
 	tsk_id cur;
 #if OS_ROBIN == 0
@@ -438,7 +438,7 @@ void core_tmr_handler( void )
 
 #if OS_HEAP_SIZE
 
-os_id core_sys_alloc( size_t size )
+void *core_sys_alloc( size_t size )
 {
 	static  stk_t    Heap[ASIZE(OS_HEAP_SIZE)];
 	#define HeapEnd (Heap+ASIZE(OS_HEAP_SIZE))
@@ -469,7 +469,7 @@ os_id core_sys_alloc( size_t size )
 
 #else
 
-os_id core_sys_alloc( size_t size )
+void *core_sys_alloc( size_t size )
 {
 	stk_t *base = 0;
 

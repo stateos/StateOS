@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -376,7 +376,7 @@ class Flag : public __flg, private EventGuard<__flg>
 public:
 
 	explicit
-	Flag( void ): __flg(_FLG_INIT()) {}
+	Flag( void ): __flg _FLG_INIT() {}
 
 	void     kill     ( void )                                             {        flg_kill     (this);                        }
 	unsigned waitUntil( unsigned _flags, unsigned _mode, unsigned _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -299,7 +299,7 @@ class FastMutex : public __mut, private MutexGuard<__mut>
 public:
 
 	explicit
-	FastMutex( void ): __mut(_MUT_INIT()) {}
+	FastMutex( void ): __mut _MUT_INIT() {}
 
 	void     kill     ( void )            {        mut_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return mut_waitUntil(this, _time);  }

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -460,7 +460,7 @@ class MailBoxQueueT : public __box, private EventGuard<__box>
 public:
 
 	explicit
-	MailBoxQueueT( void ): __box(_BOX_INIT(_limit, sizeof(T), reinterpret_cast<char *>(_data))) {}
+	MailBoxQueueT( void ): __box _BOX_INIT(_limit, sizeof(T), reinterpret_cast<char *>(_data)) {}
 
 	void     kill     ( void )                      {        box_kill     (this);                }
 	unsigned waitUntil( T *_data, unsigned _time  ) { return box_waitUntil(this, _data, _time);  }

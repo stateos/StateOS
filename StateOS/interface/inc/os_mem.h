@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    @file    StateOS: os_sig.h
+    @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
     @date    04.11.2016
     @brief   This file contains definitions for StateOS.
@@ -26,8 +26,8 @@
 
  ******************************************************************************/
 
-#ifndef __STATEOS_SIG_H
-#define __STATEOS_SIG_H
+#ifndef __STATEOS_MEM_H
+#define __STATEOS_MEM_H
 
 #include <oskernel.h>
 
@@ -37,149 +37,145 @@ extern "C" {
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : signal                                                                                         *
+ * Name              : memory pool                                                                                    *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __sig
+typedef struct __mem
 {
 	tsk_id   queue; // next process in the DELAYED queue
-	unsigned flag;  // signal's current value
-	unsigned type;  // signal type: sigClear, sigProtect
+	unsigned limit; // size of a memory pool (max number of objects)
+	unsigned size;  // size of memory object (in words)
+	void   **next;  // next memory object in memory pool
 
-}	sig_t, *sig_id;
+}	mem_t, *mem_id;
 
 /* -------------------------------------------------------------------------- */
 
-#define sigClear     ( 0U << 0 ) // auto clearing signal
-#define sigProtect   ( 1U << 0 ) // protected signal
-#define sigMASK      ( 1U )
+#define MSIZE( size ) \
+ (((unsigned)( size )+(sizeof(void*)-1))/sizeof(void*))
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : _SIG_INIT                                                                                      *
+ * Name              : _MEM_INIT                                                                                      *
  *                                                                                                                    *
- * Description       : create and initilize an signal object                                                          *
+ * Description       : create and initilize a memory pool object                                                      *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   type            : signal type                                                                                    *
- *                     sigClear:   auto clearing signal                                                               *
- *                     sigProtect: protected signal                                                                   *
+ *   size            : size of memory object (in bytes)                                                               *
+ *   data            : memory pool data buffer                                                                        *
  *                                                                                                                    *
- * Return            : signal object                                                                                  *
+ * Return            : memory pool object                                                                             *
  *                                                                                                                    *
  * Note              : for internal use                                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _SIG_INIT( _type ) { 0, 0, (_type)&sigMASK }
+#define               _MEM_INIT( _limit, _size, _data ) { 0, _limit, MSIZE(_size), ((_limit)&&(_size))?(_data):0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : OS_SIG                                                                                         *
+ * Name              : _MEM_DATA                                                                                      *
  *                                                                                                                    *
- * Description       : define and initilize a signal object                                                           *
+ * Description       : create a memory pool data buffer                                                               *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : name of a pointer to signal object                                                             *
- *   type            : signal type                                                                                    *
- *                     sigClear:   auto clearing signal                                                               *
- *                     sigProtect: protected signal                                                                   *
+ *   limit           : size of a buffer (max number of objects)                                                       *
+ *   size            : size of memory object (in bytes)                                                               *
+ *                                                                                                                    *
+ * Return            : memory pool data buffer                                                                        *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_SIG( sig, type )                     \
-                       sig_t sig##__sig = _SIG_INIT( type ); \
-                       sig_id sig = & sig##__sig
+#define               _MEM_DATA( _limit, _size ) (void*[_limit*MSIZE(_size)]){ 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : static_SIG                                                                                     *
+ * Name              : OS_MEM                                                                                         *
  *                                                                                                                    *
- * Description       : define and initilize a static signal object                                                    *
+ * Description       : define and initilize a memory pool object                                                      *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : name of a pointer to signal object                                                             *
- *   type            : signal type                                                                                    *
- *                     sigClear:   auto clearing signal                                                               *
- *                     sigProtect: protected signal                                                                   *
+ *   mem             : name of a pointer to memory pool object                                                        *
+ *   limit           : size of a buffer (max number of objects)                                                       *
+ *   size            : size of memory object (in bytes)                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_SIG( sig, type )                     \
-                static sig_t sig##__sig = _SIG_INIT( type ); \
-                static sig_id sig = & sig##__sig
+#define             OS_MEM( mem, limit, size )                                \
+                       void*mem##__buf[limit*MSIZE(size)];                     \
+                       mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
+                       mem_id mem = & mem##__mem
+
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : SIG_INIT                                                                                       *
+ * Name              : static_MEM                                                                                     *
  *                                                                                                                    *
- * Description       : create and initilize an signal object                                                          *
+ * Description       : define and initilize a static memory pool object                                               *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   type            : signal type                                                                                    *
- *                     sigClear:   auto clearing signal                                                               *
- *                     sigProtect: protected signal                                                                   *
+ *   mem             : name of a pointer to memory pool object                                                        *
+ *   limit           : size of a buffer (max number of objects)                                                       *
+ *   size            : size of memory object (in bytes)                                                               *
  *                                                                                                                    *
- * Return            : signal object                                                                                  *
+ **********************************************************************************************************************/
+
+#define         static_MEM( mem, limit, size )                                \
+                static void*mem##__buf[limit*MSIZE(size)];                     \
+                static mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
+                static mem_id mem = & mem##__mem
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : MEM_INIT                                                                                       *
+ *                                                                                                                    *
+ * Description       : create and initilize a memory pool object                                                      *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   limit           : size of a buffer (max number of objects)                                                       *
+ *   size            : size of memory object (in bytes)                                                               *
+ *                                                                                                                    *
+ * Return            : memory pool object                                                                             *
  *                                                                                                                    *
  * Note              : use only in 'C' code                                                                           *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define                SIG_INIT( type ) \
-                      _SIG_INIT( type )
+#define                MEM_INIT( limit, size ) \
+                      _MEM_INIT( limit, size, _MEM_DATA( limit, size ) )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : SIG_CREATE                                                                                     *
+ * Name              : MEM_CREATE                                                                                     *
  *                                                                                                                    *
- * Description       : create and initilize a signal object                                                           *
+ * Description       : create and initilize a memory pool object                                                      *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   type            : signal type                                                                                    *
- *                     sigClear:   auto clearing signal                                                               *
- *                     sigProtect: protected signal                                                                   *
+ *   limit           : size of a buffer (max number of objects)                                                       *
+ *   size            : size of memory object (in bytes)                                                               *
  *                                                                                                                    *
- * Return            : pointer to signal object                                                                       *
+ * Return            : pointer to memory pool object                                                                  *
  *                                                                                                                    *
  * Note              : use only in 'C' code                                                                           *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
 #ifndef __cplusplus
-#define                SIG_CREATE( type ) \
-               &(sig_t)SIG_INIT( type )
+#define                MEM_CREATE( limit, size ) \
+               &(mem_t)MEM_INIT( limit, size )
 #endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : sig_create                                                                                     *
+ * Name              : mem_init                                                                                       *
  *                                                                                                                    *
- * Description       : create and initilize a new signal object                                                       *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   type            : signal type                                                                                    *
- *                     sigClear:   auto clearing signal                                                               *
- *                     sigProtect: protected signal                                                                   *
- *                                                                                                                    *
- * Return            : pointer to signal object (signal successfully created)                                         *
- *   0               : signal not created (not enough free memory)                                                    *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-              sig_id   sig_create( unsigned type );
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : sig_kill                                                                                       *
- *                                                                                                                    *
- * Description       : reset the signal object and wake up all waiting tasks with 'E_STOPPED' event value             *
+ * Description       : initialize the memory pool object                                                              *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                       *
+ *   mem             : pointer to memory pool object                                                                  *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -187,117 +183,152 @@ typedef struct __sig
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     sig_kill( sig_id sig );
+              void     mem_init( mem_id mem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : sig_waitUntil                                                                                  *
+ * Name              : mem_create                                                                                     *
  *                                                                                                                    *
- * Description       : wait for release the signal object until given timepoint                                       *
+ * Description       : create and initilize a new memory pool object                                                  *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                       *
+ *   limit           : size of a buffer (max number of objects)                                                       *
+ *   size            : size of memory object (in bytes)                                                               *
+ *                                                                                                                    *
+ * Return            : pointer to memory pool object (memory pool successfully created)                               *
+ *   0               : memory pool not created (not enough free memory)                                               *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+              mem_id   mem_create( unsigned limit, unsigned size );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : mem_kill                                                                                       *
+ *                                                                                                                    *
+ * Description       : wake up all waiting tasks with 'E_STOPPED' event value                                         *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mem             : pointer to memory pool object                                                                  *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+              void     mem_kill( mem_id mem );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : mem_waitUntil                                                                                  *
+ *                                                                                                                    *
+ * Description       : try to get memory object from the memory pool object,                                          *
+ *                     wait until given timepoint while the memory pool object is empty                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mem             : pointer to memory pool object                                                                  *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
- * Return                                                                                                             *
- *   E_STOPPED       : signal object was killed before the specified timeout expired                                  *
- *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
- *   'another'       : signal object was successfully released or task was resumed with 'another' event value         *
+ * Return            : pointer to memory object                                                                       *
+ *   0               : task was resumed without getting a memory object                                               *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned sig_waitUntil( sig_id sig, unsigned time );
+              void *   mem_waitUntil( mem_id mem, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : sig_waitFor                                                                                    *
+ * Name              : mem_waitFor                                                                                    *
  *                                                                                                                    *
- * Description       : wait for release the signal object for given duration of time                                  *
+ * Description       : try to get memory object from the memory pool object,                                          *
+ *                     wait for given duration of time while the memory pool object is empty                          *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                       *
- *   delay           : duration of time (maximum number of ticks to wait for release the signal object)               *
- *                     IMMEDIATE: don't wait until the signal object has been released                                *
- *                     INFINITE:  wait indefinitly until the signal object has been released                          *
+ *   mem             : pointer to memory pool object                                                                  *
+ *   delay           : duration of time (maximum number of ticks to wait while the memory pool object is empty)       *
+ *                     IMMEDIATE: don't wait if the memory pool object is empty                                       *
+ *                     INFINITE:  wait indefinitly while the memory pool object is empty                              *
  *                                                                                                                    *
- * Return                                                                                                             *
- *   E_STOPPED       : signal object was killed before the specified timeout expired                                  *
- *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
- *   'another'       : signal object was successfully released or task was resumed with 'another' event value         *
+ * Return            : pointer to memory object                                                                       *
+ *   0               : task was resumed without getting a memory object                                               *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned sig_waitFor( sig_id sig, unsigned delay );
+              void *   mem_waitFor( mem_id mem, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : sig_wait                                                                                       *
+ * Name              : mem_wait                                                                                       *
  *                                                                                                                    *
- * Description       : wait indefinitly until the signal object has been released                                     *
+ * Description       : try to get memory object from the memory pool object,                                          *
+ *                     wait indefinitly while the memory pool object is empty                                         *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                       *
+ *   mem             : pointer to memory pool object                                                                  *
  *                                                                                                                    *
- * Return                                                                                                             *
- *   E_STOPPED       : signal object was killed                                                                       *
- *   'another'       : signal object was successfully released or task was resumed with 'another' event value         *
+ * Return            : pointer to memory object                                                                       *
+ *   0               : task was resumed without getting a memory object                                               *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sig_wait( sig_id sig ) { return sig_waitFor(sig, INFINITE); }
+static inline void *   mem_wait( mem_id mem ) { return mem_waitFor(mem, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : sig_take                                                                                       *
+ * Name              : mem_take                                                                                       *
  *                                                                                                                    *
- * Description       : don't wait until the signal object has been released                                           *
+ * Description       : try to get memory object from the memory pool object,                                          *
+ *                     don't wait if the memory pool object is empty                                                  *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                       *
+ *   mem             : pointer to memory pool object                                                                  *
  *                                                                                                                    *
- * Return                                                                                                             *
- *   E_SUCCESS       : signal object was successfully released                                                        *
- *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
+ * Return            : pointer to memory object                                                                       *
+ *   0               : task was resumed without getting a memory object                                               *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sig_take( sig_id sig ) { return sig_waitFor(sig, IMMEDIATE); }
+static inline void *   mem_take( mem_id mem ) { return mem_waitFor(mem, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : sig_takeISR                                                                                    *
+ * Name              : mem_takeISR                                                                                    *
  *                                                                                                                    *
- * Description       : don't wait until the signal object has been released                                           *
+ * Description       : try to get memory object from the memory pool object,                                          *
+ *                     don't wait if the memory pool object is empty                                                  *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                       *
+ *   mem             : pointer to memory pool object                                                                  *
  *                                                                                                                    *
- * Return                                                                                                             *
- *   E_SUCCESS       : signal object was successfully released                                                        *
- *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
+ * Return            : pointer to memory object                                                                       *
+ *   0               : task was resumed without getting a memory object                                               *
  *                                                                                                                    *
  * Note              : use only in handler mode                                                                       *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sig_takeISR( sig_id sig ) { return sig_waitFor(sig, IMMEDIATE); }
+static inline void *   mem_takeISR( mem_id mem ) { return mem_waitFor(mem, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : sig_give                                                                                       *
+ * Name              : mem_give                                                                                       *
  *                                                                                                                    *
- * Description       : resume one (sigClear) or all (sigProtect) tasks that are waiting on the signal object          *
+ * Description       : transfer memory object to the memory pool object,                                              *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                       *
+ *   mem             : pointer to memory pool object                                                                  *
+ *   data            : pointer to memory object                                                                       *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -305,51 +336,17 @@ static inline unsigned sig_takeISR( sig_id sig ) { return sig_waitFor(sig, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     sig_give( sig_id sig );
+              void     mem_give( mem_id mem, void *data );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : sig_giveISR                                                                                    *
+ * Name              : mem_giveISR                                                                                    *
  *                                                                                                                    *
- * Description       : resume one (for auto clearing signals) or all (for normal signals) tasks                       *
- *                     that are waiting on the signal object                                                          *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                       *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in handler mode                                                                       *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-static inline void     sig_giveISR( sig_id sig ) { sig_give(sig); }
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : sig_clear                                                                                      *
- *                                                                                                                    *
- * Description       : reset the signal object                                                                        *
+ * Description       : transfer memory object to the memory pool object,                                              *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                       *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-              void     sig_clear( sig_id sig );
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : sig_clearISR                                                                                   *
- *                                                                                                                    *
- * Description       : reset the signal object                                                                        *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   sig             : pointer to signal object                                                                       *
+ *   mem             : pointer to memory pool object                                                                  *
+ *   data            : pointer to memory object                                                                       *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -357,7 +354,7 @@ static inline void     sig_giveISR( sig_id sig ) { sig_give(sig); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     sig_clearISR( sig_id sig ) { sig_clear(sig); }
+static inline void     mem_giveISR( mem_id mem, void *data ) { mem_give(mem, data); }
 
 #ifdef __cplusplus
 }
@@ -369,38 +366,38 @@ static inline void     sig_clearISR( sig_id sig ) { sig_clear(sig); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Class             : Signal                                                                                         *
+ * Class             : MemoryPool                                                                                     *
  *                                                                                                                    *
- * Description       : create and initilize a signal object                                                           *
+ * Description       : create and initilize a memory pool object                                                      *
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
- *   type            : signal type                                                                                    *
- *                     sigClear:   auto clearing signal (default)                                                     *
- *                     sigProtect: protected signal                                                                   *
+ *   T               : class of a memory object                                                                       *
+ *   limit           : size of a buffer (max number of objects)                                                       *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Signal : public __sig, private EventGuard<__sig>
+template<class T, unsigned _limit>
+class MemoryPoolT : public __mem, private EventGuard<__mem>
 {
+	T _data[_limit];
+
 public:
 
 	explicit
-	Signal( const unsigned _type = sigClear ): __sig _SIG_INIT(_type) {}
+	MemoryPoolT( void ): __mem _MEM_INIT(_limit, sizeof(T), reinterpret_cast<void**>(_data)) { mem_init(this); }
 
-	void     kill     ( void )            {        sig_kill     (this);         }
-	unsigned waitUntil( unsigned _time  ) { return sig_waitUntil(this, _time);  }
-	unsigned waitFor  ( unsigned _delay ) { return sig_waitFor  (this, _delay); }
-	unsigned wait     ( void )            { return sig_wait     (this);         }
-	unsigned take     ( void )            { return sig_take     (this);         }
-	unsigned takeISR  ( void )            { return sig_takeISR  (this);         }
-	void     give     ( void )            {        sig_give     (this);         }
-	void     giveISR  ( void )            {        sig_giveISR  (this);         }
-	void     clear    ( void )            {        sig_clear    (this);         }
-	void     clearISR ( void )            {        sig_clearISR (this);         }
+	void kill     ( void )            {        mem_kill     (this);         }
+	void*waitUntil( unsigned _time  ) { return mem_waitUntil(this, _time);  }
+	void*waitFor  ( unsigned _delay ) { return mem_waitFor  (this, _delay); }
+	void*wait     ( void )            { return mem_wait     (this);         }
+	void*take     ( void )            { return mem_take     (this);         }
+	void*takeISR  ( void )            { return mem_takeISR  (this);         }
+	void give     ( T *_data )        {        mem_give     (this, _data);  }
+	void giveISR  ( T *_data )        {        mem_giveISR  (this, _data);  }
 };
 
 #endif
 
 /* -------------------------------------------------------------------------- */
 
-#endif//__STATEOS_SIG_H
+#endif//__STATEOS_MEM_H

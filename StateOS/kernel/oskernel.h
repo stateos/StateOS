@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -71,7 +71,7 @@ void core_ctx_reset( void )
 /* -------------------------------------------------------------------------- */
 
 // system malloc procedure
-os_id core_sys_alloc( size_t size );
+void *core_sys_alloc( size_t size );
 
 /* -------------------------------------------------------------------------- */
 
@@ -98,7 +98,7 @@ void     core_tsk_insert( tsk_id tsk );
 void     core_tsk_remove( tsk_id tsk );
 
 // append task 'tsk' to object 'obj' delayed queue
-void     core_tsk_append( tsk_id tsk, os_id obj );
+void     core_tsk_append( tsk_id tsk, void *obj );
 
 // remove task 'tsk' from object 'obj' delayed queue
 // with 'event' event value
@@ -110,7 +110,7 @@ void     core_tsk_unlink( tsk_id tsk, unsigned event );
 // add current task to timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitUntil( os_id obj, unsigned time );
+unsigned core_tsk_waitUntil( void *obj, unsigned time );
 
 // delay execution of current task for given duration of time 'delay'
 // append current task to object 'obj' delayed queue
@@ -118,7 +118,7 @@ unsigned core_tsk_waitUntil( os_id obj, unsigned time );
 // add current task to timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitFor( os_id obj, unsigned delay );
+unsigned core_tsk_waitFor( void *obj, unsigned delay );
 
 // resume execution of delayed task 'tsk' with 'event' event value
 // remove task 'tsk' from guard object delayed queue
@@ -134,14 +134,14 @@ tsk_id   core_tsk_wakeup( tsk_id tsk, unsigned event );
 // add resumed task to tasks READY queue
 // force context switch if priority of resumed task is greater then priority of current task and kernel works in preemptive mode
 // return pointer to resumed task
-tsk_id   core_one_wakeup( os_id obj, unsigned event );
+tsk_id   core_one_wakeup( void *obj, unsigned event );
 
 // resume execution of all tasks from object 'obj' delayed queue with 'event' event value
 // remove all tasks from object 'obj' delayed queue
 // remove all resumed tasks from timers READY queue
 // add all resumed tasks to tasks READY queue
 // force context switch if priority of any resumed task is greater then priority of current task and kernel works in preemptive mode
-void     core_all_wakeup( os_id obj, unsigned event );
+void     core_all_wakeup( void *obj, unsigned event );
 
 // set task 'tsk' priority
 // force context switch if new priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
@@ -151,7 +151,7 @@ void     core_tsk_prio( tsk_id tsk, unsigned prio );
 // save stack pointer 'sp' of the current task
 // reset context switch timer counter
 // return a pointer to the stack pointer of the next READY task the highest priority
-os_id    core_tsk_handler( os_id sp );
+void *   core_tsk_handler( void *sp );
 
 /* -------------------------------------------------------------------------- */
 

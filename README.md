@@ -21,6 +21,7 @@ Features
 - mutexes (recursive and priority inheritance)
 - fast mutexes (non-recursive and non-priority-inheritance)
 - condition variables
+- memory pools
 - message queues
 - mailbox queues
 - timers (one-shot, periodic)

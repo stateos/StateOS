@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -305,7 +305,7 @@ class ConditionVariable : public __cnd, private EventGuard<__cnd>
 public:
 
 	explicit
-	ConditionVariable( void ): __cnd(_CND_INIT()) {}
+	ConditionVariable( void ): __cnd _CND_INIT() {}
 
 	void     kill     ( void )                         {        cnd_kill     (this);               }
 	unsigned waitUntil( mtx_id _mtx, unsigned _time  ) { return cnd_waitUntil(this, _mtx, _time);  }

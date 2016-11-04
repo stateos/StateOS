@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    04.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -449,7 +449,7 @@ class Semaphore : public __sem, private EventGuard<__sem>
 public:
 
 	explicit
-	Semaphore( const unsigned _init, const unsigned _limit = semNormal ): __sem(_SEM_INIT(_init, _limit)) {}
+	Semaphore( const unsigned _init, const unsigned _limit = semNormal ): __sem _SEM_INIT(_init, _limit) {}
 
 	void     kill     ( void )            {        sem_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return sem_waitUntil(this, _time);  }
