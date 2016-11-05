@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    04.11.2016
+    @date    05.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -46,6 +46,7 @@ typedef struct __mem
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned limit; // size of a memory pool (max number of objects)
 	unsigned size;  // size of memory object (in words)
+	void    *data;  // pointer to memory pool buffer
 	void   **next;  // next memory object in memory pool
 
 }	mem_t, *mem_id;
@@ -71,7 +72,7 @@ typedef struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _MEM_INIT( _limit, _size, _data ) { 0, _limit, MSIZE(_size), ((_limit)&&(_size))?(_data):0 }
+#define               _MEM_INIT( _limit, _size, _data ) { 0, _limit, MSIZE(_size), _data, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -108,7 +109,6 @@ typedef struct __mem
                        void*mem##__buf[limit*MSIZE(size)];                     \
                        mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
                        mem_id mem = & mem##__mem
-
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -230,16 +230,20 @@ typedef struct __mem
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   mem             : pointer to memory pool object                                                                  *
+ *   data            : pointer to store the pointer to the memory object                                              *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
- * Return            : pointer to memory object                                                                       *
- *   0               : task was resumed without getting a memory object                                               *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
+ *   E_STOPPED       : memory pool object was killed before the specified timeout expired                             *
+ *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired     *
+ *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void *   mem_waitUntil( mem_id mem, unsigned time );
+              unsigned mem_waitUntil( mem_id mem, void **data, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -250,18 +254,22 @@ typedef struct __mem
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   mem             : pointer to memory pool object                                                                  *
+ *   data            : pointer to store the pointer to the memory object                                              *
  *   delay           : duration of time (maximum number of ticks to wait while the memory pool object is empty)       *
  *                     IMMEDIATE: don't wait if the memory pool object is empty                                       *
  *                     INFINITE:  wait indefinitly while the memory pool object is empty                              *
  *                                                                                                                    *
- * Return            : pointer to memory object                                                                       *
- *   0               : task was resumed without getting a memory object                                               *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
+ *   E_STOPPED       : memory pool object was killed before the specified timeout expired                             *
+ *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired     *
+ *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void *   mem_waitFor( mem_id mem, unsigned delay );
+              unsigned mem_waitFor( mem_id mem, void **data, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -272,15 +280,18 @@ typedef struct __mem
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   mem             : pointer to memory pool object                                                                  *
+ *   data            : pointer to store the pointer to the memory object                                              *
  *                                                                                                                    *
- * Return            : pointer to memory object                                                                       *
- *   0               : task was resumed without getting a memory object                                               *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
+ *   E_STOPPED       : memory pool object was killed                                                                  *
+ *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void *   mem_wait( mem_id mem ) { return mem_waitFor(mem, INFINITE); }
+static inline unsigned mem_wait( mem_id mem, void **data ) { return mem_waitFor(mem, data, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -291,15 +302,17 @@ static inline void *   mem_wait( mem_id mem ) { return mem_waitFor(mem, INFINITE
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   mem             : pointer to memory pool object                                                                  *
+ *   data            : pointer to store the pointer to the memory object                                              *
  *                                                                                                                    *
- * Return            : pointer to memory object                                                                       *
- *   0               : task was resumed without getting a memory object                                               *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
+ *   E_TIMEOUT       : memory pool object is empty                                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void *   mem_take( mem_id mem ) { return mem_waitFor(mem, IMMEDIATE); }
+static inline unsigned mem_take( mem_id mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -310,15 +323,17 @@ static inline void *   mem_take( mem_id mem ) { return mem_waitFor(mem, IMMEDIAT
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   mem             : pointer to memory pool object                                                                  *
+ *   data            : pointer to store the pointer to the memory object                                              *
  *                                                                                                                    *
- * Return            : pointer to memory object                                                                       *
- *   0               : task was resumed without getting a memory object                                               *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
+ *   E_TIMEOUT       : memory pool object is empty                                                                    *
  *                                                                                                                    *
  * Note              : use only in handler mode                                                                       *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void *   mem_takeISR( mem_id mem ) { return mem_waitFor(mem, IMMEDIATE); }
+static inline unsigned mem_takeISR( mem_id mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -386,14 +401,14 @@ public:
 	explicit
 	MemoryPoolT( void ): __mem _MEM_INIT(_limit, sizeof(T), reinterpret_cast<void**>(_data)) { mem_init(this); }
 
-	void kill     ( void )            {        mem_kill     (this);         }
-	void*waitUntil( unsigned _time  ) { return mem_waitUntil(this, _time);  }
-	void*waitFor  ( unsigned _delay ) { return mem_waitFor  (this, _delay); }
-	void*wait     ( void )            { return mem_wait     (this);         }
-	void*take     ( void )            { return mem_take     (this);         }
-	void*takeISR  ( void )            { return mem_takeISR  (this);         }
-	void give     ( T *_data )        {        mem_give     (this, _data);  }
-	void giveISR  ( T *_data )        {        mem_giveISR  (this, _data);  }
+	void     kill     ( void )                       {        mem_kill     (this);                        }
+	unsigned waitUntil( T **_data, unsigned _time )  { return mem_waitUntil(this, (void**)_data, _time);  }
+	unsigned waitFor  ( T **_data, unsigned _delay ) { return mem_waitFor  (this, (void**)_data, _delay); }
+	unsigned wait     ( T **_data )                  { return mem_wait     (this, (void**)_data);         }
+	unsigned take     ( T **_data )                  { return mem_take     (this, (void**)_data);         }
+	unsigned takeISR  ( T **_data )                  { return mem_takeISR  (this, (void**)_data);         }
+	void     give     ( T  *_data )                  {        mem_give     (this,         _data);         }
+	void     giveISR  ( T  *_data )                  {        mem_giveISR  (this,         _data);         }
 };
 
 #endif

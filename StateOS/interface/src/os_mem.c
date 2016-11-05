@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    04.11.2016
+    @date    05.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,15 +32,16 @@
 void mem_init( mem_id mem )
 /* -------------------------------------------------------------------------- */
 {
+	void   **ptr;
+	unsigned cnt;
+
 	port_sys_lock();
 	
-	if (mem->next)
-	{
-		void  **_mem = mem->next;
-		unsigned cnt = mem->limit;
-		while (--cnt) _mem = (void**)(*_mem = _mem + mem->size);
-		*_mem = 0;
-	}		
+	ptr = mem->data;
+	cnt = mem->limit;
+
+	mem->next = 0;
+	while (cnt--) { mem_give(mem, ptr); ptr += mem->size; }
 
 	port_sys_unlock();
 }
@@ -61,7 +62,7 @@ mem_id mem_create( unsigned limit, unsigned size )
 	{
 		mem->limit = limit;
 		mem->size  = size;
-		mem->next  = (limit && size) ? (void**)(mem + 1) : 0;
+		mem->data  = mem + 1;
 		mem_init(mem);
 	}
 
@@ -77,55 +78,55 @@ void mem_kill( mem_id mem )
 	port_sys_lock();
 
 	core_all_wakeup(mem, E_STOPPED);
+	mem_init(mem);
 
 	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 static inline
-void *priv_mem_wait( mem_id mem, unsigned time, unsigned(*wait)() )
+unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
-	void **ptr;
-	unsigned status;
+	unsigned event = E_SUCCESS;
 
 	port_sys_lock();
 
-	if (mem->next == 0)
+	if (mem->next)
 	{
-		status = wait(mem, time);
-		ptr = (void**)(((status & ~0xFU) == ~0xFU) ? 0 : status);
+		*data = mem->next;
+		mem->next = *mem->next;
 	}
 	else
 	{
-		ptr = mem->next;
-		mem->next = *ptr;
+		Current->data = data;
+		event = wait(mem, time);
 	}
-
-	if (ptr)
+	
+	if (event == E_SUCCESS)
 	{
-		void **_mem = ptr;
-		void **_end = ptr + mem->size;
-		do *_mem++ = 0; while (_mem < _end);
+		void   **ptr = *data;
+		unsigned cnt = mem->size;
+		while (cnt--) *ptr++ = 0;
 	}
 	
 	port_sys_unlock();
 
-	return ptr;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
-void *mem_waitUntil( mem_id mem, unsigned time )
+unsigned mem_waitUntil( mem_id mem, void **data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_mem_wait(mem, time, core_tsk_waitUntil);
+	return priv_mem_wait(mem, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-void *mem_waitFor( mem_id mem, unsigned delay )
+unsigned mem_waitFor( mem_id mem, void **data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_mem_wait(mem, delay, core_tsk_waitFor);
+	return priv_mem_wait(mem, data, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -134,10 +135,16 @@ void mem_give( mem_id mem, void *data )
 {
 	port_sys_lock();
 
-	if (core_one_wakeup(mem, (unsigned)data) == 0)
+	tsk_id tsk = core_one_wakeup(mem, E_SUCCESS);
+
+	if (tsk)
+	{
+		tsk->data = data;
+	}
+	else
 	{
 		*(void**)data = mem->next;
-		mem->next = (void**)data;
+		mem->next = data;
 	}
 
 	port_sys_unlock();

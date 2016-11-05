@@ -27,6 +27,10 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+3.2
+- updated memory pool object
+- added memory pool examples
+---------
 3.1
 - added CMSIS-RTOS API
 - added CMSIS-RTOS example

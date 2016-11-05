@@ -54,7 +54,7 @@
 
     @file    StateOS: cmsis_os.c
     @author  Rajmund Szymanski
-    @date    04.11.2016
+    @date    05.11.2016
     @brief   CMSIS-RTOS API implementation for StateOS.
 
  ******************************************************************************
@@ -459,7 +459,8 @@ osPoolId osPoolCreate (const osPoolDef_t *pool_def)
 /// \note MUST REMAIN UNCHANGED: \b osPoolAlloc shall be consistent in every CMSIS-RTOS.
 void *osPoolAlloc (osPoolId pool_id)
 {
-	return mem_wait(pool_id);
+	void *mem;
+	return (mem_wait(pool_id, &mem) == E_SUCCESS) ? mem : 0;
 }
 
 /// Allocate a memory block from a memory pool and set memory block to zero.
@@ -468,7 +469,8 @@ void *osPoolAlloc (osPoolId pool_id)
 /// \note MUST REMAIN UNCHANGED: \b osPoolCAlloc shall be consistent in every CMSIS-RTOS.
 void *osPoolCAlloc (osPoolId pool_id)
 {
-	return mem_wait(pool_id);
+	void *mem;
+	return (mem_wait(pool_id, &mem) == E_SUCCESS) ? mem : 0;
 }
 
 /// Return an allocated memory block back to a specific memory pool.

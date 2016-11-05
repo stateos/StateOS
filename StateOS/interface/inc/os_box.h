@@ -109,7 +109,6 @@ typedef struct __box
                        box_t box##__box = _BOX_INIT( limit, size, box##__buf ); \
                        box_id box = & box##__box
 
-
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : static_BOX                                                                                     *
