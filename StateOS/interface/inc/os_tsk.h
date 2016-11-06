@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    04.11.2016
+    @date    06.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -65,7 +65,7 @@ struct __tsk
 	mtx_id   list;  // list of mutexes held
 
 	union  {
-	unsigned all;   // used by flag object: wait for all flags to be set
+	unsigned mode;  // used by tsk_wait, tsk_sleep functions and flag object
 	void    *data;  // used by mailbox queue object
 	unsigned msg;   // used by message queue object
 	};
@@ -500,6 +500,69 @@ static inline void     tsk_pass ( void ) { core_ctx_switch(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : tsk_waitUntil                                                                                  *
+ *                                                                                                                    *
+ * Description       : delay execution of current task until given timepoint and wait for signal or message           *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flags           : all flags to wait                                                                              *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : task object resumed by a direct signal or message (tsk_give)                                   *
+ *   E_TIMEOUT       : task object was not released before the specified timeout expired                              *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+              unsigned tsk_waitUntil( unsigned flags, unsigned time );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_waitFor                                                                                    *
+ *                                                                                                                    *
+ * Description       : delay execution of current task for given duration of time and wait for signal or message      *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flags           : all flags to wait                                                                              *
+ *   delay           : duration of time (maximum number of ticks to delay execution of current task)                  *
+ *                     IMMEDIATE: don't delay execution of current task                                               *
+ *                     INFINITE:  delay indefinitly execution of current task                                         *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : task object resumed by a direct signal or message (tsk_give)                                   *
+ *   E_TIMEOUT       : task object was not released before the specified timeout expired                              *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+              unsigned tsk_waitFor( unsigned flags, unsigned delay );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_wait                                                                                       *
+ *                                                                                                                    *
+ * Description       : delay indefinitly execution of current task and wait for signal or message                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flags           : all flags to wait                                                                              *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : task object resumed by a direct signal or message (tsk_give)                                   *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, INFINITE); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : tsk_sleepUntil                                                                                 *
  *                                                                                                                    *
  * Description       : delay execution of current task until given timepoint                                          *
@@ -595,6 +658,42 @@ static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : tsk_give                                                                                       *
+ *                                                                                                                    *
+ * Description       : resume execution of given waiting task (tsk_wait)                                              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to delayed task object                                                                 *
+ *   flags           : signal or message transfered to the task                                                       *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+              void     tsk_give( tsk_id tsk, unsigned flags );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_giveISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : resume execution of given waiting task (tsk_wait)                                              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to delayed task object                                                                 *
+ *   flags           : signal or message transfered to the task                                                       *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline void     tsk_giveISR( tsk_id tsk, unsigned flags ) { tsk_give(tsk, flags); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : tsk_resume                                                                                     *
  *                                                                                                                    *
  * Description       : resume execution of given delayed task                                                         *
@@ -658,11 +757,13 @@ public:
 	explicit
 	TaskBase( const unsigned _prio, const fun_id _state, void *_top ): __tsk _TSK_INIT(_prio, _state, _top) {}
 
-	void     kill      ( void )                          {        tsk_kill      (this);                }
-	void     start     ( void )                          {        tsk_start     (this);                }
-	void     startFrom ( fun_id   _state )               {        tsk_startFrom (this, _state);        }
-	void     resume    ( unsigned _event )               {        tsk_resume    (this, _event);        }
-	void     resumeISR ( unsigned _event )               {        tsk_resumeISR (this, _event);        }
+	void     kill      ( void )                             {        tsk_kill      (this);                }
+	void     start     ( void )                             {        tsk_start     (this);                }
+	void     startFrom ( fun_id   _state )                  {        tsk_startFrom (this, _state);        }
+	void     give      ( unsigned _flags )                  {        tsk_give      (this, _flags);        }
+	void     giveISR   ( unsigned _flags )                  {        tsk_giveISR   (this, _flags);        }
+	void     resume    ( unsigned _event )                  {        tsk_resume    (this, _event);        }
+	void     resumeISR ( unsigned _event )                  {        tsk_resumeISR (this, _event);        }
 };
 
 /**********************************************************************************************************************
@@ -675,17 +776,20 @@ public:
 
 namespace ThisTask
 {
-	void     pass      ( void )                          {        tsk_pass      ();                    }
-	void     yield     ( void )                          {        tsk_yield     ();                    }
-	void     flip      ( fun_id   _state )               {        tsk_flip      (_state);              }
-	void     stop      ( void )                          {        tsk_stop      ();                    }
-	void     prio      ( unsigned _prio )                {        tsk_prio      (_prio);               }
+	void     pass      ( void )                             {        tsk_pass      ();                    }
+	void     yield     ( void )                             {        tsk_yield     ();                    }
+	void     flip      ( fun_id   _state )                  {        tsk_flip      (_state);              }
+	void     stop      ( void )                             {        tsk_stop      ();                    }
+	void     prio      ( unsigned _prio )                   {        tsk_prio      (_prio);               }
 
-	unsigned sleepUntil( unsigned _time )                { return tsk_sleepUntil(_time);               }
-	unsigned sleepFor  ( unsigned _delay )               { return tsk_sleepFor  (_delay);              }
-	unsigned sleep     ( void )                          { return tsk_sleep     ();                    }
-	unsigned delay     ( unsigned _delay )               { return tsk_delay     (_delay);              }
-	unsigned suspend   ( void )                          { return tsk_suspend   ();                    }
+	unsigned waitUntil ( unsigned _flags, unsigned _time )  { return tsk_waitUntil (_flags, _time);       }
+	unsigned waitFor   ( unsigned _flags, unsigned _delay ) { return tsk_waitFor   (_flags, _delay);      }
+	unsigned wait      ( unsigned _flags )                  { return tsk_wait      (_flags);              }
+	unsigned sleepUntil( unsigned _time )                   { return tsk_sleepUntil(_time);               }
+	unsigned sleepFor  ( unsigned _delay )                  { return tsk_sleepFor  (_delay);              }
+	unsigned sleep     ( void )                             { return tsk_sleep     ();                    }
+	unsigned delay     ( unsigned _delay )                  { return tsk_delay     (_delay);              }
+	unsigned suspend   ( void )                             { return tsk_suspend   ();                    }
 }
 
 /**********************************************************************************************************************

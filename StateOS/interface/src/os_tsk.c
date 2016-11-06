@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    06.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -150,14 +150,21 @@ void tsk_prio( unsigned prio )
 }
 
 /* -------------------------------------------------------------------------- */
+
+#define tskSleep  0
+#define tskWait   1
+
+/* -------------------------------------------------------------------------- */
 static inline
-unsigned priv_tsk_sleep( unsigned time, unsigned(*wait)() )
+unsigned priv_tsk_sleep( unsigned flags, unsigned time, unsigned status, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	port_sys_lock();
 
+	Current->mode = status;
+	Current->flags = flags;
 	event = wait(Current, time);
 
 	port_sys_unlock();
@@ -166,17 +173,50 @@ unsigned priv_tsk_sleep( unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
+unsigned tsk_waitUntil( unsigned flags, unsigned time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_tsk_sleep(flags, time, tskWait, core_tsk_waitUntil);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_waitFor( unsigned flags, unsigned delay )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_tsk_sleep(flags, delay, tskWait, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned tsk_sleepUntil( unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_tsk_sleep(time, core_tsk_waitUntil);
+	return priv_tsk_sleep(0, time, tskSleep, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned tsk_sleepFor( unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_tsk_sleep(delay, core_tsk_waitFor);
+	return priv_tsk_sleep(0, delay, tskSleep, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_give( tsk_id tsk, unsigned flags )
+/* -------------------------------------------------------------------------- */
+{
+	port_sys_lock();
+
+	if (tsk->obj.id == ID_DELAYED)
+	if (tsk->guard  == tsk)
+	if (tsk->mode   != tskSleep)
+	{
+		tsk->msg    =  flags;
+		tsk->flags &= ~flags;
+		if (tsk->flags == 0)
+		core_tsk_wakeup(tsk, E_SUCCESS);
+	}
+
+	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

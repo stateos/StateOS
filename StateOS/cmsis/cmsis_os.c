@@ -305,21 +305,48 @@ osStatus osTimerDelete (osTimerId timer_id)
 /// \param[in]     signals       specifies the signal flags of the thread that should be set.
 /// \return previous signal flags of the specified thread or 0x80000000 in case of incorrect parameters.
 /// \note MUST REMAIN UNCHANGED: \b osSignalSet shall be consistent in every CMSIS-RTOS.
-int32_t osSignalSet (osThreadId thread_id, int32_t signals);
+int32_t osSignalSet (osThreadId thread_id, int32_t signals)
+{
+	unsigned flags = thread_id->flags;
+	tsk_give(thread_id, (unsigned)signals);
+	return (int32_t)flags;
+}
 
 /// Clear the specified Signal Flags of an active thread.
 /// \param[in]     thread_id     thread ID obtained by \ref osThreadCreate or \ref osThreadGetId.
 /// \param[in]     signals       specifies the signal flags of the thread that shall be cleared.
 /// \return previous signal flags of the specified thread or 0x80000000 in case of incorrect parameters or call from ISR.
 /// \note MUST REMAIN UNCHANGED: \b osSignalClear shall be consistent in every CMSIS-RTOS.
-int32_t osSignalClear (osThreadId thread_id, int32_t signals);
+int32_t osSignalClear (osThreadId thread_id, int32_t signals)
+{
+	unsigned flags = thread_id->flags;
+	thread_id->flags &= ~(unsigned)signals;
+	return (int32_t)flags;
+}
 
 /// Wait for one or more Signal Flags to become signaled for the current \b RUNNING thread.
 /// \param[in]     signals       wait until all specified signal flags set or 0 for any single signal flag.
 /// \param[in]     millisec      \ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
 /// \return event flag information or error code.
 /// \note MUST REMAIN UNCHANGED: \b osSignalWait shall be consistent in every CMSIS-RTOS.
-osEvent osSignalWait (int32_t signals, uint32_t millisec);
+osEvent osSignalWait (int32_t signals, uint32_t millisec)
+{
+	osEvent event;
+
+	if (port_isr_inside())
+	{
+		event.status = osErrorISR;
+	}
+	else
+	switch (tsk_waitFor((unsigned)signals, millisec*MSEC))
+	{
+	case E_SUCCESS: event.status = osEventSignal; event.value.v = Current->flags; break;
+	case E_TIMEOUT: event.status = osEventTimeout; break;
+	default:        event.status = osErrorOS; break;
+	}
+
+	return event;
+}
 
 
 //  ==== Mutex Management ====

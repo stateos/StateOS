@@ -65,11 +65,11 @@ unsigned priv_flg_wait( flg_id flg, unsigned flags, unsigned mode, unsigned time
 
 	tsk_id cur = Current;
 
-	cur->all    =  mode & flgAll;
+	cur->mode   =  mode & flgAll;
 	cur->flags  = (mode & flgIgnore) ? flags : (flags & ~flg->flags);
 	flg->flags &= ~flags;
 
-	if (cur->flags && (cur->all || (cur->flags == flags)))
+	if (cur->flags && ((cur->mode != flgOne) || (cur->flags == flags)))
 	event = wait(flg, time);
 
 	port_sys_unlock();
@@ -107,7 +107,7 @@ void flg_give( flg_id flg, unsigned flags )
 		{
 			flg->flags &= ~tsk->flags;
 			tsk->flags &= ~flags;
-			if (tsk->flags && tsk->all) continue;
+			if (tsk->flags && (tsk->mode != flgOne)) continue;
 			core_one_wakeup(tsk = tsk->back, E_SUCCESS);
 		}
 	}
