@@ -1,0 +1,44 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+OS_MEM(mem, 1, sizeof(unsigned));
+OS_BOX(box, 1, sizeof(void*));
+
+void slave()
+{
+	void *p;
+
+	for (;;)
+	{
+		box_wait(box, &p);
+		LEDs = *(unsigned*)p;
+		mem_give(mem, p);
+	}
+}
+
+void master()
+{
+	void *p;
+	unsigned x = 15;
+
+	for (;;)
+	{
+		tsk_delay(SEC);
+		mem_wait(mem, &p);
+		*(unsigned*)p = x++;
+		box_give(box, &p);
+	}
+}
+
+OS_TSK(sla, 0, slave);
+OS_TSK(mas, 0, master);
+
+int main()
+{
+	LED_Config();
+
+	mem_init(mem);
+	tsk_start(sla);
+	tsk_start(mas);
+	tsk_stop();
+}
