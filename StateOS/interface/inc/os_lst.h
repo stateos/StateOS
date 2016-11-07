@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    @file    StateOS: os_mem.h
+    @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
     @date    07.11.2016
     @brief   This file contains definitions for StateOS.
@@ -26,8 +26,8 @@
 
  ******************************************************************************/
 
-#ifndef __STATEOS_MEM_H
-#define __STATEOS_MEM_H
+#ifndef __STATEOS_LST_H
+#define __STATEOS_LST_H
 
 #include <oskernel.h>
 
@@ -37,181 +37,124 @@ extern "C" {
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : memory pool                                                                                    *
+ * Name              : list                                                                                           *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __mem
+typedef struct __lst
 {
-	tsk_id   queue; // inherited from list
-	void   **next;  // inherited from list
-	unsigned limit; // size of a memory pool (max number of objects)
-	unsigned size;  // size of memory object (in words)
-	void    *data;  // pointer to memory pool buffer
+	tsk_id   queue; // next process in the DELAYED queue
+	void   **next;  // next memory object in the queue
 
-}	mem_t, *mem_id;
-
-/* -------------------------------------------------------------------------- */
-
-#define MSIZE( size ) \
- (((unsigned)( size )+(sizeof(void*)-1))/sizeof(void*))
+}	lst_t, *lst_id;
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : _MEM_INIT                                                                                      *
+ * Name              : _LST_INIT                                                                                      *
  *                                                                                                                    *
- * Description       : create and initilize a memory pool object                                                      *
+ * Description       : create and initilize a list object                                                             *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   size            : size of memory object (in bytes)                                                               *
- *   data            : memory pool data buffer                                                                        *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
- * Return            : memory pool object                                                                             *
+ * Return            : list object                                                                                    *
  *                                                                                                                    *
  * Note              : for internal use                                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _MEM_INIT( _limit, _size, _data ) { 0, 0, _limit, MSIZE(_size), _data }
+#define               _LST_INIT() { 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : _MEM_DATA                                                                                      *
+ * Name              : OS_LST                                                                                         *
  *                                                                                                                    *
- * Description       : create a memory pool data buffer                                                               *
+ * Description       : define and initilize a list object                                                             *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   limit           : size of a buffer (max number of objects)                                                       *
- *   size            : size of memory object (in bytes)                                                               *
- *                                                                                                                    *
- * Return            : memory pool data buffer                                                                        *
- *                                                                                                                    *
- * Note              : for internal use                                                                               *
+ *   lst             : name of a pointer to list object                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _MEM_DATA( _limit, _size ) (void*[_limit*MSIZE(_size)]){ 0 }
+#define             OS_LST( lst, limit, size )        \
+                       lst_t lst##__lst = _LST_INIT(); \
+                       lst_id lst = & lst##__lst
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : OS_MEM                                                                                         *
+ * Name              : static_LST                                                                                     *
  *                                                                                                                    *
- * Description       : define and initilize a memory pool object                                                      *
+ * Description       : define and initilize a static list object                                                      *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mem             : name of a pointer to memory pool object                                                        *
- *   limit           : size of a buffer (max number of objects)                                                       *
- *   size            : size of memory object (in bytes)                                                               *
+ *   lst             : name of a pointer to list object                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_MEM( mem, limit, size )                                \
-                       void*mem##__buf[limit*MSIZE(size)];                     \
-                       mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
-                       mem_id mem = & mem##__mem
+#define         static_LST( lst, limit, size )        \
+                static lst_t lst##__lst = _LST_INIT(); \
+                static lst_id lst = & lst##__lst
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : static_MEM                                                                                     *
+ * Name              : LST_INIT                                                                                       *
  *                                                                                                                    *
- * Description       : define and initilize a static memory pool object                                               *
+ * Description       : create and initilize a list object                                                             *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   mem             : name of a pointer to memory pool object                                                        *
- *   limit           : size of a buffer (max number of objects)                                                       *
- *   size            : size of memory object (in bytes)                                                               *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
- **********************************************************************************************************************/
-
-#define         static_MEM( mem, limit, size )                                \
-                static void*mem##__buf[limit*MSIZE(size)];                     \
-                static mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
-                static mem_id mem = & mem##__mem
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : MEM_INIT                                                                                       *
- *                                                                                                                    *
- * Description       : create and initilize a memory pool object                                                      *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   limit           : size of a buffer (max number of objects)                                                       *
- *   size            : size of memory object (in bytes)                                                               *
- *                                                                                                                    *
- * Return            : memory pool object                                                                             *
+ * Return            : list object                                                                                    *
  *                                                                                                                    *
  * Note              : use only in 'C' code                                                                           *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define                MEM_INIT( limit, size ) \
-                      _MEM_INIT( limit, size, _MEM_DATA( limit, size ) )
+#define                LST_INIT() \
+                      _LST_INIT()
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : MEM_CREATE                                                                                     *
+ * Name              : LST_CREATE                                                                                     *
  *                                                                                                                    *
- * Description       : create and initilize a memory pool object                                                      *
+ * Description       : create and initilize a list object                                                             *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   limit           : size of a buffer (max number of objects)                                                       *
- *   size            : size of memory object (in bytes)                                                               *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
- * Return            : pointer to memory pool object                                                                  *
+ * Return            : pointer to list object                                                                         *
  *                                                                                                                    *
  * Note              : use only in 'C' code                                                                           *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
 #ifndef __cplusplus
-#define                MEM_CREATE( limit, size ) \
-               &(mem_t)MEM_INIT( limit, size )
+#define                LST_CREATE() \
+               &(lst_t)LST_INIT()
 #endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : mem_init                                                                                       *
+ * Name              : lst_create                                                                                     *
  *                                                                                                                    *
- * Description       : initialize the memory pool object                                                              *
+ * Description       : create and initilize a new list object                                                         *
  *                                                                                                                    *
- * Parameters                                                                                                         *
- *   mem             : pointer to memory pool object                                                                  *
+ * Parameters        : none                                                                                           *
  *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-              void     mem_init( mem_id mem );
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : mem_create                                                                                     *
- *                                                                                                                    *
- * Description       : create and initilize a new memory pool object                                                  *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   limit           : size of a buffer (max number of objects)                                                       *
- *   size            : size of memory object (in bytes)                                                               *
- *                                                                                                                    *
- * Return            : pointer to memory pool object (memory pool successfully created)                               *
- *   0               : memory pool not created (not enough free memory)                                               *
+ * Return            : pointer to list object (list successfully created)                                             *
+ *   0               : list not created (not enough free memory)                                                      *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              mem_id   mem_create( unsigned limit, unsigned size );
+              lst_id   lst_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : mem_kill                                                                                       *
+ * Name              : lst_kill                                                                                       *
  *                                                                                                                    *
  * Description       : wake up all waiting tasks with 'E_STOPPED' event value                                         *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mem             : pointer to memory pool object                                                                  *
+ *   lst             : pointer to list object                                                                         *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -219,130 +162,130 @@ typedef struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     mem_kill( mem_id mem );
+              void     lst_kill( lst_id lst );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : mem_waitUntil                                                                                  *
+ * Name              : lst_waitUntil                                                                                  *
  *                                                                                                                    *
- * Description       : try to get memory object from the memory pool object,                                          *
- *                     wait until given timepoint while the memory pool object is empty                               *
+ * Description       : try to get memory object from the list object,                                                 *
+ *                     wait until given timepoint while the list object is empty                                      *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mem             : pointer to memory pool object                                                                  *
+ *   lst             : pointer to list object                                                                         *
  *   data            : pointer to store the pointer to the memory object                                              *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
- *   E_STOPPED       : memory pool object was killed before the specified timeout expired                             *
- *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired     *
+ *   E_STOPPED       : list object was killed before the specified timeout expired                                    *
+ *   E_TIMEOUT       : list object is empty and was not received data before the specified timeout expired            *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mem_waitUntil( mem_id mem, void **data, unsigned time );
+              unsigned lst_waitUntil( lst_id lst, void **data, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : mem_waitFor                                                                                    *
+ * Name              : lst_waitFor                                                                                    *
  *                                                                                                                    *
- * Description       : try to get memory object from the memory pool object,                                          *
- *                     wait for given duration of time while the memory pool object is empty                          *
+ * Description       : try to get memory object from the list object,                                                 *
+ *                     wait for given duration of time while the list object is empty                                 *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mem             : pointer to memory pool object                                                                  *
+ *   lst             : pointer to list object                                                                         *
  *   data            : pointer to store the pointer to the memory object                                              *
- *   delay           : duration of time (maximum number of ticks to wait while the memory pool object is empty)       *
- *                     IMMEDIATE: don't wait if the memory pool object is empty                                       *
- *                     INFINITE:  wait indefinitly while the memory pool object is empty                              *
+ *   delay           : duration of time (maximum number of ticks to wait while the list object is empty)              *
+ *                     IMMEDIATE: don't wait if the list object is empty                                              *
+ *                     INFINITE:  wait indefinitly while the list object is empty                                     *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
- *   E_STOPPED       : memory pool object was killed before the specified timeout expired                             *
- *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired     *
+ *   E_STOPPED       : list object was killed before the specified timeout expired                                    *
+ *   E_TIMEOUT       : list object is empty and was not received data before the specified timeout expired            *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mem_waitFor( mem_id mem, void **data, unsigned delay );
+              unsigned lst_waitFor( lst_id lst, void **data, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : mem_wait                                                                                       *
+ * Name              : lst_wait                                                                                       *
  *                                                                                                                    *
- * Description       : try to get memory object from the memory pool object,                                          *
- *                     wait indefinitly while the memory pool object is empty                                         *
+ * Description       : try to get memory object from the list object,                                                 *
+ *                     wait indefinitly while the list object is empty                                                *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mem             : pointer to memory pool object                                                                  *
+ *   lst             : pointer to list object                                                                         *
  *   data            : pointer to store the pointer to the memory object                                              *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
- *   E_STOPPED       : memory pool object was killed                                                                  *
+ *   E_STOPPED       : list object was killed                                                                         *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mem_wait( mem_id mem, void **data ) { return mem_waitFor(mem, data, INFINITE); }
+static inline unsigned lst_wait( lst_id lst, void **data ) { return lst_waitFor(lst, data, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : mem_take                                                                                       *
+ * Name              : lst_take                                                                                       *
  *                                                                                                                    *
- * Description       : try to get memory object from the memory pool object,                                          *
- *                     don't wait if the memory pool object is empty                                                  *
+ * Description       : try to get memory object from the list object,                                                 *
+ *                     don't wait if the list object is empty                                                         *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mem             : pointer to memory pool object                                                                  *
+ *   lst             : pointer to list object                                                                         *
  *   data            : pointer to store the pointer to the memory object                                              *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
- *   E_TIMEOUT       : memory pool object is empty                                                                    *
+ *   E_TIMEOUT       : list object is empty                                                                           *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mem_take( mem_id mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
+static inline unsigned lst_take( lst_id lst, void **data ) { return lst_waitFor(lst, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : mem_takeISR                                                                                    *
+ * Name              : lst_takeISR                                                                                    *
  *                                                                                                                    *
- * Description       : try to get memory object from the memory pool object,                                          *
- *                     don't wait if the memory pool object is empty                                                  *
+ * Description       : try to get memory object from the list object,                                                 *
+ *                     don't wait if the list object is empty                                                         *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mem             : pointer to memory pool object                                                                  *
+ *   lst             : pointer to list object                                                                         *
  *   data            : pointer to store the pointer to the memory object                                              *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
- *   E_TIMEOUT       : memory pool object is empty                                                                    *
+ *   E_TIMEOUT       : list object is empty                                                                           *
  *                                                                                                                    *
  * Note              : use only in handler mode                                                                       *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mem_takeISR( mem_id mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
+static inline unsigned lst_takeISR( lst_id lst, void **data ) { return lst_waitFor(lst, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : mem_give                                                                                       *
+ * Name              : lst_give                                                                                       *
  *                                                                                                                    *
- * Description       : transfer memory object to the memory pool object,                                              *
+ * Description       : transfer memory object to the list object,                                                     *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mem             : pointer to memory pool object                                                                  *
+ *   lst             : pointer to list object                                                                         *
  *   data            : pointer to memory object                                                                       *
  *                                                                                                                    *
  * Return            : none                                                                                           *
@@ -351,16 +294,16 @@ static inline unsigned mem_takeISR( mem_id mem, void **data ) { return mem_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     mem_give( mem_id mem, void *data );
+              void     lst_give( lst_id lst, void *data );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : mem_giveISR                                                                                    *
+ * Name              : lst_giveISR                                                                                    *
  *                                                                                                                    *
- * Description       : transfer memory object to the memory pool object,                                              *
+ * Description       : transfer memory object to the list object,                                                     *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   mem             : pointer to memory pool object                                                                  *
+ *   lst             : pointer to list object                                                                         *
  *   data            : pointer to memory object                                                                       *
  *                                                                                                                    *
  * Return            : none                                                                                           *
@@ -369,7 +312,7 @@ static inline unsigned mem_takeISR( mem_id mem, void **data ) { return mem_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     mem_giveISR( mem_id mem, void *data ) { mem_give(mem, data); }
+static inline void     lst_giveISR( lst_id lst, void *data ) { lst_give(lst, data); }
 
 #ifdef __cplusplus
 }
@@ -381,38 +324,34 @@ static inline void     mem_giveISR( mem_id mem, void *data ) { mem_give(mem, dat
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Class             : MemoryPool                                                                                     *
+ * Class             : List                                                                                           *
  *                                                                                                                    *
- * Description       : create and initilize a memory pool object                                                      *
+ * Description       : create and initilize a list object                                                             *
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
- *   T               : class of a memory object                                                                       *
- *   limit           : size of a buffer (max number of objects)                                                       *
+ *                   : none                                                                                           *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-template<class T, unsigned _limit>
-class MemoryPoolT : public __mem, private EventGuard<__mem>
+class List : public __lst, private EventGuard<__lst>
 {
-	T _data[_limit];
-
 public:
 
 	explicit
-	MemoryPoolT( void ): __mem _MEM_INIT(_limit, sizeof(T), reinterpret_cast<void**>(_data)) { mem_init(this); }
+	List( void ): __lst _LST_INIT() {}
 
-	void     kill     ( void )                       {        mem_kill     (this);                        }
-	unsigned waitUntil( T **_data, unsigned _time )  { return mem_waitUntil(this, (void**)_data, _time);  }
-	unsigned waitFor  ( T **_data, unsigned _delay ) { return mem_waitFor  (this, (void**)_data, _delay); }
-	unsigned wait     ( T **_data )                  { return mem_wait     (this, (void**)_data);         }
-	unsigned take     ( T **_data )                  { return mem_take     (this, (void**)_data);         }
-	unsigned takeISR  ( T **_data )                  { return mem_takeISR  (this, (void**)_data);         }
-	void     give     ( T  *_data )                  {        mem_give     (this,         _data);         }
-	void     giveISR  ( T  *_data )                  {        mem_giveISR  (this,         _data);         }
+	void     kill     ( void )                          {        lst_kill     (this);                }
+	unsigned waitUntil( void **_data, unsigned _time )  { return lst_waitUntil(this, _data, _time);  }
+	unsigned waitFor  ( void **_data, unsigned _delay ) { return lst_waitFor  (this, _data, _delay); }
+	unsigned wait     ( void **_data )                  { return lst_wait     (this, _data);         }
+	unsigned take     ( void **_data )                  { return lst_take     (this, _data);         }
+	unsigned takeISR  ( void **_data )                  { return lst_takeISR  (this, _data);         }
+	void     give     ( void  *_data )                  {        lst_give     (this, _data);         }
+	void     giveISR  ( void  *_data )                  {        lst_giveISR  (this, _data);         }
 };
 
 #endif
 
 /* -------------------------------------------------------------------------- */
 
-#endif//__STATEOS_MEM_H
+#endif//__STATEOS_LST_H

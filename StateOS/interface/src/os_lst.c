@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    @file    StateOS: os_mem.c
+    @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
     @date    07.11.2016
     @brief   This file provides set of functions for StateOS.
@@ -29,109 +29,77 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-void mem_init( mem_id mem )
+lst_id lst_create( void )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
-	
-	void   **ptr = mem->data;
-	unsigned cnt = mem->limit;
-
-	mem->next = 0;
-	while (cnt--) { mem_give(mem, ptr + 1); ptr += mem->size; }
-
-	port_sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-mem_id mem_create( unsigned limit, unsigned size )
-/* -------------------------------------------------------------------------- */
-{
-	mem_id mem;
+	lst_id lst;
 
 	port_sys_lock();
 
-	size = MSIZE(size) + 1;
-
-	mem = core_sys_alloc(sizeof(mem_t) + limit * size * sizeof(void*));
-
-	if (mem)
-	{
-		mem->limit = limit;
-		mem->size  = size;
-		mem->data  = mem + 1;
-		mem_init(mem);
-	}
+	lst = core_sys_alloc(sizeof(lst_t));
 
 	port_sys_unlock();
 
-	return mem;
+	return lst;
 }
 
 /* -------------------------------------------------------------------------- */
-void mem_kill( mem_id mem )
+void lst_kill( lst_id lst )
 /* -------------------------------------------------------------------------- */
 {
 	port_sys_lock();
 
-	core_all_wakeup(mem, E_STOPPED);
+	core_all_wakeup(lst, E_STOPPED);
 
 	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 static inline
-unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)() )
+unsigned priv_lst_wait( lst_id lst, void **data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
 
 	port_sys_lock();
 
-	if (mem->next)
+	if (lst->next)
 	{
-		*data = mem->next + 1;
-		mem->next = *mem->next;
+		*data = lst->next + 1;
+		lst->next = *lst->next;
 	}
 	else
 	{
 		Current->data = data;
-		event = wait(mem, time);
+		event = wait(lst, time);
 	}
 	
-	if (event == E_SUCCESS)
-	{
-		void   **ptr = *data;
-		unsigned cnt = mem->size;
-		while (--cnt) *ptr++ = 0;
-	}
-
 	port_sys_unlock();
 
 	return event;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mem_waitUntil( mem_id mem, void **data, unsigned time )
+unsigned lst_waitUntil( lst_id lst, void **data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_mem_wait(mem, data, time, core_tsk_waitUntil);
+	return priv_lst_wait(lst, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mem_waitFor( mem_id mem, void **data, unsigned delay )
+unsigned lst_waitFor( lst_id lst, void **data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_mem_wait(mem, data, delay, core_tsk_waitFor);
+	return priv_lst_wait(lst, data, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-void mem_give( mem_id mem, void *data )
+void lst_give( lst_id lst, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	port_sys_lock();
 
-	tsk_id tsk = core_one_wakeup(mem, E_SUCCESS);
+	tsk_id tsk = core_one_wakeup(lst, E_SUCCESS);
 
 	if (tsk)
 	{
@@ -139,7 +107,7 @@ void mem_give( mem_id mem, void *data )
 	}
 	else
 	{
-		void **ptr = (void**)&mem->next;
+		void **ptr = (void**)&lst->next;
 		while (*ptr) ptr = *ptr;
 		ptr = *ptr = (void**)data - 1; *ptr = 0;
 	}

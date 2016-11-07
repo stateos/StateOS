@@ -54,7 +54,7 @@
 
     @file    StateOS: cmsis_os.c
     @author  Rajmund Szymanski
-    @date    05.11.2016
+    @date    07.11.2016
     @brief   CMSIS-RTOS API implementation for StateOS.
 
  ******************************************************************************
@@ -486,8 +486,8 @@ osPoolId osPoolCreate (const osPoolDef_t *pool_def)
 /// \note MUST REMAIN UNCHANGED: \b osPoolAlloc shall be consistent in every CMSIS-RTOS.
 void *osPoolAlloc (osPoolId pool_id)
 {
-	void *mem;
-	return (mem_wait(pool_id, &mem) == E_SUCCESS) ? mem : 0;
+	void *block;
+	return (mem_wait(pool_id, &block) == E_SUCCESS) ? block : 0;
 }
 
 /// Allocate a memory block from a memory pool and set memory block to zero.
@@ -576,41 +576,111 @@ osEvent osMessageGet (osMessageQId queue_id, uint32_t millisec)
 /// \param[in]     thread_id     thread ID (obtained by \ref osThreadCreate or \ref osThreadGetId) or NULL.
 /// \return mail queue ID for reference by other functions or NULL in case of error.
 /// \note MUST REMAIN UNCHANGED: \b osMailCreate shall be consistent in every CMSIS-RTOS.
-osMailQId osMailCreate (const osMailQDef_t *queue_def, osThreadId thread_id);
+osMailQId osMailCreate (const osMailQDef_t *queue_def, osThreadId thread_id)
+{
+	mbq_id mbq;
+
+	(void) thread_id;
+
+	port_sys_lock();
+
+	unsigned size = MSIZE(queue_def->item_sz) + 1;
+
+	mbq = core_sys_alloc(sizeof(mbq_t) + queue_def->queue_sz * size * sizeof(void*));
+
+	if (mbq)
+	{
+		mbq->mem.limit = queue_def->queue_sz;
+		mbq->mem.size  = size;
+		mbq->mem.data  = mbq + 1;
+		mem_init(&mbq->mem);
+	}
+
+	port_sys_unlock();
+
+	return mbq;
+}
 
 /// Allocate a memory block from a mail.
 /// \param[in]     queue_id      mail queue ID obtained with \ref osMailCreate.
 /// \param[in]     millisec      \ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
 /// \return pointer to memory block that can be filled with mail or NULL in case of error.
 /// \note MUST REMAIN UNCHANGED: \b osMailAlloc shall be consistent in every CMSIS-RTOS.
-void *osMailAlloc (osMailQId queue_id, uint32_t millisec);
+void *osMailAlloc (osMailQId queue_id, uint32_t millisec)
+{
+	void *mail;
+
+	if (port_isr_inside())
+		return 0;
+
+	return (mem_waitFor(&queue_id->mem, &mail, millisec*MSEC) == E_SUCCESS) ? mail : 0;
+}
 
 /// Allocate a memory block from a mail and set memory block to zero.
 /// \param[in]     queue_id      mail queue ID obtained with \ref osMailCreate.
 /// \param[in]     millisec      \ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
 /// \return pointer to memory block that can be filled with mail or NULL in case of error.
 /// \note MUST REMAIN UNCHANGED: \b osMailCAlloc shall be consistent in every CMSIS-RTOS.
-void *osMailCAlloc (osMailQId queue_id, uint32_t millisec);
+void *osMailCAlloc (osMailQId queue_id, uint32_t millisec)
+{
+	void *mail;
+
+	if (port_isr_inside())
+		return 0;
+
+	return (mem_waitFor(&queue_id->mem, &mail, millisec*MSEC) == E_SUCCESS) ? mail : 0;
+}
 
 /// Put a mail to a queue.
 /// \param[in]     queue_id      mail queue ID obtained with \ref osMailCreate.
 /// \param[in]     mail          memory block previously allocated with \ref osMailAlloc or \ref osMailCAlloc.
 /// \return status code that indicates the execution status of the function.
 /// \note MUST REMAIN UNCHANGED: \b osMailPut shall be consistent in every CMSIS-RTOS.
-osStatus osMailPut (osMailQId queue_id, void *mail);
+osStatus osMailPut (osMailQId queue_id, void *mail)
+{
+	lst_give(&queue_id->lst, mail);
+
+	return osOK;
+}
 
 /// Get a mail from a queue.
 /// \param[in]     queue_id      mail queue ID obtained with \ref osMailCreate.
 /// \param[in]     millisec      \ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
 /// \return event that contains mail information or error code.
 /// \note MUST REMAIN UNCHANGED: \b osMailGet shall be consistent in every CMSIS-RTOS.
-osEvent osMailGet (osMailQId queue_id, uint32_t millisec);
+osEvent osMailGet (osMailQId queue_id, uint32_t millisec)
+{
+	osEvent event;
+
+	if (port_isr_inside())
+	{
+		event.status = osErrorISR;
+		return event;
+	}
+	
+	port_sys_lock();
+
+	switch (lst_waitFor(&queue_id->lst, &event.value.p, millisec*MSEC))
+	{
+	case E_SUCCESS: event.status = osEventMail; break;
+	case E_TIMEOUT: event.status = osEventTimeout; break;
+	default:        event.status = osErrorOS; break;
+	}
+	
+	port_sys_unlock();
+
+	return event;
+}
 
 /// Free a memory block from a mail.
 /// \param[in]     queue_id      mail queue ID obtained with \ref osMailCreate.
 /// \param[in]     mail          pointer to the memory block that was obtained with \ref osMailGet.
 /// \return status code that indicates the execution status of the function.
 /// \note MUST REMAIN UNCHANGED: \b osMailFree shall be consistent in every CMSIS-RTOS.
-osStatus osMailFree (osMailQId queue_id, void *mail);
+osStatus osMailFree (osMailQId queue_id, void *mail)
+{
+	mem_give(&queue_id->mem, mail);
+	return osOK;
+}
 
 #endif  // Mail Queues available

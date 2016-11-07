@@ -54,7 +54,7 @@
 
     @file    StateOS: cmsis_os.h
     @author  Rajmund Szymanski
-    @date    04.11.2016
+    @date    07.11.2016
     @brief   CMSIS-RTOS API implementation for StateOS.
 
  ******************************************************************************
@@ -193,7 +193,12 @@ typedef msg_t *osMessageQId;
 
 /// Mail ID identifies the mail queue (pointer to a mail queue control block).
 /// \note CAN BE CHANGED: \b os_mailQ_cb is implementation specific in every CMSIS-RTOS.
-typedef box_t *osMailQId;
+typedef struct __mbq
+{
+	mem_t   mem;
+	lst_t   lst;
+
+}	mbq_t, *mbq_id, *osMailQId;
 
 /// Thread Definition structure contains startup information of a thread.
 /// \note CAN BE CHANGED: \b os_thread_def is implementation specific in every CMSIS-RTOS.
