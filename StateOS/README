@@ -30,7 +30,7 @@ Features:
 3.4
 - added list object
 - added mail queue functions to cmsis_os api
-- fixed bug im memory pool object
+- fixed bug in memory pool object
 ---------
 3.3
 - added direct signal and message transfer to task object
