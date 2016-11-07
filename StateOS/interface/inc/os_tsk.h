@@ -506,7 +506,7 @@ static inline void     tsk_pass ( void ) { core_ctx_switch(); }
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   flags           : all flags to wait                                                                              *
- *                     0: any flag                                                                                    *
+ *                     0: wait for any flag or message                                                                *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
@@ -528,7 +528,7 @@ static inline void     tsk_pass ( void ) { core_ctx_switch(); }
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   flags           : all flags to wait                                                                              *
- *                     0: any flag                                                                                    *
+ *                     0: wait for any flag or message                                                                *
  *   delay           : duration of time (maximum number of ticks to delay execution of current task)                  *
  *                     IMMEDIATE: don't delay execution of current task                                               *
  *                     INFINITE:  delay indefinitly execution of current task                                         *
@@ -552,7 +552,7 @@ static inline void     tsk_pass ( void ) { core_ctx_switch(); }
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   flags           : all flags to wait                                                                              *
- *                     0: any flag                                                                                    *
+ *                     0: wait for any flag or message                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : task object resumed by the direct transfer of flags or message (tsk_give)                      *
