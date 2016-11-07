@@ -44,7 +44,7 @@ extern "C" {
 typedef struct __lst
 {
 	tsk_id   queue; // next process in the DELAYED queue
-	void   **next;  // next memory object in the queue
+	void   **next;  // next memory object in the queue, previously created in the memory pool
 
 }	lst_t, *lst_id;
 
