@@ -90,7 +90,7 @@ typedef struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _MEM_DATA( _limit, _size ) (void*[_limit*MSIZE(_size)]){ 0 }
+#define               _MEM_DATA( _limit, _size ) (void*[_limit*(1+MSIZE(_size))]){ 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -106,7 +106,7 @@ typedef struct __mem
  **********************************************************************************************************************/
 
 #define             OS_MEM( mem, limit, size )                                \
-                       void*mem##__buf[limit*MSIZE(size)];                     \
+                       void*mem##__buf[limit*(1+MSIZE(size))];                 \
                        mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
                        mem_id mem = & mem##__mem
 
@@ -124,7 +124,7 @@ typedef struct __mem
  **********************************************************************************************************************/
 
 #define         static_MEM( mem, limit, size )                                \
-                static void*mem##__buf[limit*MSIZE(size)];                     \
+                static void*mem##__buf[limit*(1+MSIZE(size))];                 \
                 static mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
                 static mem_id mem = & mem##__mem
 

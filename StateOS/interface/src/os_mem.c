@@ -38,7 +38,7 @@ void mem_init( mem_id mem )
 	unsigned cnt = mem->limit;
 
 	mem->next = 0;
-	while (cnt--) { mem_give(mem, ptr + 1); ptr += mem->size; }
+	while (cnt--) { mem_give(mem, ++ptr); ptr += mem->size; }
 
 	port_sys_unlock();
 }
@@ -51,9 +51,9 @@ mem_id mem_create( unsigned limit, unsigned size )
 
 	port_sys_lock();
 
-	size = MSIZE(size) + 1;
+	size = MSIZE(size);
 
-	mem = core_sys_alloc(sizeof(mem_t) + limit * size * sizeof(void*));
+	mem = core_sys_alloc(sizeof(mem_t) + limit * (1 + size) * sizeof(void*));
 
 	if (mem)
 	{
@@ -91,7 +91,7 @@ unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)(
 	if (mem->next)
 	{
 		*data = mem->next + 1;
-		mem->next = *mem->next;
+		mem->next = *(mem->next);
 	}
 	else
 	{
@@ -103,7 +103,7 @@ unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)(
 	{
 		void   **ptr = *data;
 		unsigned cnt = mem->size;
-		while (--cnt) *ptr++ = 0;
+		while (cnt--) *ptr++ = 0;
 	}
 
 	port_sys_unlock();
@@ -139,7 +139,7 @@ void mem_give( mem_id mem, void *data )
 	}
 	else
 	{
-		void **ptr = (void**)&mem->next;
+		void **ptr = (void**)&(mem->next);
 		while (*ptr) ptr = *ptr;
 		ptr = *ptr = (void**)data - 1; *ptr = 0;
 	}

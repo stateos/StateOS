@@ -66,7 +66,7 @@ unsigned priv_lst_wait( lst_id lst, void **data, unsigned time, unsigned(*wait)(
 	if (lst->next)
 	{
 		*data = lst->next + 1;
-		lst->next = *lst->next;
+		lst->next = *(lst->next);
 	}
 	else
 	{
@@ -107,7 +107,7 @@ void lst_give( lst_id lst, void *data )
 	}
 	else
 	{
-		void **ptr = (void**)&lst->next;
+		void **ptr = (void**)&(lst->next);
 		while (*ptr) ptr = *ptr;
 		ptr = *ptr = (void**)data - 1; *ptr = 0;
 	}
