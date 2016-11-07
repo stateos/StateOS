@@ -340,7 +340,7 @@ osEvent osSignalWait (int32_t signals, uint32_t millisec)
 	else
 	switch (tsk_waitFor((unsigned)signals, millisec*MSEC))
 	{
-	case E_SUCCESS: event.status = osEventSignal; event.value.v = Current->flags; break;
+	case E_SUCCESS: event.status = osEventSignal; event.value.signals = Current->flags; break;
 	case E_TIMEOUT: event.status = osEventTimeout; break;
 	default:        event.status = osErrorOS; break;
 	}
@@ -658,8 +658,6 @@ osEvent osMailGet (osMailQId queue_id, uint32_t millisec)
 		return event;
 	}
 	
-	port_sys_lock();
-
 	switch (lst_waitFor(&queue_id->lst, &event.value.p, millisec*MSEC))
 	{
 	case E_SUCCESS: event.status = osEventMail; break;
@@ -667,8 +665,6 @@ osEvent osMailGet (osMailQId queue_id, uint32_t millisec)
 	default:        event.status = osErrorOS; break;
 	}
 	
-	port_sys_unlock();
-
 	return event;
 }
 
