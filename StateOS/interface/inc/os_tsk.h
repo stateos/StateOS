@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    06.11.2016
+    @date    07.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -502,14 +502,15 @@ static inline void     tsk_pass ( void ) { core_ctx_switch(); }
  *                                                                                                                    *
  * Name              : tsk_waitUntil                                                                                  *
  *                                                                                                                    *
- * Description       : delay execution of current task until given timepoint and wait for signal or message           *
+ * Description       : delay execution of current task until given timepoint and wait for flags or message            *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   flags           : all flags to wait                                                                              *
+ *                     0: any flag                                                                                    *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : task object resumed by a direct signal or message (tsk_give)                                   *
+ *   E_SUCCESS       : task object resumed by the direct transfer of flags or message (tsk_give)                      *
  *   E_TIMEOUT       : task object was not released before the specified timeout expired                              *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
@@ -523,16 +524,17 @@ static inline void     tsk_pass ( void ) { core_ctx_switch(); }
  *                                                                                                                    *
  * Name              : tsk_waitFor                                                                                    *
  *                                                                                                                    *
- * Description       : delay execution of current task for given duration of time and wait for signal or message      *
+ * Description       : delay execution of current task for given duration of time and wait for flags or message       *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   flags           : all flags to wait                                                                              *
+ *                     0: any flag                                                                                    *
  *   delay           : duration of time (maximum number of ticks to delay execution of current task)                  *
  *                     IMMEDIATE: don't delay execution of current task                                               *
  *                     INFINITE:  delay indefinitly execution of current task                                         *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : task object resumed by a direct signal or message (tsk_give)                                   *
+ *   E_SUCCESS       : task object resumed by the direct transfer of flags or message (tsk_give)                      *
  *   E_TIMEOUT       : task object was not released before the specified timeout expired                              *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
@@ -546,13 +548,14 @@ static inline void     tsk_pass ( void ) { core_ctx_switch(); }
  *                                                                                                                    *
  * Name              : tsk_wait                                                                                       *
  *                                                                                                                    *
- * Description       : delay indefinitly execution of current task and wait for signal or message                     *
+ * Description       : delay indefinitly execution of current task and wait for flags or message                      *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   flags           : all flags to wait                                                                              *
+ *                     0: any flag                                                                                    *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : task object resumed by a direct signal or message (tsk_give)                                   *
+ *   E_SUCCESS       : task object resumed by the direct transfer of flags or message (tsk_give)                      *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
@@ -664,7 +667,7 @@ static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   tsk             : pointer to delayed task object                                                                 *
- *   flags           : signal or message transfered to the task                                                       *
+ *   flags           : flags or message transfered to the task                                                        *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -682,7 +685,7 @@ static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   tsk             : pointer to delayed task object                                                                 *
- *   flags           : signal or message transfered to the task                                                       *
+ *   flags           : flags or message transfered to the task                                                        *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
