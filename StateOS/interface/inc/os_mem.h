@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    07.11.2016
+    @date    08.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -44,7 +44,7 @@ extern "C" {
 typedef struct __mem
 {
 	tsk_id   queue; // inherited from list
-	void   **next;  // inherited from list
+	que_id   next;  // inherited from list
 	unsigned limit; // size of a memory pool (max number of objects)
 	unsigned size;  // size of memory object (in words)
 	void    *data;  // pointer to memory pool buffer

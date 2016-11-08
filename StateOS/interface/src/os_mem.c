@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    07.11.2016
+    @date    08.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -60,6 +60,7 @@ mem_id mem_create( unsigned limit, unsigned size )
 		mem->limit = limit;
 		mem->size  = size;
 		mem->data  = mem + 1;
+
 		mem_init(mem);
 	}
 
@@ -91,7 +92,7 @@ unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)(
 	if (mem->next)
 	{
 		*data = mem->next + 1;
-		mem->next = *(mem->next);
+		mem->next = mem->next->next;
 	}
 	else
 	{
@@ -139,9 +140,10 @@ void mem_give( mem_id mem, void *data )
 	}
 	else
 	{
-		void **ptr = (void**)&(mem->next);
-		while (*ptr) ptr = *ptr;
-		ptr = *ptr = (void**)data - 1; *ptr = 0;
+		que_id ptr = (que_id)&(mem->next);
+		while (ptr->next) ptr = ptr->next;
+		ptr->next = (que_id)data - 1;
+		ptr->next->next = 0;
 	}
 
 	port_sys_unlock();

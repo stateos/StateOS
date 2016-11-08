@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    07.11.2016
+    @date    08.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -44,7 +44,7 @@ extern "C" {
 typedef struct __lst
 {
 	tsk_id   queue; // next process in the DELAYED queue
-	void   **next;  // next memory object in the queue, previously created in the memory pool
+	que_id   next;  // next memory object in the queue, previously created in the memory pool
 
 }	lst_t, *lst_id;
 
@@ -75,7 +75,7 @@ typedef struct __lst
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_LST( lst, limit, size )        \
+#define             OS_LST( lst )                     \
                        lst_t lst##__lst = _LST_INIT(); \
                        lst_id lst = & lst##__lst
 
@@ -90,7 +90,7 @@ typedef struct __lst
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_LST( lst, limit, size )        \
+#define         static_LST( lst )                     \
                 static lst_t lst##__lst = _LST_INIT(); \
                 static lst_id lst = & lst##__lst
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    07.11.2016
+    @date    08.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -66,7 +66,7 @@ unsigned priv_lst_wait( lst_id lst, void **data, unsigned time, unsigned(*wait)(
 	if (lst->next)
 	{
 		*data = lst->next + 1;
-		lst->next = *(lst->next);
+		lst->next = lst->next->next;
 	}
 	else
 	{
@@ -107,9 +107,10 @@ void lst_give( lst_id lst, void *data )
 	}
 	else
 	{
-		void **ptr = (void**)&(lst->next);
-		while (*ptr) ptr = *ptr;
-		ptr = *ptr = (void**)data - 1; *ptr = 0;
+		que_id ptr = (que_id)&(lst->next);
+		while (ptr->next) ptr = ptr->next;
+		ptr->next = (que_id)data - 1;
+		ptr->next->next = 0;
 	}
 
 	port_sys_unlock();
