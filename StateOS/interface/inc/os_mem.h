@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    08.11.2016
+    @date    10.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************

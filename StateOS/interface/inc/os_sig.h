@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    04.11.2016
+    @date    10.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -385,7 +385,7 @@ class Signal : public __sig, private EventGuard<__sig>
 public:
 
 	explicit
-	Signal( const unsigned _type = sigClear ): __sig _SIG_INIT(_type) {}
+	Signal( const unsigned _type = sigClear ): __sig _SIG_INIT(0) { type = _type; }
 
 	void     kill     ( void )            {        sig_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return sig_waitUntil(this, _time);  }

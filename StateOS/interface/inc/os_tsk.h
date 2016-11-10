@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    07.11.2016
+    @date    10.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -741,36 +741,6 @@ static inline void     tsk_resumeISR( tsk_id tsk, unsigned event ) { tsk_resume(
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Class             : TaskBase                                                                                       *
- *                                                                                                                    *
- * Description       : create and initilize a task object, internal                                                   *
- *                                                                                                                    *
- * Constructor parameters                                                                                             *
- *   prio            : initial task priority (any unsigned int value)                                                 *
- *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
- *                     it will be executed into an infinite system-implemented loop                                   *
- *   top             : initial value of task's stack pointer                                                          *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-class TaskBase : public __tsk, private ObjectGuard<__obj>
-{
-public:
-
-	explicit
-	TaskBase( const unsigned _prio, const fun_id _state, void *_top ): __tsk _TSK_INIT(_prio, _state, _top) {}
-
-	void     kill      ( void )                             {        tsk_kill      (this);                }
-	void     start     ( void )                             {        tsk_start     (this);                }
-	void     startFrom ( fun_id   _state )                  {        tsk_startFrom (this, _state);        }
-	void     give      ( unsigned _flags )                  {        tsk_give      (this, _flags);        }
-	void     giveISR   ( unsigned _flags )                  {        tsk_giveISR   (this, _flags);        }
-	void     resume    ( unsigned _event )                  {        tsk_resume    (this, _event);        }
-	void     resumeISR ( unsigned _event )                  {        tsk_resumeISR (this, _event);        }
-};
-
-/**********************************************************************************************************************
- *                                                                                                                    *
  * Namespace         : ThisTask                                                                                       *
  *                                                                                                                    *
  * Description       : provide set of functions for Current Task                                                      *
@@ -797,7 +767,7 @@ namespace ThisTask
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Class             : TaskT                                                                                          *
+ * Class             : TaskT<>                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize complete work area for task object                                        *
  *                                                                                                                    *
@@ -810,14 +780,22 @@ namespace ThisTask
  **********************************************************************************************************************/
 
 template<unsigned _size>
-class TaskT : public TaskBase
+class TaskT : public __tsk, private ObjectGuard<__obj>
 {
 	stk_t _stack[ASIZE(_size)];
 
 public:
 
 	explicit
-	TaskT( const unsigned _prio, const fun_id _state ): TaskBase(_prio, _state, _stack+ASIZE(_size)) {}
+	TaskT( const unsigned _prio, const fun_id _state ): __tsk _TSK_INIT(0, 0, _stack+ASIZE(_size)) { basic = prio = _prio; state = _state; }
+
+	void     kill      ( void )                             {        tsk_kill      (this);                }
+	void     start     ( void )                             {        tsk_start     (this);                }
+	void     startFrom ( fun_id   _state )                  {        tsk_startFrom (this, _state);        }
+	void     give      ( unsigned _flags )                  {        tsk_give      (this, _flags);        }
+	void     giveISR   ( unsigned _flags )                  {        tsk_giveISR   (this, _flags);        }
+	void     resume    ( unsigned _event )                  {        tsk_resume    (this, _event);        }
+	void     resumeISR ( unsigned _event )                  {        tsk_resumeISR (this, _event);        }
 };
 
 /**********************************************************************************************************************
@@ -843,7 +821,7 @@ public:
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Class             : startTaskT                                                                                     *
+ * Class             : startTaskT<>                                                                                   *
  *                                                                                                                    *
  * Description       : create and initilize complete work area for task object                                        *
  *                     and start task object                                                                          *
@@ -879,12 +857,12 @@ public:
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class startTask : public Task
+class startTask : public startTaskT<OS_STACK_SIZE>
 {
 public:
 
 	explicit
-	startTask( const unsigned _prio, const fun_id _state ): Task(_prio, _state) { tsk_start(this); }
+	startTask( const unsigned _prio, const fun_id _state ): startTaskT<OS_STACK_SIZE>(_prio, _state) {}
 };
 
 #endif//__cplusplus

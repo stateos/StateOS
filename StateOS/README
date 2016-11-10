@@ -30,6 +30,7 @@ Features:
 3.5
 - updated list object
 - updated memory pool object
+- optimized c++ code
 ---------
 3.4
 - added list object

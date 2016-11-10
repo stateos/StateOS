@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    10.11.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -232,8 +232,8 @@ void port_tmr_force( void )
 /* -------------------------------------------------------------------------- */
 
 #if   defined(__CSMC__)
-#define  __disable_irq()             _asm("cpsid i")
-#define  __enable_irq()              _asm("cpsie i")
+#define  __disable_irq()            __ASM("cpsid i")
+#define  __enable_irq()             __ASM("cpsie i")
 #endif
 
 #if OS_LOCK_LEVEL && (__CORTEX_M >= 3)

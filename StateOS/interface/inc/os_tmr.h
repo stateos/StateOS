@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    04.11.2016
+    @date    10.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -385,6 +385,20 @@ static inline unsigned tmr_takeISR( tmr_id tmr ) { return tmr_waitFor(tmr, IMMED
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Namespace         : ThisTimer                                                                                      *
+ *                                                                                                                    *
+ * Description       : provide set of functions for Current Timer                                                     *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+namespace ThisTimer
+{
+	void flipISR ( fun_id   _state ) { tmr_flipISR (_state); }
+	void delayISR( unsigned _delay ) { tmr_delayISR(_delay); }
+}
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Class             : Timer                                                                                          *
  *                                                                                                                    *
  * Description       : create and initilize a timer object                                                            *
@@ -399,7 +413,7 @@ class Timer : public __tmr, private ObjectGuard<__obj>
 public:
 
 	explicit
-	Timer( const fun_id _state = 0 ): __tmr _TMR_INIT(_state) {}
+	Timer( const fun_id _state = 0 ): __tmr _TMR_INIT(0) { state = _state; }
 
 	void kill         ( void )                            {        tmr_kill         (this);                       }
 	void startUntil   ( unsigned _time   )                {        tmr_startUntil   (this, _time,   this->state); }
@@ -415,20 +429,6 @@ public:
 	unsigned take     ( void )                            { return tmr_take         (this);                       }
 	unsigned takeISR  ( void )                            { return tmr_takeISR      (this);                       }
 };
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Namespace         : ThisTimer                                                                                      *
- *                                                                                                                    *
- * Description       : provide set of functions for Current Timer                                                     *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-namespace ThisTimer
-{
-	void flipISR ( fun_id   _state ) { tmr_flipISR (_state); }
-	void delayISR( unsigned _delay ) { tmr_delayISR(_delay); }
-}
 
 /**********************************************************************************************************************
  *                                                                                                                    *
