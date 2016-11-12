@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    18.05.2016
+    @date    12.11.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -38,8 +38,14 @@ __asm void PendSV_Handler( void )
 	PRESERVE8
 	IMPORT core_tsk_handler
 
-	mrs   r0,    PSP
 #if __CORTEX_M < 3
+	mrs   r0,    PSP
+	mov   r3,    lr
+	lsls  r3,   #29
+	bmi   priv_tsk_switch
+	mov   r0,    sp
+	sub   sp,   #36
+priv_tsk_switch
 	subs  r0,   #36
 	stm   r0!, { r4  - r7 }
 	mov   r3,    r8
@@ -50,10 +56,17 @@ __asm void PendSV_Handler( void )
 	stm   r0!, { r3  - r7 }
 	subs  r0,   #36
 #else
+	tst   lr,   #4                     ; interrupt from process stack?
+	itee  ne
+	mrsne r0,    PSP
+	moveq r0,    sp
 #if __FPU_USED
+	subeq sp,   #100
 	tst   lr,   #16                     ; fpu used?
 	it    eq
  vstmdbeq r0!, { s16 - s31 }
+#else
+	subeq sp,   #36
 #endif
 	stmdb r0!, { r4  - r11, lr }
 #endif
@@ -69,6 +82,14 @@ __asm void PendSV_Handler( void )
 	subs  r0,   #36
 	ldm   r0!, { r4  - r7 }
 	adds  r0,   #20
+	mov   r3,    lr
+	lsls  r3,   #29
+	bmi   priv_tsk_enter
+	mov   sp,    r0
+	bx    lr
+priv_tsk_enter
+	msr   PSP,   r0
+	bx    lr
 #else
 	ldmia r0!, { r4  - r11, lr }
 #if __FPU_USED
@@ -76,9 +97,12 @@ __asm void PendSV_Handler( void )
 	it    eq
  vldmiaeq r0!, { s16 - s31 }
 #endif
-#endif
-	msr   PSP,   r0
+	tst   lr,   #4                     ; interrupt from process stack?
+	ite   ne
+	msrne PSP,   r0
+	moveq sp,    r0
 	bx    lr
+#endif
 
 	ALIGN
 }

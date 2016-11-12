@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    18.05.2016
+    @date    12.11.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -38,8 +38,14 @@ void PendSV_Handler( void )
 {
 	__asm volatile
 	(
-"	mrs   r0,    PSP               \n"
 #if __CORTEX_M < 3
+"	mrs   r0,    PSP               \n"
+"	mov   r3,    lr                \n"
+"	lsl   r3,   #29                \n"
+"	bmi   priv_tsk_switch          \n"
+"	mov   r0,    sp                \n"
+"	sub   sp,   #36                \n"
+"priv_tsk_switch:                  \n"
 "	sub   r0,   #36                \n"
 "	stm   r0!, { r4  - r7 }        \n"
 "	mov   r3,    r8                \n"
@@ -50,10 +56,17 @@ void PendSV_Handler( void )
 "	stm   r0!, { r3  - r7 }        \n"
 "	sub   r0,   #36                \n"
 #else
+"	tst   lr,   #4                 \n"
+"	itee  ne                       \n"
+"	mrsne r0,    PSP               \n"
+"	moveq r0,    sp                \n"
 #if __FPU_USED
+"	subeq sp,   #100               \n"
 "	tst   lr,   #16                \n"
 "	it    eq                       \n"
 "vstmdbeq r0!, { s16 - s31 }       \n"
+#else
+"	subeq sp,   #36                \n"
 #endif
 "	stmdb r0!, { r4  - r11, lr }   \n"
 #endif
@@ -69,6 +82,14 @@ void PendSV_Handler( void )
 "	sub   r0,   #36                \n"
 "	ldm   r0!, { r4  - r7 }        \n"
 "	add   r0,   #20                \n"
+"	mov   r3,    lr                \n"
+"	lsl   r3,   #29                \n"
+"	bmi   priv_tsk_enter           \n"
+"	mov   sp,    r0                \n"
+"	bx    lr                       \n"
+"priv_tsk_enter:                   \n"
+"	msr   PSP,   r0                \n"
+"	bx    lr                       \n"
 #else
 "	ldmia r0!, { r4  - r11, lr }   \n"
 #if __FPU_USED
@@ -76,9 +97,12 @@ void PendSV_Handler( void )
 "	it    eq                       \n"
 "vldmiaeq r0!, { s16 - s31 }       \n"
 #endif
-#endif
-"	msr   PSP,   r0                \n"
+"	tst   lr,   #4                 \n"
+"	ite   ne                       \n"
+"	msrne PSP,   r0                \n"
+"	moveq sp,    r0                \n"
 "	bx    lr                       \n"
+#endif
 
 :::	"memory"
 	);
