@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    12.11.2016
+    @date    13.11.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -39,14 +39,15 @@ __asm void PendSV_Handler( void )
 	IMPORT core_tsk_handler
 
 #if __CORTEX_M < 3
+
 	mrs   r0,    PSP
 	mov   r3,    lr
-	lsls  r3,   #29
+	lsls  r3,  # 29
 	bmi   priv_tsk_switch
 	mov   r0,    sp
-	sub   sp,   #36
+	sub   sp,  # 36
 priv_tsk_switch
-	subs  r0,   #36
+	subs  r0,  # 36
 	stm   r0!, { r4  - r7 }
 	mov   r3,    r8
 	mov   r4,    r9
@@ -54,55 +55,64 @@ priv_tsk_switch
 	mov   r6,    r11
 	mov   r7,    lr
 	stm   r0!, { r3  - r7 }
-	subs  r0,   #36
-#else
-	tst   lr,   #4                     ; interrupt from process stack?
+	subs  r0,  # 36
+
+#else //__CORTEX_M
+
+	tst   lr,  # 4                      ; interrupt from process stack?
 	itee  ne
 	mrsne r0,    PSP
 	moveq r0,    sp
 #if __FPU_USED
-	subeq sp,   #100
-	tst   lr,   #16                     ; fpu used?
+	subeq sp,  # 100
+	tst   lr,  # 16                     ; fpu used?
 	it    eq
  vstmdbeq r0!, { s16 - s31 }
 #else
-	subeq sp,   #36
+	subeq sp,  # 36
 #endif
 	stmdb r0!, { r4  - r11, lr }
-#endif
+
+#endif//__CORTEX_M
+
 	bl    core_tsk_handler
+
 #if __CORTEX_M < 3
-	adds  r0,   #16
+
+	adds  r0,  # 16
 	ldm   r0!, { r3  - r7 }
 	mov   r8,    r3
 	mov   r9,    r4
 	mov   r10,   r5
 	mov   r11,   r6
 	mov   lr,    r7
-	subs  r0,   #36
+	subs  r0,  # 36
 	ldm   r0!, { r4  - r7 }
-	adds  r0,   #20
+	adds  r0,  # 20
 	mov   r3,    lr
-	lsls  r3,   #29
-	bmi   priv_tsk_enter
+	lsls  r3,  # 29
+	bmi   priv_tsk_return
 	mov   sp,    r0
 	bx    lr
-priv_tsk_enter
+priv_tsk_return
 	msr   PSP,   r0
 	bx    lr
-#else
+
+#else //__CORTEX_M
+
 	ldmia r0!, { r4  - r11, lr }
 #if __FPU_USED
-	tst   lr,   #16                     ; fpu used?
+	tst   lr,  # 16                     ; fpu used?
 	it    eq
  vldmiaeq r0!, { s16 - s31 }
 #endif
-	tst   lr,   #4                     ; interrupt from process stack?
+	tst   lr,  # 4                      ; interrupt from process stack?
 	ite   ne
 	msrne PSP,   r0
 	moveq sp,    r0
 	bx    lr
-#endif
+
+#endif//__CORTEX_M
 
 	ALIGN
 }
