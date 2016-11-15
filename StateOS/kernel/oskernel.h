@@ -46,7 +46,7 @@ extern sys_t System; // system data
 
 // initiating and running the system timer
 // the port_sys_init procedure is normally called as a constructor
-void port_sys_init( void ) __constructor;
+void port_sys_init( void ) __CONSTRUCTOR;
 
 /* -------------------------------------------------------------------------- */
 
@@ -88,7 +88,7 @@ void core_tmr_handler( void );
 /* -------------------------------------------------------------------------- */
 
 // abort and reset current process and force yield system control to the next
-void     core_tsk_break( void ) __noreturn;
+void     core_tsk_break( void ) __NO_RETURN;
 
 // add task 'tsk' to tasks READY queue with id ID_READY
 // force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
@@ -165,7 +165,7 @@ unsigned port_isr_inside( void )
 /* -------------------------------------------------------------------------- */
 
 // reset task stack pointer
-static inline __always
+static inline __ALWAYS
 void port_set_stack( void *top )
 {
 #ifdef __GNUC__

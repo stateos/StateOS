@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    system_stm32f4xx.c
  * @author  Rajmund Szymanski
- * @date    03.04.2016
+ * @date    15.11.2016
  * @brief   This file provides set of configuration functions for STM32F4 uC.
  ******************************************************************************/
 
@@ -36,7 +36,7 @@
 /* -------------------------------------------------------------------------- */
 
 #ifndef __NO_SYSTEM_INIT
-__attribute__ (( weak ))
+__WEAK
 void SystemInit( void )
 {
 	FLASH->ACR = LATENCY | FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN;
@@ -63,10 +63,10 @@ void SystemInit( void )
 /* -------------------------------------------------------------------------- */
 
 #ifndef __NO_SYSTEM_INIT
-__attribute__ (( weak ))
+__WEAK
 uint32_t SystemCoreClock = CPU_FREQ * MHz;
 #else
-__attribute__ (( weak ))
+__WEAK
 uint32_t SystemCoreClock = HSI_FREQ * MHz;
 #endif//__NO_SYSTEM_INIT
 

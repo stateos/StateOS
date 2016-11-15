@@ -33,7 +33,7 @@
 // SYSTEM KERNEL SERVICES
 /* -------------------------------------------------------------------------- */
 
-__weak
+__WEAK
 void idle_hook( void )
 {
 #if OS_ROBIN || OS_TIMER == 0

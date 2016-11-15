@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    21.05.2016
+    @date    15.11.2016
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -58,7 +58,7 @@
 // critical sections protection level
 // OS_LOCK_LEVEL == 0 or  __CORTEX_M <  3 => entrance to a critical section blocks all interrupts
 // OS_LOCK_LEVEL >  0 and __CORTEX_M >= 3 => entrance to a critical section blocks interrupts with urgency lower or equal (the priority value greater or equal) than OS_LOCK_LEVEL
-// default value: (1<<(__NVIC_PRIO_BITS-1))
+// default value: 0
 #define  OS_LOCK_LEVEL        0
 
 // ----------------------------
@@ -76,4 +76,4 @@
 // ----------------------------
 // default task stack size in bytes
 // default value: 256
-#define  OS_STACK_SIZE      512
+#define  OS_STACK_SIZE      256
