@@ -28,7 +28,7 @@ Features:
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
 3.7
-- better integration with CMSIS
+- better integration with CMSISv5
 ---------
 3.6
 - new concept of task-switching: now the main task can also be restored from the main stack
