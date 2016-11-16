@@ -212,14 +212,34 @@ void port_tmr_force( void )
 #define  __disable_irq()          __ASM("cpsid i")
 #define  __enable_irq()           __ASM("cpsie i")
 
+#ifndef  __ALWAYS
 #define  __ALWAYS
+#endif
+#ifndef  __CONSTRUCTOR
 #define  __CONSTRUCTOR
 #warning No compiler specific solution for __CONSTRUCTOR. __CONSTRUCTOR is ignored.
+#endif
+#ifndef  __NO_RETURN
+#define  __NO_RETURN
+#endif
+#ifndef  __WEAK
+#define  __WEAK                   __weak
+#endif
 
 #else
 
+#ifndef  __ALWAYS
 #define  __ALWAYS                 __attribute__((always_inline))
+#endif
+#ifndef  __CONSTRUCTOR
 #define  __CONSTRUCTOR            __attribute__((constructor))
+#endif
+#ifndef  __NO_RETURN
+#define  __NO_RETURN              __attribute__((noreturn))
+#endif
+#ifndef  __WEAK
+#define  __WEAK                   __attribute__((weak))
+#endif
 
 #endif
 

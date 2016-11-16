@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    15.11.2016
+    @date    16.11.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -162,19 +162,6 @@ static inline
 unsigned port_isr_inside( void )
 {
 	return __get_IPSR();
-}
-
-/* -------------------------------------------------------------------------- */
-
-// reset task stack pointer
-static inline __ALWAYS
-void port_set_stack( void *top )
-{
-#ifdef __GNUC__
-	__asm volatile ("mov sp, %0" :: "r" (top) : "memory");
-#else
-	__set_PSP((unsigned)top);
-#endif
 }
 
 /* -------------------------------------------------------------------------- */

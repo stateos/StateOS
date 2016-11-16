@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    06.11.2016
+    @date    16.11.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -51,7 +51,7 @@ static  stk_t    IDLE_STACK[ASIZE(OS_STACK_SIZE)];
 #define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
 static
-tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
+tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .sp=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
 tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_hook }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
@@ -275,7 +275,9 @@ void *priv_tsk_prepare( tsk_id cur )
 	sft_id sft;
 
 	if (cur->sp) return cur->sp;
-	
+
+	cur->sp = cur->top;
+
 	// prepare task stack if necessary
 
 	ctx = (ctx_id)cur->top - 1;
@@ -303,7 +305,7 @@ void *core_tsk_handler( void *sp )
 	core_ctx_reset();
 
 	cur = System.cur;
-	cur->sp = sp;
+	if (cur->sp) cur->sp = sp;
 
 	if (cur->obj.id == ID_READY)
 	{
