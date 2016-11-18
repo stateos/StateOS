@@ -1,0 +1,37 @@
+#include <stm32f4_discovery.h>
+#include <osapi.h>
+
+uint32 sem;
+uint32 sla, mas;
+
+void slave(void)
+{
+	OS_TaskRegister();
+
+	for (;;)
+	{
+		OS_BinSemTake(sem);
+		LED_Tick();
+	}
+}
+
+void master(void)
+{
+	OS_TaskRegister();
+
+	for (;;)
+	{
+		OS_TaskDelay(1000);
+		OS_BinSemGive(sem);
+	}
+}
+
+int main()
+{
+	LED_Config();
+	OS_API_Init();
+	OS_BinSemCreate(&sem, "sem", 0, 0);
+	OS_TaskCreate(&sla, "sla", slave,  0, 0, 0, 0);
+	OS_TaskCreate(&mas, "mas", master, 0, 0, 0, 0);
+	OS_TaskExit();
+}

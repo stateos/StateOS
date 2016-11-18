@@ -54,7 +54,7 @@
 
     @file    StateOS: cmsis_os.c
     @author  Rajmund Szymanski
-    @date    07.11.2016
+    @date    18.11.2016
     @brief   CMSIS-RTOS API implementation for StateOS.
 
  ******************************************************************************
@@ -266,8 +266,7 @@ osStatus osTimerStart (osTimerId timer_id, uint32_t millisec)
 	if (port_isr_inside())
 		return osErrorISR;
 
-	if (timer_id->period == 0) tmr_startFor     (timer_id, millisec*MSEC, timer_id->state);
-	else                       tmr_startPeriodic(timer_id, millisec*MSEC, timer_id->state);
+	tmr_start(timer_id, millisec*MSEC, timer_id->period ? millisec*MSEC : 0, timer_id->state);
 	return osOK;
 }
 

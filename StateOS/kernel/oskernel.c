@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    16.11.2016
+    @date    17.11.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -100,12 +100,12 @@ void priv_tsk_insert( tsk_id tsk )
 
 void core_tsk_break( void )
 {
-	for (;;)
-	{
-		port_ctx_switch();
-		port_clr_lock();
-		System.cur->state();
-	}
+	System.cur->sp = 0;
+
+	port_ctx_switch();
+	port_clr_lock();
+
+	for (;;);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -305,7 +305,8 @@ void *core_tsk_handler( void *sp )
 	core_ctx_reset();
 
 	cur = System.cur;
-	if (cur->sp) cur->sp = sp;
+	if (cur->sp)
+		cur->sp = sp;
 
 	if (cur->obj.id == ID_READY)
 	{

@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    18.05.2016
+    @date    17.11.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -89,6 +89,7 @@ caddr_t _sbrk_r( struct _reent *reent, size_t size )
 }
 
 /* -------------------------------------------------------------------------- */
+#if !defined(USE_SEMIHOST) && !defined(USE_NOHOST)
 
 static
 int __enosys()
@@ -110,6 +111,7 @@ int  _fstat_r( struct _reent *reent, int file, struct stat *st )             __a
 int _getpid_r( struct _reent *reent )                                        __attribute__((weak, alias("__enosys")));
 int   _kill_r( struct _reent *reent, int pid, int sig )                      __attribute__((weak, alias("__enosys")));
 
+#endif // !USE_SEMIHOST && !USE_NOHOST
 /* -------------------------------------------------------------------------- */
 
 #endif // __GNUC__ && !__ARMCC_VERSION

@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    15.11.2016
+    @date    18.11.2016
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -76,4 +76,4 @@
 // ----------------------------
 // default task stack size in bytes
 // default value: 256
-#define  OS_STACK_SIZE      256
+#define  OS_STACK_SIZE      512

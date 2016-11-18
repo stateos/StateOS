@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    10.11.2016
+    @date    18.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -191,13 +191,17 @@ struct __tmr
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : tmr_startFor                                                                                   *
+ * Name              : tmr_start                                                                                      *
  *                                                                                                                    *
- * Description       : start/restart one-shot timer for given duration of time and then launch the callback procedure *
+ * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure *
+ *                     do this periodically if period > 0                                                             *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   tmr             : pointer to timer object                                                                        *
- *   delay           : duration of time (maximum number of ticks to countdownd)                                       *
+ *   delay           : duration of time (maximum number of ticks to countdown) for first expiration                   *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *   period          : duration of time (maximum number of ticks to countdown) for all next expirations               *
  *                     IMMEDIATE: don't countdown                                                                     *
  *                     INFINITE:  countdown indefinitly                                                               *
  *   proc            : callback procedure                                                                             *
@@ -209,7 +213,29 @@ struct __tmr
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tmr_startFor( tmr_id tmr, unsigned delay, fun_id proc );
+              void     tmr_start( tmr_id tmr, unsigned delay, unsigned period, fun_id proc );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_startFor                                                                                   *
+ *                                                                                                                    *
+ * Description       : start/restart one-shot timer for given duration of time and then launch the callback procedure *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *   delay           : duration of time (maximum number of ticks to countdown)                                        *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *   proc            : callback procedure                                                                             *
+ *                     0: no callback                                                                                 *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline void     tmr_startFor( tmr_id tmr, unsigned delay, fun_id proc ) { tmr_start(tmr, delay, 0, proc); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -220,7 +246,7 @@ struct __tmr
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   tmr             : pointer to timer object                                                                        *
- *   period          : duration of time (maximum number of ticks to countdownd)                                       *
+ *   period          : duration of time (maximum number of ticks to countdown)                                        *
  *                     IMMEDIATE: don't countdown                                                                     *
  *                     INFINITE:  countdown indefinitly                                                               *
  *   proc            : callback procedure                                                                             *
@@ -232,7 +258,24 @@ struct __tmr
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tmr_startPeriodic( tmr_id tmr, unsigned period, fun_id proc );
+static inline void     tmr_startPeriodic( tmr_id tmr, unsigned period, fun_id proc ) { tmr_start(tmr, period, period, proc); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tmr_stop                                                                                       *
+ *                                                                                                                    *
+ * Description       : stop timer                                                                                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : pointer to timer object                                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline void     tmr_stop( tmr_id tmr ) { tmr_start(tmr, 0, 0, 0); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -363,7 +406,7 @@ static inline unsigned tmr_takeISR( tmr_id tmr ) { return tmr_waitFor(tmr, IMMED
  * Description       : change delay time for current timer                                                            *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   delay           : duration of time (maximum number of ticks to countdownd)                                       *
+ *   delay           : duration of time (maximum number of ticks to countdown)                                        *
  *                     0:         current timer is stopped even if it was periodic                                    *
  *                     otherwise: current timer is restarted even if it was one-shot                                  *
  *                                                                                                                    *
@@ -415,19 +458,22 @@ public:
 	explicit
 	Timer( const fun_id _state = 0 ): __tmr _TMR_INIT(0) { state = _state; }
 
-	void kill         ( void )                            {        tmr_kill         (this);                       }
-	void startUntil   ( unsigned _time   )                {        tmr_startUntil   (this, _time,   this->state); }
-	void startUntil   ( unsigned _time,   fun_id _state ) {        tmr_startUntil   (this, _time,        _state); }
-	void startFor     ( unsigned _delay  )                {        tmr_startFor     (this, _delay,  this->state); }
-	void startFor     ( unsigned _delay,  fun_id _state ) {        tmr_startFor     (this, _delay,       _state); }
-	void startPeriodic( unsigned _period )                {        tmr_startPeriodic(this, _period, this->state); }
-	void startPeriodic( unsigned _period, fun_id _state ) {        tmr_startPeriodic(this, _period,      _state); }
+	void kill         ( void )                                             {        tmr_kill         (this);                               }
+	void startUntil   ( unsigned _time   )                                 {        tmr_startUntil   (this, _time,           this->state); }
+	void startUntil   ( unsigned _time,   fun_id _state )                  {        tmr_startUntil   (this, _time,                _state); }
+	void start        ( unsigned _delay, unsigned _period )                {        tmr_start        (this, _delay, _period, this->state); }
+	void start        ( unsigned _delay, unsigned _period, fun_id _state ) {        tmr_start        (this, _delay, _period,      _state); }
+	void startFor     ( unsigned _delay  )                                 {        tmr_startFor     (this, _delay,          this->state); }
+	void startFor     ( unsigned _delay,  fun_id _state )                  {        tmr_startFor     (this, _delay,               _state); }
+	void startPeriodic( unsigned _period )                                 {        tmr_startPeriodic(this,         _period, this->state); }
+	void startPeriodic( unsigned _period, fun_id _state )                  {        tmr_startPeriodic(this,         _period,      _state); }
+	void stop         ( void )                                             {        tmr_stop         (this);                               }
 
-	unsigned waitUntil( unsigned _time  )                 { return tmr_waitUntil    (this, _time);                }
-	unsigned waitFor  ( unsigned _delay )                 { return tmr_waitFor      (this, _delay);               }
-	unsigned wait     ( void )                            { return tmr_wait         (this);                       }
-	unsigned take     ( void )                            { return tmr_take         (this);                       }
-	unsigned takeISR  ( void )                            { return tmr_takeISR      (this);                       }
+	unsigned waitUntil( unsigned _time  )                                  { return tmr_waitUntil    (this, _time);                        }
+	unsigned waitFor  ( unsigned _delay )                                  { return tmr_waitFor      (this, _delay);                       }
+	unsigned wait     ( void )                                             { return tmr_wait         (this);                               }
+	unsigned take     ( void )                                             { return tmr_take         (this);                               }
+	unsigned takeISR  ( void )                                             { return tmr_takeISR      (this);                               }
 };
 
 /**********************************************************************************************************************
@@ -454,13 +500,41 @@ public:
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Class             : startTimer                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a timer object                                                            *
+ *                     and start periodic timer for given duration of time and then launch the callback procedure     *
+ *                     do this periodically                                                                           *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   delay           : duration of time (maximum number of ticks to countdown) for first expiration                   *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *   period          : duration of time (maximum number of ticks to countdown) for all next expirations               *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *   state           : callback procedure                                                                             *
+ *                     0: no callback                                                                                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+class startTimer : public Timer
+{
+public:
+
+	explicit
+	startTimer( const unsigned _delay, const unsigned _period, const fun_id _state ): Timer() { tmr_start(this, _delay, _period, _state); }
+};
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Class             : startTimerFor                                                                                  *
  *                                                                                                                    *
  * Description       : create and initilize a timer object                                                            *
  *                     and start one-shot timer for given duration of time and then launch the callback procedure     *
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
- *   delay           : duration of time (maximum number of ticks to countdownd)                                       *
+ *   delay           : duration of time (maximum number of ticks to countdown)                                        *
  *                     IMMEDIATE: don't countdown                                                                     *
  *                     INFINITE:  countdown indefinitly                                                               *
  *   state           : callback procedure                                                                             *
@@ -485,7 +559,7 @@ public:
  *                     do this periodically                                                                           *
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
- *   period          : duration of time (maximum number of ticks to countdownd)                                       *
+ *   period          : duration of time (maximum number of ticks to countdown)                                        *
  *                     IMMEDIATE: don't countdown                                                                     *
  *                     INFINITE:  countdown indefinitly                                                               *
  *   state           : callback procedure                                                                             *

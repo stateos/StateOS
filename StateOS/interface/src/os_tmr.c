@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    18.10.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -85,7 +85,7 @@ void tmr_startUntil( tmr_id tmr, unsigned time, fun_id proc )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_startFor( tmr_id tmr, unsigned delay, fun_id proc )
+void tmr_start( tmr_id tmr, unsigned delay, unsigned period, fun_id proc )
 /* -------------------------------------------------------------------------- */
 {
 	port_sys_lock();
@@ -93,22 +93,6 @@ void tmr_startFor( tmr_id tmr, unsigned delay, fun_id proc )
 	tmr->state  = proc;
 	tmr->start  = Counter;
 	tmr->delay  = delay;
-	tmr->period = 0;
-
-	priv_tmr_start(tmr);
-
-	port_sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-void tmr_startPeriodic( tmr_id tmr, unsigned period, fun_id proc )
-/* -------------------------------------------------------------------------- */
-{
-	port_sys_lock();
-
-	tmr->state  = proc;
-	tmr->start  = Counter;
-	tmr->delay  = period;
 	tmr->period = period;
 
 	priv_tmr_start(tmr);

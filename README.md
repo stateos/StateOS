@@ -26,6 +26,7 @@ Features
 - mailbox queues
 - timers (one-shot, periodic)
 - cmsis-rtos api
+- nasa-osal support
 - c++ wrapper
 - all documentation is contained within the source files
 - examples and templates are in separate repositories on [GitHub](https://github.com/stateos)

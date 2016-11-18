@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    16.11.2016
+    @date    17.11.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -46,8 +46,7 @@ extern sys_t System; // system data
 
 // initiating and running the system timer
 // the port_sys_init procedure is normally called as a constructor
-__CONSTRUCTOR
-void port_sys_init( void );
+void port_sys_init( void ) __CONSTRUCTOR;
 
 /* -------------------------------------------------------------------------- */
 
@@ -89,8 +88,7 @@ void core_tmr_handler( void );
 /* -------------------------------------------------------------------------- */
 
 // abort and reset current process and force yield system control to the next
-__NO_RETURN
-void     core_tsk_break( void );
+void     core_tsk_break( void ) __NORETURN;
 
 // add task 'tsk' to tasks READY queue with id ID_READY
 // force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
