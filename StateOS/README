@@ -28,6 +28,10 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+3.8
+- updated task object
+- speed up kernel
+---------
 3.7
 - better integration with CMSISv5
 - fixed bug in tsk_flip procedure

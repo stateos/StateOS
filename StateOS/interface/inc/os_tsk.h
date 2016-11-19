@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    17.11.2016
+    @date    18.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -566,6 +566,42 @@ static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, IN
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : tsk_give                                                                                       *
+ *                                                                                                                    *
+ * Description       : resume execution of given waiting task (tsk_wait)                                              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to delayed task object                                                                 *
+ *   flags           : flags or message transfered to the task                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+              void     tsk_give( tsk_id tsk, unsigned flags );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_giveISR                                                                                    *
+ *                                                                                                                    *
+ * Description       : resume execution of given waiting task (tsk_wait)                                              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to delayed task object                                                                 *
+ *   flags           : flags or message transfered to the task                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline void     tsk_giveISR( tsk_id tsk, unsigned flags ) { tsk_give(tsk, flags); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : tsk_sleepUntil                                                                                 *
  *                                                                                                                    *
  * Description       : delay execution of current task until given timepoint                                          *
@@ -581,7 +617,7 @@ static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, IN
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned tsk_sleepUntil( unsigned time );
+static inline unsigned tsk_sleepUntil( unsigned time ) { return tmr_waitUntil(&WAIT, time); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -602,7 +638,7 @@ static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, IN
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned tsk_sleepFor( unsigned delay );
+static inline unsigned tsk_sleepFor( unsigned delay ) { return tmr_waitFor(&WAIT, delay); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -619,7 +655,7 @@ static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, IN
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tsk_sleep( void ) { return tsk_sleepFor(INFINITE); }
+static inline unsigned tsk_sleep( void ) { return tmr_wait(&WAIT); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -658,42 +694,6 @@ static inline unsigned tsk_delay( unsigned delay ) { return tsk_sleepFor(delay);
  **********************************************************************************************************************/
 
 static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tsk_give                                                                                       *
- *                                                                                                                    *
- * Description       : resume execution of given waiting task (tsk_wait)                                              *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tsk             : pointer to delayed task object                                                                 *
- *   flags           : flags or message transfered to the task                                                        *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-              void     tsk_give( tsk_id tsk, unsigned flags );
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tsk_giveISR                                                                                    *
- *                                                                                                                    *
- * Description       : resume execution of given waiting task (tsk_wait)                                              *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tsk             : pointer to delayed task object                                                                 *
- *   flags           : flags or message transfered to the task                                                        *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-static inline void     tsk_giveISR( tsk_id tsk, unsigned flags ) { tsk_give(tsk, flags); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

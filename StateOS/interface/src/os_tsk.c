@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    17.11.2016
+    @date    19.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -97,7 +97,7 @@ void tsk_stop( void )
 //	while (Current->list) mtx_kill(Current->list);
 
 	core_tsk_remove(Current);
-	core_tsk_break();
+	for(;;);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -111,7 +111,6 @@ void tsk_kill( tsk_id tsk )
 	switch (tsk->obj.id)
 	{
 	case ID_READY:
-		if (tsk != Current) // instead use tsk_stop
 		core_tsk_remove((tsk_id)tsk);
 		break;
 	case ID_DELAYED:
@@ -129,8 +128,11 @@ void tsk_flip( fun_id state )
 {
 	port_set_lock();
 
+	Current->sp = 0;
 	Current->state = state;
-	core_tsk_break();
+	core_ctx_switch();
+	port_ctx_switchNow(); // if current task is the most prioritized task
+	for(;;);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -147,20 +149,14 @@ void tsk_prio( unsigned prio )
 }
 
 /* -------------------------------------------------------------------------- */
-
-#define tskSleep  0
-#define tskWait   1
-
-/* -------------------------------------------------------------------------- */
 static inline
-unsigned priv_tsk_sleep( unsigned flags, unsigned time, unsigned status, unsigned(*wait)() )
+unsigned priv_tsk_sleep( unsigned flags, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	port_sys_lock();
 
-	Current->mode = status;
 	Current->flags = flags;
 	event = wait(Current, time);
 
@@ -173,28 +169,14 @@ unsigned priv_tsk_sleep( unsigned flags, unsigned time, unsigned status, unsigne
 unsigned tsk_waitUntil( unsigned flags, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_tsk_sleep(flags, time, tskWait, core_tsk_waitUntil);
+	return priv_tsk_sleep(flags, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned tsk_waitFor( unsigned flags, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_tsk_sleep(flags, delay, tskWait, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned tsk_sleepUntil( unsigned time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_tsk_sleep(0, time, tskSleep, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned tsk_sleepFor( unsigned delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_tsk_sleep(0, delay, tskSleep, core_tsk_waitFor);
+	return priv_tsk_sleep(flags, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -205,7 +187,6 @@ void tsk_give( tsk_id tsk, unsigned flags )
 
 	if (tsk->obj.id == ID_DELAYED)
 	if (tsk->guard  == tsk)
-	if (tsk->mode   != tskSleep)
 	{
 		tsk->msg    =  flags;
 		tsk->flags &= ~flags;

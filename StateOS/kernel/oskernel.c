@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    17.11.2016
+    @date    19.11.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -33,12 +33,15 @@
 // SYSTEM KERNEL SERVICES
 /* -------------------------------------------------------------------------- */
 
-__WEAK
-void idle_hook( void )
+static
+void idle_loop( void )
 {
+	for (;;port_ctx_switch())
+	{
 #if OS_ROBIN || OS_TIMER == 0
 	__WFI();
 #endif
+	}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -50,9 +53,8 @@ static  stk_t    MAIN_STACK[ASIZE(OS_STACK_SIZE)];
 static  stk_t    IDLE_STACK[ASIZE(OS_STACK_SIZE)];
 #define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
-static
 tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .sp=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_hook }; // idle task and tasks queue
+tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_loop }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
@@ -98,33 +100,45 @@ void priv_tsk_insert( tsk_id tsk )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_break( void )
-{
-	System.cur->sp = 0;
-
-	port_ctx_switch();
-	port_clr_lock();
-
-	for (;;);
-}
-
-/* -------------------------------------------------------------------------- */
-
 void core_tsk_insert( tsk_id tsk )
 {
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
-	tsk_id nxt = IDLE.obj.next;
-	if (nxt->prio > System.cur->prio) // necessary because of the tsk_prio function
-	port_ctx_switch();
+	if (System.cur != IDLE.obj.next) port_ctx_switchNow();
 #endif
+}
+
+/* -------------------------------------------------------------------------- */
+
+static inline
+void priv_tsk_remove( tsk_id tsk )
+{
+	priv_rdy_remove(&tsk->obj);
 }
 
 /* -------------------------------------------------------------------------- */
 
 void core_tsk_remove( tsk_id tsk )
 {
-	priv_rdy_remove(&tsk->obj);
+	priv_tsk_remove(tsk);
+	if (System.cur == tsk) port_ctx_switchNow();
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_ctx_switch( void )
+{
+	tsk_id cur = System.cur;
+	
+	port_sys_lock();
+
+	if (cur->obj.id == ID_READY)
+	{
+		priv_tsk_remove(cur);
+		core_tsk_insert(cur);
+	}
+
+	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -162,15 +176,15 @@ void core_tsk_unlink( tsk_id tsk, unsigned event )
 /* -------------------------------------------------------------------------- */
 
 static inline
-unsigned priv_tsk_wait( tsk_id tsk, obj_id obj )
+unsigned priv_tsk_wait( tsk_id cur, obj_id obj )
 {
-	core_tsk_append((tsk_id)tsk, obj);
-	core_tsk_remove((tsk_id)tsk);
-	core_tmr_insert((tmr_id)tsk, ID_DELAYED);
+	core_tsk_append((tsk_id)cur, obj);
+	priv_tsk_remove((tsk_id)cur);
+	core_tmr_insert((tmr_id)cur, ID_DELAYED);
 
-	core_ctx_switch();
+	port_ctx_switchNow();
 
-	return tsk->event;
+	return cur->event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -254,7 +268,7 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 
 		if (tsk->obj.id == ID_READY)
 		{
-			core_tsk_remove(tsk);
+			priv_tsk_remove(tsk);
 			core_tsk_insert(tsk);
 		}
 		else
@@ -284,7 +298,7 @@ void *priv_tsk_prepare( tsk_id cur )
 
 	ctx->psr = 0x01000000U;
 	ctx->pc  = cur->state;
-	ctx->lr  = core_tsk_break;
+	ctx->lr  = core_ctx_switch;
 
 	sft = (sft_id)ctx - 1;
 
@@ -307,12 +321,6 @@ void *core_tsk_handler( void *sp )
 	cur = System.cur;
 	if (cur->sp)
 		cur->sp = sp;
-
-	if (cur->obj.id == ID_READY)
-	{
-		core_tsk_remove(cur);
-		priv_tsk_insert(cur);
-	}
 
 	cur = System.cur = IDLE.obj.next;
 	sp  = priv_tsk_prepare(cur); // prepare task stack if necessary
