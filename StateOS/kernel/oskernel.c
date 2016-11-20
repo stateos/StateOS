@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    19.11.2016
+    @date    20.11.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -33,15 +33,12 @@
 // SYSTEM KERNEL SERVICES
 /* -------------------------------------------------------------------------- */
 
-static
-void idle_loop( void )
+__WEAK
+void idle_hook( void )
 {
-	for (;;port_ctx_switch())
-	{
 #if OS_ROBIN || OS_TIMER == 0
 	__WFI();
 #endif
-	}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -54,8 +51,18 @@ static  stk_t    IDLE_STACK[ASIZE(OS_STACK_SIZE)];
 #define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
 tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .sp=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_loop }; // idle task and tasks queue
+tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_hook }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
+
+/* -------------------------------------------------------------------------- */
+
+static inline
+void priv_ctx_switch( void )
+{
+	port_ctx_switch();
+	port_sys_enable();
+	port_sys_disable();
+}
 
 /* -------------------------------------------------------------------------- */
 
@@ -104,7 +111,8 @@ void core_tsk_insert( tsk_id tsk )
 {
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
-	if (System.cur != IDLE.obj.next) port_ctx_switchNow();
+	if (System.cur != IDLE.obj.next)
+	port_ctx_switch();
 #endif
 }
 
@@ -121,17 +129,18 @@ void priv_tsk_remove( tsk_id tsk )
 void core_tsk_remove( tsk_id tsk )
 {
 	priv_tsk_remove(tsk);
-	if (System.cur == tsk) port_ctx_switchNow();
+	if (System.cur == tsk)
+	priv_ctx_switch();
 }
 
 /* -------------------------------------------------------------------------- */
 
 void core_ctx_switch( void )
 {
-	tsk_id cur = System.cur;
-	
 	port_sys_lock();
 
+	tsk_id cur = System.cur;
+	
 	if (cur->obj.id == ID_READY)
 	{
 		priv_tsk_remove(cur);
@@ -139,6 +148,25 @@ void core_ctx_switch( void )
 	}
 
 	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tsk_break( void )
+{
+	tsk_id cur = System.cur;
+	
+	for (;;)
+	{
+		if (cur->obj.id == ID_READY)
+		{
+		priv_tsk_remove(cur);
+		priv_tsk_insert(cur);
+		}
+		port_ctx_switch();
+		port_clr_lock();
+		cur->state();
+	}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -182,7 +210,7 @@ unsigned priv_tsk_wait( tsk_id cur, obj_id obj )
 	priv_tsk_remove((tsk_id)cur);
 	core_tmr_insert((tmr_id)cur, ID_DELAYED);
 
-	port_ctx_switchNow();
+	priv_ctx_switch();
 
 	return cur->event;
 }
@@ -298,7 +326,7 @@ void *priv_tsk_prepare( tsk_id cur )
 
 	ctx->psr = 0x01000000U;
 	ctx->pc  = cur->state;
-	ctx->lr  = core_ctx_switch;
+	ctx->lr  = core_tsk_break;
 
 	sft = (sft_id)ctx - 1;
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    19.11.2016
+    @date    20.11.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -153,6 +153,60 @@ extern   char               __initial_sp[];
 
 /* -------------------------------------------------------------------------- */
 
+static inline
+void port_ctx_reset( void )
+{
+#if OS_ROBIN && OS_TIMER
+	SysTick->VAL = 0;
+#endif
+}
+
+/* -------------------------------------------------------------------------- */
+
+static inline
+void port_ctx_switch( void )
+{
+	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+}
+
+/* -------------------------------------------------------------------------- */
+
+// clear time breakpoint
+static inline
+void port_tmr_stop( void )
+{
+#if OS_ROBIN && OS_TIMER
+	OS_TIM->DIER = 0;
+#endif
+}
+	
+/* -------------------------------------------------------------------------- */
+
+// set time breakpoint
+static inline
+void port_tmr_start( unsigned timeout )
+{
+#if OS_ROBIN && OS_TIMER
+	OS_TIM->CCR1 = timeout;
+	OS_TIM->DIER = TIM_DIER_CC1IE;
+#else
+	(void) timeout;
+#endif
+}
+
+/* -------------------------------------------------------------------------- */
+
+// force timer interrupt
+static inline
+void port_tmr_force( void )
+{
+#if OS_ROBIN && OS_TIMER
+	NVIC_SetPendingIRQ(OS_TIM_IRQn);
+#endif
+}
+
+/* -------------------------------------------------------------------------- */
+
 #if      defined(__ARMCC_VERSION)
 
 #ifndef  __ALWAYS
@@ -239,70 +293,6 @@ extern   char               __initial_sp[];
 
 #define  port_isr_enable()     do { port_clr_lock()
 #define  port_isr_disable()         port_set_lock(); } while(0)
-
-/* -------------------------------------------------------------------------- */
-
-// set time breakpoint
-static inline
-void port_tmr_start( unsigned timeout )
-{
-#if OS_ROBIN && OS_TIMER
-	OS_TIM->CCR1 = timeout;
-	OS_TIM->DIER = TIM_DIER_CC1IE;
-#else
-	(void) timeout;
-#endif
-}
-
-/* -------------------------------------------------------------------------- */
-
-// clear time breakpoint
-static inline
-void port_tmr_stop( void )
-{
-#if OS_ROBIN && OS_TIMER
-	OS_TIM->DIER = 0;
-#endif
-}
-	
-/* -------------------------------------------------------------------------- */
-
-// force timer interrupt
-static inline
-void port_tmr_force( void )
-{
-#if OS_ROBIN && OS_TIMER
-	NVIC_SetPendingIRQ(OS_TIM_IRQn);
-#endif
-}
-
-/* -------------------------------------------------------------------------- */
-
-static inline
-void port_ctx_switch( void )
-{
-	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
-}
-
-/* -------------------------------------------------------------------------- */
-
-static inline
-void port_ctx_switchNow( void )
-{
-	port_ctx_switch();
-	port_sys_enable();
-	port_sys_disable();
-}
-
-/* -------------------------------------------------------------------------- */
-
-static inline
-void port_ctx_reset( void )
-{
-#if OS_ROBIN && OS_TIMER
-	SysTick->VAL = 0;
-#endif
-}
 
 /* -------------------------------------------------------------------------- */
 

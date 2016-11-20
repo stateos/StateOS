@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    19.11.2016
+    @date    20.11.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -82,6 +82,9 @@ void core_tmr_remove( tmr_id tmr );
 void core_tmr_handler( void );
 
 /* -------------------------------------------------------------------------- */
+
+// abort and reset current process and force yield system control to the next
+void     core_tsk_break( void ) __NORETURN;
 
 // add task 'tsk' to tasks READY queue with id ID_READY
 // force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    19.11.2016
+    @date    20.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -130,9 +130,7 @@ void tsk_flip( fun_id state )
 
 	Current->sp = 0;
 	Current->state = state;
-	core_ctx_switch();
-	port_ctx_switchNow(); // if current task is the most prioritized task
-	for(;;);
+	core_tsk_break();
 }
 
 /* -------------------------------------------------------------------------- */
