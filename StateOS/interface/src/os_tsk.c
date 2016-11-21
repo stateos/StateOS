@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    20.11.2016
+    @date    21.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -97,7 +97,7 @@ void tsk_stop( void )
 //	while (Current->list) mtx_kill(Current->list);
 
 	core_tsk_remove(Current);
-	for(;;);
+	core_tsk_break();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -111,6 +111,7 @@ void tsk_kill( tsk_id tsk )
 	switch (tsk->obj.id)
 	{
 	case ID_READY:
+		if (tsk != Current) // instead use tsk_stop
 		core_tsk_remove((tsk_id)tsk);
 		break;
 	case ID_DELAYED:
@@ -127,8 +128,11 @@ void tsk_flip( fun_id state )
 /* -------------------------------------------------------------------------- */
 {
 	port_set_lock();
-
-	Current->sp = 0;
+#ifdef __GNUC__
+	__asm volatile ("mov sp, %0" :: "r" (Current->top) : "memory");
+#else
+	__set_PSP((unsigned)Current->top);
+#endif
 	Current->state = state;
 	core_tsk_break();
 }

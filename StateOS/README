@@ -30,8 +30,7 @@ Features:
 ---------
 3.8
 - updated task object
-- speed up kernel
-- fixed bug in kernel
+- back to keernel v3.5
 ---------
 3.7
 - better integration with CMSISv5

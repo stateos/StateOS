@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    19.11.2016
+    @date    28.10.2016
     @brief   StateOS port file for STM32F4 uC.
 
  ******************************************************************************
@@ -32,6 +32,17 @@
 
 void port_sys_init( void )
 {
+#if defined(__CSMC__)
+
+	static  stk_t   IRQ_STACK[ASIZE(OS_STACK_SIZE)];
+	#define IRQ_SP (IRQ_STACK+ASIZE(OS_STACK_SIZE))
+
+	__set_PSP(__get_MSP());
+	__set_CONTROL(CONTROL_SPSEL_Msk);
+	__set_MSP((unsigned)IRQ_SP);
+
+#endif
+
 #if OS_TIMER
 
 /******************************************************************************
@@ -137,7 +148,7 @@ void SysTick_Handler( void )
 	core_tmr_handler();
 	System.dly++;
 	if (System.dly >= OS_FREQUENCY/OS_ROBIN)
-	core_ctx_switch();
+	port_ctx_switch();
 #endif
 }
 
@@ -163,7 +174,7 @@ void OS_TIM_IRQHandler( void )
 
 void SysTick_Handler( void )
 {
-	core_ctx_switch();
+	port_ctx_switch();
 }
 
 /******************************************************************************

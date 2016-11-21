@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    13.11.2016
+    @date    28.10.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -39,81 +39,47 @@ void PendSV_Handler( void )
 
 	xref  _core_tsk_handler
 
-#if __CORTEX_M < 3
-
 	mrs   r0,    PSP
-	mov   r3,    lr
-	lsls  r3,  # 29
-	bmi   priv_tsk_switch
-	mov   r0,    sp
-	sub   sp,  # 36
-priv_tsk_switch
-	subs  r0,  # 36
-	stm   r0!, { r4  - r7 }
-	mov   r3,    r8
-	mov   r4,    r9
-	mov   r5,    r10
-	mov   r6,    r11
-	mov   r7,    lr
-	stm   r0!, { r3  - r7 }
-	subs  r0,  # 36
-
-#else //__CORTEX_M
-
-	tst   lr,  # 4                      ; interrupt from process stack?
-	itee  ne
-	mrsne r0,    PSP
-	moveq r0,    sp
-#if __FPU_USED
-	subeq sp,  # 100
-	tst   lr,  # 16                     ; fpu used?
-	it    eq
- vstmdbeq r0!, { s16 - s31 }
-#else
-	subeq sp,  # 36
-#endif
-	stmdb r0!, { r4  - r11, lr }
-
-#endif//__CORTEX_M
-
-	bl   _core_tsk_handler
-
 #if __CORTEX_M < 3
-
-	adds  r0,  # 16
-	ldm   r0!, { r3  - r7 }
-	mov   r8,    r3
-	mov   r9,    r4
-	mov   r10,   r5
-	mov   r11,   r6
-	mov   lr,    r7
-	subs  r0,  # 36
-	ldm   r0!, { r4  - r7 }
-	adds  r0,  # 20
-	mov   r3,    lr
-	lsls  r3,  # 29
-	bmi   priv_tsk_return
-	mov   sp,    r0
-	bx    lr
-priv_tsk_return
-	msr   PSP,   r0
-	bx    lr
-
-#else //__CORTEX_M
-
-	ldmia r0!, { r4  - r11, lr }
+	sub   r0,   #36
+	stm   r0!, { r4  - r7 }        
+	mov   r3,    r8                
+	mov   r4,    r9                
+	mov   r5,    r10               
+	mov   r6,    r11               
+	mov   r7,    lr                
+	stm   r0!, { r3  - r7 }        
+	sub   r0,   #36                
+#else
 #if __FPU_USED
-	tst   lr,  # 16                     ; fpu used?
-	it    eq
- vldmiaeq r0!, { s16 - s31 }
+	tst   lr,   #16                
+	it    eq                       
+	vstmdbeq r0!, { s16 - s31 }       
 #endif
-	tst   lr,  # 4                      ; interrupt from process stack?
-	ite   ne
-	msrne PSP,   r0
-	moveq sp,    r0
-	bx    lr
-
-#endif//__CORTEX_M
+	stmdb r0!, { r4  - r11, lr }   
+#endif
+	bl    _core_tsk_handler         
+#if __CORTEX_M < 3
+	add   r0,   #16                
+	ldm   r0!, { r3  - r7 }        
+	mov   r8,    r3                
+	mov   r9,    r4                
+	mov   r10,   r5                
+	mov   r11,   r6                
+	mov   lr,    r7                
+	sub   r0,   #36                
+	ldm   r0!, { r4  - r7 }        
+	add   r0,   #20                
+#else
+	ldmia r0!, { r4  - r11, lr }   
+#if __FPU_USED
+	tst   lr,   #16                
+	it    eq                       
+	vldmiaeq r0!, { s16 - s31 }       
+#endif
+#endif
+	msr   PSP,   r0                
+	bx    lr                       
 
 	#endasm
 }

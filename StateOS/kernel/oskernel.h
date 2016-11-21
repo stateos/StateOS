@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    20.11.2016
+    @date    21.11.2016
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -38,8 +38,8 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-extern tsk_t IDLE;   // idle task, tasks' queue
 extern tsk_t MAIN;   // main task
+extern tsk_t IDLE;   // idle task, tasks' queue
 extern tmr_t WAIT;   // timers' queue
 extern sys_t System; // system data
 
@@ -52,7 +52,13 @@ void port_sys_init( void ) __CONSTRUCTOR;
 /* -------------------------------------------------------------------------- */
 
 // save status of current process and force yield system control to the next
-void core_ctx_switch( void );
+static inline
+void core_ctx_switch( void )
+{
+	port_ctx_switch();
+	port_sys_enable();
+	port_sys_disable();
+}
 
 // reset context switch indicator
 static inline

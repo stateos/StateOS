@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    20.11.2016
+    @date    21.11.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -50,19 +50,9 @@ static  stk_t    MAIN_STACK[ASIZE(OS_STACK_SIZE)];
 static  stk_t    IDLE_STACK[ASIZE(OS_STACK_SIZE)];
 #define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
-tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .sp=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
+tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
 tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_hook }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
-
-/* -------------------------------------------------------------------------- */
-
-static inline
-void priv_ctx_switch( void )
-{
-	port_ctx_switch();
-	port_sys_enable();
-	port_sys_disable();
-}
 
 /* -------------------------------------------------------------------------- */
 
@@ -111,43 +101,17 @@ void core_tsk_insert( tsk_id tsk )
 {
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
-	if (System.cur != IDLE.obj.next)
+	tsk_id nxt = IDLE.obj.next;
+	if (nxt->prio > System.cur->prio) // necessary because of the tsk_prio function
 	port_ctx_switch();
 #endif
 }
 
 /* -------------------------------------------------------------------------- */
 
-static inline
-void priv_tsk_remove( tsk_id tsk )
-{
-	priv_rdy_remove(&tsk->obj);
-}
-
-/* -------------------------------------------------------------------------- */
-
 void core_tsk_remove( tsk_id tsk )
 {
-	priv_tsk_remove(tsk);
-	if (System.cur == tsk)
-	priv_ctx_switch();
-}
-
-/* -------------------------------------------------------------------------- */
-
-void core_ctx_switch( void )
-{
-	port_sys_lock();
-
-	tsk_id cur = System.cur;
-	
-	if (cur->obj.id == ID_READY)
-	{
-		priv_tsk_remove(cur);
-		core_tsk_insert(cur);
-	}
-
-	port_sys_unlock();
+	priv_rdy_remove(&tsk->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -158,11 +122,6 @@ void core_tsk_break( void )
 	
 	for (;;)
 	{
-		if (cur->obj.id == ID_READY)
-		{
-		priv_tsk_remove(cur);
-		priv_tsk_insert(cur);
-		}
 		port_ctx_switch();
 		port_clr_lock();
 		cur->state();
@@ -207,10 +166,10 @@ static inline
 unsigned priv_tsk_wait( tsk_id cur, obj_id obj )
 {
 	core_tsk_append((tsk_id)cur, obj);
-	priv_tsk_remove((tsk_id)cur);
+	core_tsk_remove((tsk_id)cur);
 	core_tmr_insert((tmr_id)cur, ID_DELAYED);
 
-	priv_ctx_switch();
+	core_ctx_switch();
 
 	return cur->event;
 }
@@ -296,7 +255,7 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 
 		if (tsk->obj.id == ID_READY)
 		{
-			priv_tsk_remove(tsk);
+			core_tsk_remove(tsk);
 			core_tsk_insert(tsk);
 		}
 		else
@@ -317,9 +276,7 @@ void *priv_tsk_prepare( tsk_id cur )
 	sft_id sft;
 
 	if (cur->sp) return cur->sp;
-
-	cur->sp = cur->top;
-
+	
 	// prepare task stack if necessary
 
 	ctx = (ctx_id)cur->top - 1;
@@ -347,8 +304,13 @@ void *core_tsk_handler( void *sp )
 	core_ctx_reset();
 
 	cur = System.cur;
-	if (cur->sp)
-		cur->sp = sp;
+	cur->sp = sp;
+
+	if (cur->obj.id == ID_READY)
+	{
+		core_tsk_remove(cur);
+		priv_tsk_insert(cur);
+	}
 
 	cur = System.cur = IDLE.obj.next;
 	sp  = priv_tsk_prepare(cur); // prepare task stack if necessary

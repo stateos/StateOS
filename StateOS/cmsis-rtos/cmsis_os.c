@@ -54,7 +54,7 @@
 
     @file    StateOS: cmsis_os.c
     @author  Rajmund Szymanski
-    @date    18.11.2016
+    @date    21.11.2016
     @brief   CMSIS-RTOS API implementation for StateOS.
 
  ******************************************************************************
@@ -107,7 +107,7 @@ osStatus osKernelStart (void)
 /// Check if the RTOS kernel is already started.
 /// \note MUST REMAIN UNCHANGED: \b osKernelRunning shall be consistent in every CMSIS-RTOS.
 /// \return 0 RTOS is not started, 1 RTOS is started.
-int32_t osKernelRunning(void)
+int32_t osKernelRunning (void)
 {
 	return 1;
 }
@@ -155,8 +155,8 @@ osStatus osThreadTerminate (osThreadId thread_id)
 	if (port_isr_inside())
 		return osErrorISR;
 
-	if (thread_id == 0)
-		thread_id = osThreadGetId();
+	if (thread_id == 0 || thread_id == osThreadGetId())
+		tsk_stop();
 
 	tsk_kill(thread_id);
 	return osOK;
@@ -184,10 +184,7 @@ osStatus osThreadSetPriority (osThreadId thread_id, osPriority priority)
 	if (port_isr_inside())
 		return osErrorISR;
 
-	if (thread_id == 0)
-		thread_id = osThreadGetId();
-
-	if (thread_id != osThreadGetId())
+	if (thread_id != 0 && thread_id != osThreadGetId())
 		return osErrorParameter;
 
 	tsk_prio(priority - osPriorityIdle);
