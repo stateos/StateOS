@@ -253,16 +253,16 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 	{
 		tsk->prio = prio;
 
-		switch (tsk->obj.id)
+		if (tsk->obj.id == ID_READY)
 		{
-		case ID_READY:
 			core_tsk_remove(tsk);
 			core_tsk_insert(tsk);
-			break;
-		case ID_DELAYED:
+		}
+		else
+		if (tsk->obj.id == ID_DELAYED)
+		{
 			core_tsk_unlink(tsk, 0);
 			core_tsk_append(tsk, tsk->guard);
-			break;
 		}
 	}
 }

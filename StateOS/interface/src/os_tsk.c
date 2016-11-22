@@ -108,17 +108,17 @@ void tsk_kill( tsk_id tsk )
 
 //	while (tsk->list) mtx_kill(tsk->list);
 
-	switch (tsk->obj.id)
+	if (tsk->obj.id == ID_READY)
 	{
-	case ID_READY:
 		core_tsk_remove(tsk);
 		if (tsk == Current)
 		core_tsk_break();
-		break;
-	case ID_DELAYED:
+	}
+	else
+	if (tsk->obj.id == ID_DELAYED)
+	{
 		core_tsk_unlink((tsk_id)tsk, E_STOPPED);
 		core_tmr_remove((tmr_id)tsk);
-		break;
 	}
 
 	port_sys_unlock();
