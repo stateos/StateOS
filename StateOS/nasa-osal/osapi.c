@@ -79,7 +79,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    18.11.2016
+    @date    22.11.2016
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -194,6 +194,9 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 
 int32 OS_TaskDelete(uint32 task_id)
 {
+	if (task_id == 0)
+		task_id = OS_TaskGetId();
+
 	tsk_kill((tsk_t*)task_id);
 
 	return OS_SUCCESS;
@@ -222,10 +225,16 @@ int32 OS_TaskDelay(uint32 millisecond)
 
 int32 OS_TaskSetPriority(uint32 task_id, uint32 new_priority)
 {
-	if (task_id && task_id != OS_TaskGetId())
-		return OS_ERR_INVALID_ID;
+	if (task_id == 0)
+		task_id = OS_TaskGetId();
 
-	tsk_prio(~new_priority);
+	sys_lock();
+
+	new_priority = ~new_priority;
+	((tsk_t*)task_id)->basic = new_priority;
+	core_tsk_prio(((tsk_t*)task_id), new_priority);
+
+	sys_unlock();
 
 	return OS_SUCCESS;
 }

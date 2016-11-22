@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    21.11.2016
+    @date    22.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -111,8 +111,9 @@ void tsk_kill( tsk_id tsk )
 	switch (tsk->obj.id)
 	{
 	case ID_READY:
-		if (tsk != Current) // instead use tsk_stop
-		core_tsk_remove((tsk_id)tsk);
+		core_tsk_remove(tsk);
+		if (tsk == Current)
+		core_tsk_break();
 		break;
 	case ID_DELAYED:
 		core_tsk_unlink((tsk_id)tsk, E_STOPPED);

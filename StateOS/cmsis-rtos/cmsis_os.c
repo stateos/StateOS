@@ -54,7 +54,7 @@
 
     @file    StateOS: cmsis_os.c
     @author  Rajmund Szymanski
-    @date    21.11.2016
+    @date    22.11.2016
     @brief   CMSIS-RTOS API implementation for StateOS.
 
  ******************************************************************************
@@ -155,8 +155,8 @@ osStatus osThreadTerminate (osThreadId thread_id)
 	if (port_isr_inside())
 		return osErrorISR;
 
-	if (thread_id == 0 || thread_id == osThreadGetId())
-		tsk_stop();
+	if (thread_id == 0)
+		thread_id = osThreadGetId();
 
 	tsk_kill(thread_id);
 	return osOK;
@@ -184,10 +184,17 @@ osStatus osThreadSetPriority (osThreadId thread_id, osPriority priority)
 	if (port_isr_inside())
 		return osErrorISR;
 
-	if (thread_id != 0 && thread_id != osThreadGetId())
-		return osErrorParameter;
+	if (thread_id == 0)
+		thread_id = osThreadGetId();
 
-	tsk_prio(priority - osPriorityIdle);
+	sys_lock();
+
+	priority -= osPriorityIdle;
+	thread_id->basic = priority;
+	core_tsk_prio(thread_id, priority);
+
+	sys_unlock();
+
 	return osOK;
 }
 

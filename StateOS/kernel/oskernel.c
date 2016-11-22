@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    21.11.2016
+    @date    22.11.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -253,16 +253,16 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 	{
 		tsk->prio = prio;
 
-		if (tsk->obj.id == ID_READY)
+		switch (tsk->obj.id)
 		{
+		case ID_READY:
 			core_tsk_remove(tsk);
 			core_tsk_insert(tsk);
-		}
-		else
-		if (tsk->obj.id == ID_DELAYED)
-		{
+			break;
+		case ID_DELAYED:
 			core_tsk_unlink(tsk, 0);
 			core_tsk_append(tsk, tsk->guard);
+			break;
 		}
 	}
 }
