@@ -339,8 +339,9 @@ osEvent osSignalWait (int32_t signals, uint32_t millisec)
 	if (port_isr_inside())
 	{
 		event.status = osErrorISR;
+		return event;
 	}
-	else
+
 	switch (tsk_waitFor((unsigned)signals, millisec*MSEC))
 	{
 	case E_SUCCESS: event.status = osEventSignal; event.value.signals = Current->flags; break;
