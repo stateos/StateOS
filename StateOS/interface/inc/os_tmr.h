@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    18.11.2016
+    @date    23.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -474,6 +474,8 @@ public:
 	unsigned wait     ( void )                                             { return tmr_wait         (this);                               }
 	unsigned take     ( void )                                             { return tmr_take         (this);                               }
 	unsigned takeISR  ( void )                                             { return tmr_takeISR      (this);                               }
+
+	bool     operator!( void )                                             { return obj.id == ID_STOPPED;                                  }
 };
 
 /**********************************************************************************************************************

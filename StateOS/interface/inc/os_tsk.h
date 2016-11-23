@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    22.11.2016
+    @date    23.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -754,6 +754,8 @@ namespace ThisTask
 	void     stop      ( void )                             {        tsk_stop      ();                    }
 	void     prio      ( unsigned _prio )                   {        tsk_prio      (_prio);               }
 
+	unsigned prio      ( void )                             { return Current->prio;                       }
+
 	unsigned waitUntil ( unsigned _flags, unsigned _time )  { return tsk_waitUntil (_flags, _time);       }
 	unsigned waitFor   ( unsigned _flags, unsigned _delay ) { return tsk_waitFor   (_flags, _delay);      }
 	unsigned wait      ( unsigned _flags )                  { return tsk_wait      (_flags);              }
@@ -795,6 +797,8 @@ public:
 	void     giveISR   ( unsigned _flags )                  {        tsk_giveISR   (this, _flags);        }
 	void     resume    ( unsigned _event )                  {        tsk_resume    (this, _event);        }
 	void     resumeISR ( unsigned _event )                  {        tsk_resumeISR (this, _event);        }
+
+	bool     operator! ( void )                             { return obj.id == ID_STOPPED;                }
 };
 
 /**********************************************************************************************************************
