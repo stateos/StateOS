@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    23.11.2016
+    @date    24.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -567,7 +567,7 @@ static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, IN
  *                                                                                                                    *
  * Name              : tsk_give                                                                                       *
  *                                                                                                                    *
- * Description       : resume execution of given waiting task (tsk_wait)                                              *
+ * Description       : set given flags in waiting task (tsk_wait)                                                     *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   tsk             : pointer to delayed task object                                                                 *
@@ -798,7 +798,7 @@ public:
 	void     resume    ( unsigned _event )                  {        tsk_resume    (this, _event);        }
 	void     resumeISR ( unsigned _event )                  {        tsk_resumeISR (this, _event);        }
 
-	bool     operator! ( void )                             { return obj.id == ID_STOPPED;                }
+	bool     operator! ( void )                             { return __tsk::obj.id == ID_STOPPED;         }
 };
 
 /**********************************************************************************************************************

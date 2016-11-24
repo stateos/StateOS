@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    23.11.2016
+    @date    24.11.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -459,23 +459,23 @@ public:
 	Timer( const fun_id _state = 0 ): __tmr _TMR_INIT(0) { state = _state; }
 
 	void kill         ( void )                                             {        tmr_kill         (this);                               }
-	void startUntil   ( unsigned _time   )                                 {        tmr_startUntil   (this, _time,           this->state); }
-	void startUntil   ( unsigned _time,   fun_id _state )                  {        tmr_startUntil   (this, _time,                _state); }
+	void startUntil   ( unsigned _time )                                   {        tmr_startUntil   (this, _time,           this->state); }
+	void startUntil   ( unsigned _time,                    fun_id _state ) {        tmr_startUntil   (this, _time,                _state); }
 	void start        ( unsigned _delay, unsigned _period )                {        tmr_start        (this, _delay, _period, this->state); }
 	void start        ( unsigned _delay, unsigned _period, fun_id _state ) {        tmr_start        (this, _delay, _period,      _state); }
-	void startFor     ( unsigned _delay  )                                 {        tmr_startFor     (this, _delay,          this->state); }
-	void startFor     ( unsigned _delay,  fun_id _state )                  {        tmr_startFor     (this, _delay,               _state); }
+	void startFor     ( unsigned _delay )                                  {        tmr_startFor     (this, _delay,          this->state); }
+	void startFor     ( unsigned _delay,                   fun_id _state ) {        tmr_startFor     (this, _delay,               _state); }
 	void startPeriodic( unsigned _period )                                 {        tmr_startPeriodic(this,         _period, this->state); }
-	void startPeriodic( unsigned _period, fun_id _state )                  {        tmr_startPeriodic(this,         _period,      _state); }
+	void startPeriodic( unsigned _period,                  fun_id _state ) {        tmr_startPeriodic(this,         _period,      _state); }
 	void stop         ( void )                                             {        tmr_stop         (this);                               }
 
-	unsigned waitUntil( unsigned _time  )                                  { return tmr_waitUntil    (this, _time);                        }
+	unsigned waitUntil( unsigned _time )                                   { return tmr_waitUntil    (this, _time);                        }
 	unsigned waitFor  ( unsigned _delay )                                  { return tmr_waitFor      (this, _delay);                       }
 	unsigned wait     ( void )                                             { return tmr_wait         (this);                               }
 	unsigned take     ( void )                                             { return tmr_take         (this);                               }
 	unsigned takeISR  ( void )                                             { return tmr_takeISR      (this);                               }
 
-	bool     operator!( void )                                             { return obj.id == ID_STOPPED;                                  }
+	bool     operator!( void )                                             { return __tmr::obj.id == ID_STOPPED;                           }
 };
 
 /**********************************************************************************************************************
