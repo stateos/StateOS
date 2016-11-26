@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    20.11.2016
+    @date    26.11.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -263,6 +263,13 @@ void port_tmr_force( void )
 #endif
 
 /* -------------------------------------------------------------------------- */
+
+#ifdef __GNUC__
+#define  port_set_sp(sp)          __asm volatile ("mov sp, %0" :: "r" (sp) : "memory")
+#else
+#define  port_set_sp(sp)          __set_PSP((unsigned)(sp))
+#endif
+
 
 #if OS_LOCK_LEVEL && (__CORTEX_M >= 3)
 

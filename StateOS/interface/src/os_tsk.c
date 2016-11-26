@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    22.11.2016
+    @date    26.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -129,11 +129,7 @@ void tsk_flip( fun_id state )
 /* -------------------------------------------------------------------------- */
 {
 	port_set_lock();
-#ifdef __GNUC__
-	__asm volatile ("mov sp, %0" :: "r" (Current->top) : "memory");
-#else
-	__set_PSP((unsigned)Current->top);
-#endif
+
 	Current->state = state;
 	core_tsk_break();
 }
