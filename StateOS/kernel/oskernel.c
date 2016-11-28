@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    26.11.2016
+    @date    28.11.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -118,14 +118,13 @@ void core_tsk_remove( tsk_id tsk )
 
 void core_tsk_break( void )
 {
-	tsk_id cur = System.cur;
+	port_set_sp(System.cur->top);
 
 	for (;;)
 	{
-		port_set_sp(cur->top);
 		port_ctx_switch();
 		port_clr_lock();
-		cur->state();
+		System.cur->state();
 	}
 }
 
@@ -271,24 +270,17 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 /* -------------------------------------------------------------------------- */
 
 static inline
-void *priv_tsk_prepare( tsk_id cur )
+void *priv_tsk_init( tsk_id cur )
 {
-	ctx_id ctx;
-	sft_id sft;
+	ctx_id ctx = (ctx_id)cur->top - 1;
 
-	if (cur->sp) return cur->sp;
-	
-	// prepare task stack if necessary
-
-	ctx = (ctx_id)cur->top - 1;
-
-	ctx->psr = 0x01000000U;
+	ctx->psr = 0x01000000;
 	ctx->pc  = cur->state;
 	ctx->lr  = core_tsk_break;
 
-	sft = (sft_id)ctx - 1;
+	sft_id sft = (sft_id)ctx - 1;
 
-	sft->lr  = ~2U; // EXC_RETURN: return from psp
+	sft->lr  = 0xFFFFFFFD; // EXC_RETURN: return from psp
 
 	return sft;
 }
@@ -314,7 +306,7 @@ void *core_tsk_handler( void *sp )
 	}
 
 	cur = System.cur = IDLE.obj.next;
-	sp  = priv_tsk_prepare(cur); // prepare task stack if necessary
+	sp = cur->sp ? cur->sp : priv_tsk_init(cur); // prepare task stack if necessary
 
 	port_isr_unlock();
 
