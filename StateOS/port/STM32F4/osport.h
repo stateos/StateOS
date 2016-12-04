@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    28.11.2016
+    @date    04.12.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -149,7 +149,7 @@ typedef  uint64_t             stk_t;
 #endif
 
 extern   stk_t              __initial_sp[];
-#define  MAIN_SP            __initial_sp
+#define  MAIN_TOP           __initial_sp
 
 /* -------------------------------------------------------------------------- */
 

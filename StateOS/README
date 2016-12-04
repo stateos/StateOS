@@ -28,6 +28,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+3.9
+- initiating a process stack has been removed from the context switch procedure
+---------
 3.8
 - updated task object
 - back to kernel v3.5

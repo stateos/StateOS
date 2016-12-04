@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    28.11.2016
+    @date    04.12.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -33,8 +33,8 @@
 // SYSTEM KERNEL SERVICES
 /* -------------------------------------------------------------------------- */
 
-__WEAK
-void idle_hook( void )
+static
+void priv_tsk_idle( void )
 {
 #if OS_ROBIN || OS_TIMER == 0
 	__WFI();
@@ -43,15 +43,19 @@ void idle_hook( void )
 
 /* -------------------------------------------------------------------------- */
 
-#ifndef MAIN_SP
-static  stk_t    MAIN_STACK[ASIZE(OS_STACK_SIZE)];
-#define MAIN_SP (MAIN_STACK+ASIZE(OS_STACK_SIZE))
+#ifndef MAIN_TOP
+static  struct { stk_t STK[ASIZE(OS_STACK_SIZE)]; } MAIN_STACK;
+#define MAIN_TOP &MAIN_STACK+1
 #endif
-static  stk_t    IDLE_STACK[ASIZE(OS_STACK_SIZE)];
-#define IDLE_SP (IDLE_STACK+ASIZE(OS_STACK_SIZE))
 
-tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_SP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_SP, .state=idle_hook }; // idle task and tasks queue
+static  union  { stk_t STK[ASIZE(OS_STACK_SIZE)];
+        struct { char  stk[ASIZE(OS_STACK_SIZE)*sizeof(stk_t)-sizeof(ctx_t)]; ctx_t ctx; } CTX; } IDLE_STACK =
+               { .CTX={ .ctx={ .exc=0xFFFFFFFD, .lr=core_tsk_break, .pc=priv_tsk_idle, .psr=0x01000000 } } };
+#define IDLE_TOP &IDLE_STACK+1
+#define IDLE_SP  &IDLE_STACK.CTX.ctx
+
+tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
+tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_TOP, .sp=IDLE_SP, .state=priv_tsk_idle }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
@@ -269,20 +273,16 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
-void *priv_tsk_init( tsk_id cur )
+void core_tsk_init( tsk_id tsk )
 {
-	ctx_id ctx = (ctx_id)cur->top - 1;
+	ctx_id ctx = (ctx_id)tsk->top - 1;
 
 	ctx->psr = 0x01000000;
-	ctx->pc  = cur->state;
+	ctx->pc  = tsk->state;
 	ctx->lr  = core_tsk_break;
+	ctx->exc = 0xFFFFFFFD; // EXC_RETURN: return from psp
 
-	sft_id sft = (sft_id)ctx - 1;
-
-	sft->lr  = 0xFFFFFFFD; // EXC_RETURN: return from psp
-
-	return sft;
+	tsk->sp  = ctx;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -306,7 +306,7 @@ void *core_tsk_handler( void *sp )
 	}
 
 	cur = System.cur = IDLE.obj.next;
-	sp = cur->sp ? cur->sp : priv_tsk_init(cur); // prepare task stack if necessary
+	sp = cur->sp;
 
 	port_isr_unlock();
 

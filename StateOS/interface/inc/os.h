@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    20.11.2016
+    @date    04.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -129,22 +129,6 @@ static inline void     sys_init( void ) { port_sys_init(); }
  **********************************************************************************************************************/
 
 #define                sys_unlockISR()  port_sys_unlock()
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : idle_hook                                                                                      *
- *                                                                                                                    *
- * Description       : procedure performed in the 'idle' task; waiting for an interrupt                               *
- *                                                                                                                    *
- * Parameters        : none                                                                                           *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : for internal use only                                                                          *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-              void     idle_hook( void );
 
 #ifdef __cplusplus
 }

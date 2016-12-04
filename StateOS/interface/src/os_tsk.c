@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    26.11.2016
+    @date    04.12.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,7 @@ tsk_id tsk_create( unsigned prio, fun_id state, unsigned size )
 		tsk->prio  = prio;
 		tsk->basic = prio;
 
+		core_tsk_init(tsk);
 		core_tsk_insert(tsk);
 	}
 
@@ -63,8 +64,7 @@ void tsk_start( tsk_id tsk )
 
 	if (tsk->obj.id == ID_STOPPED)
 	{
-		tsk->sp = 0; // necessary because of the tsk_kill function
-
+		core_tsk_init(tsk);
 		core_tsk_insert(tsk);
 	}
 
@@ -80,8 +80,8 @@ void tsk_startFrom( tsk_id tsk, fun_id state )
 	if (tsk->obj.id == ID_STOPPED)
 	{
 		tsk->state = state;
-		tsk->sp = 0; // necessary because of the tsk_kill function
 
+		core_tsk_init(tsk);
 		core_tsk_insert(tsk);
 	}
 
