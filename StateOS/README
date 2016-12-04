@@ -29,6 +29,7 @@ Features:
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
 3.9
+- added support for STM8S-Discovery board
 - initiating a process stack has been removed from the context switch procedure
 ---------
 3.8
