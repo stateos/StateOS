@@ -270,7 +270,6 @@ void port_tmr_force( void )
 #define  port_set_sp(sp)          __set_PSP((unsigned)(sp))
 #endif
 
-
 #if OS_LOCK_LEVEL && (__CORTEX_M >= 3)
 
 #define  port_get_lock()          __get_BASEPRI()
