@@ -39,47 +39,74 @@ void PendSV_Handler( void )
 
 	xref  _core_tsk_handler
 
+#if __CORTEX_M < 3
+
 	mrs   r0,    PSP
-#if __CORTEX_M < 3
-	sub   r0,   #36
-	stm   r0!, { r4  - r7 }        
-	mov   r3,    r8                
-	mov   r4,    r9                
-	mov   r5,    r10               
-	mov   r6,    r11               
-	mov   r7,    lr                
-	stm   r0!, { r3  - r7 }        
-	sub   r0,   #36                
+	sub   r0,  # 36
+	stm   r0!, { r4  - r7 }
+	mov   r3,    r8
+	mov   r4,    r9
+	mov   r5,    r10
+	mov   r6,    r11
+	mov   r7,    lr
+	stm   r0!, { r3  - r7 }
+	sub   r0,  # 36
+
 #else
+
+	mrs   r0,    PSP
 #if __FPU_USED
-	tst   lr,   #16                
-	it    eq                       
-	vstmdbeq r0!, { s16 - s31 }       
+	tst   lr,  # 16
+	it    eq
+	vstmdbeq r0!, { s16 - s31 }
 #endif
-	stmdb r0!, { r4  - r11, lr }   
+	stmdb r0!, { r4  - r11, lr }
+
 #endif
-	bl    _core_tsk_handler         
+
+	bl    _core_tsk_handler
+
 #if __CORTEX_M < 3
-	add   r0,   #16                
-	ldm   r0!, { r3  - r7 }        
-	mov   r8,    r3                
-	mov   r9,    r4                
-	mov   r10,   r5                
-	mov   r11,   r6                
-	mov   lr,    r7                
-	sub   r0,   #36                
-	ldm   r0!, { r4  - r7 }        
-	add   r0,   #20                
+
+	add   r0,  # 16
+	ldm   r0!, { r3  - r7 }
+	mov   r8,    r3
+	mov   r9,    r4
+	mov   r10,   r5
+	mov   r11,   r6
+	mov   lr,    r7
+	sub   r0,  # 36
+	ldm   r0!, { r4  - r7 }
+	add   r0,  # 20
+	msr   PSP,   r0
+	bx    lr
+
 #else
-	ldmia r0!, { r4  - r11, lr }   
+
+	ldmia r0!, { r4  - r11, lr }
 #if __FPU_USED
-	tst   lr,   #16                
-	it    eq                       
-	vldmiaeq r0!, { s16 - s31 }       
+	tst   lr,  # 16
+	it    eq
+	vldmiaeq r0!, { s16 - s31 }
 #endif
+	msr   PSP,   r0
+	bx    lr
+
 #endif
-	msr   PSP,   r0                
-	bx    lr                       
+
+	#endasm
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tsk_flip( void *sp )
+{
+	#asm
+
+	xref  _core_tsk_break
+
+	mov   sp,    r0
+	bl    _core_tsk_break
 
 	#endasm
 }

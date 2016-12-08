@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    18.05.2016
+    @date    08.12.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -38,9 +38,10 @@ __asm void PendSV_Handler( void )
 	PRESERVE8
 	IMPORT core_tsk_handler
 
-	mrs   r0,    PSP
 #if __CORTEX_M < 3
-	subs  r0,   #36
+
+	mrs   r0,    PSP
+	subs  r0,  # 36
 	stm   r0!, { r4  - r7 }
 	mov   r3,    r8
 	mov   r4,    r9
@@ -48,38 +49,63 @@ __asm void PendSV_Handler( void )
 	mov   r6,    r11
 	mov   r7,    lr
 	stm   r0!, { r3  - r7 }
-	subs  r0,   #36
+	subs  r0,  # 36
+
 #else
+
+	mrs   r0,    PSP
 #if __FPU_USED
-	tst   lr,   #16                     ; fpu used?
+	tst   lr,  # 16                     ; fpu used?
 	it    eq
  vstmdbeq r0!, { s16 - s31 }
 #endif
 	stmdb r0!, { r4  - r11, lr }
+
 #endif
+
 	bl    core_tsk_handler
+
 #if __CORTEX_M < 3
-	adds  r0,   #16
+
+	adds  r0,  # 16
 	ldm   r0!, { r3  - r7 }
 	mov   r8,    r3
 	mov   r9,    r4
 	mov   r10,   r5
 	mov   r11,   r6
 	mov   lr,    r7
-	subs  r0,   #36
+	subs  r0,  # 36
 	ldm   r0!, { r4  - r7 }
-	adds  r0,   #20
+	adds  r0,  # 20
+	msr   PSP,   r0
+	bx    lr
+
 #else
+
 	ldmia r0!, { r4  - r11, lr }
 #if __FPU_USED
-	tst   lr,   #16                     ; fpu used?
+	tst   lr,  # 16                     ; fpu used?
 	it    eq
  vldmiaeq r0!, { s16 - s31 }
-#endif
 #endif
 	msr   PSP,   r0
 	bx    lr
 
+#endif
+
+	ALIGN
+}
+
+/* -------------------------------------------------------------------------- */
+
+__asm void core_tsk_flip( void *sp )
+{
+	PRESERVE8
+	IMPORT core_tsk_break
+
+	mov   sp,    r0
+	bl    core_tsk_break
+	
 	ALIGN
 }
 

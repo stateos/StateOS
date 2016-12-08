@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    04.12.11.2016
+    @date    08.12.11.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -131,7 +131,7 @@ void tsk_flip( fun_id state )
 	port_set_lock();
 
 	Current->state = state;
-	core_tsk_break();
+	core_tsk_flip(Current->top);
 }
 
 /* -------------------------------------------------------------------------- */

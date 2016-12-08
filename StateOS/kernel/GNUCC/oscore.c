@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    18.05.2016
+    @date    08.12.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -38,9 +38,10 @@ void PendSV_Handler( void )
 {
 	__asm volatile
 	(
-"	mrs   r0,    PSP               \n"
 #if __CORTEX_M < 3
-"	sub   r0,   #36                \n"
+
+"	mrs   r0,    PSP               \n"
+"	sub   r0,  # 36                \n"
 "	stm   r0!, { r4  - r7 }        \n"
 "	mov   r3,    r8                \n"
 "	mov   r4,    r9                \n"
@@ -48,42 +49,69 @@ void PendSV_Handler( void )
 "	mov   r6,    r11               \n"
 "	mov   r7,    lr                \n"
 "	stm   r0!, { r3  - r7 }        \n"
-"	sub   r0,   #36                \n"
+"	sub   r0,  # 36                \n"
+
 #else
+
+"	mrs   r0,    PSP               \n"
 #if __FPU_USED
-"	tst   lr,   #16                \n"
+"	tst   lr,  # 16                \n"
 "	it    eq                       \n"
 "vstmdbeq r0!, { s16 - s31 }       \n"
 #endif
 "	stmdb r0!, { r4  - r11, lr }   \n"
+
 #endif
+
 "	bl    core_tsk_handler         \n"
+
 #if __CORTEX_M < 3
-"	add   r0,   #16                \n"
+
+"	add   r0,  # 16                \n"
 "	ldm   r0!, { r3  - r7 }        \n"
 "	mov   r8,    r3                \n"
 "	mov   r9,    r4                \n"
 "	mov   r10,   r5                \n"
 "	mov   r11,   r6                \n"
 "	mov   lr,    r7                \n"
-"	sub   r0,   #36                \n"
+"	sub   r0,  # 36                \n"
 "	ldm   r0!, { r4  - r7 }        \n"
-"	add   r0,   #20                \n"
+"	add   r0,  # 20                \n"
+"	msr   PSP,   r0                \n"
+"	bx    lr                       \n"
+
 #else
+
 "	ldmia r0!, { r4  - r11, lr }   \n"
 #if __FPU_USED
-"	tst   lr,   #16                \n"
+"	tst   lr,  # 16                \n"
 "	it    eq                       \n"
 "vldmiaeq r0!, { s16 - s31 }       \n"
 #endif
-#endif
 "	msr   PSP,   r0                \n"
 "	bx    lr                       \n"
+
+#endif
 
 :::	"memory"
 	);
 }
 
+/* -------------------------------------------------------------------------- */
+
+__attribute__((naked))
+void core_tsk_flip( void *sp )
+{
+	__asm volatile
+	(
+"	mov   sp,  %[sp]               \n"
+"	bl    core_tsk_break           \n"
+	
+::	[sp]"r"(sp)
+:	"memory"
+	);
+}
+	
 /* -------------------------------------------------------------------------- */
 
 #endif // __GNUC__ && !__ARMCC_VERSION
