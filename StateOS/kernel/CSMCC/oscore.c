@@ -52,17 +52,17 @@ void PendSV_Handler( void )
 	stm   r0!, { r3  - r7 }
 	sub   r0,  # 36
 
-#else
+#else //__CORTEX_M
 
 	mrs   r0,    PSP
 #if __FPU_USED
 	tst   lr,  # 16
 	it    eq
-	vstmdbeq r0!, { s16 - s31 }
+ vstmdbeq r0!, { s16 - s31 }
 #endif
 	stmdb r0!, { r4  - r11, lr }
 
-#endif
+#endif//__CORTEX_M
 
 	bl    _core_tsk_handler
 
@@ -81,18 +81,18 @@ void PendSV_Handler( void )
 	msr   PSP,   r0
 	bx    lr
 
-#else
+#else //__CORTEX_M
 
 	ldmia r0!, { r4  - r11, lr }
 #if __FPU_USED
 	tst   lr,  # 16
 	it    eq
-	vldmiaeq r0!, { s16 - s31 }
+ vldmiaeq r0!, { s16 - s31 }
 #endif
 	msr   PSP,   r0
 	bx    lr
 
-#endif
+#endif//__CORTEX_M
 
 	#endasm
 }

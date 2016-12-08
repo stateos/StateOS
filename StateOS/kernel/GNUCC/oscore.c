@@ -51,7 +51,7 @@ void PendSV_Handler( void )
 "	stm   r0!, { r3  - r7 }        \n"
 "	sub   r0,  # 36                \n"
 
-#else
+#else //__CORTEX_M
 
 "	mrs   r0,    PSP               \n"
 #if __FPU_USED
@@ -61,7 +61,7 @@ void PendSV_Handler( void )
 #endif
 "	stmdb r0!, { r4  - r11, lr }   \n"
 
-#endif
+#endif//__CORTEX_M
 
 "	bl    core_tsk_handler         \n"
 
@@ -80,7 +80,7 @@ void PendSV_Handler( void )
 "	msr   PSP,   r0                \n"
 "	bx    lr                       \n"
 
-#else
+#else //__CORTEX_M
 
 "	ldmia r0!, { r4  - r11, lr }   \n"
 #if __FPU_USED
@@ -91,7 +91,7 @@ void PendSV_Handler( void )
 "	msr   PSP,   r0                \n"
 "	bx    lr                       \n"
 
-#endif
+#endif//__CORTEX_M
 
 :::	"memory"
 	);

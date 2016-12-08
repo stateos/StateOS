@@ -28,6 +28,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+4.0
+- tsk_flip is realized through core_tsk_flip function
+---------
 3.9
 - added support for STM8S-Discovery board
 - initiating a process stack has been removed from the context switch procedure
