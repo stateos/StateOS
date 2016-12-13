@@ -30,6 +30,7 @@ Features:
 ---------
 4.0
 - tsk_flip is realized through core_tsk_flip function
+- improved performance of kernel
 ---------
 3.9
 - added support for STM8S-Discovery board

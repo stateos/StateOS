@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    24.11.2016
+    @date    09.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -445,7 +445,7 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tsk_yield( void ) { core_ctx_switch(); }
+              void     tsk_yield( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -461,7 +461,7 @@ static inline void     tsk_yield( void ) { core_ctx_switch(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tsk_pass ( void ) { core_ctx_switch(); }
+static inline void     tsk_pass ( void ) { tsk_yield(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

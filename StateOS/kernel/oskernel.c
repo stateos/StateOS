@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    08.12.2016
+    @date    13.12.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -61,11 +61,10 @@ sys_t System = { .cur=&MAIN };
 /* -------------------------------------------------------------------------- */
 
 static inline
-void priv_rdy_insert( obj_id obj, unsigned id, obj_id nxt )
+void priv_rdy_insert( obj_id obj, obj_id nxt )
 {
 	obj_id prv = nxt->prev;
 
-	obj->id   = id;
 	obj->prev = prv;
 	obj->next = nxt;
 	nxt->prev = obj;
@@ -82,7 +81,6 @@ void priv_rdy_remove( obj_id obj )
 
 	nxt->prev = prv;
 	prv->next = nxt;
-	obj->id   = ID_STOPPED;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -96,17 +94,25 @@ void priv_tsk_insert( tsk_id tsk )
 	do     nxt = nxt->obj.next;
 	while (tsk->prio <= nxt->prio);
 
-	priv_rdy_insert(&tsk->obj, ID_READY, &nxt->obj);
+	priv_rdy_insert(&tsk->obj, &nxt->obj);
+}
+
+/* -------------------------------------------------------------------------- */
+
+static inline
+void priv_tsk_remove( tsk_id tsk )
+{
+	priv_rdy_remove(&tsk->obj);
 }
 
 /* -------------------------------------------------------------------------- */
 
 void core_tsk_insert( tsk_id tsk )
 {
+	tsk->obj.id = ID_READY;
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
-	tsk_id nxt = IDLE.obj.next;
-	if (nxt->prio > System.cur->prio) // necessary because of the tsk_prio function
+	if (tsk == IDLE.obj.next)
 	port_ctx_switch();
 #endif
 }
@@ -115,7 +121,18 @@ void core_tsk_insert( tsk_id tsk )
 
 void core_tsk_remove( tsk_id tsk )
 {
+	tsk->obj.id = ID_STOPPED;
 	priv_rdy_remove(&tsk->obj);
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_ctx_switch( void )
+{
+	tsk_id cur = IDLE.obj.next;
+	tsk_id nxt = cur->obj.next;
+	if (nxt->prio == cur->prio)
+		port_ctx_switch();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -142,8 +159,8 @@ void core_tsk_append( tsk_id tsk, void *obj )
 	while (nxt && tsk->prio <= nxt->prio);
 
 	if (nxt)
-	nxt->back  = tsk;
-	tsk->back  = prv;
+	nxt->back = tsk;
+	tsk->back = prv;
 	tsk->obj.queue = nxt;
 	prv->obj.queue = tsk;
 }
@@ -168,10 +185,12 @@ static inline
 unsigned priv_tsk_wait( tsk_id cur, obj_id obj )
 {
 	core_tsk_append((tsk_id)cur, obj);
-	core_tsk_remove((tsk_id)cur);
+	priv_tsk_remove((tsk_id)cur);
 	core_tmr_insert((tmr_id)cur, ID_DELAYED);
 
-	core_ctx_switch();
+	port_ctx_switch();
+	port_clr_lock();
+	port_set_lock();
 
 	return cur->event;
 }
@@ -255,9 +274,16 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 	{
 		tsk->prio = prio;
 
+		if (tsk == System.cur)
+		{
+			tsk = tsk->obj.next;
+			if (tsk->prio > prio)
+			port_ctx_switch();
+		}
+		else
 		if (tsk->obj.id == ID_READY)
 		{
-			core_tsk_remove(tsk);
+			priv_tsk_remove(tsk);
 			core_tsk_insert(tsk);
 		}
 		else
@@ -287,28 +313,29 @@ void core_tsk_init( tsk_id tsk )
 
 void *core_tsk_handler( void *sp )
 {
-	tsk_id cur;
+	tsk_id cur, nxt;
 #if OS_ROBIN == 0
 	core_tmr_handler();
 #endif
 	port_isr_lock();
 	core_ctx_reset();
 
+	nxt = IDLE.obj.next;
 	cur = System.cur;
 	cur->sp = sp;
 
-	if (cur->obj.id == ID_READY)
+	if (cur == nxt)
 	{
-		core_tsk_remove(cur);
+		priv_tsk_remove(cur);
 		priv_tsk_insert(cur);
+		nxt = IDLE.obj.next;
 	}
 
-	cur = System.cur = IDLE.obj.next;
-	sp = cur->sp;
+	System.cur = nxt;
 
 	port_isr_unlock();
 
-	return sp;
+	return nxt->sp;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -322,13 +349,14 @@ static inline
 void priv_tmr_insert( tmr_id tmr, unsigned id )
 {
 	tmr_id nxt = &WAIT;
+	tmr->obj.id = id;
 
 	if    (tmr->delay != INFINITE)
 	do     nxt = nxt->obj.next;
 	while (nxt->delay != INFINITE &&
 	       nxt->delay <= tmr->start + tmr->delay - nxt->start);
 
-	priv_rdy_insert(&tmr->obj, id, &nxt->obj);
+	priv_rdy_insert(&tmr->obj, &nxt->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -343,6 +371,7 @@ void core_tmr_insert( tmr_id tmr, unsigned id )
 
 void core_tmr_remove( tmr_id tmr )
 {
+	tmr->obj.id = ID_STOPPED;
 	priv_rdy_remove(&tmr->obj);
 }
 

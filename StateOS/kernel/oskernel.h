@@ -52,13 +52,7 @@ void port_sys_init( void ) __CONSTRUCTOR;
 /* -------------------------------------------------------------------------- */
 
 // save status of current process and force yield system control to the next
-static inline
-void core_ctx_switch( void )
-{
-	port_ctx_switch();
-	port_sys_enable();
-	port_sys_disable();
-}
+void core_ctx_switch( void );
 
 // reset context switch indicator
 static inline
