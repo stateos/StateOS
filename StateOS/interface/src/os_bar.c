@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.c
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    16.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -63,7 +63,7 @@ void bar_kill( bar_id bar )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 unsigned priv_bar_wait( bar_id bar, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

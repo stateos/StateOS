@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    16.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -63,7 +63,7 @@ void sem_kill( sem_id sem )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 unsigned priv_sem_wait( sem_id sem, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
@@ -97,7 +97,7 @@ unsigned sem_waitFor( sem_id sem, unsigned delay )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 unsigned priv_sem_send( sem_id sem, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

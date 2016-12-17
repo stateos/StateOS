@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    08.11.2016
+    @date    16.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -81,7 +81,7 @@ void mem_kill( mem_id mem )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

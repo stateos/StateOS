@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    16.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -66,7 +66,7 @@ void box_kill( box_id box )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 void priv_box_get( box_id box, void *data )
 /* -------------------------------------------------------------------------- */
 {
@@ -80,7 +80,7 @@ void priv_box_get( box_id box, void *data )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 void priv_box_put( box_id box, void *data )
 /* -------------------------------------------------------------------------- */
 {
@@ -94,7 +94,7 @@ void priv_box_put( box_id box, void *data )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 unsigned priv_box_wait( box_id box, void *data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
@@ -137,7 +137,7 @@ unsigned box_waitFor( box_id box, void *data, unsigned delay )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 unsigned priv_box_send( box_id box, void *data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.c
     @author  Rajmund Szymanski
-    @date    28.10.2016
+    @date    16.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -55,7 +55,7 @@ void mut_kill( mut_id mut )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 unsigned priv_mut_wait( mut_id mut, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

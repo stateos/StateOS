@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    18.10.2016
+    @date    16.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -59,7 +59,7 @@ void tmr_kill( tmr_id tmr )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 void priv_tmr_start( tmr_id tmr )
 /* -------------------------------------------------------------------------- */
 {
@@ -101,7 +101,7 @@ void tmr_start( tmr_id tmr, unsigned delay, unsigned period, fun_id proc )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 unsigned priv_tmr_wait( tmr_id tmr, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

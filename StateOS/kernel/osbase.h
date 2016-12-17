@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    04.12.2016
+    @date    16.12.2016
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -140,8 +140,8 @@ typedef struct __ctx
 	unsigned r2;
 	unsigned r3;
 	void    *ip;
-	void    *lr;
-	void    *pc;
+	fun_id   lr;
+	fun_id   pc;
 	unsigned psr;
 
 }	ctx_t, *ctx_id;

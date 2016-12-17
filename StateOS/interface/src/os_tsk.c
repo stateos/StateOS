@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    09.12.11.2016
+    @date    16.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -97,7 +97,8 @@ void tsk_stop( void )
 //	while (Current->list) mtx_kill(Current->list);
 
 	core_tsk_remove(Current);
-	core_tsk_break();
+
+	for (;;);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -108,8 +109,6 @@ void tsk_kill( tsk_id tsk )
 
 //	while (tsk->list) mtx_kill(tsk->list);
 
-	if (tsk == Current)
-		tsk_stop();
 	if (tsk->obj.id == ID_READY)
 		core_tsk_remove(tsk);
 	else
@@ -158,7 +157,7 @@ void tsk_prio( unsigned prio )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 unsigned priv_tsk_sleep( unsigned flags, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {

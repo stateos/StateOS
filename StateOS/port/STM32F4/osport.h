@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    08.12.2016
+    @date    15.12.2016
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -149,13 +149,68 @@ extern   stk_t              __initial_sp[];
 
 /* -------------------------------------------------------------------------- */
 
-static inline
-void port_ctx_reset( void )
-{
-#if OS_ROBIN && OS_TIMER
-	SysTick->VAL = 0;
+#if      defined(__ARMCC_VERSION)
+
+#ifndef  __CONSTRUCTOR
+#define  __CONSTRUCTOR            __attribute__((constructor))
 #endif
-}
+#ifndef  __NORETURN
+#define  __NORETURN               __attribute__((noreturn))
+#endif
+
+#elif    defined(__GNUC__)
+
+#ifndef  __CONSTRUCTOR
+#define  __CONSTRUCTOR            __attribute__((constructor))
+#endif
+#ifndef  __NORETURN
+#define  __NORETURN               __attribute__((noreturn, naked))
+#endif
+
+#elif    defined(__CSMC__)
+
+#ifndef  __CONSTRUCTOR
+#define  __CONSTRUCTOR
+#warning No compiler specific solution for __CONSTRUCTOR. __CONSTRUCTOR is ignored.
+#endif
+#ifndef  __NORETURN
+#define  __NORETURN
+#endif
+
+#define  __disable_irq()          __ASM("cpsid i")
+#define  __enable_irq()           __ASM("cpsie i")
+
+#else
+
+#error   Unknown compiler!
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_LOCK_LEVEL && (__CORTEX_M >= 3)
+
+#define  port_get_lock()          __get_BASEPRI()
+#define  port_put_lock(state)     __set_BASEPRI(state)
+
+#define  port_set_lock()          __set_BASEPRI((OS_LOCK_LEVEL)<<(8-__NVIC_PRIO_BITS))
+#define  port_clr_lock()          __set_BASEPRI(0)
+
+#else
+
+#define  port_get_lock()          __get_PRIMASK()
+#define  port_put_lock(state)     __set_PRIMASK(state)
+
+#define  port_set_lock()          __disable_irq()
+#define  port_clr_lock()          __enable_irq()
+
+#endif
+
+#define  port_sys_lock()       do { unsigned __LOCK = port_get_lock(); port_set_lock()
+#define  port_sys_unlock()          port_put_lock(__LOCK); } while(0)
+
+#define  port_isr_lock()       do { port_set_lock()
+#define  port_isr_unlock()          port_clr_lock(); } while(0)
 
 /* -------------------------------------------------------------------------- */
 
@@ -163,6 +218,34 @@ static inline
 void port_ctx_switch( void )
 {
 	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+}
+
+/* -------------------------------------------------------------------------- */
+
+static inline
+void port_ctx_switchNow( void )
+{
+	port_ctx_switch();
+	port_clr_lock();
+}
+
+/* -------------------------------------------------------------------------- */
+
+static inline
+void port_ctx_switchLock( void )
+{
+	port_ctx_switchNow();
+	port_set_lock();
+}
+
+/* -------------------------------------------------------------------------- */
+
+static inline
+void port_ctx_reset( void )
+{
+#if OS_ROBIN && OS_TIMER
+	SysTick->VAL = 0;
+#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -200,95 +283,6 @@ void port_tmr_force( void )
 	NVIC_SetPendingIRQ(OS_TIM_IRQn);
 #endif
 }
-
-/* -------------------------------------------------------------------------- */
-
-#if      defined(__ARMCC_VERSION)
-
-#ifndef  __ALWAYS
-#define  __ALWAYS                 __attribute__((always_inline))
-#endif
-#ifndef  __CONSTRUCTOR
-#define  __CONSTRUCTOR            __attribute__((constructor))
-#endif
-#ifndef  __NORETURN
-#define  __NORETURN               __attribute__((noreturn))
-#endif
-#ifndef  __WEAK
-#define  __WEAK                   __attribute__((weak))
-#endif
-
-#elif    defined(__GNUC__)
-
-#ifndef  __ALWAYS
-#define  __ALWAYS                 __attribute__((always_inline))
-#endif
-#ifndef  __CONSTRUCTOR
-#define  __CONSTRUCTOR            __attribute__((constructor))
-#endif
-#ifndef  __NORETURN
-#define  __NORETURN               __attribute__((noreturn, naked))
-#endif
-#ifndef  __WEAK
-#define  __WEAK                   __attribute__((weak))
-#endif
-
-#elif    defined(__CSMC__)
-
-#ifndef  __ALWAYS
-#define  __ALWAYS
-#endif
-#ifndef  __CONSTRUCTOR
-#define  __CONSTRUCTOR
-#warning No compiler specific solution for __CONSTRUCTOR. __CONSTRUCTOR is ignored.
-#endif
-#ifndef  __NORETURN
-#define  __NORETURN
-#endif
-#ifndef  __WEAK
-#define  __WEAK                   __weak
-#endif
-
-#define  __disable_irq()          __ASM("cpsid i")
-#define  __enable_irq()           __ASM("cpsie i")
-
-#else
-
-#error   Unknown compiler!
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#if OS_LOCK_LEVEL && (__CORTEX_M >= 3)
-
-#define  port_get_lock()          __get_BASEPRI()
-#define  port_put_lock(state)     __set_BASEPRI(state)
-
-#define  port_set_lock()          __set_BASEPRI((OS_LOCK_LEVEL)<<(8-__NVIC_PRIO_BITS))
-#define  port_clr_lock()          __set_BASEPRI(0)
-
-#else
-
-#define  port_get_lock()          __get_PRIMASK()
-#define  port_put_lock(state)     __set_PRIMASK(state)
-
-#define  port_set_lock()          __disable_irq()
-#define  port_clr_lock()          __enable_irq()
-
-#endif
-
-#define  port_sys_lock()       do { unsigned __LOCK = port_get_lock(); port_set_lock()
-#define  port_sys_unlock()          port_put_lock(__LOCK); } while(0)
-
-#define  port_sys_enable()     do { unsigned __LOCK = port_get_lock(); port_clr_lock()
-#define  port_sys_disable()         port_put_lock(__LOCK); } while(0)
-
-#define  port_isr_lock()       do { port_set_lock()
-#define  port_isr_unlock()          port_clr_lock(); } while(0)
-
-#define  port_isr_enable()     do { port_clr_lock()
-#define  port_isr_disable()         port_set_lock(); } while(0)
 
 /* -------------------------------------------------------------------------- */
 

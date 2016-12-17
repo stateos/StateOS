@@ -28,6 +28,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+4.1
+- more kernel improvements
+---------
 4.0
 - tsk_flip is realized through core_tsk_flip function
 - improved performance of kernel

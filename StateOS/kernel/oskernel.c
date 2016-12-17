@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    13.12.2016
+    @date    16.12.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -60,7 +60,7 @@ sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+static
 void priv_rdy_insert( obj_id obj, obj_id nxt )
 {
 	obj_id prv = nxt->prev;
@@ -73,7 +73,7 @@ void priv_rdy_insert( obj_id obj, obj_id nxt )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+static
 void priv_rdy_remove( obj_id obj )
 {
 	obj_id nxt = obj->next;
@@ -85,7 +85,7 @@ void priv_rdy_remove( obj_id obj )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+static
 void priv_tsk_insert( tsk_id tsk )
 {
 	tsk_id nxt = &IDLE;
@@ -99,7 +99,7 @@ void priv_tsk_insert( tsk_id tsk )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+static
 void priv_tsk_remove( tsk_id tsk )
 {
 	priv_rdy_remove(&tsk->obj);
@@ -113,7 +113,7 @@ void core_tsk_insert( tsk_id tsk )
 	priv_tsk_insert(tsk);
 #if OS_ROBIN
 	if (tsk == IDLE.obj.next)
-	port_ctx_switch();
+		port_ctx_switch();
 #endif
 }
 
@@ -123,6 +123,8 @@ void core_tsk_remove( tsk_id tsk )
 {
 	tsk->obj.id = ID_STOPPED;
 	priv_rdy_remove(&tsk->obj);
+	if (tsk == System.cur)
+		port_ctx_switchNow();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -141,7 +143,7 @@ void core_tsk_break( void )
 {
 	for (;;)
 	{
-		port_ctx_switch();
+		core_ctx_switch();
 		port_clr_lock();
 		System.cur->state();
 	}
@@ -181,16 +183,14 @@ void core_tsk_unlink( tsk_id tsk, unsigned event )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+static
 unsigned priv_tsk_wait( tsk_id cur, obj_id obj )
 {
 	core_tsk_append((tsk_id)cur, obj);
 	priv_tsk_remove((tsk_id)cur);
 	core_tmr_insert((tmr_id)cur, ID_DELAYED);
 
-	port_ctx_switch();
-	port_clr_lock();
-	port_set_lock();
+	port_ctx_switchLock();
 
 	return cur->event;
 }
@@ -278,7 +278,7 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 		{
 			tsk = tsk->obj.next;
 			if (tsk->prio > prio)
-			port_ctx_switch();
+				port_ctx_switch();
 		}
 		else
 		if (tsk->obj.id == ID_READY)
@@ -320,9 +320,10 @@ void *core_tsk_handler( void *sp )
 	port_isr_lock();
 	core_ctx_reset();
 
-	nxt = IDLE.obj.next;
 	cur = System.cur;
 	cur->sp = sp;
+
+	nxt = IDLE.obj.next;
 
 	if (cur == nxt)
 	{
@@ -332,10 +333,11 @@ void *core_tsk_handler( void *sp )
 	}
 
 	System.cur = nxt;
+	sp = nxt->sp;
 
 	port_isr_unlock();
 
-	return nxt->sp;
+	return sp;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -345,7 +347,7 @@ void *core_tsk_handler( void *sp )
 tmr_t WAIT = { { .id=ID_TIMER, .prev=&WAIT, .next=&WAIT }, .delay=INFINITE }; // timers queue
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 void priv_tmr_insert( tmr_id tmr, unsigned id )
 {
 	tmr_id nxt = &WAIT;
@@ -379,7 +381,7 @@ void core_tmr_remove( tmr_id tmr )
 
 #if OS_ROBIN && OS_TIMER
 
-static inline
+static
 bool priv_tmr_expired( tmr_id tmr )
 {
 	port_tmr_stop();
@@ -404,7 +406,7 @@ bool priv_tmr_expired( tmr_id tmr )
 
 #else
 
-static inline
+static
 bool priv_tmr_expired( tmr_id tmr )
 {
 	if (tmr->delay >= Counter - tmr->start + 1)
@@ -417,7 +419,7 @@ bool priv_tmr_expired( tmr_id tmr )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+static
 void priv_tmr_wakeup( tmr_id tmr, unsigned event )
 {
 	tmr->start += tmr->delay;

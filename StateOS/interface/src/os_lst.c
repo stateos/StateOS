@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    08.11.2016
+    @date    16.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -55,7 +55,7 @@ void lst_kill( lst_id lst )
 }
 
 /* -------------------------------------------------------------------------- */
-static inline
+static
 unsigned priv_lst_wait( lst_id lst, void **data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
