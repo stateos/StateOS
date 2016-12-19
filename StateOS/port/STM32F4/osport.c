@@ -32,17 +32,6 @@
 
 void port_sys_init( void )
 {
-#if defined(__CSMC__)
-
-	static  stk_t   IRQ_STACK[ASIZE(OS_STACK_SIZE)];
-	#define IRQ_SP (IRQ_STACK+ASIZE(OS_STACK_SIZE))
-
-	__set_PSP(__get_MSP());
-	__set_CONTROL(CONTROL_SPSEL_Msk);
-	__set_MSP((unsigned)IRQ_SP);
-
-#endif
-
 #if OS_TIMER
 
 /******************************************************************************

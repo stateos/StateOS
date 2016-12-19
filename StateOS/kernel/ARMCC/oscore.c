@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    08.12.2016
+    @date    19.12.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -41,6 +41,12 @@ __asm void PendSV_Handler( void )
 #if __CORTEX_M < 3
 
 	mrs   r0,    PSP
+	mov   r3,    lr
+	lsls  r3,  # 29
+	bmi   priv_ctx_enter
+	mov   r0,    sp
+	sub   sp,  # 36
+priv_ctx_enter
 	subs  r0,  # 36
 	stm   r0!, { r4  - r7 }
 	mov   r3,    r8
@@ -54,10 +60,16 @@ __asm void PendSV_Handler( void )
 #else //__CORTEX_M
 
 	mrs   r0,    PSP
+	tst   lr,  # 4                      ; interrupt from main stack?
+	itt   eq
+	moveq r0,    sp
 #if __FPU_USED
+	subeq sp,  # 100
 	tst   lr,  # 16                     ; fpu used?
 	it    eq
  vstmdbeq r0!, { s16 - s31 }
+#else
+	subeq sp,  # 36
 #endif
 	stmdb r0!, { r4  - r11, lr }
 
@@ -77,6 +89,12 @@ __asm void PendSV_Handler( void )
 	subs  r0,  # 36
 	ldm   r0!, { r4  - r7 }
 	adds  r0,  # 20
+	mov   r3,    lr
+	lsls  r3,  # 29
+	bmi   priv_ctx_exit
+	mov   sp,    r0
+	bx    lr
+priv_ctx_exit
 	msr   PSP,   r0
 	bx    lr
 
@@ -88,7 +106,10 @@ __asm void PendSV_Handler( void )
 	it    eq
  vldmiaeq r0!, { s16 - s31 }
 #endif
-	msr   PSP,   r0
+	tst   lr,  # 4                      ; interrupt from main stack?
+	ite   eq
+	moveq sp,    r0
+	msrne PSP,   r0
 	bx    lr
 
 #endif//__CORTEX_M

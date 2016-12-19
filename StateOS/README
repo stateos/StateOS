@@ -30,6 +30,7 @@ Features:
 ---------
 4.1
 - more kernel improvements
+- new concept of task-switching for cortex-m: second try
 ---------
 4.0
 - tsk_flip is realized through core_tsk_flip function
