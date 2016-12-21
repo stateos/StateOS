@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    19.12.2016
+    @date    21.12.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -59,9 +59,9 @@ void PendSV_Handler( void )
 
 #else //__CORTEX_M
 
-"	mrs   r0,    PSP               \n"
 "	tst   lr,  # 4                 \n"
-"	itt   eq                       \n"
+"	itee  ne                       \n"
+"	mrsne r0,    PSP               \n"
 "	moveq r0,    sp                \n"
 #if __FPU_USED
 "	subeq sp,  # 100               \n"
@@ -107,9 +107,9 @@ void PendSV_Handler( void )
 "vldmiaeq r0!, { s16 - s31 }       \n"
 #endif
 "	tst   lr,  # 4                 \n"
-"	ite   eq                       \n"
-"	moveq sp,    r0                \n"
+"	ite   ne                       \n"
 "	msrne PSP,   r0                \n"
+"	moveq sp,    r0                \n"
 "	bx    lr                       \n"
 
 #endif//__CORTEX_M

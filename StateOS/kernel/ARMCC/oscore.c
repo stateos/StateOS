@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    19.12.2016
+    @date    21.12.2016
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -59,9 +59,9 @@ priv_ctx_enter
 
 #else //__CORTEX_M
 
-	mrs   r0,    PSP
-	tst   lr,  # 4                      ; interrupt from main stack?
-	itt   eq
+	tst   lr,  # 4                      ; process stack used?
+	itee  ne
+	mrsne r0,    PSP
 	moveq r0,    sp
 #if __FPU_USED
 	subeq sp,  # 100
@@ -106,10 +106,10 @@ priv_ctx_exit
 	it    eq
  vldmiaeq r0!, { s16 - s31 }
 #endif
-	tst   lr,  # 4                      ; interrupt from main stack?
-	ite   eq
-	moveq sp,    r0
+	tst   lr,  # 4                      ; process stack used?
+	ite   ne
 	msrne PSP,   r0
+	moveq sp,    r0
 	bx    lr
 
 #endif//__CORTEX_M
