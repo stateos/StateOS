@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    18.11.2016
+    @date    27.12.2016
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -39,13 +39,13 @@
 // os frequency in Hz
 // OS_TIMER == 0 (SysTick) => dafault value:    1000
 // OS_TIMER >  0 (TIM2, 5) => dafault value: 1000000 (tickless mode)
-#define  OS_FREQUENCY   1000000
+#define  OS_FREQUENCY      1000
 
 // ----------------------------
 // system timer
 // 0:SysTick, 2:TIM2, 5:TIM5
 // default value: 0 (SysTick)
-#define  OS_TIMER             2
+#define  OS_TIMER             0
 
 // ----------------------------
 // system mode, round-robin frequency in Hz
@@ -77,3 +77,8 @@
 // default task stack size in bytes
 // default value: 256
 #define  OS_STACK_SIZE      512
+
+// ----------------------------
+// using standard assertions
+// default value: 0
+#define  OS_ASSERT            0

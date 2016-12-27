@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.c
     @author  Rajmund Szymanski
-    @date    16.12.2016
+    @date    27.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,6 +34,8 @@ bar_id bar_create( unsigned limit )
 {
 	bar_id bar;
 
+	assert(limit);
+
 	port_sys_lock();
 
 	bar = core_sys_alloc(sizeof(bar_t));
@@ -53,6 +55,8 @@ bar_id bar_create( unsigned limit )
 void bar_kill( bar_id bar )
 /* -------------------------------------------------------------------------- */
 {
+	assert(bar);
+	
 	port_sys_lock();
 
 	bar->count = bar->limit;
@@ -91,6 +95,8 @@ unsigned priv_bar_wait( bar_id bar, unsigned time, unsigned(*wait)() )
 unsigned bar_waitUntil( bar_id bar, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(bar);
+
 	return priv_bar_wait(bar, time, core_tsk_waitUntil);
 }
 
@@ -98,6 +104,8 @@ unsigned bar_waitUntil( bar_id bar, unsigned time )
 unsigned bar_waitFor( bar_id bar, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(bar);
+
 	return priv_bar_wait(bar, delay, core_tsk_waitFor);
 }
 

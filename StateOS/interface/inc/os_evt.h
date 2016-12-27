@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    10.11.2016
+    @date    27.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,11 +41,15 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __evt
+typedef struct __evt evt_t, *evt_id;
+
+struct __evt
 {
 	tsk_id   queue; // next process in the DELAYED queue
-
-}	evt_t, *evt_id;
+#ifdef __cplusplus
+	~__evt( void ) { assert(queue == nullptr); }
+#endif
+};
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -281,7 +285,7 @@ static inline void     evt_giveISR( evt_id evt, unsigned event ) { evt_give(evt,
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Event : public __evt, private EventGuard<__evt>
+class Event : public __evt
 {
 public:
 

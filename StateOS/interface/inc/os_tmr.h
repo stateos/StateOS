@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    24.11.2016
+    @date    27.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,6 +49,9 @@ struct __tmr
 	unsigned start;
 	unsigned delay;
 	unsigned period;
+#ifdef __cplusplus
+	~__tmr( void ) { assert(obj.id == ID_STOPPED); }
+#endif
 };
 
 /**********************************************************************************************************************
@@ -451,7 +454,7 @@ namespace ThisTimer
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Timer : public __tmr, private ObjectGuard<__obj>
+class Timer : public __tmr
 {
 public:
 

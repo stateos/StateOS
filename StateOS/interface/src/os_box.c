@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    16.12.2016
+    @date    27.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,6 +34,9 @@ box_id box_create( unsigned limit, unsigned size )
 {
 	box_id box;
 
+	assert(limit);
+	assert(size);
+
 	port_sys_lock();
 
 	box = core_sys_alloc(sizeof(box_t) + limit * size);
@@ -54,6 +57,8 @@ box_id box_create( unsigned limit, unsigned size )
 void box_kill( box_id box )
 /* -------------------------------------------------------------------------- */
 {
+	assert(box);
+
 	port_sys_lock();
 
 	box->count = 0;
@@ -126,6 +131,9 @@ unsigned priv_box_wait( box_id box, void *data, unsigned time, unsigned(*wait)()
 unsigned box_waitUntil( box_id box, void *data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(box);
+	assert(data);
+
 	return priv_box_wait(box, data, time, core_tsk_waitUntil);
 }
 
@@ -133,6 +141,9 @@ unsigned box_waitUntil( box_id box, void *data, unsigned time )
 unsigned box_waitFor( box_id box, void *data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(box);
+	assert(data);
+
 	return priv_box_wait(box, data, delay, core_tsk_waitFor);
 }
 
@@ -169,6 +180,9 @@ unsigned priv_box_send( box_id box, void *data, unsigned time, unsigned(*wait)()
 unsigned box_sendUntil( box_id box, void *data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(box);
+	assert(data);
+
 	return priv_box_send(box, data, time, core_tsk_waitUntil);
 }
 
@@ -176,6 +190,9 @@ unsigned box_sendUntil( box_id box, void *data, unsigned time )
 unsigned box_sendFor( box_id box, void *data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(box);
+	assert(data);
+
 	return priv_box_send(box, data, delay, core_tsk_waitFor);
 }
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.c
     @author  Rajmund Szymanski
-    @date    16.12.2016
+    @date    27.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,8 @@ cnd_id cnd_create( void )
 void cnd_kill( cnd_id cnd )
 /* -------------------------------------------------------------------------- */
 {
+	assert(cnd);
+
 	port_sys_lock();
 
 	core_all_wakeup(cnd, E_STOPPED);
@@ -76,6 +78,8 @@ unsigned priv_cnd_wait( cnd_id cnd, mtx_id mtx, unsigned time, unsigned(*wait)()
 unsigned cnd_waitUntil( cnd_id cnd, mtx_id mtx, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(cnd);
+
 	return priv_cnd_wait(cnd, mtx, time, core_tsk_waitUntil);
 }
 
@@ -83,6 +87,8 @@ unsigned cnd_waitUntil( cnd_id cnd, mtx_id mtx, unsigned time )
 unsigned cnd_waitFor( cnd_id cnd, mtx_id mtx, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(cnd);
+
 	return priv_cnd_wait(cnd, mtx, delay, core_tsk_waitFor);
 }
 
@@ -90,6 +96,8 @@ unsigned cnd_waitFor( cnd_id cnd, mtx_id mtx, unsigned delay )
 void cnd_give( cnd_id cnd, bool all )
 /* -------------------------------------------------------------------------- */
 {
+	assert(cnd);
+
 	port_sys_lock();
 
 	if (all) core_all_wakeup(cnd, E_SUCCESS);

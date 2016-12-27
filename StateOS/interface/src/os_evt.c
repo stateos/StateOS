@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.c
     @author  Rajmund Szymanski
-    @date    16.12.2016
+    @date    27.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,8 @@ evt_id evt_create( void )
 void evt_kill( evt_id evt )
 /* -------------------------------------------------------------------------- */
 {
+	assert(evt);
+
 	port_sys_lock();
 
 	core_all_wakeup(evt, E_STOPPED);
@@ -74,6 +76,8 @@ unsigned priv_evt_wait( evt_id evt, unsigned time, unsigned(*wait)() )
 unsigned evt_waitUntil( evt_id evt, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(evt);
+
 	return priv_evt_wait(evt, time, core_tsk_waitUntil);
 }
 
@@ -81,6 +85,8 @@ unsigned evt_waitUntil( evt_id evt, unsigned time )
 unsigned evt_waitFor( evt_id evt, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(evt);
+
 	return priv_evt_wait(evt, delay, core_tsk_waitFor);
 }
 
@@ -88,6 +94,8 @@ unsigned evt_waitFor( evt_id evt, unsigned delay )
 void evt_give( evt_id evt, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
+	assert(evt);
+
 	port_sys_lock();
 
 	core_all_wakeup(evt, event);

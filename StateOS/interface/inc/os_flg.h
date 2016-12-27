@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    10.11.2016
+    @date    27.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,12 +41,16 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __flg
+typedef struct __flg flg_t, *flg_id;
+
+struct __flg
 {
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned flags; // flag's current value
-
-}	flg_t, *flg_id;
+#ifdef __cplusplus
+	~__flg( void ) { assert(queue == nullptr); }
+#endif
+};
 
 /* -------------------------------------------------------------------------- */
 
@@ -371,7 +375,7 @@ static inline void     flg_giveISR( flg_id flg, unsigned flags ) { flg_give(flg,
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Flag : public __flg, private EventGuard<__flg>
+class Flag : public __flg
 {
 public:
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    10.11.2016
+    @date    27.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,7 +41,9 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __box
+typedef struct __box box_t, *box_id;
+
+struct __box
 {
 	tsk_id   queue; // inherited from semaphore
 	unsigned count; // inherited from semaphore
@@ -51,8 +53,10 @@ typedef struct __box
 	unsigned next;  // next element to write into queue
 	char    *data;  // queue data
 	unsigned size;  // size of a single mail (in bytes)
-
-}	box_t, *box_id;
+#ifdef __cplusplus
+	~__box( void ) { assert(queue == nullptr); }
+#endif
+};
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -452,7 +456,7 @@ static inline unsigned box_giveISR( box_id box, void *data ) { return box_sendFo
  **********************************************************************************************************************/
 
 template<class T, unsigned _limit>
-class MailBoxQueueT : public __box, private EventGuard<__box>
+class MailBoxQueueT : public __box
 {
 	T _data[_limit];
 

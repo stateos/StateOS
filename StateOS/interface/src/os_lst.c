@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    16.12.2016
+    @date    27.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,8 @@ lst_id lst_create( void )
 void lst_kill( lst_id lst )
 /* -------------------------------------------------------------------------- */
 {
+	assert(lst);
+
 	port_sys_lock();
 
 	core_all_wakeup(lst, E_STOPPED);
@@ -83,6 +85,9 @@ unsigned priv_lst_wait( lst_id lst, void **data, unsigned time, unsigned(*wait)(
 unsigned lst_waitUntil( lst_id lst, void **data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(lst);
+	assert(data);
+
 	return priv_lst_wait(lst, data, time, core_tsk_waitUntil);
 }
 
@@ -90,6 +95,9 @@ unsigned lst_waitUntil( lst_id lst, void **data, unsigned time )
 unsigned lst_waitFor( lst_id lst, void **data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(lst);
+	assert(data);
+
 	return priv_lst_wait(lst, data, delay, core_tsk_waitFor);
 }
 
@@ -97,6 +105,9 @@ unsigned lst_waitFor( lst_id lst, void **data, unsigned delay )
 void lst_give( lst_id lst, void *data )
 /* -------------------------------------------------------------------------- */
 {
+	assert(lst);
+	assert(data);
+
 	port_sys_lock();
 
 	tsk_id tsk = core_one_wakeup(lst, E_SUCCESS);

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    16.12.2016
+    @date    27.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,9 @@
 void mem_init( mem_id mem )
 /* -------------------------------------------------------------------------- */
 {
+	assert(mem);
+	assert(mem->data);
+
 	port_sys_lock();
 	
 	void   **ptr = mem->data;
@@ -48,6 +51,9 @@ mem_id mem_create( unsigned limit, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	mem_id mem;
+
+	assert(limit);
+	assert(size);
 
 	port_sys_lock();
 
@@ -73,6 +79,8 @@ mem_id mem_create( unsigned limit, unsigned size )
 void mem_kill( mem_id mem )
 /* -------------------------------------------------------------------------- */
 {
+	assert(mem);
+
 	port_sys_lock();
 
 	core_all_wakeup(mem, E_STOPPED);
@@ -116,6 +124,9 @@ unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)(
 unsigned mem_waitUntil( mem_id mem, void **data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(mem);
+	assert(data);
+
 	return priv_mem_wait(mem, data, time, core_tsk_waitUntil);
 }
 
@@ -123,6 +134,9 @@ unsigned mem_waitUntil( mem_id mem, void **data, unsigned time )
 unsigned mem_waitFor( mem_id mem, void **data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(mem);
+	assert(data);
+
 	return priv_mem_wait(mem, data, delay, core_tsk_waitFor);
 }
 
@@ -130,6 +144,9 @@ unsigned mem_waitFor( mem_id mem, void **data, unsigned delay )
 void mem_give( mem_id mem, void *data )
 /* -------------------------------------------------------------------------- */
 {
+	assert(mem);
+	assert(data);
+
 	port_sys_lock();
 
 	tsk_id tsk = core_one_wakeup(mem, E_SUCCESS);

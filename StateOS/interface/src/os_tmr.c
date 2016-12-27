@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    16.12.2016
+    @date    27.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,8 @@ tmr_id tmr_create( void )
 void tmr_kill( tmr_id tmr )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tmr);
+
 	port_sys_lock();
 
 	if (tmr->obj.id != ID_STOPPED)
@@ -72,6 +74,8 @@ void priv_tmr_start( tmr_id tmr )
 void tmr_startUntil( tmr_id tmr, unsigned time, fun_id proc )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tmr);
+
 	port_sys_lock();
 
 	tmr->state  = proc;
@@ -88,6 +92,8 @@ void tmr_startUntil( tmr_id tmr, unsigned time, fun_id proc )
 void tmr_start( tmr_id tmr, unsigned delay, unsigned period, fun_id proc )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tmr);
+
 	port_sys_lock();
 
 	tmr->state  = proc;
@@ -123,6 +129,8 @@ unsigned priv_tmr_wait( tmr_id tmr, unsigned time, unsigned(*wait)() )
 unsigned tmr_waitUntil( tmr_id tmr, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tmr);
+
 	return priv_tmr_wait(tmr, time, core_tsk_waitUntil);
 }
 
@@ -130,6 +138,8 @@ unsigned tmr_waitUntil( tmr_id tmr, unsigned time )
 unsigned tmr_waitFor( tmr_id tmr, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tmr);
+
 	return priv_tmr_wait(tmr, delay, core_tsk_waitFor);
 }
 

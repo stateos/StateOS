@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    17.11.2016
+    @date    26.12.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -114,4 +114,14 @@ int   _kill_r( struct _reent *reent, int pid, int sig )                      __a
 #endif // !USE_SEMIHOST && !USE_NOHOST
 /* -------------------------------------------------------------------------- */
 
+#include <stdlib.h>
+#include <stdio.h>
+
+void __assert_func(const char* const file, const int line, const char* const func, const char* const expr)
+{
+	printf("\nassert error at %s:%d:%s:%s\n", file, line, expr, func);
+	abort();
+}
+
+/* -------------------------------------------------------------------------- */
 #endif // __GNUC__ && !__ARMCC_VERSION

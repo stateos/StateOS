@@ -30,6 +30,7 @@ Features:
 ---------
 4.2
 - added tsk_join function
+- added assertions
 ---------
 4.1
 - more kernel improvements

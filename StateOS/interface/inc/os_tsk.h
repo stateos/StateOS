@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    23.12.2016
+    @date    27.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -76,6 +76,9 @@ struct __tsk
 	};
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 	char     libspace[96];
+#endif
+#ifdef __cplusplus
+	~__tsk( void ) { assert(obj.id == ID_STOPPED); }
 #endif
 };
 
@@ -802,7 +805,7 @@ namespace ThisTask
  **********************************************************************************************************************/
 
 template<unsigned _size>
-class TaskT : public __tsk, private ObjectGuard<__obj>
+class TaskT : public __tsk
 {
 	stk_t _stack[ASIZE(_size)];
 

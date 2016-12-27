@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    10.11.2016
+    @date    27.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,13 +42,17 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __sem
+typedef struct __sem sem_t, *sem_id;
+
+struct __sem
 {
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned count; // semaphore's current value
 	unsigned limit; // semaphore's value limit
-
-}	sem_t, *sem_id;
+#ifdef __cplusplus
+	~__sem( void ) { assert(queue == nullptr); }
+#endif
+};
 
 /* -------------------------------------------------------------------------- */
 
@@ -444,7 +448,7 @@ static inline unsigned sem_giveISR( sem_id sem ) { return sem_sendFor(sem, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Semaphore : public __sem, private EventGuard<__sem>
+class Semaphore : public __sem
 {
 public:
 

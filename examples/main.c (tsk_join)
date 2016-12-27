@@ -1,0 +1,31 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+void slave()
+{
+	static unsigned time = 0;
+
+	tsk_sleepUntil(time += SEC);
+
+	tsk_stop();
+}
+
+OS_TSK(sla, 0, slave);
+
+void master()
+{
+	tsk_start(sla);
+	tsk_join(sla);
+
+	LED_Tick();
+}
+
+OS_TSK(mas, 0, master);
+
+int main()
+{
+	LED_Config();
+
+	tsk_start(mas);
+	tsk_join(mas);
+}

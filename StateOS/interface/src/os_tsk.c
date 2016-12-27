@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    23.12.2016
+    @date    27.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,9 @@
 tsk_id tsk_create( unsigned prio, fun_id state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
+	assert(state);
+	assert(size);
+
 	size = ASIZE(sizeof(tsk_t) + size);
 
 	tsk_id tsk;
@@ -60,6 +63,9 @@ tsk_id tsk_create( unsigned prio, fun_id state, unsigned size )
 void tsk_start( tsk_id tsk )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tsk);
+	assert(tsk->state);
+
 	port_sys_lock();
 
 	if (tsk->obj.id == ID_STOPPED)
@@ -75,6 +81,9 @@ void tsk_start( tsk_id tsk )
 void tsk_startFrom( tsk_id tsk, fun_id state )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tsk);
+	assert(state);
+
 	port_sys_lock();
 
 	if (tsk->obj.id == ID_STOPPED)
@@ -106,6 +115,8 @@ void tsk_stop( void )
 void tsk_kill( tsk_id tsk )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tsk);
+
 	port_sys_lock();
 
 //	while (tsk->list) mtx_kill(tsk->list);
@@ -128,6 +139,8 @@ unsigned tsk_join( tsk_id tsk )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
+
+	assert(tsk);
 
 	port_sys_lock();
 
@@ -157,6 +170,8 @@ void tsk_yield( void )
 void tsk_flip( fun_id state )
 /* -------------------------------------------------------------------------- */
 {
+	assert(state);
+
 	port_set_lock();
 
 	Current->state = state;
@@ -211,6 +226,8 @@ unsigned tsk_waitFor( unsigned flags, unsigned delay )
 void tsk_give( tsk_id tsk, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tsk);
+
 	port_sys_lock();
 
 	if (tsk->obj.id == ID_DELAYED)
@@ -229,6 +246,8 @@ void tsk_give( tsk_id tsk, unsigned flags )
 void tsk_resume( tsk_id tsk, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tsk);
+
 	port_sys_lock();
 
 	if (tsk->obj.id == ID_DELAYED)

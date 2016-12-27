@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    10.11.2016
+    @date    27.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,15 +41,19 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __mem
+typedef struct __mem mem_t, *mem_id;
+
+struct __mem
 {
 	tsk_id   queue; // inherited from list
 	que_id   next;  // inherited from list
 	unsigned limit; // size of a memory pool (max number of objects)
 	unsigned size;  // size of memory object (in words)
 	void    *data;  // pointer to memory pool buffer
-
-}	mem_t, *mem_id;
+#ifdef __cplusplus
+	~__mem( void ) { assert(queue == nullptr); }
+#endif
+};
 
 /* -------------------------------------------------------------------------- */
 
@@ -392,7 +396,7 @@ static inline void     mem_giveISR( mem_id mem, void *data ) { mem_give(mem, dat
  **********************************************************************************************************************/
 
 template<class T, unsigned _limit>
-class MemoryPoolT : public __mem, private EventGuard<__mem>
+class MemoryPoolT : public __mem
 {
 	T _data[_limit];
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    10.11.2016
+    @date    27.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,9 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __msg
+typedef struct __msg msg_t, *msg_id;
+
+struct __msg
 {
 	tsk_id   queue; // inherited from semaphore
 	unsigned count; // inherited from semaphore
@@ -51,8 +53,10 @@ typedef struct __msg
 	unsigned first; // first element to read from queue
 	unsigned next;  // next element to write into queue
 	unsigned*data;  // queue data
-
-}	msg_t, *msg_id;
+#ifdef __cplusplus
+	~__msg( void ) { assert(queue == nullptr); }
+#endif
+};
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -444,7 +448,7 @@ static inline unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sen
  **********************************************************************************************************************/
 
 template<unsigned _limit>
-class MessageQueueT : public __msg, private EventGuard<__msg>
+class MessageQueueT : public __msg
 {
 	unsigned _data[_limit];
 

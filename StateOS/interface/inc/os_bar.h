@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    10.11.2016
+    @date    27.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,13 +42,17 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __bar
+typedef struct __bar bar_t, *bar_id;
+
+struct __bar
 {
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned count; // barrier's current value
 	unsigned limit; // barrier's value limit
-
-}	bar_t, *bar_id;
+#ifdef __cplusplus
+	~__bar( void ) { assert(queue == nullptr); }
+#endif
+};
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -257,7 +261,7 @@ static inline unsigned bar_wait( bar_id bar ) { return bar_waitFor(bar, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Barrier : public __bar, private EventGuard<__bar>
+class Barrier : public __bar
 {
 public:
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    19.05.2016
+    @date    26.12.2016
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -26,7 +26,8 @@
 
  ******************************************************************************/
 
-#if defined(__CC_ARM) && !defined(__MICROLIB)
+#if  defined(__CC_ARM)
+#if !defined(__MICROLIB)
 
 #include <os.h>
 
@@ -84,4 +85,19 @@ char *_sys_command_string( char *cmd, int len )
 
 /* -------------------------------------------------------------------------- */
 
-#endif // __CC_ARM && !__MICROLIB
+#endif // !__MICROLIB
+
+/* -------------------------------------------------------------------------- */
+
+#include <stdlib.h>
+#include <stdio.h>
+
+void __aeabi_assert(const char* expr, const char* file, int line)
+{
+	printf("\nassert error at %s:%d:%s\n", file, line, expr);
+	abort();
+}
+
+/* -------------------------------------------------------------------------- */
+
+#endif // __CC_ARM
