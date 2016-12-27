@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    16.12.2016
+    @date    23.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -94,7 +94,8 @@ void tsk_stop( void )
 {
 	port_set_lock();
 
-//	while (Current->list) mtx_kill(Current->list);
+//	while (Current->list) mtx_give(Current->list);
+	core_all_wakeup(&Current->join, E_SUCCESS);
 
 	core_tsk_remove(Current);
 
@@ -108,6 +109,7 @@ void tsk_kill( tsk_id tsk )
 	port_sys_lock();
 
 //	while (tsk->list) mtx_kill(tsk->list);
+	core_all_wakeup(&tsk->join, E_STOPPED);
 
 	if (tsk->obj.id == ID_READY)
 		core_tsk_remove(tsk);
@@ -119,6 +121,24 @@ void tsk_kill( tsk_id tsk )
 	}
 
 	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_join( tsk_id tsk )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event = E_SUCCESS;
+
+	port_sys_lock();
+
+	if (tsk->obj.id != ID_STOPPED)
+	{
+		event = core_tsk_waitFor(&tsk->join, INFINITE);
+	}
+
+	port_sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    09.12.2016
+    @date    23.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -63,6 +63,7 @@ struct __tsk
 
 	void    *guard; // object that controls the pending process
 	mtx_id   list;  // list of mutexes held
+	tsk_id   join;  // list of joined tasks
 
 	union  {
 	unsigned mode;  // used by tsk_wait, tsk_sleep functions and flag object
@@ -101,9 +102,9 @@ struct __tsk
  **********************************************************************************************************************/
 
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
-#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, { 0 }, { 0 }, { 0 } }
+#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, 0, { 0 }, { 0 }, { 0 } }
 #else
-#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, { 0 }, { 0 } }
+#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, 0, { 0 }, { 0 } }
 #endif
 
 /**********************************************************************************************************************
@@ -430,6 +431,26 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  **********************************************************************************************************************/
 
               void     tsk_kill( tsk_id tsk );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_join                                                                                       *
+ *                                                                                                                    *
+ * Description       : delay execution of current task until termination of given task                                *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to task object                                                                         *
+ *                                                                                                                    *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : joined task was stopped its execution                                                          *
+ *   E_STOPPED       : joined task was killed                                                                         *
+ *   'another'       : task was resumed with 'another' event value                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+              unsigned tsk_join( tsk_id tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -791,6 +812,7 @@ public:
 	TaskT( const unsigned _prio, const fun_id _state ): __tsk _TSK_INIT(0, 0, _stack+ASIZE(_size)) { basic = prio = _prio; state = _state; }
 
 	void     kill      ( void )                             {        tsk_kill      (this);                }
+	void     join      ( void )                             {        tsk_join      (this);                }
 	void     start     ( void )                             {        tsk_start     (this);                }
 	void     startFrom ( fun_id   _state )                  {        tsk_startFrom (this, _state);        }
 	void     give      ( unsigned _flags )                  {        tsk_give      (this, _flags);        }

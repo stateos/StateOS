@@ -28,6 +28,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+4.2
+- added tsk_join function
+---------
 4.1
 - more kernel improvements
 - new concept of task-switching for cortex-m: second try
