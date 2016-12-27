@@ -39,13 +39,13 @@
 // os frequency in Hz
 // OS_TIMER == 0 (SysTick) => dafault value:    1000
 // OS_TIMER >  0 (TIM2, 5) => dafault value: 1000000 (tickless mode)
-#define  OS_FREQUENCY      1000
+#define  OS_FREQUENCY   1000000
 
 // ----------------------------
 // system timer
 // 0:SysTick, 2:TIM2, 5:TIM5
 // default value: 0 (SysTick)
-#define  OS_TIMER             0
+#define  OS_TIMER             2
 
 // ----------------------------
 // system mode, round-robin frequency in Hz
