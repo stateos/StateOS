@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    28.12.2016
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -815,7 +815,7 @@ public:
 	TaskT( const unsigned _prio, const fun_id _state ): __tsk _TSK_INIT(0, 0, _stack+ASIZE(_size)) { basic = prio = _prio; state = _state; }
 
 	void     kill      ( void )                             {        tsk_kill      (this);                }
-	void     join      ( void )                             {        tsk_join      (this);                }
+	unsigned join      ( void )                             { return tsk_join      (this);                }
 	void     start     ( void )                             {        tsk_start     (this);                }
 	void     startFrom ( fun_id   _state )                  {        tsk_startFrom (this, _state);        }
 	void     give      ( unsigned _flags )                  {        tsk_give      (this, _flags);        }
