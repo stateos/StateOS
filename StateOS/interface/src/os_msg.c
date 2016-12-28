@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    28.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -97,6 +97,9 @@ unsigned priv_msg_wait( msg_id msg, unsigned *data, unsigned time, unsigned(*wai
 {
 	unsigned event = E_SUCCESS;
 
+	assert(msg);
+	assert(data);
+
 	port_sys_lock();
 
 	if (msg->count == 0)
@@ -123,9 +126,6 @@ unsigned priv_msg_wait( msg_id msg, unsigned *data, unsigned time, unsigned(*wai
 unsigned msg_waitUntil( msg_id msg, unsigned *data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(msg);
-	assert(data);
-
 	return priv_msg_wait(msg, data, time, core_tsk_waitUntil);
 }
 
@@ -133,9 +133,6 @@ unsigned msg_waitUntil( msg_id msg, unsigned *data, unsigned time )
 unsigned msg_waitFor( msg_id msg, unsigned *data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(msg);
-	assert(data);
-
 	return priv_msg_wait(msg, data, delay, core_tsk_waitFor);
 }
 
@@ -145,6 +142,8 @@ unsigned priv_msg_send( msg_id msg, unsigned data, unsigned time, unsigned(*wait
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
+
+	assert(msg);
 
 	port_sys_lock();
 
@@ -172,9 +171,6 @@ unsigned priv_msg_send( msg_id msg, unsigned data, unsigned time, unsigned(*wait
 unsigned msg_sendUntil( msg_id msg, unsigned data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(msg);
-	assert(data);
-
 	return priv_msg_send(msg, data, time, core_tsk_waitUntil);
 }
 
@@ -182,9 +178,6 @@ unsigned msg_sendUntil( msg_id msg, unsigned data, unsigned time )
 unsigned msg_sendFor( msg_id msg, unsigned data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(msg);
-	assert(data);
-
 	return priv_msg_send(msg, data, delay, core_tsk_waitFor);
 }
 

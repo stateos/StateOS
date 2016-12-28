@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    28.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -95,6 +95,9 @@ unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)(
 {
 	unsigned event = E_SUCCESS;
 
+	assert(mem);
+	assert(data);
+
 	port_sys_lock();
 
 	if (mem->next)
@@ -124,9 +127,6 @@ unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)(
 unsigned mem_waitUntil( mem_id mem, void **data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(mem);
-	assert(data);
-
 	return priv_mem_wait(mem, data, time, core_tsk_waitUntil);
 }
 
@@ -134,9 +134,6 @@ unsigned mem_waitUntil( mem_id mem, void **data, unsigned time )
 unsigned mem_waitFor( mem_id mem, void **data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(mem);
-	assert(data);
-
 	return priv_mem_wait(mem, data, delay, core_tsk_waitFor);
 }
 

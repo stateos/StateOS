@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.c
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    28.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -63,6 +63,8 @@ unsigned priv_cnd_wait( cnd_id cnd, mtx_id mtx, unsigned time, unsigned(*wait)()
 {
 	unsigned event;
 
+	assert(cnd);
+
 	port_sys_lock();
 
 	if ((event = mtx_give(mtx))   == E_SUCCESS)
@@ -78,8 +80,6 @@ unsigned priv_cnd_wait( cnd_id cnd, mtx_id mtx, unsigned time, unsigned(*wait)()
 unsigned cnd_waitUntil( cnd_id cnd, mtx_id mtx, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(cnd);
-
 	return priv_cnd_wait(cnd, mtx, time, core_tsk_waitUntil);
 }
 
@@ -87,8 +87,6 @@ unsigned cnd_waitUntil( cnd_id cnd, mtx_id mtx, unsigned time )
 unsigned cnd_waitFor( cnd_id cnd, mtx_id mtx, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(cnd);
-
 	return priv_cnd_wait(cnd, mtx, delay, core_tsk_waitFor);
 }
 

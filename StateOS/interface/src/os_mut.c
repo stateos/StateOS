@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.c
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    28.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -63,6 +63,9 @@ unsigned priv_mut_wait( mut_id mut, unsigned time, unsigned(*wait)() )
 {
 	unsigned event = E_TIMEOUT;
 
+	assert(mut);
+	assert(mut->owner != Current);
+
 	port_sys_lock();
 
 	if (mut->owner == 0)
@@ -70,8 +73,7 @@ unsigned priv_mut_wait( mut_id mut, unsigned time, unsigned(*wait)() )
 		mut->owner = Current;
 		event = E_SUCCESS;
 	}
-
-	if (mut->owner != Current)
+	else
 	{
 		event = wait(mut, time);
 	}
@@ -85,8 +87,6 @@ unsigned priv_mut_wait( mut_id mut, unsigned time, unsigned(*wait)() )
 unsigned mut_waitUntil( mut_id mut, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(mut);
-
 	return priv_mut_wait(mut, time, core_tsk_waitUntil);
 }
 
@@ -94,8 +94,6 @@ unsigned mut_waitUntil( mut_id mut, unsigned time )
 unsigned mut_waitFor( mut_id mut, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(mut);
-
 	return priv_mut_wait(mut, delay, core_tsk_waitFor);
 }
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    28.12.2016
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -73,6 +73,8 @@ unsigned priv_sem_wait( sem_id sem, unsigned time, unsigned(*wait)() )
 {
 	unsigned event = E_SUCCESS;
 
+	assert(sem);
+
 	port_sys_lock();
 
 	if (sem->count == 0)
@@ -90,8 +92,6 @@ unsigned priv_sem_wait( sem_id sem, unsigned time, unsigned(*wait)() )
 unsigned sem_waitUntil( sem_id sem, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(sem);
-
 	return priv_sem_wait(sem, time, core_tsk_waitUntil);
 }
 
@@ -99,8 +99,6 @@ unsigned sem_waitUntil( sem_id sem, unsigned time )
 unsigned sem_waitFor( sem_id sem, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(sem);
-
 	return priv_sem_wait(sem, delay, core_tsk_waitFor);
 }
 
@@ -110,6 +108,8 @@ unsigned priv_sem_send( sem_id sem, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
+
+	assert(sem);
 
 	port_sys_lock();
 
@@ -128,8 +128,6 @@ unsigned priv_sem_send( sem_id sem, unsigned time, unsigned(*wait)() )
 unsigned sem_sendUntil( sem_id sem, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(sem);
-
 	return priv_sem_send(sem, time, core_tsk_waitUntil);
 }
 
@@ -137,8 +135,6 @@ unsigned sem_sendUntil( sem_id sem, unsigned time )
 unsigned sem_sendFor( sem_id sem, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(sem);
-
 	return priv_sem_send(sem, delay, core_tsk_waitFor);
 }
 
