@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     27.10.2016
+@date     02.01.2017
 @brief    Startup file header for armclang compiler.
 *******************************************************************************/
 
@@ -12,58 +12,46 @@
 *******************************************************************************/
 
 #define NUM(n) #n
-#define STR(n) NUM(n) "\n"
+#define STR(n) NUM(n)
 
 __attribute__ ((naked))
-void __user_stack_config( void )
+void __user_stacks_and_heap_config( void )
 {
 	__asm volatile
 	(
-"               .pushsection .stack, \"aw\", %nobits \n"
-
+"               .pushsection .heap, \"w\",\"nobits\"\n"
+"__heap_base    =       .               \n"
+"__heap_limit   =      "STR(__ram_end - proc_stack)"\n"
+"               .popsection             \n"
                 #if     main_stack_size > 0
-"               .space "STR(main_stack_size)
+"               .pushsection .stack,\"w\",\"nobits\"\n"
+"               .space "STR(main_stack)"\n"
 "               .align  3               \n"
 "__initial_msp  =       .               \n"
-                #else
-"__initial_msp  =      "STR(__ram_end)
-                #endif
-
-                #if     proc_stack_size > 0
-"               .space "STR(proc_stack_size)
-"               .align  3               \n"
-"__initial_sp   =       .               \n"
-                #else
-"__initial_sp   =      "STR(__ram_end)
-                #endif
-
-                #if     main_stack_size + proc_stack_size > 0
-                #ifndef __MICROLIB
-"               .global __use_two_region_memory \n"
-                #endif
-                #endif
-
-"               .global __initial_msp   \n"
-"               .global __initial_sp    \n"
-
 "               .popsection             \n"
-	);
-}
+                #else
+"__initial_msp  =       __heap_limit    \n"
+                #endif
+                #if     proc_stack_size > 0
+"               .pushsection .heap, \"w\",\"nobits\"\n"
+"               .space "STR(proc_stack)"\n"
+"               .align  3               \n"
+"               .popsection             \n"
+"__initial_sp   =      "STR(__ram_end) "\n"
+                #else
+"__initial_sp   =       __initial_msp   \n"
+                #endif
 
-__attribute__ ((naked))
-void __user_heap_config( void )
-{
-	__asm volatile
-	(
-"               .pushsection .heap, \"aw\", %nobits \n"
-
-"__heap_base    =       .               \n"
-"__heap_limit   =      "STR(__ram_end)
+				#if     proc_stack_size > 0
+                #ifndef __MICROLIB
+"               .global __use_two_region_memory\n"
+                #endif
+                #endif
 
 "               .global __heap_base     \n"
 "               .global __heap_limit    \n"
-
-"               .popsection             \n"
+"               .global __initial_msp   \n"
+"               .global __initial_sp    \n"
 	);
 }
 

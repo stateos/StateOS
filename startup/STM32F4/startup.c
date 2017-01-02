@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     15.11.2016
+@date     30.12.2016
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -23,11 +23,11 @@
 *******************************************************************************/
 
 #ifndef main_stack_size
-#define main_stack_size  256 // <- default size of main stack
+#define main_stack_size  0 // <- default size of main stack
 #endif
 
 #ifndef proc_stack_size
-#define proc_stack_size    0 // <- default size of process stack
+#define proc_stack_size  0 // <- default size of process stack
 #endif
 
 #define main_stack (((main_stack_size)+7)&(~7))
@@ -332,7 +332,7 @@ void (* const vectors[])(void) __attribute__ ((used, section(".vectors"))) =
 
 void Reset_Handler( void )
 {
-#if main_stack_size + proc_stack_size > 0
+#if proc_stack_size > 0
 	/* Initialize the process stack pointer */
 	__set_PSP((unsigned)__initial_sp);
 	__set_CONTROL(CONTROL_SPSEL_Msk);

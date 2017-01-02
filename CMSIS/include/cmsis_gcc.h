@@ -13,7 +13,7 @@
  * not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
@@ -51,7 +51,11 @@
   #define __WEAK                    __attribute__((weak))
 #endif
 #ifndef   __UNALIGNED_UINT32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpacked"
+#pragma GCC diagnostic ignored "-Wattributes"
   struct __attribute__((packed)) T_UINT32 { uint32_t v; };
+#pragma GCC diagnostic pop
   #define __UNALIGNED_UINT32(x)     (((struct T_UINT32 *)(x))->v)
 #endif
 #ifndef   __ALIGNED
