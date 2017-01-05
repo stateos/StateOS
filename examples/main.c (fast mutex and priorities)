@@ -3,7 +3,7 @@
 
 OS_MUT(mut);
 
-OS_DEF(mas, 2)
+void master()
 {
 	mut_wait(mut);
 	mut_give(mut);
@@ -12,13 +12,17 @@ OS_DEF(mas, 2)
 	for (;;); // BREAKPOINT: 1
 }
 
-OS_DEF(sla, 1)
+OS_TSK(mas, 2, master);
+
+void slave()
 {
 	tsk_start(mas);
 
 	LEDR = 1;
 	for (;;); // BREAKPOINT: 2
 }
+
+OS_TSK(sla, 1, slave);
 
 int main()
 {
