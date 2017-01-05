@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    05.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -93,7 +93,26 @@ struct __box
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _BOX_DATA( _limit, _size ) (char[_limit*_size]){ 0 }
+#define               _BOX_DATA( _limit, _size ) (char[_limit * _size]){ 0 }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : BOX_DEF                                                                                        *
+ *                                                                                                                    *
+ * Description       : define and initilize complete mail box queue area                                              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   box             : name of a mailbox queue area                                                                   *
+ *   limit           : size of a queue (max number of stored mails)                                                   *
+ *   size            : size of a single mail (in bytes)                                                               *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                BOX_DEF( _box, _limit, _size )                         \
+                       struct { box_t obj; char data[_limit * _size]; } _box = \
+                       { _BOX_INIT( _limit, _size, _box.data ), { 0 } }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -108,10 +127,9 @@ struct __box
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_BOX( box, limit, size )                                \
-                       char box##__buf[limit*size];                            \
-                       box_t box##__box = _BOX_INIT( limit, size, box##__buf ); \
-                       box_id box = & box##__box
+#define             OS_BOX( box, limit, size )            \
+                       BOX_DEF( box##__box, limit, size ); \
+                       box_id box = & box##__box.obj
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -126,10 +144,9 @@ struct __box
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_BOX( box, limit, size )                                \
-                static char box##__buf[limit*size];                            \
-                static box_t box##__box = _BOX_INIT( limit, size, box##__buf ); \
-                static box_id box = & box##__box
+#define         static_BOX( box, limit, size )            \
+                static BOX_DEF( box##__box, limit, size ); \
+                static box_id box = & box##__box.obj
 
 /**********************************************************************************************************************
  *                                                                                                                    *
