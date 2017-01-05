@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    04.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -125,7 +125,28 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _TSK_STACK( _size ) (stk_t[ASIZE(_size)]){ 0 } + ASIZE(_size)
+#ifndef __cplusplus
+#define               _TSK_STACK( _size ) ( stk_t[ASIZE( _size )] ){ 0 } + ASIZE( _size )
+#endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : OS_DEF                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize complete work area for task object                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   wrk             : name of a work area                                                                            *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *   size            : size of task private stack (in bytes)                                                          *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define             OS_DEF( wrk, prio, state, size )                        \
+                       struct { tsk_t tsk; stk_t stk[ASIZE( size )]; } wrk = \
+                       { _TSK_INIT( prio, state, &wrk + 1 ), { 0 } }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -134,7 +155,7 @@ struct __tsk
  * Description       : define and initilize complete work area for task object                                        *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   tsk             : name of a pointer to task object                                                               *
+ *   thd             : name of a pointer to task object                                                               *
  *   prio            : initial task priority (any unsigned int value)                                                 *
  *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
  *                     it will be executed into an infinite system-implemented loop                                   *
@@ -142,10 +163,9 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_WRK( tsk, prio, state, size )                                        \
-                       stk_t tsk##__stk[ASIZE( size )];                                      \
-                       tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk+ASIZE( size ) ); \
-                       tsk_id tsk = & tsk##__tsk
+#define             OS_WRK( thd, prio, state, size )        \
+                    OS_DEF( thd##__wrk, prio, state, size ); \
+                       tsk_id thd = & thd##__wrk.tsk
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -166,21 +186,22 @@ struct __tsk
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : OS_DEF                                                                                         *
+ * Name              : static_DEF                                                                                     *
  *                                                                                                                    *
- * Description       : define and initilize complete work area for task obj. with stack size defined by OS_STACK_SIZE *
- *                     task state (function body) must be defined immediately below                                   *
+ * Description       : define and initilize static work area for task object                                          *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   tsk             : name of a pointer to task object                                                               *
+ *   wrk             : name of a work area                                                                            *
  *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *   size            : size of task private stack (in bytes)                                                          *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_DEF( tsk, prio )            \
-                       void tsk##__fun( void );     \
-                    OS_TSK( tsk, prio, tsk##__fun ); \
-                       void tsk##__fun( void )
+#define         static_DEF( wrk, prio, state, size )                        \
+                static struct { tsk_t tsk; stk_t stk[ASIZE( size )]; } wrk = \
+                       { _TSK_INIT( prio, state, &wrk + 1 ), { 0 } }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -189,7 +210,7 @@ struct __tsk
  * Description       : define and initilize static work area for task object                                          *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   tsk             : name of a pointer to task object                                                               *
+ *   thd             : name of a pointer to task object                                                               *
  *   prio            : initial task priority (any unsigned int value)                                                 *
  *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
  *                     it will be executed into an infinite system-implemented loop                                   *
@@ -197,10 +218,9 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_WRK( tsk, prio, state, size )                                        \
-                static stk_t tsk##__stk[ASIZE( size )];                                      \
-                static tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk+ASIZE( size ) ); \
-                static tsk_id tsk = & tsk##__tsk
+#define         static_WRK( thd, prio, state, size )        \
+                static_DEF( thd##__wrk, prio, state, size ); \
+                static tsk_id thd = & thd##__wrk.tsk
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -218,24 +238,6 @@ struct __tsk
 
 #define         static_TSK( tsk, prio, state ) \
                 static_WRK( tsk, prio, state, OS_STACK_SIZE )
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : static_DEF                                                                                     *
- *                                                                                                                    *
- * Description       : define and initilize static work area for task object with stack size defined by OS_STACK_SIZE *
- *                     task state (function body) must be defined immediately below                                   *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tsk             : name of a pointer to task object                                                               *
- *   prio            : initial task priority (any unsigned int value)                                                 *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-#define         static_DEF( tsk, prio )            \
-                static void tsk##__fun( void );     \
-                static_TSK( tsk, prio, tsk##__fun ); \
-                static void tsk##__fun( void )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -276,10 +278,8 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#ifndef __cplusplus
 #define                WRK_CREATE( prio, state, size ) \
                &(tsk_t)WRK_INIT( prio, state, size )
-#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -318,16 +318,14 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#ifndef __cplusplus
 #define                TSK_CREATE( prio, state ) \
                        WRK_CREATE( prio, state, OS_STACK_SIZE )
-#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : tsk_create                                                                                     *
  *                                                                                                                    *
- * Description       : create and initilize complete work area for task object                                        *
+ * Description       : create and initilize complete work area for task object and start the task                     *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   prio            : initial task priority (any unsigned int value)                                                 *

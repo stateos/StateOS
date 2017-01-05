@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    04.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,12 +32,12 @@
 tsk_id tsk_create( unsigned prio, fun_id state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
+	tsk_id tsk;
+
 	assert(state);
 	assert(size);
 
 	size = ASIZE(sizeof(tsk_t) + size);
-
-	tsk_id tsk;
 
 	port_sys_lock();
 

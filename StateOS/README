@@ -28,6 +28,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+4.3
+- rebuilded OS_DEF macro definition
+---------
 4.2
 - added tsk_join function
 - added assertions
