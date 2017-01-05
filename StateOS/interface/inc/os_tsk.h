@@ -188,6 +188,24 @@ struct __tsk
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : OS_DEF                                                                                         *
+ *                                                                                                                    *
+ * Description       : define and initilize complete work area for task obj. with stack size defined by OS_STACK_SIZE *
+ *                     task state (function body) must be defined immediately below                                   *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : name of a pointer to task object                                                               *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define             OS_DEF( tsk, prio )            \
+                       void tsk##__fun( void );     \
+                    OS_TSK( tsk, prio, tsk##__fun ); \
+                       void tsk##__fun( void )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : static_WRK                                                                                     *
  *                                                                                                                    *
  * Description       : define and initilize static work area for task object                                          *
@@ -221,6 +239,24 @@ struct __tsk
 
 #define         static_TSK( tsk, prio, state ) \
                 static_WRK( tsk, prio, state, OS_STACK_SIZE )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_DEF                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize static work area for task object with stack size defined by OS_STACK_SIZE *
+ *                     task state (function body) must be defined immediately below                                   *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : name of a pointer to task object                                                               *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define         static_DEF( tsk, prio )            \
+                static void tsk##__fun( void );     \
+                static_TSK( tsk, prio, tsk##__fun ); \
+                static void tsk##__fun( void )
 
 /**********************************************************************************************************************
  *                                                                                                                    *

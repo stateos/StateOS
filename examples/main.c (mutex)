@@ -3,7 +3,7 @@
 
 OS_MTX(mtx);
 
-void slave()
+OS_DEF(sla, 0)
 {
 	mtx_wait(mtx);
 
@@ -12,7 +12,7 @@ void slave()
 	mtx_give(mtx);
 }
 
-void master()
+OS_DEF(mas, 1)
 {
 	mtx_wait(mtx);
 
@@ -20,9 +20,6 @@ void master()
 
 	mtx_give(mtx);
 }
-
-OS_TSK(sla, 0, slave);
-OS_TSK(mas, 0, master);
 
 int main()
 {

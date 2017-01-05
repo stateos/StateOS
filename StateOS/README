@@ -29,7 +29,7 @@ Features:
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
 4.3
-- rebuilded OS_DEF macro definition
+- rebuilded internal preprocessor definitions
 ---------
 4.2
 - added tsk_join function
