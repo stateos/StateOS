@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    07.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,9 +49,6 @@ struct __mut
 {
 	tsk_id   queue; // next process in the DELAYED queue
 	tsk_id   owner; // owner task
-#ifdef __cplusplus
-	~__mut( void ) { assert(owner == nullptr); }
-#endif
 };
 
 /**********************************************************************************************************************
@@ -114,8 +111,10 @@ struct __mut
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                MUT_INIT() \
                       _MUT_INIT()
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -298,12 +297,11 @@ static inline unsigned mut_take( mut_id mut ) { return mut_waitFor(mut, IMMEDIAT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class FastMutex : public __mut
+struct FastMutex : public __mut
 {
-public:
-
 	explicit
-	FastMutex( void ): __mut _MUT_INIT() {}
+	 FastMutex( void ): __mut _MUT_INIT() {}
+	~FastMutex( void ) { assert(owner == nullptr); }
 
 	void     kill     ( void )            {        mut_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return mut_waitUntil(this, _time);  }

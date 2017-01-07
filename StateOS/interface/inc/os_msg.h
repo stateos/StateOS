@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    05.01.2017
+    @date    07.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,9 +53,6 @@ struct __msg
 	unsigned first; // first element to read from queue
 	unsigned next;  // next element to write into queue
 	unsigned*data;  // queue data
-#ifdef __cplusplus
-	~__msg( void ) { assert(queue == nullptr); }
-#endif
 };
 
 /**********************************************************************************************************************
@@ -91,7 +88,9 @@ struct __msg
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define               _MSG_DATA( _limit ) (unsigned[_limit]){ 0 }
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -158,8 +157,10 @@ struct __msg
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                MSG_INIT( limit ) \
                       _MSG_INIT( limit, _MSG_DATA( limit ) )
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -464,14 +465,11 @@ static inline unsigned msg_giveISR( msg_id msg, unsigned data ) { return msg_sen
  **********************************************************************************************************************/
 
 template<unsigned _limit>
-class MessageQueueT : public __msg
+struct MessageQueueT : public __msg
 {
-	unsigned _data[_limit];
-
-public:
-
 	explicit
-	MessageQueueT( void ): __msg _MSG_INIT(_limit, _data) {}
+	 MessageQueueT( void ): __msg _MSG_INIT(_limit, _data) {}
+	~MessageQueueT( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                            {        msg_kill     (this);                }
 	unsigned waitUntil( unsigned*_data, unsigned _time  ) { return msg_waitUntil(this, _data, _time);  }
@@ -484,6 +482,9 @@ public:
 	unsigned send     ( unsigned _data )                  { return msg_send     (this, _data);         }
 	unsigned give     ( unsigned _data )                  { return msg_give     (this, _data);         }
 	unsigned giveISR  ( unsigned _data )                  { return msg_giveISR  (this, _data);         }
+
+	private:
+	unsigned _data[_limit];
 };
 
 #endif

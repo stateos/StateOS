@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    07.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -50,9 +50,6 @@ struct __mem
 	unsigned limit; // size of a memory pool (max number of objects)
 	unsigned size;  // size of memory object (in words)
 	void    *data;  // pointer to memory pool buffer
-#ifdef __cplusplus
-	~__mem( void ) { assert(queue == nullptr); }
-#endif
 };
 
 /* -------------------------------------------------------------------------- */
@@ -94,7 +91,9 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define               _MEM_DATA( _limit, _size ) (void*[_limit*(1+MSIZE(_size))]){ 0 }
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -148,8 +147,10 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                MEM_INIT( limit, size ) \
                       _MEM_INIT( limit, size, _MEM_DATA( limit, size ) )
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -390,22 +391,46 @@ static inline void     mem_giveISR( mem_id mem, void *data ) { mem_give(mem, dat
  * Description       : create and initilize a memory pool object                                                      *
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
- *   T               : class of a memory object                                                                       *
  *   limit           : size of a buffer (max number of objects)                                                       *
+ *   size            : size of memory object (in bytes)                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-template<class T, unsigned _limit>
-class MemoryPoolT : public __mem
+template<unsigned _limit, unsigned _size>
+struct MemoryPoolT : public __mem
 {
-	T _data[_limit];
-
-public:
-
 	explicit
-	MemoryPoolT( void ): __mem _MEM_INIT(_limit, sizeof(T), reinterpret_cast<void**>(_data)) { mem_init(this); }
+	 MemoryPoolT( void ): __mem _MEM_INIT(_limit, _size, _data) { mem_init(this); }
+	~MemoryPoolT( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                       {        mem_kill     (this);                        }
+	void     kill     ( void )                          {        mem_kill     (this);                }
+	unsigned waitUntil( void **_data, unsigned _time )  { return mem_waitUntil(this, _data, _time);  }
+	unsigned waitFor  ( void **_data, unsigned _delay ) { return mem_waitFor  (this, _data, _delay); }
+	unsigned wait     ( void **_data )                  { return mem_wait     (this, _data);         }
+	unsigned take     ( void **_data )                  { return mem_take     (this, _data);         }
+	unsigned takeISR  ( void **_data )                  { return mem_takeISR  (this, _data);         }
+	void     give     ( void  *_data )                  {        mem_give     (this, _data);         }
+	void     giveISR  ( void  *_data )                  {        mem_giveISR  (this, _data);         }
+
+	private:
+	void *_data[_limit * (1 + MSIZE(_size))];
+};
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : MemoryPool                                                                                     *
+ *                                                                                                                    *
+ * Description       : create and initilize a memory pool object                                                      *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   limit           : size of a buffer (max number of objects)                                                       *
+ *   T               : class of a memory object                                                                       *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+template<unsigned _limit, class T>
+struct MemoryPoolTT : public MemoryPoolT<_limit, sizeof(T)>
+{
 	unsigned waitUntil( T **_data, unsigned _time )  { return mem_waitUntil(this, (void**)_data, _time);  }
 	unsigned waitFor  ( T **_data, unsigned _delay ) { return mem_waitFor  (this, (void**)_data, _delay); }
 	unsigned wait     ( T **_data )                  { return mem_wait     (this, (void**)_data);         }

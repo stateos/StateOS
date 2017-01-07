@@ -30,6 +30,7 @@ Features:
 ---------
 4.3
 - rebuilded internal preprocessor definitions
+- rebuilded c++ classes
 ---------
 4.2
 - added tsk_join function

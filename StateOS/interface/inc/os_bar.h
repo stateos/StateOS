@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    07.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,9 +49,6 @@ struct __bar
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned count; // barrier's current value
 	unsigned limit; // barrier's value limit
-#ifdef __cplusplus
-	~__bar( void ) { assert(queue == nullptr); }
-#endif
 };
 
 /**********************************************************************************************************************
@@ -118,8 +115,10 @@ struct __bar
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                BAR_INIT( limit ) \
                       _BAR_INIT( limit )
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -261,12 +260,11 @@ static inline unsigned bar_wait( bar_id bar ) { return bar_waitFor(bar, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Barrier : public __bar
+struct Barrier : public __bar
 {
-public:
-
 	explicit
-	Barrier( const unsigned _limit ): __bar _BAR_INIT(0) { limit = _limit; }
+	 Barrier( const unsigned _limit ): __bar _BAR_INIT(0) { limit = _limit; }
+	~Barrier( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        bar_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return bar_waitUntil(this, _time);  }

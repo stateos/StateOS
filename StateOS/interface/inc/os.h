@@ -138,15 +138,13 @@ static inline void     sys_init( void ) { port_sys_init(); }
 
 #ifdef __cplusplus
 
-class CriticalSection
+struct CriticalSection
 {
-	unsigned state;
-
-public:
-
 	 CriticalSection( void ) { state = port_get_lock(); port_set_lock(); }
-
 	~CriticalSection( void ) { port_put_lock(state); }
+
+	private:
+	unsigned state;
 };
 
 #endif

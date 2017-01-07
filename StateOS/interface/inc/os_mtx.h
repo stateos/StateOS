@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    07.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,9 +48,6 @@ struct __mtx
 	tsk_id   owner; // owner task
 	unsigned count; // mutex's curent value
 	mtx_id   list;  // list of mutexes held by owner
-#ifdef __cplusplus
-	~__mtx( void ) { assert(owner == nullptr); }
-#endif
 };
 
 /**********************************************************************************************************************
@@ -113,8 +110,10 @@ struct __mtx
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                MTX_INIT() \
                       _MTX_INIT()
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -297,12 +296,11 @@ static inline unsigned mtx_take( mtx_id mtx ) { return mtx_waitFor(mtx, IMMEDIAT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Mutex : public __mtx
+struct Mutex : public __mtx
 {
-public:
-
 	explicit
-	Mutex( void ): __mtx _MTX_INIT() {}
+	 Mutex( void ): __mtx _MTX_INIT() {}
+	~Mutex( void ) { assert(owner == nullptr); }
 
 	void     kill     ( void )            {        mtx_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return mtx_waitUntil(this, _time);  }

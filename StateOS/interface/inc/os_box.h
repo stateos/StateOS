@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    05.01.2017
+    @date    07.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,9 +53,6 @@ struct __box
 	unsigned next;  // next element to write into queue
 	char    *data;  // queue data
 	unsigned size;  // size of a single mail (in bytes)
-#ifdef __cplusplus
-	~__box( void ) { assert(queue == nullptr); }
-#endif
 };
 
 /**********************************************************************************************************************
@@ -93,7 +90,9 @@ struct __box
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define               _BOX_DATA( _limit, _size ) (char[_limit * _size]){ 0 }
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -164,8 +163,10 @@ struct __box
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                BOX_INIT( limit, size ) \
                       _BOX_INIT( limit, size, _BOX_DATA( limit, size ) )
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -467,22 +468,49 @@ static inline unsigned box_giveISR( box_id box, void *data ) { return box_sendFo
  * Description       : create and initilize a mailbox queue object                                                    *
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
- *   T               : class of a single mail                                                                         *
  *   limit           : size of a queue (max number of stored mails)                                                   *
+ *   size            : size of a single mail (in bytes)                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-template<class T, unsigned _limit>
-class MailBoxQueueT : public __box
+template<unsigned _limit, unsigned _size>
+struct MailBoxQueueT : public __box
 {
-	T _data[_limit];
-
-public:
-
 	explicit
-	MailBoxQueueT( void ): __box _BOX_INIT(_limit, sizeof(T), reinterpret_cast<char *>(_data)) {}
+	 MailBoxQueueT( void ): __box _BOX_INIT(_limit, _size, _data) {}
+	~MailBoxQueueT( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                      {        box_kill     (this);                }
+	void     kill     ( void )                         {        box_kill     (this);                }
+	unsigned waitUntil( void *_data, unsigned _time  ) { return box_waitUntil(this, _data, _time);  }
+	unsigned waitFor  ( void *_data, unsigned _delay ) { return box_waitFor  (this, _data, _delay); }
+	unsigned wait     ( void *_data )                  { return box_wait     (this, _data);         }
+	unsigned take     ( void *_data )                  { return box_take     (this, _data);         }
+	unsigned takeISR  ( void *_data )                  { return box_takeISR  (this, _data);         }
+	unsigned sendUntil( void *_data, unsigned _time  ) { return box_sendUntil(this, _data, _time);  }
+	unsigned sendFor  ( void *_data, unsigned _delay ) { return box_sendFor  (this, _data, _delay); }
+	unsigned send     ( void *_data )                  { return box_send     (this, _data);         }
+	unsigned give     ( void *_data )                  { return box_give     (this, _data);         }
+	unsigned giveISR  ( void *_data )                  { return box_giveISR  (this, _data);         }
+
+	private:
+	char _data[_limit * _size];
+};
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : MailBoxQueue                                                                                   *
+ *                                                                                                                    *
+ * Description       : create and initilize a mailbox queue object                                                    *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   limit           : size of a queue (max number of stored mails)                                                   *
+ *   T               : class of a single mail                                                                         *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+template<unsigned _limit, class T>
+struct MailBoxQueueTT : public MailBoxQueueT<_limit, sizeof(T)>
+{
 	unsigned waitUntil( T *_data, unsigned _time  ) { return box_waitUntil(this, _data, _time);  }
 	unsigned waitFor  ( T *_data, unsigned _delay ) { return box_waitFor  (this, _data, _delay); }
 	unsigned wait     ( T *_data )                  { return box_wait     (this, _data);         }

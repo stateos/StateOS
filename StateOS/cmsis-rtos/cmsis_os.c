@@ -54,7 +54,7 @@
 
     @file    StateOS: cmsis_os.c
     @author  Rajmund Szymanski
-    @date    22.11.2016
+    @date    07.01.2017
     @brief   CMSIS-RTOS API implementation for StateOS.
 
  ******************************************************************************
@@ -588,15 +588,16 @@ osMailQId osMailCreate (const osMailQDef_t *queue_def, osThreadId thread_id)
 
 	port_sys_lock();
 
-	unsigned size = MSIZE(queue_def->item_sz) + 1;
+	unsigned size = MSIZE(queue_def->item_sz);
 
-	mbq = core_sys_alloc(sizeof(mbq_t) + queue_def->queue_sz * size * sizeof(void*));
+	mbq = core_sys_alloc(sizeof(mbq_t) + queue_def->queue_sz * (1 + size) * sizeof(void*));
 
 	if (mbq)
 	{
 		mbq->mem.limit = queue_def->queue_sz;
 		mbq->mem.size  = size;
 		mbq->mem.data  = mbq + 1;
+
 		mem_init(&mbq->mem);
 	}
 

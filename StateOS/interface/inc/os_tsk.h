@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    05.01.2017
+    @date    07.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -76,9 +76,6 @@ struct __tsk
 	};
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 	char     libspace[96];
-#endif
-#ifdef __cplusplus
-	~__tsk( void ) { assert(obj.id == ID_STOPPED); }
 #endif
 };
 
@@ -276,8 +273,10 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                WRK_INIT( prio, state, size ) \
                       _TSK_INIT( prio, state, _TSK_STACK( size ) )
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -297,8 +296,10 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                WRK_CREATE( prio, state, size ) \
                &(tsk_t)WRK_INIT( prio, state, size )
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -822,14 +823,11 @@ namespace ThisTask
  **********************************************************************************************************************/
 
 template<unsigned _size>
-class TaskT : public __tsk
+struct TaskT : public __tsk
 {
-	stk_t _stack[ASIZE(_size)];
-
-public:
-
 	explicit
-	TaskT( const unsigned _prio, const fun_id _state ): __tsk _TSK_INIT(0, 0, _stack+ASIZE(_size)) { basic = prio = _prio; state = _state; }
+	 TaskT( const unsigned _prio, const fun_id _state ): __tsk _TSK_INIT(0, 0, _stack+ASIZE(_size)) { basic = prio = _prio; state = _state; }
+	~TaskT( void ) { assert(obj.id == ID_STOPPED); }
 
 	void     kill      ( void )                             {        tsk_kill      (this);                }
 	unsigned join      ( void )                             { return tsk_join      (this);                }
@@ -841,6 +839,9 @@ public:
 	void     resumeISR ( unsigned _event )                  {        tsk_resumeISR (this, _event);        }
 
 	bool     operator! ( void )                             { return __tsk::obj.id == ID_STOPPED;         }
+
+	private:
+	stk_t _stack[ASIZE(_size)];
 };
 
 /**********************************************************************************************************************
@@ -856,10 +857,8 @@ public:
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Task: public TaskT<OS_STACK_SIZE>
+struct Task: public TaskT<OS_STACK_SIZE>
 {
-public:
-
 	explicit
 	Task( const unsigned _prio, const fun_id _state ): TaskT<OS_STACK_SIZE>(_prio, _state) {}
 };
@@ -880,10 +879,8 @@ public:
  **********************************************************************************************************************/
 
 template<unsigned _size>
-class startTaskT : public TaskT<_size>
+struct startTaskT : public TaskT<_size>
 {
-public:
-
 	explicit
 	startTaskT( const unsigned _prio, const fun_id _state ): TaskT<_size>(_prio, _state) { tsk_start(this); }
 };
@@ -902,10 +899,8 @@ public:
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class startTask : public startTaskT<OS_STACK_SIZE>
+struct startTask : public startTaskT<OS_STACK_SIZE>
 {
-public:
-
 	explicit
 	startTask( const unsigned _prio, const fun_id _state ): startTaskT<OS_STACK_SIZE>(_prio, _state) {}
 };

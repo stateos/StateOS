@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    07.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,9 +48,6 @@ struct __sig
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned flag;  // signal's current value
 	unsigned type;  // signal type: sigClear, sigProtect
-#ifdef __cplusplus
-	~__sig( void ) { assert(queue == nullptr); }
-#endif
 };
 
 /* -------------------------------------------------------------------------- */
@@ -131,8 +128,10 @@ struct __sig
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                SIG_INIT( type ) \
                       _SIG_INIT( type )
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -384,12 +383,11 @@ static inline void     sig_clearISR( sig_id sig ) { sig_clear(sig); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Signal : public __sig
+struct Signal : public __sig
 {
-public:
-
 	explicit
-	Signal( const unsigned _type = sigClear ): __sig _SIG_INIT(0) { type = _type; }
+	 Signal( const unsigned _type = sigClear ): __sig _SIG_INIT(0) { type = _type; }
+	~Signal( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        sig_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return sig_waitUntil(this, _time);  }

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    07.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -47,9 +47,6 @@ typedef struct __cnd cnd_t, *cnd_id;
 struct __cnd
 {
 	tsk_id   queue; // next process in the DELAYED queue
-#ifdef __cplusplus
-	~__cnd( void ) { assert(queue == nullptr); }
-#endif
 };
 
 /* -------------------------------------------------------------------------- */
@@ -117,8 +114,10 @@ struct __cnd
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                CND_INIT() \
                       _CND_INIT()
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -304,12 +303,11 @@ static inline void     cnd_giveISR( cnd_id cnd, bool all ) { cnd_give(cnd, all);
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class ConditionVariable : public __cnd
+struct ConditionVariable : public __cnd
 {
-public:
-
 	explicit
-	ConditionVariable( void ): __cnd _CND_INIT() {}
+	 ConditionVariable( void ): __cnd _CND_INIT() {}
+	~ConditionVariable( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                         {        cnd_kill     (this);               }
 	unsigned waitUntil( mtx_id _mtx, unsigned _time  ) { return cnd_waitUntil(this, _mtx, _time);  }

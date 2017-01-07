@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    07.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,9 +49,6 @@ struct __sem
 	tsk_id   queue; // next process in the DELAYED queue
 	unsigned count; // semaphore's current value
 	unsigned limit; // semaphore's value limit
-#ifdef __cplusplus
-	~__sem( void ) { assert(queue == nullptr); }
-#endif
 };
 
 /* -------------------------------------------------------------------------- */
@@ -141,8 +138,10 @@ struct __sem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#ifndef __cplusplus
 #define                SEM_INIT( init, limit ) \
                       _SEM_INIT( init, limit )
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -448,12 +447,11 @@ static inline unsigned sem_giveISR( sem_id sem ) { return sem_sendFor(sem, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-class Semaphore : public __sem
+struct Semaphore : public __sem
 {
-public:
-
 	explicit
-	Semaphore( const unsigned _init, const unsigned _limit = semNormal ): __sem _SEM_INIT(0, 0) { count = _init; limit = _limit; }
+	 Semaphore( const unsigned _init, const unsigned _limit = semNormal ): __sem _SEM_INIT(0, 0) { count = _init; limit = _limit; }
+	~Semaphore( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        sem_kill     (this);         }
 	unsigned waitUntil( unsigned _time  ) { return sem_waitUntil(this, _time);  }
