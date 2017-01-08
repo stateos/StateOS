@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    07.01.2017
+    @date    08.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -97,6 +97,25 @@ struct __mem
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : MEM_DEF                                                                                        *
+ *                                                                                                                    *
+ * Description       : define and initilize complete memory pool area                                                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mem             : name of a memory pool area                                                                     *
+ *   limit           : size of a buffer (max number of objects)                                                       *
+ *   size            : size of memory object (in bytes)                                                               *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                MEM_DEF( _mem, _limit, _size )                                   \
+                       struct { mem_t obj; void *data[_limit*(1+MSIZE(_size))]; } _mem = \
+                       { _MEM_INIT( _limit, _size, _mem.data ), { 0 } }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : OS_MEM                                                                                         *
  *                                                                                                                    *
  * Description       : define and initilize a memory pool object                                                      *
@@ -108,10 +127,9 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_MEM( mem, limit, size )                                \
-                       void*mem##__buf[limit*(1+MSIZE(size))];                 \
-                       mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
-                       mem_id mem = & mem##__mem
+#define             OS_MEM( mem, limit, size )            \
+                       MEM_DEF( mem##__mem, limit, size ); \
+                       mem_id mem = & mem##__mem.obj
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -126,10 +144,9 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_MEM( mem, limit, size )                                \
-                static void*mem##__buf[limit*(1+MSIZE(size))];                 \
-                static mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
-                static mem_id mem = & mem##__mem
+#define         static_MEM( mem, limit, size )            \
+                static MEM_DEF( mem##__mem, limit, size ); \
+                static mem_id mem = & mem##__mem.obj
 
 /**********************************************************************************************************************
  *                                                                                                                    *

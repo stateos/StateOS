@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    07.01.2017
+    @date    08.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -99,7 +99,7 @@ struct __msg
  * Description       : define and initilize complete message queue area                                               *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   msg             : name of a pointer to message queue object                                                      *
+ *   msg             : name of a message queue area                                                                   *
  *   limit           : size of a queue (max number of stored messages)                                                *
  *                                                                                                                    *
  * Note              : for internal use                                                                               *
