@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.c
     @author  Rajmund Szymanski
-    @date    02.01.2017
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-mut_id mut_create( void )
+mut_t *mut_create( void )
 /* -------------------------------------------------------------------------- */
 {
-	mut_id mut;
+	mut_t *mut;
 
 	port_sys_lock();
 
@@ -44,7 +44,7 @@ mut_id mut_create( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void mut_kill( mut_id mut )
+void mut_kill( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
 	assert(mut);
@@ -58,7 +58,7 @@ void mut_kill( mut_id mut )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mut_wait( mut_id mut, unsigned time, unsigned(*wait)() )
+unsigned priv_mut_wait( mut_t *mut, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_TIMEOUT;
@@ -84,21 +84,21 @@ unsigned priv_mut_wait( mut_id mut, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_waitUntil( mut_id mut, unsigned time )
+unsigned mut_waitUntil( mut_t *mut, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_mut_wait(mut, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_waitFor( mut_id mut, unsigned delay )
+unsigned mut_waitFor( mut_t *mut, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_mut_wait(mut, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_give( mut_id mut )
+unsigned mut_give( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_TIMEOUT;

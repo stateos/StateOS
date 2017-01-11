@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-bar_id bar_create( unsigned limit )
+bar_t *bar_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	bar_id bar;
+	bar_t *bar;
 
 	assert(limit);
 
@@ -52,7 +52,7 @@ bar_id bar_create( unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
-void bar_kill( bar_id bar )
+void bar_kill( bar_t *bar )
 /* -------------------------------------------------------------------------- */
 {
 	assert(bar);
@@ -68,7 +68,7 @@ void bar_kill( bar_id bar )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_bar_wait( bar_id bar, unsigned time, unsigned(*wait)() )
+unsigned priv_bar_wait( bar_t *bar, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -94,14 +94,14 @@ unsigned priv_bar_wait( bar_id bar, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned bar_waitUntil( bar_id bar, unsigned time )
+unsigned bar_waitUntil( bar_t *bar, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_bar_wait(bar, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned bar_waitFor( bar_id bar, unsigned delay )
+unsigned bar_waitFor( bar_t *bar, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_bar_wait(bar, delay, core_tsk_waitFor);

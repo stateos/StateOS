@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    27.12.2016
+    @date    11.01.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -73,10 +73,10 @@ void *core_sys_alloc( size_t size );
 
 // add timer 'tmr' to timers READY queue with id 'id'
 // start countdown
-void core_tmr_insert( tmr_id tmr, unsigned id );
+void core_tmr_insert( tmr_t *tmr, unsigned id );
 
 // remove timer 'tmr' from timers READY queue
-void core_tmr_remove( tmr_id tmr );
+void core_tmr_remove( tmr_t *tmr );
 
 // timers queue handler procedure
 void core_tmr_handler( void );
@@ -84,24 +84,24 @@ void core_tmr_handler( void );
 /* -------------------------------------------------------------------------- */
 
 // reset stack and restart current task
-void     core_tsk_flip( void *sp ) __NORETURN;
+void core_tsk_flip( void *sp ) __NORETURN;
 
 // abort and reset current process and force yield system control to the next
-void     core_tsk_break( void ) __NORETURN;
+void core_tsk_break( void ) __NORETURN;
 
 // add task 'tsk' to tasks READY queue with id ID_READY
 // force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
-void     core_tsk_insert( tsk_id tsk );
+void core_tsk_insert( tsk_t *tsk );
 
 // remove task 'tsk' from tasks READY queue
-void     core_tsk_remove( tsk_id tsk );
+void core_tsk_remove( tsk_t *tsk );
 
 // append task 'tsk' to object 'obj' delayed queue
-void     core_tsk_append( tsk_id tsk, void *obj );
+void core_tsk_append( tsk_t *tsk, void *obj );
 
 // remove task 'tsk' from object 'obj' delayed queue
 // with 'event' event value
-void     core_tsk_unlink( tsk_id tsk, unsigned event );
+void core_tsk_unlink( tsk_t *tsk, unsigned event );
 
 // delay execution of current task until given timepoint 'time'
 // append current task to object 'obj' delayed queue
@@ -125,7 +125,7 @@ unsigned core_tsk_waitFor( void *obj, unsigned delay );
 // add task 'tsk' to tasks READY queue
 // force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
 // return 'tsk'
-tsk_id   core_tsk_wakeup( tsk_id tsk, unsigned event );
+tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event );
 
 // resume execution of first task from object 'obj' delayed queue with 'event' event value
 // remove first task from object 'obj' delayed queue
@@ -133,28 +133,28 @@ tsk_id   core_tsk_wakeup( tsk_id tsk, unsigned event );
 // add resumed task to tasks READY queue
 // force context switch if priority of resumed task is greater then priority of current task and kernel works in preemptive mode
 // return pointer to resumed task
-tsk_id   core_one_wakeup( void *obj, unsigned event );
+tsk_t *core_one_wakeup( void *obj, unsigned event );
 
 // resume execution of all tasks from object 'obj' delayed queue with 'event' event value
 // remove all tasks from object 'obj' delayed queue
 // remove all resumed tasks from timers READY queue
 // add all resumed tasks to tasks READY queue
 // force context switch if priority of any resumed task is greater then priority of current task and kernel works in preemptive mode
-void     core_all_wakeup( void *obj, unsigned event );
+void core_all_wakeup( void *obj, unsigned event );
 
 // set task 'tsk' priority
 // force context switch if new priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
-void     core_tsk_prio( tsk_id tsk, unsigned prio );
+void core_tsk_prio( tsk_t *tsk, unsigned prio );
 
 // init task 'tsk' stack
 // prepare stack the starting task for context switch
-void     core_tsk_init( tsk_id tsk );
+void core_tsk_init( tsk_t *tsk );
 
 // tasks queue handler procedure
 // save stack pointer 'sp' of the current task
 // reset context switch timer counter
 // return a pointer to the stack pointer of the next READY task the highest priority
-void *   core_tsk_handler( void *sp );
+void *core_tsk_handler( void *sp );
 
 /* -------------------------------------------------------------------------- */
 

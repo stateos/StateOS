@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-lst_id lst_create( void )
+lst_t *lst_create( void )
 /* -------------------------------------------------------------------------- */
 {
-	lst_id lst;
+	lst_t *lst;
 
 	port_sys_lock();
 
@@ -44,7 +44,7 @@ lst_id lst_create( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void lst_kill( lst_id lst )
+void lst_kill( lst_t *lst )
 /* -------------------------------------------------------------------------- */
 {
 	assert(lst);
@@ -58,7 +58,7 @@ void lst_kill( lst_id lst )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_lst_wait( lst_id lst, void **data, unsigned time, unsigned(*wait)() )
+unsigned priv_lst_wait( lst_t *lst, void **data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -85,21 +85,21 @@ unsigned priv_lst_wait( lst_id lst, void **data, unsigned time, unsigned(*wait)(
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned lst_waitUntil( lst_id lst, void **data, unsigned time )
+unsigned lst_waitUntil( lst_t *lst, void **data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_lst_wait(lst, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned lst_waitFor( lst_id lst, void **data, unsigned delay )
+unsigned lst_waitFor( lst_t *lst, void **data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_lst_wait(lst, data, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-void lst_give( lst_id lst, void *data )
+void lst_give( lst_t *lst, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	assert(lst);
@@ -107,7 +107,7 @@ void lst_give( lst_id lst, void *data )
 
 	port_sys_lock();
 
-	tsk_id tsk = core_one_wakeup(lst, E_SUCCESS);
+	tsk_t *tsk = core_one_wakeup(lst, E_SUCCESS);
 
 	if (tsk)
 	{
@@ -115,9 +115,9 @@ void lst_give( lst_id lst, void *data )
 	}
 	else
 	{
-		que_id ptr = (que_id)&(lst->next);
+		que_t *ptr = (que_t *)&(lst->next);
 		while (ptr->next) ptr = ptr->next;
-		ptr->next = (que_id)data - 1;
+		ptr->next = (que_t *)data - 1;
 		ptr->next->next = 0;
 	}
 

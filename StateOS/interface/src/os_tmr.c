@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-tmr_id tmr_create( void )
+tmr_t *tmr_create( void )
 /* -------------------------------------------------------------------------- */
 {
-	tmr_id tmr;
+	tmr_t *tmr;
 
 	port_sys_lock();
 
@@ -44,7 +44,7 @@ tmr_id tmr_create( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_kill( tmr_id tmr )
+void tmr_kill( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tmr);
@@ -62,7 +62,7 @@ void tmr_kill( tmr_id tmr )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_tmr_start( tmr_id tmr )
+void priv_tmr_start( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
 	if (tmr->obj.id != ID_STOPPED)
@@ -71,7 +71,7 @@ void priv_tmr_start( tmr_id tmr )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_startUntil( tmr_id tmr, unsigned time, fun_id proc )
+void tmr_startUntil( tmr_t *tmr, unsigned time, fun_id proc )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tmr);
@@ -89,7 +89,7 @@ void tmr_startUntil( tmr_id tmr, unsigned time, fun_id proc )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_start( tmr_id tmr, unsigned delay, unsigned period, fun_id proc )
+void tmr_start( tmr_t *tmr, unsigned delay, unsigned period, fun_id proc )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tmr);
@@ -108,7 +108,7 @@ void tmr_start( tmr_id tmr, unsigned delay, unsigned period, fun_id proc )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_tmr_wait( tmr_id tmr, unsigned time, unsigned(*wait)() )
+unsigned priv_tmr_wait( tmr_t *tmr, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -128,14 +128,14 @@ unsigned priv_tmr_wait( tmr_id tmr, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_waitUntil( tmr_id tmr, unsigned time )
+unsigned tmr_waitUntil( tmr_t *tmr, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_tmr_wait(tmr, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_waitFor( tmr_id tmr, unsigned delay )
+unsigned tmr_waitFor( tmr_t *tmr, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_tmr_wait(tmr, delay, core_tsk_waitFor);
@@ -145,7 +145,7 @@ unsigned tmr_waitFor( tmr_id tmr, unsigned delay )
 void tmr_flipISR( fun_id proc )
 /* -------------------------------------------------------------------------- */
 {
-	tmr_id tmr = WAIT.obj.next;
+	tmr_t *tmr = WAIT.obj.next;
 	
 	tmr->state = proc;
 }
@@ -154,7 +154,7 @@ void tmr_flipISR( fun_id proc )
 void tmr_delayISR( unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	tmr_id tmr = WAIT.obj.next;
+	tmr_t *tmr = WAIT.obj.next;
 
 	tmr->delay = delay;
 }

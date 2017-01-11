@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    07.01.2017
+    @date    11.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,13 +41,13 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __lst lst_t, *lst_id;
-
 struct __lst
 {
-	tsk_id   queue; // next process in the DELAYED queue
-	que_id   next;  // next memory object in the queue, previously created in the memory pool
+	tsk_t  * queue; // next process in the DELAYED queue
+	que_t  * next;  // next memory object in the queue, previously created in the memory pool
 };
+
+typedef struct __lst lst_t, lst_id[1];
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -76,9 +76,8 @@ struct __lst
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_LST( lst )                     \
-                       lst_t lst##__lst = _LST_INIT(); \
-                       lst_id lst = & lst##__lst
+#define             OS_LST( lst ) \
+                       lst_id lst = { _LST_INIT() }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -91,9 +90,8 @@ struct __lst
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_LST( lst )                     \
-                static lst_t lst##__lst = _LST_INIT(); \
-                static lst_id lst = & lst##__lst
+#define         static_LST( lst ) \
+                static lst_id lst = { _LST_INIT() }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -130,7 +128,7 @@ struct __lst
 
 #ifndef __cplusplus
 #define                LST_CREATE() \
-               &(lst_t)LST_INIT()
+                     { LST_INIT() }
 #endif
 
 /**********************************************************************************************************************
@@ -148,7 +146,7 @@ struct __lst
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              lst_id   lst_create( void );
+              lst_t  * lst_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -165,7 +163,7 @@ struct __lst
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     lst_kill( lst_id lst );
+              void     lst_kill( lst_t *lst );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -189,7 +187,7 @@ struct __lst
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned lst_waitUntil( lst_id lst, void **data, unsigned time );
+              unsigned lst_waitUntil( lst_t *lst, void **data, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -215,7 +213,7 @@ struct __lst
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned lst_waitFor( lst_id lst, void **data, unsigned delay );
+              unsigned lst_waitFor( lst_t *lst, void **data, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -237,7 +235,7 @@ struct __lst
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned lst_wait( lst_id lst, void **data ) { return lst_waitFor(lst, data, INFINITE); }
+static inline unsigned lst_wait( lst_t *lst, void **data ) { return lst_waitFor(lst, data, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -258,7 +256,7 @@ static inline unsigned lst_wait( lst_id lst, void **data ) { return lst_waitFor(
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned lst_take( lst_id lst, void **data ) { return lst_waitFor(lst, data, IMMEDIATE); }
+static inline unsigned lst_take( lst_t *lst, void **data ) { return lst_waitFor(lst, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -279,7 +277,7 @@ static inline unsigned lst_take( lst_id lst, void **data ) { return lst_waitFor(
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned lst_takeISR( lst_id lst, void **data ) { return lst_waitFor(lst, data, IMMEDIATE); }
+static inline unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_waitFor(lst, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -297,7 +295,7 @@ static inline unsigned lst_takeISR( lst_id lst, void **data ) { return lst_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     lst_give( lst_id lst, void *data );
+              void     lst_give( lst_t *lst, void *data );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -315,7 +313,7 @@ static inline unsigned lst_takeISR( lst_id lst, void **data ) { return lst_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     lst_giveISR( lst_id lst, void *data ) { lst_give(lst, data); }
+static inline void     lst_giveISR( lst_t *lst, void *data ) { lst_give(lst, data); }
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    04.01.2017
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-tsk_id tsk_create( unsigned prio, fun_id state, unsigned size )
+tsk_t *tsk_create( unsigned prio, fun_id state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_id tsk;
+	tsk_t *tsk;
 
 	assert(state);
 	assert(size);
@@ -60,7 +60,7 @@ tsk_id tsk_create( unsigned prio, fun_id state, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_start( tsk_id tsk )
+void tsk_start( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tsk);
@@ -78,7 +78,7 @@ void tsk_start( tsk_id tsk )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_startFrom( tsk_id tsk, fun_id state )
+void tsk_startFrom( tsk_t *tsk, fun_id state )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tsk);
@@ -112,7 +112,7 @@ void tsk_stop( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_kill( tsk_id tsk )
+void tsk_kill( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tsk);
@@ -127,15 +127,15 @@ void tsk_kill( tsk_id tsk )
 	else
 	if (tsk->obj.id == ID_DELAYED)
 	{
-		core_tsk_unlink((tsk_id)tsk, E_STOPPED);
-		core_tmr_remove((tmr_id)tsk);
+		core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
+		core_tmr_remove((tmr_t *)tsk);
 	}
 
 	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_join( tsk_id tsk )
+unsigned tsk_join( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -223,7 +223,7 @@ unsigned tsk_waitFor( unsigned flags, unsigned delay )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_give( tsk_id tsk, unsigned flags )
+void tsk_give( tsk_t *tsk, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tsk);
@@ -243,7 +243,7 @@ void tsk_give( tsk_id tsk, unsigned flags )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_resume( tsk_id tsk, unsigned event )
+void tsk_resume( tsk_t *tsk, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tsk);

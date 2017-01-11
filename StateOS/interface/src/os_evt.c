@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-evt_id evt_create( void )
+evt_t *evt_create( void )
 /* -------------------------------------------------------------------------- */
 {
-	evt_id evt;
+	evt_t *evt;
 
 	port_sys_lock();
 
@@ -44,7 +44,7 @@ evt_id evt_create( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void evt_kill( evt_id evt )
+void evt_kill( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
 	assert(evt);
@@ -58,7 +58,7 @@ void evt_kill( evt_id evt )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_evt_wait( evt_id evt, unsigned time, unsigned(*wait)() )
+unsigned priv_evt_wait( evt_t *evt, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -75,21 +75,21 @@ unsigned priv_evt_wait( evt_id evt, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitUntil( evt_id evt, unsigned time )
+unsigned evt_waitUntil( evt_t *evt, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_evt_wait(evt, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitFor( evt_id evt, unsigned delay )
+unsigned evt_waitFor( evt_t *evt, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_evt_wait(evt, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-void evt_give( evt_id evt, unsigned event )
+void evt_give( evt_t *evt, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
 	assert(evt);

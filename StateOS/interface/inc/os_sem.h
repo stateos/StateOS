@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    07.01.2017
+    @date    11.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,14 +42,14 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __sem sem_t, *sem_id;
-
 struct __sem
 {
-	tsk_id   queue; // next process in the DELAYED queue
+	tsk_t  * queue; // next process in the DELAYED queue
 	unsigned count; // semaphore's current value
 	unsigned limit; // semaphore's value limit
 };
+
+typedef struct __sem sem_t, sem_id[1];
 
 /* -------------------------------------------------------------------------- */
 
@@ -95,9 +95,8 @@ struct __sem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_SEM( sem, init, limit )                     \
-                       sem_t sem##__sem = _SEM_INIT( init, limit ); \
-                       sem_id sem = & sem##__sem
+#define             OS_SEM( sem, init, limit ) \
+                       sem_id sem = { _SEM_INIT( init, limit ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -115,9 +114,8 @@ struct __sem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_SEM( sem, init, limit )                     \
-                static sem_t sem##__sem = _SEM_INIT( init, limit ); \
-                static sem_id sem = & sem##__sem
+#define         static_SEM( sem, init, limit ) \
+                static sem_id sem = { _SEM_INIT( init, limit ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -164,7 +162,7 @@ struct __sem
 
 #ifndef __cplusplus
 #define                SEM_CREATE( init, limit ) \
-               &(sem_t)SEM_INIT( init, limit )
+                     { SEM_INIT( init, limit ) }
 #endif
 
 /**********************************************************************************************************************
@@ -187,7 +185,7 @@ struct __sem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              sem_id   sem_create( unsigned init, unsigned limit );
+              sem_t  * sem_create( unsigned init, unsigned limit );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -204,7 +202,7 @@ struct __sem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     sem_kill( sem_id sem );
+              void     sem_kill( sem_t *sem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -227,7 +225,7 @@ struct __sem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned sem_waitUntil( sem_id sem, unsigned time );
+              unsigned sem_waitUntil( sem_t *sem, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -252,7 +250,7 @@ struct __sem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned sem_waitFor( sem_id sem, unsigned delay );
+              unsigned sem_waitFor( sem_t *sem, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -273,7 +271,7 @@ struct __sem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_wait( sem_id sem ) { return sem_waitFor(sem, INFINITE); }
+static inline unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -293,7 +291,7 @@ static inline unsigned sem_wait( sem_id sem ) { return sem_waitFor(sem, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_take( sem_id sem ) { return sem_waitFor(sem, IMMEDIATE); }
+static inline unsigned sem_take( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -313,7 +311,7 @@ static inline unsigned sem_take( sem_id sem ) { return sem_waitFor(sem, IMMEDIAT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMEDIATE); }
+static inline unsigned sem_takeISR( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -336,7 +334,7 @@ static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned sem_sendUntil( sem_id sem, unsigned time );
+              unsigned sem_sendUntil( sem_t *sem, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -361,7 +359,7 @@ static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned sem_sendFor( sem_id sem, unsigned delay );
+              unsigned sem_sendFor( sem_t *sem, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -382,7 +380,7 @@ static inline unsigned sem_takeISR( sem_id sem ) { return sem_waitFor(sem, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_send( sem_id sem ) { return sem_sendFor(sem, INFINITE); }
+static inline unsigned sem_send( sem_t *sem ) { return sem_sendFor(sem, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -402,7 +400,7 @@ static inline unsigned sem_send( sem_id sem ) { return sem_sendFor(sem, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_give( sem_id sem ) { return sem_sendFor(sem, IMMEDIATE); }
+static inline unsigned sem_give( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -422,7 +420,7 @@ static inline unsigned sem_give( sem_id sem ) { return sem_sendFor(sem, IMMEDIAT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_giveISR( sem_id sem ) { return sem_sendFor(sem, IMMEDIATE); }
+static inline unsigned sem_giveISR( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-box_id box_create( unsigned limit, unsigned size )
+box_t *box_create( unsigned limit, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	box_id box;
+	box_t *box;
 
 	assert(limit);
 	assert(size);
@@ -54,7 +54,7 @@ box_id box_create( unsigned limit, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-void box_kill( box_id box )
+void box_kill( box_t *box )
 /* -------------------------------------------------------------------------- */
 {
 	assert(box);
@@ -72,7 +72,7 @@ void box_kill( box_id box )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_box_get( box_id box, void *data )
+void priv_box_get( box_t *box, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i;
@@ -86,7 +86,7 @@ void priv_box_get( box_id box, void *data )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_box_put( box_id box, void *data )
+void priv_box_put( box_t *box, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i;
@@ -100,7 +100,7 @@ void priv_box_put( box_id box, void *data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_box_wait( box_id box, void *data, unsigned time, unsigned(*wait)() )
+unsigned priv_box_wait( box_t *box, void *data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -120,7 +120,7 @@ unsigned priv_box_wait( box_id box, void *data, unsigned time, unsigned(*wait)()
 	{
 		priv_box_get(box, data);
 
-		tsk_id tsk = core_one_wakeup(box, E_SUCCESS);
+		tsk_t *tsk = core_one_wakeup(box, E_SUCCESS);
 
 		if (tsk) priv_box_put(box, tsk->data);
 	}
@@ -131,14 +131,14 @@ unsigned priv_box_wait( box_id box, void *data, unsigned time, unsigned(*wait)()
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_waitUntil( box_id box, void *data, unsigned time )
+unsigned box_waitUntil( box_t *box, void *data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_box_wait(box, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_waitFor( box_id box, void *data, unsigned delay )
+unsigned box_waitFor( box_t *box, void *data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_box_wait(box, data, delay, core_tsk_waitFor);
@@ -146,7 +146,7 @@ unsigned box_waitFor( box_id box, void *data, unsigned delay )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_box_send( box_id box, void *data, unsigned time, unsigned(*wait)() )
+unsigned priv_box_send( box_t *box, void *data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -166,7 +166,7 @@ unsigned priv_box_send( box_id box, void *data, unsigned time, unsigned(*wait)()
 	{
 		priv_box_put(box, data);
 
-		tsk_id tsk = core_one_wakeup(box, E_SUCCESS);
+		tsk_t *tsk = core_one_wakeup(box, E_SUCCESS);
 
 		if (tsk) priv_box_get(box, tsk->data);
 	}
@@ -177,14 +177,14 @@ unsigned priv_box_send( box_id box, void *data, unsigned time, unsigned(*wait)()
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendUntil( box_id box, void *data, unsigned time )
+unsigned box_sendUntil( box_t *box, void *data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_box_send(box, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendFor( box_id box, void *data, unsigned delay )
+unsigned box_sendFor( box_t *box, void *data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_box_send(box, data, delay, core_tsk_waitFor);

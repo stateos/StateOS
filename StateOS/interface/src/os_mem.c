@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-void mem_init( mem_id mem )
+void mem_init( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
 	assert(mem);
@@ -47,10 +47,10 @@ void mem_init( mem_id mem )
 }
 
 /* -------------------------------------------------------------------------- */
-mem_id mem_create( unsigned limit, unsigned size )
+mem_t *mem_create( unsigned limit, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	mem_id mem;
+	mem_t *mem;
 
 	assert(limit);
 	assert(size);
@@ -76,7 +76,7 @@ mem_id mem_create( unsigned limit, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-void mem_kill( mem_id mem )
+void mem_kill( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
 	assert(mem);
@@ -90,7 +90,7 @@ void mem_kill( mem_id mem )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)() )
+unsigned priv_mem_wait( mem_t *mem, void **data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -124,21 +124,21 @@ unsigned priv_mem_wait( mem_id mem, void **data, unsigned time, unsigned(*wait)(
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mem_waitUntil( mem_id mem, void **data, unsigned time )
+unsigned mem_waitUntil( mem_t *mem, void **data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_mem_wait(mem, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mem_waitFor( mem_id mem, void **data, unsigned delay )
+unsigned mem_waitFor( mem_t *mem, void **data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_mem_wait(mem, data, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-void mem_give( mem_id mem, void *data )
+void mem_give( mem_t *mem, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	assert(mem);
@@ -146,7 +146,7 @@ void mem_give( mem_id mem, void *data )
 
 	port_sys_lock();
 
-	tsk_id tsk = core_one_wakeup(mem, E_SUCCESS);
+	tsk_t *tsk = core_one_wakeup(mem, E_SUCCESS);
 
 	if (tsk)
 	{
@@ -154,9 +154,9 @@ void mem_give( mem_id mem, void *data )
 	}
 	else
 	{
-		que_id ptr = (que_id)&(mem->next);
+		que_t *ptr = (que_t *)&(mem->next);
 		while (ptr->next) ptr = ptr->next;
-		ptr->next = (que_id)data - 1;
+		ptr->next = (que_t *)data - 1;
 		ptr->next->next = 0;
 	}
 

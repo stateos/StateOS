@@ -30,6 +30,7 @@ Features:
 ---------
 4.3
 - rebuilded internal preprocessor definitions
+- rebuilded data structures
 - rebuilded c++ classes
 ---------
 4.2

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-flg_id flg_create( void )
+flg_t *flg_create( void )
 /* -------------------------------------------------------------------------- */
 {
-	flg_id flg;
+	flg_t *flg;
 
 	port_sys_lock();
 
@@ -44,7 +44,7 @@ flg_id flg_create( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void flg_kill( flg_id flg )
+void flg_kill( flg_t *flg )
 /* -------------------------------------------------------------------------- */
 {
 	assert(flg);
@@ -58,7 +58,7 @@ void flg_kill( flg_id flg )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_flg_wait( flg_id flg, unsigned flags, unsigned mode, unsigned time, unsigned(*wait)() )
+unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -67,7 +67,7 @@ unsigned priv_flg_wait( flg_id flg, unsigned flags, unsigned mode, unsigned time
 
 	port_sys_lock();
 
-	tsk_id cur = Current;
+	tsk_t *cur = Current;
 
 	cur->mode   =  mode & flgAll;
 	cur->flags  = (mode & flgIgnore) ? flags : (flags & ~flg->flags);
@@ -82,24 +82,24 @@ unsigned priv_flg_wait( flg_id flg, unsigned flags, unsigned mode, unsigned time
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitUntil( flg_id flg, unsigned flags, unsigned mode, unsigned time )
+unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_flg_wait(flg, flags, mode, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitFor( flg_id flg, unsigned flags, unsigned mode, unsigned delay )
+unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_flg_wait(flg, flags, mode, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-void flg_give( flg_id flg, unsigned flags )
+void flg_give( flg_t *flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_id tsk;
+	tsk_t *tsk;
 	
 	assert(flg);
 

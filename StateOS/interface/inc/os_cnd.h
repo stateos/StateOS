@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    07.01.2017
+    @date    11.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,12 +42,12 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __cnd cnd_t, *cnd_id;
-
 struct __cnd
 {
-	tsk_id   queue; // next process in the DELAYED queue
+	tsk_t  * queue; // next process in the DELAYED queue
 };
+
+typedef struct __cnd cnd_t, cnd_id[1];
 
 /* -------------------------------------------------------------------------- */
 
@@ -81,9 +81,8 @@ struct __cnd
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_CND( cnd )                     \
-                       cnd_t cnd##__cnd = _CND_INIT(); \
-                       cnd_id cnd = & cnd##__cnd
+#define             OS_CND( cnd ) \
+                       cnd_id cnd = { _CND_INIT() }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -96,9 +95,8 @@ struct __cnd
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_CND( cnd )                     \
-                static cnd_t cnd##__cnd = _CND_INIT(); \
-                static cnd_id cnd = & cnd##__cnd
+#define         static_CND( cnd ) \
+                static cnd_id cnd = { _CND_INIT() }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -135,7 +133,7 @@ struct __cnd
 
 #ifndef __cplusplus
 #define                CND_CREATE() \
-               &(cnd_t)CND_INIT()
+                     { CND_INIT() }
 #endif
 
 /**********************************************************************************************************************
@@ -153,7 +151,7 @@ struct __cnd
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              cnd_id   cnd_create( void );
+              cnd_t  * cnd_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -170,7 +168,7 @@ struct __cnd
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     cnd_kill( cnd_id cnd );
+              void     cnd_kill( cnd_t *cnd );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -194,7 +192,7 @@ struct __cnd
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned cnd_waitUntil( cnd_id cnd, mtx_id mtx, unsigned time );
+              unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -220,7 +218,7 @@ struct __cnd
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned cnd_waitFor( cnd_id cnd, mtx_id mtx, unsigned delay );
+              unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -242,7 +240,7 @@ struct __cnd
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned cnd_wait( cnd_id cnd, mtx_id mtx ) { return cnd_waitFor(cnd, mtx, INFINITE); }
+static inline unsigned cnd_wait( cnd_t *cnd, mtx_t *mtx ) { return cnd_waitFor(cnd, mtx, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -262,7 +260,7 @@ static inline unsigned cnd_wait( cnd_id cnd, mtx_id mtx ) { return cnd_waitFor(c
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     cnd_give( cnd_id cnd, bool all );
+              void     cnd_give( cnd_t *cnd, bool all );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -282,7 +280,7 @@ static inline unsigned cnd_wait( cnd_id cnd, mtx_id mtx ) { return cnd_waitFor(c
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     cnd_giveISR( cnd_id cnd, bool all ) { cnd_give(cnd, all); }
+static inline void     cnd_giveISR( cnd_t *cnd, bool all ) { cnd_give(cnd, all); }
 
 #ifdef __cplusplus
 }
@@ -310,9 +308,9 @@ struct ConditionVariable : public __cnd
 	~ConditionVariable( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                         {        cnd_kill     (this);               }
-	unsigned waitUntil( mtx_id _mtx, unsigned _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
-	unsigned waitFor  ( mtx_id _mtx, unsigned _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
-	unsigned wait     ( mtx_id _mtx )                  { return cnd_wait     (this, _mtx);         }
+	unsigned waitUntil( mtx_t *_mtx, unsigned _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
+	unsigned waitFor  ( mtx_t *_mtx, unsigned _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
+	unsigned wait     ( mtx_t *_mtx )                  { return cnd_wait     (this, _mtx);         }
 	void     give     ( bool   _all = cndAll )         {        cnd_give     (this, _all);         }
 	void     giveISR  ( bool   _all = cndAll )         {        cnd_giveISR  (this, _all);         }
 };

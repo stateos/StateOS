@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    08.01.2017
+    @date    11.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,16 +41,16 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __mem mem_t, *mem_id;
-
 struct __mem
 {
-	tsk_id   queue; // inherited from list
-	que_id   next;  // inherited from list
+	tsk_t  * queue; // inherited from list
+	que_t  * next;  // inherited from list
 	unsigned limit; // size of a memory pool (max number of objects)
 	unsigned size;  // size of memory object (in words)
-	void    *data;  // pointer to memory pool buffer
+	void   * data;  // pointer to memory pool buffer
 };
+
+typedef struct __mem mem_t, mem_id[1];
 
 /* -------------------------------------------------------------------------- */
 
@@ -92,27 +92,8 @@ struct __mem
  **********************************************************************************************************************/
 
 #ifndef __cplusplus
-#define               _MEM_DATA( _limit, _size ) (void*[_limit*(1+MSIZE(_size))]){ 0 }
+#define               _MEM_DATA( _limit, _size ) (void *[_limit * (1 + MSIZE(_size))]){ 0 }
 #endif
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : MEM_DEF                                                                                        *
- *                                                                                                                    *
- * Description       : define and initilize complete memory pool area                                                 *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   mem             : name of a memory pool area                                                                     *
- *   limit           : size of a buffer (max number of objects)                                                       *
- *   size            : size of memory object (in bytes)                                                               *
- *                                                                                                                    *
- * Note              : for internal use                                                                               *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-#define                MEM_DEF( _mem, _limit, _size )                                   \
-                       struct { mem_t obj; void *data[_limit*(1+MSIZE(_size))]; } _mem = \
-                       { _MEM_INIT( _limit, _size, _mem.data ), { 0 } }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -127,9 +108,9 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_MEM( mem, limit, size )            \
-                       MEM_DEF( mem##__mem, limit, size ); \
-                       mem_id mem = & mem##__mem.obj
+#define             OS_MEM( mem, limit, size )                     \
+                       void *mem##__buf[limit * (1 + MSIZE(size))]; \
+                       mem_id mem = { _MEM_INIT( limit, size, mem##__buf ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -144,9 +125,9 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_MEM( mem, limit, size )            \
-                static MEM_DEF( mem##__mem, limit, size ); \
-                static mem_id mem = & mem##__mem.obj
+#define         static_MEM( mem, limit, size )                     \
+                static void *mem##__buf[limit * (1 + MSIZE(size))]; \
+                static mem_id mem = { _MEM_INIT( limit, size, mem##__buf ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -187,7 +168,7 @@ struct __mem
 
 #ifndef __cplusplus
 #define                MEM_CREATE( limit, size ) \
-               &(mem_t)MEM_INIT( limit, size )
+                     { MEM_INIT( limit, size ) }
 #endif
 
 /**********************************************************************************************************************
@@ -205,7 +186,7 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     mem_init( mem_id mem );
+              void     mem_init( mem_t *mem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -224,7 +205,7 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              mem_id   mem_create( unsigned limit, unsigned size );
+              mem_t  * mem_create( unsigned limit, unsigned size );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -241,7 +222,7 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     mem_kill( mem_id mem );
+              void     mem_kill( mem_t *mem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -265,7 +246,7 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mem_waitUntil( mem_id mem, void **data, unsigned time );
+              unsigned mem_waitUntil( mem_t *mem, void **data, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -291,7 +272,7 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mem_waitFor( mem_id mem, void **data, unsigned delay );
+              unsigned mem_waitFor( mem_t *mem, void **data, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -313,7 +294,7 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mem_wait( mem_id mem, void **data ) { return mem_waitFor(mem, data, INFINITE); }
+static inline unsigned mem_wait( mem_t *mem, void **data ) { return mem_waitFor(mem, data, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -334,7 +315,7 @@ static inline unsigned mem_wait( mem_id mem, void **data ) { return mem_waitFor(
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mem_take( mem_id mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
+static inline unsigned mem_take( mem_t *mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -355,7 +336,7 @@ static inline unsigned mem_take( mem_id mem, void **data ) { return mem_waitFor(
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mem_takeISR( mem_id mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
+static inline unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -373,7 +354,7 @@ static inline unsigned mem_takeISR( mem_id mem, void **data ) { return mem_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     mem_give( mem_id mem, void *data );
+              void     mem_give( mem_t *mem, void *data );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -391,7 +372,7 @@ static inline unsigned mem_takeISR( mem_id mem, void **data ) { return mem_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     mem_giveISR( mem_id mem, void *data ) { mem_give(mem, data); }
+static inline void     mem_giveISR( mem_t *mem, void *data ) { mem_give(mem, data); }
 
 #ifdef __cplusplus
 }

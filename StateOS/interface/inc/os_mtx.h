@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    07.01.2017
+    @date    11.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -44,11 +44,13 @@ extern "C" {
 
 struct __mtx
 {
-	tsk_id   queue; // next process in the DELAYED queue
-	tsk_id   owner; // owner task
+	tsk_t  * queue; // next process in the DELAYED queue
+	tsk_t  * owner; // owner task
 	unsigned count; // mutex's curent value
-	mtx_id   list;  // list of mutexes held by owner
+	mtx_t  * list;  // list of mutexes held by owner
 };
+
+typedef struct __mtx mtx_id[1];
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -77,9 +79,8 @@ struct __mtx
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_MTX( mtx )                     \
-                       mtx_t mtx##__mtx = _MTX_INIT(); \
-                       mtx_id mtx = & mtx##__mtx
+#define             OS_MTX( mtx ) \
+                       mtx_id mtx = { _MTX_INIT() }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -92,9 +93,8 @@ struct __mtx
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_MTX( mtx )                     \
-                static mtx_t mtx##__mtx = _MTX_INIT(); \
-                static mtx_id mtx = & mtx##__mtx
+#define         static_MTX( mtx ) \
+                static mtx_id mtx = { _MTX_INIT() }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -131,7 +131,7 @@ struct __mtx
 
 #ifndef __cplusplus
 #define                MTX_CREATE() \
-               &(mtx_t)MTX_INIT()
+                     { MTX_INIT() }
 #endif
 
 /**********************************************************************************************************************
@@ -149,7 +149,7 @@ struct __mtx
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              mtx_id   mtx_create( void );
+              mtx_t  * mtx_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -166,7 +166,7 @@ struct __mtx
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     mtx_kill( mtx_id mtx );
+              void     mtx_kill( mtx_t *mtx );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -189,7 +189,7 @@ struct __mtx
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mtx_waitUntil( mtx_id mtx, unsigned time );
+              unsigned mtx_waitUntil( mtx_t *mtx, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -214,7 +214,7 @@ struct __mtx
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mtx_waitFor( mtx_id mtx, unsigned delay );
+              unsigned mtx_waitFor( mtx_t *mtx, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -235,7 +235,7 @@ struct __mtx
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mtx_wait( mtx_id mtx ) { return mtx_waitFor(mtx, INFINITE); }
+static inline unsigned mtx_wait( mtx_t *mtx ) { return mtx_waitFor(mtx, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -255,7 +255,7 @@ static inline unsigned mtx_wait( mtx_id mtx ) { return mtx_waitFor(mtx, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mtx_take( mtx_id mtx ) { return mtx_waitFor(mtx, IMMEDIATE); }
+static inline unsigned mtx_take( mtx_t *mtx ) { return mtx_waitFor(mtx, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -275,7 +275,7 @@ static inline unsigned mtx_take( mtx_id mtx ) { return mtx_waitFor(mtx, IMMEDIAT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mtx_give( mtx_id mtx );
+              unsigned mtx_give( mtx_t *mtx );
 
 #ifdef __cplusplus
 }

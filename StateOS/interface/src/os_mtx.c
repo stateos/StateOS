@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-mtx_id mtx_create( void )
+mtx_t *mtx_create( void )
 /* -------------------------------------------------------------------------- */
 {
-	mtx_id mtx;
+	mtx_t *mtx;
 
 	port_sys_lock();
 
@@ -45,7 +45,7 @@ mtx_id mtx_create( void )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_mtx_link( mtx_id mtx, tsk_id tsk )
+void priv_mtx_link( mtx_t *mtx, tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	mtx->owner = tsk;
@@ -59,11 +59,11 @@ void priv_mtx_link( mtx_id mtx, tsk_id tsk )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_mtx_unlink( mtx_id mtx )
+void priv_mtx_unlink( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_id tsk;
-	mtx_id lst;
+	tsk_t *tsk;
+	mtx_t *lst;
 
 	if (mtx->owner)
 	{
@@ -84,7 +84,7 @@ void priv_mtx_unlink( mtx_id mtx )
 }
 
 /* -------------------------------------------------------------------------- */
-void mtx_kill( mtx_id mtx )
+void mtx_kill( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
 	assert(mtx);
@@ -102,7 +102,7 @@ void mtx_kill( mtx_id mtx )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mtx_wait( mtx_id mtx, unsigned time, unsigned(*wait)() )
+unsigned priv_mtx_wait( mtx_t *mtx, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_TIMEOUT;
@@ -140,21 +140,21 @@ unsigned priv_mtx_wait( mtx_id mtx, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mtx_waitUntil( mtx_id mtx, unsigned time )
+unsigned mtx_waitUntil( mtx_t *mtx, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_mtx_wait(mtx, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mtx_waitFor( mtx_id mtx, unsigned delay )
+unsigned mtx_waitFor( mtx_t *mtx, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_mtx_wait(mtx, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mtx_give( mtx_id mtx )
+unsigned mtx_give( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_TIMEOUT;

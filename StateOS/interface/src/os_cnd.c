@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-cnd_id cnd_create( void )
+cnd_t *cnd_create( void )
 /* -------------------------------------------------------------------------- */
 {
-	cnd_id cnd;
+	cnd_t *cnd;
 
 	port_sys_lock();
 
@@ -44,7 +44,7 @@ cnd_id cnd_create( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void cnd_kill( cnd_id cnd )
+void cnd_kill( cnd_t *cnd )
 /* -------------------------------------------------------------------------- */
 {
 	assert(cnd);
@@ -58,7 +58,7 @@ void cnd_kill( cnd_id cnd )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_cnd_wait( cnd_id cnd, mtx_id mtx, unsigned time, unsigned(*wait)() )
+unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -77,21 +77,21 @@ unsigned priv_cnd_wait( cnd_id cnd, mtx_id mtx, unsigned time, unsigned(*wait)()
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned cnd_waitUntil( cnd_id cnd, mtx_id mtx, unsigned time )
+unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_cnd_wait(cnd, mtx, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned cnd_waitFor( cnd_id cnd, mtx_id mtx, unsigned delay )
+unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_cnd_wait(cnd, mtx, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-void cnd_give( cnd_id cnd, bool all )
+void cnd_give( cnd_t *cnd, bool all )
 /* -------------------------------------------------------------------------- */
 {
 	assert(cnd);

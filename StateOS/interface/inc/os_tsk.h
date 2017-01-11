@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    08.01.2017
+    @date    11.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,21 +53,21 @@ struct __tsk
 	fun_id   state; // callback procedure
 	unsigned start;
 	unsigned delay;
-	tsk_id   back;  // previous process in the DELAYED queue
+	tsk_t  * back;  // previous process in the DELAYED queue
 
-	void    *sp;    // stack pointer
-	void    *top;   // top of stack
+	void   * sp;    // stack pointer
+	void   * top;   // top of stack
 
 	unsigned basic; // basic priority
 	unsigned prio;  // current priority
 
-	void    *guard; // object that controls the pending process
-	mtx_id   list;  // list of mutexes held
-	tsk_id   join;  // list of joined tasks
+	void   * guard; // object that controls the pending process
+	mtx_t  * list;  // list of mutexes held
+	tsk_t  * join;  // list of joined tasks
 
 	union  {
 	unsigned mode;  // used by tsk_wait, tsk_sleep functions and flag object
-	void    *data;  // used by mailbox queue object
+	void   * data;  // used by mailbox queue object
 	unsigned msg;   // used by message queue object
 	};
 	union  {
@@ -78,6 +78,8 @@ struct __tsk
 	char     libspace[96];
 #endif
 };
+
+typedef struct __tsk tsk_id[1];
 
 #ifdef __CC_ARM
 #pragma pop
@@ -128,27 +130,6 @@ struct __tsk
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : WRK_DEF                                                                                        *
- *                                                                                                                    *
- * Description       : define and initilize complete task work area                                                   *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   wrk             : name of a task work area                                                                       *
- *   prio            : initial task priority (any unsigned int value)                                                 *
- *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
- *                     it will be executed into an infinite system-implemented loop                                   *
- *   size            : size of task private stack (in bytes)                                                          *
- *                                                                                                                    *
- * Note              : for internal use                                                                               *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-#define                WRK_DEF( _wrk, _prio, _state, _size )                    \
-                       struct { tsk_t obj; stk_t stack[ASIZE( _size )]; } _wrk = \
-                       { _TSK_INIT( _prio, _state, & _wrk + 1 ), { 0 } }
-
-/**********************************************************************************************************************
- *                                                                                                                    *
  * Name              : OS_WRK                                                                                         *
  *                                                                                                                    *
  * Description       : define and initilize complete work area for task object                                        *
@@ -162,9 +143,9 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_WRK( tsk, prio, state, size )            \
-                       WRK_DEF( tsk##__wrk, prio, state, size ); \
-                       tsk_id tsk = & tsk##__wrk.obj
+#define             OS_WRK( tsk, prio, state, size )   \
+                       stk_t tsk##__stk[ASIZE( size )]; \
+                       tsk_id tsk = { _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -216,9 +197,9 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_WRK( tsk, prio, state, size )            \
-                static WRK_DEF( tsk##__wrk, prio, state, size ); \
-                static tsk_id tsk = & tsk##__wrk.obj
+#define         static_WRK( tsk, prio, state, size )   \
+                static stk_t tsk##__stk[ASIZE( size )]; \
+                static tsk_id tsk = { _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -298,7 +279,7 @@ struct __tsk
 
 #ifndef __cplusplus
 #define                WRK_CREATE( prio, state, size ) \
-               &(tsk_t)WRK_INIT( prio, state, size )
+                     { WRK_INIT( prio, state, size ) }
 #endif
 
 /**********************************************************************************************************************
@@ -320,7 +301,7 @@ struct __tsk
 
 #ifndef __cplusplus
 #define                TSK_INIT( prio, state ) \
-                       WRK_INIT( prio, state, OS_STACK_SIZE )
+                      _TSK_INIT( prio, state, _TSK_STACK( OS_STACK_SIZE ) )
 #endif
 
 /**********************************************************************************************************************
@@ -342,7 +323,7 @@ struct __tsk
 
 #ifndef __cplusplus
 #define                TSK_CREATE( prio, state ) \
-                       WRK_CREATE( prio, state, OS_STACK_SIZE )
+                     { TSK_INIT( prio, state ) }
 #endif
 
 /**********************************************************************************************************************
@@ -364,7 +345,7 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              tsk_id   tsk_create( unsigned prio, fun_id state, unsigned size );
+              tsk_t  * tsk_create( unsigned prio, fun_id state, unsigned size );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -384,7 +365,7 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_create(prio, state, OS_STACK_SIZE); }
+static inline tsk_t  * tsk_new( unsigned prio, fun_id state ) { return tsk_create(prio, state, OS_STACK_SIZE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -401,7 +382,7 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_start( tsk_id tsk );
+              void     tsk_start( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -420,7 +401,7 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_startFrom( tsk_id tsk, fun_id state );
+              void     tsk_startFrom( tsk_t *tsk, fun_id state );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -455,7 +436,7 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_kill( tsk_id tsk );
+              void     tsk_kill( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -475,7 +456,7 @@ static inline tsk_id   tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned tsk_join( tsk_id tsk );
+              unsigned tsk_join( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -625,7 +606,7 @@ static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, IN
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_give( tsk_id tsk, unsigned flags );
+              void     tsk_give( tsk_t *tsk, unsigned flags );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -643,7 +624,7 @@ static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, IN
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tsk_giveISR( tsk_id tsk, unsigned flags ) { tsk_give(tsk, flags); }
+static inline void     tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -756,7 +737,7 @@ static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_resume( tsk_id tsk, unsigned event );
+              void     tsk_resume( tsk_t *tsk, unsigned event );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -774,7 +755,7 @@ static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tsk_resumeISR( tsk_id tsk, unsigned event ) { tsk_resume(tsk, event); }
+static inline void     tsk_resumeISR( tsk_t *tsk, unsigned event ) { tsk_resume(tsk, event); }
 
 #ifdef __cplusplus
 }

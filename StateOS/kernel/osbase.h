@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    16.12.2016
+    @date    10.01.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -75,11 +75,11 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-typedef               void (*fun_id)(); // task/timer procedure
-typedef struct __que que_t, *que_id;    // queue
-typedef struct __mtx mtx_t, *mtx_id;    // mutex
-typedef struct __tmr tmr_t, *tmr_id;    // timer
-typedef struct __tsk tsk_t, *tsk_id;    // task
+typedef   void (*fun_id)(); // task/timer procedure
+typedef struct __que que_t; // queue
+typedef struct __mtx mtx_t; // mutex
+typedef struct __tmr tmr_t; // timer
+typedef struct __tsk tsk_t; // task
 
 /* -------------------------------------------------------------------------- */
 
@@ -87,7 +87,7 @@ typedef struct __tsk tsk_t, *tsk_id;    // task
 
 struct __que
 {
-	que_id   next;
+	que_t  * next;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -96,12 +96,12 @@ struct __que
 
 typedef struct __obj
 {
-	tsk_id   queue; // next process in the DELAYED queue
+	tsk_t  * queue; // next process in the DELAYED queue
 	unsigned id;    // object id: ID_STOPPED, ID_READY, ID_DELAYED, ID_TIMER, ID_IDLE
-	void    *prev;  // previous object (timer, task) in the READY queue
-	void    *next;  // next object (timer, task) in the READY queue
+	void   * prev;  // previous object (timer, task) in the READY queue
+	void   * next;  // next object (timer, task) in the READY queue
 
-}	obj_t, *obj_id;
+}	obj_t;
 
 /* -------------------------------------------------------------------------- */
 
@@ -109,7 +109,7 @@ typedef struct __obj
 
 typedef struct __sys
 {
-	tsk_id   cur;   // pointer to the current task control block
+	tsk_t  * cur;   // pointer to the current task control block
 #if OS_TIMER == 0
 	volatile
 	unsigned cnt;   // system timer counter
@@ -117,7 +117,7 @@ typedef struct __sys
 	unsigned dly;   // task switch counter
 #endif
 #endif
-}	sys_t, *sys_id;
+}	sys_t;
 
 /* -------------------------------------------------------------------------- */
 
@@ -139,12 +139,12 @@ typedef struct __ctx
 	unsigned r1;
 	unsigned r2;
 	unsigned r3;
-	void    *ip;
+	void   * ip;
 	fun_id   lr;
 	fun_id   pc;
 	unsigned psr;
 
-}	ctx_t, *ctx_id;
+}	ctx_t;
 
 /* -------------------------------------------------------------------------- */
 

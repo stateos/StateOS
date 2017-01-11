@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    07.01.2017
+    @date    11.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,14 +41,14 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __sig sig_t, *sig_id;
-
 struct __sig
 {
-	tsk_id   queue; // next process in the DELAYED queue
+	tsk_t  * queue; // next process in the DELAYED queue
 	unsigned flag;  // signal's current value
 	unsigned type;  // signal type: sigClear, sigProtect
 };
+
+typedef struct __sig sig_t, sig_id[1];
 
 /* -------------------------------------------------------------------------- */
 
@@ -89,9 +89,8 @@ struct __sig
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_SIG( sig, type )                     \
-                       sig_t sig##__sig = _SIG_INIT( type ); \
-                       sig_id sig = & sig##__sig
+#define             OS_SIG( sig, type ) \
+                       sig_id sig = { _SIG_INIT( type ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -107,9 +106,8 @@ struct __sig
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_SIG( sig, type )                     \
-                static sig_t sig##__sig = _SIG_INIT( type ); \
-                static sig_id sig = & sig##__sig
+#define         static_SIG( sig, type ) \
+                static sig_id sig = { _SIG_INIT( type ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -152,7 +150,7 @@ struct __sig
 
 #ifndef __cplusplus
 #define                SIG_CREATE( type ) \
-               &(sig_t)SIG_INIT( type )
+                     { SIG_INIT( type ) }
 #endif
 
 /**********************************************************************************************************************
@@ -173,7 +171,7 @@ struct __sig
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              sig_id   sig_create( unsigned type );
+              sig_t  * sig_create( unsigned type );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -190,7 +188,7 @@ struct __sig
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     sig_kill( sig_id sig );
+              void     sig_kill( sig_t *sig );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -211,7 +209,7 @@ struct __sig
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned sig_waitUntil( sig_id sig, unsigned time );
+              unsigned sig_waitUntil( sig_t *sig, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -234,7 +232,7 @@ struct __sig
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned sig_waitFor( sig_id sig, unsigned delay );
+              unsigned sig_waitFor( sig_t *sig, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -253,7 +251,7 @@ struct __sig
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sig_wait( sig_id sig ) { return sig_waitFor(sig, INFINITE); }
+static inline unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -272,7 +270,7 @@ static inline unsigned sig_wait( sig_id sig ) { return sig_waitFor(sig, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sig_take( sig_id sig ) { return sig_waitFor(sig, IMMEDIATE); }
+static inline unsigned sig_take( sig_t *sig ) { return sig_waitFor(sig, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -291,7 +289,7 @@ static inline unsigned sig_take( sig_id sig ) { return sig_waitFor(sig, IMMEDIAT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sig_takeISR( sig_id sig ) { return sig_waitFor(sig, IMMEDIATE); }
+static inline unsigned sig_takeISR( sig_t *sig ) { return sig_waitFor(sig, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -308,7 +306,7 @@ static inline unsigned sig_takeISR( sig_id sig ) { return sig_waitFor(sig, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     sig_give( sig_id sig );
+              void     sig_give( sig_t *sig );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -326,7 +324,7 @@ static inline unsigned sig_takeISR( sig_id sig ) { return sig_waitFor(sig, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     sig_giveISR( sig_id sig ) { sig_give(sig); }
+static inline void     sig_giveISR( sig_t *sig ) { sig_give(sig); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -343,7 +341,7 @@ static inline void     sig_giveISR( sig_id sig ) { sig_give(sig); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     sig_clear( sig_id sig );
+              void     sig_clear( sig_t *sig );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -360,7 +358,7 @@ static inline void     sig_giveISR( sig_id sig ) { sig_give(sig); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     sig_clearISR( sig_id sig ) { sig_clear(sig); }
+static inline void     sig_clearISR( sig_t *sig ) { sig_clear(sig); }
 
 #ifdef __cplusplus
 }

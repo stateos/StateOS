@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,12 +29,12 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-msg_id msg_create( unsigned limit )
+msg_t *msg_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
 	assert(limit);
 
-	msg_id msg;
+	msg_t *msg;
 
 	port_sys_lock();
 
@@ -52,7 +52,7 @@ msg_id msg_create( unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
-void msg_kill( msg_id msg )
+void msg_kill( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
 	assert(msg);
@@ -70,7 +70,7 @@ void msg_kill( msg_id msg )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_get( msg_id msg, unsigned *data )
+void priv_msg_get( msg_t *msg, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
 	*data = msg->data[msg->first];
@@ -81,7 +81,7 @@ void priv_msg_get( msg_id msg, unsigned *data )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_put( msg_id msg, unsigned data )
+void priv_msg_put( msg_t *msg, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
 	msg->data[msg->next] = data;
@@ -92,7 +92,7 @@ void priv_msg_put( msg_id msg, unsigned data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_wait( msg_id msg, unsigned *data, unsigned time, unsigned(*wait)() )
+unsigned priv_msg_wait( msg_t *msg, unsigned *data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -112,7 +112,7 @@ unsigned priv_msg_wait( msg_id msg, unsigned *data, unsigned time, unsigned(*wai
 	{
 		priv_msg_get(msg, data);
 
-		tsk_id tsk = core_one_wakeup(msg, E_SUCCESS);
+		tsk_t *tsk = core_one_wakeup(msg, E_SUCCESS);
 
 		if (tsk) priv_msg_put(msg, tsk->msg);
 	}
@@ -123,14 +123,14 @@ unsigned priv_msg_wait( msg_id msg, unsigned *data, unsigned time, unsigned(*wai
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitUntil( msg_id msg, unsigned *data, unsigned time )
+unsigned msg_waitUntil( msg_t *msg, unsigned *data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_msg_wait(msg, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitFor( msg_id msg, unsigned *data, unsigned delay )
+unsigned msg_waitFor( msg_t *msg, unsigned *data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_msg_wait(msg, data, delay, core_tsk_waitFor);
@@ -138,7 +138,7 @@ unsigned msg_waitFor( msg_id msg, unsigned *data, unsigned delay )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_send( msg_id msg, unsigned data, unsigned time, unsigned(*wait)() )
+unsigned priv_msg_send( msg_t *msg, unsigned data, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -157,7 +157,7 @@ unsigned priv_msg_send( msg_id msg, unsigned data, unsigned time, unsigned(*wait
 	{
 		priv_msg_put(msg, data);
 
-		tsk_id tsk = core_one_wakeup(msg, E_SUCCESS);
+		tsk_t *tsk = core_one_wakeup(msg, E_SUCCESS);
 
 		if (tsk) priv_msg_get(msg, tsk->data);
 	}
@@ -168,14 +168,14 @@ unsigned priv_msg_send( msg_id msg, unsigned data, unsigned time, unsigned(*wait
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendUntil( msg_id msg, unsigned data, unsigned time )
+unsigned msg_sendUntil( msg_t *msg, unsigned data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_msg_send(msg, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendFor( msg_id msg, unsigned data, unsigned delay )
+unsigned msg_sendFor( msg_t *msg, unsigned data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_msg_send(msg, data, delay, core_tsk_waitFor);

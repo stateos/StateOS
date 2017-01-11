@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.c
     @author  Rajmund Szymanski
-    @date    28.12.2016
+    @date    10.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-sig_id sig_create( unsigned type )
+sig_t *sig_create( unsigned type )
 /* -------------------------------------------------------------------------- */
 {
-	sig_id sig;
+	sig_t *sig;
 
 	port_sys_lock();
 
@@ -49,7 +49,7 @@ sig_id sig_create( unsigned type )
 }
 
 /* -------------------------------------------------------------------------- */
-void sig_kill( sig_id sig )
+void sig_kill( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
 	assert(sig);
@@ -65,7 +65,7 @@ void sig_kill( sig_id sig )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sig_wait( sig_id sig, unsigned time, unsigned(*wait)() )
+unsigned priv_sig_wait( sig_t *sig, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -89,21 +89,21 @@ unsigned priv_sig_wait( sig_id sig, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitUntil( sig_id sig, unsigned time )
+unsigned sig_waitUntil( sig_t *sig, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_sig_wait(sig, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitFor( sig_id sig, unsigned delay )
+unsigned sig_waitFor( sig_t *sig, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_sig_wait(sig, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-void sig_give( sig_id sig )
+void sig_give( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
 	assert(sig);
@@ -126,7 +126,7 @@ void sig_give( sig_id sig )
 }
 
 /* -------------------------------------------------------------------------- */
-void sig_clear( sig_id sig )
+void sig_clear( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
 	assert(sig);

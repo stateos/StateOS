@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    16.12.2016
+    @date    10.01.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -61,9 +61,9 @@ sys_t System = { .cur=&MAIN };
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_rdy_insert( obj_id obj, obj_id nxt )
+void priv_rdy_insert( obj_t *obj, obj_t *nxt )
 {
-	obj_id prv = nxt->prev;
+	obj_t *prv = nxt->prev;
 
 	obj->prev = prv;
 	obj->next = nxt;
@@ -74,10 +74,10 @@ void priv_rdy_insert( obj_id obj, obj_id nxt )
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_rdy_remove( obj_id obj )
+void priv_rdy_remove( obj_t *obj )
 {
-	obj_id nxt = obj->next;
-	obj_id prv = obj->prev;
+	obj_t *nxt = obj->next;
+	obj_t *prv = obj->prev;
 
 	nxt->prev = prv;
 	prv->next = nxt;
@@ -86,9 +86,9 @@ void priv_rdy_remove( obj_id obj )
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_tsk_insert( tsk_id tsk )
+void priv_tsk_insert( tsk_t *tsk )
 {
-	tsk_id nxt = &IDLE;
+	tsk_t *nxt = &IDLE;
 
 	if    (tsk->prio)
 	do     nxt = nxt->obj.next;
@@ -100,14 +100,14 @@ void priv_tsk_insert( tsk_id tsk )
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_tsk_remove( tsk_id tsk )
+void priv_tsk_remove( tsk_t *tsk )
 {
 	priv_rdy_remove(&tsk->obj);
 }
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_insert( tsk_id tsk )
+void core_tsk_insert( tsk_t *tsk )
 {
 	tsk->obj.id = ID_READY;
 	priv_tsk_insert(tsk);
@@ -119,7 +119,7 @@ void core_tsk_insert( tsk_id tsk )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_remove( tsk_id tsk )
+void core_tsk_remove( tsk_t *tsk )
 {
 	tsk->obj.id = ID_STOPPED;
 	priv_rdy_remove(&tsk->obj);
@@ -131,8 +131,8 @@ void core_tsk_remove( tsk_id tsk )
 
 void core_ctx_switch( void )
 {
-	tsk_id cur = IDLE.obj.next;
-	tsk_id nxt = cur->obj.next;
+	tsk_t *cur = IDLE.obj.next;
+	tsk_t *nxt = cur->obj.next;
 	if (nxt->prio == cur->prio)
 		port_ctx_switch();
 }
@@ -151,10 +151,10 @@ void core_tsk_break( void )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_append( tsk_id tsk, void *obj )
+void core_tsk_append( tsk_t *tsk, void *obj )
 {
-	tsk_id prv;
-	tsk_id nxt = obj;
+	tsk_t *prv;
+	tsk_t *nxt = obj;
 	tsk->guard = obj;
 
 	do prv = nxt, nxt = nxt->obj.queue;
@@ -169,10 +169,10 @@ void core_tsk_append( tsk_id tsk, void *obj )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_unlink( tsk_id tsk, unsigned event )
+void core_tsk_unlink( tsk_t *tsk, unsigned event )
 {
-	tsk_id prv = tsk->back;
-	tsk_id nxt = tsk->obj.queue;
+	tsk_t *prv = tsk->back;
+	tsk_t *nxt = tsk->obj.queue;
 	tsk->event = event;
 
 	if (nxt)
@@ -184,11 +184,11 @@ void core_tsk_unlink( tsk_id tsk, unsigned event )
 /* -------------------------------------------------------------------------- */
 
 static
-unsigned priv_tsk_wait( tsk_id cur, obj_id obj )
+unsigned priv_tsk_wait( tsk_t *cur, obj_t *obj )
 {
-	core_tsk_append((tsk_id)cur, obj);
-	priv_tsk_remove((tsk_id)cur);
-	core_tmr_insert((tmr_id)cur, ID_DELAYED);
+	core_tsk_append((tsk_t *)cur, obj);
+	priv_tsk_remove((tsk_t *)cur);
+	core_tmr_insert((tmr_t *)cur, ID_DELAYED);
 
 	port_ctx_switchLock();
 
@@ -199,7 +199,7 @@ unsigned priv_tsk_wait( tsk_id cur, obj_id obj )
 
 unsigned core_tsk_waitUntil( void *obj, unsigned time )
 {
-	tsk_id cur = System.cur;
+	tsk_t *cur = System.cur;
 
 	cur->start = Counter;
 	cur->delay = time - cur->start;
@@ -214,7 +214,7 @@ unsigned core_tsk_waitUntil( void *obj, unsigned time )
 
 unsigned core_tsk_waitFor( void *obj, unsigned delay )
 {
-	tsk_id cur = System.cur;
+	tsk_t *cur = System.cur;
 
 	cur->start = Counter;
 	cur->delay = delay;
@@ -227,13 +227,13 @@ unsigned core_tsk_waitFor( void *obj, unsigned delay )
 
 /* -------------------------------------------------------------------------- */
 
-tsk_id core_tsk_wakeup( tsk_id tsk, unsigned event )
+tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event )
 {
 	if (tsk)
 	{
-		core_tsk_unlink((tsk_id)tsk, event);
-		core_tmr_remove((tmr_id)tsk);
-		core_tsk_insert((tsk_id)tsk);
+		core_tsk_unlink((tsk_t *)tsk, event);
+		core_tmr_remove((tmr_t *)tsk);
+		core_tsk_insert((tsk_t *)tsk);
 	}
 
 	return tsk;
@@ -241,9 +241,9 @@ tsk_id core_tsk_wakeup( tsk_id tsk, unsigned event )
 
 /* -------------------------------------------------------------------------- */
 
-tsk_id core_one_wakeup( void *obj, unsigned event )
+tsk_t *core_one_wakeup( void *obj, unsigned event )
 {
-	obj_id lst = obj;
+	obj_t *lst = obj;
 
 	return core_tsk_wakeup(lst->queue, event);
 }
@@ -252,16 +252,16 @@ tsk_id core_one_wakeup( void *obj, unsigned event )
 
 void core_all_wakeup( void *obj, unsigned event )
 {
-	obj_id lst = obj;
+	obj_t *lst = obj;
 
 	while (core_tsk_wakeup(lst->queue, event));
 }
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_prio( tsk_id tsk, unsigned prio )
+void core_tsk_prio( tsk_t *tsk, unsigned prio )
 {
-	mtx_id mtx;
+	mtx_t *mtx;
 	
 	for (mtx = tsk->list; mtx; mtx = mtx->list)
 	{
@@ -297,9 +297,9 @@ void core_tsk_prio( tsk_id tsk, unsigned prio )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_init( tsk_id tsk )
+void core_tsk_init( tsk_t *tsk )
 {
-	ctx_id ctx = (ctx_id)tsk->top - 1;
+	ctx_t *ctx = (ctx_t *)tsk->top - 1;
 
 	ctx->psr = 0x01000000;
 	ctx->pc  = tsk->state;
@@ -313,7 +313,7 @@ void core_tsk_init( tsk_id tsk )
 
 void *core_tsk_handler( void *sp )
 {
-	tsk_id cur, nxt;
+	tsk_t *cur, *nxt;
 #if OS_ROBIN == 0
 	core_tmr_handler();
 #endif
@@ -348,9 +348,9 @@ tmr_t WAIT = { { .id=ID_TIMER, .prev=&WAIT, .next=&WAIT }, .delay=INFINITE }; //
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_tmr_insert( tmr_id tmr, unsigned id )
+void priv_tmr_insert( tmr_t *tmr, unsigned id )
 {
-	tmr_id nxt = &WAIT;
+	tmr_t *nxt = &WAIT;
 	tmr->obj.id = id;
 
 	if    (tmr->delay != INFINITE)
@@ -363,7 +363,7 @@ void priv_tmr_insert( tmr_id tmr, unsigned id )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tmr_insert( tmr_id tmr, unsigned id )
+void core_tmr_insert( tmr_t *tmr, unsigned id )
 {
 	priv_tmr_insert(tmr, id);
 	port_tmr_force();
@@ -371,7 +371,7 @@ void core_tmr_insert( tmr_id tmr, unsigned id )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tmr_remove( tmr_id tmr )
+void core_tmr_remove( tmr_t *tmr )
 {
 	tmr->obj.id = ID_STOPPED;
 	priv_rdy_remove(&tmr->obj);
@@ -382,7 +382,7 @@ void core_tmr_remove( tmr_id tmr )
 #if OS_ROBIN && OS_TIMER
 
 static
-bool priv_tmr_expired( tmr_id tmr )
+bool priv_tmr_expired( tmr_t *tmr )
 {
 	port_tmr_stop();
 
@@ -407,7 +407,7 @@ bool priv_tmr_expired( tmr_id tmr )
 #else
 
 static
-bool priv_tmr_expired( tmr_id tmr )
+bool priv_tmr_expired( tmr_t *tmr )
 {
 	if (tmr->delay >= Counter - tmr->start + 1)
 	return false; // return if timer still counts or counting indefinitly
@@ -420,7 +420,7 @@ bool priv_tmr_expired( tmr_id tmr )
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_tmr_wakeup( tmr_id tmr, unsigned event )
+void priv_tmr_wakeup( tmr_t *tmr, unsigned event )
 {
 	tmr->start += tmr->delay;
 	tmr->delay  = tmr->period;
@@ -439,17 +439,17 @@ void priv_tmr_wakeup( tmr_id tmr, unsigned event )
 
 void core_tmr_handler( void )
 {
-	tmr_id tmr;
+	tmr_t *tmr;
 
 	port_isr_lock();
 
 	while (priv_tmr_expired(tmr = WAIT.obj.next))
 	{
 		if (tmr->obj.id == ID_TIMER)
-			priv_tmr_wakeup((tmr_id)tmr, E_SUCCESS);
+			priv_tmr_wakeup((tmr_t *)tmr, E_SUCCESS);
 
 		else      /* id == ID_DELAYED */
-			core_tsk_wakeup((tsk_id)tmr, E_TIMEOUT);
+			core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
 	}
 
 	port_isr_unlock();
