@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    10.01.2017
+    @date    13.01.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-tsk_t *tsk_create( unsigned prio, fun_id state, unsigned size )
+tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
@@ -78,7 +78,7 @@ void tsk_start( tsk_t *tsk )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_startFrom( tsk_t *tsk, fun_id state )
+void tsk_startFrom( tsk_t *tsk, fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tsk);
@@ -167,7 +167,7 @@ void tsk_yield( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_flip( fun_id state )
+void tsk_flip( fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
 	assert(state);

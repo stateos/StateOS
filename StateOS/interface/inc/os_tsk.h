@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    11.01.2017
+    @date    13.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -50,7 +50,7 @@ struct __tsk
 {
 	obj_t    obj;   // object header
 
-	fun_id   state; // callback procedure
+	fun_t  * state; // callback procedure
 	unsigned start;
 	unsigned delay;
 	tsk_t  * back;  // previous process in the DELAYED queue
@@ -345,7 +345,7 @@ typedef struct __tsk tsk_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              tsk_t  * tsk_create( unsigned prio, fun_id state, unsigned size );
+              tsk_t  * tsk_create( unsigned prio, fun_t *state, unsigned size );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -365,7 +365,7 @@ typedef struct __tsk tsk_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline tsk_t  * tsk_new( unsigned prio, fun_id state ) { return tsk_create(prio, state, OS_STACK_SIZE); }
+static inline tsk_t  * tsk_new( unsigned prio, fun_t *state ) { return tsk_create(prio, state, OS_STACK_SIZE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -401,7 +401,7 @@ static inline tsk_t  * tsk_new( unsigned prio, fun_id state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_startFrom( tsk_t *tsk, fun_id state );
+              void     tsk_startFrom( tsk_t *tsk, fun_t *state );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -505,7 +505,7 @@ static inline void     tsk_pass ( void ) { tsk_yield(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_flip( fun_id state ) __NORETURN;
+              void     tsk_flip( fun_t *state ) __NORETURN;
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -777,7 +777,7 @@ namespace ThisTask
 {
 	void     pass      ( void )                             {        tsk_pass      ();                    }
 	void     yield     ( void )                             {        tsk_yield     ();                    }
-	void     flip      ( fun_id   _state )                  {        tsk_flip      (_state);              }
+	void     flip      ( fun_t  * _state )                  {        tsk_flip      (_state);              }
 	void     stop      ( void )                             {        tsk_stop      ();                    }
 	void     prio      ( unsigned _prio )                   {        tsk_prio      (_prio);               }
 
@@ -811,13 +811,13 @@ template<unsigned _size>
 struct TaskT : public __tsk
 {
 	explicit
-	 TaskT( const unsigned _prio, const fun_id _state ): __tsk _TSK_INIT(0, 0, _stack+ASIZE(_size)) { basic = prio = _prio; state = _state; }
+	 TaskT( const unsigned _prio, fun_t *_state ): __tsk _TSK_INIT(0, 0, _stack+ASIZE(_size)) { basic = prio = _prio; state = _state; }
 	~TaskT( void ) { assert(obj.id == ID_STOPPED); }
 
 	void     kill      ( void )                             {        tsk_kill      (this);                }
 	unsigned join      ( void )                             { return tsk_join      (this);                }
 	void     start     ( void )                             {        tsk_start     (this);                }
-	void     startFrom ( fun_id   _state )                  {        tsk_startFrom (this, _state);        }
+	void     startFrom ( fun_t  * _state )                  {        tsk_startFrom (this, _state);        }
 	void     give      ( unsigned _flags )                  {        tsk_give      (this, _flags);        }
 	void     giveISR   ( unsigned _flags )                  {        tsk_giveISR   (this, _flags);        }
 	void     resume    ( unsigned _event )                  {        tsk_resume    (this, _event);        }
@@ -845,7 +845,7 @@ struct TaskT : public __tsk
 struct Task: public TaskT<OS_STACK_SIZE>
 {
 	explicit
-	Task( const unsigned _prio, const fun_id _state ): TaskT<OS_STACK_SIZE>(_prio, _state) {}
+	Task( const unsigned _prio, fun_t *_state ): TaskT<OS_STACK_SIZE>(_prio, _state) {}
 };
 
 /**********************************************************************************************************************
@@ -867,7 +867,7 @@ template<unsigned _size>
 struct startTaskT : public TaskT<_size>
 {
 	explicit
-	startTaskT( const unsigned _prio, const fun_id _state ): TaskT<_size>(_prio, _state) { tsk_start(this); }
+	startTaskT( const unsigned _prio, fun_t *_state ): TaskT<_size>(_prio, _state) { tsk_start(this); }
 };
 
 /**********************************************************************************************************************
@@ -887,7 +887,7 @@ struct startTaskT : public TaskT<_size>
 struct startTask : public startTaskT<OS_STACK_SIZE>
 {
 	explicit
-	startTask( const unsigned _prio, const fun_id _state ): startTaskT<OS_STACK_SIZE>(_prio, _state) {}
+	startTask( const unsigned _prio, fun_t *_state ): startTaskT<OS_STACK_SIZE>(_prio, _state) {}
 };
 
 #endif//__cplusplus

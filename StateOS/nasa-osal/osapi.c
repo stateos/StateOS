@@ -79,7 +79,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    22.11.2016
+    @date    13.01.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -809,7 +809,7 @@ int32 OS_TimerCreate(uint32 *timer_id, const char *timer_name, uint32 *clock_acc
 	*timer_id = (uint32) tmr_create();
 
 	if (*timer_id)
-		((tmr_t*)*timer_id)->state = (fun_id) callback_ptr;
+		((tmr_t*)*timer_id)->state = (fun_t*) callback_ptr;
 
 	sys_unlock();
 

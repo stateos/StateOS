@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    10.01.2017
+    @date    13.01.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -75,7 +75,8 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-typedef   void (*fun_id)(); // task/timer procedure
+typedef   void       fun_t(); // timer/task procedure
+
 typedef struct __que que_t; // queue
 typedef struct __mtx mtx_t; // mutex
 typedef struct __tmr tmr_t; // timer
@@ -140,8 +141,8 @@ typedef struct __ctx
 	unsigned r2;
 	unsigned r3;
 	void   * ip;
-	fun_id   lr;
-	fun_id   pc;
+	fun_t  * lr;
+	fun_t  * pc;
 	unsigned psr;
 
 }	ctx_t;
