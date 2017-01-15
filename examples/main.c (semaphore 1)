@@ -6,14 +6,12 @@ OS_SEM(sem, 0, semNormal);
 void slave()
 {
 	sem_wait(sem);
-
 	LED_Tick();
 }
 
 void master()
 {
 	tsk_delay(1000*MSEC);
-
 	sem_give(sem);
 }
 

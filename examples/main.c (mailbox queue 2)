@@ -10,7 +10,6 @@ void slave()
 	for (;;)
 	{
 		box_wait(box, &x);
-
 		LEDs = x;
 	}
 }
@@ -22,9 +21,7 @@ void master()
 	for (;;)
 	{
 		tsk_delay(SEC);
-
 		x++;
-
 		box_give(box, &x);
 	}
 }

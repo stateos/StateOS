@@ -6,7 +6,6 @@ tsk_t tsk = TSK_INIT(0, 0);
 void slave()
 {
 	LED_Tick();
-
 	tsk_stop();
 }
 
@@ -17,7 +16,6 @@ void master()
 	for (;;)
 	{
 		tsk_sleepUntil(time += SEC);
-
 		tsk_startFrom(&tsk, slave);
 	}
 }

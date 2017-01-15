@@ -6,14 +6,12 @@ sem_id sem = SEM_CREATE(0, semBinary);
 void slave()
 {
 	sem_wait(sem);
-
 	LED_Tick();
 }
 
 void master()
 {
 	tsk_delay(SEC);
-
 	sem_give(sem);
 }
 

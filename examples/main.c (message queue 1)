@@ -10,7 +10,6 @@ void slave()
 	for (;;)
 	{
 		msg_wait(msg, &x);
-
 		LEDs = x;
 	}
 }
@@ -22,7 +21,6 @@ void master()
 	for (;;)
 	{
 		tsk_delay(SEC);
-
 		msg_give(msg, ++x);
 	}
 }

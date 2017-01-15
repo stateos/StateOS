@@ -32,6 +32,7 @@ Features:
 - rebuilded internal preprocessor definitions
 - rebuilded data structures
 - rebuilded c++ classes
+- updated examples
 ---------
 4.2
 - added tsk_join function

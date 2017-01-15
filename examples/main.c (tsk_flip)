@@ -7,7 +7,6 @@ void master(void);
 void slave()
 {
 	LED_Tick();
-
 	tsk_flip(master);
 }
 
@@ -16,7 +15,6 @@ void master()
 	static unsigned time = 0;
 
 	tsk_sleepUntil(time += SEC);
-
 	tsk_flip(slave);
 }
 

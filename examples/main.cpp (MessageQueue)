@@ -11,7 +11,6 @@ void slave()
 	for (;;)
 	{
 		msg.wait(&x);
-
 		led = x;
 	}
 }
@@ -23,7 +22,6 @@ void master()
 	for (;;)
 	{
 		ThisTask::delay(SEC);
-
 		msg.give(++x);
 	}
 }

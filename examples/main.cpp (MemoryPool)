@@ -2,8 +2,8 @@
 #include <os.h>
 
 auto led = Led();
-auto box = MailBoxQueueT<unsigned*, 1>();
-auto mem = MemoryPoolT<unsigned, 1>();
+auto box = MailBoxQueueTT<1, unsigned*>();
+auto mem = MemoryPoolTT<1, unsigned>();
 
 void slave()
 {

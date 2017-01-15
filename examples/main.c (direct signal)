@@ -4,7 +4,6 @@
 void slave()
 {
 	tsk_wait(1);
-
 	LED_Tick();
 }
 
@@ -13,7 +12,6 @@ OS_TSK(sla, 0, slave);
 void master()
 {
 	tsk_delay(SEC);
-
 	tsk_give(sla, 1);
 }
 

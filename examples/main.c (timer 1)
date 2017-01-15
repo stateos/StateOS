@@ -7,7 +7,6 @@ OS_TMR(tmr);
 void slave()
 {
 	sem_wait(sem);
-
 	LED_Tick();
 }
 

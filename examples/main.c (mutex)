@@ -6,18 +6,14 @@ OS_MTX(mtx);
 OS_DEF(sla, 0)
 {
 	mtx_wait(mtx);
-
 	LED_Tick();
-
 	mtx_give(mtx);
 }
 
 OS_DEF(mas, 1)
 {
 	mtx_wait(mtx);
-
 	tsk_delay(SEC);
-
 	mtx_give(mtx);
 }
 

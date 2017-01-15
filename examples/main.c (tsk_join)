@@ -6,7 +6,6 @@ void slave()
 	static unsigned time = 0;
 
 	tsk_sleepUntil(time += SEC);
-
 	tsk_stop();
 }
 

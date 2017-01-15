@@ -6,14 +6,12 @@ sig_id sig = SIG_CREATE(sigClear);
 void slave()
 {
 	sig_wait(sig);
-
 	LED_Tick();
 }
 
 void master()
 {
 	tsk_delay(SEC);
-
 	sig_give(sig);
 }
 
@@ -21,7 +19,7 @@ int main()
 {
 	LED_Config();
 
-	tsk_start(TSK_CREATE(0, slave));
-	tsk_start(TSK_CREATE(0, master));
+	tsk_start((tsk_id)TSK_CREATE(0, slave));
+	tsk_start((tsk_id)TSK_CREATE(0, master));
 	tsk_sleep();
 }

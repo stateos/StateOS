@@ -6,18 +6,14 @@ OS_FLG(flg);
 void slave()
 {
 	flg_wait(flg, 3, flgAll);
-
 	LED_Tick();
 }
 
 void master()
 {
 	tsk_delay(SEC/2);
-
 	flg_give(flg, 1);
-
 	tsk_delay(SEC/2);
-
 	flg_give(flg, 2);
 }
 

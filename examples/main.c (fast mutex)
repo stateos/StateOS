@@ -6,18 +6,14 @@ static_MUT(mut);
 void slave()
 {
 	mut_wait(mut);
-
 	LED_Tick();
-
 	mut_give(mut);
 }
 
 void master()
 {
 	mut_wait(mut);
-
 	tsk_delay(SEC);
-
 	mut_give(mut);
 }
 

@@ -8,7 +8,6 @@ int main()
 	for (;;)
 	{
 		tsk_delay(SEC);
-
 		LED_Tick();
 	}
 }
