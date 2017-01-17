@@ -10,11 +10,11 @@ void proc(volatile unsigned *led, unsigned timePoint)
 	}
 }
 
-OS_DEF(t1, 0) { proc(&LED[0], SEC/8*0); }
-OS_DEF(t2, 0) { proc(&LED[1], SEC/8*1); }
-OS_DEF(t3, 0) { proc(&LED[2], SEC/8*2); }
-OS_DEF(t4, 0) { proc(&LED[3], SEC/8*3); }
-OS_DEF(t5, 0) { proc(&GRN,    SEC/8*4); }
+OS_DEF(t1, 0, 256) { proc(&LED[0], SEC/8*0); }
+OS_DEF(t2, 0, 256) { proc(&LED[1], SEC/8*1); }
+OS_DEF(t3, 0, 256) { proc(&LED[2], SEC/8*2); }
+OS_DEF(t4, 0, 256) { proc(&LED[3], SEC/8*3); }
+OS_DEF(t5, 0, 256) { proc(&GRN,    SEC/8*4); }
 
 int main()
 {
