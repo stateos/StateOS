@@ -28,6 +28,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+4.4
+- added oslibc.c file for COSMIC Software CORTEX-M C Cross Compiler
+---------
 4.3
 - rebuilded internal preprocessor definitions
 - rebuilded data structures
