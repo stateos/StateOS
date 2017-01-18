@@ -79,7 +79,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    13.01.2017
+    @date    18.01.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -198,6 +198,7 @@ int32 OS_TaskDelete(uint32 task_id)
 		task_id = OS_TaskGetId();
 
 	tsk_kill((tsk_t*)task_id);
+	sys_free((void *)task_id);
 
 	return OS_SUCCESS;
 }
@@ -283,6 +284,7 @@ int32 OS_QueueCreate(uint32 *queue_id, const char *queue_name, uint32 queue_dept
 int32 OS_QueueDelete(uint32 queue_id)
 {
 	box_kill((box_t*)queue_id);
+	sys_free((void *)queue_id);
 
 	return OS_SUCCESS;
 }
@@ -383,6 +385,7 @@ int32 OS_BinSemTimedWait(uint32 sem_id, uint32 msecs)
 int32 OS_BinSemDelete(uint32 sem_id)
 {
 	sem_kill((sem_t*)sem_id);
+	sys_free((void *)sem_id);
 
 	return OS_SUCCESS;
 }
@@ -446,6 +449,7 @@ int32 OS_CountSemTimedWait(uint32 sem_id, uint32 msecs)
 int32 OS_CountSemDelete(uint32 sem_id)
 {
 	sem_kill((sem_t*)sem_id);
+	sys_free((void *)sem_id);
 
 	return OS_SUCCESS;
 }
@@ -503,6 +507,7 @@ int32 OS_MutSemTake(uint32 sem_id)
 int32 OS_MutSemDelete(uint32 sem_id)
 {
 	mtx_kill((mtx_t*)sem_id);
+	sys_free((void *)sem_id);
 
 	return OS_SUCCESS;
 }
@@ -826,6 +831,7 @@ int32 OS_TimerSet(uint32 timer_id, uint32 start_msec, uint32 interval_msec)
 int32 OS_TimerDelete(uint32 timer_id)
 {
 	tmr_kill((tmr_t*)timer_id);
+	sys_free((void *)timer_id);
 
 	return OS_SUCCESS;
 }

@@ -33,6 +33,7 @@ Features:
 - added _TSK_CREATE macro in os_tsk.h file
 - changed OS_DEF macro and added OS_NEW macro in os_tsk.h file
 - added sys_alloc and sys_free procedures
+- updated cmsis-rtos and nasa-osal
 ---------
 4.3
 - rebuilded internal preprocessor definitions

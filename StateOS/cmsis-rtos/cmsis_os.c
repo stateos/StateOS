@@ -54,7 +54,7 @@
 
     @file    StateOS: cmsis_os.c
     @author  Rajmund Szymanski
-    @date    07.01.2017
+    @date    18.01.2017
     @brief   CMSIS-RTOS API implementation for StateOS.
 
  ******************************************************************************
@@ -297,6 +297,7 @@ osStatus osTimerDelete (osTimerId timer_id)
 		return osErrorISR;
 
 	tmr_kill(timer_id);
+	sys_free(timer_id);
 	return osOK;
 }
 
@@ -409,6 +410,7 @@ osStatus osMutexDelete (osMutexId mutex_id)
 		return osErrorISR;
 
 	mtx_kill(mutex_id);
+	sys_free(mutex_id);
 	return osOK;
 }
 
@@ -465,6 +467,7 @@ osStatus osSemaphoreDelete (osSemaphoreId semaphore_id)
 		return osErrorISR;
 
 	sem_kill(semaphore_id);
+	sys_free(semaphore_id);
 	return osOK;
 }
 
