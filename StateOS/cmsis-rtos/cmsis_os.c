@@ -593,7 +593,7 @@ osMailQId osMailCreate (const osMailQDef_t *queue_def, osThreadId thread_id)
 
 	unsigned size = MSIZE(queue_def->item_sz);
 
-	mbq = core_sys_alloc(sizeof(mbq_t) + queue_def->queue_sz * (1 + size) * sizeof(void*));
+	mbq = sys_alloc(sizeof(mbq_t) + queue_def->queue_sz * (1 + size) * sizeof(void*));
 
 	if (mbq)
 	{
