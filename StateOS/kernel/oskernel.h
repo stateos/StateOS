@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    11.01.2017
+    @date    18.01.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -68,6 +68,9 @@ void core_ctx_reset( void )
 
 // system malloc procedure
 void *core_sys_alloc( size_t size );
+
+// system free procedure
+void core_sys_free( void *ptr );
 
 /* -------------------------------------------------------------------------- */
 

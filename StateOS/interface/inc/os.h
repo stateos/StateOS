@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    07.01.2017
+    @date    18.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -65,6 +65,41 @@ extern "C" {
  **********************************************************************************************************************/
 
 static inline void     sys_init( void ) { port_sys_init(); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sys_alloc                                                                                      *
+ *                                                                                                                    *
+ * Description       : system malloc procedure                                                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   size            : size of the memory block (in bytes)                                                            *
+ *                                                                                                                    *
+ * Return            : pointer to the beginning of allocated block of memory                                          *
+ *   0               : memory block not allocated (not enough free memory)                                            *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline void   * sys_alloc( size_t size ) { return core_sys_alloc(size); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sys_free                                                                                       *
+ *                                                                                                                    *
+ * Description       : system free procedure                                                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   ptr             : pointer to a memory block previously allocated with sys_alloc or xxx_create                    *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+static inline void     sys_free( void *ptr ) { core_sys_free(ptr); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
