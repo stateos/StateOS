@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    18.01.2017
+    @date    22.01.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -151,7 +151,7 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio );
 
 // init task 'tsk' stack
 // prepare stack the starting task for context switch
-void core_tsk_init( tsk_t *tsk );
+void core_ctx_init( tsk_t *tsk );
 
 // tasks queue handler procedure
 // save stack pointer 'sp' of the current task

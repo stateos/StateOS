@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    18.01.2017
+    @date    22.01.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -297,7 +297,7 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_init( tsk_t *tsk )
+void core_ctx_init( tsk_t *tsk )
 {
 	ctx_t *ctx = (ctx_t *)tsk->top - 1;
 
