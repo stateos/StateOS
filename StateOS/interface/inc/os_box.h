@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    11.01.2017
+    @date    24.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -187,7 +187,7 @@ typedef struct __box box_t, box_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              box_t  * box_create( unsigned limit, unsigned size );
+box_t *box_create( unsigned limit, unsigned size );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -204,7 +204,7 @@ typedef struct __box box_t, box_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     box_kill( box_t *box );
+void box_kill( box_t *box );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -228,7 +228,7 @@ typedef struct __box box_t, box_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned box_waitUntil( box_t *box, void *data, unsigned time );
+unsigned box_waitUntil( box_t *box, void *data, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -254,7 +254,7 @@ typedef struct __box box_t, box_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned box_waitFor( box_t *box, void *data, unsigned delay );
+unsigned box_waitFor( box_t *box, void *data, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -276,7 +276,8 @@ typedef struct __box box_t, box_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFINITE); }
+__STATIC_INLINE
+unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -297,7 +298,8 @@ static inline unsigned box_wait( box_t *box, void *data ) { return box_waitFor(b
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned box_take( box_t *box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
+__STATIC_INLINE
+unsigned box_take( box_t *box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -318,7 +320,8 @@ static inline unsigned box_take( box_t *box, void *data ) { return box_waitFor(b
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned box_takeISR( box_t *box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
+__STATIC_INLINE
+unsigned box_takeISR( box_t *box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -342,7 +345,7 @@ static inline unsigned box_takeISR( box_t *box, void *data ) { return box_waitFo
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned box_sendUntil( box_t *box, void *data, unsigned time );
+unsigned box_sendUntil( box_t *box, void *data, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -368,7 +371,7 @@ static inline unsigned box_takeISR( box_t *box, void *data ) { return box_waitFo
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned box_sendFor( box_t *box, void *data, unsigned delay );
+unsigned box_sendFor( box_t *box, void *data, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -390,7 +393,8 @@ static inline unsigned box_takeISR( box_t *box, void *data ) { return box_waitFo
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned box_send( box_t *box, void *data ) { return box_sendFor(box, data, INFINITE); }
+__STATIC_INLINE
+unsigned box_send( box_t *box, void *data ) { return box_sendFor(box, data, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -411,7 +415,8 @@ static inline unsigned box_send( box_t *box, void *data ) { return box_sendFor(b
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned box_give( box_t *box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
+__STATIC_INLINE
+unsigned box_give( box_t *box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -432,7 +437,8 @@ static inline unsigned box_give( box_t *box, void *data ) { return box_sendFor(b
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned box_giveISR( box_t *box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
+__STATIC_INLINE
+unsigned box_giveISR( box_t *box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
 
 #ifdef __cplusplus
 }

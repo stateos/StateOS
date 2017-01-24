@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    13.01.2017
+    @date    24.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -152,7 +152,7 @@ typedef struct __tmr tmr_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              tmr_t  * tmr_create( void );
+tmr_t *tmr_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -169,7 +169,7 @@ typedef struct __tmr tmr_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tmr_kill( tmr_t *tmr );
+void tmr_kill( tmr_t *tmr );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -189,7 +189,7 @@ typedef struct __tmr tmr_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tmr_startUntil( tmr_t *tmr, unsigned time, fun_t *proc );
+void tmr_startUntil( tmr_t *tmr, unsigned time, fun_t *proc );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -215,7 +215,7 @@ typedef struct __tmr tmr_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tmr_start( tmr_t *tmr, unsigned delay, unsigned period, fun_t *proc );
+void tmr_start( tmr_t *tmr, unsigned delay, unsigned period, fun_t *proc );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -237,7 +237,8 @@ typedef struct __tmr tmr_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tmr_startFor( tmr_t *tmr, unsigned delay, fun_t *proc ) { tmr_start(tmr, delay, 0, proc); }
+__STATIC_INLINE
+void tmr_startFor( tmr_t *tmr, unsigned delay, fun_t *proc ) { tmr_start(tmr, delay, 0, proc); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -260,7 +261,8 @@ static inline void     tmr_startFor( tmr_t *tmr, unsigned delay, fun_t *proc ) {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tmr_startPeriodic( tmr_t *tmr, unsigned period, fun_t *proc ) { tmr_start(tmr, period, period, proc); }
+__STATIC_INLINE
+void tmr_startPeriodic( tmr_t *tmr, unsigned period, fun_t *proc ) { tmr_start(tmr, period, period, proc); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -277,7 +279,8 @@ static inline void     tmr_startPeriodic( tmr_t *tmr, unsigned period, fun_t *pr
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0, 0); }
+__STATIC_INLINE
+void tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0, 0); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -299,7 +302,7 @@ static inline void     tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0, 0); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned tmr_waitUntil( tmr_t *tmr, unsigned time );
+unsigned tmr_waitUntil( tmr_t *tmr, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -323,7 +326,7 @@ static inline void     tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0, 0); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned tmr_waitFor( tmr_t *tmr, unsigned delay );
+unsigned tmr_waitFor( tmr_t *tmr, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -343,7 +346,8 @@ static inline void     tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0, 0); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
+__STATIC_INLINE
+unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -362,7 +366,8 @@ static inline unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tmr_take( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
+__STATIC_INLINE
+unsigned tmr_take( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -381,7 +386,8 @@ static inline unsigned tmr_take( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIAT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
+__STATIC_INLINE
+unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -399,7 +405,8 @@ static inline unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tmr_flipISR( fun_t *proc );
+__STATIC_INLINE
+void tmr_flipISR( fun_t *proc ) { ((tmr_t *)WAIT.obj.next)->state = proc; }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -418,7 +425,8 @@ static inline unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tmr_delayISR( unsigned delay );
+__STATIC_INLINE
+void tmr_delayISR( unsigned delay ) { ((tmr_t *)WAIT.obj.next)->delay = delay; }
 
 #ifdef __cplusplus
 }

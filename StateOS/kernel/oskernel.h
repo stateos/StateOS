@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    22.01.2017
+    @date    24.01.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -47,7 +47,8 @@ extern sys_t System; // system data
 
 // initiating and running the system timer
 // the port_sys_init procedure is normally called as a constructor
-void port_sys_init( void ) __CONSTRUCTOR;
+__CONSTRUCTOR
+void port_sys_init( void );
 
 /* -------------------------------------------------------------------------- */
 
@@ -55,7 +56,7 @@ void port_sys_init( void ) __CONSTRUCTOR;
 void core_ctx_switch( void );
 
 // reset context switch indicator
-static inline
+__STATIC_INLINE
 void core_ctx_reset( void )
 {
 #if OS_ROBIN && OS_TIMER == 0
@@ -87,10 +88,12 @@ void core_tmr_handler( void );
 /* -------------------------------------------------------------------------- */
 
 // reset stack and restart current task
-void core_tsk_flip( void *sp ) __NORETURN;
+__NO_RETURN
+void core_tsk_flip( void *sp );
 
 // abort and reset current process and force yield system control to the next
-void core_tsk_break( void ) __NORETURN;
+__NO_RETURN
+void core_tsk_break( void );
 
 // add task 'tsk' to tasks READY queue with id ID_READY
 // force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
@@ -162,7 +165,7 @@ void *core_tsk_handler( void *sp );
 /* -------------------------------------------------------------------------- */
 
 // procedure inside ISR?
-static inline
+__STATIC_INLINE
 unsigned port_isr_inside( void )
 {
 	return __get_IPSR();

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    11.01.2017
+    @date    24.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -151,7 +151,7 @@ typedef struct __cnd cnd_t, cnd_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              cnd_t  * cnd_create( void );
+cnd_t *cnd_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -168,7 +168,7 @@ typedef struct __cnd cnd_t, cnd_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     cnd_kill( cnd_t *cnd );
+void cnd_kill( cnd_t *cnd );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -192,7 +192,7 @@ typedef struct __cnd cnd_t, cnd_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, unsigned time );
+unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -218,7 +218,7 @@ typedef struct __cnd cnd_t, cnd_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, unsigned delay );
+unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -240,7 +240,8 @@ typedef struct __cnd cnd_t, cnd_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned cnd_wait( cnd_t *cnd, mtx_t *mtx ) { return cnd_waitFor(cnd, mtx, INFINITE); }
+__STATIC_INLINE
+unsigned cnd_wait( cnd_t *cnd, mtx_t *mtx ) { return cnd_waitFor(cnd, mtx, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -260,7 +261,7 @@ static inline unsigned cnd_wait( cnd_t *cnd, mtx_t *mtx ) { return cnd_waitFor(c
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     cnd_give( cnd_t *cnd, bool all );
+void cnd_give( cnd_t *cnd, bool all );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -280,7 +281,8 @@ static inline unsigned cnd_wait( cnd_t *cnd, mtx_t *mtx ) { return cnd_waitFor(c
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     cnd_giveISR( cnd_t *cnd, bool all ) { cnd_give(cnd, all); }
+__STATIC_INLINE
+void cnd_giveISR( cnd_t *cnd, bool all ) { cnd_give(cnd, all); }
 
 #ifdef __cplusplus
 }

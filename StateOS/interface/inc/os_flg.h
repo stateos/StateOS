@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    11.01.2017
+    @date    24.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -159,7 +159,7 @@ typedef struct __flg flg_t, flg_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              flg_t  * flg_create( void );
+flg_t *flg_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -176,7 +176,7 @@ typedef struct __flg flg_t, flg_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     flg_kill( flg_t *flg );
+void flg_kill( flg_t *flg );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -205,7 +205,7 @@ typedef struct __flg flg_t, flg_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned time );
+unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -236,7 +236,7 @@ typedef struct __flg flg_t, flg_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned delay );
+unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -263,7 +263,8 @@ typedef struct __flg flg_t, flg_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned flg_wait( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
+__STATIC_INLINE
+unsigned flg_wait( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -289,7 +290,8 @@ static inline unsigned flg_wait( flg_t *flg, unsigned flags, unsigned mode ) { r
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
+__STATIC_INLINE
+unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -315,7 +317,8 @@ static inline unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode ) { r
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
+__STATIC_INLINE
+unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -333,7 +336,7 @@ static inline unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) 
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     flg_give( flg_t *flg, unsigned flags );
+void flg_give( flg_t *flg, unsigned flags );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -351,7 +354,8 @@ static inline unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) 
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     flg_giveISR( flg_t *flg, unsigned flags ) { flg_give(flg, flags); }
+__STATIC_INLINE
+void flg_giveISR( flg_t *flg, unsigned flags ) { flg_give(flg, flags); }
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    11.01.2017
+    @date    24.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -185,7 +185,7 @@ typedef struct __sem sem_t, sem_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              sem_t  * sem_create( unsigned init, unsigned limit );
+sem_t *sem_create( unsigned init, unsigned limit );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -202,7 +202,7 @@ typedef struct __sem sem_t, sem_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     sem_kill( sem_t *sem );
+void sem_kill( sem_t *sem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -271,7 +271,8 @@ typedef struct __sem sem_t, sem_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
+                     __STATIC_INLINE
+              unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -291,7 +292,8 @@ static inline unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_take( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
+                     __STATIC_INLINE
+              unsigned sem_take( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -311,7 +313,8 @@ static inline unsigned sem_take( sem_t *sem ) { return sem_waitFor(sem, IMMEDIAT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_takeISR( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
+                     __STATIC_INLINE
+              unsigned sem_takeISR( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -380,7 +383,8 @@ static inline unsigned sem_takeISR( sem_t *sem ) { return sem_waitFor(sem, IMMED
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_send( sem_t *sem ) { return sem_sendFor(sem, INFINITE); }
+                     __STATIC_INLINE
+              unsigned sem_send( sem_t *sem ) { return sem_sendFor(sem, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -400,7 +404,8 @@ static inline unsigned sem_send( sem_t *sem ) { return sem_sendFor(sem, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_give( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
+                     __STATIC_INLINE
+              unsigned sem_give( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -420,7 +425,8 @@ static inline unsigned sem_give( sem_t *sem ) { return sem_sendFor(sem, IMMEDIAT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned sem_giveISR( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
+                     __STATIC_INLINE
+              unsigned sem_giveISR( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
 
 #ifdef __cplusplus
 }

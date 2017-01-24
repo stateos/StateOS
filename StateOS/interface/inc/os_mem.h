@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    11.01.2017
+    @date    24.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -186,7 +186,7 @@ typedef struct __mem mem_t, mem_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     mem_init( mem_t *mem );
+void mem_init( mem_t *mem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -205,7 +205,7 @@ typedef struct __mem mem_t, mem_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              mem_t  * mem_create( unsigned limit, unsigned size );
+mem_t *mem_create( unsigned limit, unsigned size );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -222,7 +222,7 @@ typedef struct __mem mem_t, mem_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     mem_kill( mem_t *mem );
+void mem_kill( mem_t *mem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -246,7 +246,7 @@ typedef struct __mem mem_t, mem_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mem_waitUntil( mem_t *mem, void **data, unsigned time );
+unsigned mem_waitUntil( mem_t *mem, void **data, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -272,7 +272,7 @@ typedef struct __mem mem_t, mem_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mem_waitFor( mem_t *mem, void **data, unsigned delay );
+unsigned mem_waitFor( mem_t *mem, void **data, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -294,7 +294,8 @@ typedef struct __mem mem_t, mem_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mem_wait( mem_t *mem, void **data ) { return mem_waitFor(mem, data, INFINITE); }
+__STATIC_INLINE
+unsigned mem_wait( mem_t *mem, void **data ) { return mem_waitFor(mem, data, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -315,7 +316,8 @@ static inline unsigned mem_wait( mem_t *mem, void **data ) { return mem_waitFor(
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mem_take( mem_t *mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
+__STATIC_INLINE
+unsigned mem_take( mem_t *mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -336,7 +338,8 @@ static inline unsigned mem_take( mem_t *mem, void **data ) { return mem_waitFor(
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
+__STATIC_INLINE
+unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -354,7 +357,7 @@ static inline unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     mem_give( mem_t *mem, void *data );
+void mem_give( mem_t *mem, void *data );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -372,7 +375,8 @@ static inline unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     mem_giveISR( mem_t *mem, void *data ) { mem_give(mem, data); }
+__STATIC_INLINE
+void mem_giveISR( mem_t *mem, void *data ) { mem_give(mem, data); }
 
 #ifdef __cplusplus
 }

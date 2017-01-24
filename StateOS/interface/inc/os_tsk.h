@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    17.01.2017
+    @date    24.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -400,7 +400,7 @@ typedef struct __tsk tsk_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              tsk_t  * tsk_create( unsigned prio, fun_t *state, unsigned size );
+tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -420,7 +420,8 @@ typedef struct __tsk tsk_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline tsk_t  * tsk_new( unsigned prio, fun_t *state ) { return tsk_create(prio, state, OS_STACK_SIZE); }
+__STATIC_INLINE
+tsk_t *tsk_new( unsigned prio, fun_t *state ) { return tsk_create(prio, state, OS_STACK_SIZE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -437,7 +438,7 @@ static inline tsk_t  * tsk_new( unsigned prio, fun_t *state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_start( tsk_t *tsk );
+void tsk_start( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -456,7 +457,7 @@ static inline tsk_t  * tsk_new( unsigned prio, fun_t *state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_startFrom( tsk_t *tsk, fun_t *state );
+void tsk_startFrom( tsk_t *tsk, fun_t *state );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -474,7 +475,8 @@ static inline tsk_t  * tsk_new( unsigned prio, fun_t *state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_stop( void ) __NORETURN;
+__NO_RETURN
+void tsk_stop( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -491,7 +493,7 @@ static inline tsk_t  * tsk_new( unsigned prio, fun_t *state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_kill( tsk_t *tsk );
+void tsk_kill( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -511,7 +513,7 @@ static inline tsk_t  * tsk_new( unsigned prio, fun_t *state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned tsk_join( tsk_t *tsk );
+unsigned tsk_join( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -527,7 +529,7 @@ static inline tsk_t  * tsk_new( unsigned prio, fun_t *state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_yield( void );
+void tsk_yield( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -543,7 +545,8 @@ static inline tsk_t  * tsk_new( unsigned prio, fun_t *state ) { return tsk_creat
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tsk_pass ( void ) { tsk_yield(); }
+__STATIC_INLINE
+void tsk_pass( void ) { tsk_yield(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -560,7 +563,8 @@ static inline void     tsk_pass ( void ) { tsk_yield(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_flip( fun_t *state ) __NORETURN;
+__NO_RETURN
+void tsk_flip( fun_t *state );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -577,7 +581,7 @@ static inline void     tsk_pass ( void ) { tsk_yield(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_prio( unsigned prio );
+void tsk_prio( unsigned prio );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -599,7 +603,7 @@ static inline void     tsk_pass ( void ) { tsk_yield(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned tsk_waitUntil( unsigned flags, unsigned time );
+unsigned tsk_waitUntil( unsigned flags, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -623,7 +627,7 @@ static inline void     tsk_pass ( void ) { tsk_yield(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned tsk_waitFor( unsigned flags, unsigned delay );
+unsigned tsk_waitFor( unsigned flags, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -643,7 +647,8 @@ static inline void     tsk_pass ( void ) { tsk_yield(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, INFINITE); }
+__STATIC_INLINE
+unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -661,7 +666,7 @@ static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, IN
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_give( tsk_t *tsk, unsigned flags );
+void tsk_give( tsk_t *tsk, unsigned flags );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -679,7 +684,8 @@ static inline unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, IN
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
+__STATIC_INLINE
+void tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -698,7 +704,8 @@ static inline void     tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk,
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tsk_sleepUntil( unsigned time ) { return tmr_waitUntil(&WAIT, time); }
+__STATIC_INLINE
+unsigned tsk_sleepUntil( unsigned time ) { return tmr_waitUntil(&WAIT, time); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -719,7 +726,8 @@ static inline unsigned tsk_sleepUntil( unsigned time ) { return tmr_waitUntil(&W
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tsk_sleepFor( unsigned delay ) { return tmr_waitFor(&WAIT, delay); }
+__STATIC_INLINE
+unsigned tsk_sleepFor( unsigned delay ) { return tmr_waitFor(&WAIT, delay); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -736,7 +744,8 @@ static inline unsigned tsk_sleepFor( unsigned delay ) { return tmr_waitFor(&WAIT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tsk_sleep( void ) { return tmr_wait(&WAIT); }
+__STATIC_INLINE
+unsigned tsk_sleep( void ) { return tmr_wait(&WAIT); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -757,7 +766,8 @@ static inline unsigned tsk_sleep( void ) { return tmr_wait(&WAIT); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tsk_delay( unsigned delay ) { return tsk_sleepFor(delay); }
+__STATIC_INLINE
+unsigned tsk_delay( unsigned delay ) { return tsk_sleepFor(delay); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -774,7 +784,8 @@ static inline unsigned tsk_delay( unsigned delay ) { return tsk_sleepFor(delay);
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
+__STATIC_INLINE
+unsigned tsk_suspend( void ) { return tsk_sleep(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -792,7 +803,7 @@ static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     tsk_resume( tsk_t *tsk, unsigned event );
+void tsk_resume( tsk_t *tsk, unsigned event );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -810,7 +821,8 @@ static inline unsigned tsk_suspend( void ) { return tsk_sleep(); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     tsk_resumeISR( tsk_t *tsk, unsigned event ) { tsk_resume(tsk, event); }
+__STATIC_INLINE
+void tsk_resumeISR( tsk_t *tsk, unsigned event ) { tsk_resume(tsk, event); }
 
 #ifdef __cplusplus
 }

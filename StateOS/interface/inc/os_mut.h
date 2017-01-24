@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    11.01.2017
+    @date    24.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -148,7 +148,7 @@ typedef struct __mut mut_t, mut_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              mut_t  * mut_create( void );
+mut_t *mut_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -165,7 +165,7 @@ typedef struct __mut mut_t, mut_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     mut_kill( mut_t *mut );
+void mut_kill( mut_t *mut );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -188,7 +188,7 @@ typedef struct __mut mut_t, mut_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mut_waitUntil( mut_t *mut, unsigned time );
+unsigned mut_waitUntil( mut_t *mut, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -213,7 +213,7 @@ typedef struct __mut mut_t, mut_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mut_waitFor( mut_t *mut, unsigned delay );
+unsigned mut_waitFor( mut_t *mut, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -234,7 +234,8 @@ typedef struct __mut mut_t, mut_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mut_wait( mut_t *mut ) { return mut_waitFor(mut, INFINITE); }
+__STATIC_INLINE
+unsigned mut_wait( mut_t *mut ) { return mut_waitFor(mut, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -254,7 +255,8 @@ static inline unsigned mut_wait( mut_t *mut ) { return mut_waitFor(mut, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned mut_take( mut_t *mut ) { return mut_waitFor(mut, IMMEDIATE); }
+__STATIC_INLINE
+unsigned mut_take( mut_t *mut ) { return mut_waitFor(mut, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -274,7 +276,7 @@ static inline unsigned mut_take( mut_t *mut ) { return mut_waitFor(mut, IMMEDIAT
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned mut_give( mut_t *mut );
+unsigned mut_give( mut_t *mut );
 
 #ifdef __cplusplus
 }

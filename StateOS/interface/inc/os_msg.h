@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    11.01.2017
+    @date    24.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -180,7 +180,7 @@ typedef struct __msg msg_t, msg_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              msg_t  * msg_create( unsigned limit );
+msg_t *msg_create( unsigned limit );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -197,7 +197,7 @@ typedef struct __msg msg_t, msg_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     msg_kill( msg_t *msg );
+void msg_kill( msg_t *msg );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -221,7 +221,7 @@ typedef struct __msg msg_t, msg_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned msg_waitUntil( msg_t *msg, unsigned *data, unsigned time );
+unsigned msg_waitUntil( msg_t *msg, unsigned *data, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -247,7 +247,7 @@ typedef struct __msg msg_t, msg_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned msg_waitFor( msg_t *msg, unsigned *data, unsigned delay );
+unsigned msg_waitFor( msg_t *msg, unsigned *data, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -269,7 +269,8 @@ typedef struct __msg msg_t, msg_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned msg_wait( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, INFINITE); }
+__STATIC_INLINE
+unsigned msg_wait( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -290,7 +291,8 @@ static inline unsigned msg_wait( msg_t *msg, unsigned *data ) { return msg_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned msg_take( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+__STATIC_INLINE
+unsigned msg_take( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -311,7 +313,8 @@ static inline unsigned msg_take( msg_t *msg, unsigned *data ) { return msg_waitF
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned msg_takeISR( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+__STATIC_INLINE
+unsigned msg_takeISR( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -335,7 +338,7 @@ static inline unsigned msg_takeISR( msg_t *msg, unsigned *data ) { return msg_wa
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned msg_sendUntil( msg_t *msg, unsigned data, unsigned time );
+unsigned msg_sendUntil( msg_t *msg, unsigned data, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -361,7 +364,7 @@ static inline unsigned msg_takeISR( msg_t *msg, unsigned *data ) { return msg_wa
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned msg_sendFor( msg_t *msg, unsigned data, unsigned delay );
+unsigned msg_sendFor( msg_t *msg, unsigned data, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -383,7 +386,8 @@ static inline unsigned msg_takeISR( msg_t *msg, unsigned *data ) { return msg_wa
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned msg_send( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, INFINITE); }
+__STATIC_INLINE
+unsigned msg_send( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -404,7 +408,8 @@ static inline unsigned msg_send( msg_t *msg, unsigned data ) { return msg_sendFo
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned msg_give( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
+__STATIC_INLINE
+unsigned msg_give( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -425,7 +430,8 @@ static inline unsigned msg_give( msg_t *msg, unsigned data ) { return msg_sendFo
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned msg_giveISR( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
+__STATIC_INLINE
+unsigned msg_giveISR( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    11.01.2017
+    @date    24.01.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -145,7 +145,7 @@ typedef struct __evt evt_t, evt_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              evt_t  * evt_create( void );
+evt_t *evt_create( void );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -162,7 +162,7 @@ typedef struct __evt evt_t, evt_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     evt_kill( evt_t *evt );
+void evt_kill( evt_t *evt );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -183,7 +183,7 @@ typedef struct __evt evt_t, evt_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned evt_waitUntil( evt_t *evt, unsigned time );
+unsigned evt_waitUntil( evt_t *evt, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -206,7 +206,7 @@ typedef struct __evt evt_t, evt_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              unsigned evt_waitFor( evt_t *evt, unsigned delay );
+unsigned evt_waitFor( evt_t *evt, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -225,7 +225,8 @@ typedef struct __evt evt_t, evt_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline unsigned evt_wait( evt_t *evt ) { return evt_waitFor(evt, INFINITE); }
+__STATIC_INLINE
+unsigned evt_wait( evt_t *evt ) { return evt_waitFor(evt, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -243,7 +244,7 @@ static inline unsigned evt_wait( evt_t *evt ) { return evt_waitFor(evt, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-              void     evt_give( evt_t *evt, unsigned event );
+void evt_give( evt_t *evt, unsigned event );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -261,7 +262,8 @@ static inline unsigned evt_wait( evt_t *evt ) { return evt_waitFor(evt, INFINITE
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-static inline void     evt_giveISR( evt_t *evt, unsigned event ) { evt_give(evt, event); }
+__STATIC_INLINE
+void evt_giveISR( evt_t *evt, unsigned event ) { evt_give(evt, event); }
 
 #ifdef __cplusplus
 }
