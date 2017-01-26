@@ -35,6 +35,7 @@ Features:
 - added sys_alloc and sys_free procedures
 - updated cmsis-rtos and nasa-osal
 - added changes in some definitions
+- rebuilded kernel
 ---------
 4.3
 - rebuilded internal preprocessor definitions

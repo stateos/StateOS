@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    13.01.2017
+    @date    25.01.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -126,26 +126,36 @@ typedef struct __sys
 
 typedef struct __ctx
 {
-	unsigned r4; // context saved by the software
-	unsigned r5;
-	unsigned r6;
-	unsigned r7;
-	unsigned r8;
-	unsigned r9;
-	unsigned r10;
-	unsigned r11;
-	unsigned exc; // EXC_RETURN
-
-	unsigned r0; // context saved by the hardware
-	unsigned r1;
-	unsigned r2;
-	unsigned r3;
-	void   * ip;
-	fun_t  * lr;
+	// context saved by the software
+	unsigned h[8]; // r4-r11
+	unsigned lr;   // EXC_RETURN
+	// context saved by the hardware
+	unsigned l[6]; // r0-r3,ip,lr
 	fun_t  * pc;
 	unsigned psr;
 
 }	ctx_t;
+
+/* -------------------------------------------------------------------------- */
+
+#define _CTX_INIT( pc ) { { 0 }, 0xFFFFFFFD, { 0 }, pc, 0x01000000 }
+
+__STATIC_INLINE
+void port_ctx_init( ctx_t *ctx, fun_t *pc )
+{
+	ctx->lr  = 0xFFFFFFFD; // EXC_RETURN: return from psp
+	ctx->pc  = pc;
+	ctx->psr = 0x01000000;
+}
+
+/* -------------------------------------------------------------------------- */
+
+// procedure inside ISR?
+__STATIC_INLINE
+unsigned port_isr_inside( void )
+{
+	return __get_IPSR();
+}
 
 /* -------------------------------------------------------------------------- */
 

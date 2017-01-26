@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    25.01.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -52,8 +52,15 @@ void port_sys_init( void );
 
 /* -------------------------------------------------------------------------- */
 
+// init task 'tsk' for context switch
+void core_ctx_init( tsk_t *tsk );
+
 // save status of current process and force yield system control to the next
 void core_ctx_switch( void );
+
+// start current process
+__NO_RETURN
+void core_tsk_start( void );
 
 // reset context switch indicator
 __STATIC_INLINE
@@ -90,10 +97,6 @@ void core_tmr_handler( void );
 // reset stack and restart current task
 __NO_RETURN
 void core_tsk_flip( void *sp );
-
-// abort and reset current process and force yield system control to the next
-__NO_RETURN
-void core_tsk_break( void );
 
 // add task 'tsk' to tasks READY queue with id ID_READY
 // force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
@@ -152,24 +155,11 @@ void core_all_wakeup( void *obj, unsigned event );
 // force context switch if new priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
 void core_tsk_prio( tsk_t *tsk, unsigned prio );
 
-// init task 'tsk' stack
-// prepare stack the starting task for context switch
-void core_ctx_init( tsk_t *tsk );
-
 // tasks queue handler procedure
 // save stack pointer 'sp' of the current task
 // reset context switch timer counter
 // return a pointer to the stack pointer of the next READY task the highest priority
 void *core_tsk_handler( void *sp );
-
-/* -------------------------------------------------------------------------- */
-
-// procedure inside ISR?
-__STATIC_INLINE
-unsigned port_isr_inside( void )
-{
-	return __get_IPSR();
-}
 
 /* -------------------------------------------------------------------------- */
 

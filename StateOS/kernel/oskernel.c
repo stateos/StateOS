@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    22.01.2017
+    @date    26.01.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -49,8 +49,8 @@ static  struct { stk_t STK[ASIZE(OS_STACK_SIZE)]; } MAIN_STACK;
 #endif
 
 static  union  { stk_t STK[ASIZE(OS_STACK_SIZE)];
-        struct { char  stk[ASIZE(OS_STACK_SIZE)*sizeof(stk_t)-sizeof(ctx_t)]; ctx_t ctx; } CTX; } IDLE_STACK =
-               { .CTX={ .ctx={ .exc=0xFFFFFFFD, .lr=core_tsk_break, .pc=priv_tsk_idle, .psr=0x01000000 } } };
+        struct { char  stk[sizeof(stk_t[ASIZE(OS_STACK_SIZE)])-sizeof(ctx_t)]; ctx_t ctx; } CTX; } IDLE_STACK =
+               { .CTX = { .ctx = _CTX_INIT(core_tsk_start) } };
 #define IDLE_TOP &IDLE_STACK+1
 #define IDLE_SP  &IDLE_STACK.CTX.ctx
 
@@ -129,6 +129,17 @@ void core_tsk_remove( tsk_t *tsk )
 
 /* -------------------------------------------------------------------------- */
 
+void core_ctx_init( tsk_t *tsk )
+{
+	ctx_t *ctx = (ctx_t *)tsk->top - 1;
+
+	port_ctx_init(ctx, core_tsk_start);
+
+	tsk->sp = ctx;
+}
+
+/* -------------------------------------------------------------------------- */
+
 void core_ctx_switch( void )
 {
 	tsk_t *cur = IDLE.obj.next;
@@ -139,13 +150,13 @@ void core_ctx_switch( void )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_break( void )
+void core_tsk_start( void )
 {
 	for (;;)
 	{
-		core_ctx_switch();
 		port_clr_lock();
-		System.cur->state();
+		Current->state();
+		core_ctx_switch();
 	}
 }
 
@@ -293,20 +304,6 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 			core_tsk_append(tsk, tsk->guard);
 		}
 	}
-}
-
-/* -------------------------------------------------------------------------- */
-
-void core_ctx_init( tsk_t *tsk )
-{
-	ctx_t *ctx = (ctx_t *)tsk->top - 1;
-
-	ctx->psr = 0x01000000;
-	ctx->pc  = tsk->state;
-	ctx->lr  = core_tsk_break;
-	ctx->exc = 0xFFFFFFFD; // EXC_RETURN: return from psp
-
-	tsk->sp  = ctx;
 }
 
 /* -------------------------------------------------------------------------- */
