@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    25.01.2017
+    @date    31.01.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -127,18 +127,20 @@ typedef struct __sys
 typedef struct __ctx
 {
 	// context saved by the software
-	unsigned h[8]; // r4-r11
-	unsigned lr;   // EXC_RETURN
+	unsigned r4, r5, r6, r7, r8, r9, r10, r11;
+	unsigned lr;  // EXC_RETURN
 	// context saved by the hardware
-	unsigned l[6]; // r0-r3,ip,lr
+	unsigned r0, r1, r2, r3;
+	unsigned r12; // ip
+	unsigned r14; // lr
 	fun_t  * pc;
 	unsigned psr;
 
 }	ctx_t;
 
-/* -------------------------------------------------------------------------- */
+#define _CTX_INIT( pc ) { 0, 0, 0, 0, 0, 0, 0, 0, 0xFFFFFFFD, 0, 0, 0, 0, 0, 0, pc, 0x01000000 }
 
-#define _CTX_INIT( pc ) { { 0 }, 0xFFFFFFFD, { 0 }, pc, 0x01000000 }
+/* -------------------------------------------------------------------------- */
 
 __STATIC_INLINE
 void port_ctx_init( ctx_t *ctx, fun_t *pc )
