@@ -12,7 +12,7 @@ Features:
 - kernel can operate in tick-less mode (32-bit timer required)
 - signals (auto clearing, protected)
 - events
-- flags (one, all, accept, ignore)
+- flags (any, all, accept, ignore)
 - barriers
 - semaphores (binary, limited, counting)
 - mutexes (recursive and priority inheritance)
@@ -27,6 +27,9 @@ Features:
 - c++ wrapper
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
+---------
+4.5
+- rename flgOne to flgAny
 ---------
 4.4
 - added oslibc.c file for COSMIC Software CORTEX-M C Cross Compiler

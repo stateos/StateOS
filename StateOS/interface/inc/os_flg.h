@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    16.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -51,15 +51,15 @@ typedef struct __flg flg_t, flg_id[1];
 
 /* -------------------------------------------------------------------------- */
 
-#define flgOne       ( 0U << 0 )
+#define flgAny       ( 0U << 0 )
 #define flgAll       ( 1U << 0 )
 #define flgAccept    ( 0U << 1 )
 #define flgIgnore    ( 1U << 1 )
 #define flgMASK      ( 3U )
 
-#define flgOneAccept ( flgOne | flgAccept )
+#define flgAnyAccept ( flgAny | flgAccept )
 #define flgAllAccept ( flgAll | flgAccept )
-#define flgOneIgnore ( flgOne | flgIgnore )
+#define flgAnyIgnore ( flgAny | flgIgnore )
 #define flgAllIgnore ( flgAll | flgIgnore )
 
 /**********************************************************************************************************************
@@ -188,11 +188,11 @@ void flg_kill( flg_t *flg );
  *   flg             : pointer to flag object                                                                         *
  *   flags           : all flags to wait                                                                              *
  *   mode            : waiting mode                                                                                   *
- *                     flgOne:    wait for any flags to be set                                                        *
+ *                     flgAny:    wait for any flags to be set                                                        *
  *                     flgAll:    wait for all flags to be set                                                        *
  *                     flgAccept: accept flags that have been set and not accepted before                             *
  *                     flgIgnore: ignore flags that have been set and not accepted before                             *
- *                     ( either flgOne or flgAll can be OR'ed with flgAccept or flgIgnore )                           *
+ *                     ( either flgAny or flgAll can be OR'ed with flgAccept or flgIgnore )                           *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
@@ -217,11 +217,11 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned time
  *   flg             : pointer to flag object                                                                         *
  *   flags           : all flags to wait                                                                              *
  *   mode            : waiting mode                                                                                   *
- *                     flgOne:    wait for any flags to be set                                                        *
+ *                     flgAny:    wait for any flags to be set                                                        *
  *                     flgAll:    wait for all flags to be set                                                        *
  *                     flgAccept: accept flags that have been set and not accepted before                             *
  *                     flgIgnore: ignore flags that have been set and not accepted before                             *
- *                     ( either flgOne or flgAll can be OR'ed with flgAccept or flgIgnore )                           *
+ *                     ( either flgAny or flgAll can be OR'ed with flgAccept or flgIgnore )                           *
  *   delay           : duration of time (maximum number of ticks to wait on flag object for given flags)              *
  *                     IMMEDIATE: don't wait until requested flags have been set                                      *
  *                     INFINITE:  wait indefinitly until requested flags have been set                                *
@@ -248,11 +248,11 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned delay 
  *   flg             : pointer to flag object                                                                         *
  *   flags           : all flags to wait                                                                              *
  *   mode            : waiting mode                                                                                   *
- *                     flgOne:    wait for any flags to be set                                                        *
+ *                     flgAny:    wait for any flags to be set                                                        *
  *                     flgAll:    wait for all flags to be set                                                        *
  *                     flgAccept: accept flags that have been set and not accepted before                             *
  *                     flgIgnore: ignore flags that have been set and not accepted before                             *
- *                     ( either flgOne or flgAll can be OR'ed with flgAccept or flgIgnore )                           *
+ *                     ( either flgAny or flgAll can be OR'ed with flgAccept or flgIgnore )                           *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : requested flags have been set                                                                  *
@@ -276,11 +276,11 @@ unsigned flg_wait( flg_t *flg, unsigned flags, unsigned mode ) { return flg_wait
  *   flg             : pointer to flag object                                                                         *
  *   flags           : all flags to wait                                                                              *
  *   mode            : waiting mode                                                                                   *
- *                     flgOne:    wait for any flags to be set                                                        *
+ *                     flgAny:    wait for any flags to be set                                                        *
  *                     flgAll:    wait for all flags to be set                                                        *
  *                     flgAccept: accept flags that have been set and not accepted before                             *
  *                     flgIgnore: ignore flags that have been set and not accepted before                             *
- *                     ( either flgOne or flgAll can be OR'ed with flgAccept or flgIgnore )                           *
+ *                     ( either flgAny or flgAll can be OR'ed with flgAccept or flgIgnore )                           *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : requested flags have been set                                                                  *
@@ -303,11 +303,11 @@ unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode ) { return flg_wait
  *   flg             : pointer to flag object                                                                         *
  *   flags           : all flags to wait                                                                              *
  *   mode            : waiting mode                                                                                   *
- *                     flgOne:    wait for any flags to be set                                                        *
+ *                     flgAny:    wait for any flags to be set                                                        *
  *                     flgAll:    wait for all flags to be set                                                        *
  *                     flgAccept: accept flags that have been set and not accepted before                             *
  *                     flgIgnore: ignore flags that have been set and not accepted before                             *
- *                     ( either flgOne or flgAll can be OR'ed with flgAccept or flgIgnore )                           *
+ *                     ( either flgAny or flgAll can be OR'ed with flgAccept or flgIgnore )                           *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : requested flags have been set                                                                  *
