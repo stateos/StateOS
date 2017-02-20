@@ -23,6 +23,7 @@ Features:
 - mailbox queues
 - timers (one-shot, periodic)
 - cmsis-rtos api
+- cmsis-rtos2 api
 - nasa-osal support
 - c++ wrapper
 - all documentation is contained within the source files
@@ -32,6 +33,8 @@ Features:
 - rename flgOne to flgAny
 - added flg_clear function
 - added protection to flag object
+- added CMSIS-OS2 API
+- added CMSIS-OS2 example
 ---------
 4.4
 - added oslibc.c file for COSMIC Software CORTEX-M C Cross Compiler
