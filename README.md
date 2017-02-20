@@ -13,9 +13,9 @@ Features
 
 - kernel works in preemptive or cooperative mode
 - kernel can operate in tick-less mode (32-bit timer required)
-- signals (auto clearing, protected)
+- signals (clear, protect)
 - events
-- flags (any, all, accept, ignore)
+- flags (any, all, protect, ignore)
 - barriers
 - semaphores (binary, limited, counting)
 - mutexes (recursive and priority inheritance)
@@ -26,6 +26,7 @@ Features
 - mailbox queues
 - timers (one-shot, periodic)
 - cmsis-rtos api
+- cmsis-rtos2 api
 - nasa-osal support
 - c++ wrapper
 - all documentation is contained within the source files
