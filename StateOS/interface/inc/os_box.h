@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    17.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -345,7 +345,7 @@ unsigned box_takeISR( box_t *box, void *data ) { return box_waitFor(box, data, I
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned box_sendUntil( box_t *box, void *data, unsigned time );
+unsigned box_sendUntil( box_t *box, const void *data, unsigned time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -371,7 +371,7 @@ unsigned box_sendUntil( box_t *box, void *data, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned box_sendFor( box_t *box, void *data, unsigned delay );
+unsigned box_sendFor( box_t *box, const void *data, unsigned delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -394,7 +394,7 @@ unsigned box_sendFor( box_t *box, void *data, unsigned delay );
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-unsigned box_send( box_t *box, void *data ) { return box_sendFor(box, data, INFINITE); }
+unsigned box_send( box_t *box, const void *data ) { return box_sendFor(box, data, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -416,7 +416,7 @@ unsigned box_send( box_t *box, void *data ) { return box_sendFor(box, data, INFI
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-unsigned box_give( box_t *box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
+unsigned box_give( box_t *box, const void *data ) { return box_sendFor(box, data, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -438,7 +438,7 @@ unsigned box_give( box_t *box, void *data ) { return box_sendFor(box, data, IMME
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-unsigned box_giveISR( box_t *box, void *data ) { return box_sendFor(box, data, IMMEDIATE); }
+unsigned box_giveISR( box_t *box, const void *data ) { return box_sendFor(box, data, IMMEDIATE); }
 
 #ifdef __cplusplus
 }
@@ -467,17 +467,17 @@ struct MailBoxQueueT : public __box
 	 MailBoxQueueT( void ): __box _BOX_INIT(_limit, _size, _data) {}
 	~MailBoxQueueT( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                         {        box_kill     (this);                }
-	unsigned waitUntil( void *_data, unsigned _time  ) { return box_waitUntil(this, _data, _time);  }
-	unsigned waitFor  ( void *_data, unsigned _delay ) { return box_waitFor  (this, _data, _delay); }
-	unsigned wait     ( void *_data )                  { return box_wait     (this, _data);         }
-	unsigned take     ( void *_data )                  { return box_take     (this, _data);         }
-	unsigned takeISR  ( void *_data )                  { return box_takeISR  (this, _data);         }
-	unsigned sendUntil( void *_data, unsigned _time  ) { return box_sendUntil(this, _data, _time);  }
-	unsigned sendFor  ( void *_data, unsigned _delay ) { return box_sendFor  (this, _data, _delay); }
-	unsigned send     ( void *_data )                  { return box_send     (this, _data);         }
-	unsigned give     ( void *_data )                  { return box_give     (this, _data);         }
-	unsigned giveISR  ( void *_data )                  { return box_giveISR  (this, _data);         }
+	void     kill     ( void )                               {        box_kill     (this);                }
+	unsigned waitUntil(       void *_data, unsigned _time  ) { return box_waitUntil(this, _data, _time);  }
+	unsigned waitFor  (       void *_data, unsigned _delay ) { return box_waitFor  (this, _data, _delay); }
+	unsigned wait     (       void *_data )                  { return box_wait     (this, _data);         }
+	unsigned take     (       void *_data )                  { return box_take     (this, _data);         }
+	unsigned takeISR  (       void *_data )                  { return box_takeISR  (this, _data);         }
+	unsigned sendUntil( const void *_data, unsigned _time  ) { return box_sendUntil(this, _data, _time);  }
+	unsigned sendFor  ( const void *_data, unsigned _delay ) { return box_sendFor  (this, _data, _delay); }
+	unsigned send     ( const void *_data )                  { return box_send     (this, _data);         }
+	unsigned give     ( const void *_data )                  { return box_give     (this, _data);         }
+	unsigned giveISR  ( const void *_data )                  { return box_giveISR  (this, _data);         }
 
 	private:
 	char _data[_limit * _size];

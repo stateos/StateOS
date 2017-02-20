@@ -10,9 +10,9 @@ There's a dedicated function for immediate change the task state.
 Features:
 - kernel works in preemptive or cooperative mode
 - kernel can operate in tick-less mode (32-bit timer required)
-- signals (auto clearing, protected)
+- signals (clear, protect)
 - events
-- flags (any, all, accept, ignore)
+- flags (any, all, protect, ignore)
 - barriers
 - semaphores (binary, limited, counting)
 - mutexes (recursive and priority inheritance)
@@ -30,6 +30,8 @@ Features:
 ---------
 4.5
 - rename flgOne to flgAny
+- added flg_clear function
+- added protection to flag object
 ---------
 4.4
 - added oslibc.c file for COSMIC Software CORTEX-M C Cross Compiler

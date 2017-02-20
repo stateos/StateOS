@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    10.01.2017
+    @date    17.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -177,17 +177,17 @@ unsigned priv_box_send( box_t *box, void *data, unsigned time, unsigned(*wait)()
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendUntil( box_t *box, void *data, unsigned time )
+unsigned box_sendUntil( box_t *box, const void *data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_box_send(box, data, time, core_tsk_waitUntil);
+	return priv_box_send(box, (void*)data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendFor( box_t *box, void *data, unsigned delay )
+unsigned box_sendFor( box_t *box, const void *data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_box_send(box, data, delay, core_tsk_waitFor);
+	return priv_box_send(box, (void*)data, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
