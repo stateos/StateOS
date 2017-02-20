@@ -68,7 +68,8 @@ osStatus_t osKernelGetInfo (osVersion_t *version, char *id_buf, uint32_t id_size
 	if (port_isr_inside())
 		return osErrorISR;
 
-	if (version != NULL) {
+	if (version != NULL)
+	{
 		version->api    = OS_API;
 		version->kernel = OS_VER;
 	}
@@ -97,7 +98,7 @@ osStatus_t osKernelStart (void)
 
 int32_t osKernelLock (void)
 {
-	uint32_t lock;
+	int32_t lock;
 
 	if (port_isr_inside())
 		return (int32_t)osErrorISR;
@@ -110,7 +111,7 @@ int32_t osKernelLock (void)
 
 int32_t osKernelUnlock (void)
 {
-	uint32_t lock;
+	int32_t lock;
 
 	if (port_isr_inside())
 		return (int32_t)osErrorISR;
