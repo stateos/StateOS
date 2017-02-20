@@ -9,8 +9,8 @@ void slave()
 {
 	mtx.wait();
 	cnd.wait(&mtx);
-	led.tick();
 	mtx.give();
+	led.tick();
 }
 
 void master()

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    17.02.2017
+    @date    20.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -422,9 +422,9 @@ struct Flag : public __flg
 	void     kill     ( void )                                             {        flg_kill     (this);                        }
 	unsigned waitUntil( unsigned _flags, unsigned _mode, unsigned _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
 	unsigned waitFor  ( unsigned _flags, unsigned _mode, unsigned _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
-	unsigned wait     ( unsigned _flags, unsigned _mode = flgAllAccept )   { return flg_wait     (this, _flags, _mode);         }
-	unsigned take     ( unsigned _flags, unsigned _mode = flgAllAccept )   { return flg_take     (this, _flags, _mode);         }
-	unsigned takeISR  ( unsigned _flags, unsigned _mode = flgAllAccept )   { return flg_takeISR  (this, _flags, _mode);         }
+	unsigned wait     ( unsigned _flags, unsigned _mode = flgAll )         { return flg_wait     (this, _flags, _mode);         }
+	unsigned take     ( unsigned _flags, unsigned _mode = flgAll )         { return flg_take     (this, _flags, _mode);         }
+	unsigned takeISR  ( unsigned _flags, unsigned _mode = flgAll )         { return flg_takeISR  (this, _flags, _mode);         }
 	unsigned give     ( unsigned _flags )                                  { return flg_give     (this, _flags);                }
 	unsigned giveISR  ( unsigned _flags )                                  { return flg_giveISR  (this, _flags);                }
 	unsigned clear    ( unsigned _flags )                                  { return flg_clear    (this, _flags);                }
