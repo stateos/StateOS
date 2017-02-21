@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    21.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -497,6 +497,23 @@ void tsk_kill( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : tsk_detach                                                                                     *
+ *                                                                                                                    *
+ * Description       : detach given task                                                                              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to task object                                                                         *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void tsk_detach( tsk_t *tsk );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : tsk_join                                                                                       *
  *                                                                                                                    *
  * Description       : delay execution of current task until termination of given task                                *
@@ -507,6 +524,7 @@ void tsk_kill( tsk_t *tsk );
  * Return                                                                                                             *
  *   E_SUCCESS       : joined task was stopped its execution                                                          *
  *   E_STOPPED       : joined task was killed                                                                         *
+ *   E_TIMEOUT       : joined task was detached                                                                       *
  *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
@@ -849,6 +867,8 @@ namespace ThisTask
 	void     prio      ( unsigned _prio )                   {        tsk_prio      (_prio);               }
 
 	unsigned prio      ( void )                             { return Current->prio;                       }
+	void     kill      ( void )                             {        tsk_kill      (Current);             }
+	void     detach    ( void )                             {        tsk_detach    (Current);             }
 
 	unsigned waitUntil ( unsigned _flags, unsigned _time )  { return tsk_waitUntil (_flags, _time);       }
 	unsigned waitFor   ( unsigned _flags, unsigned _delay ) { return tsk_waitFor   (_flags, _delay);      }
@@ -882,6 +902,7 @@ struct TaskT : public __tsk
 	~TaskT( void ) { assert(obj.id == ID_STOPPED); }
 
 	void     kill      ( void )                             {        tsk_kill      (this);                }
+	void     detach    ( void )                             {        tsk_detach    (this);                }
 	unsigned join      ( void )                             { return tsk_join      (this);                }
 	void     start     ( void )                             {        tsk_start     (this);                }
 	void     startFrom ( fun_t  * _state )                  {        tsk_startFrom (this, _state);        }

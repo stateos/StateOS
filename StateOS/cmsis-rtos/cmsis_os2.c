@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    20.02.2017
+    @date    21.02.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -98,27 +98,23 @@ osStatus_t osKernelStart (void)
 
 int32_t osKernelLock (void)
 {
-	int32_t lock;
+	int32_t lock = __get_PRIMASK();
 
 	if (port_isr_inside())
 		return (int32_t)osErrorISR;
 
-	lock = __get_PRIMASK();
 	__disable_irq();
-
 	return lock;
 }
 
 int32_t osKernelUnlock (void)
 {
-	int32_t lock;
+	int32_t lock = __get_PRIMASK();
 
 	if (port_isr_inside())
 		return (int32_t)osErrorISR;
 
-	lock = __get_PRIMASK();
 	__enable_irq();
-
 	return lock;
 }
 
@@ -128,8 +124,6 @@ int32_t osKernelRestoreLock (int32_t lock)
 		return (int32_t)osErrorISR;
 
 	__set_PRIMASK(lock);
-	lock = __get_PRIMASK();
-
 	return lock;
 }
 
@@ -140,27 +134,27 @@ uint32_t osKernelSuspend (void)
 
 void osKernelResume (uint32_t sleep_ticks)
 {
-	(void)sleep_ticks;
+	(void) sleep_ticks;
 }
 
 uint64_t osKernelGetTickCount (void)
 {
-	return (uint64_t)Counter;
+	return Counter;
 }
 
 uint32_t osKernelGetTickFreq (void)
 {
-	return (uint32_t)OS_FREQUENCY;
+	return OS_FREQUENCY;
 }
 
 uint32_t osKernelGetSysTimerCount (void)
 {
-	return (uint32_t)Counter;
+	return Counter;
 }
 
 uint32_t osKernelGetSysTimerFreq (void)
 {
-	return (uint32_t)OS_FREQUENCY;
+	return OS_FREQUENCY;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -177,7 +171,7 @@ static void osThreadProcedure (void)
 osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAttr_t *attr)
 {
 	osThread_t * thread     = NULL;
-	uint32_t     flags      = 0U;
+	uint32_t     flags      = osThreadJoinable;
 	void       * stack_mem  = NULL;
 	uint32_t     stack_size = osThreadStackSize(OS_STACK_SIZE);
 
@@ -235,6 +229,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	thread->tsk.top   = (uint64_t *)stack_mem + stack_size/8U;
 	thread->tsk.prio  = \
 	thread->tsk.basic = (attr == NULL) ? osPriorityNormal : attr->priority;
+	thread->tsk.join  = (flags & osThreadJoinable) ? NULL : DETACHED;
 	thread->flags     = flags;
 	thread->name      = (attr == NULL) ? NULL : attr->name;
 	thread->func      = func;
@@ -364,7 +359,7 @@ osStatus_t osThreadResume (osThreadId_t thread_id)
 	return osOK;
 }
 
-static osStatus_t osThreadDelete (osThreadId_t thread_id)
+static void osThreadDelete (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
 
@@ -379,8 +374,6 @@ static osStatus_t osThreadDelete (osThreadId_t thread_id)
 	}
 
 	sys_unlock();
-
-	return osOK;
 }
 
 osStatus_t osThreadDetach (osThreadId_t thread_id)
@@ -391,12 +384,13 @@ osStatus_t osThreadDetach (osThreadId_t thread_id)
 		return osErrorISR;
 	if (thread_id == NULL)
 		return osErrorParameter;
-	if ((thread->flags & osThreadJoinable) == 0U)
+	if (thread->tsk.join == DETACHED)
 		return osErrorResource;
 
-	thread->flags &= ~osThreadJoinable;
+	tsk_detach(&thread->tsk);
 
-	return osThreadDelete(thread_id);
+	osThreadDelete(thread_id);
+	return osOK;
 }
 
 osStatus_t osThreadJoin (osThreadId_t thread_id)
@@ -407,15 +401,16 @@ osStatus_t osThreadJoin (osThreadId_t thread_id)
 		return osErrorISR;
 	if (thread_id == NULL)
 		return osErrorParameter;
-	if ((thread->flags & osThreadJoinable) == 0U)
-		return osErrorResource;
 
 	switch (tsk_join(&thread->tsk))
 	{
 		case E_SUCCESS:
-		case E_STOPPED: return osThreadDelete(thread_id);
-		default:        return osError;
+		case E_STOPPED: break;
+		default:        return osErrorResource;
 	}
+
+	osThreadDelete(thread_id);
+	return osOK;
 }
 
 __NO_RETURN void osThreadExit (void)
@@ -434,8 +429,8 @@ osStatus_t osThreadTerminate (osThreadId_t thread_id)
 
 	tsk_kill(&thread->tsk);
 
-	if ((thread->flags & osThreadJoinable) == 0U)
-		return osThreadDelete(thread_id);
+	if (thread->tsk.join == DETACHED)
+		osThreadDelete(thread_id);
 
 	return osOK;
 }

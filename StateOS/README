@@ -35,6 +35,7 @@ Features:
 - added protection to flag object
 - added CMSIS-OS2 API
 - added CMSIS-OS2 example
+- added tsk_detach function
 ---------
 4.4
 - added oslibc.c file for COSMIC Software CORTEX-M C Cross Compiler

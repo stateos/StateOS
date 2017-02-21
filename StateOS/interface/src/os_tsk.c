@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    20.02.2017
+    @date    21.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -103,8 +103,10 @@ void tsk_stop( void )
 {
 	port_set_lock();
 
-	while (Current->list) mtx_kill(Current->list);
-	core_all_wakeup(&Current->join, E_SUCCESS);
+	while (Current->list)
+		mtx_kill(Current->list);
+	if (Current->join != DETACHED)
+		core_all_wakeup(&Current->join, E_SUCCESS);
 
 	core_tsk_remove(Current);
 
@@ -119,8 +121,10 @@ void tsk_kill( tsk_t *tsk )
 
 	port_sys_lock();
 
-	while (tsk->list) mtx_kill(tsk->list);
-	core_all_wakeup(&tsk->join, E_STOPPED);
+	while (tsk->list)
+		mtx_kill(tsk->list);
+	if (tsk->join != DETACHED)
+		core_all_wakeup(&tsk->join, E_STOPPED);
 
 	if (tsk->obj.id == ID_READY)
 		core_tsk_remove(tsk);
@@ -135,19 +139,39 @@ void tsk_kill( tsk_t *tsk )
 }
 
 /* -------------------------------------------------------------------------- */
+void tsk_detach( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	assert(tsk);
+
+	port_sys_lock();
+
+	if (tsk->join != DETACHED)
+		if (tsk->obj.id != ID_STOPPED)
+			core_all_wakeup(&tsk->join, E_TIMEOUT);
+
+	tsk->join = DETACHED;
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned tsk_join( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_SUCCESS;
+	unsigned event;
 
 	assert(tsk);
 
 	port_sys_lock();
 
-	if (tsk->obj.id != ID_STOPPED)
-	{
+	if (tsk->join == DETACHED)
+		event = E_TIMEOUT;
+	else
+	if (tsk->obj.id == ID_STOPPED)
+		event = E_SUCCESS;
+	else
 		event = core_tsk_waitFor(&tsk->join, INFINITE);
-	}
 
 	port_sys_unlock();
 

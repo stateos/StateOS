@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    31.01.2017
+    @date    21.02.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -62,6 +62,10 @@ extern "C" {
 
 #define IMMEDIATE  ( 0U) // no waiting
 #define INFINITE   (~0U) // infinite waiting
+
+/* -------------------------------------------------------------------------- */
+
+#define DETACHED   ((void*)-1) // task in detached state
 
 /* -------------------------------------------------------------------------- */
 
