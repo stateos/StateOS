@@ -1195,7 +1195,7 @@ uint32 OS_TaskGetId(void)
 	uint32 task_id = ((OS_task_record_t *) Current - OS_task_table) / sizeof(OS_task_record_t);
 
 	if (task_id >= OS_MAX_TASKS)
-		return OS_ERR_INVALID_ID;
+		return (uint32) OS_ERR_INVALID_ID;
 
 	return task_id;
 }
