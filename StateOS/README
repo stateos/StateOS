@@ -33,9 +33,11 @@ Features:
 - rename flgOne to flgAny
 - added flg_clear function
 - added protection to flag object
-- added CMSIS-OS2 API
-- added CMSIS-OS2 example
+- added cmsis-os2 API
+- added cmsis-os2 example
 - added tsk_detach function
+- rebuilded cmsis-os1 api
+- rebuilded nasa-osal api
 ---------
 4.4
 - added oslibc.c file for COSMIC Software CORTEX-M C Cross Compiler

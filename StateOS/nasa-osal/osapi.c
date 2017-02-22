@@ -18,68 +18,13 @@
 **
 ** $Date: 2013/07/25 10:01:32GMT-05:00 $
 **
-** $Log: osapi.h  $
-** Revision 1.10 2013/07/25 10:01:32GMT-05:00 acudmore
-** Added C++ support
-** Revision 1.9 2010/11/12 12:00:17GMT-05:00 acudmore
-** replaced copyright character with (c) and added open source notice where needed.
-** Revision 1.8 2010/03/08 15:57:20EST acudmore
-** include new OSAL version header file
-** Revision 1.7 2009/08/10 14:01:10EDT acudmore
-** Reset OSAL version for trunk
-** Revision 1.6 2009/08/10 13:55:49EDT acudmore
-** Updated OSAL version defines to 3.0
-** Revision 1.5 2009/06/10 14:15:55EDT acudmore
-** Removed HAL include files. HAL code was removed from OSAL.
-** Revision 1.4 2008/08/20 16:12:51EDT apcudmore
-** Updated timer error codes
-** Revision 1.3 2008/08/20 15:46:27EDT apcudmore
-** Add support for timer API
-** Revision 1.2 2008/06/20 15:13:43EDT apcudmore
-** Checked in new Module loader/symbol table functionality
-** Revision 1.1 2008/04/20 22:36:02EDT ruperera
-** Initial revision
-** Member added to project c:/MKSDATA/MKS-REPOSITORY/MKS-OSAL-REPOSITORY/src/os/inc/project.pj
-** Revision 1.6 2008/02/14 11:29:10EST apcudmore
-** Updated version define ( 2.11 )
-** Revision 1.5 2008/02/07 11:31:58EST apcudmore
-** Fixed merge problem
-** Revision 1.4 2008/02/07 11:07:29EST apcudmore
-** Added dynamic loader / Symbol lookup API
-**   -- API only, next release will have functionality
-** Revision 1.2 2008/01/29 14:30:49EST njyanchik
-** I added code to all the ports that allow the values of both binary and counting semaphores to be
-** gotten through the OS_*SemGetInfo API.
-** Revision 1.1 2007/10/16 16:14:52EDT apcudmore
-** Initial revision
-** Member added to project d:/mksdata/MKS-OSAL-REPOSITORY/src/os/inc/project.pj
-** Revision 1.2 2007/09/28 15:46:49EDT rjmcgraw
-** Updated version numbers to 5.0
-** Revision 1.1 2007/08/24 13:43:25EDT apcudmore
-** Initial revision
-** Member added to project d:/mksdata/MKS-CFE-PROJECT/fsw/cfe-core/os/inc/project.pj
-** Revision 1.9.1.1 2007/05/21 08:58:51EDT njyanchik
-** The trunk version number has been updated to version 0.0
-** Revision 1.9 2006/06/12 10:20:07EDT rjmcgraw
-** Updated OS_MINOR_VERSION from 3 to 4
-** Revision 1.8 2006/02/03 09:30:45EST njyanchik
-** Changed version number to 2.3
-** Revision 1.7 2006/01/20 11:56:16EST njyanchik
-** Fixed header file information to match api document
-** Revision 1.15  2005/11/09 13:35:49  nyanchik
-** Revisions for 2.2 include:
-** a new scheduler mapper for Linux and OS X
-** addition of OS_printf function
-** fixed issues that would cause warnings at compile time
-**
-**
 */
 
 /******************************************************************************
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    18.01.2017
+    @date    22.02.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -104,27 +49,83 @@
  ******************************************************************************/
 
 #include <stdarg.h>
+#include <string.h>
 #include <stdio.h>
-#include <osapi.h>
 #include <os.h>
+#include <osapi.h>
 
 /*---------------------------------------------------------------------------*/
 /*
-** OSAL data
+** OSAL internal data
 */
 
+static uint32    printf_enabled = FALSE;
+static OS_time_t localtime = { 0, 0 };
+
+/* queues */
 typedef struct
 {
-	OS_time_t localtime;
-	boolean   printf;
-}	osal_t;
+	box_t  box;
+	char   name [OS_MAX_API_NAME];
+	uint32 creator;
+	uint32 used;
+}	OS_queue_record_t;
 
-/*---------------------------------------------------------------------------*/
-/*
-** OSAL data instance
-*/
+/* binary semaphores */
+typedef struct
+{
+	sem_t  sem;
+	char   name [OS_MAX_API_NAME];
+	uint32 creator;
+	uint32 used;
+}	OS_bin_sem_record_t;
 
-static osal_t osal = {{ 0, 0 }, 0 };
+/* counting semaphores */
+typedef struct
+{
+	sem_t  sem;
+	char   name [OS_MAX_API_NAME];
+	uint32 creator;
+	uint32 used;
+}	OS_count_sem_record_t;
+
+/* mutexes */
+typedef struct
+{
+	mtx_t  mtx;
+	char   name [OS_MAX_API_NAME];
+	uint32 creator;
+	uint32 used;
+}	OS_mut_sem_record_t;
+
+/* tasks */
+typedef struct
+{
+	tsk_t  tsk;
+	char   name [OS_MAX_API_NAME];
+	uint32 creator;
+	uint32 used;
+	void  *stack;
+	uint32 size;
+	void (*delete_handler)(void);
+}	OS_task_record_t;
+
+/* timers */
+typedef struct
+{
+	tmr_t  tmr;
+	char   name [OS_MAX_API_NAME];
+	uint32 creator;
+	uint32 used;
+	void (*handler)(uint32);
+}	OS_timer_record_t;
+
+static OS_queue_record_t     OS_queue_table    [OS_MAX_QUEUES];
+static OS_bin_sem_record_t   OS_bin_sem_table  [OS_MAX_BIN_SEMAPHORES];
+static OS_count_sem_record_t OS_count_sem_table[OS_MAX_COUNT_SEMAPHORES];
+static OS_mut_sem_record_t   OS_mut_sem_table  [OS_MAX_MUTEXES];
+static OS_task_record_t      OS_task_table     [OS_MAX_TASKS];
+static OS_timer_record_t     OS_timer_table    [OS_MAX_TIMERS];
 
 /*---------------------------------------------------------------------------*/
 /*
@@ -135,11 +136,12 @@ static void local_timer_handler( void )
 {
 	sys_lockISR();
 
-	osal.localtime.microsecs += 1000;
-	if (osal.localtime.microsecs >= 1000000)
+	localtime.microsecs += 1000;
+
+	if (localtime.microsecs >= 1000000)
 	{
-		osal.localtime.microsecs = 0;
-		osal.localtime.seconds++;
+		localtime.microsecs = 0;
+		localtime.seconds++;
 	}
 
 	sys_unlockISR();
@@ -163,369 +165,34 @@ int32 OS_API_Init(void)
 	sys_init();
 #endif
 	tmr_startPeriodic(&local_timer, MSEC, local_timer_handler);
-	
+
 	return OS_SUCCESS;
 }
 
 /*---------------------------------------------------------------------------*/
 /*
-** Task API
+** Abstraction for printf statements
 */
 
-int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry function_pointer,
-                    const uint32 *stack_pointer, uint32 stack_size, uint32 priority, uint32 flags)
+void OS_printf(const char *fmt, ...)
 {
-	(void) task_name;
-	(void) flags;
-
-	sys_lock();
-
-	if (!stack_pointer && !stack_size) stack_size = OS_STACK_SIZE;
-
-	*task_id = (uint32) tsk_create(~priority, function_pointer, stack_pointer ? 0 : stack_size);
-
-	if (*task_id && stack_pointer)
-		((tsk_t*)*task_id)->top = (void*) &stack_pointer[stack_size / sizeof(uint32)];
-
-	sys_unlock();
-
-	return *task_id ? OS_SUCCESS : OS_ERROR;
-}
-
-int32 OS_TaskDelete(uint32 task_id)
-{
-	if (task_id == 0)
-		task_id = OS_TaskGetId();
-
-	tsk_kill((tsk_t*)task_id);
-	sys_free((void *)task_id);
-
-	return OS_SUCCESS;
-}
-
-void OS_TaskExit(void)
-{
-	tsk_stop();
-}
-
-int32 OS_TaskInstallDeleteHandler(void *function_pointer)
-{
-	(void) function_pointer;
-
-	return OS_ERR_NOT_IMPLEMENTED;
-}
-
-int32 OS_TaskDelay(uint32 millisecond)
-{
-	switch (tsk_delay(millisecond*MSEC))
+	if (printf_enabled)
 	{
-	case E_TIMEOUT: return OS_SUCCESS;
-	default:        return OS_ERROR;
+		va_list arp;
+		va_start(arp, fmt);
+		printf(fmt, arp);
+		va_end(arp);
 	}
 }
 
-int32 OS_TaskSetPriority(uint32 task_id, uint32 new_priority)
+void OS_printf_disable(void)
 {
-	if (task_id == 0)
-		task_id = OS_TaskGetId();
-
-	sys_lock();
-
-	new_priority = ~new_priority;
-	((tsk_t*)task_id)->basic = new_priority;
-	core_tsk_prio(((tsk_t*)task_id), new_priority);
-
-	sys_unlock();
-
-	return OS_SUCCESS;
+	printf_enabled = FALSE;
 }
 
-int32 OS_TaskRegister(void)
+void OS_printf_enable(void)
 {
-	return OS_SUCCESS;
-}
-
-uint32 OS_TaskGetId(void)
-{
-	return (uint32) Current;
-}
-
-int32 OS_TaskGetIdByName(uint32 *task_id, const char *task_name)
-{
-	(void) task_id;
-	(void) task_name;
-
-	return OS_ERR_NOT_IMPLEMENTED;
-}
-
-int32 OS_TaskGetInfo(uint32 task_id, OS_task_prop_t *task_prop)
-{
-	(void) task_id;
-	(void) task_prop;
-
-	return OS_ERR_NOT_IMPLEMENTED;
-}
-
-/*---------------------------------------------------------------------------*/
-/*
-** Message Queue API
-*/
-
-int32 OS_QueueCreate(uint32 *queue_id, const char *queue_name, uint32 queue_depth, uint32 data_size, uint32 flags)
-{
-	(void) queue_name;
-	(void) flags;
-
-	*queue_id = (uint32) box_create(queue_depth, data_size);
-
-	return *queue_id ? OS_SUCCESS : OS_ERROR;
-}
-
-int32 OS_QueueDelete(uint32 queue_id)
-{
-	box_kill((box_t*)queue_id);
-	sys_free((void *)queue_id);
-
-	return OS_SUCCESS;
-}
-
-int32 OS_QueueGet(uint32 queue_id, void *data, uint32 size, uint32 *size_copied, int32 timeout)
-{
-	(void) size;
-
-	switch (box_waitFor((box_t*)queue_id, data, timeout))
-	{
-	case E_SUCCESS: *size_copied = ((box_t*)queue_id)->size; return OS_SUCCESS;
-	case E_TIMEOUT: *size_copied = 0;                        return OS_QUEUE_TIMEOUT;
-	default:        *size_copied = 0;                        return OS_ERROR;
-	}
-}
-
-int32 OS_QueuePut(uint32 queue_id, void *data, uint32 size, uint32 flags)
-{
-	(void) size;
-	(void) flags;
-
-	switch (box_give((box_t*)queue_id, data))
-	{
-	case E_SUCCESS: return OS_SUCCESS;
-	case E_TIMEOUT: return OS_QUEUE_FULL;
-	default:        return OS_ERROR;
-	}
-}
-
-int32 OS_QueueGetIdByName(uint32 *queue_id, const char *queue_name)
-{
-	(void) queue_id;
-	(void) queue_name;
-
-	return OS_ERR_NOT_IMPLEMENTED;
-}
-
-int32 OS_QueueGetInfo(uint32 queue_id, OS_queue_prop_t *queue_prop)
-{
-	(void) queue_id;
-	(void) queue_prop;
-
-	return OS_ERR_NOT_IMPLEMENTED;
-}
-
-/*---------------------------------------------------------------------------*/
-/*
-** Semaphore API
-*/
-
-int32 OS_BinSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_value, uint32 options)
-{
-	(void) sem_name;
-	(void) options;
-
-	*sem_id = (uint32) sem_create(sem_initial_value, semBinary);
-
-	return *sem_id ? OS_SUCCESS : OS_ERROR;
-}
-
-int32 OS_BinSemFlush(uint32 sem_id)
-{
-	sem_kill((sem_t*)sem_id);
-
-	return OS_SUCCESS;
-}
-
-int32 OS_BinSemGive(uint32 sem_id)
-{
-	switch (sem_give((sem_t*)sem_id))
-	{
-	case E_SUCCESS: return OS_SUCCESS;
-	case E_TIMEOUT: return OS_SUCCESS;
-	default:        return OS_SEM_FAILURE;
-	}
-}
-
-int32 OS_BinSemTake(uint32 sem_id)
-{
-	switch (sem_wait((sem_t*)sem_id))
-	{
-	case E_SUCCESS: return OS_SUCCESS;
-	case E_TIMEOUT: return OS_SEM_TIMEOUT;
-	default:        return OS_SEM_FAILURE;
-	}
-}
-
-int32 OS_BinSemTimedWait(uint32 sem_id, uint32 msecs)
-{
-	switch (sem_waitFor((sem_t*)sem_id, msecs*MSEC))
-	{
-	case E_SUCCESS: return OS_SUCCESS;
-	case E_TIMEOUT: return OS_SEM_TIMEOUT;
-	default:        return OS_SEM_FAILURE;
-	}
-}
-
-int32 OS_BinSemDelete(uint32 sem_id)
-{
-	sem_kill((sem_t*)sem_id);
-	sys_free((void *)sem_id);
-
-	return OS_SUCCESS;
-}
-
-int32 OS_BinSemGetIdByName(uint32 *sem_id, const char *sem_name)
-{
-	(void) sem_id;
-	(void) sem_name;
-
-	return OS_ERR_NOT_IMPLEMENTED;
-}
-
-int32 OS_BinSemGetInfo(uint32 sem_id, OS_bin_sem_prop_t *bin_prop)
-{
-	(void) sem_id;
-	(void) bin_prop;
-
-	return OS_ERR_NOT_IMPLEMENTED;
-}
-
-int32 OS_CountSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_value, uint32 options)
-{
-	(void) sem_name;
-	(void) options;
-
-	*sem_id = (uint32) sem_create(sem_initial_value, semCounting);
-
-	return *sem_id ? OS_SUCCESS : OS_ERROR;
-}
-
-int32 OS_CountSemGive(uint32 sem_id)
-{
-	switch (sem_give((sem_t*)sem_id))
-	{
-	case E_SUCCESS: return OS_SUCCESS;
-	case E_TIMEOUT: return OS_SUCCESS;
-	default:        return OS_SEM_FAILURE;
-	}
-}
-
-int32 OS_CountSemTake(uint32 sem_id)
-{
-	switch (sem_wait((sem_t*)sem_id))
-	{
-	case E_SUCCESS: return OS_SUCCESS;
-	case E_TIMEOUT: return OS_SEM_TIMEOUT;
-	default:        return OS_SEM_FAILURE;
-	}
-}
-
-int32 OS_CountSemTimedWait(uint32 sem_id, uint32 msecs)
-{
-	switch (sem_waitFor((sem_t*)sem_id, msecs*MSEC))
-	{
-	case E_SUCCESS: return OS_SUCCESS;
-	case E_TIMEOUT: return OS_SEM_TIMEOUT;
-	default:        return OS_SEM_FAILURE;
-	}
-}
-
-int32 OS_CountSemDelete(uint32 sem_id)
-{
-	sem_kill((sem_t*)sem_id);
-	sys_free((void *)sem_id);
-
-	return OS_SUCCESS;
-}
-
-int32 OS_CountSemGetIdByName(uint32 *sem_id, const char *sem_name)
-{
-	(void) sem_id;
-	(void) sem_name;
-
-	return OS_ERR_NOT_IMPLEMENTED;
-}
-
-int32 OS_CountSemGetInfo(uint32 sem_id, OS_count_sem_prop_t *count_prop)
-{
-	(void) sem_id;
-	(void) count_prop;
-
-	return OS_ERR_NOT_IMPLEMENTED;
-}
-
-/*---------------------------------------------------------------------------*/
-/*
-** Mutex API
-*/
-
-int32 OS_MutSemCreate(uint32 *sem_id, const char *sem_name, uint32 options)
-{
-	(void) sem_name;
-	(void) options;
-
-	*sem_id = (uint32) mtx_create();
-
-	return *sem_id ? OS_SUCCESS : OS_ERROR;
-}
-
-int32 OS_MutSemGive(uint32 sem_id)
-{
-	switch (mtx_give((mtx_t*)sem_id))
-	{
-	case E_SUCCESS: return OS_SUCCESS;
-	default:        return OS_SEM_FAILURE;
-	}
-}
-
-int32 OS_MutSemTake(uint32 sem_id)
-{
-	switch (mtx_wait((mtx_t*)sem_id))
-	{
-	case E_SUCCESS: return OS_SUCCESS;
-	case E_TIMEOUT: return OS_SEM_TIMEOUT;
-	default:        return OS_SEM_FAILURE;
-	}
-}
-
-int32 OS_MutSemDelete(uint32 sem_id)
-{
-	mtx_kill((mtx_t*)sem_id);
-	sys_free((void *)sem_id);
-
-	return OS_SUCCESS;
-}
-
-int32 OS_MutSemGetIdByName(uint32 *sem_id, const char *sem_name)
-{
-	(void) sem_id;
-	(void) sem_name;
-
-	return OS_ERR_NOT_IMPLEMENTED;
-}
-
-int32 OS_MutSemGetInfo(uint32 sem_id, OS_mut_sem_prop_t *mut_prop)
-{
-	(void) sem_id;
-	(void) mut_prop;
-
-	return OS_ERR_NOT_IMPLEMENTED;
+	printf_enabled = TRUE;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -547,7 +214,7 @@ int32 OS_GetLocalTime(OS_time_t *time_struct)
 {
 	sys_lock();
 
-	*time_struct = osal.localtime;
+	*time_struct = localtime;
 
 	sys_unlock();
 
@@ -558,11 +225,1037 @@ int32 OS_SetLocalTime(OS_time_t *time_struct)
 {
 	sys_lock();
 
-	osal.localtime = *time_struct;
+	localtime = *time_struct;
 
 	sys_unlock();
 
 	return OS_SUCCESS;
+}
+
+/*---------------------------------------------------------------------------*/
+/*
+** Message Queue API
+*/
+
+int32 OS_QueueCreate(uint32 *queue_id, const char *queue_name, uint32 queue_depth, uint32 data_size, uint32 flags)
+{
+	OS_queue_record_t *rec;
+	int32 status;
+	void *data;
+
+	(void) flags;
+
+	sys_lock();
+
+	if (!queue_id || !queue_name)
+		status = OS_INVALID_POINTER;
+	else if (strlen(queue_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_queue_table; rec < OS_queue_table + OS_MAX_QUEUES; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, queue_name) == 0)
+					break;
+
+		if (rec < OS_queue_table + OS_MAX_QUEUES)
+			status = OS_ERR_NAME_TAKEN;
+		else
+		{
+			for (rec = OS_queue_table; rec < OS_queue_table + OS_MAX_QUEUES; rec++)
+				if (rec->used == 0)
+					break;
+
+			if (rec >= OS_queue_table + OS_MAX_QUEUES)
+				status = OS_ERR_NO_FREE_IDS;
+			else
+			{
+				data = sys_alloc(queue_depth * data_size);
+
+				if (!data)
+					status = OS_ERROR;
+				else
+				{
+					*queue_id = (rec - OS_queue_table) / sizeof(OS_queue_record_t);
+					strcpy(rec->name, queue_name);
+					rec->creator   = OS_TaskGetId();
+					rec->box.limit = queue_depth;
+					rec->box.size  = data_size;
+					rec->box.data  = data;
+					rec->used = 1;
+					status = OS_SUCCESS;
+				}
+			}
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_QueueDelete(uint32 queue_id)
+{
+	OS_queue_record_t *rec = &OS_queue_table[queue_id];
+	int32 status;
+
+	sys_lock();
+
+	if (queue_id >= OS_MAX_QUEUES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		box_kill(&rec->box);
+		sys_free(rec->box.data);
+		memset(rec, 0, sizeof(OS_queue_record_t));
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_QueueGet(uint32 queue_id, void *data, uint32 size, uint32 *size_copied, int32 timeout)
+{
+	OS_queue_record_t *rec = &OS_queue_table[queue_id];
+	int32 status;
+
+	sys_lock();
+
+	if (queue_id >= OS_MAX_QUEUES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else if (size < rec->box.size)
+		status = OS_QUEUE_INVALID_SIZE;
+	else
+	{
+		timeout = (timeout == OS_PEND)  ? (int32) INFINITE  :
+		          (timeout == OS_CHECK) ? (int32) IMMEDIATE :
+		          /* else */              (int32)(timeout * MSEC);
+
+		switch (box_waitFor(&rec->box, data, timeout))
+		{
+			case E_SUCCESS: *size_copied = rec->box.size; status = OS_SUCCESS; break;
+			case E_TIMEOUT: status = timeout ? OS_QUEUE_TIMEOUT : OS_QUEUE_EMPTY; break;
+			default:        status = OS_ERROR; break;
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_QueuePut(uint32 queue_id, void *data, uint32 size, uint32 flags)
+{
+	OS_queue_record_t *rec = &OS_queue_table[queue_id];
+	int32 status;
+
+	(void) flags;
+
+	sys_lock();
+
+	if (queue_id >= OS_MAX_QUEUES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else if (size > rec->box.size)
+		status = OS_QUEUE_INVALID_SIZE;
+	else switch (box_give(&rec->box, data))
+	{
+		case E_SUCCESS: status = OS_SUCCESS;    break;
+		case E_TIMEOUT: status = OS_QUEUE_FULL; break;
+		default:        status = OS_ERROR;      break;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_QueueGetIdByName(uint32 *queue_id, const char *queue_name)
+{
+	OS_queue_record_t *rec;
+	int32 status;
+
+	sys_lock();
+
+	if (!queue_id || !queue_name)
+		status = OS_INVALID_POINTER;
+	else if (strlen(queue_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_queue_table; rec < OS_queue_table + OS_MAX_QUEUES; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, queue_name) == 0)
+					break;
+
+		if (rec >= OS_queue_table + OS_MAX_QUEUES)
+			status = OS_ERR_NAME_NOT_FOUND;
+		else
+		{
+			*queue_id = (rec - OS_queue_table) / sizeof(OS_queue_record_t);
+			status = OS_SUCCESS;
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_QueueGetInfo(uint32 queue_id, OS_queue_prop_t *queue_prop)
+{
+	OS_queue_record_t *rec = &OS_queue_table[queue_id];
+	int32 status;
+
+	sys_lock();
+
+	if (queue_id >= OS_MAX_QUEUES)
+		status = OS_ERR_INVALID_ID;
+	else if (!queue_prop || !rec->used)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		strcpy(queue_prop->name, rec->name);
+		queue_prop->creator = rec->creator;
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+/*---------------------------------------------------------------------------*/
+/*
+** Semaphore API
+*/
+
+int32 OS_BinSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_value, uint32 options)
+{
+	OS_bin_sem_record_t *rec;
+	int32 status;
+
+	(void) options;
+
+	sys_lock();
+
+	if (!sem_id || !sem_name)
+		status = OS_INVALID_POINTER;
+	else if (strlen(sem_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_bin_sem_table; rec < OS_bin_sem_table + OS_MAX_BIN_SEMAPHORES; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, sem_name) == 0)
+					break;
+
+		if (rec < OS_bin_sem_table + OS_MAX_BIN_SEMAPHORES)
+			status = OS_ERR_NAME_TAKEN;
+		else
+		{
+			for (rec = OS_bin_sem_table; rec < OS_bin_sem_table + OS_MAX_BIN_SEMAPHORES; rec++)
+				if (rec->used == 0)
+					break;
+
+			if (rec >= OS_bin_sem_table + OS_MAX_BIN_SEMAPHORES)
+				status = OS_ERR_NO_FREE_IDS;
+			else
+			{
+				*sem_id = (rec - OS_bin_sem_table) / sizeof(OS_bin_sem_record_t);
+				strcpy(rec->name, sem_name);
+				rec->creator   = OS_TaskGetId();
+				rec->sem.count = sem_initial_value & 1U;
+				rec->sem.limit = semBinary;
+				rec->used = 1;
+				status = OS_SUCCESS;
+			}
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_BinSemDelete(uint32 sem_id)
+{
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		sem_kill(&rec->sem);
+		memset(rec, 0, sizeof(OS_bin_sem_record_t));
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_BinSemFlush(uint32 sem_id)
+{
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		sem_kill(&rec->sem);
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_BinSemGive(uint32 sem_id)
+{
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else switch (sem_give(&rec->sem))
+	{
+		case E_SUCCESS: status = OS_SUCCESS;     break;
+		default:        status = OS_SEM_FAILURE; break;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_BinSemTake(uint32 sem_id)
+{
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else switch (sem_wait(&rec->sem))
+	{
+		case E_SUCCESS: status = OS_SUCCESS;     break;
+		default:        status = OS_SEM_FAILURE; break;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_BinSemTimedWait(uint32 sem_id, uint32 msecs)
+{
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else switch (sem_waitFor(&rec->sem, msecs*MSEC))
+	{
+		case E_SUCCESS: status = OS_SUCCESS;     break;
+		case E_TIMEOUT: status = OS_SEM_TIMEOUT; break;
+		default:        status = OS_SEM_FAILURE; break;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_BinSemGetIdByName(uint32 *sem_id, const char *sem_name)
+{
+	OS_bin_sem_record_t *rec;
+	int32 status;
+
+	sys_lock();
+
+	if (!sem_id || !sem_name)
+		status = OS_INVALID_POINTER;
+	else if (strlen(sem_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_bin_sem_table; rec < OS_bin_sem_table + OS_MAX_BIN_SEMAPHORES; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, sem_name) == 0)
+					break;
+
+		if (rec >= OS_bin_sem_table + OS_MAX_BIN_SEMAPHORES)
+			status = OS_ERR_NAME_NOT_FOUND;
+		else
+		{
+			*sem_id = (rec - OS_bin_sem_table) / sizeof(OS_bin_sem_record_t);
+			status = OS_SUCCESS;
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_BinSemGetInfo(uint32 sem_id, OS_bin_sem_prop_t *bin_prop)
+{
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (!bin_prop || !rec->used)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		strcpy(bin_prop->name, rec->name);
+		bin_prop->creator = rec->creator;
+		bin_prop->value = rec->sem.count;
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+/*---------------------------------------------------------------------------*/
+
+int32 OS_CountSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_value, uint32 options)
+{
+	OS_count_sem_record_t *rec;
+	int32 status;
+
+	(void) options;
+
+	sys_lock();
+
+	if (!sem_id || !sem_name)
+		status = OS_INVALID_POINTER;
+	else if (strlen(sem_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_count_sem_table; rec < OS_count_sem_table + OS_MAX_COUNT_SEMAPHORES; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, sem_name) == 0)
+					break;
+
+		if (rec < OS_count_sem_table + OS_MAX_COUNT_SEMAPHORES)
+			status = OS_ERR_NAME_TAKEN;
+		else
+		{
+			for (rec = OS_count_sem_table; rec < OS_count_sem_table + OS_MAX_COUNT_SEMAPHORES; rec++)
+				if (rec->used == 0)
+					break;
+
+			if (rec >= OS_count_sem_table + OS_MAX_COUNT_SEMAPHORES)
+				status = OS_ERR_NO_FREE_IDS;
+			else
+			{
+				*sem_id = (rec - OS_count_sem_table) / sizeof(OS_count_sem_record_t);
+				strcpy(rec->name, sem_name);
+				rec->creator   = OS_TaskGetId();
+				rec->sem.count = sem_initial_value;
+				rec->sem.limit = semCounting;
+				rec->used = 1;
+				status = OS_SUCCESS;
+			}
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_CountSemDelete(uint32 sem_id)
+{
+	OS_count_sem_record_t *rec = &OS_count_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_COUNT_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		sem_kill(&rec->sem);
+		memset(rec, 0, sizeof(OS_count_sem_record_t));
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_CountSemGive(uint32 sem_id)
+{
+	OS_count_sem_record_t *rec = &OS_count_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else switch (sem_give(&rec->sem))
+	{
+		case E_SUCCESS: status = OS_SUCCESS;     break;
+		default:        status = OS_SEM_FAILURE; break;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_CountSemTake(uint32 sem_id)
+{
+	OS_count_sem_record_t *rec = &OS_count_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else switch (sem_wait(&rec->sem))
+	{
+		case E_SUCCESS: status = OS_SUCCESS;     break;
+		default:        status = OS_SEM_FAILURE; break;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_CountSemTimedWait(uint32 sem_id, uint32 msecs)
+{
+	OS_count_sem_record_t *rec = &OS_count_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else switch (sem_waitFor(&rec->sem, msecs*MSEC))
+	{
+		case E_SUCCESS: status = OS_SUCCESS;     break;
+		case E_TIMEOUT: status = OS_SEM_TIMEOUT; break;
+		default:        status = OS_SEM_FAILURE; break;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_CountSemGetIdByName(uint32 *sem_id, const char *sem_name)
+{
+	OS_count_sem_record_t *rec;
+	int32 status;
+
+	sys_lock();
+
+	if (!sem_id || !sem_name)
+		status = OS_INVALID_POINTER;
+	else if (strlen(sem_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_count_sem_table; rec < OS_count_sem_table + OS_MAX_COUNT_SEMAPHORES; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, sem_name) == 0)
+					break;
+
+		if (rec >= OS_count_sem_table + OS_MAX_COUNT_SEMAPHORES)
+			status = OS_ERR_NAME_NOT_FOUND;
+		else
+		{
+			*sem_id = (rec - OS_count_sem_table) / sizeof(OS_count_sem_record_t);
+			status = OS_SUCCESS;
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_CountSemGetInfo(uint32 sem_id, OS_count_sem_prop_t *count_prop)
+{
+	OS_count_sem_record_t *rec = &OS_count_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_COUNT_SEMAPHORES)
+		status = OS_ERR_INVALID_ID;
+	else if (!count_prop || !rec->used)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		strcpy(count_prop->name, rec->name);
+		count_prop->creator = rec->creator;
+		count_prop->value = rec->sem.count;
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+/*---------------------------------------------------------------------------*/
+/*
+** Mutex API
+*/
+
+int32 OS_MutSemCreate(uint32 *sem_id, const char *sem_name, uint32 options)
+{
+	OS_mut_sem_record_t *rec;
+	int32 status;
+
+	(void) options;
+
+	sys_lock();
+
+	if (!sem_id || !sem_name)
+		status = OS_INVALID_POINTER;
+	else if (strlen(sem_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_mut_sem_table; rec < OS_mut_sem_table + OS_MAX_MUTEXES; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, sem_name) == 0)
+					break;
+
+		if (rec < OS_mut_sem_table + OS_MAX_MUTEXES)
+			status = OS_ERR_NAME_TAKEN;
+		else
+		{
+			for (rec = OS_mut_sem_table; rec < OS_mut_sem_table + OS_MAX_MUTEXES; rec++)
+				if (rec->used == 0)
+					break;
+
+			if (rec >= OS_mut_sem_table + OS_MAX_MUTEXES)
+				status = OS_ERR_NO_FREE_IDS;
+			else
+			{
+				*sem_id = (rec - OS_mut_sem_table) / sizeof(OS_mut_sem_record_t);
+				strcpy(rec->name, sem_name);
+				rec->creator = OS_TaskGetId();
+				rec->used = 1;
+				status = OS_SUCCESS;
+			}
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_MutSemDelete(uint32 sem_id)
+{
+	OS_mut_sem_record_t *rec = &OS_mut_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_MUTEXES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		mtx_kill(&rec->mtx);
+		memset(rec, 0, sizeof(OS_mut_sem_record_t));
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_MutSemGive(uint32 sem_id)
+{
+	OS_mut_sem_record_t *rec = &OS_mut_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_MUTEXES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else switch (mtx_give(&rec->mtx))
+	{
+		case E_SUCCESS: status = OS_SUCCESS;     break;
+		default:        status = OS_SEM_FAILURE; break;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_MutSemTake(uint32 sem_id)
+{
+	OS_mut_sem_record_t *rec = &OS_mut_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_MUTEXES)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else switch (mtx_wait(&rec->mtx))
+	{
+		case E_SUCCESS: status = OS_SUCCESS;     break;
+		default:        status = OS_SEM_FAILURE; break;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_MutSemGetIdByName(uint32 *sem_id, const char *sem_name)
+{
+	OS_mut_sem_record_t *rec;
+	int32 status;
+
+	sys_lock();
+
+	if (!sem_id || !sem_name)
+		status = OS_INVALID_POINTER;
+	else if (strlen(sem_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_mut_sem_table; rec < OS_mut_sem_table + OS_MAX_MUTEXES; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, sem_name) == 0)
+					break;
+
+		if (rec >= OS_mut_sem_table + OS_MAX_MUTEXES)
+			status = OS_ERR_NAME_NOT_FOUND;
+		else
+		{
+			*sem_id = (rec - OS_mut_sem_table) / sizeof(OS_mut_sem_record_t);
+			status = OS_SUCCESS;
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_MutSemGetInfo(uint32 sem_id, OS_mut_sem_prop_t *mut_prop)
+{
+	OS_mut_sem_record_t *rec = &OS_mut_sem_table[sem_id];
+	int32 status;
+
+	sys_lock();
+
+	if (sem_id >= OS_MAX_MUTEXES)
+		status = OS_ERR_INVALID_ID;
+	else if (!mut_prop || !rec->used)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		strcpy(mut_prop->name, rec->name);
+		mut_prop->creator = rec->creator;
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+/*---------------------------------------------------------------------------*/
+/*
+** Task API
+*/
+
+int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry function_pointer,
+                    const uint32 *stack_pointer, uint32 stack_size, uint32 priority, uint32 flags)
+{
+	OS_task_record_t *rec;
+	int32 status;
+	void *stack = (void *) stack_pointer;
+
+	(void) flags;
+
+	sys_lock();
+
+	if (!task_id || !task_name || !function_pointer)
+		status = OS_INVALID_POINTER;
+	else if (strlen(task_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else if ((priority < 1) || (priority > 255))
+		status = OS_ERR_INVALID_PRIORITY;
+	else if (stack_pointer && !stack_size)
+		status = OS_ERROR;
+	else
+	{
+		for (rec = OS_task_table; rec < OS_task_table + OS_MAX_TASKS; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, task_name) == 0)
+					break;
+
+		if (rec < OS_task_table + OS_MAX_TASKS)
+			status = OS_ERR_NAME_TAKEN;
+		else
+		{
+			for (rec = OS_task_table; rec < OS_task_table + OS_MAX_TASKS; rec++)
+				if (rec->used == 0)
+					break;
+
+			if (rec >= OS_task_table + OS_MAX_TASKS)
+				status = OS_ERR_NO_FREE_IDS;
+			else
+			{
+				if (!stack)
+				{
+					if (!stack_size) stack_size = OS_STACK_SIZE;
+					stack = sys_alloc(stack_size);
+				}
+				if (!stack)
+					status = OS_ERROR;
+				else
+				{
+					*task_id = (rec - OS_task_table) / sizeof(OS_task_record_t);
+					strcpy(rec->name, task_name);
+					rec->creator   = OS_TaskGetId();
+					rec->tsk.state = function_pointer;
+					rec->tsk.top   = (uint64 *)stack + stack_size/8;
+					rec->tsk.prio  =
+					rec->tsk.basic = ~priority;
+					rec->stack     = stack_pointer ? 0 : stack;
+					rec->size      = stack_size;
+					rec->used = 1;
+					core_ctx_init(&rec->tsk);
+					core_tsk_insert(&rec->tsk);
+					status = OS_SUCCESS;
+				}
+			}
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_TaskDelete(uint32 task_id)
+{
+	OS_task_record_t *rec = &OS_task_table[task_id];
+	int32 status;
+
+	sys_lock();
+
+	if (task_id >= OS_MAX_TASKS)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		if (rec->delete_handler)
+			rec->delete_handler();
+		tsk_kill(&rec->tsk);
+		if (rec->stack)
+			sys_free(rec->stack);
+		memset(rec, 0, sizeof(OS_task_record_t));
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_TaskInstallDeleteHandler(void *function_pointer)
+{
+	uint32 task_id = OS_TaskGetId();
+	OS_task_record_t *rec = &OS_task_table[task_id];
+	int32 status;
+
+	sys_lock();
+
+	if (task_id >= OS_MAX_TASKS)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		rec->delete_handler = (void(*)(void)) function_pointer;
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+void OS_TaskExit(void)
+{
+	tsk_stop();
+}
+
+int32 OS_TaskDelay(uint32 millisecond)
+{
+	switch (tsk_delay(millisecond*MSEC))
+	{
+		case E_TIMEOUT: return OS_SUCCESS;
+		default:        return OS_ERROR;
+	}
+}
+
+int32 OS_TaskSetPriority(uint32 task_id, uint32 new_priority)
+{
+	OS_task_record_t *rec = &OS_task_table[task_id];
+	int32 status;
+
+	sys_lock();
+
+	if (task_id >= OS_MAX_TASKS)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else if ((new_priority < 1) || (new_priority > 255))
+		status = OS_ERR_INVALID_PRIORITY;
+	else
+	{
+		core_tsk_prio(&rec->tsk, rec->tsk.basic = ~new_priority);
+		status =  OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_TaskRegister(void)
+{
+	return OS_SUCCESS;
+}
+
+uint32 OS_TaskGetId(void)
+{
+	uint32 task_id = ((OS_task_record_t *) Current - OS_task_table) / sizeof(OS_task_record_t);
+
+	if (task_id >= OS_MAX_TASKS)
+		return OS_ERR_INVALID_ID;
+
+	return task_id;
+}
+
+int32 OS_TaskGetIdByName(uint32 *task_id, const char *task_name)
+{
+	OS_task_record_t *rec;
+	int32 status;
+
+	sys_lock();
+
+	if (!task_id || !task_name)
+		status = OS_INVALID_POINTER;
+	else if (strlen(task_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_task_table; rec < OS_task_table + OS_MAX_TASKS; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, task_name) == 0)
+					break;
+
+		if (rec >= OS_task_table + OS_MAX_TASKS)
+			status = OS_ERR_NAME_NOT_FOUND;
+		else
+		{
+			*task_id = (rec - OS_task_table) / sizeof(OS_task_record_t);
+			status = OS_SUCCESS;
+		}
+	}
+
+	sys_unlock();
+
+	return status;
+}
+
+int32 OS_TaskGetInfo(uint32 task_id, OS_task_prop_t *task_prop)
+{
+	OS_task_record_t *rec = &OS_task_table[task_id];
+	int32 status;
+
+	sys_lock();
+
+	if (task_id >= OS_MAX_TASKS)
+		status = OS_ERR_INVALID_ID;
+	else if (!task_prop || !rec->used)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		strcpy(task_prop->name, rec->name);
+		task_prop->creator = rec->creator;
+		task_prop->stack_size = rec->size;
+		task_prop->priority = ~rec->tsk.basic;
+		task_prop->OStask_id = (uint32) &rec->tsk;
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -575,21 +1268,18 @@ int32 OS_ExcAttachHandler(uint32 ExceptionNumber, void (*ExceptionHandler)(uint3
 	(void) ExceptionNumber;
 	(void) ExceptionHandler;
 	(void) parameter;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_ExcEnable(int32 ExceptionNumber)
 {
 	(void) ExceptionNumber;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_ExcDisable(int32 ExceptionNumber)
 {
 	(void) ExceptionNumber;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
@@ -603,35 +1293,30 @@ int32 OS_FPUExcAttachHandler(uint32 ExceptionNumber, void *ExceptionHandler, int
 	(void) ExceptionNumber;
 	(void) ExceptionHandler;
 	(void) parameter;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_FPUExcEnable(int32 ExceptionNumber)
 {
 	(void) ExceptionNumber;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_FPUExcDisable(int32 ExceptionNumber)
 {
 	(void) ExceptionNumber;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_FPUExcSetMask(uint32 mask)
 {
 	(void) mask;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_FPUExcGetMask(uint32 *mask)
 {
 	(void) mask;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
@@ -645,56 +1330,50 @@ int32 OS_IntAttachHandler(uint32 InterruptNumber, osal_task_entry InterruptHandl
 	(void) InterruptNumber;
 	(void) InterruptHandler;
 	(void) parameter;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_IntUnlock(int32 IntLevel)
 {
+	uint32 lock = port_get_lock();
 	port_put_lock(IntLevel);
-
-	return OS_SUCCESS;
+	return lock;
 }
 
 int32 OS_IntLock(void)
 {
-	uint32 IntLevel = port_get_lock();
+	uint32 lock = port_get_lock();
 	port_set_lock();
-	return IntLevel;
+	return lock;
 }
 
 int32 OS_IntEnable(int32 Level)
 {
 	NVIC_EnableIRQ((IRQn_Type)Level);
-
 	return OS_SUCCESS;
 }
 
 int32 OS_IntDisable(int32 Level)
 {
 	NVIC_DisableIRQ((IRQn_Type)Level);
-
 	return OS_SUCCESS;
 }
 
 int32 OS_IntSetMask(uint32 mask)
 {
 	(void) mask;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_IntGetMask(uint32 *mask)
 {
 	(void) mask;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_IntAck(int32 InterruptNumber)
 {
 	NVIC_ClearPendingIRQ((IRQn_Type)InterruptNumber);
-
 	return OS_SUCCESS;
 }
 
@@ -702,6 +1381,7 @@ int32 OS_IntAck(int32 InterruptNumber)
 /*
 ** Shared memory API
 */
+
 int32 OS_ShMemInit(void)
 {
 	return OS_ERR_NOT_IMPLEMENTED;
@@ -712,21 +1392,18 @@ int32 OS_ShMemCreate(uint32 *Id, uint32 NBytes, char *SegName)
 	(void) Id;
 	(void) NBytes;
 	(void) SegName;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_ShMemSemTake(uint32 Id)
 {
 	(void) Id;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
 int32 OS_ShMemSemGive(uint32 Id)
 {
 	(void) Id;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
@@ -734,7 +1411,6 @@ int32 OS_ShMemAttach(uint32 *Address, uint32 Id)
 {
 	(void) Address;
 	(void) Id;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
@@ -742,7 +1418,6 @@ int32 OS_ShMemGetIdByName(uint32 *ShMemId, const char *SegName)
 {
 	(void) ShMemId;
 	(void) SegName;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
@@ -750,10 +1425,10 @@ int32 OS_ShMemGetIdByName(uint32 *ShMemId, const char *SegName)
 /*
 ** Heap API
 */
+
 int32 OS_HeapGetInfo(OS_heap_prop_t *heap_prop)
 {
 	(void) heap_prop;
-
 	return OS_ERR_NOT_IMPLEMENTED;
 }
 
@@ -761,43 +1436,66 @@ int32 OS_HeapGetInfo(OS_heap_prop_t *heap_prop)
 /*
 ** API for useful debugging function
 */
+
 int32 OS_GetErrorName(int32 error_num, os_err_name_t *err_name)
 {
-	(void) error_num;
-	(void) err_name;
+	char *error;
 
-	return OS_ERR_NOT_IMPLEMENTED;
-}
+    switch (error_num)
+    {
+		case OS_SUCCESS:                  error = "OS_SUCCESS";                  break;
+		case OS_ERROR:                    error = "OS_ERROR";                    break;
+		case OS_INVALID_POINTER:          error = "OS_INVALID_POINTER";          break;
+		case OS_ERROR_ADDRESS_MISALIGNED: error = "OS_ERROR_ADDRESS_MISALIGNED"; break;
+		case OS_ERROR_TIMEOUT:            error = "OS_ERROR_TIMEOUT";            break;
+		case OS_INVALID_INT_NUM:          error = "OS_INVALID_INT_NUM";          break;
+		case OS_SEM_FAILURE:              error = "OS_SEM_FAILURE";              break;
+		case OS_SEM_TIMEOUT:              error = "OS_SEM_TIMEOUT";              break;
+		case OS_QUEUE_EMPTY:              error = "OS_QUEUE_EMPTY";              break;
+		case OS_QUEUE_FULL:               error = "OS_QUEUE_FULL";               break;
+		case OS_QUEUE_TIMEOUT:            error = "OS_QUEUE_TIMEOUT";            break;
+		case OS_QUEUE_INVALID_SIZE:       error = "OS_QUEUE_INVALID_SIZE";       break;
+		case OS_QUEUE_ID_ERROR:           error = "OS_QUEUE_ID_ERROR";           break;
+		case OS_ERR_NAME_TOO_LONG:        error = "OS_ERR_NAME_TOO_LONG";        break;
+		case OS_ERR_NO_FREE_IDS:          error = "OS_ERR_NO_FREE_IDS";          break;
+		case OS_ERR_NAME_TAKEN:           error = "OS_ERR_NAME_TAKEN";           break;
+		case OS_ERR_INVALID_ID:           error = "OS_ERR_INVALID_ID";           break;
+		case OS_ERR_NAME_NOT_FOUND:       error = "OS_ERR_NAME_NOT_FOUND";       break;
+		case OS_ERR_SEM_NOT_FULL:         error = "OS_ERR_SEM_NOT_FULL";         break;
+		case OS_ERR_INVALID_PRIORITY:     error = "OS_ERR_INVALID_PRIORITY";     break;
+		case OS_INVALID_SEM_VALUE:        error = "OS_INVALID_SEM_VALUE";        break;
+		case OS_ERR_FILE:                 error = "OS_ERR_FILE";                 break;
+		case OS_ERR_NOT_IMPLEMENTED:      error = "OS_ERR_NOT_IMPLEMENTED";      break;
+		case OS_TIMER_ERR_INVALID_ARGS:   error = "OS_TIMER_ERR_INVALID_ARGS";   break;
+		case OS_TIMER_ERR_TIMER_ID:       error = "OS_TIMER_ERR_TIMER_ID";       break;
+		case OS_TIMER_ERR_UNAVAILABLE:    error = "OS_TIMER_ERR_UNAVAILABLE";    break;
+		case OS_TIMER_ERR_INTERNAL:       error = "OS_TIMER_ERR_INTERNAL";       break;
 
-/*---------------------------------------------------------------------------*/
-/*
-** Abstraction for printf statements
-*/
-void OS_printf(const char *fmt, ...)
-{
-	if (osal.printf)
-	{
-		va_list arp;
-		va_start(arp, fmt);
-		printf(fmt, arp);
-		va_end(arp);
-	}
-}
+        default: return OS_ERROR;
+    }
 
-void OS_printf_disable(void)
-{
-	osal.printf = FALSE;
-}
+	sys_lock();
 
-void OS_printf_enable(void)
-{
-	osal.printf = TRUE;
+    strcpy((char *) err_name, error);
+
+	sys_unlock();
+
+    return OS_SUCCESS;
 }
 
 /*---------------------------------------------------------------------------*/
 /*
 ** Timer API
 */
+
+static void timer_handler(void)
+{
+	OS_timer_record_t *rec = (OS_timer_record_t *) WAIT.obj.next;
+	uint32 timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
+
+	rec->handler(timer_id);
+}
+
 int32 OS_TimerAPIInit(void)
 {
 	return OS_SUCCESS;
@@ -805,51 +1503,153 @@ int32 OS_TimerAPIInit(void)
 
 int32 OS_TimerCreate(uint32 *timer_id, const char *timer_name, uint32 *clock_accuracy, OS_TimerCallback_t callback_ptr)
 {
-	(void) timer_name;
+	OS_timer_record_t *rec;
+	int32 status;
 
 	sys_lock();
 
-	*clock_accuracy = 1000000 / OS_FREQUENCY;
+	if (!timer_id || !timer_name || !callback_ptr)
+		status = OS_INVALID_POINTER;
+	else if (strlen(timer_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_timer_table; rec < OS_timer_table + OS_MAX_TIMERS; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, timer_name) == 0)
+					break;
 
-	*timer_id = (uint32) tmr_create();
+		if (rec < OS_timer_table + OS_MAX_TIMERS)
+			status = OS_ERR_NAME_TAKEN;
+		else
+		{
+			for (rec = OS_timer_table; rec < OS_timer_table + OS_MAX_TIMERS; rec++)
+				if (rec->used == 0)
+					break;
 
-	if (*timer_id)
-		((tmr_t*)*timer_id)->state = (fun_t*) callback_ptr;
+			if (rec >= OS_timer_table + OS_MAX_TIMERS)
+				status = OS_ERR_NO_FREE_IDS;
+			else
+			{
+				if (clock_accuracy)
+					*clock_accuracy = 1000000 / OS_FREQUENCY;
+
+				*timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
+				strcpy(rec->name, timer_name);
+				rec->creator = OS_TaskGetId();
+				rec->handler = callback_ptr;
+				rec->used = 1;
+				status = OS_SUCCESS;
+			}
+		}
+	}
 
 	sys_unlock();
 
-	return *timer_id ? OS_SUCCESS : OS_ERROR;
+	return status;
 }
 
 int32 OS_TimerSet(uint32 timer_id, uint32 start_msec, uint32 interval_msec)
 {
-	tmr_start((tmr_t*)timer_id, start_msec * MSEC, interval_msec * MSEC, ((tmr_t*)timer_id)->state);
-	
-	return OS_SUCCESS;
+	OS_timer_record_t *rec = &OS_timer_table[timer_id];
+	int32 status;
+
+	sys_lock();
+
+	if (timer_id >= OS_MAX_TIMERS)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		tmr_start(&rec->tmr, start_msec * MSEC, interval_msec * MSEC, timer_handler);
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
 }
 
 int32 OS_TimerDelete(uint32 timer_id)
 {
-	tmr_kill((tmr_t*)timer_id);
-	sys_free((void *)timer_id);
+	OS_timer_record_t *rec = &OS_timer_table[timer_id];
+	int32 status;
 
-	return OS_SUCCESS;
+	sys_lock();
+
+	if (timer_id >= OS_MAX_TIMERS)
+		status = OS_ERR_INVALID_ID;
+	else if (rec->used == 0)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		tmr_kill(&rec->tmr);
+		memset(rec, 0, sizeof(OS_timer_record_t));
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
 }
 
 int32 OS_TimerGetIdByName(uint32 *timer_id, const char *timer_name)
 {
-	(void) timer_id;
-	(void) timer_name;
+	OS_timer_record_t *rec;
+	int32 status;
 
-	return OS_ERR_NOT_IMPLEMENTED;
+	sys_lock();
+
+	if (!timer_id || !timer_name)
+		status = OS_INVALID_POINTER;
+	else if (strlen(timer_name) >= OS_MAX_API_NAME)
+		status = OS_ERR_NAME_TOO_LONG;
+	else
+	{
+		for (rec = OS_timer_table; rec < OS_timer_table + OS_MAX_TIMERS; rec++)
+			if (rec->used)
+				if (strcmp(rec->name, timer_name) == 0)
+					break;
+
+		if (rec >= OS_timer_table + OS_MAX_TIMERS)
+			status = OS_ERR_NAME_NOT_FOUND;
+		else
+		{
+			*timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
+			status = OS_SUCCESS;
+		}
+	}
+
+	sys_unlock();
+
+	return status;
 }
 
 int32 OS_TimerGetInfo(uint32 timer_id, OS_timer_prop_t *timer_prop)
 {
-	(void) timer_id;
-	(void) timer_prop;
+	OS_timer_record_t *rec = &OS_timer_table[timer_id];
+	int32 status;
 
-	return OS_ERR_NOT_IMPLEMENTED;
+	sys_lock();
+
+	if (timer_id >= OS_MAX_TIMERS)
+		status = OS_ERR_INVALID_ID;
+	else if (!timer_prop || !rec->used)
+		status = OS_INVALID_POINTER;
+	else
+	{
+		strcpy(timer_prop->name, rec->name);
+		timer_prop->creator = rec->creator;
+		timer_prop->start_time = rec->tmr.start;
+		timer_prop->interval_time = rec->tmr.period;
+		timer_prop->accuracy = 1000000 / OS_FREQUENCY;
+		status = OS_SUCCESS;
+	}
+
+	sys_unlock();
+
+	return status;
 }
 
 /*---------------------------------------------------------------------------*/
