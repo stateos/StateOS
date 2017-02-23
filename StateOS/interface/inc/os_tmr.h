@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -296,7 +296,6 @@ void tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0, 0); }
  *   E_SUCCESS       : timer object successfully finished countdown                                                   *
  *   E_STOPPED       : timer object was killed before the specified timeout expired                                   *
  *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired                   *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -320,7 +319,6 @@ unsigned tmr_waitUntil( tmr_t *tmr, unsigned time );
  *   E_SUCCESS       : timer object successfully finished countdown                                                   *
  *   E_STOPPED       : timer object was killed before the specified timeout expired                                   *
  *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired                   *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -340,7 +338,6 @@ unsigned tmr_waitFor( tmr_t *tmr, unsigned delay );
  * Return                                                                                                             *
  *   E_SUCCESS       : timer object successfully finished countdown                                                   *
  *   E_STOPPED       : timer object was killed before the specified timeout expired                                   *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *

@@ -38,6 +38,8 @@ Features:
 - added tsk_detach function
 - rebuilded cmsis-os1 api
 - rebuilded nasa-osal api
+- only delayed and suspended tasks can be resumed
+- tsk_wait functions return received flags or messages
 ---------
 4.4
 - added oslibc.c file for COSMIC Software CORTEX-M C Cross Compiler

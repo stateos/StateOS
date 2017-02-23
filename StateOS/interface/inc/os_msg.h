@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -215,7 +215,6 @@ void msg_kill( msg_t *msg );
  *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
  *   E_STOPPED       : message queue object was killed before the specified timeout expired                           *
  *   E_TIMEOUT       : message queue object is empty and was not received data before the specified timeout expired   *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -241,7 +240,6 @@ unsigned msg_waitUntil( msg_t *msg, unsigned *data, unsigned time );
  *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
  *   E_STOPPED       : message queue object was killed before the specified timeout expired                           *
  *   E_TIMEOUT       : message queue object is empty and was not received data before the specified timeout expired   *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -263,7 +261,6 @@ unsigned msg_waitFor( msg_t *msg, unsigned *data, unsigned delay );
  * Return                                                                                                             *
  *   E_SUCCESS       : message data was successfully transfered from the message queue object                         *
  *   E_STOPPED       : message queue object was killed                                                                *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -332,7 +329,6 @@ unsigned msg_takeISR( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, dat
  *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
  *   E_STOPPED       : message queue object was killed before the specified timeout expired                           *
  *   E_TIMEOUT       : message queue object is full and was not issued data before the specified timeout expired      *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -358,7 +354,6 @@ unsigned msg_sendUntil( msg_t *msg, unsigned data, unsigned time );
  *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
  *   E_STOPPED       : message queue object was killed before the specified timeout expired                           *
  *   E_TIMEOUT       : message queue object is full and was not issued data before the specified timeout expired      *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -380,7 +375,6 @@ unsigned msg_sendFor( msg_t *msg, unsigned data, unsigned delay );
  * Return                                                                                                             *
  *   E_SUCCESS       : message data was successfully transfered to the message queue object                           *
  *   E_STOPPED       : message queue object was killed                                                                *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *

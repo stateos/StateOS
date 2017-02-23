@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -240,7 +240,6 @@ void mem_kill( mem_t *mem );
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
  *   E_STOPPED       : memory pool object was killed before the specified timeout expired                             *
  *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired     *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -266,7 +265,6 @@ unsigned mem_waitUntil( mem_t *mem, void **data, unsigned time );
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
  *   E_STOPPED       : memory pool object was killed before the specified timeout expired                             *
  *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired     *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -288,7 +286,6 @@ unsigned mem_waitFor( mem_t *mem, void **data, unsigned delay );
  * Return                                                                                                             *
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer                       *
  *   E_STOPPED       : memory pool object was killed                                                                  *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *

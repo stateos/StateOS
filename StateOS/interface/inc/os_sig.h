@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -201,9 +201,9 @@ void sig_kill( sig_t *sig );
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
+ *   E_SUCCESS       : signal object was successfully released                                                        *
  *   E_STOPPED       : signal object was killed before the specified timeout expired                                  *
  *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
- *   'another'       : signal object was successfully released or task was resumed with 'another' event value         *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -224,9 +224,9 @@ unsigned sig_waitUntil( sig_t *sig, unsigned time );
  *                     INFINITE:  wait indefinitly until the signal object has been released                          *
  *                                                                                                                    *
  * Return                                                                                                             *
+ *   E_SUCCESS       : signal object was successfully released                                                        *
  *   E_STOPPED       : signal object was killed before the specified timeout expired                                  *
  *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
- *   'another'       : signal object was successfully released or task was resumed with 'another' event value         *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -244,8 +244,8 @@ unsigned sig_waitFor( sig_t *sig, unsigned delay );
  *   sig             : pointer to signal object                                                                       *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_STOPPED       : signal object was killed                                                                       *
- *   'another'       : signal object was successfully released or task was resumed with 'another' event value         *
+ *   E_SUCCESS       : signal object was successfully released                                                        *
+ *   E_STOPPED       : signal object was killed before the specified timeout expired                                  *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -265,7 +265,7 @@ unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : signal object was successfully released                                                        *
- *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
+ *   E_TIMEOUT       : signal object is not set                                                                       *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -285,7 +285,7 @@ unsigned sig_take( sig_t *sig ) { return sig_waitFor(sig, IMMEDIATE); }
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : signal object was successfully released                                                        *
- *   E_TIMEOUT       : signal object was not released before the specified timeout expired                            *
+ *   E_TIMEOUT       : signal object is not set                                                                       *
  *                                                                                                                    *
  * Note              : use only in handler mode                                                                       *
  *                                                                                                                    *

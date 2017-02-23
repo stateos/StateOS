@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -177,7 +177,7 @@ void evt_kill( evt_t *evt );
  * Return                                                                                                             *
  *   E_STOPPED       : event object was killed before the specified timeout expired                                   *
  *   E_TIMEOUT       : event object was not released before the specified timeout expired                             *
- *   'another'       : event object was successfully released or task was resumed with 'another' event value          *
+ *   'another'       : event object was successfully released                                                         *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -200,7 +200,7 @@ unsigned evt_waitUntil( evt_t *evt, unsigned time );
  * Return                                                                                                             *
  *   E_STOPPED       : event object was killed before the specified timeout expired                                   *
  *   E_TIMEOUT       : event object was not released before the specified timeout expired                             *
- *   'another'       : event object was successfully released or task was resumed with 'another' event value          *
+ *   'another'       : event object was successfully released                                                         *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -219,7 +219,7 @@ unsigned evt_waitFor( evt_t *evt, unsigned delay );
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_STOPPED       : event object was killed                                                                        *
- *   'another'       : event object was successfully released or task was resumed with 'another' event value          *
+ *   'another'       : event object was successfully released                                                         *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *

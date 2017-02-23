@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -183,7 +183,6 @@ void mtx_kill( mtx_t *mtx );
  *   E_SUCCESS       : mutex object was successfully locked                                                           *
  *   E_STOPPED       : mutex object was killed before the specified timeout expired                                   *
  *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired                               *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -208,7 +207,6 @@ unsigned mtx_waitUntil( mtx_t *mtx, unsigned time );
  *   E_SUCCESS       : mutex object was successfully locked                                                           *
  *   E_STOPPED       : mutex object was killed before the specified timeout expired                                   *
  *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired                               *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -229,7 +227,6 @@ unsigned mtx_waitFor( mtx_t *mtx, unsigned delay );
  * Return                                                                                                             *
  *   E_SUCCESS       : mutex object was successfully locked                                                           *
  *   E_STOPPED       : mutex object was killed                                                                        *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -186,7 +186,6 @@ void cnd_kill( cnd_t *cnd );
  *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again              *
  *   E_STOPPED       : condition variable object was killed before the specified timeout expired                      *
  *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired               *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -212,7 +211,6 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, unsigned time );
  *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again              *
  *   E_STOPPED       : condition variable object was killed before the specified timeout expired                      *
  *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired               *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -234,7 +232,6 @@ unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, unsigned delay );
  * Return                                                                                                             *
  *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again              *
  *   E_STOPPED       : condition variable object was killed                                                           *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    17.02.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -222,7 +222,6 @@ void box_kill( box_t *box );
  *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object                         *
  *   E_STOPPED       : mailbox queue object was killed before the specified timeout expired                           *
  *   E_TIMEOUT       : mailbox queue object is empty and was not received data before the specified timeout expired   *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -248,7 +247,6 @@ unsigned box_waitUntil( box_t *box, void *data, unsigned time );
  *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object                         *
  *   E_STOPPED       : mailbox queue object was killed before the specified timeout expired                           *
  *   E_TIMEOUT       : mailbox queue object is empty and was not received data before the specified timeout expired   *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -270,7 +268,6 @@ unsigned box_waitFor( box_t *box, void *data, unsigned delay );
  * Return                                                                                                             *
  *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object                         *
  *   E_STOPPED       : mailbox queue object was killed                                                                *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -339,7 +336,6 @@ unsigned box_takeISR( box_t *box, void *data ) { return box_waitFor(box, data, I
  *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object                           *
  *   E_STOPPED       : mailbox queue object was killed before the specified timeout expired                           *
  *   E_TIMEOUT       : mailbox queue object is full and was not issued data before the specified timeout expired      *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -365,7 +361,6 @@ unsigned box_sendUntil( box_t *box, const void *data, unsigned time );
  *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object                           *
  *   E_STOPPED       : mailbox queue object was killed before the specified timeout expired                           *
  *   E_TIMEOUT       : mailbox queue object is full and was not issued data before the specified timeout expired      *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -387,7 +382,6 @@ unsigned box_sendFor( box_t *box, const void *data, unsigned delay );
  * Return                                                                                                             *
  *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object                           *
  *   E_STOPPED       : mailbox queue object was killed                                                                *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *

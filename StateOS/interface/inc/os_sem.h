@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -219,7 +219,6 @@ void sem_kill( sem_t *sem );
  *   E_SUCCESS       : semaphore object was successfully locked                                                       *
  *   E_STOPPED       : semaphore object was killed before the specified timeout expired                               *
  *   E_TIMEOUT       : semaphore object was not locked before the specified timeout expired                           *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -244,7 +243,6 @@ void sem_kill( sem_t *sem );
  *   E_SUCCESS       : semaphore object was successfully locked                                                       *
  *   E_STOPPED       : semaphore object was killed before the specified timeout expired                               *
  *   E_TIMEOUT       : semaphore object was not locked before the specified timeout expired                           *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -265,7 +263,6 @@ void sem_kill( sem_t *sem );
  * Return                                                                                                             *
  *   E_SUCCESS       : semaphore object was successfully locked                                                       *
  *   E_STOPPED       : semaphore object was killed                                                                    *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -331,7 +328,6 @@ void sem_kill( sem_t *sem );
  *   E_SUCCESS       : semaphore object was successfully unlocked                                                     *
  *   E_STOPPED       : semaphore object was killed before the specified timeout expired                               *
  *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired                         *
- *   'another'       : task was resumed with 'another' event                                                          *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -356,7 +352,6 @@ void sem_kill( sem_t *sem );
  *   E_SUCCESS       : semaphore object was successfully unlocked                                                     *
  *   E_STOPPED       : semaphore object was killed before the specified timeout expired                               *
  *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired                         *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -377,7 +372,6 @@ void sem_kill( sem_t *sem );
  * Return                                                                                                             *
  *   E_SUCCESS       : semaphore object was successfully unlocked                                                     *
  *   E_STOPPED       : semaphore object was killed                                                                    *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *

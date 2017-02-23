@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    20.02.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -199,7 +199,6 @@ void flg_kill( flg_t *flg );
  *   E_SUCCESS       : requested flags have been set before the specified timeout expired                             *
  *   E_STOPPED       : flag object was killed before the specified timeout expired                                    *
  *   E_TIMEOUT       : requested flags have not been set before the specified timeout expired                         *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -230,7 +229,6 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned time
  *   E_SUCCESS       : requested flags have been set before the specified timeout expired                             *
  *   E_STOPPED       : flag object was killed before the specified timeout expired                                    *
  *   E_TIMEOUT       : requested flags have not been set before the specified timeout expired                         *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -257,7 +255,6 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned delay 
  * Return                                                                                                             *
  *   E_SUCCESS       : requested flags have been set                                                                  *
  *   E_STOPPED       : flag object was killed                                                                         *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
