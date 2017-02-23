@@ -178,6 +178,8 @@ static void osThreadProcedure (void)
 	osThread_t *cur = (osThread_t *)Current;
 
 	cur->func(cur->arg);
+
+	osThreadExit();
 }
 
 /*---------------------------------------------------------------------------*/
