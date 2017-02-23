@@ -1,11 +1,11 @@
 /**************************************************************************//**
  * @file     cmsis_armclang.h
- * @brief    CMSIS Cortex-M Core Function/Instruction Header File
- * @version  V5.00
- * @date     20. December 2016
+ * @brief    CMSIS compiler ARMCLANG (ARM compiler V6) header file
+ * @version  V5.0.2
+ * @date     13. February 2017
  ******************************************************************************/
 /*
- * Copyright (c) 2009-2016 ARM Limited. All rights reserved.
+ * Copyright (c) 2009-2017 ARM Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -31,35 +31,66 @@
 
 /* CMSIS compiler specific defines */
 #ifndef   __ASM
-  #define __ASM                     __asm
+  #define __ASM                                  __asm
 #endif
 #ifndef   __INLINE
-  #define __INLINE                  __inline
+  #define __INLINE                               __inline
 #endif
 #ifndef   __STATIC_INLINE
-  #define __STATIC_INLINE           static __inline
+  #define __STATIC_INLINE                        static __inline
 #endif
 #ifndef   __NO_RETURN
-  #define __NO_RETURN               __attribute__((noreturn))
+  #define __NO_RETURN                            __attribute__((noreturn))
 #endif
 #ifndef   __USED
-  #define __USED                    __attribute__((used))
+  #define __USED                                 __attribute__((used))
 #endif
 #ifndef   __WEAK
-  #define __WEAK                    __attribute__((weak))
+  #define __WEAK                                 __attribute__((weak))
 #endif
-#ifndef   __UNALIGNED_UINT32
+#ifndef   __PACKED
+  #define __PACKED                               __attribute__((packed, aligned(1)))
+#endif
+#ifndef   __PACKED_STRUCT
+  #define __PACKED_STRUCT                        struct __attribute__((packed, aligned(1)))
+#endif
+#ifndef   __UNALIGNED_UINT32        /* deprecated */
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wpacked"
   struct __attribute__((packed)) T_UINT32 { uint32_t v; };
   #pragma clang diagnostic pop
-  #define __UNALIGNED_UINT32(x)     (((struct T_UINT32 *)(x))->v)
+  #define __UNALIGNED_UINT32(x)                  (((struct T_UINT32 *)(x))->v)
+#endif
+#ifndef   __UNALIGNED_UINT16_WRITE
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wpacked"
+  __PACKED_STRUCT T_UINT16_WRITE { uint16_t v; };
+  #pragma clang diagnostic pop
+  #define __UNALIGNED_UINT16_WRITE(addr, val)    (void)((((struct T_UINT16_WRITE *)(void *)(addr))->v) = (val))
+#endif
+#ifndef   __UNALIGNED_UINT16_READ
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wpacked"
+  __PACKED_STRUCT T_UINT16_READ { uint16_t v; };
+  #pragma clang diagnostic pop
+  #define __UNALIGNED_UINT16_READ(addr)          (((const struct T_UINT16_READ *)(const void *)(addr))->v)
+#endif
+#ifndef   __UNALIGNED_UINT32_WRITE
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wpacked"
+  __PACKED_STRUCT T_UINT32_WRITE { uint32_t v; };
+  #pragma clang diagnostic pop
+  #define __UNALIGNED_UINT32_WRITE(addr, val)    (void)((((struct T_UINT32_WRITE *)(void *)(addr))->v) = (val))
+#endif
+#ifndef   __UNALIGNED_UINT32_READ
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wpacked"
+  __PACKED_STRUCT T_UINT32_READ { uint32_t v; };
+  #pragma clang diagnostic pop
+  #define __UNALIGNED_UINT32_READ(addr)          (((const struct T_UINT32_READ *)(const void *)(addr))->v)
 #endif
 #ifndef   __ALIGNED
-  #define __ALIGNED(x)              __attribute__((aligned(x)))
-#endif
-#ifndef   __PACKED
-  #define __PACKED                  __attribute__((packed, aligned(1)))
+  #define __ALIGNED(x)                           __attribute__((aligned(x)))
 #endif
 
 
@@ -218,7 +249,7 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __TZ_get_PSP_NS(void)
  */
 __attribute__((always_inline)) __STATIC_INLINE void __set_PSP(uint32_t topOfProcStack)
 {
-  __ASM volatile ("MSR psp, %0" : : "r" (topOfProcStack) : "sp");
+  __ASM volatile ("MSR psp, %0" : : "r" (topOfProcStack) : );
 }
 
 
@@ -230,7 +261,7 @@ __attribute__((always_inline)) __STATIC_INLINE void __set_PSP(uint32_t topOfProc
  */
 __attribute__((always_inline)) __STATIC_INLINE void __TZ_set_PSP_NS(uint32_t topOfProcStack)
 {
-  __ASM volatile ("MSR psp_ns, %0" : : "r" (topOfProcStack) : "sp");
+  __ASM volatile ("MSR psp_ns, %0" : : "r" (topOfProcStack) : );
 }
 #endif
 
@@ -272,7 +303,7 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __TZ_get_MSP_NS(void)
  */
 __attribute__((always_inline)) __STATIC_INLINE void __set_MSP(uint32_t topOfMainStack)
 {
-  __ASM volatile ("MSR msp, %0" : : "r" (topOfMainStack) : "sp");
+  __ASM volatile ("MSR msp, %0" : : "r" (topOfMainStack) : );
 }
 
 
@@ -284,7 +315,7 @@ __attribute__((always_inline)) __STATIC_INLINE void __set_MSP(uint32_t topOfMain
  */
 __attribute__((always_inline)) __STATIC_INLINE void __TZ_set_MSP_NS(uint32_t topOfMainStack)
 {
-  __ASM volatile ("MSR msp_ns, %0" : : "r" (topOfMainStack) : "sp");
+  __ASM volatile ("MSR msp_ns, %0" : : "r" (topOfMainStack) : );
 }
 #endif
 

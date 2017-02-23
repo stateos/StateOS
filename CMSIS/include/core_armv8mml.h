@@ -2,10 +2,10 @@
  * @file     core_armv8mml.h
  * @brief    CMSIS ARMv8MML Core Peripheral Access Layer Header File
  * @version  V5.0.2
- * @date     07. December 2016
+ * @date     13. February 2017
  ******************************************************************************/
 /*
- * Copyright (c) 2009-2016 ARM Limited. All rights reserved.
+ * Copyright (c) 2009-2017 ARM Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -2545,6 +2545,10 @@ __STATIC_INLINE uint32_t TZ_NVIC_GetPendingIRQ_NS(IRQn_Type IRQn)
   if ((int32_t)(IRQn) >= 0)
   {
     return((uint32_t)(((NVIC_NS->ISPR[(((uint32_t)(int32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)(int32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
+  }
+  else
+  {
+    return(0U);
   }
 }
 
