@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    22.02.2017
+    @date    23.02.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -105,6 +105,7 @@ typedef struct
 	char   name [OS_MAX_API_NAME];
 	uint32 creator;
 	uint32 used;
+	void (*handler)(void);
 	void  *stack;
 	uint32 size;
 	void (*delete_handler)(void);
@@ -1027,6 +1028,15 @@ int32 OS_MutSemGetInfo(uint32 sem_id, OS_mut_sem_prop_t *mut_prop)
 ** Task API
 */
 
+static void task_handler(void)
+{
+	OS_task_record_t *rec = (OS_task_record_t *) Current;
+
+	rec->handler();
+
+	OS_TaskExit();
+}
+
 int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry function_pointer,
                     const uint32 *stack_pointer, uint32 stack_size, uint32 priority, uint32 flags)
 {
@@ -1077,15 +1087,14 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 					*task_id = (rec - OS_task_table) / sizeof(OS_task_record_t);
 					strcpy(rec->name, task_name);
 					rec->creator   = OS_TaskGetId();
-					rec->tsk.state = function_pointer;
 					rec->tsk.top   = (uint64 *)stack + stack_size/8;
 					rec->tsk.prio  =
 					rec->tsk.basic = ~priority;
+					rec->handler   = function_pointer;
 					rec->stack     = stack_pointer ? 0 : stack;
 					rec->size      = stack_size;
 					rec->used = 1;
-					core_ctx_init(&rec->tsk);
-					core_tsk_insert(&rec->tsk);
+					tsk_startFrom(&rec->tsk, task_handler);
 					status = OS_SUCCESS;
 				}
 			}
