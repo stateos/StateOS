@@ -51,75 +51,16 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
-#include <os.h>
-#include <osapi.h>
+#include <osnasa.h>
 
 /*---------------------------------------------------------------------------*/
 /*
 ** OSAL internal data
 */
 
-static uint32    printf_enabled = FALSE;
-static OS_time_t localtime = { 0, 0 };
-
-/* queues */
-typedef struct
-{
-	box_t  box;
-	char   name [OS_MAX_API_NAME];
-	uint32 creator;
-	uint32 used;
-}	OS_queue_record_t;
-
-/* binary semaphores */
-typedef struct
-{
-	sem_t  sem;
-	char   name [OS_MAX_API_NAME];
-	uint32 creator;
-	uint32 used;
-}	OS_bin_sem_record_t;
-
-/* counting semaphores */
-typedef struct
-{
-	sem_t  sem;
-	char   name [OS_MAX_API_NAME];
-	uint32 creator;
-	uint32 used;
-}	OS_count_sem_record_t;
-
-/* mutexes */
-typedef struct
-{
-	mtx_t  mtx;
-	char   name [OS_MAX_API_NAME];
-	uint32 creator;
-	uint32 used;
-}	OS_mut_sem_record_t;
-
-/* tasks */
-typedef struct
-{
-	tsk_t  tsk;
-	char   name [OS_MAX_API_NAME];
-	uint32 creator;
-	uint32 used;
-	void (*handler)(void);
-	void  *stack;
-	uint32 size;
-	void (*delete_handler)(void);
-}	OS_task_record_t;
-
-/* timers */
-typedef struct
-{
-	tmr_t  tmr;
-	char   name [OS_MAX_API_NAME];
-	uint32 creator;
-	uint32 used;
-	void (*handler)(uint32);
-}	OS_timer_record_t;
+static uint32                printf_enabled  = FALSE;
+static OS_time_t             localtime       = { 0, 0 };
+static tmr_t                 local_timer     = TMR_INIT();
 
 static OS_queue_record_t     OS_queue_table    [OS_MAX_QUEUES];
 static OS_bin_sem_record_t   OS_bin_sem_table  [OS_MAX_BIN_SEMAPHORES];
@@ -147,13 +88,6 @@ static void local_timer_handler( void )
 
 	sys_unlockISR();
 }
-
-/*---------------------------------------------------------------------------*/
-/*
-** OSAL local timer instance
-*/
-
-static tmr_t local_timer = TMR_INIT();
 
 /*---------------------------------------------------------------------------*/
 /*
