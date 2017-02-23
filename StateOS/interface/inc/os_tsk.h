@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    21.02.2017
+    @date    23.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -66,7 +66,7 @@ struct __tsk
 	tsk_t  * join;  // list of joined tasks
 
 	union  {
-	unsigned mode;  // used by tsk_wait, tsk_sleep functions and flag object
+	unsigned mode;  // used by flag object
 	void   * data;  // used by mailbox queue object
 	unsigned msg;   // used by message queue object
 	};
@@ -525,7 +525,6 @@ void tsk_detach( tsk_t *tsk );
  *   E_SUCCESS       : joined task was stopped its execution                                                          *
  *   E_STOPPED       : joined task was killed                                                                         *
  *   E_TIMEOUT       : joined task was detached                                                                       *
- *   'another'       : task was resumed with 'another' event value                                                    *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -609,13 +608,12 @@ void tsk_prio( unsigned prio );
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   flags           : all flags to wait                                                                              *
- *                     0: wait for any flag or message                                                                *
+ *                     0: wait for any flags or message                                                               *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : task object resumed by the direct transfer of flags or message (tsk_give)                      *
  *   E_TIMEOUT       : task object was not released before the specified timeout expired                              *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   'another'       : task object resumed by the direct transfer of 'another' flags or message (tsk_give)            *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -637,9 +635,8 @@ unsigned tsk_waitUntil( unsigned flags, unsigned time );
  *                     INFINITE:  delay indefinitly execution of current task                                         *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : task object resumed by the direct transfer of flags or message (tsk_give)                      *
  *   E_TIMEOUT       : task object was not released before the specified timeout expired                              *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   'another'       : task object resumed by the direct transfer of 'another' flags or message (tsk_give)            *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -658,8 +655,7 @@ unsigned tsk_waitFor( unsigned flags, unsigned delay );
  *                     0: wait for any flag or message                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   E_SUCCESS       : task object resumed by the direct transfer of flags or message (tsk_give)                      *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   'another'       : task object resumed by the direct transfer of 'another' flags or message (tsk_give)            *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -716,7 +712,7 @@ void tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_TIMEOUT       : task object successfully finished countdown                                                    *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   'another'       : task was resumed with 'another' event value (tsk_resume)                                       *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -738,7 +734,7 @@ unsigned tsk_sleepUntil( unsigned time ) { return tmr_waitUntil(&WAIT, time); }
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_TIMEOUT       : task object successfully finished countdown                                                    *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   'another'       : task was resumed with 'another' event value (tsk_resume)                                       *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -756,7 +752,7 @@ unsigned tsk_sleepFor( unsigned delay ) { return tmr_waitFor(&WAIT, delay); }
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   'another'       : task was resumed with 'another' event value (tsk_resume)                                       *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -778,7 +774,7 @@ unsigned tsk_sleep( void ) { return tmr_wait(&WAIT); }
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_TIMEOUT       : task object successfully finished countdown                                                    *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   'another'       : task was resumed with 'another' event value (tsk_resume)                                       *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -796,7 +792,7 @@ unsigned tsk_delay( unsigned delay ) { return tsk_sleepFor(delay); }
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   'another'       : task was resumed with 'another' event value                                                    *
+ *   'another'       : task was resumed with 'another' event value (tsk_resume)                                       *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
