@@ -173,7 +173,7 @@ uint32_t osKernelGetSysTimerFreq (void)
 
 /*---------------------------------------------------------------------------*/
 
-static void osThreadProcedure (void)
+static void thread_handler (void)
 {
 	osThread_t *cur = (osThread_t *)Current;
 
@@ -253,7 +253,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	thread->stack     = stack_mem;
 	thread->size      = stack_size;
 
-	tsk_startFrom(&thread->tsk, osThreadProcedure);
+	tsk_startFrom(&thread->tsk, thread_handler);
 
 	sys_unlock();
 
@@ -375,7 +375,7 @@ osStatus_t osThreadResume (osThreadId_t thread_id)
 	return osOK;
 }
 
-static void osThreadDelete (osThreadId_t thread_id)
+static void thread_delete (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
 
@@ -405,7 +405,7 @@ osStatus_t osThreadDetach (osThreadId_t thread_id)
 
 	tsk_detach(&thread->tsk);
 
-	osThreadDelete(thread_id);
+	thread_delete(thread_id);
 	return osOK;
 }
 
@@ -425,7 +425,7 @@ osStatus_t osThreadJoin (osThreadId_t thread_id)
 		default:        return osErrorResource;
 	}
 
-	osThreadDelete(thread_id);
+	thread_delete(thread_id);
 	return osOK;
 }
 
@@ -446,7 +446,7 @@ osStatus_t osThreadTerminate (osThreadId_t thread_id)
 	tsk_kill(&thread->tsk);
 
 	if (thread->tsk.join == DETACHED)
-		osThreadDelete(thread_id);
+		thread_delete(thread_id);
 
 	return osOK;
 }
@@ -572,7 +572,7 @@ osStatus_t osDelayUntil (uint64_t ticks)
 
 /*---------------------------------------------------------------------------*/
 
-static void osTimerProcedure (void)
+static void timer_handler (void)
 {
 	osTimer_t *cur = (osTimer_t *)WAIT.obj.next;
 
@@ -641,7 +641,7 @@ osStatus_t osTimerStart (osTimerId_t timer_id, uint32_t ticks)
 	if (timer_id == NULL)
 		return osErrorParameter;
 
-	tmr_start(&timer->tmr, ticks, (timer->flags & osTimerPeriodic) ? ticks : 0, osTimerProcedure);
+	tmr_start(&timer->tmr, ticks, (timer->flags & osTimerPeriodic) ? ticks : 0, timer_handler);
 
 	return osOK;
 }
