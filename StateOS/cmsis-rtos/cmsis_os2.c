@@ -60,15 +60,7 @@
 
 /*---------------------------------------------------------------------------*/
 
-#define IS_IRQ_MODE()            (__get_IPSR() != 0U)
-
-#if   ((__ARM_ARCH_7M__      == 1U) || \
-       (__ARM_ARCH_7EM__     == 1U) || \
-       (__ARM_ARCH_8M_MAIN__ == 1U))
-#define IS_IRQ_MASKED()         ((__get_PRIMASK() != 0U) || (__get_BASEPRI() != 0U))
-#else
-#define IS_IRQ_MASKED()          (__get_PRIMASK() != 0U) 
-#endif
+#define IS_IRQ_MODE()    port_isr_inside()
 
 /*---------------------------------------------------------------------------*/
 
@@ -117,23 +109,25 @@ osStatus_t osKernelStart (void)
 
 int32_t osKernelLock (void)
 {
-	int32_t lock = __get_PRIMASK();
+	int32_t lock;
 
 	if (IS_IRQ_MODE())
 		return (int32_t)osErrorISR;
 
-	__disable_irq();
+	lock = port_get_lock();
+	port_set_lock();
 	return lock;
 }
 
 int32_t osKernelUnlock (void)
 {
-	int32_t lock = __get_PRIMASK();
+	int32_t lock;
 
 	if (IS_IRQ_MODE())
 		return (int32_t)osErrorISR;
 
-	__enable_irq();
+	lock = port_get_lock();
+	port_clr_lock();
 	return lock;
 }
 
@@ -142,7 +136,8 @@ int32_t osKernelRestoreLock (int32_t lock)
 	if (IS_IRQ_MODE())
 		return (int32_t)osErrorISR;
 
-	__set_PRIMASK(lock);
+	port_put_lock(lock);
+	lock = port_get_lock();
 	return lock;
 }
 

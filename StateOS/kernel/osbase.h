@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    21.02.2017
+    @date    24.02.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -156,11 +156,22 @@ void port_ctx_init( ctx_t *ctx, fun_t *pc )
 
 /* -------------------------------------------------------------------------- */
 
-// procedure inside ISR?
+// is procedure inside ISR?
 __STATIC_INLINE
-unsigned port_isr_inside( void )
+bool port_isr_inside( void )
 {
-	return __get_IPSR();
+	return (__get_IPSR() != 0U);
+}
+
+// are interrupts masked?
+__STATIC_INLINE
+bool port_isr_masked( void )
+{
+#if __CORTEX_M >= 3
+	return (__get_PRIMASK() != 0U) || (__get_BASEPRI() != 0U);
+#else
+	return (__get_PRIMASK() != 0U);
+#endif
 }
 
 /* -------------------------------------------------------------------------- */
