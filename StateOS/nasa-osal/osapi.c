@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -668,7 +668,7 @@ int32 OS_CountSemGive(uint32 sem_id)
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+	if (sem_id >= OS_MAX_COUNT_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -690,7 +690,7 @@ int32 OS_CountSemTake(uint32 sem_id)
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+	if (sem_id >= OS_MAX_COUNT_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -712,7 +712,7 @@ int32 OS_CountSemTimedWait(uint32 sem_id, uint32 msecs)
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+	if (sem_id >= OS_MAX_COUNT_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
