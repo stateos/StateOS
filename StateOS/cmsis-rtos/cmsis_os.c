@@ -24,34 +24,6 @@
  * Title:        cmsis_os_v1.c V1 module file
  *---------------------------------------------------------------------------*/
 
-/******************************************************************************
-
-    @file    StateOS: cmsis_os2.c
-    @author  Rajmund Szymanski
-    @date    20.02.2017
-    @brief   CMSIS-RTOS2 API implementation for StateOS.
-
- ******************************************************************************
-
-    StateOS - Copyright (C) 2013 Rajmund Szymanski.
-
-    This file is part of StateOS distribution.
-
-    StateOS is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published
-    by the Free Software Foundation; either version 3 of the License,
-    or (at your option) any later version.
-
-    StateOS is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
-
- ******************************************************************************/
-
 #include <string.h>
 #include "cmsis_os.h"
 
@@ -166,7 +138,7 @@ osSemaphoreId osSemaphoreCreate (const osSemaphoreDef_t *semaphore_def, int32_t 
   if (semaphore_def == NULL) {
     return NULL;
   }
-  return osSemaphoreNew((uint32_t)count, 0U, semaphore_def);
+  return osSemaphoreNew((uint32_t)count, (uint32_t)count, semaphore_def);
 }
 
 int32_t osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec) {
