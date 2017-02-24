@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,10 +34,10 @@ tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size )
 {
 	tsk_t *tsk;
 
+	assert(!port_isr_inside());
 	assert(state);
-	assert(size);
 
-	size = ASIZE(sizeof(tsk_t) + size);
+	size = ASIZE(sizeof(tsk_t) + size ? size : OS_STACK_SIZE);
 
 	port_sys_lock();
 
@@ -63,6 +63,7 @@ tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size )
 void tsk_start( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(tsk);
 	assert(tsk->state);
 
@@ -81,6 +82,7 @@ void tsk_start( tsk_t *tsk )
 void tsk_startFrom( tsk_t *tsk, fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(tsk);
 	assert(state);
 
@@ -101,6 +103,8 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	port_set_lock();
 
 	while (Current->list)
@@ -118,6 +122,7 @@ void tsk_stop( void )
 void tsk_kill( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(tsk);
 
 	port_sys_lock();
@@ -144,6 +149,7 @@ void tsk_kill( tsk_t *tsk )
 void tsk_detach( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(tsk);
 
 	port_sys_lock();
@@ -163,6 +169,7 @@ unsigned tsk_join( tsk_t *tsk )
 {
 	unsigned event;
 
+	assert(!port_isr_inside());
 	assert(tsk);
 
 	port_sys_lock();
@@ -184,6 +191,8 @@ unsigned tsk_join( tsk_t *tsk )
 void tsk_yield( void )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	port_sys_lock();
 
 	core_ctx_switch();
@@ -196,6 +205,7 @@ void tsk_yield( void )
 void tsk_flip( fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(state);
 
 	port_set_lock();
@@ -208,6 +218,8 @@ void tsk_flip( fun_t *state )
 void tsk_prio( unsigned prio )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	port_sys_lock();
 
 	Current->basic = prio;
@@ -223,6 +235,8 @@ unsigned priv_tsk_wait( unsigned flags, unsigned time, unsigned(*wait)() )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
+
+	assert(!port_isr_inside());
 
 	port_sys_lock();
 

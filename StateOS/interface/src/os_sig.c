@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.c
     @author  Rajmund Szymanski
-    @date    10.01.2017
+    @date    24.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,6 +34,8 @@ sig_t *sig_create( unsigned type )
 {
 	sig_t *sig;
 
+	assert(!port_isr_inside());
+
 	port_sys_lock();
 
 	sig = core_sys_alloc(sizeof(sig_t));
@@ -52,6 +54,7 @@ sig_t *sig_create( unsigned type )
 void sig_kill( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(sig);
 
 	port_sys_lock();
@@ -70,6 +73,7 @@ unsigned priv_sig_wait( sig_t *sig, unsigned time, unsigned(*wait)() )
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside() || !time);
 	assert(sig);
 
 	port_sys_lock();

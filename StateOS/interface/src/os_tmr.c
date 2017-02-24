@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    24.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,6 +34,8 @@ tmr_t *tmr_create( void )
 {
 	tmr_t *tmr;
 
+	assert(!port_isr_inside());
+
 	port_sys_lock();
 
 	tmr = core_sys_alloc(sizeof(tmr_t));
@@ -47,6 +49,7 @@ tmr_t *tmr_create( void )
 void tmr_kill( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(tmr);
 
 	port_sys_lock();
@@ -65,6 +68,8 @@ static
 void priv_tmr_start( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	if (tmr->obj.id != ID_STOPPED)
 	core_tmr_remove(tmr);
 	core_tmr_insert(tmr, ID_TIMER);
@@ -113,6 +118,7 @@ unsigned priv_tmr_wait( tmr_t *tmr, unsigned time, unsigned(*wait)() )
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside() || !time);
 	assert(tmr);
 
 	port_sys_lock();

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    10.01.2017
+    @date    24.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,7 +32,10 @@
 void mem_init( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(mem);
+	assert(mem->limit);
+	assert(mem->size);
 	assert(mem->data);
 
 	port_sys_lock();
@@ -52,6 +55,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 {
 	mem_t *mem;
 
+	assert(!port_isr_inside());
 	assert(limit);
 	assert(size);
 
@@ -79,6 +83,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 void mem_kill( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(mem);
 
 	port_sys_lock();
@@ -95,6 +100,7 @@ unsigned priv_mem_wait( mem_t *mem, void **data, unsigned time, unsigned(*wait)(
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside() || !time);
 	assert(mem);
 	assert(data);
 

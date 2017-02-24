@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    17.02.2017
+    @date    24.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,6 +34,7 @@ box_t *box_create( unsigned limit, unsigned size )
 {
 	box_t *box;
 
+	assert(!port_isr_inside());
 	assert(limit);
 	assert(size);
 
@@ -57,6 +58,7 @@ box_t *box_create( unsigned limit, unsigned size )
 void box_kill( box_t *box )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(box);
 
 	port_sys_lock();
@@ -105,6 +107,7 @@ unsigned priv_box_wait( box_t *box, void *data, unsigned time, unsigned(*wait)()
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside() || !time);
 	assert(box);
 	assert(data);
 
@@ -151,6 +154,7 @@ unsigned priv_box_send( box_t *box, void *data, unsigned time, unsigned(*wait)()
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside() || !time);
 	assert(box);
 	assert(data);
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    10.01.2017
+    @date    24.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 msg_t *msg_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(limit);
 
 	msg_t *msg;
@@ -55,6 +56,7 @@ msg_t *msg_create( unsigned limit )
 void msg_kill( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(msg);
 
 	port_sys_lock();
@@ -97,6 +99,7 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, unsigned time, unsigned(*wai
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside() || !time);
 	assert(msg);
 	assert(data);
 
@@ -143,6 +146,7 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, unsigned time, unsigned(*wait
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside() || !time);
 	assert(msg);
 
 	port_sys_lock();

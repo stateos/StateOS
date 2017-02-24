@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    10.01.2017
+    @date    24.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,6 +34,7 @@ sem_t *sem_create( unsigned init, unsigned limit )
 {
 	sem_t *sem;
 
+	assert(!port_isr_inside());
 	assert(limit);
 
 	port_sys_lock();
@@ -55,6 +56,7 @@ sem_t *sem_create( unsigned init, unsigned limit )
 void sem_kill( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(sem);
 
 	port_sys_lock();
@@ -73,6 +75,7 @@ unsigned priv_sem_wait( sem_t *sem, unsigned time, unsigned(*wait)() )
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside() || !time);
 	assert(sem);
 
 	port_sys_lock();
@@ -109,6 +112,7 @@ unsigned priv_sem_send( sem_t *sem, unsigned time, unsigned(*wait)() )
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside() || !time);
 	assert(sem);
 
 	port_sys_lock();

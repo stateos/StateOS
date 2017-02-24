@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.c
     @author  Rajmund Szymanski
-    @date    10.01.2017
+    @date    24.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,6 +34,8 @@ evt_t *evt_create( void )
 {
 	evt_t *evt;
 
+	assert(!port_isr_inside());
+
 	port_sys_lock();
 
 	evt = core_sys_alloc(sizeof(evt_t));
@@ -47,6 +49,7 @@ evt_t *evt_create( void )
 void evt_kill( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(evt);
 
 	port_sys_lock();
@@ -63,6 +66,7 @@ unsigned priv_evt_wait( evt_t *evt, unsigned time, unsigned(*wait)() )
 {
 	unsigned event;
 
+	assert(!port_isr_inside());
 	assert(evt);
 
 	port_sys_lock();

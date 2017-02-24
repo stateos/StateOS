@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.c
     @author  Rajmund Szymanski
-    @date    10.01.2017
+    @date    24.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,6 +34,8 @@ mut_t *mut_create( void )
 {
 	mut_t *mut;
 
+	assert(!port_isr_inside());
+
 	port_sys_lock();
 
 	mut = core_sys_alloc(sizeof(mut_t));
@@ -47,6 +49,7 @@ mut_t *mut_create( void )
 void mut_kill( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(mut);
 
 	port_sys_lock();
@@ -63,6 +66,7 @@ unsigned priv_mut_wait( mut_t *mut, unsigned time, unsigned(*wait)() )
 {
 	unsigned event = E_TIMEOUT;
 
+	assert(!port_isr_inside());
 	assert(mut);
 
 	port_sys_lock();
@@ -103,6 +107,7 @@ unsigned mut_give( mut_t *mut )
 {
 	unsigned event = E_TIMEOUT;
 	
+	assert(!port_isr_inside());
 	assert(mut);
 
 	port_sys_lock();

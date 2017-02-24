@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    17.02.2017
+    @date    24.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,6 +34,8 @@ flg_t *flg_create( void )
 {
 	flg_t *flg;
 
+	assert(!port_isr_inside());
+
 	port_sys_lock();
 
 	flg = core_sys_alloc(sizeof(flg_t));
@@ -47,6 +49,7 @@ flg_t *flg_create( void )
 void flg_kill( flg_t *flg )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
 	assert(flg);
 
 	port_sys_lock();
@@ -63,7 +66,9 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, unsigned time
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside() || !time);
 	assert(flg);
+	assert((mode & ~flgMASK) == 0U);
 
 	port_sys_lock();
 
