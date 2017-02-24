@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -380,6 +380,27 @@ typedef struct __tsk tsk_id[1];
 #define                TSK_CREATE( prio, state ) \
                        WRK_CREATE( prio, state, OS_STACK_SIZE )
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize complete work area for task object and start the task                                *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to task object                                                                         *
+ *   prio            : initial task priority (any unsigned int value)                                                 *
+ *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
+ *                     it will be executed into an infinite system-implemented loop                                   *
+ *   stack           : top of task's private stack storage                                                            *
+ *                                                                                                                    *
+ * Return            : task object                                                                                    *
+ *                                                                                                                    *
+ * Note              : use only in 'C' code                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

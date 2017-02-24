@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -163,6 +163,25 @@ typedef struct __msg msg_t, msg_id[1];
 #define                MSG_CREATE( limit ) \
                      { MSG_INIT( limit ) }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a message queue object                                                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *   limit           : size of a queue (max number of stored messages)                                                *
+ *   data            : message queue data buffer                                                                      *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void msg_init( msg_t *msg, unsigned limit, void *data );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -50,6 +50,29 @@ void mem_reset( mem_t *mem )
 }
 
 /* -------------------------------------------------------------------------- */
+void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data )
+/* -------------------------------------------------------------------------- */
+{
+	assert(!port_isr_inside());
+	assert(mem);
+	assert(limit);
+	assert(size);
+	assert(data);
+
+	port_sys_lock();
+
+	memset(mem, 0, sizeof(mem_t));
+
+	mem->limit = limit;
+	mem->size  = size;
+	mem->data  = data;
+
+	mem_reset(mem);
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 mem_t *mem_create( unsigned limit, unsigned size )
 /* -------------------------------------------------------------------------- */
 {

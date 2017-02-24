@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -135,6 +135,23 @@ typedef struct __cnd cnd_t, cnd_id[1];
 #define                CND_CREATE() \
                      { CND_INIT() }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : cnd_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a condition variable object                                                          *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   cnd             : pointer to condition variable object                                                           *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void cnd_init( cnd_t *cnd );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -29,6 +29,24 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
+void bar_init( bar_t *bar, unsigned limit )
+/* -------------------------------------------------------------------------- */
+{
+	assert(!port_isr_inside());
+	assert(bar);
+	assert(limit);
+
+	port_sys_lock();
+
+	memset(bar, 0, sizeof(bar_t));
+
+	bar->count = limit;
+	bar->limit = limit;
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 bar_t *bar_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {

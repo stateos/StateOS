@@ -40,6 +40,8 @@ Features:
 - rebuilded nasa-osal api
 - only delayed and suspended tasks can be resumed
 - tsk_wait functions return received flags or messages
+- mem_init function renamed to mem_reset
+- added xxx_init functions and corresponding example
 ---------
 4.4
 - added oslibc.c file for COSMIC Software CORTEX-M C Cross Compiler

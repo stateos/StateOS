@@ -29,6 +29,30 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
+void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack )
+/* -------------------------------------------------------------------------- */
+{
+	assert(!port_isr_inside());
+	assert(tsk);
+	assert(state);
+	assert(stack);
+
+	port_sys_lock();
+
+	memset(tsk, 0, sizeof(tsk_t));
+	
+	tsk->state = state;
+	tsk->top   = stack;
+	tsk->prio  = prio;
+	tsk->basic = prio;
+
+	core_ctx_init(tsk);
+	core_tsk_insert(tsk);
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {

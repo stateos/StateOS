@@ -29,6 +29,25 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
+void msg_init( msg_t *msg, unsigned limit, void *data )
+/* -------------------------------------------------------------------------- */
+{
+	assert(!port_isr_inside());
+	assert(msg);
+	assert(limit);
+	assert(data);
+
+	port_sys_lock();
+
+	memset(msg, 0, sizeof(msg_t));
+
+	msg->limit = limit;
+	msg->data  = data;
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 msg_t *msg_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {

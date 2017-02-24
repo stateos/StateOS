@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -129,6 +129,23 @@ typedef struct __evt evt_t, evt_id[1];
 #define                EVT_CREATE() \
                      { EVT_INIT() }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : evt_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize an event object                                                                      *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   evt             : pointer to event object                                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void evt_init( evt_t *evt );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

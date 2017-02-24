@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -130,6 +130,23 @@ typedef struct __lst lst_t, lst_id[1];
 #define                LST_CREATE() \
                      { LST_INIT() }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : lst_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a list object                                                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   lst             : pointer to list object                                                                         *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void lst_init( lst_t *lst );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

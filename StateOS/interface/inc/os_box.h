@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -169,6 +169,26 @@ typedef struct __box box_t, box_id[1];
 #define                BOX_CREATE( limit, size ) \
                      { BOX_INIT( limit, size ) }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : box_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a mailbox queue object                                                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   box             : pointer to mailbox queue object                                                                *
+ *   limit           : size of a queue (max number of stored mails)                                                   *
+ *   size            : size of a single mail (in bytes)                                                               *
+ *   data            : mailbox queue data buffer                                                                      *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void box_init( box_t *box, unsigned limit, unsigned size, void *data );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -132,6 +132,23 @@ typedef struct __mut mut_t, mut_id[1];
 #define                MUT_CREATE() \
                      { MUT_INIT() }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : mut_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a fast mutex object                                                                  *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mut             : pointer to fast mutex object                                                                   *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void mut_init( mut_t *mut );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

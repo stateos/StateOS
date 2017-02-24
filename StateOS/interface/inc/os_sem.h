@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -164,6 +164,28 @@ typedef struct __sem sem_t, sem_id[1];
 #define                SEM_CREATE( init, limit ) \
                      { SEM_INIT( init, limit ) }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a semaphore object                                                                   *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *   init            : initial value of semaphore counter                                                             *
+ *   limit           : maximum value of semaphore counter                                                             *
+ *                     semBinary: binary semaphore                                                                    *
+ *                     semNormal, semCounting: counting semaphore                                                     *
+ *                     otherwise: limited semaphore                                                                   *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void sem_init( sem_t *sem, unsigned init, unsigned limit );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -60,7 +60,7 @@ typedef struct __sig sig_t, sig_id[1];
  *                                                                                                                    *
  * Name              : _SIG_INIT                                                                                      *
  *                                                                                                                    *
- * Description       : create and initilize an signal object                                                          *
+ * Description       : create and initilize a signal object                                                           *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   type            : signal type                                                                                    *
@@ -113,7 +113,7 @@ typedef struct __sig sig_t, sig_id[1];
  *                                                                                                                    *
  * Name              : SIG_INIT                                                                                       *
  *                                                                                                                    *
- * Description       : create and initilize an signal object                                                          *
+ * Description       : create and initilize a signal object                                                           *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   type            : signal type                                                                                    *
@@ -152,6 +152,26 @@ typedef struct __sig sig_t, sig_id[1];
 #define                SIG_CREATE( type ) \
                      { SIG_INIT( type ) }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sig_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a signal object                                                                      *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sig             : pointer to signal object                                                                       *
+ *   type            : signal type                                                                                    *
+ *                     sigClear:   auto clearing signal                                                               *
+ *                     sigProtect: protected signal                                                                   *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void sig_init( sig_t *sig, unsigned type );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

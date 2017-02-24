@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -143,6 +143,23 @@ typedef struct __flg flg_t, flg_id[1];
 #define                FLG_CREATE() \
                      { FLG_INIT() }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a flag object                                                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : pointer to flag object                                                                         *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void flg_init( flg_t *flg );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

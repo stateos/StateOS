@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -133,6 +133,23 @@ typedef struct __mtx mtx_id[1];
 #define                MTX_CREATE() \
                      { MTX_INIT() }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : mtx_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a mutex object                                                                       *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mtx             : pointer to mutex object                                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void mtx_init( mtx_t *mtx );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

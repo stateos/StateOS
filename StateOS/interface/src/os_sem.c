@@ -29,6 +29,24 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
+void sem_init( sem_t *sem, unsigned init, unsigned limit )
+/* -------------------------------------------------------------------------- */
+{
+	assert(!port_isr_inside());
+	assert(sem);
+	assert(limit);
+
+	port_sys_lock();
+
+	memset(sem, 0, sizeof(sem_t));
+
+	sem->count = UMIN(init, limit);
+	sem->limit = limit;
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 sem_t *sem_create( unsigned init, unsigned limit )
 /* -------------------------------------------------------------------------- */
 {

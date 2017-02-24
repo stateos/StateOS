@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    24.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -137,6 +137,24 @@ typedef struct __bar bar_t, bar_id[1];
 #define                BAR_CREATE( limit ) \
                      { BAR_INIT( limit ) }
 #endif
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : bar_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a barrier object                                                                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   bar             : pointer to barrier object                                                                      *
+ *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object      *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void bar_init( bar_t *bar, unsigned limit );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

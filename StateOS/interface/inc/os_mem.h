@@ -190,6 +190,26 @@ void mem_reset( mem_t *mem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : mem_init                                                                                       *
+ *                                                                                                                    *
+ * Description       : initilize a memory pool object                                                                 *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mem             : pointer to memory pool object                                                                  *
+ *   limit           : size of a buffer (max number of objects)                                                       *
+ *   size            : size of memory object (in bytes)                                                               *
+ *   data            : memory pool data buffer                                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : mem_create                                                                                     *
  *                                                                                                                    *
  * Description       : create and initilize a new memory pool object                                                  *

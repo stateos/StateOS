@@ -29,6 +29,27 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
+void box_init( box_t *box, unsigned limit, unsigned size, void *data )
+/* -------------------------------------------------------------------------- */
+{
+	assert(!port_isr_inside());
+	assert(box);
+	assert(limit);
+	assert(size);
+	assert(data);
+
+	port_sys_lock();
+
+	memset(box, 0, sizeof(box_t));
+	
+	box->limit = limit;
+	box->size  = size;
+	box->data  = data;
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 box_t *box_create( unsigned limit, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
