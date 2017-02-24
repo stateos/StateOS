@@ -32,10 +32,10 @@
 msg_t *msg_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
+	msg_t *msg;
+
 	assert(!port_isr_inside());
 	assert(limit);
-
-	msg_t *msg;
 
 	port_sys_lock();
 
