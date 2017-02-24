@@ -1113,7 +1113,7 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 	mp->flags     = flags;
 	mp->name      = (attr == NULL) ? NULL : attr->name;
 
-	mem_init(&mp->mem);
+	mem_reset(&mp->mem);
 
 	sys_unlock();
 

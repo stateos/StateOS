@@ -29,7 +29,7 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-void mem_init( mem_t *mem )
+void mem_reset( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -71,7 +71,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 		mem->size  = size;
 		mem->data  = mem + 1;
 
-		mem_init(mem);
+		mem_reset(mem);
 	}
 
 	port_sys_unlock();
