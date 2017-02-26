@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    24.02.2017
+    @date    26.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -69,7 +69,7 @@ typedef struct __tmr tmr_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _TMR_INIT( _state ) { { 0, 0, 0, 0 }, _state, 0, 0, 0 }
+#define               _TMR_INIT() { { 0, 0, 0, 0 }, 0, 0, 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -83,7 +83,7 @@ typedef struct __tmr tmr_id[1];
  **********************************************************************************************************************/
 
 #define             OS_TMR( tmr ) \
-                       tmr_id tmr = { _TMR_INIT( 0 ) }
+                       tmr_id tmr = { _TMR_INIT() }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -97,7 +97,7 @@ typedef struct __tmr tmr_id[1];
  **********************************************************************************************************************/
 
 #define         static_TMR( tmr ) \
-                static tmr_id tmr = { _TMR_INIT( 0 ) }
+                static tmr_id tmr = { _TMR_INIT() }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -115,7 +115,7 @@ typedef struct __tmr tmr_id[1];
 
 #ifndef __cplusplus
 #define                TMR_INIT() \
-                      _TMR_INIT( 0 )
+                      _TMR_INIT()
 #endif
 
 /**********************************************************************************************************************
@@ -478,7 +478,7 @@ namespace ThisTimer
 struct Timer : public __tmr
 {
 	explicit
-	 Timer( fun_t *_state = nullptr ): __tmr _TMR_INIT(0) { state = _state; }
+	 Timer( fun_t *_state = nullptr ): __tmr _TMR_INIT() { state = _state; }
 	~Timer( void ) { assert(obj.id == ID_STOPPED); }
 
 	void kill         ( void )                                             {        tmr_kill         (this);                               }
