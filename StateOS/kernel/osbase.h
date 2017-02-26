@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    24.02.2017
+    @date    26.02.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -65,6 +65,7 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+#define JOINABLE   ((void*) 0) // task in joinable state
 #define DETACHED   ((void*)-1) // task in detached state
 
 /* -------------------------------------------------------------------------- */
