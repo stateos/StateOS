@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    24.02.2017
+    @date    27.02.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -173,9 +173,9 @@ typedef struct __mem mem_t, mem_id[1];
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : mem_reset                                                                                      *
+ * Name              : mem_bind                                                                                       *
  *                                                                                                                    *
- * Description       : reset (initialize) data buffer of a memory pool object                                         *
+ * Description       : initialize data buffer of a memory pool object                                                 *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   mem             : pointer to memory pool object                                                                  *
@@ -186,7 +186,7 @@ typedef struct __mem mem_t, mem_id[1];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-void mem_reset( mem_t *mem );
+void mem_bind( mem_t *mem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -419,7 +419,7 @@ template<unsigned _limit, unsigned _size>
 struct MemoryPoolT : public __mem
 {
 	explicit
-	 MemoryPoolT( void ): __mem _MEM_INIT(_limit, _size, _data) { mem_reset(this); }
+	 MemoryPoolT( void ): __mem _MEM_INIT(_limit, _size, _data) { mem_bind(this); }
 	~MemoryPoolT( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                          {        mem_kill     (this);                }

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    24.02.2017
+    @date    27.02.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-void mem_reset( mem_t *mem )
+void mem_bind( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -67,7 +67,7 @@ void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data )
 	mem->size  = size;
 	mem->data  = data;
 
-	mem_reset(mem);
+	mem_bind(mem);
 
 	port_sys_unlock();
 }
@@ -94,7 +94,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 		mem->size  = size;
 		mem->data  = mem + 1;
 
-		mem_reset(mem);
+		mem_bind(mem);
 	}
 
 	port_sys_unlock();

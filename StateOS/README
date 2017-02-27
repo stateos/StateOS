@@ -29,6 +29,11 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+4.6
+- added JOINABLE constant
+- macro _TMR_INIT has no parameters
+- function mem_reset renamed to mem_bind
+---------
 4.5
 - rename flgOne to flgAny
 - added flg_clear function

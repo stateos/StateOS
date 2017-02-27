@@ -37,7 +37,7 @@ int main()
 {
 	LED_Config();
 
-	mem_reset(mem);
+	mem_bind(mem);
 	tsk_start(sla);
 	tsk_start(mas);
 	tsk_stop();

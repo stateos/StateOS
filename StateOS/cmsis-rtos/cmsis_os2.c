@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    26.02.2017
+    @date    27.02.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -1113,7 +1113,7 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 	mp->flags     = flags;
 	mp->name      = (attr == NULL) ? NULL : attr->name;
 
-	mem_reset(&mp->mem);
+	mem_bind(&mp->mem);
 
 	sys_unlock();
 
