@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    24.02.2017
+    @date    27.02.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -968,7 +968,7 @@ static void task_handler(void)
 
 	rec->handler();
 
-	OS_TaskExit();
+	tsk_stop();
 }
 
 int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry function_pointer,
@@ -1021,6 +1021,7 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 					*task_id = (rec - OS_task_table) / sizeof(OS_task_record_t);
 					strcpy(rec->name, task_name);
 					rec->creator   = OS_TaskGetId();
+					rec->tsk.state = task_handler;
 					rec->tsk.top   = (uint64 *)stack + stack_size/8;
 					rec->tsk.prio  =
 					rec->tsk.basic = ~priority;
@@ -1028,7 +1029,7 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 					rec->stack     = stack_pointer ? 0 : stack;
 					rec->size      = stack_size;
 					rec->used = 1;
-					tsk_startFrom(&rec->tsk, task_handler);
+					tsk_start(&rec->tsk);
 					status = OS_SUCCESS;
 				}
 			}
