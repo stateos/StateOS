@@ -193,7 +193,24 @@ static void thread_handler (void)
 
 	cur->func(cur->arg);
 
-	osThreadExit();
+	tsk_stop();
+}
+
+static void thread_delete (osThreadId_t thread_id)
+{
+	osThread_t *thread = thread_id;
+
+	sys_lock();
+
+	if (thread->tsk.obj.id == ID_STOPPED)
+	{
+		if ((thread->flags & osFlagSystemMemory) != 0U)
+			sys_free(thread->stack);
+		if ((thread->flags & osFlagSystemObject) != 0U)
+			sys_free(thread);
+	}
+
+	sys_unlock();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -389,23 +406,6 @@ osStatus_t osThreadResume (osThreadId_t thread_id)
 	return osOK;
 }
 
-static void thread_delete (osThreadId_t thread_id)
-{
-	osThread_t *thread = thread_id;
-
-	sys_lock();
-
-	if (thread->tsk.obj.id == ID_STOPPED)
-	{
-		if ((thread->flags & osFlagSystemMemory) != 0U)
-			sys_free(thread->stack);
-		if ((thread->flags & osFlagSystemObject) != 0U)
-			sys_free(thread);
-	}
-
-	sys_unlock();
-}
-
 osStatus_t osThreadDetach (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
@@ -567,10 +567,11 @@ osStatus_t osDelay (uint32_t ticks)
 	if (IS_IRQ_MODE())
 		return osErrorISR;
 
-	if (tsk_sleepFor(ticks) != E_TIMEOUT)
-		return osError;
-
-	return osOK;
+	switch (tsk_sleepFor(ticks))
+	{
+		case E_TIMEOUT: return osOK;
+		default:        return osError;
+	}
 }
 
 osStatus_t osDelayUntil (uint64_t ticks)
@@ -578,10 +579,11 @@ osStatus_t osDelayUntil (uint64_t ticks)
 	if (IS_IRQ_MODE())
 		return osErrorISR;
 
-	if (tsk_sleepUntil(ticks) != E_TIMEOUT)
-		return osError;
-
-	return osOK;
+	switch (tsk_sleepUntil(ticks))
+	{
+		case E_TIMEOUT: return osOK;
+		default:        return osError;
+	}
 }
 
 /*---------------------------------------------------------------------------*/
