@@ -273,6 +273,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 
 	memset(thread, 0, osThreadCbSize);
 	
+	thread->tsk.state = thread_handler;
 	thread->tsk.top   = (uint64_t *)stack_mem + stack_size/8U;
 	thread->tsk.prio  = \
 	thread->tsk.basic = (attr == NULL) ? osPriorityNormal : attr->priority;
@@ -284,7 +285,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	thread->stack     = stack_mem;
 	thread->size      = stack_size;
 
-	tsk_startFrom(&thread->tsk, thread_handler);
+	tsk_start(&thread->tsk);
 
 	sys_unlock();
 
