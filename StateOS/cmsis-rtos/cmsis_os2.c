@@ -629,10 +629,11 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 
 	memset(timer, 0, osTimerCbSize);
 
-	timer->flags = flags;
-	timer->name  = (attr == NULL) ? NULL : attr->name;
-	timer->func  = func;
-	timer->arg   = argument;
+	timer->tmr.state = timer_handler;
+	timer->flags     = flags;
+	timer->name      = (attr == NULL) ? NULL : attr->name;
+	timer->func      = func;
+	timer->arg       = argument;
 
 	sys_unlock();
 
@@ -658,7 +659,7 @@ osStatus_t osTimerStart (osTimerId_t timer_id, uint32_t ticks)
 	if (timer_id == NULL)
 		return osErrorParameter;
 
-	tmr_start(&timer->tmr, ticks, (timer->flags & osTimerPeriodic) ? ticks : 0, timer_handler);
+	tmr_start(&timer->tmr, ticks, (timer->flags & osTimerPeriodic) ? ticks : 0);
 
 	return osOK;
 }

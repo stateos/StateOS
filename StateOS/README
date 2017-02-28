@@ -31,8 +31,8 @@ Features:
 ---------
 4.6
 - added JOINABLE constant
-- macro _TMR_INIT has no parameters
 - function mem_reset renamed to mem_bind
+- redefined timer macros and procedures
 ---------
 4.5
 - rename flgOne to flgAny

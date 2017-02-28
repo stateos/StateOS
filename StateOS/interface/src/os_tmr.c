@@ -29,7 +29,7 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-void tmr_init( tmr_t *tmr )
+void tmr_init( tmr_t *tmr, fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -39,11 +39,13 @@ void tmr_init( tmr_t *tmr )
 
 	memset(tmr, 0, sizeof(tmr_t));
 
+	tmr->state = state;
+
 	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-tmr_t *tmr_create( void )
+tmr_t *tmr_create( fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
 	tmr_t *tmr;
@@ -53,6 +55,11 @@ tmr_t *tmr_create( void )
 	port_sys_lock();
 
 	tmr = core_sys_alloc(sizeof(tmr_t));
+
+	if (tmr)
+	{
+		tmr->state = state;
+	}
 
 	port_sys_unlock();
 
@@ -90,14 +97,13 @@ void priv_tmr_start( tmr_t *tmr )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_startUntil( tmr_t *tmr, unsigned time, fun_t *proc )
+void tmr_startUntil( tmr_t *tmr, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tmr);
 
 	port_sys_lock();
 
-	tmr->state  = proc;
 	tmr->start  = Counter;
 	tmr->delay  = time - tmr->start;
 	tmr->period = 0;
@@ -108,7 +114,24 @@ void tmr_startUntil( tmr_t *tmr, unsigned time, fun_t *proc )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_start( tmr_t *tmr, unsigned delay, unsigned period, fun_t *proc )
+void tmr_start( tmr_t *tmr, unsigned delay, unsigned period )
+/* -------------------------------------------------------------------------- */
+{
+	assert(tmr);
+
+	port_sys_lock();
+
+	tmr->start  = Counter;
+	tmr->delay  = delay;
+	tmr->period = period;
+
+	priv_tmr_start(tmr);
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tmr_startFrom( tmr_t *tmr, unsigned delay, unsigned period, fun_t *proc )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tmr);

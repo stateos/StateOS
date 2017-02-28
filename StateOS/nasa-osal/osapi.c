@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    27.02.2017
+    @date    28.02.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -58,16 +58,16 @@
 ** OSAL internal data
 */
 
-static uint32                printf_enabled  = FALSE;
-static OS_time_t             localtime       = { 0, 0 };
-static tmr_t                 local_timer     = TMR_INIT();
-
 static OS_queue_record_t     OS_queue_table    [OS_MAX_QUEUES];
 static OS_bin_sem_record_t   OS_bin_sem_table  [OS_MAX_BIN_SEMAPHORES];
 static OS_count_sem_record_t OS_count_sem_table[OS_MAX_COUNT_SEMAPHORES];
 static OS_mut_sem_record_t   OS_mut_sem_table  [OS_MAX_MUTEXES];
 static OS_task_record_t      OS_task_table     [OS_MAX_TASKS];
 static OS_timer_record_t     OS_timer_table    [OS_MAX_TIMERS];
+
+static OS_time_t             localtime        = { 0, 0 };
+static tmr_t                 local_timer      = TMR_INIT(0);
+static uint32                printf_enabled   = FALSE;
 
 /*---------------------------------------------------------------------------*/
 /*
@@ -99,7 +99,7 @@ int32 OS_API_Init(void)
 #if defined(__CSMC__)
 	sys_init();
 #endif
-	tmr_startPeriodic(&local_timer, MSEC, local_timer_handler);
+	tmr_startFrom(&local_timer, MSEC, MSEC, local_timer_handler);
 
 	return OS_SUCCESS;
 }
@@ -1480,8 +1480,9 @@ int32 OS_TimerCreate(uint32 *timer_id, const char *timer_name, uint32 *clock_acc
 
 				*timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
 				strcpy(rec->name, timer_name);
-				rec->creator = OS_TaskGetId();
-				rec->handler = callback_ptr;
+				rec->creator   = OS_TaskGetId();
+				rec->tmr.state = timer_handler;
+				rec->handler   = callback_ptr;
 				rec->used = 1;
 				status = OS_SUCCESS;
 			}
@@ -1506,7 +1507,7 @@ int32 OS_TimerSet(uint32 timer_id, uint32 start_msec, uint32 interval_msec)
 		status = OS_INVALID_POINTER;
 	else
 	{
-		tmr_start(&rec->tmr, start_msec * MSEC, interval_msec * MSEC, timer_handler);
+		tmr_start(&rec->tmr, start_msec * MSEC, interval_msec * MSEC);
 		status = OS_SUCCESS;
 	}
 
