@@ -2,7 +2,6 @@
 #include <os.h>
 
 OS_SEM(sem, 0, semNormal);
-OS_TMR(tmr);
 
 void slave()
 {
@@ -16,12 +15,13 @@ void proc()
 }
 
 OS_TSK(sla, 0, slave);
+OS_TMR(tmr, proc);
 
 int main()
 {
 	LED_Config();
 
 	tsk_start(sla);
-	tmr_startPeriodic(tmr, SEC, proc);
+	tmr_startPeriodic(tmr, SEC);
 	tsk_stop();
 }
