@@ -274,7 +274,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	memset(thread, 0, osThreadCbSize);
 	
 	thread->tsk.state = thread_handler;
-	thread->tsk.top   = (uint64_t *)stack_mem + stack_size/8U;
+	thread->tsk.top   = (uint64_t *)stack_mem + stack_size/8;
 	thread->tsk.prio  = \
 	thread->tsk.basic = (attr == NULL) ? osPriorityNormal : attr->priority;
 	thread->tsk.join  = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
