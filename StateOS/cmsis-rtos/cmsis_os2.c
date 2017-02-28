@@ -319,9 +319,9 @@ osThreadState_t osThreadGetState (osThreadId_t thread_id)
 
 	switch (thread->tsk.obj.id)
 	{
-	    case ID_STOPPED: return osThreadTerminated;
-	    case ID_READY:   return osThreadReady;
-	    case ID_DELAYED: return osThreadBlocked;
+		case ID_STOPPED: return osThreadTerminated;
+		case ID_READY:   return osThreadReady;
+		case ID_DELAYED: return osThreadBlocked;
 		default:         return osThreadError;
 	}
 }
