@@ -212,11 +212,11 @@ int32 OS_QueueCreate(uint32 *queue_id, const char *queue_name, uint32 queue_dept
 				else
 				{
 					*queue_id = (rec - OS_queue_table) / sizeof(OS_queue_record_t);
-					strcpy(rec->name, queue_name);
-					rec->creator   = OS_TaskGetId();
 					rec->box.limit = queue_depth;
 					rec->box.size  = data_size;
 					rec->box.data  = data;
+					strcpy(rec->name, queue_name);
+					rec->creator = OS_TaskGetId();
 					rec->used = 1;
 					status = OS_SUCCESS;
 				}
@@ -405,10 +405,10 @@ int32 OS_BinSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_v
 			else
 			{
 				*sem_id = (rec - OS_bin_sem_table) / sizeof(OS_bin_sem_record_t);
-				strcpy(rec->name, sem_name);
-				rec->creator   = OS_TaskGetId();
-				rec->sem.count = sem_initial_value & 1U;
+				rec->sem.count = UMIN(sem_initial_value, semBinary);
 				rec->sem.limit = semBinary;
+				strcpy(rec->name, sem_name);
+				rec->creator = OS_TaskGetId();
 				rec->used = 1;
 				status = OS_SUCCESS;
 			}
@@ -623,10 +623,10 @@ int32 OS_CountSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial
 			else
 			{
 				*sem_id = (rec - OS_count_sem_table) / sizeof(OS_count_sem_record_t);
-				strcpy(rec->name, sem_name);
-				rec->creator   = OS_TaskGetId();
 				rec->sem.count = sem_initial_value;
 				rec->sem.limit = semCounting;
+				strcpy(rec->name, sem_name);
+				rec->creator = OS_TaskGetId();
 				rec->used = 1;
 				status = OS_SUCCESS;
 			}
@@ -1019,16 +1019,16 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 				else
 				{
 					*task_id = (rec - OS_task_table) / sizeof(OS_task_record_t);
-					strcpy(rec->name, task_name);
-					rec->creator   = OS_TaskGetId();
 					rec->tsk.state = task_handler;
 					rec->tsk.top   = (uint64 *)stack + stack_size/8;
 					rec->tsk.prio  =
 					rec->tsk.basic = ~priority;
-					rec->handler   = function_pointer;
-					rec->stack     = stack_pointer ? 0 : stack;
-					rec->size      = stack_size;
+					strcpy(rec->name, task_name);
+					rec->creator = OS_TaskGetId();
 					rec->used = 1;
+					rec->handler = function_pointer;
+					rec->stack = stack_pointer ? 0 : stack;
+					rec->size = stack_size;
 					tsk_start(&rec->tsk);
 					status = OS_SUCCESS;
 				}
@@ -1479,11 +1479,11 @@ int32 OS_TimerCreate(uint32 *timer_id, const char *timer_name, uint32 *clock_acc
 					*clock_accuracy = 1000000 / OS_FREQUENCY;
 
 				*timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
-				strcpy(rec->name, timer_name);
-				rec->creator   = OS_TaskGetId();
 				rec->tmr.state = timer_handler;
-				rec->handler   = callback_ptr;
+				strcpy(rec->name, timer_name);
+				rec->creator = OS_TaskGetId();
 				rec->used = 1;
+				rec->handler = callback_ptr;
 				status = OS_SUCCESS;
 			}
 		}

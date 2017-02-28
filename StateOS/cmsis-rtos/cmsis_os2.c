@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    27.02.2017
+    @date    28.02.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
