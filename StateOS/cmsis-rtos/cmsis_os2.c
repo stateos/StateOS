@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    28.02.2017
+    @date    01.03.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -274,16 +274,16 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	memset(thread, 0, osThreadCbSize);
 	
 	thread->tsk.state = thread_handler;
-	thread->tsk.top   = (uint64_t *)stack_mem + stack_size/8;
-	thread->tsk.prio  = \
+	thread->tsk.top = (uint64_t *)stack_mem + stack_size/8;
+	thread->tsk.prio = \
 	thread->tsk.basic = (attr == NULL) ? osPriorityNormal : attr->priority;
-	thread->tsk.join  = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
-	thread->flags     = flags;
-	thread->name      = (attr == NULL) ? NULL : attr->name;
-	thread->func      = func;
-	thread->arg       = argument;
-	thread->stack     = stack_mem;
-	thread->size      = stack_size;
+	thread->tsk.join = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
+	thread->flags = flags;
+	thread->name = (attr == NULL) ? NULL : attr->name;
+	thread->func = func;
+	thread->arg = argument;
+	thread->stack = stack_mem;
+	thread->size = stack_size;
 
 	tsk_start(&thread->tsk);
 
@@ -630,10 +630,10 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 	memset(timer, 0, osTimerCbSize);
 
 	timer->tmr.state = timer_handler;
-	timer->flags     = flags;
-	timer->name      = (attr == NULL) ? NULL : attr->name;
-	timer->func      = func;
-	timer->arg       = argument;
+	timer->flags = flags;
+	timer->name = (attr == NULL) ? NULL : attr->name;
+	timer->func = func;
+	timer->arg = argument;
 
 	sys_unlock();
 
@@ -742,7 +742,7 @@ osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 	memset(ef, 0, osEventFlagsCbSize);
 
 	ef->flags = flags;
-	ef->name  = (attr == NULL) ? NULL : attr->name;
+	ef->name = (attr == NULL) ? NULL : attr->name;
 
 	sys_unlock();
 
@@ -862,7 +862,7 @@ osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 	memset(mutex, 0, osMutexCbSize);
 
 	mutex->flags = flags;
-	mutex->name  = (attr == NULL) ? NULL : attr->name;
+	mutex->name = (attr == NULL) ? NULL : attr->name;
 
 	sys_unlock();
 
@@ -977,8 +977,8 @@ osSemaphoreId_t osSemaphoreNew (uint32_t max_count, uint32_t initial_count, cons
 
 	semaphore->sem.count = UMIN(initial_count, max_count);
 	semaphore->sem.limit = max_count;
-	semaphore->flags     = flags;
-	semaphore->name      = (attr == NULL) ? NULL : attr->name;
+	semaphore->flags = flags;
+	semaphore->name = (attr == NULL) ? NULL : attr->name;
 
 	sys_unlock();
 
@@ -1112,10 +1112,10 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 	memset(mp, 0, osMemoryPoolCbSize);
 
 	mp->mem.limit = block_count;
-	mp->mem.size  = block_size;
-	mp->mem.data  = data;
-	mp->flags     = flags;
-	mp->name      = (attr == NULL) ? NULL : attr->name;
+	mp->mem.size = block_size;
+	mp->mem.data = data;
+	mp->flags = flags;
+	mp->name = (attr == NULL) ? NULL : attr->name;
 
 	mem_bind(&mp->mem);
 
@@ -1297,10 +1297,10 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 	memset(mq, 0, osMessageQueueCbSize);
 
 	mq->box.limit = msg_count;
-	mq->box.size  = msg_size;
-	mq->box.data  = data;
-	mq->flags     = flags;
-	mq->name      = (attr == NULL) ? NULL : attr->name;
+	mq->box.size = msg_size;
+	mq->box.data = data;
+	mq->flags = flags;
+	mq->name = (attr == NULL) ? NULL : attr->name;
 
 	sys_unlock();
 
