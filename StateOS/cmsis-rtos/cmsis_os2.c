@@ -271,21 +271,15 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 
 	sys_lock();
 
-	memset(thread, 0, osThreadCbSize);
-	
-	thread->tsk.state = thread_handler;
-	thread->tsk.top = (uint64_t *)stack_mem + stack_size/8;
-	thread->tsk.prio = \
-	thread->tsk.basic = (attr == NULL) ? osPriorityNormal : attr->priority;
+	tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, (uint64_t *)stack_mem + stack_size/8);
 	thread->tsk.join = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
+	flg_init(&thread->flg);
 	thread->flags = flags;
 	thread->name = (attr == NULL) ? NULL : attr->name;
 	thread->func = func;
 	thread->arg = argument;
 	thread->stack = stack_mem;
 	thread->size = stack_size;
-
-	tsk_start(&thread->tsk);
 
 	sys_unlock();
 
@@ -627,9 +621,7 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 
 	sys_lock();
 
-	memset(timer, 0, osTimerCbSize);
-
-	timer->tmr.state = timer_handler;
+	tmr_init(&timer->tmr, timer_handler);
 	timer->flags = flags;
 	timer->name = (attr == NULL) ? NULL : attr->name;
 	timer->func = func;
@@ -739,8 +731,7 @@ osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 
 	sys_lock();
 
-	memset(ef, 0, osEventFlagsCbSize);
-
+	flg_init(&ef->flg);
 	ef->flags = flags;
 	ef->name = (attr == NULL) ? NULL : attr->name;
 
@@ -859,8 +850,7 @@ osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 
 	sys_lock();
 
-	memset(mutex, 0, osMutexCbSize);
-
+	mtx_init(&mutex->mtx);
 	mutex->flags = flags;
 	mutex->name = (attr == NULL) ? NULL : attr->name;
 
@@ -973,10 +963,7 @@ osSemaphoreId_t osSemaphoreNew (uint32_t max_count, uint32_t initial_count, cons
 
 	sys_lock();
 
-	memset(semaphore, 0, osSemaphoreCbSize);
-
-	semaphore->sem.count = UMIN(initial_count, max_count);
-	semaphore->sem.limit = max_count;
+	sem_init(&semaphore->sem, initial_count, max_count);
 	semaphore->flags = flags;
 	semaphore->name = (attr == NULL) ? NULL : attr->name;
 
@@ -1109,15 +1096,9 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 
 	sys_lock();
 
-	memset(mp, 0, osMemoryPoolCbSize);
-
-	mp->mem.limit = block_count;
-	mp->mem.size = block_size;
-	mp->mem.data = data;
+	mem_init(&mp->mem, block_count, block_size, data);
 	mp->flags = flags;
 	mp->name = (attr == NULL) ? NULL : attr->name;
-
-	mem_bind(&mp->mem);
 
 	sys_unlock();
 
@@ -1294,11 +1275,7 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 
 	sys_lock();
 
-	memset(mq, 0, osMessageQueueCbSize);
-
-	mq->box.limit = msg_count;
-	mq->box.size = msg_size;
-	mq->box.data = data;
+	box_init(&mq->box, msg_count, msg_size, data);
 	mq->flags = flags;
 	mq->name = (attr == NULL) ? NULL : attr->name;
 
