@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    27.02.2017
+    @date    01.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -470,7 +470,7 @@ unsigned sem_giveISR( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
 struct Semaphore : public __sem
 {
 	explicit
-	 Semaphore( const unsigned _init, const unsigned _limit = semNormal ): __sem _SEM_INIT(0, 0) { count = _init; limit = _limit; }
+	 Semaphore( const unsigned _init, const unsigned _limit = semNormal ): __sem _SEM_INIT(_init, _limit) {}
 	~Semaphore( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        sem_kill     (this);         }

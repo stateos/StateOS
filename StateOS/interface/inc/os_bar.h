@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    24.02.2017
+    @date    01.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -277,7 +277,7 @@ unsigned bar_wait( bar_t *bar ) { return bar_waitFor(bar, INFINITE); }
 struct Barrier : public __bar
 {
 	explicit
-	 Barrier( const unsigned _limit ): __bar _BAR_INIT(0) { limit = _limit; }
+	 Barrier( const unsigned _limit ): __bar _BAR_INIT(_limit) {}
 	~Barrier( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        bar_kill     (this);         }
