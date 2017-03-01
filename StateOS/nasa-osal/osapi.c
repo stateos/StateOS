@@ -212,9 +212,7 @@ int32 OS_QueueCreate(uint32 *queue_id, const char *queue_name, uint32 queue_dept
 				else
 				{
 					*queue_id = (rec - OS_queue_table) / sizeof(OS_queue_record_t);
-					rec->box.limit = queue_depth;
-					rec->box.size = data_size;
-					rec->box.data = data;
+					box_init(&rec->box, queue_depth, data_size, data);
 					strcpy(rec->name, queue_name);
 					rec->creator = OS_TaskGetId();
 					rec->used = 1;
@@ -244,7 +242,7 @@ int32 OS_QueueDelete(uint32 queue_id)
 	{
 		box_kill(&rec->box);
 		sys_free(rec->box.data);
-		memset(rec, 0, sizeof(OS_queue_record_t));
+		rec->used = 0;
 		status = OS_SUCCESS;
 	}
 
@@ -405,8 +403,7 @@ int32 OS_BinSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_v
 			else
 			{
 				*sem_id = (rec - OS_bin_sem_table) / sizeof(OS_bin_sem_record_t);
-				rec->sem.count = UMIN(sem_initial_value, semBinary);
-				rec->sem.limit = semBinary;
+				sem_init(&rec->sem, sem_initial_value, semBinary);
 				strcpy(rec->name, sem_name);
 				rec->creator = OS_TaskGetId();
 				rec->used = 1;
@@ -434,7 +431,7 @@ int32 OS_BinSemDelete(uint32 sem_id)
 	else
 	{
 		sem_kill(&rec->sem);
-		memset(rec, 0, sizeof(OS_bin_sem_record_t));
+		rec->used = 0;
 		status = OS_SUCCESS;
 	}
 
@@ -623,8 +620,7 @@ int32 OS_CountSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial
 			else
 			{
 				*sem_id = (rec - OS_count_sem_table) / sizeof(OS_count_sem_record_t);
-				rec->sem.count = sem_initial_value;
-				rec->sem.limit = semCounting;
+				sem_init(&rec->sem, sem_initial_value, semCounting);
 				strcpy(rec->name, sem_name);
 				rec->creator = OS_TaskGetId();
 				rec->used = 1;
@@ -652,7 +648,7 @@ int32 OS_CountSemDelete(uint32 sem_id)
 	else
 	{
 		sem_kill(&rec->sem);
-		memset(rec, 0, sizeof(OS_count_sem_record_t));
+		rec->used = 0;
 		status = OS_SUCCESS;
 	}
 
@@ -822,6 +818,7 @@ int32 OS_MutSemCreate(uint32 *sem_id, const char *sem_name, uint32 options)
 			else
 			{
 				*sem_id = (rec - OS_mut_sem_table) / sizeof(OS_mut_sem_record_t);
+				mtx_init(&rec->mtx);
 				strcpy(rec->name, sem_name);
 				rec->creator = OS_TaskGetId();
 				rec->used = 1;
@@ -849,7 +846,7 @@ int32 OS_MutSemDelete(uint32 sem_id)
 	else
 	{
 		mtx_kill(&rec->mtx);
-		memset(rec, 0, sizeof(OS_mut_sem_record_t));
+		rec->used = 0;
 		status = OS_SUCCESS;
 	}
 
@@ -1019,17 +1016,14 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 				else
 				{
 					*task_id = (rec - OS_task_table) / sizeof(OS_task_record_t);
-					rec->tsk.state = task_handler;
-					rec->tsk.top = (uint64 *)stack + stack_size/8;
-					rec->tsk.prio = \
-					rec->tsk.basic = ~priority;
+					tsk_init(&rec->tsk, ~priority, task_handler, (uint64 *)stack + stack_size/8);
 					strcpy(rec->name, task_name);
 					rec->creator = OS_TaskGetId();
 					rec->used = 1;
 					rec->handler = function_pointer;
 					rec->stack = stack_pointer ? 0 : stack;
 					rec->size = stack_size;
-					tsk_start(&rec->tsk);
+					rec->delete_handler = NULL;
 					status = OS_SUCCESS;
 				}
 			}
@@ -1059,7 +1053,7 @@ int32 OS_TaskDelete(uint32 task_id)
 		tsk_kill(&rec->tsk);
 		if (rec->stack)
 			sys_free(rec->stack);
-		memset(rec, 0, sizeof(OS_task_record_t));
+		rec->used = 0;
 		status = OS_SUCCESS;
 	}
 
@@ -1479,7 +1473,7 @@ int32 OS_TimerCreate(uint32 *timer_id, const char *timer_name, uint32 *clock_acc
 					*clock_accuracy = 1000000 / OS_FREQUENCY;
 
 				*timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
-				rec->tmr.state = timer_handler;
+				tmr_init(&rec->tmr, timer_handler);
 				strcpy(rec->name, timer_name);
 				rec->creator = OS_TaskGetId();
 				rec->used = 1;
@@ -1530,7 +1524,7 @@ int32 OS_TimerDelete(uint32 timer_id)
 	else
 	{
 		tmr_kill(&rec->tmr);
-		memset(rec, 0, sizeof(OS_timer_record_t));
+		rec->used = 0;
 		status = OS_SUCCESS;
 	}
 
