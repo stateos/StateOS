@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    01.03.2017
+    @date    04.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,7 +49,7 @@ struct __bar
 	unsigned limit; // barrier's value limit
 };
 
-typedef struct __bar bar_t, bar_id[1];
+typedef struct __bar bar_t, *bar_id;
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -81,7 +81,7 @@ typedef struct __bar bar_t, bar_id[1];
  **********************************************************************************************************************/
 
 #define             OS_BAR( bar, limit ) \
-                       bar_id bar = { _BAR_INIT( limit ) }
+                       bar_t bar[1] = { _BAR_INIT( limit ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -96,7 +96,7 @@ typedef struct __bar bar_t, bar_id[1];
  **********************************************************************************************************************/
 
 #define         static_BAR( bar, limit ) \
-                static bar_id bar = { _BAR_INIT( limit ) }
+                static bar_t bar[1] = { _BAR_INIT( limit ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -135,7 +135,7 @@ typedef struct __bar bar_t, bar_id[1];
 
 #ifndef __cplusplus
 #define                BAR_CREATE( limit ) \
-                     { BAR_INIT( limit ) }
+             & (bar_t) BAR_INIT( limit )
 #endif
 
 /**********************************************************************************************************************

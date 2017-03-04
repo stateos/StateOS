@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    01.03.2017
+    @date    04.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,7 +48,7 @@ struct __sig
 	unsigned type;  // signal type: sigClear, sigProtect
 };
 
-typedef struct __sig sig_t, sig_id[1];
+typedef struct __sig sig_t, *sig_id;
 
 /* -------------------------------------------------------------------------- */
 
@@ -90,7 +90,7 @@ typedef struct __sig sig_t, sig_id[1];
  **********************************************************************************************************************/
 
 #define             OS_SIG( sig, type ) \
-                       sig_id sig = { _SIG_INIT( type ) }
+                       sig_t sig[1] = { _SIG_INIT( type ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -107,7 +107,7 @@ typedef struct __sig sig_t, sig_id[1];
  **********************************************************************************************************************/
 
 #define         static_SIG( sig, type ) \
-                static sig_id sig = { _SIG_INIT( type ) }
+                static sig_t sig[1] = { _SIG_INIT( type ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -150,7 +150,7 @@ typedef struct __sig sig_t, sig_id[1];
 
 #ifndef __cplusplus
 #define                SIG_CREATE( type ) \
-                     { SIG_INIT( type ) }
+             & (sig_t) SIG_INIT( type )
 #endif
 
 /**********************************************************************************************************************

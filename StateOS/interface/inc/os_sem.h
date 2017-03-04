@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    01.03.2017
+    @date    04.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,7 +49,7 @@ struct __sem
 	unsigned limit; // semaphore's value limit
 };
 
-typedef struct __sem sem_t, sem_id[1];
+typedef struct __sem sem_t, *sem_id;
 
 /* -------------------------------------------------------------------------- */
 
@@ -96,7 +96,7 @@ typedef struct __sem sem_t, sem_id[1];
  **********************************************************************************************************************/
 
 #define             OS_SEM( sem, init, limit ) \
-                       sem_id sem = { _SEM_INIT( init, limit ) }
+                       sem_t sem[1] = { _SEM_INIT( init, limit ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -115,7 +115,7 @@ typedef struct __sem sem_t, sem_id[1];
  **********************************************************************************************************************/
 
 #define         static_SEM( sem, init, limit ) \
-                static sem_id sem = { _SEM_INIT( init, limit ) }
+                static sem_t sem[1] = { _SEM_INIT( init, limit ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -162,7 +162,7 @@ typedef struct __sem sem_t, sem_id[1];
 
 #ifndef __cplusplus
 #define                SEM_CREATE( init, limit ) \
-                     { SEM_INIT( init, limit ) }
+             & (sem_t) SEM_INIT( init, limit )
 #endif
 
 /**********************************************************************************************************************

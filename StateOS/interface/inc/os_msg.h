@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    24.02.2017
+    @date    04.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,7 +53,7 @@ struct __msg
 	unsigned*data;  // queue data
 };
 
-typedef struct __msg msg_t, msg_id[1];
+typedef struct __msg msg_t, *msg_id;
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -106,7 +106,7 @@ typedef struct __msg msg_t, msg_id[1];
 
 #define             OS_MSG( msg, limit )          \
                        unsigned msg##__buf[limit]; \
-                       msg_id msg = { _MSG_INIT( limit, msg##__buf ) }
+                       msg_t msg[1] = { _MSG_INIT( limit, msg##__buf ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -122,7 +122,7 @@ typedef struct __msg msg_t, msg_id[1];
 
 #define         static_MSG( msg, limit )          \
                 static unsigned msg##__buf[limit]; \
-                static msg_id msg = { _MSG_INIT( limit, msg##__buf ) }
+                static msg_t msg[1] = { _MSG_INIT( limit, msg##__buf ) }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -161,7 +161,7 @@ typedef struct __msg msg_t, msg_id[1];
 
 #ifndef __cplusplus
 #define                MSG_CREATE( limit ) \
-                     { MSG_INIT( limit ) }
+             & (msg_t) MSG_INIT( limit )
 #endif
 
 /**********************************************************************************************************************
