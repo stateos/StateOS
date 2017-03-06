@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    01.03.2017
+    @date    06.03.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -53,17 +53,6 @@
 
 /*---------------------------------------------------------------------------*/
 
-#define OS_API     ((2 * 10000000U) | (1 * 10000U) | (0 * 1U))
-#define OS_VER     ((4 * 10000000U) | (5 * 10000U) | (0 * 1U))
-
-#define OS_ID      "StateOS v4.5"
-
-/*---------------------------------------------------------------------------*/
-
-#define IS_IRQ_MODE()    port_isr_inside()
-
-/*---------------------------------------------------------------------------*/
-
 osStatus_t osKernelInitialize (void)
 {
 	if (IS_IRQ_MODE())
@@ -81,12 +70,12 @@ osStatus_t osKernelGetInfo (osVersion_t *version, char *id_buf, uint32_t id_size
 
 	if (version != NULL)
 	{
-		version->api    = OS_API;
-		version->kernel = OS_VER;
+		version->api    = osVersionAPI;
+		version->kernel = osVersionKernel;
 	}
 
 	if (id_buf != NULL)
-		strncpy(id_buf, OS_ID, id_size);
+		strncpy(id_buf, osKernelId, id_size);
 
 	return osOK;
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: oscmsis.h
     @author  Rajmund Szymanski
-    @date    24.02.2017
+    @date    06.03.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -38,8 +38,20 @@ extern "C" {
 
 /*---------------------------------------------------------------------------*/
 
-#define osFlagSystemObject    0x00000100U ///< Object allocated by system.
-#define osFlagSystemMemory    0x00000200U ///< Memory allocated by ststem.
+/// Kernel Information
+#define osVersionAPI         20010000   ///< API version (2.1.0)
+#define osVersionKernel      40050000   ///< Kernel version (4.5.0)
+#define osKernelId      "StateOS v4.5"  ///< Kernel identification string
+
+/*---------------------------------------------------------------------------*/
+
+/// Object Flags definitions
+#define osFlagSystemObject    0x0100U   ///< Object allocated by system
+#define osFlagSystemMemory    0x0200U   ///< Memory allocated by ststem
+
+/*---------------------------------------------------------------------------*/
+
+#define IS_IRQ_MODE()    port_isr_inside()
 
 /*---------------------------------------------------------------------------*/
 
