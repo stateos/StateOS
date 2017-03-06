@@ -30,7 +30,7 @@ Features:
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
 4.6
-- added JOINABLE constant
+- added JOINABLE and DETACHED constants
 - function mem_reset renamed to mem_bind
 - redefined timer macros and procedures
 ---------
