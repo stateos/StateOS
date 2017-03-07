@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    24.01.2017
+    @date    07.03.2017
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -62,15 +62,9 @@ extern "C" {
 #define  OS_TIM_IRQn       CAT(TIM,OS_TIMER,_IRQn)
 #define  OS_TIM_IRQHandler CAT(TIM,OS_TIMER,_IRQHandler)
 
-#define  Counter OS_TIM->CNT
-
-#else
-
-#define  Counter System.cnt
+#define  Counter           OS_TIM->CNT
 
 #endif
-
-#define  Current System.cur
 
 /* -------------------------------------------------------------------------- */
 
@@ -120,6 +114,14 @@ extern "C" {
 
 #ifndef  OS_STACK_SIZE
 #define  OS_STACK_SIZE      256 /* default task stack size in bytes           */
+#endif
+
+#ifndef  OS_MAIN_STACK
+#define  OS_MAIN_STACK     1024 /* main task stack size in bytes              */
+#endif
+
+#ifndef  OS_IDLE_STACK
+#define  OS_IDLE_STACK      128 /* idle task stack size in bytes              */
 #endif
 
 /* -------------------------------------------------------------------------- */
