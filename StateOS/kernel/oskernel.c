@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    07.03.2017
+    @date    08.03.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -50,7 +50,7 @@ static  struct { stk_t STK[ASIZE(OS_MAIN_STACK)]; } MAIN_STACK;
 
 static  union  { stk_t STK[ASIZE(OS_IDLE_STACK)];
         struct { char  stk[sizeof(stk_t[ASIZE(OS_IDLE_STACK)])-sizeof(ctx_t)]; ctx_t ctx; } CTX; } IDLE_STACK =
-               { .CTX = { .ctx = _CTX_INIT(core_tsk_start) } };
+               { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
 #define IDLE_TOP &IDLE_STACK+1
 #define IDLE_SP  &IDLE_STACK.CTX.ctx
 
@@ -133,7 +133,7 @@ void core_ctx_init( tsk_t *tsk )
 {
 	ctx_t *ctx = (ctx_t *)tsk->top - 1;
 
-	port_ctx_init(ctx, core_tsk_start);
+	port_ctx_init(ctx, core_tsk_loop);
 
 	tsk->sp = ctx;
 }
@@ -150,7 +150,7 @@ void core_ctx_switch( void )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_start( void )
+void core_tsk_loop( void )
 {
 	for (;;)
 	{

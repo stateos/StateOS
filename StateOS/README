@@ -34,6 +34,7 @@ Features:
 - function mem_reset renamed to mem_bind
 - redefined timer macros and procedures
 - added OS_MAIN_STACK and OS_IDLE_STACK definitions
+- function core_tsk_start renamed to core_tsk_loop
 ---------
 4.5
 - rename flgOne to flgAny

@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    05.03.2017
+    @date    08.03.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -126,7 +126,7 @@ void core_tsk_flip(/*void *sp*/)
 	__asm volatile
 	(
 "	mov   sp,    r0                \n"
-"	bl    core_tsk_start           \n"
+"	bl    core_tsk_loop            \n"
 	
 :::	"memory"
 	);
