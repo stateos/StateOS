@@ -19,7 +19,7 @@ int main()
 {
 	LED_Config();
 
-	tsk_start((tsk_id)TSK_CREATE(0, slave));
-	tsk_start((tsk_id)TSK_CREATE(0, master));
+	tsk_start(TSK_CREATE(0, slave));
+	tsk_start(TSK_CREATE(0, master));
 	tsk_sleep();
 }
