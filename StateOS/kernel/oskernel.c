@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    08.03.2017
+    @date    10.03.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -44,7 +44,7 @@ void priv_tsk_idle( void )
 /* -------------------------------------------------------------------------- */
 
 #ifndef MAIN_TOP
-static  struct { stk_t STK[ASIZE(OS_MAIN_STACK)]; } MAIN_STACK;
+static  struct { stk_t STK[ASIZE(OS_STACK_SIZE)]; } MAIN_STACK;
 #define MAIN_TOP &MAIN_STACK+1
 #endif
 

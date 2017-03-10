@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    04.03.2017
+    @date    10.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,12 +41,12 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __evt evt_t, *evt_id;
+
 struct __evt
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 };
-
-typedef struct __evt evt_t, *evt_id;
 
 /**********************************************************************************************************************
  *                                                                                                                    *

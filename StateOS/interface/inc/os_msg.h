@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    04.03.2017
+    @date    10.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,6 +42,8 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __msg msg_t, *msg_id;
+
 struct __msg
 {
 	tsk_t  * queue; // inherited from semaphore
@@ -52,8 +54,6 @@ struct __msg
 	unsigned next;  // next element to write into queue
 	unsigned*data;  // queue data
 };
-
-typedef struct __msg msg_t, *msg_id;
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    04.03.2017
+    @date    10.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,13 +41,13 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __lst lst_t, *lst_id;
+
 struct __lst
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 	que_t  * next;  // next memory object in the queue, previously created in the memory pool
 };
-
-typedef struct __lst lst_t, *lst_id;
 
 /**********************************************************************************************************************
  *                                                                                                                    *

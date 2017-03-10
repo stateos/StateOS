@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    04.03.2017
+    @date    10.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -50,8 +50,6 @@ struct __tmr
 	unsigned delay;
 	unsigned period;
 };
-
-typedef struct __tmr *tmr_id;
 
 /**********************************************************************************************************************
  *                                                                                                                    *

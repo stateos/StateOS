@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    07.03.2017
+    @date    10.03.2017
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -114,10 +114,6 @@ extern "C" {
 
 #ifndef  OS_STACK_SIZE
 #define  OS_STACK_SIZE      256 /* default task stack size in bytes           */
-#endif
-
-#ifndef  OS_MAIN_STACK
-#define  OS_MAIN_STACK     1024 /* main task stack size in bytes              */
 #endif
 
 #ifndef  OS_IDLE_STACK

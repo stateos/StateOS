@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    04.03.2017
+    @date    10.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,14 +41,14 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __sig sig_t, *sig_id;
+
 struct __sig
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 	unsigned flag;  // signal's current value
 	unsigned type;  // signal type: sigClear, sigProtect
 };
-
-typedef struct __sig sig_t, *sig_id;
 
 /* -------------------------------------------------------------------------- */
 

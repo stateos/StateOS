@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    26.02.2017
+    @date    10.03.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -60,8 +60,12 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+#ifndef IMMEDIATE
 #define IMMEDIATE  ( 0U) // no waiting
+#endif
+#ifndef INFINITE
 #define INFINITE   (~0U) // infinite waiting
+#endif
 
 /* -------------------------------------------------------------------------- */
 
@@ -80,40 +84,43 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-typedef   void       fun_t(); // timer/task procedure
+typedef struct __tmr tmr_t, *tmr_id; // timer
+typedef struct __tsk tsk_t, *tsk_id; // task
 
-typedef struct __que que_t; // queue
-typedef struct __mtx mtx_t; // mutex
-typedef struct __tmr tmr_t; // timer
-typedef struct __tsk tsk_t; // task
+typedef void fun_t(); // timer/task procedure
 
 /* -------------------------------------------------------------------------- */
 
 // queue
 
+typedef struct __que que_t;
+
 struct __que
 {
-	que_t  * next;
+	que_t  * next; // next object in the queue
 };
 
 /* -------------------------------------------------------------------------- */
 
 // object (timer, task) header
 
-typedef struct __obj
+typedef struct __obj obj_t;
+
+struct __obj
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 	unsigned id;    // object id: ID_STOPPED, ID_READY, ID_DELAYED, ID_TIMER, ID_IDLE
 	void   * prev;  // previous object (timer, task) in the READY queue
 	void   * next;  // next object (timer, task) in the READY queue
-
-}	obj_t;
+};
 
 /* -------------------------------------------------------------------------- */
 
 // system data
 
-typedef struct __sys
+typedef struct __sys sys_t;
+
+struct __sys
 {
 	tsk_t  * cur;   // pointer to the current task control block
 #if OS_TIMER == 0
@@ -123,13 +130,15 @@ typedef struct __sys
 	unsigned dly;   // task switch counter
 #endif
 #endif
-}	sys_t;
+};
 
 /* -------------------------------------------------------------------------- */
 
 // task context
 
-typedef struct __ctx
+typedef struct __ctx ctx_t;
+
+struct __ctx
 {
 	// context saved by the software
 	unsigned r4, r5, r6, r7, r8, r9, r10, r11;
@@ -140,8 +149,7 @@ typedef struct __ctx
 	unsigned r14; // lr
 	fun_t  * pc;
 	unsigned psr;
-
-}	ctx_t;
+};
 
 #define _CTX_INIT( pc ) { 0, 0, 0, 0, 0, 0, 0, 0, 0xFFFFFFFD, 0, 0, 0, 0, 0, 0, pc, 0x01000000 }
 

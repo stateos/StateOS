@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    04.03.2017
+    @date    10.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,12 +42,12 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __cnd cnd_t, *cnd_id;
+
 struct __cnd
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 };
-
-typedef struct __cnd cnd_t, *cnd_id;
 
 /* -------------------------------------------------------------------------- */
 

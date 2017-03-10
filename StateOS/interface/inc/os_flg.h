@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    04.03.2017
+    @date    10.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,13 +41,13 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+typedef struct __flg flg_t, *flg_id;
+
 struct __flg
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 	unsigned flags; // flag's current value
 };
-
-typedef struct __flg flg_t, *flg_id;
 
 /* -------------------------------------------------------------------------- */
 

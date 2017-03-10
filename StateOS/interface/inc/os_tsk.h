@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    04.03.2017
+    @date    10.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -78,8 +78,6 @@ struct __tsk
 	char     libspace[96];
 #endif
 };
-
-typedef struct __tsk *tsk_id;
 
 #ifdef __CC_ARM
 #pragma pop
