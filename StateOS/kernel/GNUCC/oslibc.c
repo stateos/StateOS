@@ -34,8 +34,6 @@
 
 /* -------------------------------------------------------------------------- */
 
-#ifndef USE_NANO
-
 static unsigned LCK = 0;
 static unsigned CNT = 0;
 
@@ -63,8 +61,6 @@ void __malloc_unlock()
 		port_put_lock(LCK);
 }
 
-#endif // USE_NANO
-
 /* -------------------------------------------------------------------------- */
 
 caddr_t _sbrk_r( struct _reent *reent, size_t size )
@@ -74,9 +70,7 @@ caddr_t _sbrk_r( struct _reent *reent, size_t size )
 	static char * heap = __heap_start;
 	       char * base;
 	      (void)  reent;
-#ifdef USE_NANO
-	port_sys_lock();
-#endif
+
 	if (heap + size <= __heap_end)
 	{
 		base  = heap;
@@ -87,9 +81,7 @@ caddr_t _sbrk_r( struct _reent *reent, size_t size )
 		errno = ENOMEM;
 		base  = (caddr_t) -1;
 	}
-#ifdef USE_NANO
-	port_sys_unlock();
-#endif
+
 	return base;
 }
 
