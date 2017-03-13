@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    26.12.2016
+    @date    13.03.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -43,19 +43,24 @@ static unsigned CNT = 0;
 
 void __malloc_lock()
 {
-	unsigned lock = port_get_lock();
+	unsigned lock;
+
+	assert(CNT+1);
+
+	lock = port_get_lock();
 	port_set_lock();
-	if (CNT == 0U) LCK = lock;
-	if (CNT < ~0U) CNT++;
+	if (CNT++ == 0U)
+		LCK = lock;
 }
 
 /* -------------------------------------------------------------------------- */
 
 void __malloc_unlock()
 {
-	if (CNT > 0U)
-		if (--CNT == 0U)
-			port_put_lock(LCK);
+	assert(CNT);
+
+	if (--CNT == 0U)
+		port_put_lock(LCK);
 }
 
 #endif // USE_NANO
