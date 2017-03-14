@@ -68,7 +68,6 @@ void priv_mtx_link( mtx_t *mtx, tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	assert(mtx);
-	assert(tsk);
 
 	mtx->owner = tsk;
 
