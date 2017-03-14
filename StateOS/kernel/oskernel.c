@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    13.03.2017
+    @date    14.03.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -111,10 +111,9 @@ void core_tsk_insert( tsk_t *tsk )
 {
 	tsk->obj.id = ID_READY;
 	priv_tsk_insert(tsk);
-#if OS_ROBIN
+
 	if (tsk == IDLE.obj.next)
 		port_ctx_switch();
-#endif
 }
 
 /* -------------------------------------------------------------------------- */
