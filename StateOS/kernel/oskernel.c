@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    14.03.2017
+    @date    21.03.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -111,7 +111,6 @@ void core_tsk_insert( tsk_t *tsk )
 {
 	tsk->obj.id = ID_READY;
 	priv_tsk_insert(tsk);
-
 	if (tsk == IDLE.obj.next)
 		port_ctx_switch();
 }
@@ -131,9 +130,7 @@ void core_tsk_remove( tsk_t *tsk )
 void core_ctx_init( tsk_t *tsk )
 {
 	ctx_t *ctx = (ctx_t *)tsk->top - 1;
-
 	port_ctx_init(ctx, core_tsk_loop);
-
 	tsk->sp = ctx;
 }
 
