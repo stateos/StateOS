@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    10.03.2017
+    @date    22.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -162,7 +162,8 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_WRK( tsk, prio, state, size )   \
+#define             OS_WRK( tsk, prio, state, size )  \
+                       fun_t state;                    \
                        stk_t tsk##__stk[ASIZE( size )]; \
                        tsk_t tsk[1] = { _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ) }
 
@@ -197,8 +198,7 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_DEF( tsk, prio, size )            \
-                       void tsk##__fun( void );           \
+#define             OS_DEF( tsk, prio, size )             \
                     OS_WRK( tsk, prio, tsk##__fun, size ); \
                        void tsk##__fun( void )
 
@@ -233,7 +233,8 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_WRK( tsk, prio, state, size )   \
+#define         static_WRK( tsk, prio, state, size )  \
+                static fun_t state;                    \
                 static stk_t tsk##__stk[ASIZE( size )]; \
                 static tsk_t tsk[1] = { _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ) }
 
@@ -268,8 +269,7 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_DEF( tsk, prio, size )            \
-                static void tsk##__fun( void );           \
+#define         static_DEF( tsk, prio, size )             \
                 static_TSK( tsk, prio, tsk##__fun, size ); \
                 static void tsk##__fun( void )
 

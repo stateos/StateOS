@@ -29,6 +29,10 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+4.7
+- updated macros for task and timer objects
+- updated examples
+---------
 4.6
 - added JOINABLE and DETACHED constants
 - function mem_reset renamed to mem_bind

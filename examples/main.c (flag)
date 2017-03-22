@@ -2,6 +2,8 @@
 #include <os.h>
 
 OS_FLG(flg);
+OS_TSK(sla, 0, slave);
+OS_TSK(mas, 0, master);
 
 void slave()
 {
@@ -16,9 +18,6 @@ void master()
 	tsk_delay(SEC/2);
 	flg_give(flg, 2);
 }
-
-OS_TSK(sla, 0, slave);
-OS_TSK(mas, 0, master);
 
 int main()
 {
