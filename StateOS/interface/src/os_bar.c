@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.c
     @author  Rajmund Szymanski
-    @date    01.03.2017
+    @date    22.03.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -92,6 +92,7 @@ unsigned priv_bar_wait( bar_t *bar, unsigned time, unsigned(*wait)() )
 
 	assert(!port_isr_inside());
 	assert(bar);
+	assert(bar->count);
 
 	port_sys_lock();
 
