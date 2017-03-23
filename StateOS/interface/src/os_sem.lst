@@ -1,0 +1,339 @@
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 23, 1
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 4
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"os_sem.c"
+  12              		.section	.text.priv_sem_wait,"ax",%progbits
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu fpv4-sp-d16
+  18              		.type	priv_sem_wait, %function
+  19              	priv_sem_wait:
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22 0000 38B5     		push	{r3, r4, r5, lr}
+  23 0002 0446     		mov	r4, r0
+  24              		.syntax unified
+  25              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  26 0004 EFF31085 		MRS r5, primask
+  27              	@ 0 "" 2
+  28              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  29 0008 72B6     		cpsid i
+  30              	@ 0 "" 2
+  31              		.thumb
+  32              		.syntax unified
+  33 000a 4368     		ldr	r3, [r0, #4]
+  34 000c 1BB9     		cbnz	r3, .L2
+  35 000e 9047     		blx	r2
+  36              	.L3:
+  37              		.syntax unified
+  38              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  39 0010 85F31088 		MSR primask, r5
+  40              	@ 0 "" 2
+  41              		.thumb
+  42              		.syntax unified
+  43 0014 38BD     		pop	{r3, r4, r5, pc}
+  44              	.L2:
+  45 0016 0021     		movs	r1, #0
+  46 0018 FFF7FEFF 		bl	core_one_wakeup
+  47 001c 18B9     		cbnz	r0, .L4
+  48 001e 6368     		ldr	r3, [r4, #4]
+  49 0020 013B     		subs	r3, r3, #1
+  50 0022 6360     		str	r3, [r4, #4]
+  51 0024 F4E7     		b	.L3
+  52              	.L4:
+  53 0026 0020     		movs	r0, #0
+  54 0028 F2E7     		b	.L3
+  55              		.size	priv_sem_wait, .-priv_sem_wait
+  56              		.section	.text.priv_sem_send,"ax",%progbits
+  57              		.align	1
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s 			page 2
+
+
+  58              		.syntax unified
+  59              		.thumb
+  60              		.thumb_func
+  61              		.fpu fpv4-sp-d16
+  62              		.type	priv_sem_send, %function
+  63              	priv_sem_send:
+  64              		@ args = 0, pretend = 0, frame = 0
+  65              		@ frame_needed = 0, uses_anonymous_args = 0
+  66 0000 70B5     		push	{r4, r5, r6, lr}
+  67 0002 0446     		mov	r4, r0
+  68              		.syntax unified
+  69              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  70 0004 EFF31085 		MRS r5, primask
+  71              	@ 0 "" 2
+  72              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  73 0008 72B6     		cpsid i
+  74              	@ 0 "" 2
+  75              		.thumb
+  76              		.syntax unified
+  77 000a 4668     		ldr	r6, [r0, #4]
+  78 000c 8368     		ldr	r3, [r0, #8]
+  79 000e 9E42     		cmp	r6, r3
+  80 0010 03D3     		bcc	.L6
+  81 0012 9047     		blx	r2
+  82              	.L7:
+  83              		.syntax unified
+  84              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  85 0014 85F31088 		MSR primask, r5
+  86              	@ 0 "" 2
+  87              		.thumb
+  88              		.syntax unified
+  89 0018 70BD     		pop	{r4, r5, r6, pc}
+  90              	.L6:
+  91 001a 0021     		movs	r1, #0
+  92 001c FFF7FEFF 		bl	core_one_wakeup
+  93 0020 18B9     		cbnz	r0, .L8
+  94 0022 6368     		ldr	r3, [r4, #4]
+  95 0024 0133     		adds	r3, r3, #1
+  96 0026 6360     		str	r3, [r4, #4]
+  97 0028 F4E7     		b	.L7
+  98              	.L8:
+  99 002a 0020     		movs	r0, #0
+ 100 002c F2E7     		b	.L7
+ 101              		.size	priv_sem_send, .-priv_sem_send
+ 102              		.section	.text.sem_init,"ax",%progbits
+ 103              		.align	1
+ 104              		.global	sem_init
+ 105              		.syntax unified
+ 106              		.thumb
+ 107              		.thumb_func
+ 108              		.fpu fpv4-sp-d16
+ 109              		.type	sem_init, %function
+ 110              	sem_init:
+ 111              		@ args = 0, pretend = 0, frame = 0
+ 112              		@ frame_needed = 0, uses_anonymous_args = 0
+ 113 0000 10B5     		push	{r4, lr}
+ 114              		.syntax unified
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s 			page 3
+
+
+ 115              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 116 0002 EFF31083 		MRS r3, primask
+ 117              	@ 0 "" 2
+ 118              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 119 0006 72B6     		cpsid i
+ 120              	@ 0 "" 2
+ 121              		.thumb
+ 122              		.syntax unified
+ 123 0008 0024     		movs	r4, #0
+ 124 000a 0460     		str	r4, [r0]	@ unaligned
+ 125 000c 8A42     		cmp	r2, r1
+ 126 000e 94BF     		ite	ls
+ 127 0010 4260     		strls	r2, [r0, #4]
+ 128 0012 4160     		strhi	r1, [r0, #4]
+ 129 0014 8260     		str	r2, [r0, #8]
+ 130              		.syntax unified
+ 131              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 132 0016 83F31088 		MSR primask, r3
+ 133              	@ 0 "" 2
+ 134              		.thumb
+ 135              		.syntax unified
+ 136 001a 10BD     		pop	{r4, pc}
+ 137              		.size	sem_init, .-sem_init
+ 138              		.section	.text.sem_create,"ax",%progbits
+ 139              		.align	1
+ 140              		.global	sem_create
+ 141              		.syntax unified
+ 142              		.thumb
+ 143              		.thumb_func
+ 144              		.fpu fpv4-sp-d16
+ 145              		.type	sem_create, %function
+ 146              	sem_create:
+ 147              		@ args = 0, pretend = 0, frame = 0
+ 148              		@ frame_needed = 0, uses_anonymous_args = 0
+ 149 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 150 0002 0646     		mov	r6, r0
+ 151 0004 0F46     		mov	r7, r1
+ 152              		.syntax unified
+ 153              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 154 0006 EFF31085 		MRS r5, primask
+ 155              	@ 0 "" 2
+ 156              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 157 000a 72B6     		cpsid i
+ 158              	@ 0 "" 2
+ 159              		.thumb
+ 160              		.syntax unified
+ 161 000c 0C20     		movs	r0, #12
+ 162 000e FFF7FEFF 		bl	core_sys_alloc
+ 163 0012 0446     		mov	r4, r0
+ 164 0014 18B1     		cbz	r0, .L11
+ 165 0016 3A46     		mov	r2, r7
+ 166 0018 3146     		mov	r1, r6
+ 167 001a FFF7FEFF 		bl	sem_init
+ 168              	.L11:
+ 169              		.syntax unified
+ 170              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 171 001e 85F31088 		MSR primask, r5
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s 			page 4
+
+
+ 172              	@ 0 "" 2
+ 173              		.thumb
+ 174              		.syntax unified
+ 175 0022 2046     		mov	r0, r4
+ 176 0024 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 177              		.size	sem_create, .-sem_create
+ 178              		.section	.text.sem_kill,"ax",%progbits
+ 179              		.align	1
+ 180              		.global	sem_kill
+ 181              		.syntax unified
+ 182              		.thumb
+ 183              		.thumb_func
+ 184              		.fpu fpv4-sp-d16
+ 185              		.type	sem_kill, %function
+ 186              	sem_kill:
+ 187              		@ args = 0, pretend = 0, frame = 0
+ 188              		@ frame_needed = 0, uses_anonymous_args = 0
+ 189 0000 10B5     		push	{r4, lr}
+ 190              		.syntax unified
+ 191              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 192 0002 EFF31084 		MRS r4, primask
+ 193              	@ 0 "" 2
+ 194              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 195 0006 72B6     		cpsid i
+ 196              	@ 0 "" 2
+ 197              		.thumb
+ 198              		.syntax unified
+ 199 0008 0022     		movs	r2, #0
+ 200 000a 4260     		str	r2, [r0, #4]
+ 201 000c 4FF0FF31 		mov	r1, #-1
+ 202 0010 FFF7FEFF 		bl	core_all_wakeup
+ 203              		.syntax unified
+ 204              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 205 0014 84F31088 		MSR primask, r4
+ 206              	@ 0 "" 2
+ 207              		.thumb
+ 208              		.syntax unified
+ 209 0018 10BD     		pop	{r4, pc}
+ 210              		.size	sem_kill, .-sem_kill
+ 211              		.section	.text.sem_waitUntil,"ax",%progbits
+ 212              		.align	1
+ 213              		.global	sem_waitUntil
+ 214              		.syntax unified
+ 215              		.thumb
+ 216              		.thumb_func
+ 217              		.fpu fpv4-sp-d16
+ 218              		.type	sem_waitUntil, %function
+ 219              	sem_waitUntil:
+ 220              		@ args = 0, pretend = 0, frame = 0
+ 221              		@ frame_needed = 0, uses_anonymous_args = 0
+ 222              		@ link register save eliminated.
+ 223 0000 014A     		ldr	r2, .L17
+ 224 0002 FFF7FEBF 		b	priv_sem_wait
+ 225              	.L18:
+ 226 0006 00BF     		.align	2
+ 227              	.L17:
+ 228 0008 00000000 		.word	core_tsk_waitUntil
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s 			page 5
+
+
+ 229              		.size	sem_waitUntil, .-sem_waitUntil
+ 230              		.section	.text.sem_waitFor,"ax",%progbits
+ 231              		.align	1
+ 232              		.global	sem_waitFor
+ 233              		.syntax unified
+ 234              		.thumb
+ 235              		.thumb_func
+ 236              		.fpu fpv4-sp-d16
+ 237              		.type	sem_waitFor, %function
+ 238              	sem_waitFor:
+ 239              		@ args = 0, pretend = 0, frame = 0
+ 240              		@ frame_needed = 0, uses_anonymous_args = 0
+ 241              		@ link register save eliminated.
+ 242 0000 014A     		ldr	r2, .L20
+ 243 0002 FFF7FEBF 		b	priv_sem_wait
+ 244              	.L21:
+ 245 0006 00BF     		.align	2
+ 246              	.L20:
+ 247 0008 00000000 		.word	core_tsk_waitFor
+ 248              		.size	sem_waitFor, .-sem_waitFor
+ 249              		.section	.text.sem_sendUntil,"ax",%progbits
+ 250              		.align	1
+ 251              		.global	sem_sendUntil
+ 252              		.syntax unified
+ 253              		.thumb
+ 254              		.thumb_func
+ 255              		.fpu fpv4-sp-d16
+ 256              		.type	sem_sendUntil, %function
+ 257              	sem_sendUntil:
+ 258              		@ args = 0, pretend = 0, frame = 0
+ 259              		@ frame_needed = 0, uses_anonymous_args = 0
+ 260              		@ link register save eliminated.
+ 261 0000 014A     		ldr	r2, .L23
+ 262 0002 FFF7FEBF 		b	priv_sem_send
+ 263              	.L24:
+ 264 0006 00BF     		.align	2
+ 265              	.L23:
+ 266 0008 00000000 		.word	core_tsk_waitUntil
+ 267              		.size	sem_sendUntil, .-sem_sendUntil
+ 268              		.section	.text.sem_sendFor,"ax",%progbits
+ 269              		.align	1
+ 270              		.global	sem_sendFor
+ 271              		.syntax unified
+ 272              		.thumb
+ 273              		.thumb_func
+ 274              		.fpu fpv4-sp-d16
+ 275              		.type	sem_sendFor, %function
+ 276              	sem_sendFor:
+ 277              		@ args = 0, pretend = 0, frame = 0
+ 278              		@ frame_needed = 0, uses_anonymous_args = 0
+ 279              		@ link register save eliminated.
+ 280 0000 014A     		ldr	r2, .L26
+ 281 0002 FFF7FEBF 		b	priv_sem_send
+ 282              	.L27:
+ 283 0006 00BF     		.align	2
+ 284              	.L26:
+ 285 0008 00000000 		.word	core_tsk_waitFor
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s 			page 6
+
+
+ 286              		.size	sem_sendFor, .-sem_sendFor
+ 287              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 6.2.1 20161205 (release) [ARM/embedded-6-bran
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 os_sem.c
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:13     .text.priv_sem_wait:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:19     .text.priv_sem_wait:00000000 priv_sem_wait
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:57     .text.priv_sem_send:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:63     .text.priv_sem_send:00000000 priv_sem_send
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:103    .text.sem_init:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:110    .text.sem_init:00000000 sem_init
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:139    .text.sem_create:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:146    .text.sem_create:00000000 sem_create
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:179    .text.sem_kill:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:186    .text.sem_kill:00000000 sem_kill
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:212    .text.sem_waitUntil:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:219    .text.sem_waitUntil:00000000 sem_waitUntil
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:228    .text.sem_waitUntil:00000008 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:231    .text.sem_waitFor:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:238    .text.sem_waitFor:00000000 sem_waitFor
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:247    .text.sem_waitFor:00000008 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:250    .text.sem_sendUntil:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:257    .text.sem_sendUntil:00000000 sem_sendUntil
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:266    .text.sem_sendUntil:00000008 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:269    .text.sem_sendFor:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:276    .text.sem_sendFor:00000000 sem_sendFor
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cckj5yDQ.s:285    .text.sem_sendFor:00000008 $d
+
+UNDEFINED SYMBOLS
+core_one_wakeup
+core_sys_alloc
+core_all_wakeup
+core_tsk_waitUntil
+core_tsk_waitFor

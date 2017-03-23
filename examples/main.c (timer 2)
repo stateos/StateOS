@@ -10,7 +10,7 @@ void proc()
 
 int main()
 {
-	LED_Config();
+	LED_Init();
 
 	tmr_startPeriodic(tmr, SEC);
 	tsk_stop();

@@ -31,7 +31,7 @@ osThreadDef(master, osPriorityNormal, 1, 0);
 
 int main( void )
 {
-	LED_Config();
+	LED_Init();
 	osKernelInitialize();
 	sem = osSemaphoreCreate(osSemaphore(sem), 1);
 	osThreadCreate(osThread(slave),  NULL);

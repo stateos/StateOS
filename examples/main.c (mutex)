@@ -19,7 +19,7 @@ OS_NEW(mas, 1)
 
 int main()
 {
-	LED_Config();
+	LED_Init();
 
 	tsk_start(sla);
 	tsk_start(mas);

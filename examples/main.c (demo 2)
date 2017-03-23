@@ -18,8 +18,8 @@ OS_DEF(t5, 0, 256) { proc(&GRN,    SEC/8*4); }
 
 int main()
 {
-    LED_Config();
-    GRN_Config();
+    LED_Init();
+    GRN_Init();
 	
 	tsk_start(t1);
 	tsk_start(t2);

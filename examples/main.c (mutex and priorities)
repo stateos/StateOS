@@ -24,7 +24,7 @@ void slave()
 
 int main()
 {
-	LED_Config();
+	LED_Init();
 	
 	mtx_wait(mtx);
 	tsk_start(sla);

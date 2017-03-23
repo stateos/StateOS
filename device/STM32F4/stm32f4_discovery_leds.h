@@ -43,7 +43,7 @@ void GRN_Config( void )
 // config leds (PD12..PD15) as pushpull output
 
 static inline
-void LED_Config( void )
+void LED_Init( void )
 {
 	GPIO_Init(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15, GPIO_Output_PushPull);
 }
@@ -92,7 +92,7 @@ class Led
 	void     set( unsigned status ) { GPIOD->BSRR = (~status << 28) | (uint16_t)(status << 12); }
 
 public:
-	Led( void ) { LED_Config(); }
+	Led( void ) { LED_Init(); }
 
 	unsigned & operator []( const unsigned number ) { return (unsigned &)LED[number]; }
 	unsigned   operator = ( const unsigned status ) {                              set(status); return status & 0xF; }

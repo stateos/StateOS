@@ -34,7 +34,7 @@ void master()
 
 int main()
 {
-	LED_Config();
+	LED_Init();
 
 	mem_bind(mem);
 	tsk_start(sla);

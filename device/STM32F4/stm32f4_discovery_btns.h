@@ -23,7 +23,7 @@ extern "C" {
 // config user button (PA0)
 
 static inline
-void BTN_Config( void )
+void BTN_Init( void )
 {
 	GPIO_Init(GPIOA, GPIO_Pin_0, GPIO_Input_PullDown);
 }
@@ -43,7 +43,7 @@ void BTN_Config( void )
 class Button
 {
 public:
-	Button( void ) { BTN_Config(); }
+	Button( void ) { BTN_Init(); }
 	
 	unsigned operator ()( void ) { return BTN; }
 };

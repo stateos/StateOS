@@ -31,7 +31,7 @@ tsk_id mas = WRK_CREATE(0, master, 256);
 
 int main()
 {
-	LED_Config();
+	LED_Init();
 
 	tsk_start(sla);
 	tsk_start(mas);

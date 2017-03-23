@@ -1,0 +1,364 @@
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 23, 1
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 4
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"os_flg.c"
+  12              		.section	.text.priv_flg_wait,"ax",%progbits
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu fpv4-sp-d16
+  18              		.type	priv_flg_wait, %function
+  19              	priv_flg_wait:
+  20              		@ args = 4, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22 0000 70B5     		push	{r4, r5, r6, lr}
+  23              		.syntax unified
+  24              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  25 0002 EFF31086 		MRS r6, primask
+  26              	@ 0 "" 2
+  27              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  28 0006 72B6     		cpsid i
+  29              	@ 0 "" 2
+  30              		.thumb
+  31              		.syntax unified
+  32 0008 0F4C     		ldr	r4, .L7
+  33 000a 2468     		ldr	r4, [r4]
+  34 000c 5507     		lsls	r5, r2, #29
+  35 000e 2164     		str	r1, [r4, #64]
+  36 0010 E263     		str	r2, [r4, #60]
+  37 0012 5EBF     		ittt	pl
+  38 0014 4568     		ldrpl	r5, [r0, #4]
+  39 0016 21EA0505 		bicpl	r5, r1, r5
+  40 001a 2564     		strpl	r5, [r4, #64]
+  41 001c 9507     		lsls	r5, r2, #30
+  42 001e 5EBF     		ittt	pl
+  43 0020 4568     		ldrpl	r5, [r0, #4]
+  44 0022 8D43     		bicpl	r5, r5, r1
+  45 0024 4560     		strpl	r5, [r0, #4]
+  46 0026 246C     		ldr	r4, [r4, #64]
+  47 0028 64B1     		cbz	r4, .L6
+  48 002a 12F00102 		ands	r2, r2, #1
+  49 002e 01D1     		bne	.L5
+  50 0030 A142     		cmp	r1, r4
+  51 0032 03D1     		bne	.L4
+  52              	.L5:
+  53 0034 1946     		mov	r1, r3
+  54 0036 049B     		ldr	r3, [sp, #16]
+  55 0038 9847     		blx	r3
+  56 003a 0246     		mov	r2, r0
+  57              	.L4:
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s 			page 2
+
+
+  58              		.syntax unified
+  59              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  60 003c 86F31088 		MSR primask, r6
+  61              	@ 0 "" 2
+  62              		.thumb
+  63              		.syntax unified
+  64 0040 1046     		mov	r0, r2
+  65 0042 70BD     		pop	{r4, r5, r6, pc}
+  66              	.L6:
+  67 0044 2246     		mov	r2, r4
+  68 0046 F9E7     		b	.L4
+  69              	.L8:
+  70              		.align	2
+  71              	.L7:
+  72 0048 00000000 		.word	System
+  73              		.size	priv_flg_wait, .-priv_flg_wait
+  74              		.section	.text.flg_init,"ax",%progbits
+  75              		.align	1
+  76              		.global	flg_init
+  77              		.syntax unified
+  78              		.thumb
+  79              		.thumb_func
+  80              		.fpu fpv4-sp-d16
+  81              		.type	flg_init, %function
+  82              	flg_init:
+  83              		@ args = 0, pretend = 0, frame = 0
+  84              		@ frame_needed = 0, uses_anonymous_args = 0
+  85              		@ link register save eliminated.
+  86              		.syntax unified
+  87              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  88 0000 EFF31083 		MRS r3, primask
+  89              	@ 0 "" 2
+  90              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  91 0004 72B6     		cpsid i
+  92              	@ 0 "" 2
+  93              		.thumb
+  94              		.syntax unified
+  95 0006 0022     		movs	r2, #0
+  96 0008 0260     		str	r2, [r0]	@ unaligned
+  97 000a 4260     		str	r2, [r0, #4]	@ unaligned
+  98              		.syntax unified
+  99              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 100 000c 83F31088 		MSR primask, r3
+ 101              	@ 0 "" 2
+ 102              		.thumb
+ 103              		.syntax unified
+ 104 0010 7047     		bx	lr
+ 105              		.size	flg_init, .-flg_init
+ 106              		.section	.text.flg_create,"ax",%progbits
+ 107              		.align	1
+ 108              		.global	flg_create
+ 109              		.syntax unified
+ 110              		.thumb
+ 111              		.thumb_func
+ 112              		.fpu fpv4-sp-d16
+ 113              		.type	flg_create, %function
+ 114              	flg_create:
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s 			page 3
+
+
+ 115              		@ args = 0, pretend = 0, frame = 0
+ 116              		@ frame_needed = 0, uses_anonymous_args = 0
+ 117 0000 10B5     		push	{r4, lr}
+ 118              		.syntax unified
+ 119              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 120 0002 EFF31084 		MRS r4, primask
+ 121              	@ 0 "" 2
+ 122              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 123 0006 72B6     		cpsid i
+ 124              	@ 0 "" 2
+ 125              		.thumb
+ 126              		.syntax unified
+ 127 0008 0820     		movs	r0, #8
+ 128 000a FFF7FEFF 		bl	core_sys_alloc
+ 129 000e 0146     		mov	r1, r0
+ 130 0010 08B1     		cbz	r0, .L11
+ 131 0012 FFF7FEFF 		bl	flg_init
+ 132              	.L11:
+ 133              		.syntax unified
+ 134              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 135 0016 84F31088 		MSR primask, r4
+ 136              	@ 0 "" 2
+ 137              		.thumb
+ 138              		.syntax unified
+ 139 001a 0846     		mov	r0, r1
+ 140 001c 10BD     		pop	{r4, pc}
+ 141              		.size	flg_create, .-flg_create
+ 142              		.section	.text.flg_kill,"ax",%progbits
+ 143              		.align	1
+ 144              		.global	flg_kill
+ 145              		.syntax unified
+ 146              		.thumb
+ 147              		.thumb_func
+ 148              		.fpu fpv4-sp-d16
+ 149              		.type	flg_kill, %function
+ 150              	flg_kill:
+ 151              		@ args = 0, pretend = 0, frame = 0
+ 152              		@ frame_needed = 0, uses_anonymous_args = 0
+ 153 0000 10B5     		push	{r4, lr}
+ 154              		.syntax unified
+ 155              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 156 0002 EFF31084 		MRS r4, primask
+ 157              	@ 0 "" 2
+ 158              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 159 0006 72B6     		cpsid i
+ 160              	@ 0 "" 2
+ 161              		.thumb
+ 162              		.syntax unified
+ 163 0008 4FF0FF31 		mov	r1, #-1
+ 164 000c FFF7FEFF 		bl	core_all_wakeup
+ 165              		.syntax unified
+ 166              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 167 0010 84F31088 		MSR primask, r4
+ 168              	@ 0 "" 2
+ 169              		.thumb
+ 170              		.syntax unified
+ 171 0014 10BD     		pop	{r4, pc}
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s 			page 4
+
+
+ 172              		.size	flg_kill, .-flg_kill
+ 173              		.section	.text.flg_waitUntil,"ax",%progbits
+ 174              		.align	1
+ 175              		.global	flg_waitUntil
+ 176              		.syntax unified
+ 177              		.thumb
+ 178              		.thumb_func
+ 179              		.fpu fpv4-sp-d16
+ 180              		.type	flg_waitUntil, %function
+ 181              	flg_waitUntil:
+ 182              		@ args = 0, pretend = 0, frame = 0
+ 183              		@ frame_needed = 0, uses_anonymous_args = 0
+ 184 0000 13B5     		push	{r0, r1, r4, lr}
+ 185 0002 034C     		ldr	r4, .L17
+ 186 0004 0094     		str	r4, [sp]
+ 187 0006 FFF7FEFF 		bl	priv_flg_wait
+ 188 000a 02B0     		add	sp, sp, #8
+ 189              		@ sp needed
+ 190 000c 10BD     		pop	{r4, pc}
+ 191              	.L18:
+ 192 000e 00BF     		.align	2
+ 193              	.L17:
+ 194 0010 00000000 		.word	core_tsk_waitUntil
+ 195              		.size	flg_waitUntil, .-flg_waitUntil
+ 196              		.section	.text.flg_waitFor,"ax",%progbits
+ 197              		.align	1
+ 198              		.global	flg_waitFor
+ 199              		.syntax unified
+ 200              		.thumb
+ 201              		.thumb_func
+ 202              		.fpu fpv4-sp-d16
+ 203              		.type	flg_waitFor, %function
+ 204              	flg_waitFor:
+ 205              		@ args = 0, pretend = 0, frame = 0
+ 206              		@ frame_needed = 0, uses_anonymous_args = 0
+ 207 0000 13B5     		push	{r0, r1, r4, lr}
+ 208 0002 034C     		ldr	r4, .L20
+ 209 0004 0094     		str	r4, [sp]
+ 210 0006 FFF7FEFF 		bl	priv_flg_wait
+ 211 000a 02B0     		add	sp, sp, #8
+ 212              		@ sp needed
+ 213 000c 10BD     		pop	{r4, pc}
+ 214              	.L21:
+ 215 000e 00BF     		.align	2
+ 216              	.L20:
+ 217 0010 00000000 		.word	core_tsk_waitFor
+ 218              		.size	flg_waitFor, .-flg_waitFor
+ 219              		.section	.text.flg_give,"ax",%progbits
+ 220              		.align	1
+ 221              		.global	flg_give
+ 222              		.syntax unified
+ 223              		.thumb
+ 224              		.thumb_func
+ 225              		.fpu fpv4-sp-d16
+ 226              		.type	flg_give, %function
+ 227              	flg_give:
+ 228              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s 			page 5
+
+
+ 229              		@ frame_needed = 0, uses_anonymous_args = 0
+ 230 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 231 0004 0546     		mov	r5, r0
+ 232              		.syntax unified
+ 233              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 234 0006 EFF31087 		MRS r7, primask
+ 235              	@ 0 "" 2
+ 236              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 237 000a 72B6     		cpsid i
+ 238              	@ 0 "" 2
+ 239              		.thumb
+ 240              		.syntax unified
+ 241 000c 4668     		ldr	r6, [r0, #4]
+ 242 000e 0468     		ldr	r4, [r0]
+ 243 0010 0E43     		orrs	r6, r6, r1
+ 244 0012 4660     		str	r6, [r0, #4]
+ 245 0014 6FEA0608 		mvn	r8, r6
+ 246              	.L23:
+ 247 0018 24B9     		cbnz	r4, .L27
+ 248 001a 6868     		ldr	r0, [r5, #4]
+ 249              		.syntax unified
+ 250              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 251 001c 87F31088 		MSR primask, r7
+ 252              	@ 0 "" 2
+ 253              		.thumb
+ 254              		.syntax unified
+ 255 0020 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 256              	.L27:
+ 257 0024 236C     		ldr	r3, [r4, #64]
+ 258 0026 1E42     		tst	r6, r3
+ 259 0028 11D0     		beq	.L24
+ 260 002a E16B     		ldr	r1, [r4, #60]
+ 261 002c 8A07     		lsls	r2, r1, #30
+ 262 002e 5CBF     		itt	pl
+ 263 0030 6A68     		ldrpl	r2, [r5, #4]
+ 264 0032 9A43     		bicpl	r2, r2, r3
+ 265 0034 08EA0303 		and	r3, r8, r3
+ 266 0038 58BF     		it	pl
+ 267 003a 6A60     		strpl	r2, [r5, #4]
+ 268 003c 2364     		str	r3, [r4, #64]
+ 269 003e 0BB1     		cbz	r3, .L26
+ 270 0040 CB07     		lsls	r3, r1, #31
+ 271 0042 04D4     		bmi	.L24
+ 272              	.L26:
+ 273 0044 E469     		ldr	r4, [r4, #28]
+ 274 0046 0021     		movs	r1, #0
+ 275 0048 2046     		mov	r0, r4
+ 276 004a FFF7FEFF 		bl	core_one_wakeup
+ 277              	.L24:
+ 278 004e 2468     		ldr	r4, [r4]
+ 279 0050 E2E7     		b	.L23
+ 280              		.size	flg_give, .-flg_give
+ 281              		.section	.text.flg_clear,"ax",%progbits
+ 282              		.align	1
+ 283              		.global	flg_clear
+ 284              		.syntax unified
+ 285              		.thumb
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s 			page 6
+
+
+ 286              		.thumb_func
+ 287              		.fpu fpv4-sp-d16
+ 288              		.type	flg_clear, %function
+ 289              	flg_clear:
+ 290              		@ args = 0, pretend = 0, frame = 0
+ 291              		@ frame_needed = 0, uses_anonymous_args = 0
+ 292              		@ link register save eliminated.
+ 293              		.syntax unified
+ 294              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 295 0000 EFF31083 		MRS r3, primask
+ 296              	@ 0 "" 2
+ 297              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 298 0004 72B6     		cpsid i
+ 299              	@ 0 "" 2
+ 300              		.thumb
+ 301              		.syntax unified
+ 302 0006 4268     		ldr	r2, [r0, #4]
+ 303 0008 22EA0101 		bic	r1, r2, r1
+ 304 000c 4160     		str	r1, [r0, #4]
+ 305              		.syntax unified
+ 306              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 307 000e 83F31088 		MSR primask, r3
+ 308              	@ 0 "" 2
+ 309              		.thumb
+ 310              		.syntax unified
+ 311 0012 1046     		mov	r0, r2
+ 312 0014 7047     		bx	lr
+ 313              		.size	flg_clear, .-flg_clear
+ 314              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 6.2.1 20161205 (release) [ARM/embedded-6-bran
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 os_flg.c
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:13     .text.priv_flg_wait:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:19     .text.priv_flg_wait:00000000 priv_flg_wait
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:72     .text.priv_flg_wait:00000048 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:75     .text.flg_init:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:82     .text.flg_init:00000000 flg_init
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:107    .text.flg_create:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:114    .text.flg_create:00000000 flg_create
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:143    .text.flg_kill:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:150    .text.flg_kill:00000000 flg_kill
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:174    .text.flg_waitUntil:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:181    .text.flg_waitUntil:00000000 flg_waitUntil
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:194    .text.flg_waitUntil:00000010 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:197    .text.flg_waitFor:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:204    .text.flg_waitFor:00000000 flg_waitFor
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:217    .text.flg_waitFor:00000010 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:220    .text.flg_give:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:227    .text.flg_give:00000000 flg_give
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:282    .text.flg_clear:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccft9rzR.s:289    .text.flg_clear:00000000 flg_clear
+
+UNDEFINED SYMBOLS
+System
+core_sys_alloc
+core_all_wakeup
+core_tsk_waitUntil
+core_tsk_waitFor
+core_one_wakeup

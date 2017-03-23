@@ -1,0 +1,409 @@
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 23, 1
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 4
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"os_msg.c"
+  12              		.section	.text.priv_msg_wait,"ax",%progbits
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu fpv4-sp-d16
+  18              		.type	priv_msg_wait, %function
+  19              	priv_msg_wait:
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22 0000 70B5     		push	{r4, r5, r6, lr}
+  23 0002 0446     		mov	r4, r0
+  24              		.syntax unified
+  25              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  26 0004 EFF31085 		MRS r5, primask
+  27              	@ 0 "" 2
+  28              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  29 0008 72B6     		cpsid i
+  30              	@ 0 "" 2
+  31              		.thumb
+  32              		.syntax unified
+  33 000a 4668     		ldr	r6, [r0, #4]
+  34 000c 3EB9     		cbnz	r6, .L2
+  35 000e 174C     		ldr	r4, .L5
+  36 0010 2468     		ldr	r4, [r4]
+  37 0012 E163     		str	r1, [r4, #60]
+  38 0014 1146     		mov	r1, r2
+  39 0016 9847     		blx	r3
+  40              	.L3:
+  41              		.syntax unified
+  42              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  43 0018 85F31088 		MSR primask, r5
+  44              	@ 0 "" 2
+  45              		.thumb
+  46              		.syntax unified
+  47 001c 70BD     		pop	{r4, r5, r6, pc}
+  48              	.L2:
+  49 001e C268     		ldr	r2, [r0, #12]
+  50 0020 4369     		ldr	r3, [r0, #20]
+  51 0022 53F82230 		ldr	r3, [r3, r2, lsl #2]
+  52 0026 0B60     		str	r3, [r1]
+  53 0028 C368     		ldr	r3, [r0, #12]
+  54 002a 8168     		ldr	r1, [r0, #8]
+  55 002c 0133     		adds	r3, r3, #1
+  56 002e B3FBF1F2 		udiv	r2, r3, r1
+  57 0032 01FB1233 		mls	r3, r1, r2, r3
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s 			page 2
+
+
+  58 0036 C360     		str	r3, [r0, #12]
+  59 0038 4368     		ldr	r3, [r0, #4]
+  60 003a 013B     		subs	r3, r3, #1
+  61 003c 4360     		str	r3, [r0, #4]
+  62 003e 0021     		movs	r1, #0
+  63 0040 FFF7FEFF 		bl	core_one_wakeup
+  64 0044 0028     		cmp	r0, #0
+  65 0046 E7D0     		beq	.L3
+  66 0048 2269     		ldr	r2, [r4, #16]
+  67 004a 6369     		ldr	r3, [r4, #20]
+  68 004c C16B     		ldr	r1, [r0, #60]
+  69 004e 43F82210 		str	r1, [r3, r2, lsl #2]
+  70 0052 2369     		ldr	r3, [r4, #16]
+  71 0054 A168     		ldr	r1, [r4, #8]
+  72 0056 0133     		adds	r3, r3, #1
+  73 0058 B3FBF1F2 		udiv	r2, r3, r1
+  74 005c 01FB1233 		mls	r3, r1, r2, r3
+  75 0060 2361     		str	r3, [r4, #16]
+  76 0062 6368     		ldr	r3, [r4, #4]
+  77 0064 0133     		adds	r3, r3, #1
+  78 0066 6360     		str	r3, [r4, #4]
+  79 0068 0020     		movs	r0, #0
+  80 006a D5E7     		b	.L3
+  81              	.L6:
+  82              		.align	2
+  83              	.L5:
+  84 006c 00000000 		.word	System
+  85              		.size	priv_msg_wait, .-priv_msg_wait
+  86              		.section	.text.priv_msg_send,"ax",%progbits
+  87              		.align	1
+  88              		.syntax unified
+  89              		.thumb
+  90              		.thumb_func
+  91              		.fpu fpv4-sp-d16
+  92              		.type	priv_msg_send, %function
+  93              	priv_msg_send:
+  94              		@ args = 0, pretend = 0, frame = 0
+  95              		@ frame_needed = 0, uses_anonymous_args = 0
+  96 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+  97 0002 0446     		mov	r4, r0
+  98              		.syntax unified
+  99              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 100 0004 EFF31085 		MRS r5, primask
+ 101              	@ 0 "" 2
+ 102              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 103 0008 72B6     		cpsid i
+ 104              	@ 0 "" 2
+ 105              		.thumb
+ 106              		.syntax unified
+ 107 000a 4768     		ldr	r7, [r0, #4]
+ 108 000c 8668     		ldr	r6, [r0, #8]
+ 109 000e B742     		cmp	r7, r6
+ 110 0010 07D3     		bcc	.L8
+ 111 0012 174C     		ldr	r4, .L11
+ 112 0014 2468     		ldr	r4, [r4]
+ 113 0016 E163     		str	r1, [r4, #60]
+ 114 0018 1146     		mov	r1, r2
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s 			page 3
+
+
+ 115 001a 9847     		blx	r3
+ 116              	.L9:
+ 117              		.syntax unified
+ 118              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 119 001c 85F31088 		MSR primask, r5
+ 120              	@ 0 "" 2
+ 121              		.thumb
+ 122              		.syntax unified
+ 123 0020 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 124              	.L8:
+ 125 0022 0269     		ldr	r2, [r0, #16]
+ 126 0024 4369     		ldr	r3, [r0, #20]
+ 127 0026 43F82210 		str	r1, [r3, r2, lsl #2]
+ 128 002a 0369     		ldr	r3, [r0, #16]
+ 129 002c 8168     		ldr	r1, [r0, #8]
+ 130 002e 0133     		adds	r3, r3, #1
+ 131 0030 B3FBF1F2 		udiv	r2, r3, r1
+ 132 0034 01FB1233 		mls	r3, r1, r2, r3
+ 133 0038 0361     		str	r3, [r0, #16]
+ 134 003a 4368     		ldr	r3, [r0, #4]
+ 135 003c 0133     		adds	r3, r3, #1
+ 136 003e 4360     		str	r3, [r0, #4]
+ 137 0040 0021     		movs	r1, #0
+ 138 0042 FFF7FEFF 		bl	core_one_wakeup
+ 139 0046 0028     		cmp	r0, #0
+ 140 0048 E8D0     		beq	.L9
+ 141 004a E168     		ldr	r1, [r4, #12]
+ 142 004c 6269     		ldr	r2, [r4, #20]
+ 143 004e C36B     		ldr	r3, [r0, #60]
+ 144 0050 52F82120 		ldr	r2, [r2, r1, lsl #2]
+ 145 0054 1A60     		str	r2, [r3]
+ 146 0056 E368     		ldr	r3, [r4, #12]
+ 147 0058 A168     		ldr	r1, [r4, #8]
+ 148 005a 0133     		adds	r3, r3, #1
+ 149 005c B3FBF1F2 		udiv	r2, r3, r1
+ 150 0060 01FB1233 		mls	r3, r1, r2, r3
+ 151 0064 E360     		str	r3, [r4, #12]
+ 152 0066 6368     		ldr	r3, [r4, #4]
+ 153 0068 013B     		subs	r3, r3, #1
+ 154 006a 6360     		str	r3, [r4, #4]
+ 155 006c 0020     		movs	r0, #0
+ 156 006e D5E7     		b	.L9
+ 157              	.L12:
+ 158              		.align	2
+ 159              	.L11:
+ 160 0070 00000000 		.word	System
+ 161              		.size	priv_msg_send, .-priv_msg_send
+ 162              		.section	.text.msg_init,"ax",%progbits
+ 163              		.align	1
+ 164              		.global	msg_init
+ 165              		.syntax unified
+ 166              		.thumb
+ 167              		.thumb_func
+ 168              		.fpu fpv4-sp-d16
+ 169              		.type	msg_init, %function
+ 170              	msg_init:
+ 171              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s 			page 4
+
+
+ 172              		@ frame_needed = 0, uses_anonymous_args = 0
+ 173 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 174 0002 0546     		mov	r5, r0
+ 175 0004 0F46     		mov	r7, r1
+ 176 0006 1646     		mov	r6, r2
+ 177              		.syntax unified
+ 178              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 179 0008 EFF31084 		MRS r4, primask
+ 180              	@ 0 "" 2
+ 181              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 182 000c 72B6     		cpsid i
+ 183              	@ 0 "" 2
+ 184              		.thumb
+ 185              		.syntax unified
+ 186 000e 1822     		movs	r2, #24
+ 187 0010 0021     		movs	r1, #0
+ 188 0012 FFF7FEFF 		bl	memset
+ 189 0016 AF60     		str	r7, [r5, #8]
+ 190 0018 6E61     		str	r6, [r5, #20]
+ 191              		.syntax unified
+ 192              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 193 001a 84F31088 		MSR primask, r4
+ 194              	@ 0 "" 2
+ 195              		.thumb
+ 196              		.syntax unified
+ 197 001e F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 198              		.size	msg_init, .-msg_init
+ 199              		.section	.text.msg_create,"ax",%progbits
+ 200              		.align	1
+ 201              		.global	msg_create
+ 202              		.syntax unified
+ 203              		.thumb
+ 204              		.thumb_func
+ 205              		.fpu fpv4-sp-d16
+ 206              		.type	msg_create, %function
+ 207              	msg_create:
+ 208              		@ args = 0, pretend = 0, frame = 0
+ 209              		@ frame_needed = 0, uses_anonymous_args = 0
+ 210 0000 70B5     		push	{r4, r5, r6, lr}
+ 211 0002 0546     		mov	r5, r0
+ 212              		.syntax unified
+ 213              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 214 0004 EFF31086 		MRS r6, primask
+ 215              	@ 0 "" 2
+ 216              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 217 0008 72B6     		cpsid i
+ 218              	@ 0 "" 2
+ 219              		.thumb
+ 220              		.syntax unified
+ 221 000a 0630     		adds	r0, r0, #6
+ 222 000c 8000     		lsls	r0, r0, #2
+ 223 000e FFF7FEFF 		bl	core_sys_alloc
+ 224 0012 0446     		mov	r4, r0
+ 225 0014 20B1     		cbz	r0, .L15
+ 226 0016 00F11802 		add	r2, r0, #24
+ 227 001a 2946     		mov	r1, r5
+ 228 001c FFF7FEFF 		bl	msg_init
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s 			page 5
+
+
+ 229              	.L15:
+ 230              		.syntax unified
+ 231              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 232 0020 86F31088 		MSR primask, r6
+ 233              	@ 0 "" 2
+ 234              		.thumb
+ 235              		.syntax unified
+ 236 0024 2046     		mov	r0, r4
+ 237 0026 70BD     		pop	{r4, r5, r6, pc}
+ 238              		.size	msg_create, .-msg_create
+ 239              		.section	.text.msg_kill,"ax",%progbits
+ 240              		.align	1
+ 241              		.global	msg_kill
+ 242              		.syntax unified
+ 243              		.thumb
+ 244              		.thumb_func
+ 245              		.fpu fpv4-sp-d16
+ 246              		.type	msg_kill, %function
+ 247              	msg_kill:
+ 248              		@ args = 0, pretend = 0, frame = 0
+ 249              		@ frame_needed = 0, uses_anonymous_args = 0
+ 250 0000 10B5     		push	{r4, lr}
+ 251              		.syntax unified
+ 252              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 253 0002 EFF31084 		MRS r4, primask
+ 254              	@ 0 "" 2
+ 255              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 256 0006 72B6     		cpsid i
+ 257              	@ 0 "" 2
+ 258              		.thumb
+ 259              		.syntax unified
+ 260 0008 0022     		movs	r2, #0
+ 261 000a 4260     		str	r2, [r0, #4]
+ 262 000c C260     		str	r2, [r0, #12]
+ 263 000e 0261     		str	r2, [r0, #16]
+ 264 0010 4FF0FF31 		mov	r1, #-1
+ 265 0014 FFF7FEFF 		bl	core_all_wakeup
+ 266              		.syntax unified
+ 267              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 268 0018 84F31088 		MSR primask, r4
+ 269              	@ 0 "" 2
+ 270              		.thumb
+ 271              		.syntax unified
+ 272 001c 10BD     		pop	{r4, pc}
+ 273              		.size	msg_kill, .-msg_kill
+ 274              		.section	.text.msg_waitUntil,"ax",%progbits
+ 275              		.align	1
+ 276              		.global	msg_waitUntil
+ 277              		.syntax unified
+ 278              		.thumb
+ 279              		.thumb_func
+ 280              		.fpu fpv4-sp-d16
+ 281              		.type	msg_waitUntil, %function
+ 282              	msg_waitUntil:
+ 283              		@ args = 0, pretend = 0, frame = 0
+ 284              		@ frame_needed = 0, uses_anonymous_args = 0
+ 285              		@ link register save eliminated.
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s 			page 6
+
+
+ 286 0000 014B     		ldr	r3, .L21
+ 287 0002 FFF7FEBF 		b	priv_msg_wait
+ 288              	.L22:
+ 289 0006 00BF     		.align	2
+ 290              	.L21:
+ 291 0008 00000000 		.word	core_tsk_waitUntil
+ 292              		.size	msg_waitUntil, .-msg_waitUntil
+ 293              		.section	.text.msg_waitFor,"ax",%progbits
+ 294              		.align	1
+ 295              		.global	msg_waitFor
+ 296              		.syntax unified
+ 297              		.thumb
+ 298              		.thumb_func
+ 299              		.fpu fpv4-sp-d16
+ 300              		.type	msg_waitFor, %function
+ 301              	msg_waitFor:
+ 302              		@ args = 0, pretend = 0, frame = 0
+ 303              		@ frame_needed = 0, uses_anonymous_args = 0
+ 304              		@ link register save eliminated.
+ 305 0000 014B     		ldr	r3, .L24
+ 306 0002 FFF7FEBF 		b	priv_msg_wait
+ 307              	.L25:
+ 308 0006 00BF     		.align	2
+ 309              	.L24:
+ 310 0008 00000000 		.word	core_tsk_waitFor
+ 311              		.size	msg_waitFor, .-msg_waitFor
+ 312              		.section	.text.msg_sendUntil,"ax",%progbits
+ 313              		.align	1
+ 314              		.global	msg_sendUntil
+ 315              		.syntax unified
+ 316              		.thumb
+ 317              		.thumb_func
+ 318              		.fpu fpv4-sp-d16
+ 319              		.type	msg_sendUntil, %function
+ 320              	msg_sendUntil:
+ 321              		@ args = 0, pretend = 0, frame = 0
+ 322              		@ frame_needed = 0, uses_anonymous_args = 0
+ 323              		@ link register save eliminated.
+ 324 0000 014B     		ldr	r3, .L27
+ 325 0002 FFF7FEBF 		b	priv_msg_send
+ 326              	.L28:
+ 327 0006 00BF     		.align	2
+ 328              	.L27:
+ 329 0008 00000000 		.word	core_tsk_waitUntil
+ 330              		.size	msg_sendUntil, .-msg_sendUntil
+ 331              		.section	.text.msg_sendFor,"ax",%progbits
+ 332              		.align	1
+ 333              		.global	msg_sendFor
+ 334              		.syntax unified
+ 335              		.thumb
+ 336              		.thumb_func
+ 337              		.fpu fpv4-sp-d16
+ 338              		.type	msg_sendFor, %function
+ 339              	msg_sendFor:
+ 340              		@ args = 0, pretend = 0, frame = 0
+ 341              		@ frame_needed = 0, uses_anonymous_args = 0
+ 342              		@ link register save eliminated.
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s 			page 7
+
+
+ 343 0000 014B     		ldr	r3, .L30
+ 344 0002 FFF7FEBF 		b	priv_msg_send
+ 345              	.L31:
+ 346 0006 00BF     		.align	2
+ 347              	.L30:
+ 348 0008 00000000 		.word	core_tsk_waitFor
+ 349              		.size	msg_sendFor, .-msg_sendFor
+ 350              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 6.2.1 20161205 (release) [ARM/embedded-6-bran
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s 			page 8
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 os_msg.c
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:13     .text.priv_msg_wait:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:19     .text.priv_msg_wait:00000000 priv_msg_wait
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:84     .text.priv_msg_wait:0000006c $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:87     .text.priv_msg_send:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:93     .text.priv_msg_send:00000000 priv_msg_send
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:160    .text.priv_msg_send:00000070 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:163    .text.msg_init:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:170    .text.msg_init:00000000 msg_init
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:200    .text.msg_create:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:207    .text.msg_create:00000000 msg_create
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:240    .text.msg_kill:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:247    .text.msg_kill:00000000 msg_kill
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:275    .text.msg_waitUntil:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:282    .text.msg_waitUntil:00000000 msg_waitUntil
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:291    .text.msg_waitUntil:00000008 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:294    .text.msg_waitFor:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:301    .text.msg_waitFor:00000000 msg_waitFor
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:310    .text.msg_waitFor:00000008 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:313    .text.msg_sendUntil:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:320    .text.msg_sendUntil:00000000 msg_sendUntil
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:329    .text.msg_sendUntil:00000008 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:332    .text.msg_sendFor:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:339    .text.msg_sendFor:00000000 msg_sendFor
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccALmVsf.s:348    .text.msg_sendFor:00000008 $d
+
+UNDEFINED SYMBOLS
+core_one_wakeup
+System
+memset
+core_sys_alloc
+core_all_wakeup
+core_tsk_waitUntil
+core_tsk_waitFor

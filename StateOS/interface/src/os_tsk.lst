@@ -1,0 +1,719 @@
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 23, 1
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 4
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"os_tsk.c"
+  12              		.section	.text.tsk_init,"ax",%progbits
+  13              		.align	1
+  14              		.global	tsk_init
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu fpv4-sp-d16
+  19              		.type	tsk_init, %function
+  20              	tsk_init:
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+  24 0004 0446     		mov	r4, r0
+  25 0006 0E46     		mov	r6, r1
+  26 0008 9046     		mov	r8, r2
+  27 000a 1F46     		mov	r7, r3
+  28              		.syntax unified
+  29              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  30 000c EFF31085 		MRS r5, primask
+  31              	@ 0 "" 2
+  32              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  33 0010 72B6     		cpsid i
+  34              	@ 0 "" 2
+  35              		.thumb
+  36              		.syntax unified
+  37 0012 4422     		movs	r2, #68
+  38 0014 0021     		movs	r1, #0
+  39 0016 FFF7FEFF 		bl	memset
+  40 001a 2046     		mov	r0, r4
+  41 001c E662     		str	r6, [r4, #44]
+  42 001e A662     		str	r6, [r4, #40]
+  43 0020 C4F81080 		str	r8, [r4, #16]
+  44 0024 6762     		str	r7, [r4, #36]
+  45 0026 FFF7FEFF 		bl	core_ctx_init
+  46 002a 2046     		mov	r0, r4
+  47 002c FFF7FEFF 		bl	core_tsk_insert
+  48              		.syntax unified
+  49              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  50 0030 85F31088 		MSR primask, r5
+  51              	@ 0 "" 2
+  52              		.thumb
+  53              		.syntax unified
+  54 0034 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+  55              		.size	tsk_init, .-tsk_init
+  56              		.section	.text.tsk_create,"ax",%progbits
+  57              		.align	1
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 2
+
+
+  58              		.global	tsk_create
+  59              		.syntax unified
+  60              		.thumb
+  61              		.thumb_func
+  62              		.fpu fpv4-sp-d16
+  63              		.type	tsk_create, %function
+  64              	tsk_create:
+  65              		@ args = 0, pretend = 0, frame = 0
+  66              		@ frame_needed = 0, uses_anonymous_args = 0
+  67 0000 12F1440F 		cmn	r2, #68
+  68 0004 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+  69 0008 18BF     		it	ne
+  70 000a D41D     		addne	r4, r2, #7
+  71 000c 0746     		mov	r7, r0
+  72 000e 8846     		mov	r8, r1
+  73 0010 14BF     		ite	ne
+  74 0012 E408     		lsrne	r4, r4, #3
+  75 0014 4024     		moveq	r4, #64
+  76              		.syntax unified
+  77              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  78 0016 EFF31086 		MRS r6, primask
+  79              	@ 0 "" 2
+  80              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  81 001a 72B6     		cpsid i
+  82              	@ 0 "" 2
+  83              		.thumb
+  84              		.syntax unified
+  85 001c E400     		lsls	r4, r4, #3
+  86 001e 2046     		mov	r0, r4
+  87 0020 FFF7FEFF 		bl	core_sys_alloc
+  88 0024 0546     		mov	r5, r0
+  89 0026 20B1     		cbz	r0, .L4
+  90 0028 0319     		adds	r3, r0, r4
+  91 002a 4246     		mov	r2, r8
+  92 002c 3946     		mov	r1, r7
+  93 002e FFF7FEFF 		bl	tsk_init
+  94              	.L4:
+  95              		.syntax unified
+  96              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  97 0032 86F31088 		MSR primask, r6
+  98              	@ 0 "" 2
+  99              		.thumb
+ 100              		.syntax unified
+ 101 0036 2846     		mov	r0, r5
+ 102 0038 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 103              		.size	tsk_create, .-tsk_create
+ 104              		.section	.text.tsk_start,"ax",%progbits
+ 105              		.align	1
+ 106              		.global	tsk_start
+ 107              		.syntax unified
+ 108              		.thumb
+ 109              		.thumb_func
+ 110              		.fpu fpv4-sp-d16
+ 111              		.type	tsk_start, %function
+ 112              	tsk_start:
+ 113              		@ args = 0, pretend = 0, frame = 0
+ 114              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 3
+
+
+ 115 0000 38B5     		push	{r3, r4, r5, lr}
+ 116 0002 0446     		mov	r4, r0
+ 117              		.syntax unified
+ 118              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 119 0004 EFF31085 		MRS r5, primask
+ 120              	@ 0 "" 2
+ 121              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 122 0008 72B6     		cpsid i
+ 123              	@ 0 "" 2
+ 124              		.thumb
+ 125              		.syntax unified
+ 126 000a 4368     		ldr	r3, [r0, #4]
+ 127 000c 23B9     		cbnz	r3, .L10
+ 128 000e FFF7FEFF 		bl	core_ctx_init
+ 129 0012 2046     		mov	r0, r4
+ 130 0014 FFF7FEFF 		bl	core_tsk_insert
+ 131              	.L10:
+ 132              		.syntax unified
+ 133              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 134 0018 85F31088 		MSR primask, r5
+ 135              	@ 0 "" 2
+ 136              		.thumb
+ 137              		.syntax unified
+ 138 001c 38BD     		pop	{r3, r4, r5, pc}
+ 139              		.size	tsk_start, .-tsk_start
+ 140              		.section	.text.tsk_startFrom,"ax",%progbits
+ 141              		.align	1
+ 142              		.global	tsk_startFrom
+ 143              		.syntax unified
+ 144              		.thumb
+ 145              		.thumb_func
+ 146              		.fpu fpv4-sp-d16
+ 147              		.type	tsk_startFrom, %function
+ 148              	tsk_startFrom:
+ 149              		@ args = 0, pretend = 0, frame = 0
+ 150              		@ frame_needed = 0, uses_anonymous_args = 0
+ 151 0000 38B5     		push	{r3, r4, r5, lr}
+ 152 0002 0446     		mov	r4, r0
+ 153              		.syntax unified
+ 154              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 155 0004 EFF31085 		MRS r5, primask
+ 156              	@ 0 "" 2
+ 157              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 158 0008 72B6     		cpsid i
+ 159              	@ 0 "" 2
+ 160              		.thumb
+ 161              		.syntax unified
+ 162 000a 4368     		ldr	r3, [r0, #4]
+ 163 000c 2BB9     		cbnz	r3, .L12
+ 164 000e 0161     		str	r1, [r0, #16]
+ 165 0010 FFF7FEFF 		bl	core_ctx_init
+ 166 0014 2046     		mov	r0, r4
+ 167 0016 FFF7FEFF 		bl	core_tsk_insert
+ 168              	.L12:
+ 169              		.syntax unified
+ 170              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 171 001a 85F31088 		MSR primask, r5
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 4
+
+
+ 172              	@ 0 "" 2
+ 173              		.thumb
+ 174              		.syntax unified
+ 175 001e 38BD     		pop	{r3, r4, r5, pc}
+ 176              		.size	tsk_startFrom, .-tsk_startFrom
+ 177              		.section	.text.tsk_stop,"ax",%progbits
+ 178              		.align	1
+ 179              		.global	tsk_stop
+ 180              		.syntax unified
+ 181              		.thumb
+ 182              		.thumb_func
+ 183              		.fpu fpv4-sp-d16
+ 184              		.type	tsk_stop, %function
+ 185              	tsk_stop:
+ 186              		@ Volatile: function does not return.
+ 187              		@ args = 0, pretend = 0, frame = 0
+ 188              		@ frame_needed = 0, uses_anonymous_args = 0
+ 189 0000 08B5     		push	{r3, lr}
+ 190              		.syntax unified
+ 191              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 192 0002 72B6     		cpsid i
+ 193              	@ 0 "" 2
+ 194              		.thumb
+ 195              		.syntax unified
+ 196 0004 094C     		ldr	r4, .L21
+ 197 0006 2546     		mov	r5, r4
+ 198              	.L14:
+ 199 0008 2068     		ldr	r0, [r4]
+ 200 000a 416B     		ldr	r1, [r0, #52]
+ 201 000c 49B9     		cbnz	r1, .L15
+ 202 000e 826B     		ldr	r2, [r0, #56]
+ 203 0010 0132     		adds	r2, r2, #1
+ 204 0012 02D0     		beq	.L16
+ 205 0014 3830     		adds	r0, r0, #56
+ 206 0016 FFF7FEFF 		bl	core_all_wakeup
+ 207              	.L16:
+ 208 001a 2868     		ldr	r0, [r5]
+ 209 001c FFF7FEFF 		bl	core_tsk_remove
+ 210              	.L17:
+ 211 0020 FEE7     		b	.L17
+ 212              	.L15:
+ 213 0022 0846     		mov	r0, r1
+ 214 0024 FFF7FEFF 		bl	mtx_kill
+ 215 0028 EEE7     		b	.L14
+ 216              	.L22:
+ 217 002a 00BF     		.align	2
+ 218              	.L21:
+ 219 002c 00000000 		.word	System
+ 220              		.size	tsk_stop, .-tsk_stop
+ 221              		.section	.text.tsk_kill,"ax",%progbits
+ 222              		.align	1
+ 223              		.global	tsk_kill
+ 224              		.syntax unified
+ 225              		.thumb
+ 226              		.thumb_func
+ 227              		.fpu fpv4-sp-d16
+ 228              		.type	tsk_kill, %function
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 5
+
+
+ 229              	tsk_kill:
+ 230              		@ args = 0, pretend = 0, frame = 0
+ 231              		@ frame_needed = 0, uses_anonymous_args = 0
+ 232 0000 38B5     		push	{r3, r4, r5, lr}
+ 233 0002 0446     		mov	r4, r0
+ 234              		.syntax unified
+ 235              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 236 0004 EFF31085 		MRS r5, primask
+ 237              	@ 0 "" 2
+ 238              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 239 0008 72B6     		cpsid i
+ 240              	@ 0 "" 2
+ 241              		.thumb
+ 242              		.syntax unified
+ 243              	.L24:
+ 244 000a 606B     		ldr	r0, [r4, #52]
+ 245 000c 88B9     		cbnz	r0, .L25
+ 246 000e A36B     		ldr	r3, [r4, #56]
+ 247 0010 0133     		adds	r3, r3, #1
+ 248 0012 05D0     		beq	.L26
+ 249 0014 4FF0FF31 		mov	r1, #-1
+ 250 0018 04F13800 		add	r0, r4, #56
+ 251 001c FFF7FEFF 		bl	core_all_wakeup
+ 252              	.L26:
+ 253 0020 6368     		ldr	r3, [r4, #4]
+ 254 0022 012B     		cmp	r3, #1
+ 255 0024 08D1     		bne	.L27
+ 256 0026 2046     		mov	r0, r4
+ 257 0028 FFF7FEFF 		bl	core_tsk_remove
+ 258              	.L28:
+ 259              		.syntax unified
+ 260              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 261 002c 85F31088 		MSR primask, r5
+ 262              	@ 0 "" 2
+ 263              		.thumb
+ 264              		.syntax unified
+ 265 0030 38BD     		pop	{r3, r4, r5, pc}
+ 266              	.L25:
+ 267 0032 FFF7FEFF 		bl	mtx_kill
+ 268 0036 E8E7     		b	.L24
+ 269              	.L27:
+ 270 0038 022B     		cmp	r3, #2
+ 271 003a F7D1     		bne	.L28
+ 272 003c 2046     		mov	r0, r4
+ 273 003e 4FF0FF31 		mov	r1, #-1
+ 274 0042 FFF7FEFF 		bl	core_tsk_unlink
+ 275 0046 2046     		mov	r0, r4
+ 276 0048 FFF7FEFF 		bl	core_tmr_remove
+ 277 004c EEE7     		b	.L28
+ 278              		.size	tsk_kill, .-tsk_kill
+ 279              		.section	.text.tsk_detach,"ax",%progbits
+ 280              		.align	1
+ 281              		.global	tsk_detach
+ 282              		.syntax unified
+ 283              		.thumb
+ 284              		.thumb_func
+ 285              		.fpu fpv4-sp-d16
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 6
+
+
+ 286              		.type	tsk_detach, %function
+ 287              	tsk_detach:
+ 288              		@ args = 0, pretend = 0, frame = 0
+ 289              		@ frame_needed = 0, uses_anonymous_args = 0
+ 290 0000 38B5     		push	{r3, r4, r5, lr}
+ 291 0002 0446     		mov	r4, r0
+ 292              		.syntax unified
+ 293              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 294 0004 EFF31085 		MRS r5, primask
+ 295              	@ 0 "" 2
+ 296              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 297 0008 72B6     		cpsid i
+ 298              	@ 0 "" 2
+ 299              		.thumb
+ 300              		.syntax unified
+ 301 000a 836B     		ldr	r3, [r0, #56]
+ 302 000c 0133     		adds	r3, r3, #1
+ 303 000e 09D0     		beq	.L33
+ 304 0010 4368     		ldr	r3, [r0, #4]
+ 305 0012 3BB1     		cbz	r3, .L33
+ 306 0014 6FF00101 		mvn	r1, #1
+ 307 0018 3830     		adds	r0, r0, #56
+ 308 001a FFF7FEFF 		bl	core_all_wakeup
+ 309 001e 4FF0FF33 		mov	r3, #-1
+ 310 0022 A363     		str	r3, [r4, #56]
+ 311              	.L33:
+ 312              		.syntax unified
+ 313              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 314 0024 85F31088 		MSR primask, r5
+ 315              	@ 0 "" 2
+ 316              		.thumb
+ 317              		.syntax unified
+ 318 0028 38BD     		pop	{r3, r4, r5, pc}
+ 319              		.size	tsk_detach, .-tsk_detach
+ 320              		.section	.text.tsk_join,"ax",%progbits
+ 321              		.align	1
+ 322              		.global	tsk_join
+ 323              		.syntax unified
+ 324              		.thumb
+ 325              		.thumb_func
+ 326              		.fpu fpv4-sp-d16
+ 327              		.type	tsk_join, %function
+ 328              	tsk_join:
+ 329              		@ args = 0, pretend = 0, frame = 0
+ 330              		@ frame_needed = 0, uses_anonymous_args = 0
+ 331 0000 10B5     		push	{r4, lr}
+ 332 0002 0346     		mov	r3, r0
+ 333              		.syntax unified
+ 334              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 335 0004 EFF31084 		MRS r4, primask
+ 336              	@ 0 "" 2
+ 337              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 338 0008 72B6     		cpsid i
+ 339              	@ 0 "" 2
+ 340              		.thumb
+ 341              		.syntax unified
+ 342 000a 826B     		ldr	r2, [r0, #56]
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 7
+
+
+ 343 000c 0132     		adds	r2, r2, #1
+ 344 000e 0AD0     		beq	.L42
+ 345 0010 4068     		ldr	r0, [r0, #4]
+ 346 0012 28B1     		cbz	r0, .L41
+ 347 0014 4FF0FF31 		mov	r1, #-1
+ 348 0018 03F13800 		add	r0, r3, #56
+ 349 001c FFF7FEFF 		bl	core_tsk_waitFor
+ 350              	.L41:
+ 351              		.syntax unified
+ 352              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 353 0020 84F31088 		MSR primask, r4
+ 354              	@ 0 "" 2
+ 355              		.thumb
+ 356              		.syntax unified
+ 357 0024 10BD     		pop	{r4, pc}
+ 358              	.L42:
+ 359 0026 6FF00100 		mvn	r0, #1
+ 360 002a F9E7     		b	.L41
+ 361              		.size	tsk_join, .-tsk_join
+ 362              		.section	.text.tsk_yield,"ax",%progbits
+ 363              		.align	1
+ 364              		.global	tsk_yield
+ 365              		.syntax unified
+ 366              		.thumb
+ 367              		.thumb_func
+ 368              		.fpu fpv4-sp-d16
+ 369              		.type	tsk_yield, %function
+ 370              	tsk_yield:
+ 371              		@ args = 0, pretend = 0, frame = 0
+ 372              		@ frame_needed = 0, uses_anonymous_args = 0
+ 373 0000 10B5     		push	{r4, lr}
+ 374              		.syntax unified
+ 375              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 376 0002 EFF31084 		MRS r4, primask
+ 377              	@ 0 "" 2
+ 378              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 379 0006 72B6     		cpsid i
+ 380              	@ 0 "" 2
+ 381              		.thumb
+ 382              		.syntax unified
+ 383 0008 FFF7FEFF 		bl	core_ctx_switch
+ 384              		.syntax unified
+ 385              	@ 117 "CMSIS/include/cmsis_gcc.h" 1
+ 386 000c 62B6     		cpsie i
+ 387              	@ 0 "" 2
+ 388              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 389 000e 84F31088 		MSR primask, r4
+ 390              	@ 0 "" 2
+ 391              		.thumb
+ 392              		.syntax unified
+ 393 0012 10BD     		pop	{r4, pc}
+ 394              		.size	tsk_yield, .-tsk_yield
+ 395              		.section	.text.tsk_flip,"ax",%progbits
+ 396              		.align	1
+ 397              		.global	tsk_flip
+ 398              		.syntax unified
+ 399              		.thumb
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 8
+
+
+ 400              		.thumb_func
+ 401              		.fpu fpv4-sp-d16
+ 402              		.type	tsk_flip, %function
+ 403              	tsk_flip:
+ 404              		@ Volatile: function does not return.
+ 405              		@ args = 0, pretend = 0, frame = 0
+ 406              		@ frame_needed = 0, uses_anonymous_args = 0
+ 407 0000 08B5     		push	{r3, lr}
+ 408 0002 0446     		mov	r4, r0
+ 409              		.syntax unified
+ 410              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 411 0004 72B6     		cpsid i
+ 412              	@ 0 "" 2
+ 413              		.thumb
+ 414              		.syntax unified
+ 415 0006 FFF7FEFF 		bl	core_ctx_switch
+ 416 000a 034B     		ldr	r3, .L48
+ 417 000c 1B68     		ldr	r3, [r3]
+ 418 000e 1C61     		str	r4, [r3, #16]
+ 419 0010 586A     		ldr	r0, [r3, #36]
+ 420 0012 FFF7FEFF 		bl	core_tsk_flip
+ 421              	.L49:
+ 422 0016 00BF     		.align	2
+ 423              	.L48:
+ 424 0018 00000000 		.word	System
+ 425              		.size	tsk_flip, .-tsk_flip
+ 426              		.section	.text.tsk_prio,"ax",%progbits
+ 427              		.align	1
+ 428              		.global	tsk_prio
+ 429              		.syntax unified
+ 430              		.thumb
+ 431              		.thumb_func
+ 432              		.fpu fpv4-sp-d16
+ 433              		.type	tsk_prio, %function
+ 434              	tsk_prio:
+ 435              		@ args = 0, pretend = 0, frame = 0
+ 436              		@ frame_needed = 0, uses_anonymous_args = 0
+ 437 0000 10B5     		push	{r4, lr}
+ 438 0002 0146     		mov	r1, r0
+ 439              		.syntax unified
+ 440              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 441 0004 EFF31084 		MRS r4, primask
+ 442              	@ 0 "" 2
+ 443              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 444 0008 72B6     		cpsid i
+ 445              	@ 0 "" 2
+ 446              		.thumb
+ 447              		.syntax unified
+ 448 000a 044B     		ldr	r3, .L51
+ 449 000c 1868     		ldr	r0, [r3]
+ 450 000e 8162     		str	r1, [r0, #40]
+ 451 0010 FFF7FEFF 		bl	core_tsk_prio
+ 452              		.syntax unified
+ 453              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 454 0014 84F31088 		MSR primask, r4
+ 455              	@ 0 "" 2
+ 456              		.thumb
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 9
+
+
+ 457              		.syntax unified
+ 458 0018 10BD     		pop	{r4, pc}
+ 459              	.L52:
+ 460 001a 00BF     		.align	2
+ 461              	.L51:
+ 462 001c 00000000 		.word	System
+ 463              		.size	tsk_prio, .-tsk_prio
+ 464              		.section	.text.tsk_waitUntil,"ax",%progbits
+ 465              		.align	1
+ 466              		.global	tsk_waitUntil
+ 467              		.syntax unified
+ 468              		.thumb
+ 469              		.thumb_func
+ 470              		.fpu fpv4-sp-d16
+ 471              		.type	tsk_waitUntil, %function
+ 472              	tsk_waitUntil:
+ 473              		@ args = 0, pretend = 0, frame = 0
+ 474              		@ frame_needed = 0, uses_anonymous_args = 0
+ 475 0000 10B5     		push	{r4, lr}
+ 476              		.syntax unified
+ 477              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 478 0002 EFF31084 		MRS r4, primask
+ 479              	@ 0 "" 2
+ 480              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 481 0006 72B6     		cpsid i
+ 482              	@ 0 "" 2
+ 483              		.thumb
+ 484              		.syntax unified
+ 485 0008 044B     		ldr	r3, .L54
+ 486 000a 1B68     		ldr	r3, [r3]
+ 487 000c 1864     		str	r0, [r3, #64]
+ 488 000e 1846     		mov	r0, r3
+ 489 0010 FFF7FEFF 		bl	core_tsk_waitUntil
+ 490              		.syntax unified
+ 491              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 492 0014 84F31088 		MSR primask, r4
+ 493              	@ 0 "" 2
+ 494              		.thumb
+ 495              		.syntax unified
+ 496 0018 10BD     		pop	{r4, pc}
+ 497              	.L55:
+ 498 001a 00BF     		.align	2
+ 499              	.L54:
+ 500 001c 00000000 		.word	System
+ 501              		.size	tsk_waitUntil, .-tsk_waitUntil
+ 502              		.section	.text.tsk_waitFor,"ax",%progbits
+ 503              		.align	1
+ 504              		.global	tsk_waitFor
+ 505              		.syntax unified
+ 506              		.thumb
+ 507              		.thumb_func
+ 508              		.fpu fpv4-sp-d16
+ 509              		.type	tsk_waitFor, %function
+ 510              	tsk_waitFor:
+ 511              		@ args = 0, pretend = 0, frame = 0
+ 512              		@ frame_needed = 0, uses_anonymous_args = 0
+ 513 0000 10B5     		push	{r4, lr}
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 10
+
+
+ 514              		.syntax unified
+ 515              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 516 0002 EFF31084 		MRS r4, primask
+ 517              	@ 0 "" 2
+ 518              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 519 0006 72B6     		cpsid i
+ 520              	@ 0 "" 2
+ 521              		.thumb
+ 522              		.syntax unified
+ 523 0008 044B     		ldr	r3, .L57
+ 524 000a 1B68     		ldr	r3, [r3]
+ 525 000c 1864     		str	r0, [r3, #64]
+ 526 000e 1846     		mov	r0, r3
+ 527 0010 FFF7FEFF 		bl	core_tsk_waitFor
+ 528              		.syntax unified
+ 529              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 530 0014 84F31088 		MSR primask, r4
+ 531              	@ 0 "" 2
+ 532              		.thumb
+ 533              		.syntax unified
+ 534 0018 10BD     		pop	{r4, pc}
+ 535              	.L58:
+ 536 001a 00BF     		.align	2
+ 537              	.L57:
+ 538 001c 00000000 		.word	System
+ 539              		.size	tsk_waitFor, .-tsk_waitFor
+ 540              		.section	.text.tsk_give,"ax",%progbits
+ 541              		.align	1
+ 542              		.global	tsk_give
+ 543              		.syntax unified
+ 544              		.thumb
+ 545              		.thumb_func
+ 546              		.fpu fpv4-sp-d16
+ 547              		.type	tsk_give, %function
+ 548              	tsk_give:
+ 549              		@ args = 0, pretend = 0, frame = 0
+ 550              		@ frame_needed = 0, uses_anonymous_args = 0
+ 551 0000 38B5     		push	{r3, r4, r5, lr}
+ 552              		.syntax unified
+ 553              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 554 0002 EFF31084 		MRS r4, primask
+ 555              	@ 0 "" 2
+ 556              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 557 0006 72B6     		cpsid i
+ 558              	@ 0 "" 2
+ 559              		.thumb
+ 560              		.syntax unified
+ 561 0008 4268     		ldr	r2, [r0, #4]
+ 562 000a 022A     		cmp	r2, #2
+ 563 000c 09D1     		bne	.L61
+ 564 000e 026B     		ldr	r2, [r0, #48]
+ 565 0010 9042     		cmp	r0, r2
+ 566 0012 06D1     		bne	.L61
+ 567 0014 026C     		ldr	r2, [r0, #64]
+ 568 0016 22EA0102 		bic	r2, r2, r1
+ 569 001a 0264     		str	r2, [r0, #64]
+ 570 001c 0AB9     		cbnz	r2, .L61
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 11
+
+
+ 571 001e FFF7FEFF 		bl	core_tsk_wakeup
+ 572              	.L61:
+ 573              		.syntax unified
+ 574              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 575 0022 84F31088 		MSR primask, r4
+ 576              	@ 0 "" 2
+ 577              		.thumb
+ 578              		.syntax unified
+ 579 0026 38BD     		pop	{r3, r4, r5, pc}
+ 580              		.size	tsk_give, .-tsk_give
+ 581              		.section	.text.tsk_resume,"ax",%progbits
+ 582              		.align	1
+ 583              		.global	tsk_resume
+ 584              		.syntax unified
+ 585              		.thumb
+ 586              		.thumb_func
+ 587              		.fpu fpv4-sp-d16
+ 588              		.type	tsk_resume, %function
+ 589              	tsk_resume:
+ 590              		@ args = 0, pretend = 0, frame = 0
+ 591              		@ frame_needed = 0, uses_anonymous_args = 0
+ 592 0000 10B5     		push	{r4, lr}
+ 593              		.syntax unified
+ 594              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 595 0002 EFF31084 		MRS r4, primask
+ 596              	@ 0 "" 2
+ 597              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 598 0006 72B6     		cpsid i
+ 599              	@ 0 "" 2
+ 600              		.thumb
+ 601              		.syntax unified
+ 602 0008 4268     		ldr	r2, [r0, #4]
+ 603 000a 022A     		cmp	r2, #2
+ 604 000c 05D1     		bne	.L64
+ 605 000e 026B     		ldr	r2, [r0, #48]
+ 606 0010 034B     		ldr	r3, .L65
+ 607 0012 9A42     		cmp	r2, r3
+ 608 0014 01D1     		bne	.L64
+ 609 0016 FFF7FEFF 		bl	core_tsk_wakeup
+ 610              	.L64:
+ 611              		.syntax unified
+ 612              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 613 001a 84F31088 		MSR primask, r4
+ 614              	@ 0 "" 2
+ 615              		.thumb
+ 616              		.syntax unified
+ 617 001e 10BD     		pop	{r4, pc}
+ 618              	.L66:
+ 619              		.align	2
+ 620              	.L65:
+ 621 0020 00000000 		.word	WAIT
+ 622              		.size	tsk_resume, .-tsk_resume
+ 623              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 6.2.1 20161205 (release) [ARM/embedded-6-bran
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 12
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 os_tsk.c
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:13     .text.tsk_init:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:20     .text.tsk_init:00000000 tsk_init
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:57     .text.tsk_create:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:64     .text.tsk_create:00000000 tsk_create
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:105    .text.tsk_start:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:112    .text.tsk_start:00000000 tsk_start
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:141    .text.tsk_startFrom:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:148    .text.tsk_startFrom:00000000 tsk_startFrom
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:178    .text.tsk_stop:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:185    .text.tsk_stop:00000000 tsk_stop
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:219    .text.tsk_stop:0000002c $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:222    .text.tsk_kill:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:229    .text.tsk_kill:00000000 tsk_kill
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:280    .text.tsk_detach:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:287    .text.tsk_detach:00000000 tsk_detach
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:321    .text.tsk_join:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:328    .text.tsk_join:00000000 tsk_join
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:363    .text.tsk_yield:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:370    .text.tsk_yield:00000000 tsk_yield
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:396    .text.tsk_flip:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:403    .text.tsk_flip:00000000 tsk_flip
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:424    .text.tsk_flip:00000018 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:427    .text.tsk_prio:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:434    .text.tsk_prio:00000000 tsk_prio
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:462    .text.tsk_prio:0000001c $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:465    .text.tsk_waitUntil:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:472    .text.tsk_waitUntil:00000000 tsk_waitUntil
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:500    .text.tsk_waitUntil:0000001c $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:503    .text.tsk_waitFor:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:510    .text.tsk_waitFor:00000000 tsk_waitFor
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:538    .text.tsk_waitFor:0000001c $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:541    .text.tsk_give:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:548    .text.tsk_give:00000000 tsk_give
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:582    .text.tsk_resume:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:589    .text.tsk_resume:00000000 tsk_resume
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s:621    .text.tsk_resume:00000020 $d
+
+UNDEFINED SYMBOLS
+memset
+core_ctx_init
+core_tsk_insert
+core_sys_alloc
+core_all_wakeup
+core_tsk_remove
+mtx_kill
+System
+core_tsk_unlink
+core_tmr_remove
+core_tsk_waitFor
+core_ctx_switch
+core_tsk_flip
+core_tsk_prio
+core_tsk_waitUntil
+core_tsk_wakeup
+WAIT
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJnZTsf.s 			page 13
+
+

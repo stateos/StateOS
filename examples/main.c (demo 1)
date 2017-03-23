@@ -25,8 +25,8 @@ void proc()
 
 int main()
 {
-    LED_Config();
-    GRN_Config();
+    LED_Init();
+    GRN_Init();
 	
 	tsk_start(TSK_CREATE(0, proc));
 	tsk_start(TSK_CREATE(0, proc));

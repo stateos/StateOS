@@ -1,0 +1,554 @@
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 23, 1
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 4
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"startup.c"
+  12              		.section	.text.Fault_Handler,"ax",%progbits
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu fpv4-sp-d16
+  18              		.type	Fault_Handler, %function
+  19              	Fault_Handler:
+  20              		@ Volatile: function does not return.
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23              		@ link register save eliminated.
+  24              	.L2:
+  25 0000 FEE7     		b	.L2
+  26              		.size	Fault_Handler, .-Fault_Handler
+  27              		.weak	FMPI2C1_ER_IRQHandler
+  28              		.thumb_set FMPI2C1_ER_IRQHandler,Fault_Handler
+  29              		.weak	FMPI2C1_EV_IRQHandler
+  30              		.thumb_set FMPI2C1_EV_IRQHandler,Fault_Handler
+  31              		.weak	SPDIF_RX_IRQHandler
+  32              		.thumb_set SPDIF_RX_IRQHandler,Fault_Handler
+  33              		.weak	CEC_IRQHandler
+  34              		.thumb_set CEC_IRQHandler,Fault_Handler
+  35              		.weak	QUADSPI_IRQHandler
+  36              		.thumb_set QUADSPI_IRQHandler,Fault_Handler
+  37              		.weak	SAI2_IRQHandler
+  38              		.thumb_set SAI2_IRQHandler,Fault_Handler
+  39              		.weak	DMA2D_IRQHandler
+  40              		.thumb_set DMA2D_IRQHandler,Fault_Handler
+  41              		.weak	LTDC_ER_IRQHandler
+  42              		.thumb_set LTDC_ER_IRQHandler,Fault_Handler
+  43              		.weak	LTDC_IRQHandler
+  44              		.thumb_set LTDC_IRQHandler,Fault_Handler
+  45              		.weak	SAI1_IRQHandler
+  46              		.thumb_set SAI1_IRQHandler,Fault_Handler
+  47              		.weak	SPI6_IRQHandler
+  48              		.thumb_set SPI6_IRQHandler,Fault_Handler
+  49              		.weak	SPI5_IRQHandler
+  50              		.thumb_set SPI5_IRQHandler,Fault_Handler
+  51              		.weak	SPI4_IRQHandler
+  52              		.thumb_set SPI4_IRQHandler,Fault_Handler
+  53              		.weak	UART8_IRQHandler
+  54              		.thumb_set UART8_IRQHandler,Fault_Handler
+  55              		.weak	UART7_IRQHandler
+  56              		.thumb_set UART7_IRQHandler,Fault_Handler
+  57              		.weak	FPU_IRQHandler
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s 			page 2
+
+
+  58              		.thumb_set FPU_IRQHandler,Fault_Handler
+  59              		.weak	HASH_RNG_IRQHandler
+  60              		.thumb_set HASH_RNG_IRQHandler,Fault_Handler
+  61              		.weak	CRYP_IRQHandler
+  62              		.thumb_set CRYP_IRQHandler,Fault_Handler
+  63              		.weak	DCMI_IRQHandler
+  64              		.thumb_set DCMI_IRQHandler,Fault_Handler
+  65              		.weak	OTG_HS_IRQHandler
+  66              		.thumb_set OTG_HS_IRQHandler,Fault_Handler
+  67              		.weak	OTG_HS_WKUP_IRQHandler
+  68              		.thumb_set OTG_HS_WKUP_IRQHandler,Fault_Handler
+  69              		.weak	OTG_HS_EP1_IN_IRQHandler
+  70              		.thumb_set OTG_HS_EP1_IN_IRQHandler,Fault_Handler
+  71              		.weak	OTG_HS_EP1_OUT_IRQHandler
+  72              		.thumb_set OTG_HS_EP1_OUT_IRQHandler,Fault_Handler
+  73              		.weak	I2C3_ER_IRQHandler
+  74              		.thumb_set I2C3_ER_IRQHandler,Fault_Handler
+  75              		.weak	I2C3_EV_IRQHandler
+  76              		.thumb_set I2C3_EV_IRQHandler,Fault_Handler
+  77              		.weak	USART6_IRQHandler
+  78              		.thumb_set USART6_IRQHandler,Fault_Handler
+  79              		.weak	DMA2_Stream7_IRQHandler
+  80              		.thumb_set DMA2_Stream7_IRQHandler,Fault_Handler
+  81              		.weak	DMA2_Stream6_IRQHandler
+  82              		.thumb_set DMA2_Stream6_IRQHandler,Fault_Handler
+  83              		.weak	DMA2_Stream5_IRQHandler
+  84              		.thumb_set DMA2_Stream5_IRQHandler,Fault_Handler
+  85              		.weak	OTG_FS_IRQHandler
+  86              		.thumb_set OTG_FS_IRQHandler,Fault_Handler
+  87              		.weak	CAN2_SCE_IRQHandler
+  88              		.thumb_set CAN2_SCE_IRQHandler,Fault_Handler
+  89              		.weak	CAN2_RX1_IRQHandler
+  90              		.thumb_set CAN2_RX1_IRQHandler,Fault_Handler
+  91              		.weak	CAN2_RX0_IRQHandler
+  92              		.thumb_set CAN2_RX0_IRQHandler,Fault_Handler
+  93              		.weak	CAN2_TX_IRQHandler
+  94              		.thumb_set CAN2_TX_IRQHandler,Fault_Handler
+  95              		.weak	ETH_WKUP_IRQHandler
+  96              		.thumb_set ETH_WKUP_IRQHandler,Fault_Handler
+  97              		.weak	ETH_IRQHandler
+  98              		.thumb_set ETH_IRQHandler,Fault_Handler
+  99              		.weak	DMA2_Stream4_IRQHandler
+ 100              		.thumb_set DMA2_Stream4_IRQHandler,Fault_Handler
+ 101              		.weak	DMA2_Stream3_IRQHandler
+ 102              		.thumb_set DMA2_Stream3_IRQHandler,Fault_Handler
+ 103              		.weak	DMA2_Stream2_IRQHandler
+ 104              		.thumb_set DMA2_Stream2_IRQHandler,Fault_Handler
+ 105              		.weak	DMA2_Stream1_IRQHandler
+ 106              		.thumb_set DMA2_Stream1_IRQHandler,Fault_Handler
+ 107              		.weak	DMA2_Stream0_IRQHandler
+ 108              		.thumb_set DMA2_Stream0_IRQHandler,Fault_Handler
+ 109              		.weak	TIM7_IRQHandler
+ 110              		.thumb_set TIM7_IRQHandler,Fault_Handler
+ 111              		.weak	TIM6_DAC_IRQHandler
+ 112              		.thumb_set TIM6_DAC_IRQHandler,Fault_Handler
+ 113              		.weak	UART5_IRQHandler
+ 114              		.thumb_set UART5_IRQHandler,Fault_Handler
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s 			page 3
+
+
+ 115              		.weak	UART4_IRQHandler
+ 116              		.thumb_set UART4_IRQHandler,Fault_Handler
+ 117              		.weak	SPI3_IRQHandler
+ 118              		.thumb_set SPI3_IRQHandler,Fault_Handler
+ 119              		.weak	TIM5_IRQHandler
+ 120              		.thumb_set TIM5_IRQHandler,Fault_Handler
+ 121              		.weak	SDIO_IRQHandler
+ 122              		.thumb_set SDIO_IRQHandler,Fault_Handler
+ 123              		.weak	FSMC_IRQHandler
+ 124              		.thumb_set FSMC_IRQHandler,Fault_Handler
+ 125              		.weak	DMA1_Stream7_IRQHandler
+ 126              		.thumb_set DMA1_Stream7_IRQHandler,Fault_Handler
+ 127              		.weak	TIM8_CC_IRQHandler
+ 128              		.thumb_set TIM8_CC_IRQHandler,Fault_Handler
+ 129              		.weak	TIM8_TRG_COM_TIM14_IRQHandler
+ 130              		.thumb_set TIM8_TRG_COM_TIM14_IRQHandler,Fault_Handler
+ 131              		.weak	TIM8_UP_TIM13_IRQHandler
+ 132              		.thumb_set TIM8_UP_TIM13_IRQHandler,Fault_Handler
+ 133              		.weak	TIM8_BRK_TIM12_IRQHandler
+ 134              		.thumb_set TIM8_BRK_TIM12_IRQHandler,Fault_Handler
+ 135              		.weak	OTG_FS_WKUP_IRQHandler
+ 136              		.thumb_set OTG_FS_WKUP_IRQHandler,Fault_Handler
+ 137              		.weak	RTC_Alarm_IRQHandler
+ 138              		.thumb_set RTC_Alarm_IRQHandler,Fault_Handler
+ 139              		.weak	EXTI15_10_IRQHandler
+ 140              		.thumb_set EXTI15_10_IRQHandler,Fault_Handler
+ 141              		.weak	USART3_IRQHandler
+ 142              		.thumb_set USART3_IRQHandler,Fault_Handler
+ 143              		.weak	USART2_IRQHandler
+ 144              		.thumb_set USART2_IRQHandler,Fault_Handler
+ 145              		.weak	USART1_IRQHandler
+ 146              		.thumb_set USART1_IRQHandler,Fault_Handler
+ 147              		.weak	SPI2_IRQHandler
+ 148              		.thumb_set SPI2_IRQHandler,Fault_Handler
+ 149              		.weak	SPI1_IRQHandler
+ 150              		.thumb_set SPI1_IRQHandler,Fault_Handler
+ 151              		.weak	I2C2_ER_IRQHandler
+ 152              		.thumb_set I2C2_ER_IRQHandler,Fault_Handler
+ 153              		.weak	I2C2_EV_IRQHandler
+ 154              		.thumb_set I2C2_EV_IRQHandler,Fault_Handler
+ 155              		.weak	I2C1_ER_IRQHandler
+ 156              		.thumb_set I2C1_ER_IRQHandler,Fault_Handler
+ 157              		.weak	I2C1_EV_IRQHandler
+ 158              		.thumb_set I2C1_EV_IRQHandler,Fault_Handler
+ 159              		.weak	TIM4_IRQHandler
+ 160              		.thumb_set TIM4_IRQHandler,Fault_Handler
+ 161              		.weak	TIM3_IRQHandler
+ 162              		.thumb_set TIM3_IRQHandler,Fault_Handler
+ 163              		.weak	TIM2_IRQHandler
+ 164              		.thumb_set TIM2_IRQHandler,Fault_Handler
+ 165              		.weak	TIM1_CC_IRQHandler
+ 166              		.thumb_set TIM1_CC_IRQHandler,Fault_Handler
+ 167              		.weak	TIM1_TRG_COM_TIM11_IRQHandler
+ 168              		.thumb_set TIM1_TRG_COM_TIM11_IRQHandler,Fault_Handler
+ 169              		.weak	TIM1_UP_TIM10_IRQHandler
+ 170              		.thumb_set TIM1_UP_TIM10_IRQHandler,Fault_Handler
+ 171              		.weak	TIM1_BRK_TIM9_IRQHandler
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s 			page 4
+
+
+ 172              		.thumb_set TIM1_BRK_TIM9_IRQHandler,Fault_Handler
+ 173              		.weak	EXTI9_5_IRQHandler
+ 174              		.thumb_set EXTI9_5_IRQHandler,Fault_Handler
+ 175              		.weak	CAN1_SCE_IRQHandler
+ 176              		.thumb_set CAN1_SCE_IRQHandler,Fault_Handler
+ 177              		.weak	CAN1_RX1_IRQHandler
+ 178              		.thumb_set CAN1_RX1_IRQHandler,Fault_Handler
+ 179              		.weak	CAN1_RX0_IRQHandler
+ 180              		.thumb_set CAN1_RX0_IRQHandler,Fault_Handler
+ 181              		.weak	CAN1_TX_IRQHandler
+ 182              		.thumb_set CAN1_TX_IRQHandler,Fault_Handler
+ 183              		.weak	ADC_IRQHandler
+ 184              		.thumb_set ADC_IRQHandler,Fault_Handler
+ 185              		.weak	DMA1_Stream6_IRQHandler
+ 186              		.thumb_set DMA1_Stream6_IRQHandler,Fault_Handler
+ 187              		.weak	DMA1_Stream5_IRQHandler
+ 188              		.thumb_set DMA1_Stream5_IRQHandler,Fault_Handler
+ 189              		.weak	DMA1_Stream4_IRQHandler
+ 190              		.thumb_set DMA1_Stream4_IRQHandler,Fault_Handler
+ 191              		.weak	DMA1_Stream3_IRQHandler
+ 192              		.thumb_set DMA1_Stream3_IRQHandler,Fault_Handler
+ 193              		.weak	DMA1_Stream2_IRQHandler
+ 194              		.thumb_set DMA1_Stream2_IRQHandler,Fault_Handler
+ 195              		.weak	DMA1_Stream1_IRQHandler
+ 196              		.thumb_set DMA1_Stream1_IRQHandler,Fault_Handler
+ 197              		.weak	DMA1_Stream0_IRQHandler
+ 198              		.thumb_set DMA1_Stream0_IRQHandler,Fault_Handler
+ 199              		.weak	EXTI4_IRQHandler
+ 200              		.thumb_set EXTI4_IRQHandler,Fault_Handler
+ 201              		.weak	EXTI3_IRQHandler
+ 202              		.thumb_set EXTI3_IRQHandler,Fault_Handler
+ 203              		.weak	EXTI2_IRQHandler
+ 204              		.thumb_set EXTI2_IRQHandler,Fault_Handler
+ 205              		.weak	EXTI1_IRQHandler
+ 206              		.thumb_set EXTI1_IRQHandler,Fault_Handler
+ 207              		.weak	EXTI0_IRQHandler
+ 208              		.thumb_set EXTI0_IRQHandler,Fault_Handler
+ 209              		.weak	RCC_IRQHandler
+ 210              		.thumb_set RCC_IRQHandler,Fault_Handler
+ 211              		.weak	FLASH_IRQHandler
+ 212              		.thumb_set FLASH_IRQHandler,Fault_Handler
+ 213              		.weak	RTC_WKUP_IRQHandler
+ 214              		.thumb_set RTC_WKUP_IRQHandler,Fault_Handler
+ 215              		.weak	TAMP_STAMP_IRQHandler
+ 216              		.thumb_set TAMP_STAMP_IRQHandler,Fault_Handler
+ 217              		.weak	PVD_IRQHandler
+ 218              		.thumb_set PVD_IRQHandler,Fault_Handler
+ 219              		.weak	WWDG_IRQHandler
+ 220              		.thumb_set WWDG_IRQHandler,Fault_Handler
+ 221              		.weak	SysTick_Handler
+ 222              		.thumb_set SysTick_Handler,Fault_Handler
+ 223              		.weak	PendSV_Handler
+ 224              		.thumb_set PendSV_Handler,Fault_Handler
+ 225              		.weak	DebugMon_Handler
+ 226              		.thumb_set DebugMon_Handler,Fault_Handler
+ 227              		.weak	SVC_Handler
+ 228              		.thumb_set SVC_Handler,Fault_Handler
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s 			page 5
+
+
+ 229              		.weak	UsageFault_Handler
+ 230              		.thumb_set UsageFault_Handler,Fault_Handler
+ 231              		.weak	BusFault_Handler
+ 232              		.thumb_set BusFault_Handler,Fault_Handler
+ 233              		.weak	MemManage_Handler
+ 234              		.thumb_set MemManage_Handler,Fault_Handler
+ 235              		.weak	HardFault_Handler
+ 236              		.thumb_set HardFault_Handler,Fault_Handler
+ 237              		.weak	NMI_Handler
+ 238              		.thumb_set NMI_Handler,Fault_Handler
+ 239              		.weak	_exit
+ 240              		.thumb_set _exit,Fault_Handler
+ 241              		.section	.text.Reset_Handler,"ax",%progbits
+ 242              		.align	1
+ 243              		.weak	Reset_Handler
+ 244              		.syntax unified
+ 245              		.thumb
+ 246              		.thumb_func
+ 247              		.fpu fpv4-sp-d16
+ 248              		.type	Reset_Handler, %function
+ 249              	Reset_Handler:
+ 250              		@ Volatile: function does not return.
+ 251              		@ args = 0, pretend = 0, frame = 0
+ 252              		@ frame_needed = 0, uses_anonymous_args = 0
+ 253 0000 08B5     		push	{r3, lr}
+ 254 0002 104B     		ldr	r3, .L9
+ 255 0004 4FF47002 		mov	r2, #15728640
+ 256 0008 C3F88820 		str	r2, [r3, #136]
+ 257 000c FFF7FEFF 		bl	SystemInit
+ 258 0010 0D4A     		ldr	r2, .L9+4
+ 259 0012 0E4B     		ldr	r3, .L9+8
+ 260 0014 0E49     		ldr	r1, .L9+12
+ 261              	.L4:
+ 262 0016 8B42     		cmp	r3, r1
+ 263 0018 0BD3     		bcc	.L5
+ 264 001a 0E4B     		ldr	r3, .L9+16
+ 265 001c 0E4A     		ldr	r2, .L9+20
+ 266 001e 0021     		movs	r1, #0
+ 267              	.L6:
+ 268 0020 9342     		cmp	r3, r2
+ 269 0022 0BD3     		bcc	.L7
+ 270 0024 FFF7FEFF 		bl	__libc_init_array
+ 271 0028 FFF7FEFF 		bl	main
+ 272 002c FFF7FEFF 		bl	__libc_fini_array
+ 273              	.L8:
+ 274 0030 FEE7     		b	.L8
+ 275              	.L5:
+ 276 0032 52F8040F 		ldr	r0, [r2, #4]!
+ 277 0036 43F8040B 		str	r0, [r3], #4
+ 278 003a ECE7     		b	.L4
+ 279              	.L7:
+ 280 003c 43F8041B 		str	r1, [r3], #4
+ 281 0040 EEE7     		b	.L6
+ 282              	.L10:
+ 283 0042 00BF     		.align	2
+ 284              	.L9:
+ 285 0044 00ED00E0 		.word	-536810240
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s 			page 6
+
+
+ 286 0048 FCFFFFFF 		.word	__data_init_start-4
+ 287 004c 00000000 		.word	__data_start
+ 288 0050 00000000 		.word	__data_end
+ 289 0054 00000000 		.word	__bss_start
+ 290 0058 00000000 		.word	__bss_end
+ 291              		.size	Reset_Handler, .-Reset_Handler
+ 292              		.global	vectors
+ 293              		.section	.vectors,"a",%progbits
+ 294              		.align	2
+ 295              		.type	vectors, %object
+ 296              		.size	vectors, 392
+ 297              	vectors:
+ 298 0000 00000000 		.word	__initial_msp
+ 299 0004 00000000 		.word	Reset_Handler
+ 300 0008 00000000 		.word	NMI_Handler
+ 301 000c 00000000 		.word	HardFault_Handler
+ 302 0010 00000000 		.word	MemManage_Handler
+ 303 0014 00000000 		.word	BusFault_Handler
+ 304 0018 00000000 		.word	UsageFault_Handler
+ 305 001c 00000000 		.word	0
+ 306 0020 00000000 		.word	0
+ 307 0024 00000000 		.word	0
+ 308 0028 00000000 		.word	0
+ 309 002c 00000000 		.word	SVC_Handler
+ 310 0030 00000000 		.word	DebugMon_Handler
+ 311 0034 00000000 		.word	0
+ 312 0038 00000000 		.word	PendSV_Handler
+ 313 003c 00000000 		.word	SysTick_Handler
+ 314 0040 00000000 		.word	WWDG_IRQHandler
+ 315 0044 00000000 		.word	PVD_IRQHandler
+ 316 0048 00000000 		.word	TAMP_STAMP_IRQHandler
+ 317 004c 00000000 		.word	RTC_WKUP_IRQHandler
+ 318 0050 00000000 		.word	FLASH_IRQHandler
+ 319 0054 00000000 		.word	RCC_IRQHandler
+ 320 0058 00000000 		.word	EXTI0_IRQHandler
+ 321 005c 00000000 		.word	EXTI1_IRQHandler
+ 322 0060 00000000 		.word	EXTI2_IRQHandler
+ 323 0064 00000000 		.word	EXTI3_IRQHandler
+ 324 0068 00000000 		.word	EXTI4_IRQHandler
+ 325 006c 00000000 		.word	DMA1_Stream0_IRQHandler
+ 326 0070 00000000 		.word	DMA1_Stream1_IRQHandler
+ 327 0074 00000000 		.word	DMA1_Stream2_IRQHandler
+ 328 0078 00000000 		.word	DMA1_Stream3_IRQHandler
+ 329 007c 00000000 		.word	DMA1_Stream4_IRQHandler
+ 330 0080 00000000 		.word	DMA1_Stream5_IRQHandler
+ 331 0084 00000000 		.word	DMA1_Stream6_IRQHandler
+ 332 0088 00000000 		.word	ADC_IRQHandler
+ 333 008c 00000000 		.word	CAN1_TX_IRQHandler
+ 334 0090 00000000 		.word	CAN1_RX0_IRQHandler
+ 335 0094 00000000 		.word	CAN1_RX1_IRQHandler
+ 336 0098 00000000 		.word	CAN1_SCE_IRQHandler
+ 337 009c 00000000 		.word	EXTI9_5_IRQHandler
+ 338 00a0 00000000 		.word	TIM1_BRK_TIM9_IRQHandler
+ 339 00a4 00000000 		.word	TIM1_UP_TIM10_IRQHandler
+ 340 00a8 00000000 		.word	TIM1_TRG_COM_TIM11_IRQHandler
+ 341 00ac 00000000 		.word	TIM1_CC_IRQHandler
+ 342 00b0 00000000 		.word	TIM2_IRQHandler
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s 			page 7
+
+
+ 343 00b4 00000000 		.word	TIM3_IRQHandler
+ 344 00b8 00000000 		.word	TIM4_IRQHandler
+ 345 00bc 00000000 		.word	I2C1_EV_IRQHandler
+ 346 00c0 00000000 		.word	I2C1_ER_IRQHandler
+ 347 00c4 00000000 		.word	I2C2_EV_IRQHandler
+ 348 00c8 00000000 		.word	I2C2_ER_IRQHandler
+ 349 00cc 00000000 		.word	SPI1_IRQHandler
+ 350 00d0 00000000 		.word	SPI2_IRQHandler
+ 351 00d4 00000000 		.word	USART1_IRQHandler
+ 352 00d8 00000000 		.word	USART2_IRQHandler
+ 353 00dc 00000000 		.word	USART3_IRQHandler
+ 354 00e0 00000000 		.word	EXTI15_10_IRQHandler
+ 355 00e4 00000000 		.word	RTC_Alarm_IRQHandler
+ 356 00e8 00000000 		.word	OTG_FS_WKUP_IRQHandler
+ 357 00ec 00000000 		.word	TIM8_BRK_TIM12_IRQHandler
+ 358 00f0 00000000 		.word	TIM8_UP_TIM13_IRQHandler
+ 359 00f4 00000000 		.word	TIM8_TRG_COM_TIM14_IRQHandler
+ 360 00f8 00000000 		.word	TIM8_CC_IRQHandler
+ 361 00fc 00000000 		.word	DMA1_Stream7_IRQHandler
+ 362 0100 00000000 		.word	FSMC_IRQHandler
+ 363 0104 00000000 		.word	SDIO_IRQHandler
+ 364 0108 00000000 		.word	TIM5_IRQHandler
+ 365 010c 00000000 		.word	SPI3_IRQHandler
+ 366 0110 00000000 		.word	UART4_IRQHandler
+ 367 0114 00000000 		.word	UART5_IRQHandler
+ 368 0118 00000000 		.word	TIM6_DAC_IRQHandler
+ 369 011c 00000000 		.word	TIM7_IRQHandler
+ 370 0120 00000000 		.word	DMA2_Stream0_IRQHandler
+ 371 0124 00000000 		.word	DMA2_Stream1_IRQHandler
+ 372 0128 00000000 		.word	DMA2_Stream2_IRQHandler
+ 373 012c 00000000 		.word	DMA2_Stream3_IRQHandler
+ 374 0130 00000000 		.word	DMA2_Stream4_IRQHandler
+ 375 0134 00000000 		.word	ETH_IRQHandler
+ 376 0138 00000000 		.word	ETH_WKUP_IRQHandler
+ 377 013c 00000000 		.word	CAN2_TX_IRQHandler
+ 378 0140 00000000 		.word	CAN2_RX0_IRQHandler
+ 379 0144 00000000 		.word	CAN2_RX1_IRQHandler
+ 380 0148 00000000 		.word	CAN2_SCE_IRQHandler
+ 381 014c 00000000 		.word	OTG_FS_IRQHandler
+ 382 0150 00000000 		.word	DMA2_Stream5_IRQHandler
+ 383 0154 00000000 		.word	DMA2_Stream6_IRQHandler
+ 384 0158 00000000 		.word	DMA2_Stream7_IRQHandler
+ 385 015c 00000000 		.word	USART6_IRQHandler
+ 386 0160 00000000 		.word	I2C3_EV_IRQHandler
+ 387 0164 00000000 		.word	I2C3_ER_IRQHandler
+ 388 0168 00000000 		.word	OTG_HS_EP1_OUT_IRQHandler
+ 389 016c 00000000 		.word	OTG_HS_EP1_IN_IRQHandler
+ 390 0170 00000000 		.word	OTG_HS_WKUP_IRQHandler
+ 391 0174 00000000 		.word	OTG_HS_IRQHandler
+ 392 0178 00000000 		.word	DCMI_IRQHandler
+ 393 017c 00000000 		.word	CRYP_IRQHandler
+ 394 0180 00000000 		.word	HASH_RNG_IRQHandler
+ 395 0184 00000000 		.word	FPU_IRQHandler
+ 396              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 6.2.1 20161205 (release) [ARM/embedded-6-bran
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s 			page 8
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 startup.c
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:13     .text.Fault_Handler:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 Fault_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 FMPI2C1_ER_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 FMPI2C1_EV_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SPDIF_RX_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 CEC_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 QUADSPI_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SAI2_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA2D_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 LTDC_ER_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 LTDC_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SAI1_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SPI6_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SPI5_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SPI4_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 UART8_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 UART7_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 FPU_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 HASH_RNG_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 CRYP_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DCMI_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 OTG_HS_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 OTG_HS_WKUP_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 OTG_HS_EP1_IN_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 OTG_HS_EP1_OUT_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 I2C3_ER_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 I2C3_EV_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 USART6_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA2_Stream7_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA2_Stream6_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA2_Stream5_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 OTG_FS_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 CAN2_SCE_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 CAN2_RX1_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 CAN2_RX0_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 CAN2_TX_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 ETH_WKUP_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 ETH_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA2_Stream4_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA2_Stream3_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA2_Stream2_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA2_Stream1_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA2_Stream0_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM7_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM6_DAC_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 UART5_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 UART4_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SPI3_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM5_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SDIO_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 FSMC_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA1_Stream7_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM8_CC_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM8_TRG_COM_TIM14_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM8_UP_TIM13_IRQHandler
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s 			page 9
+
+
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM8_BRK_TIM12_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 OTG_FS_WKUP_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 RTC_Alarm_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 EXTI15_10_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 USART3_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 USART2_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 USART1_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SPI2_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SPI1_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 I2C2_ER_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 I2C2_EV_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 I2C1_ER_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 I2C1_EV_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM4_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM3_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM2_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM1_CC_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM1_TRG_COM_TIM11_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM1_UP_TIM10_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TIM1_BRK_TIM9_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 EXTI9_5_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 CAN1_SCE_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 CAN1_RX1_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 CAN1_RX0_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 CAN1_TX_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 ADC_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA1_Stream6_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA1_Stream5_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA1_Stream4_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA1_Stream3_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA1_Stream2_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA1_Stream1_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DMA1_Stream0_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 EXTI4_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 EXTI3_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 EXTI2_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 EXTI1_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 EXTI0_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 RCC_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 FLASH_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 RTC_WKUP_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 TAMP_STAMP_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 PVD_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 WWDG_IRQHandler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SysTick_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 PendSV_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 DebugMon_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 SVC_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 UsageFault_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 BusFault_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 MemManage_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 HardFault_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 NMI_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:19     .text.Fault_Handler:00000000 _exit
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:242    .text.Reset_Handler:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:249    .text.Reset_Handler:00000000 Reset_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:285    .text.Reset_Handler:00000044 $d
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s 			page 10
+
+
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:297    .vectors:00000000 vectors
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccH54V5t.s:294    .vectors:00000000 $d
+
+UNDEFINED SYMBOLS
+SystemInit
+__libc_init_array
+main
+__libc_fini_array
+__data_init_start
+__data_start
+__data_end
+__bss_start
+__bss_end
+__initial_msp

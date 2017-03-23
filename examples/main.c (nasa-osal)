@@ -28,7 +28,7 @@ void master(void)
 
 int main()
 {
-	LED_Config();
+	LED_Init();
 	OS_API_Init();
 	OS_BinSemCreate(&sem, "sem", 0, 0);
 	OS_TaskCreate(&sla, "sla", slave,  0, 0, 255, 0);

@@ -1,0 +1,269 @@
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 23, 1
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 4
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"os_cnd.c"
+  12              		.section	.text.priv_cnd_wait,"ax",%progbits
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu fpv4-sp-d16
+  18              		.type	priv_cnd_wait, %function
+  19              	priv_cnd_wait:
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+  23 0004 0746     		mov	r7, r0
+  24 0006 0C46     		mov	r4, r1
+  25 0008 9046     		mov	r8, r2
+  26 000a 1E46     		mov	r6, r3
+  27              		.syntax unified
+  28              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  29 000c EFF31085 		MRS r5, primask
+  30              	@ 0 "" 2
+  31              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  32 0010 72B6     		cpsid i
+  33              	@ 0 "" 2
+  34              		.thumb
+  35              		.syntax unified
+  36 0012 0846     		mov	r0, r1
+  37 0014 FFF7FEFF 		bl	mtx_give
+  38 0018 40B9     		cbnz	r0, .L2
+  39 001a 4146     		mov	r1, r8
+  40 001c 3846     		mov	r0, r7
+  41 001e B047     		blx	r6
+  42 0020 20B9     		cbnz	r0, .L2
+  43 0022 4FF0FF31 		mov	r1, #-1
+  44 0026 2046     		mov	r0, r4
+  45 0028 FFF7FEFF 		bl	mtx_waitFor
+  46              	.L2:
+  47              		.syntax unified
+  48              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  49 002c 85F31088 		MSR primask, r5
+  50              	@ 0 "" 2
+  51              		.thumb
+  52              		.syntax unified
+  53 0030 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+  54              		.size	priv_cnd_wait, .-priv_cnd_wait
+  55              		.section	.text.cnd_init,"ax",%progbits
+  56              		.align	1
+  57              		.global	cnd_init
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s 			page 2
+
+
+  58              		.syntax unified
+  59              		.thumb
+  60              		.thumb_func
+  61              		.fpu fpv4-sp-d16
+  62              		.type	cnd_init, %function
+  63              	cnd_init:
+  64              		@ args = 0, pretend = 0, frame = 0
+  65              		@ frame_needed = 0, uses_anonymous_args = 0
+  66              		@ link register save eliminated.
+  67              		.syntax unified
+  68              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  69 0000 EFF31083 		MRS r3, primask
+  70              	@ 0 "" 2
+  71              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  72 0004 72B6     		cpsid i
+  73              	@ 0 "" 2
+  74              		.thumb
+  75              		.syntax unified
+  76 0006 0022     		movs	r2, #0
+  77 0008 0260     		str	r2, [r0]	@ unaligned
+  78              		.syntax unified
+  79              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  80 000a 83F31088 		MSR primask, r3
+  81              	@ 0 "" 2
+  82              		.thumb
+  83              		.syntax unified
+  84 000e 7047     		bx	lr
+  85              		.size	cnd_init, .-cnd_init
+  86              		.section	.text.cnd_create,"ax",%progbits
+  87              		.align	1
+  88              		.global	cnd_create
+  89              		.syntax unified
+  90              		.thumb
+  91              		.thumb_func
+  92              		.fpu fpv4-sp-d16
+  93              		.type	cnd_create, %function
+  94              	cnd_create:
+  95              		@ args = 0, pretend = 0, frame = 0
+  96              		@ frame_needed = 0, uses_anonymous_args = 0
+  97 0000 10B5     		push	{r4, lr}
+  98              		.syntax unified
+  99              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 100 0002 EFF31084 		MRS r4, primask
+ 101              	@ 0 "" 2
+ 102              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 103 0006 72B6     		cpsid i
+ 104              	@ 0 "" 2
+ 105              		.thumb
+ 106              		.syntax unified
+ 107 0008 0420     		movs	r0, #4
+ 108 000a FFF7FEFF 		bl	core_sys_alloc
+ 109 000e 0146     		mov	r1, r0
+ 110 0010 08B1     		cbz	r0, .L5
+ 111 0012 FFF7FEFF 		bl	cnd_init
+ 112              	.L5:
+ 113              		.syntax unified
+ 114              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s 			page 3
+
+
+ 115 0016 84F31088 		MSR primask, r4
+ 116              	@ 0 "" 2
+ 117              		.thumb
+ 118              		.syntax unified
+ 119 001a 0846     		mov	r0, r1
+ 120 001c 10BD     		pop	{r4, pc}
+ 121              		.size	cnd_create, .-cnd_create
+ 122              		.section	.text.cnd_kill,"ax",%progbits
+ 123              		.align	1
+ 124              		.global	cnd_kill
+ 125              		.syntax unified
+ 126              		.thumb
+ 127              		.thumb_func
+ 128              		.fpu fpv4-sp-d16
+ 129              		.type	cnd_kill, %function
+ 130              	cnd_kill:
+ 131              		@ args = 0, pretend = 0, frame = 0
+ 132              		@ frame_needed = 0, uses_anonymous_args = 0
+ 133 0000 10B5     		push	{r4, lr}
+ 134              		.syntax unified
+ 135              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 136 0002 EFF31084 		MRS r4, primask
+ 137              	@ 0 "" 2
+ 138              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 139 0006 72B6     		cpsid i
+ 140              	@ 0 "" 2
+ 141              		.thumb
+ 142              		.syntax unified
+ 143 0008 4FF0FF31 		mov	r1, #-1
+ 144 000c FFF7FEFF 		bl	core_all_wakeup
+ 145              		.syntax unified
+ 146              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 147 0010 84F31088 		MSR primask, r4
+ 148              	@ 0 "" 2
+ 149              		.thumb
+ 150              		.syntax unified
+ 151 0014 10BD     		pop	{r4, pc}
+ 152              		.size	cnd_kill, .-cnd_kill
+ 153              		.section	.text.cnd_waitUntil,"ax",%progbits
+ 154              		.align	1
+ 155              		.global	cnd_waitUntil
+ 156              		.syntax unified
+ 157              		.thumb
+ 158              		.thumb_func
+ 159              		.fpu fpv4-sp-d16
+ 160              		.type	cnd_waitUntil, %function
+ 161              	cnd_waitUntil:
+ 162              		@ args = 0, pretend = 0, frame = 0
+ 163              		@ frame_needed = 0, uses_anonymous_args = 0
+ 164              		@ link register save eliminated.
+ 165 0000 014B     		ldr	r3, .L11
+ 166 0002 FFF7FEBF 		b	priv_cnd_wait
+ 167              	.L12:
+ 168 0006 00BF     		.align	2
+ 169              	.L11:
+ 170 0008 00000000 		.word	core_tsk_waitUntil
+ 171              		.size	cnd_waitUntil, .-cnd_waitUntil
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s 			page 4
+
+
+ 172              		.section	.text.cnd_waitFor,"ax",%progbits
+ 173              		.align	1
+ 174              		.global	cnd_waitFor
+ 175              		.syntax unified
+ 176              		.thumb
+ 177              		.thumb_func
+ 178              		.fpu fpv4-sp-d16
+ 179              		.type	cnd_waitFor, %function
+ 180              	cnd_waitFor:
+ 181              		@ args = 0, pretend = 0, frame = 0
+ 182              		@ frame_needed = 0, uses_anonymous_args = 0
+ 183              		@ link register save eliminated.
+ 184 0000 014B     		ldr	r3, .L14
+ 185 0002 FFF7FEBF 		b	priv_cnd_wait
+ 186              	.L15:
+ 187 0006 00BF     		.align	2
+ 188              	.L14:
+ 189 0008 00000000 		.word	core_tsk_waitFor
+ 190              		.size	cnd_waitFor, .-cnd_waitFor
+ 191              		.section	.text.cnd_give,"ax",%progbits
+ 192              		.align	1
+ 193              		.global	cnd_give
+ 194              		.syntax unified
+ 195              		.thumb
+ 196              		.thumb_func
+ 197              		.fpu fpv4-sp-d16
+ 198              		.type	cnd_give, %function
+ 199              	cnd_give:
+ 200              		@ args = 0, pretend = 0, frame = 0
+ 201              		@ frame_needed = 0, uses_anonymous_args = 0
+ 202 0000 10B5     		push	{r4, lr}
+ 203              		.syntax unified
+ 204              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 205 0002 EFF31084 		MRS r4, primask
+ 206              	@ 0 "" 2
+ 207              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 208 0006 72B6     		cpsid i
+ 209              	@ 0 "" 2
+ 210              		.thumb
+ 211              		.syntax unified
+ 212 0008 29B1     		cbz	r1, .L17
+ 213 000a 0021     		movs	r1, #0
+ 214 000c FFF7FEFF 		bl	core_all_wakeup
+ 215              	.L18:
+ 216              		.syntax unified
+ 217              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 218 0010 84F31088 		MSR primask, r4
+ 219              	@ 0 "" 2
+ 220              		.thumb
+ 221              		.syntax unified
+ 222 0014 10BD     		pop	{r4, pc}
+ 223              	.L17:
+ 224 0016 FFF7FEFF 		bl	core_one_wakeup
+ 225 001a F9E7     		b	.L18
+ 226              		.size	cnd_give, .-cnd_give
+ 227              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 6.2.1 20161205 (release) [ARM/embedded-6-bran
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 os_cnd.c
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:13     .text.priv_cnd_wait:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:19     .text.priv_cnd_wait:00000000 priv_cnd_wait
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:56     .text.cnd_init:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:63     .text.cnd_init:00000000 cnd_init
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:87     .text.cnd_create:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:94     .text.cnd_create:00000000 cnd_create
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:123    .text.cnd_kill:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:130    .text.cnd_kill:00000000 cnd_kill
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:154    .text.cnd_waitUntil:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:161    .text.cnd_waitUntil:00000000 cnd_waitUntil
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:170    .text.cnd_waitUntil:00000008 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:173    .text.cnd_waitFor:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:180    .text.cnd_waitFor:00000000 cnd_waitFor
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:189    .text.cnd_waitFor:00000008 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:192    .text.cnd_give:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccTXecCw.s:199    .text.cnd_give:00000000 cnd_give
+
+UNDEFINED SYMBOLS
+mtx_give
+mtx_waitFor
+core_sys_alloc
+core_all_wakeup
+core_tsk_waitUntil
+core_tsk_waitFor
+core_one_wakeup

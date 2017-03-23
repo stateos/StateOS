@@ -1,0 +1,373 @@
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 23, 1
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 4
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"os_mem.c"
+  12              		.section	.text.priv_mem_wait,"ax",%progbits
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu fpv4-sp-d16
+  18              		.type	priv_mem_wait, %function
+  19              	priv_mem_wait:
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+  23 0002 0446     		mov	r4, r0
+  24 0004 0E46     		mov	r6, r1
+  25              		.syntax unified
+  26              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  27 0006 EFF31087 		MRS r7, primask
+  28              	@ 0 "" 2
+  29              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  30 000a 72B6     		cpsid i
+  31              	@ 0 "" 2
+  32              		.thumb
+  33              		.syntax unified
+  34 000c 4568     		ldr	r5, [r0, #4]
+  35 000e 65B1     		cbz	r5, .L2
+  36 0010 0435     		adds	r5, r5, #4
+  37 0012 0D60     		str	r5, [r1]
+  38 0014 4368     		ldr	r3, [r0, #4]
+  39 0016 1B68     		ldr	r3, [r3]
+  40 0018 4360     		str	r3, [r0, #4]
+  41              	.L3:
+  42 001a 3268     		ldr	r2, [r6]
+  43 001c E368     		ldr	r3, [r4, #12]
+  44 001e 0021     		movs	r1, #0
+  45              	.L5:
+  46 0020 13F1FF33 		adds	r3, r3, #-1
+  47 0024 0BD2     		bcs	.L6
+  48 0026 0020     		movs	r0, #0
+  49 0028 06E0     		b	.L4
+  50              	.L2:
+  51 002a 0649     		ldr	r1, .L7
+  52 002c 0968     		ldr	r1, [r1]
+  53 002e CE63     		str	r6, [r1, #60]
+  54 0030 1146     		mov	r1, r2
+  55 0032 9847     		blx	r3
+  56 0034 0028     		cmp	r0, #0
+  57 0036 F0D0     		beq	.L3
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s 			page 2
+
+
+  58              	.L4:
+  59              		.syntax unified
+  60              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  61 0038 87F31088 		MSR primask, r7
+  62              	@ 0 "" 2
+  63              		.thumb
+  64              		.syntax unified
+  65 003c F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+  66              	.L6:
+  67 003e 42F8041B 		str	r1, [r2], #4
+  68 0042 EDE7     		b	.L5
+  69              	.L8:
+  70              		.align	2
+  71              	.L7:
+  72 0044 00000000 		.word	System
+  73              		.size	priv_mem_wait, .-priv_mem_wait
+  74              		.section	.text.mem_kill,"ax",%progbits
+  75              		.align	1
+  76              		.global	mem_kill
+  77              		.syntax unified
+  78              		.thumb
+  79              		.thumb_func
+  80              		.fpu fpv4-sp-d16
+  81              		.type	mem_kill, %function
+  82              	mem_kill:
+  83              		@ args = 0, pretend = 0, frame = 0
+  84              		@ frame_needed = 0, uses_anonymous_args = 0
+  85 0000 10B5     		push	{r4, lr}
+  86              		.syntax unified
+  87              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  88 0002 EFF31084 		MRS r4, primask
+  89              	@ 0 "" 2
+  90              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  91 0006 72B6     		cpsid i
+  92              	@ 0 "" 2
+  93              		.thumb
+  94              		.syntax unified
+  95 0008 4FF0FF31 		mov	r1, #-1
+  96 000c FFF7FEFF 		bl	core_all_wakeup
+  97              		.syntax unified
+  98              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  99 0010 84F31088 		MSR primask, r4
+ 100              	@ 0 "" 2
+ 101              		.thumb
+ 102              		.syntax unified
+ 103 0014 10BD     		pop	{r4, pc}
+ 104              		.size	mem_kill, .-mem_kill
+ 105              		.section	.text.mem_waitUntil,"ax",%progbits
+ 106              		.align	1
+ 107              		.global	mem_waitUntil
+ 108              		.syntax unified
+ 109              		.thumb
+ 110              		.thumb_func
+ 111              		.fpu fpv4-sp-d16
+ 112              		.type	mem_waitUntil, %function
+ 113              	mem_waitUntil:
+ 114              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s 			page 3
+
+
+ 115              		@ frame_needed = 0, uses_anonymous_args = 0
+ 116              		@ link register save eliminated.
+ 117 0000 014B     		ldr	r3, .L11
+ 118 0002 FFF7FEBF 		b	priv_mem_wait
+ 119              	.L12:
+ 120 0006 00BF     		.align	2
+ 121              	.L11:
+ 122 0008 00000000 		.word	core_tsk_waitUntil
+ 123              		.size	mem_waitUntil, .-mem_waitUntil
+ 124              		.section	.text.mem_waitFor,"ax",%progbits
+ 125              		.align	1
+ 126              		.global	mem_waitFor
+ 127              		.syntax unified
+ 128              		.thumb
+ 129              		.thumb_func
+ 130              		.fpu fpv4-sp-d16
+ 131              		.type	mem_waitFor, %function
+ 132              	mem_waitFor:
+ 133              		@ args = 0, pretend = 0, frame = 0
+ 134              		@ frame_needed = 0, uses_anonymous_args = 0
+ 135              		@ link register save eliminated.
+ 136 0000 014B     		ldr	r3, .L14
+ 137 0002 FFF7FEBF 		b	priv_mem_wait
+ 138              	.L15:
+ 139 0006 00BF     		.align	2
+ 140              	.L14:
+ 141 0008 00000000 		.word	core_tsk_waitFor
+ 142              		.size	mem_waitFor, .-mem_waitFor
+ 143              		.section	.text.mem_give,"ax",%progbits
+ 144              		.align	1
+ 145              		.global	mem_give
+ 146              		.syntax unified
+ 147              		.thumb
+ 148              		.thumb_func
+ 149              		.fpu fpv4-sp-d16
+ 150              		.type	mem_give, %function
+ 151              	mem_give:
+ 152              		@ args = 0, pretend = 0, frame = 0
+ 153              		@ frame_needed = 0, uses_anonymous_args = 0
+ 154 0000 70B5     		push	{r4, r5, r6, lr}
+ 155 0002 0446     		mov	r4, r0
+ 156 0004 0D46     		mov	r5, r1
+ 157              		.syntax unified
+ 158              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 159 0006 EFF31086 		MRS r6, primask
+ 160              	@ 0 "" 2
+ 161              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 162 000a 72B6     		cpsid i
+ 163              	@ 0 "" 2
+ 164              		.thumb
+ 165              		.syntax unified
+ 166 000c 0021     		movs	r1, #0
+ 167 000e FFF7FEFF 		bl	core_one_wakeup
+ 168 0012 20B1     		cbz	r0, .L17
+ 169 0014 C36B     		ldr	r3, [r0, #60]
+ 170 0016 1D60     		str	r5, [r3]
+ 171              	.L18:
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s 			page 4
+
+
+ 172              		.syntax unified
+ 173              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 174 0018 86F31088 		MSR primask, r6
+ 175              	@ 0 "" 2
+ 176              		.thumb
+ 177              		.syntax unified
+ 178 001c 70BD     		pop	{r4, r5, r6, pc}
+ 179              	.L17:
+ 180 001e 201D     		adds	r0, r4, #4
+ 181              	.L19:
+ 182 0020 0368     		ldr	r3, [r0]
+ 183 0022 23B9     		cbnz	r3, .L20
+ 184 0024 2A1F     		subs	r2, r5, #4
+ 185 0026 0260     		str	r2, [r0]
+ 186 0028 45F8043C 		str	r3, [r5, #-4]
+ 187 002c F4E7     		b	.L18
+ 188              	.L20:
+ 189 002e 1846     		mov	r0, r3
+ 190 0030 F6E7     		b	.L19
+ 191              		.size	mem_give, .-mem_give
+ 192              		.section	.text.mem_bind,"ax",%progbits
+ 193              		.align	1
+ 194              		.global	mem_bind
+ 195              		.syntax unified
+ 196              		.thumb
+ 197              		.thumb_func
+ 198              		.fpu fpv4-sp-d16
+ 199              		.type	mem_bind, %function
+ 200              	mem_bind:
+ 201              		@ args = 0, pretend = 0, frame = 0
+ 202              		@ frame_needed = 0, uses_anonymous_args = 0
+ 203 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 204 0002 0546     		mov	r5, r0
+ 205              		.syntax unified
+ 206              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 207 0004 EFF31087 		MRS r7, primask
+ 208              	@ 0 "" 2
+ 209              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 210 0008 72B6     		cpsid i
+ 211              	@ 0 "" 2
+ 212              		.thumb
+ 213              		.syntax unified
+ 214 000a 0023     		movs	r3, #0
+ 215 000c 0469     		ldr	r4, [r0, #16]
+ 216 000e 8668     		ldr	r6, [r0, #8]
+ 217 0010 4360     		str	r3, [r0, #4]
+ 218              	.L22:
+ 219 0012 16B9     		cbnz	r6, .L23
+ 220              		.syntax unified
+ 221              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 222 0014 87F31088 		MSR primask, r7
+ 223              	@ 0 "" 2
+ 224              		.thumb
+ 225              		.syntax unified
+ 226 0018 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 227              	.L23:
+ 228 001a 0434     		adds	r4, r4, #4
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s 			page 5
+
+
+ 229 001c 2146     		mov	r1, r4
+ 230 001e 2846     		mov	r0, r5
+ 231 0020 FFF7FEFF 		bl	mem_give
+ 232 0024 EB68     		ldr	r3, [r5, #12]
+ 233 0026 013E     		subs	r6, r6, #1
+ 234 0028 04EB8304 		add	r4, r4, r3, lsl #2
+ 235 002c F1E7     		b	.L22
+ 236              		.size	mem_bind, .-mem_bind
+ 237              		.section	.text.mem_init,"ax",%progbits
+ 238              		.align	1
+ 239              		.global	mem_init
+ 240              		.syntax unified
+ 241              		.thumb
+ 242              		.thumb_func
+ 243              		.fpu fpv4-sp-d16
+ 244              		.type	mem_init, %function
+ 245              	mem_init:
+ 246              		@ args = 0, pretend = 0, frame = 0
+ 247              		@ frame_needed = 0, uses_anonymous_args = 0
+ 248 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 249 0004 0446     		mov	r4, r0
+ 250 0006 8846     		mov	r8, r1
+ 251 0008 1746     		mov	r7, r2
+ 252 000a 1E46     		mov	r6, r3
+ 253              		.syntax unified
+ 254              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 255 000c EFF31085 		MRS r5, primask
+ 256              	@ 0 "" 2
+ 257              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 258 0010 72B6     		cpsid i
+ 259              	@ 0 "" 2
+ 260              		.thumb
+ 261              		.syntax unified
+ 262 0012 1422     		movs	r2, #20
+ 263 0014 0021     		movs	r1, #0
+ 264 0016 FFF7FEFF 		bl	memset
+ 265 001a C4F80880 		str	r8, [r4, #8]
+ 266 001e E760     		str	r7, [r4, #12]
+ 267 0020 2661     		str	r6, [r4, #16]
+ 268 0022 2046     		mov	r0, r4
+ 269 0024 FFF7FEFF 		bl	mem_bind
+ 270              		.syntax unified
+ 271              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 272 0028 85F31088 		MSR primask, r5
+ 273              	@ 0 "" 2
+ 274              		.thumb
+ 275              		.syntax unified
+ 276 002c BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 277              		.size	mem_init, .-mem_init
+ 278              		.section	.text.mem_create,"ax",%progbits
+ 279              		.align	1
+ 280              		.global	mem_create
+ 281              		.syntax unified
+ 282              		.thumb
+ 283              		.thumb_func
+ 284              		.fpu fpv4-sp-d16
+ 285              		.type	mem_create, %function
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s 			page 6
+
+
+ 286              	mem_create:
+ 287              		@ args = 0, pretend = 0, frame = 0
+ 288              		@ frame_needed = 0, uses_anonymous_args = 0
+ 289 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 290 0002 0546     		mov	r5, r0
+ 291              		.syntax unified
+ 292              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 293 0004 EFF31087 		MRS r7, primask
+ 294              	@ 0 "" 2
+ 295              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 296 0008 72B6     		cpsid i
+ 297              	@ 0 "" 2
+ 298              		.thumb
+ 299              		.syntax unified
+ 300 000a CC1C     		adds	r4, r1, #3
+ 301 000c A408     		lsrs	r4, r4, #2
+ 302 000e 04FB0000 		mla	r0, r4, r0, r0
+ 303 0012 0530     		adds	r0, r0, #5
+ 304 0014 8000     		lsls	r0, r0, #2
+ 305 0016 FFF7FEFF 		bl	core_sys_alloc
+ 306 001a 0646     		mov	r6, r0
+ 307 001c 28B1     		cbz	r0, .L26
+ 308 001e 00F11403 		add	r3, r0, #20
+ 309 0022 2246     		mov	r2, r4
+ 310 0024 2946     		mov	r1, r5
+ 311 0026 FFF7FEFF 		bl	mem_init
+ 312              	.L26:
+ 313              		.syntax unified
+ 314              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 315 002a 87F31088 		MSR primask, r7
+ 316              	@ 0 "" 2
+ 317              		.thumb
+ 318              		.syntax unified
+ 319 002e 3046     		mov	r0, r6
+ 320 0030 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 321              		.size	mem_create, .-mem_create
+ 322              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 6.2.1 20161205 (release) [ARM/embedded-6-bran
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 os_mem.c
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:13     .text.priv_mem_wait:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:19     .text.priv_mem_wait:00000000 priv_mem_wait
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:72     .text.priv_mem_wait:00000044 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:75     .text.mem_kill:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:82     .text.mem_kill:00000000 mem_kill
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:106    .text.mem_waitUntil:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:113    .text.mem_waitUntil:00000000 mem_waitUntil
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:122    .text.mem_waitUntil:00000008 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:125    .text.mem_waitFor:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:132    .text.mem_waitFor:00000000 mem_waitFor
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:141    .text.mem_waitFor:00000008 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:144    .text.mem_give:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:151    .text.mem_give:00000000 mem_give
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:193    .text.mem_bind:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:200    .text.mem_bind:00000000 mem_bind
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:238    .text.mem_init:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:245    .text.mem_init:00000000 mem_init
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:279    .text.mem_create:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccJC2J3e.s:286    .text.mem_create:00000000 mem_create
+
+UNDEFINED SYMBOLS
+System
+core_all_wakeup
+core_tsk_waitUntil
+core_tsk_waitFor
+core_one_wakeup
+memset
+core_sys_alloc

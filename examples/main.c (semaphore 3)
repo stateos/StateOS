@@ -20,7 +20,7 @@ tsk_id mas = TSK_CREATE(0, master);
 
 int main()
 {
-	LED_Config();
+	LED_Init();
 
 	tsk_start(sla);
 	tsk_start(mas);

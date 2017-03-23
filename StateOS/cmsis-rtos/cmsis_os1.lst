@@ -1,0 +1,678 @@
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 23, 1
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 4
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"cmsis_os1.c"
+  12              		.section	.text.osThreadCreate,"ax",%progbits
+  13              		.align	1
+  14              		.global	osThreadCreate
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu fpv4-sp-d16
+  19              		.type	osThreadCreate, %function
+  20              	osThreadCreate:
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23              		@ link register save eliminated.
+  24 0000 18B1     		cbz	r0, .L2
+  25 0002 021D     		adds	r2, r0, #4
+  26 0004 0068     		ldr	r0, [r0]
+  27 0006 FFF7FEBF 		b	osThreadNew
+  28              	.L2:
+  29 000a 7047     		bx	lr
+  30              		.size	osThreadCreate, .-osThreadCreate
+  31              		.section	.text.osSignalSet,"ax",%progbits
+  32              		.align	1
+  33              		.global	osSignalSet
+  34              		.syntax unified
+  35              		.thumb
+  36              		.thumb_func
+  37              		.fpu fpv4-sp-d16
+  38              		.type	osSignalSet, %function
+  39              	osSignalSet:
+  40              		@ args = 0, pretend = 0, frame = 0
+  41              		@ frame_needed = 0, uses_anonymous_args = 0
+  42 0000 10B5     		push	{r4, lr}
+  43 0002 0C46     		mov	r4, r1
+  44 0004 FFF7FEFF 		bl	osThreadFlagsSet
+  45 0008 0028     		cmp	r0, #0
+  46 000a ACBF     		ite	ge
+  47 000c A043     		bicge	r0, r0, r4
+  48 000e 4FF00040 		movlt	r0, #-2147483648
+  49 0012 10BD     		pop	{r4, pc}
+  50              		.size	osSignalSet, .-osSignalSet
+  51              		.section	.text.osSignalClear,"ax",%progbits
+  52              		.align	1
+  53              		.global	osSignalClear
+  54              		.syntax unified
+  55              		.thumb
+  56              		.thumb_func
+  57              		.fpu fpv4-sp-d16
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 2
+
+
+  58              		.type	osSignalClear, %function
+  59              	osSignalClear:
+  60              		@ args = 0, pretend = 0, frame = 0
+  61              		@ frame_needed = 0, uses_anonymous_args = 0
+  62 0000 38B5     		push	{r3, r4, r5, lr}
+  63 0002 0546     		mov	r5, r0
+  64 0004 0C46     		mov	r4, r1
+  65 0006 FFF7FEFF 		bl	osThreadGetId
+  66 000a 8542     		cmp	r5, r0
+  67 000c 04D1     		bne	.L7
+  68 000e 2046     		mov	r0, r4
+  69 0010 FFF7FEFF 		bl	osThreadFlagsClear
+  70 0014 0028     		cmp	r0, #0
+  71 0016 01DA     		bge	.L6
+  72              	.L7:
+  73 0018 4FF00040 		mov	r0, #-2147483648
+  74              	.L6:
+  75 001c 38BD     		pop	{r3, r4, r5, pc}
+  76              		.size	osSignalClear, .-osSignalClear
+  77              		.section	.text.osSignalWait,"ax",%progbits
+  78              		.align	1
+  79              		.global	osSignalWait
+  80              		.syntax unified
+  81              		.thumb
+  82              		.thumb_func
+  83              		.fpu fpv4-sp-d16
+  84              		.type	osSignalWait, %function
+  85              	osSignalWait:
+  86              		@ args = 0, pretend = 0, frame = 0
+  87              		@ frame_needed = 0, uses_anonymous_args = 0
+  88 0000 38B5     		push	{r3, r4, r5, lr}
+  89 0002 0446     		mov	r4, r0
+  90 0004 0846     		mov	r0, r1
+  91 0006 81B1     		cbz	r1, .L11
+  92 0008 0121     		movs	r1, #1
+  93              	.L19:
+  94 000a FFF7FEFF 		bl	osThreadFlagsWait
+  95 000e 0028     		cmp	r0, #0
+  96 0010 10DC     		bgt	.L17
+  97 0012 C11C     		adds	r1, r0, #3
+  98 0014 11D0     		beq	.L18
+  99 0016 821C     		adds	r2, r0, #2
+ 100 0018 0AD0     		beq	.L15
+ 101 001a 031D     		adds	r3, r0, #4
+ 102 001c 08BF     		it	eq
+ 103 001e 6FF07E00 		mvneq	r0, #126
+ 104              	.L13:
+ 105 0022 84E82100 		stm	r4, {r0, r5}
+ 106 0026 2046     		mov	r0, r4
+ 107 0028 38BD     		pop	{r3, r4, r5, pc}
+ 108              	.L11:
+ 109 002a 6FF00040 		mvn	r0, #-2147483648
+ 110 002e ECE7     		b	.L19
+ 111              	.L15:
+ 112 0030 4020     		movs	r0, #64
+ 113 0032 F6E7     		b	.L13
+ 114              	.L17:
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 3
+
+
+ 115 0034 0546     		mov	r5, r0
+ 116 0036 0820     		movs	r0, #8
+ 117 0038 F3E7     		b	.L13
+ 118              	.L18:
+ 119 003a 0020     		movs	r0, #0
+ 120 003c F1E7     		b	.L13
+ 121              		.size	osSignalWait, .-osSignalWait
+ 122              		.section	.text.osTimerCreate,"ax",%progbits
+ 123              		.align	1
+ 124              		.global	osTimerCreate
+ 125              		.syntax unified
+ 126              		.thumb
+ 127              		.thumb_func
+ 128              		.fpu fpv4-sp-d16
+ 129              		.type	osTimerCreate, %function
+ 130              	osTimerCreate:
+ 131              		@ args = 0, pretend = 0, frame = 0
+ 132              		@ frame_needed = 0, uses_anonymous_args = 0
+ 133              		@ link register save eliminated.
+ 134 0000 10B4     		push	{r4}
+ 135 0002 28B1     		cbz	r0, .L21
+ 136 0004 031D     		adds	r3, r0, #4
+ 137 0006 5DF8044B 		ldr	r4, [sp], #4
+ 138 000a 0068     		ldr	r0, [r0]
+ 139 000c FFF7FEBF 		b	osTimerNew
+ 140              	.L21:
+ 141 0010 5DF8044B 		ldr	r4, [sp], #4
+ 142 0014 7047     		bx	lr
+ 143              		.size	osTimerCreate, .-osTimerCreate
+ 144              		.section	.text.osMutexCreate,"ax",%progbits
+ 145              		.align	1
+ 146              		.global	osMutexCreate
+ 147              		.syntax unified
+ 148              		.thumb
+ 149              		.thumb_func
+ 150              		.fpu fpv4-sp-d16
+ 151              		.type	osMutexCreate, %function
+ 152              	osMutexCreate:
+ 153              		@ args = 0, pretend = 0, frame = 0
+ 154              		@ frame_needed = 0, uses_anonymous_args = 0
+ 155              		@ link register save eliminated.
+ 156 0000 08B1     		cbz	r0, .L23
+ 157 0002 FFF7FEBF 		b	osMutexNew
+ 158              	.L23:
+ 159 0006 7047     		bx	lr
+ 160              		.size	osMutexCreate, .-osMutexCreate
+ 161              		.section	.text.osSemaphoreCreate,"ax",%progbits
+ 162              		.align	1
+ 163              		.global	osSemaphoreCreate
+ 164              		.syntax unified
+ 165              		.thumb
+ 166              		.thumb_func
+ 167              		.fpu fpv4-sp-d16
+ 168              		.type	osSemaphoreCreate, %function
+ 169              	osSemaphoreCreate:
+ 170              		@ args = 0, pretend = 0, frame = 0
+ 171              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 4
+
+
+ 172              		@ link register save eliminated.
+ 173 0000 0246     		mov	r2, r0
+ 174 0002 10B1     		cbz	r0, .L25
+ 175 0004 0846     		mov	r0, r1
+ 176 0006 FFF7FEBF 		b	osSemaphoreNew
+ 177              	.L25:
+ 178 000a 7047     		bx	lr
+ 179              		.size	osSemaphoreCreate, .-osSemaphoreCreate
+ 180              		.section	.text.osSemaphoreWait,"ax",%progbits
+ 181              		.align	1
+ 182              		.global	osSemaphoreWait
+ 183              		.syntax unified
+ 184              		.thumb
+ 185              		.thumb_func
+ 186              		.fpu fpv4-sp-d16
+ 187              		.type	osSemaphoreWait, %function
+ 188              	osSemaphoreWait:
+ 189              		@ args = 0, pretend = 0, frame = 0
+ 190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 191 0000 10B5     		push	{r4, lr}
+ 192 0002 0446     		mov	r4, r0
+ 193 0004 FFF7FEFF 		bl	osSemaphoreAcquire
+ 194 0008 C21C     		adds	r2, r0, #3
+ 195 000a 02DB     		blt	.L27
+ 196 000c 831C     		adds	r3, r0, #2
+ 197 000e 08DD     		ble	.L30
+ 198 0010 10B1     		cbz	r0, .L29
+ 199              	.L27:
+ 200 0012 4FF0FF30 		mov	r0, #-1
+ 201 0016 10BD     		pop	{r4, pc}
+ 202              	.L29:
+ 203 0018 2046     		mov	r0, r4
+ 204 001a FFF7FEFF 		bl	osSemaphoreGetCount
+ 205 001e 0130     		adds	r0, r0, #1
+ 206 0020 10BD     		pop	{r4, pc}
+ 207              	.L30:
+ 208 0022 0020     		movs	r0, #0
+ 209 0024 10BD     		pop	{r4, pc}
+ 210              		.size	osSemaphoreWait, .-osSemaphoreWait
+ 211              		.section	.text.osPoolCreate,"ax",%progbits
+ 212              		.align	1
+ 213              		.global	osPoolCreate
+ 214              		.syntax unified
+ 215              		.thumb
+ 216              		.thumb_func
+ 217              		.fpu fpv4-sp-d16
+ 218              		.type	osPoolCreate, %function
+ 219              	osPoolCreate:
+ 220              		@ args = 0, pretend = 0, frame = 0
+ 221              		@ frame_needed = 0, uses_anonymous_args = 0
+ 222              		@ link register save eliminated.
+ 223 0000 20B1     		cbz	r0, .L32
+ 224 0002 00F10802 		add	r2, r0, #8
+ 225 0006 03C8     		ldm	r0, {r0, r1}
+ 226 0008 FFF7FEBF 		b	osMemoryPoolNew
+ 227              	.L32:
+ 228 000c 7047     		bx	lr
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 5
+
+
+ 229              		.size	osPoolCreate, .-osPoolCreate
+ 230              		.section	.text.osPoolAlloc,"ax",%progbits
+ 231              		.align	1
+ 232              		.global	osPoolAlloc
+ 233              		.syntax unified
+ 234              		.thumb
+ 235              		.thumb_func
+ 236              		.fpu fpv4-sp-d16
+ 237              		.type	osPoolAlloc, %function
+ 238              	osPoolAlloc:
+ 239              		@ args = 0, pretend = 0, frame = 0
+ 240              		@ frame_needed = 0, uses_anonymous_args = 0
+ 241              		@ link register save eliminated.
+ 242 0000 0021     		movs	r1, #0
+ 243 0002 FFF7FEBF 		b	osMemoryPoolAlloc
+ 244              		.size	osPoolAlloc, .-osPoolAlloc
+ 245              		.section	.text.osPoolCAlloc,"ax",%progbits
+ 246              		.align	1
+ 247              		.global	osPoolCAlloc
+ 248              		.syntax unified
+ 249              		.thumb
+ 250              		.thumb_func
+ 251              		.fpu fpv4-sp-d16
+ 252              		.type	osPoolCAlloc, %function
+ 253              	osPoolCAlloc:
+ 254              		@ args = 0, pretend = 0, frame = 0
+ 255              		@ frame_needed = 0, uses_anonymous_args = 0
+ 256 0000 38B5     		push	{r3, r4, r5, lr}
+ 257 0002 0546     		mov	r5, r0
+ 258 0004 FFF7FEFF 		bl	osMemoryPoolGetBlockSize
+ 259 0008 0446     		mov	r4, r0
+ 260 000a 58B1     		cbz	r0, .L36
+ 261 000c 2846     		mov	r0, r5
+ 262 000e 0021     		movs	r1, #0
+ 263 0010 FFF7FEFF 		bl	osMemoryPoolAlloc
+ 264 0014 0546     		mov	r5, r0
+ 265 0016 18B1     		cbz	r0, .L34
+ 266 0018 2246     		mov	r2, r4
+ 267 001a 0021     		movs	r1, #0
+ 268 001c FFF7FEFF 		bl	memset
+ 269              	.L34:
+ 270 0020 2846     		mov	r0, r5
+ 271 0022 38BD     		pop	{r3, r4, r5, pc}
+ 272              	.L36:
+ 273 0024 0546     		mov	r5, r0
+ 274 0026 FBE7     		b	.L34
+ 275              		.size	osPoolCAlloc, .-osPoolCAlloc
+ 276              		.section	.text.osPoolFree,"ax",%progbits
+ 277              		.align	1
+ 278              		.global	osPoolFree
+ 279              		.syntax unified
+ 280              		.thumb
+ 281              		.thumb_func
+ 282              		.fpu fpv4-sp-d16
+ 283              		.type	osPoolFree, %function
+ 284              	osPoolFree:
+ 285              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 6
+
+
+ 286              		@ frame_needed = 0, uses_anonymous_args = 0
+ 287              		@ link register save eliminated.
+ 288 0000 FFF7FEBF 		b	osMemoryPoolFree
+ 289              		.size	osPoolFree, .-osPoolFree
+ 290              		.section	.text.osMessageCreate,"ax",%progbits
+ 291              		.align	1
+ 292              		.global	osMessageCreate
+ 293              		.syntax unified
+ 294              		.thumb
+ 295              		.thumb_func
+ 296              		.fpu fpv4-sp-d16
+ 297              		.type	osMessageCreate, %function
+ 298              	osMessageCreate:
+ 299              		@ args = 0, pretend = 0, frame = 0
+ 300              		@ frame_needed = 0, uses_anonymous_args = 0
+ 301              		@ link register save eliminated.
+ 302 0000 20B1     		cbz	r0, .L42
+ 303 0002 021D     		adds	r2, r0, #4
+ 304 0004 0421     		movs	r1, #4
+ 305 0006 0068     		ldr	r0, [r0]
+ 306 0008 FFF7FEBF 		b	osMessageQueueNew
+ 307              	.L42:
+ 308 000c 7047     		bx	lr
+ 309              		.size	osMessageCreate, .-osMessageCreate
+ 310              		.section	.text.osMessagePut,"ax",%progbits
+ 311              		.align	1
+ 312              		.global	osMessagePut
+ 313              		.syntax unified
+ 314              		.thumb
+ 315              		.thumb_func
+ 316              		.fpu fpv4-sp-d16
+ 317              		.type	osMessagePut, %function
+ 318              	osMessagePut:
+ 319              		@ args = 0, pretend = 0, frame = 8
+ 320              		@ frame_needed = 0, uses_anonymous_args = 0
+ 321 0000 13B5     		push	{r0, r1, r4, lr}
+ 322 0002 02AC     		add	r4, sp, #8
+ 323 0004 1346     		mov	r3, r2
+ 324 0006 44F8041D 		str	r1, [r4, #-4]!
+ 325 000a 0022     		movs	r2, #0
+ 326 000c 2146     		mov	r1, r4
+ 327 000e FFF7FEFF 		bl	osMessageQueuePut
+ 328 0012 02B0     		add	sp, sp, #8
+ 329              		@ sp needed
+ 330 0014 10BD     		pop	{r4, pc}
+ 331              		.size	osMessagePut, .-osMessagePut
+ 332              		.section	.text.osMessageGet,"ax",%progbits
+ 333              		.align	1
+ 334              		.global	osMessageGet
+ 335              		.syntax unified
+ 336              		.thumb
+ 337              		.thumb_func
+ 338              		.fpu fpv4-sp-d16
+ 339              		.type	osMessageGet, %function
+ 340              	osMessageGet:
+ 341              		@ args = 0, pretend = 0, frame = 8
+ 342              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 7
+
+
+ 343 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+ 344 0002 1346     		mov	r3, r2
+ 345 0004 0446     		mov	r4, r0
+ 346 0006 0022     		movs	r2, #0
+ 347 0008 0846     		mov	r0, r1
+ 348 000a 01A9     		add	r1, sp, #4
+ 349 000c FFF7FEFF 		bl	osMessageQueueGet
+ 350 0010 821C     		adds	r2, r0, #2
+ 351 0012 08D0     		beq	.L46
+ 352 0014 48B1     		cbz	r0, .L47
+ 353 0016 C31C     		adds	r3, r0, #3
+ 354 0018 08BF     		it	eq
+ 355 001a 0020     		moveq	r0, #0
+ 356              	.L48:
+ 357 001c 84E82100 		stm	r4, {r0, r5}
+ 358 0020 2046     		mov	r0, r4
+ 359 0022 03B0     		add	sp, sp, #12
+ 360              		@ sp needed
+ 361 0024 30BD     		pop	{r4, r5, pc}
+ 362              	.L46:
+ 363 0026 4020     		movs	r0, #64
+ 364 0028 F8E7     		b	.L48
+ 365              	.L47:
+ 366 002a 019D     		ldr	r5, [sp, #4]
+ 367 002c 1020     		movs	r0, #16
+ 368 002e F5E7     		b	.L48
+ 369              		.size	osMessageGet, .-osMessageGet
+ 370              		.section	.text.osMailCreate,"ax",%progbits
+ 371              		.align	1
+ 372              		.global	osMailCreate
+ 373              		.syntax unified
+ 374              		.thumb
+ 375              		.thumb_func
+ 376              		.fpu fpv4-sp-d16
+ 377              		.type	osMailCreate, %function
+ 378              	osMailCreate:
+ 379              		@ args = 0, pretend = 0, frame = 0
+ 380              		@ frame_needed = 0, uses_anonymous_args = 0
+ 381 0000 70B5     		push	{r4, r5, r6, lr}
+ 382 0002 0546     		mov	r5, r0
+ 383 0004 08B9     		cbnz	r0, .L51
+ 384              	.L65:
+ 385 0006 0020     		movs	r0, #0
+ 386 0008 70BD     		pop	{r4, r5, r6, pc}
+ 387              	.L51:
+ 388 000a 8468     		ldr	r4, [r0, #8]
+ 389 000c 002C     		cmp	r4, #0
+ 390 000e FAD0     		beq	.L65
+ 391 0010 0646     		mov	r6, r0
+ 392 0012 00F10C02 		add	r2, r0, #12
+ 393 0016 4168     		ldr	r1, [r0, #4]
+ 394 0018 56F8240B 		ldr	r0, [r6], #36
+ 395 001c FFF7FEFF 		bl	osMemoryPoolNew
+ 396 0020 3246     		mov	r2, r6
+ 397 0022 2060     		str	r0, [r4]
+ 398 0024 0421     		movs	r1, #4
+ 399 0026 2868     		ldr	r0, [r5]
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 8
+
+
+ 400 0028 FFF7FEFF 		bl	osMessageQueueNew
+ 401 002c 2368     		ldr	r3, [r4]
+ 402 002e 6060     		str	r0, [r4, #4]
+ 403 0030 1BB1     		cbz	r3, .L54
+ 404 0032 40B9     		cbnz	r0, .L55
+ 405 0034 1846     		mov	r0, r3
+ 406 0036 FFF7FEFF 		bl	osMemoryPoolDelete
+ 407              	.L54:
+ 408 003a 6068     		ldr	r0, [r4, #4]
+ 409 003c 0028     		cmp	r0, #0
+ 410 003e E2D0     		beq	.L65
+ 411 0040 FFF7FEFF 		bl	osMessageQueueDelete
+ 412 0044 DFE7     		b	.L65
+ 413              	.L55:
+ 414 0046 2046     		mov	r0, r4
+ 415 0048 70BD     		pop	{r4, r5, r6, pc}
+ 416              		.size	osMailCreate, .-osMailCreate
+ 417              		.section	.text.osMailAlloc,"ax",%progbits
+ 418              		.align	1
+ 419              		.global	osMailAlloc
+ 420              		.syntax unified
+ 421              		.thumb
+ 422              		.thumb_func
+ 423              		.fpu fpv4-sp-d16
+ 424              		.type	osMailAlloc, %function
+ 425              	osMailAlloc:
+ 426              		@ args = 0, pretend = 0, frame = 0
+ 427              		@ frame_needed = 0, uses_anonymous_args = 0
+ 428              		@ link register save eliminated.
+ 429 0000 10B1     		cbz	r0, .L67
+ 430 0002 0068     		ldr	r0, [r0]
+ 431 0004 FFF7FEBF 		b	osMemoryPoolAlloc
+ 432              	.L67:
+ 433 0008 7047     		bx	lr
+ 434              		.size	osMailAlloc, .-osMailAlloc
+ 435              		.section	.text.osMailCAlloc,"ax",%progbits
+ 436              		.align	1
+ 437              		.global	osMailCAlloc
+ 438              		.syntax unified
+ 439              		.thumb
+ 440              		.thumb_func
+ 441              		.fpu fpv4-sp-d16
+ 442              		.type	osMailCAlloc, %function
+ 443              	osMailCAlloc:
+ 444              		@ args = 0, pretend = 0, frame = 0
+ 445              		@ frame_needed = 0, uses_anonymous_args = 0
+ 446 0000 70B5     		push	{r4, r5, r6, lr}
+ 447 0002 0E46     		mov	r6, r1
+ 448 0004 0446     		mov	r4, r0
+ 449 0006 10B9     		cbnz	r0, .L69
+ 450              	.L71:
+ 451 0008 0024     		movs	r4, #0
+ 452              	.L68:
+ 453 000a 2046     		mov	r0, r4
+ 454 000c 70BD     		pop	{r4, r5, r6, pc}
+ 455              	.L69:
+ 456 000e 0068     		ldr	r0, [r0]
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 9
+
+
+ 457 0010 FFF7FEFF 		bl	osMemoryPoolGetBlockSize
+ 458 0014 0546     		mov	r5, r0
+ 459 0016 0028     		cmp	r0, #0
+ 460 0018 F6D0     		beq	.L71
+ 461 001a 2068     		ldr	r0, [r4]
+ 462 001c 3146     		mov	r1, r6
+ 463 001e FFF7FEFF 		bl	osMemoryPoolAlloc
+ 464 0022 0446     		mov	r4, r0
+ 465 0024 0028     		cmp	r0, #0
+ 466 0026 F0D0     		beq	.L68
+ 467 0028 2A46     		mov	r2, r5
+ 468 002a 0021     		movs	r1, #0
+ 469 002c FFF7FEFF 		bl	memset
+ 470 0030 EBE7     		b	.L68
+ 471              		.size	osMailCAlloc, .-osMailCAlloc
+ 472              		.section	.text.osMailPut,"ax",%progbits
+ 473              		.align	1
+ 474              		.global	osMailPut
+ 475              		.syntax unified
+ 476              		.thumb
+ 477              		.thumb_func
+ 478              		.fpu fpv4-sp-d16
+ 479              		.type	osMailPut, %function
+ 480              	osMailPut:
+ 481              		@ args = 0, pretend = 0, frame = 8
+ 482              		@ frame_needed = 0, uses_anonymous_args = 0
+ 483 0000 07B5     		push	{r0, r1, r2, lr}
+ 484 0002 0191     		str	r1, [sp, #4]
+ 485 0004 48B1     		cbz	r0, .L80
+ 486 0006 59B1     		cbz	r1, .L81
+ 487 0008 0023     		movs	r3, #0
+ 488 000a 1A46     		mov	r2, r3
+ 489 000c 01A9     		add	r1, sp, #4
+ 490 000e 4068     		ldr	r0, [r0, #4]
+ 491 0010 FFF7FEFF 		bl	osMessageQueuePut
+ 492              	.L78:
+ 493 0014 03B0     		add	sp, sp, #12
+ 494              		@ sp needed
+ 495 0016 5DF804FB 		ldr	pc, [sp], #4
+ 496              	.L80:
+ 497 001a 6FF00300 		mvn	r0, #3
+ 498 001e F9E7     		b	.L78
+ 499              	.L81:
+ 500 0020 6FF07E00 		mvn	r0, #126
+ 501 0024 F6E7     		b	.L78
+ 502              		.size	osMailPut, .-osMailPut
+ 503              		.section	.text.osMailGet,"ax",%progbits
+ 504              		.align	1
+ 505              		.global	osMailGet
+ 506              		.syntax unified
+ 507              		.thumb
+ 508              		.thumb_func
+ 509              		.fpu fpv4-sp-d16
+ 510              		.type	osMailGet, %function
+ 511              	osMailGet:
+ 512              		@ args = 0, pretend = 0, frame = 8
+ 513              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 10
+
+
+ 514 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+ 515 0002 1346     		mov	r3, r2
+ 516 0004 0446     		mov	r4, r0
+ 517 0006 0846     		mov	r0, r1
+ 518 0008 39B9     		cbnz	r1, .L83
+ 519 000a 6FF00303 		mvn	r3, #3
+ 520 000e 2360     		str	r3, [r4]
+ 521 0010 0025     		movs	r5, #0
+ 522              	.L90:
+ 523 0012 2046     		mov	r0, r4
+ 524 0014 6560     		str	r5, [r4, #4]
+ 525 0016 03B0     		add	sp, sp, #12
+ 526              		@ sp needed
+ 527 0018 30BD     		pop	{r4, r5, pc}
+ 528              	.L83:
+ 529 001a 0022     		movs	r2, #0
+ 530 001c 01A9     		add	r1, sp, #4
+ 531 001e 4068     		ldr	r0, [r0, #4]
+ 532 0020 FFF7FEFF 		bl	osMessageQueueGet
+ 533 0024 821C     		adds	r2, r0, #2
+ 534 0026 05D0     		beq	.L86
+ 535 0028 30B1     		cbz	r0, .L87
+ 536 002a C31C     		adds	r3, r0, #3
+ 537 002c 08BF     		it	eq
+ 538 002e 0020     		moveq	r0, #0
+ 539              	.L88:
+ 540 0030 2060     		str	r0, [r4]
+ 541 0032 EEE7     		b	.L90
+ 542              	.L86:
+ 543 0034 4020     		movs	r0, #64
+ 544 0036 FBE7     		b	.L88
+ 545              	.L87:
+ 546 0038 019D     		ldr	r5, [sp, #4]
+ 547 003a 2020     		movs	r0, #32
+ 548 003c F8E7     		b	.L88
+ 549              		.size	osMailGet, .-osMailGet
+ 550              		.section	.text.osMailFree,"ax",%progbits
+ 551              		.align	1
+ 552              		.global	osMailFree
+ 553              		.syntax unified
+ 554              		.thumb
+ 555              		.thumb_func
+ 556              		.fpu fpv4-sp-d16
+ 557              		.type	osMailFree, %function
+ 558              	osMailFree:
+ 559              		@ args = 0, pretend = 0, frame = 0
+ 560              		@ frame_needed = 0, uses_anonymous_args = 0
+ 561              		@ link register save eliminated.
+ 562 0000 18B1     		cbz	r0, .L93
+ 563 0002 29B1     		cbz	r1, .L94
+ 564 0004 0068     		ldr	r0, [r0]
+ 565 0006 FFF7FEBF 		b	osMemoryPoolFree
+ 566              	.L93:
+ 567 000a 6FF00300 		mvn	r0, #3
+ 568 000e 7047     		bx	lr
+ 569              	.L94:
+ 570 0010 6FF07E00 		mvn	r0, #126
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 11
+
+
+ 571 0014 7047     		bx	lr
+ 572              		.size	osMailFree, .-osMailFree
+ 573              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 6.2.1 20161205 (release) [ARM/embedded-6-bran
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 12
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 cmsis_os1.c
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:13     .text.osThreadCreate:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:20     .text.osThreadCreate:00000000 osThreadCreate
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:32     .text.osSignalSet:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:39     .text.osSignalSet:00000000 osSignalSet
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:52     .text.osSignalClear:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:59     .text.osSignalClear:00000000 osSignalClear
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:78     .text.osSignalWait:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:85     .text.osSignalWait:00000000 osSignalWait
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:123    .text.osTimerCreate:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:130    .text.osTimerCreate:00000000 osTimerCreate
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:145    .text.osMutexCreate:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:152    .text.osMutexCreate:00000000 osMutexCreate
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:162    .text.osSemaphoreCreate:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:169    .text.osSemaphoreCreate:00000000 osSemaphoreCreate
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:181    .text.osSemaphoreWait:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:188    .text.osSemaphoreWait:00000000 osSemaphoreWait
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:212    .text.osPoolCreate:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:219    .text.osPoolCreate:00000000 osPoolCreate
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:231    .text.osPoolAlloc:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:238    .text.osPoolAlloc:00000000 osPoolAlloc
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:246    .text.osPoolCAlloc:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:253    .text.osPoolCAlloc:00000000 osPoolCAlloc
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:277    .text.osPoolFree:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:284    .text.osPoolFree:00000000 osPoolFree
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:291    .text.osMessageCreate:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:298    .text.osMessageCreate:00000000 osMessageCreate
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:311    .text.osMessagePut:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:318    .text.osMessagePut:00000000 osMessagePut
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:333    .text.osMessageGet:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:340    .text.osMessageGet:00000000 osMessageGet
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:371    .text.osMailCreate:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:378    .text.osMailCreate:00000000 osMailCreate
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:418    .text.osMailAlloc:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:425    .text.osMailAlloc:00000000 osMailAlloc
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:436    .text.osMailCAlloc:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:443    .text.osMailCAlloc:00000000 osMailCAlloc
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:473    .text.osMailPut:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:480    .text.osMailPut:00000000 osMailPut
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:504    .text.osMailGet:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:511    .text.osMailGet:00000000 osMailGet
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:551    .text.osMailFree:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s:558    .text.osMailFree:00000000 osMailFree
+
+UNDEFINED SYMBOLS
+osThreadNew
+osThreadFlagsSet
+osThreadGetId
+osThreadFlagsClear
+osThreadFlagsWait
+osTimerNew
+osMutexNew
+osSemaphoreNew
+osSemaphoreAcquire
+osSemaphoreGetCount
+osMemoryPoolNew
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\cccu1uGv.s 			page 13
+
+
+osMemoryPoolAlloc
+osMemoryPoolGetBlockSize
+memset
+osMemoryPoolFree
+osMessageQueueNew
+osMessageQueuePut
+osMessageQueueGet
+osMemoryPoolDelete
+osMessageQueueDelete

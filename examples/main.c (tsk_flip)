@@ -20,7 +20,7 @@ void master()
 
 int main()
 {
-	LED_Config();
+	LED_Init();
 
 	tsk_flip(master);
 }

@@ -22,7 +22,7 @@ void master()
 
 int main()
 {
-	LED_Config();
+	LED_Init();
 
 	tsk_start(mas);
 	tsk_join(mas);

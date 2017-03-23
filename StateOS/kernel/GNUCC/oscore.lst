@@ -1,0 +1,91 @@
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccNFgoW8.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 23, 1
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 4
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"oscore.c"
+  12              		.section	.text.PendSV_Handler,"ax",%progbits
+  13              		.align	1
+  14              		.global	PendSV_Handler
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu fpv4-sp-d16
+  19              		.type	PendSV_Handler, %function
+  20              	PendSV_Handler:
+  21              		@ Naked Function: prologue and epilogue provided by programmer.
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24              		.syntax unified
+  25              	@ 39 "StateOS/kernel/GNUCC/oscore.c" 1
+  26 0000 1EF0040F 			tst   lr,  # 4                 
+  27 0004 12BF     		itee  ne                       
+  28 0006 EFF30980 		mrsne r0,    PSP               
+  29 000a 6846     		moveq r0,    sp                
+  30 000c 99B0     		subeq sp,  # 100               
+  31 000e 1EF0100F 		tst   lr,  # 16                
+  32 0012 08BF     		it    eq                       
+  33 0014 20ED108A 	vstmdbeq r0!, { s16 - s31 }       
+  34 0018 20E9F04F 		stmdb r0!, { r4  - r11, lr }   
+  35 001c FFF7FEFF 		bl    core_tsk_handler         
+  36 0020 B0E8F04F 		ldmia r0!, { r4  - r11, lr }   
+  37 0024 1EF0100F 		tst   lr,  # 16                
+  38 0028 08BF     		it    eq                       
+  39 002a B0EC108A 	vldmiaeq r0!, { s16 - s31 }       
+  40 002e 1EF0040F 		tst   lr,  # 4                 
+  41 0032 14BF     		ite   ne                       
+  42 0034 80F30988 		msrne PSP,   r0                
+  43 0038 8546     		moveq sp,    r0                
+  44 003a 7047     		bx    lr                       
+  45              	
+  46              	@ 0 "" 2
+  47              		.thumb
+  48              		.syntax unified
+  49              		.size	PendSV_Handler, .-PendSV_Handler
+  50              		.section	.text.core_tsk_flip,"ax",%progbits
+  51              		.align	1
+  52              		.global	core_tsk_flip
+  53              		.syntax unified
+  54              		.thumb
+  55              		.thumb_func
+  56              		.fpu fpv4-sp-d16
+  57              		.type	core_tsk_flip, %function
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccNFgoW8.s 			page 2
+
+
+  58              	core_tsk_flip:
+  59              		@ Naked Function: prologue and epilogue provided by programmer.
+  60              		@ Volatile: function does not return.
+  61              		@ args = 0, pretend = 0, frame = 0
+  62              		@ frame_needed = 0, uses_anonymous_args = 0
+  63              		.syntax unified
+  64              	@ 126 "StateOS/kernel/GNUCC/oscore.c" 1
+  65 0000 8546     			mov   sp,  r0               
+  66 0002 FFF7FEFF 		bl    core_tsk_loop            
+  67              	
+  68              	@ 0 "" 2
+  69              		.thumb
+  70              		.syntax unified
+  71              		.size	core_tsk_flip, .-core_tsk_flip
+  72              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 6.2.1 20161205 (release) [ARM/embedded-6-bran
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccNFgoW8.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 oscore.c
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccNFgoW8.s:13     .text.PendSV_Handler:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccNFgoW8.s:20     .text.PendSV_Handler:00000000 PendSV_Handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccNFgoW8.s:51     .text.core_tsk_flip:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccNFgoW8.s:58     .text.core_tsk_flip:00000000 core_tsk_flip
+
+UNDEFINED SYMBOLS
+core_tsk_handler
+core_tsk_loop

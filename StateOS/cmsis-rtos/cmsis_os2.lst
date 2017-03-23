@@ -1,0 +1,3429 @@
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 23, 1
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 4
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"cmsis_os2.c"
+  12              		.section	.text.timer_handler,"ax",%progbits
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu fpv4-sp-d16
+  18              		.type	timer_handler, %function
+  19              	timer_handler:
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22              		@ link register save eliminated.
+  23 0000 024B     		ldr	r3, .L2
+  24 0002 DB68     		ldr	r3, [r3, #12]
+  25 0004 9A6A     		ldr	r2, [r3, #40]
+  26 0006 D86A     		ldr	r0, [r3, #44]
+  27 0008 1047     		bx	r2	@ indirect register sibling call
+  28              	.L3:
+  29 000a 00BF     		.align	2
+  30              	.L2:
+  31 000c 00000000 		.word	WAIT
+  32              		.size	timer_handler, .-timer_handler
+  33              		.section	.text.thread_handler,"ax",%progbits
+  34              		.align	1
+  35              		.syntax unified
+  36              		.thumb
+  37              		.thumb_func
+  38              		.fpu fpv4-sp-d16
+  39              		.type	thread_handler, %function
+  40              	thread_handler:
+  41              		@ args = 0, pretend = 0, frame = 0
+  42              		@ frame_needed = 0, uses_anonymous_args = 0
+  43 0000 08B5     		push	{r3, lr}
+  44 0002 034B     		ldr	r3, .L5
+  45 0004 1B68     		ldr	r3, [r3]
+  46 0006 5A6D     		ldr	r2, [r3, #84]
+  47 0008 986D     		ldr	r0, [r3, #88]
+  48 000a 9047     		blx	r2
+  49 000c FFF7FEFF 		bl	tsk_stop
+  50              	.L6:
+  51              		.align	2
+  52              	.L5:
+  53 0010 00000000 		.word	System
+  54              		.size	thread_handler, .-thread_handler
+  55              		.section	.text.thread_delete,"ax",%progbits
+  56              		.align	1
+  57              		.syntax unified
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 2
+
+
+  58              		.thumb
+  59              		.thumb_func
+  60              		.fpu fpv4-sp-d16
+  61              		.type	thread_delete, %function
+  62              	thread_delete:
+  63              		@ args = 0, pretend = 0, frame = 0
+  64              		@ frame_needed = 0, uses_anonymous_args = 0
+  65 0000 38B5     		push	{r3, r4, r5, lr}
+  66 0002 0446     		mov	r4, r0
+  67              		.syntax unified
+  68              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+  69 0004 EFF31085 		MRS r5, primask
+  70              	@ 0 "" 2
+  71              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+  72 0008 72B6     		cpsid i
+  73              	@ 0 "" 2
+  74              		.thumb
+  75              		.syntax unified
+  76 000a 4368     		ldr	r3, [r0, #4]
+  77 000c 5BB9     		cbnz	r3, .L9
+  78 000e C36C     		ldr	r3, [r0, #76]
+  79 0010 9A05     		lsls	r2, r3, #22
+  80 0012 02D5     		bpl	.L10
+  81 0014 C06D     		ldr	r0, [r0, #92]
+  82 0016 FFF7FEFF 		bl	core_sys_free
+  83              	.L10:
+  84 001a E36C     		ldr	r3, [r4, #76]
+  85 001c DB05     		lsls	r3, r3, #23
+  86 001e 02D5     		bpl	.L9
+  87 0020 2046     		mov	r0, r4
+  88 0022 FFF7FEFF 		bl	core_sys_free
+  89              	.L9:
+  90              		.syntax unified
+  91              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+  92 0026 85F31088 		MSR primask, r5
+  93              	@ 0 "" 2
+  94              		.thumb
+  95              		.syntax unified
+  96 002a 38BD     		pop	{r3, r4, r5, pc}
+  97              		.size	thread_delete, .-thread_delete
+  98              		.section	.text.osKernelGetInfo,"ax",%progbits
+  99              		.align	1
+ 100              		.global	osKernelGetInfo
+ 101              		.syntax unified
+ 102              		.thumb
+ 103              		.thumb_func
+ 104              		.fpu fpv4-sp-d16
+ 105              		.type	osKernelGetInfo, %function
+ 106              	osKernelGetInfo:
+ 107              		@ args = 0, pretend = 0, frame = 0
+ 108              		@ frame_needed = 0, uses_anonymous_args = 0
+ 109 0000 08B5     		push	{r3, lr}
+ 110 0002 0346     		mov	r3, r0
+ 111 0004 0846     		mov	r0, r1
+ 112              		.syntax unified
+ 113              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 114 0006 EFF30581 		MRS r1, ipsr
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 3
+
+
+ 115              	@ 0 "" 2
+ 116              		.thumb
+ 117              		.syntax unified
+ 118 000a 59B9     		cbnz	r1, .L21
+ 119 000c 23B1     		cbz	r3, .L20
+ 120 000e 0749     		ldr	r1, .L26
+ 121 0010 DFF820C0 		ldr	ip, .L26+8
+ 122 0014 83E80210 		stm	r3, {r1, ip}
+ 123              	.L20:
+ 124 0018 30B1     		cbz	r0, .L18
+ 125 001a 0549     		ldr	r1, .L26+4
+ 126 001c FFF7FEFF 		bl	strncpy
+ 127 0020 0020     		movs	r0, #0
+ 128 0022 08BD     		pop	{r3, pc}
+ 129              	.L21:
+ 130 0024 6FF00500 		mvn	r0, #5
+ 131              	.L18:
+ 132 0028 08BD     		pop	{r3, pc}
+ 133              	.L27:
+ 134 002a 00BF     		.align	2
+ 135              	.L26:
+ 136 002c 10543101 		.word	20010000
+ 137 0030 00000000 		.word	.LC0
+ 138 0034 501D6302 		.word	40050000
+ 139              		.size	osKernelGetInfo, .-osKernelGetInfo
+ 140              		.section	.text.osKernelGetState,"ax",%progbits
+ 141              		.align	1
+ 142              		.global	osKernelGetState
+ 143              		.syntax unified
+ 144              		.thumb
+ 145              		.thumb_func
+ 146              		.fpu fpv4-sp-d16
+ 147              		.type	osKernelGetState, %function
+ 148              	osKernelGetState:
+ 149              		@ args = 0, pretend = 0, frame = 0
+ 150              		@ frame_needed = 0, uses_anonymous_args = 0
+ 151              		@ link register save eliminated.
+ 152              		.syntax unified
+ 153              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 154 0000 EFF30583 		MRS r3, ipsr
+ 155              	@ 0 "" 2
+ 156              		.thumb
+ 157              		.syntax unified
+ 158 0004 002B     		cmp	r3, #0
+ 159 0006 14BF     		ite	ne
+ 160 0008 4FF0FF30 		movne	r0, #-1
+ 161 000c 0220     		moveq	r0, #2
+ 162 000e 7047     		bx	lr
+ 163              		.size	osKernelGetState, .-osKernelGetState
+ 164              		.section	.text.osKernelStart,"ax",%progbits
+ 165              		.align	1
+ 166              		.global	osKernelStart
+ 167              		.syntax unified
+ 168              		.thumb
+ 169              		.thumb_func
+ 170              		.fpu fpv4-sp-d16
+ 171              		.type	osKernelStart, %function
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 4
+
+
+ 172              	osKernelStart:
+ 173              		@ args = 0, pretend = 0, frame = 0
+ 174              		@ frame_needed = 0, uses_anonymous_args = 0
+ 175              		@ link register save eliminated.
+ 176              		.syntax unified
+ 177              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 178 0000 EFF30583 		MRS r3, ipsr
+ 179              	@ 0 "" 2
+ 180              		.thumb
+ 181              		.syntax unified
+ 182 0004 002B     		cmp	r3, #0
+ 183 0006 14BF     		ite	ne
+ 184 0008 6FF00500 		mvnne	r0, #5
+ 185 000c 0020     		moveq	r0, #0
+ 186 000e 7047     		bx	lr
+ 187              		.size	osKernelStart, .-osKernelStart
+ 188              		.section	.text.osKernelInitialize,"ax",%progbits
+ 189              		.align	1
+ 190              		.global	osKernelInitialize
+ 191              		.syntax unified
+ 192              		.thumb
+ 193              		.thumb_func
+ 194              		.fpu fpv4-sp-d16
+ 195              		.type	osKernelInitialize, %function
+ 196              	osKernelInitialize:
+ 197              		@ args = 0, pretend = 0, frame = 0
+ 198              		@ frame_needed = 0, uses_anonymous_args = 0
+ 199              		@ link register save eliminated.
+ 200 0000 FFF7FEBF 		b	osKernelStart
+ 201              		.size	osKernelInitialize, .-osKernelInitialize
+ 202              		.section	.text.osKernelLock,"ax",%progbits
+ 203              		.align	1
+ 204              		.global	osKernelLock
+ 205              		.syntax unified
+ 206              		.thumb
+ 207              		.thumb_func
+ 208              		.fpu fpv4-sp-d16
+ 209              		.type	osKernelLock, %function
+ 210              	osKernelLock:
+ 211              		@ args = 0, pretend = 0, frame = 0
+ 212              		@ frame_needed = 0, uses_anonymous_args = 0
+ 213              		@ link register save eliminated.
+ 214              		.syntax unified
+ 215              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 216 0000 EFF30583 		MRS r3, ipsr
+ 217              	@ 0 "" 2
+ 218              		.thumb
+ 219              		.syntax unified
+ 220 0004 1BB9     		cbnz	r3, .L37
+ 221              		.syntax unified
+ 222              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 223 0006 EFF31080 		MRS r0, primask
+ 224              	@ 0 "" 2
+ 225              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 226 000a 72B6     		cpsid i
+ 227              	@ 0 "" 2
+ 228              		.thumb
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 5
+
+
+ 229              		.syntax unified
+ 230 000c 7047     		bx	lr
+ 231              	.L37:
+ 232 000e 6FF00500 		mvn	r0, #5
+ 233 0012 7047     		bx	lr
+ 234              		.size	osKernelLock, .-osKernelLock
+ 235              		.section	.text.osKernelUnlock,"ax",%progbits
+ 236              		.align	1
+ 237              		.global	osKernelUnlock
+ 238              		.syntax unified
+ 239              		.thumb
+ 240              		.thumb_func
+ 241              		.fpu fpv4-sp-d16
+ 242              		.type	osKernelUnlock, %function
+ 243              	osKernelUnlock:
+ 244              		@ args = 0, pretend = 0, frame = 0
+ 245              		@ frame_needed = 0, uses_anonymous_args = 0
+ 246              		@ link register save eliminated.
+ 247              		.syntax unified
+ 248              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 249 0000 EFF30583 		MRS r3, ipsr
+ 250              	@ 0 "" 2
+ 251              		.thumb
+ 252              		.syntax unified
+ 253 0004 1BB9     		cbnz	r3, .L40
+ 254              		.syntax unified
+ 255              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 256 0006 EFF31080 		MRS r0, primask
+ 257              	@ 0 "" 2
+ 258              	@ 117 "CMSIS/include/cmsis_gcc.h" 1
+ 259 000a 62B6     		cpsie i
+ 260              	@ 0 "" 2
+ 261              		.thumb
+ 262              		.syntax unified
+ 263 000c 7047     		bx	lr
+ 264              	.L40:
+ 265 000e 6FF00500 		mvn	r0, #5
+ 266 0012 7047     		bx	lr
+ 267              		.size	osKernelUnlock, .-osKernelUnlock
+ 268              		.section	.text.osKernelRestoreLock,"ax",%progbits
+ 269              		.align	1
+ 270              		.global	osKernelRestoreLock
+ 271              		.syntax unified
+ 272              		.thumb
+ 273              		.thumb_func
+ 274              		.fpu fpv4-sp-d16
+ 275              		.type	osKernelRestoreLock, %function
+ 276              	osKernelRestoreLock:
+ 277              		@ args = 0, pretend = 0, frame = 0
+ 278              		@ frame_needed = 0, uses_anonymous_args = 0
+ 279              		@ link register save eliminated.
+ 280              		.syntax unified
+ 281              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 282 0000 EFF30583 		MRS r3, ipsr
+ 283              	@ 0 "" 2
+ 284              		.thumb
+ 285              		.syntax unified
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 6
+
+
+ 286 0004 23B9     		cbnz	r3, .L43
+ 287              		.syntax unified
+ 288              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 289 0006 80F31088 		MSR primask, r0
+ 290              	@ 0 "" 2
+ 291              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 292 000a EFF31080 		MRS r0, primask
+ 293              	@ 0 "" 2
+ 294              		.thumb
+ 295              		.syntax unified
+ 296 000e 7047     		bx	lr
+ 297              	.L43:
+ 298 0010 6FF00500 		mvn	r0, #5
+ 299 0014 7047     		bx	lr
+ 300              		.size	osKernelRestoreLock, .-osKernelRestoreLock
+ 301              		.section	.text.osKernelSuspend,"ax",%progbits
+ 302              		.align	1
+ 303              		.global	osKernelSuspend
+ 304              		.syntax unified
+ 305              		.thumb
+ 306              		.thumb_func
+ 307              		.fpu fpv4-sp-d16
+ 308              		.type	osKernelSuspend, %function
+ 309              	osKernelSuspend:
+ 310              		@ args = 0, pretend = 0, frame = 0
+ 311              		@ frame_needed = 0, uses_anonymous_args = 0
+ 312              		@ link register save eliminated.
+ 313 0000 0020     		movs	r0, #0
+ 314 0002 7047     		bx	lr
+ 315              		.size	osKernelSuspend, .-osKernelSuspend
+ 316              		.section	.text.osKernelResume,"ax",%progbits
+ 317              		.align	1
+ 318              		.global	osKernelResume
+ 319              		.syntax unified
+ 320              		.thumb
+ 321              		.thumb_func
+ 322              		.fpu fpv4-sp-d16
+ 323              		.type	osKernelResume, %function
+ 324              	osKernelResume:
+ 325              		@ args = 0, pretend = 0, frame = 0
+ 326              		@ frame_needed = 0, uses_anonymous_args = 0
+ 327              		@ link register save eliminated.
+ 328 0000 7047     		bx	lr
+ 329              		.size	osKernelResume, .-osKernelResume
+ 330              		.section	.text.osKernelGetTickCount,"ax",%progbits
+ 331              		.align	1
+ 332              		.global	osKernelGetTickCount
+ 333              		.syntax unified
+ 334              		.thumb
+ 335              		.thumb_func
+ 336              		.fpu fpv4-sp-d16
+ 337              		.type	osKernelGetTickCount, %function
+ 338              	osKernelGetTickCount:
+ 339              		@ args = 0, pretend = 0, frame = 0
+ 340              		@ frame_needed = 0, uses_anonymous_args = 0
+ 341              		@ link register save eliminated.
+ 342 0000 4FF08043 		mov	r3, #1073741824
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 7
+
+
+ 343 0004 0021     		movs	r1, #0
+ 344 0006 586A     		ldr	r0, [r3, #36]
+ 345 0008 7047     		bx	lr
+ 346              		.size	osKernelGetTickCount, .-osKernelGetTickCount
+ 347              		.section	.text.osKernelGetTickFreq,"ax",%progbits
+ 348              		.align	1
+ 349              		.global	osKernelGetTickFreq
+ 350              		.syntax unified
+ 351              		.thumb
+ 352              		.thumb_func
+ 353              		.fpu fpv4-sp-d16
+ 354              		.type	osKernelGetTickFreq, %function
+ 355              	osKernelGetTickFreq:
+ 356              		@ args = 0, pretend = 0, frame = 0
+ 357              		@ frame_needed = 0, uses_anonymous_args = 0
+ 358              		@ link register save eliminated.
+ 359 0000 0048     		ldr	r0, .L48
+ 360 0002 7047     		bx	lr
+ 361              	.L49:
+ 362              		.align	2
+ 363              	.L48:
+ 364 0004 40420F00 		.word	1000000
+ 365              		.size	osKernelGetTickFreq, .-osKernelGetTickFreq
+ 366              		.section	.text.osKernelGetSysTimerCount,"ax",%progbits
+ 367              		.align	1
+ 368              		.global	osKernelGetSysTimerCount
+ 369              		.syntax unified
+ 370              		.thumb
+ 371              		.thumb_func
+ 372              		.fpu fpv4-sp-d16
+ 373              		.type	osKernelGetSysTimerCount, %function
+ 374              	osKernelGetSysTimerCount:
+ 375              		@ args = 0, pretend = 0, frame = 0
+ 376              		@ frame_needed = 0, uses_anonymous_args = 0
+ 377              		@ link register save eliminated.
+ 378 0000 4FF08043 		mov	r3, #1073741824
+ 379 0004 586A     		ldr	r0, [r3, #36]
+ 380 0006 7047     		bx	lr
+ 381              		.size	osKernelGetSysTimerCount, .-osKernelGetSysTimerCount
+ 382              		.section	.text.osKernelGetSysTimerFreq,"ax",%progbits
+ 383              		.align	1
+ 384              		.global	osKernelGetSysTimerFreq
+ 385              		.syntax unified
+ 386              		.thumb
+ 387              		.thumb_func
+ 388              		.fpu fpv4-sp-d16
+ 389              		.type	osKernelGetSysTimerFreq, %function
+ 390              	osKernelGetSysTimerFreq:
+ 391              		@ args = 0, pretend = 0, frame = 0
+ 392              		@ frame_needed = 0, uses_anonymous_args = 0
+ 393              		@ link register save eliminated.
+ 394 0000 0048     		ldr	r0, .L52
+ 395 0002 7047     		bx	lr
+ 396              	.L53:
+ 397              		.align	2
+ 398              	.L52:
+ 399 0004 40420F00 		.word	1000000
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 8
+
+
+ 400              		.size	osKernelGetSysTimerFreq, .-osKernelGetSysTimerFreq
+ 401              		.section	.text.osThreadNew,"ax",%progbits
+ 402              		.align	1
+ 403              		.global	osThreadNew
+ 404              		.syntax unified
+ 405              		.thumb
+ 406              		.thumb_func
+ 407              		.fpu fpv4-sp-d16
+ 408              		.type	osThreadNew, %function
+ 409              	osThreadNew:
+ 410              		@ args = 0, pretend = 0, frame = 0
+ 411              		@ frame_needed = 0, uses_anonymous_args = 0
+ 412 0000 2DE9F84F 		push	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 413 0004 8146     		mov	r9, r0
+ 414 0006 8A46     		mov	r10, r1
+ 415 0008 1546     		mov	r5, r2
+ 416              		.syntax unified
+ 417              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 418 000a EFF30583 		MRS r3, ipsr
+ 419              	@ 0 "" 2
+ 420              		.thumb
+ 421              		.syntax unified
+ 422 000e 13B1     		cbz	r3, .L55
+ 423              	.L57:
+ 424 0010 0020     		movs	r0, #0
+ 425 0012 BDE8F88F 		pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 426              	.L55:
+ 427 0016 0028     		cmp	r0, #0
+ 428 0018 FAD0     		beq	.L57
+ 429 001a 32B3     		cbz	r2, .L67
+ 430 001c 9369     		ldr	r3, [r2, #24]
+ 431 001e 013B     		subs	r3, r3, #1
+ 432 0020 372B     		cmp	r3, #55
+ 433 0022 F5D8     		bhi	.L57
+ 434 0024 D368     		ldr	r3, [r2, #12]
+ 435 0026 5668     		ldr	r6, [r2, #4]
+ 436 0028 EBB1     		cbz	r3, .L68
+ 437 002a 642B     		cmp	r3, #100
+ 438 002c 9468     		ldr	r4, [r2, #8]
+ 439 002e EFD1     		bne	.L57
+ 440              	.L59:
+ 441 0030 D5F81480 		ldr	r8, [r5, #20]
+ 442 0034 B8F1000F 		cmp	r8, #0
+ 443 0038 47D0     		beq	.L60
+ 444 003a 2F69     		ldr	r7, [r5, #16]
+ 445 003c 3CB9     		cbnz	r4, .L61
+ 446              	.L58:
+ 447 003e 6420     		movs	r0, #100
+ 448 0040 FFF7FEFF 		bl	core_sys_alloc
+ 449 0044 0028     		cmp	r0, #0
+ 450 0046 E3D0     		beq	.L57
+ 451 0048 46F48076 		orr	r6, r6, #256
+ 452 004c 0446     		mov	r4, r0
+ 453              	.L61:
+ 454 004e 9FB9     		cbnz	r7, .L62
+ 455              	.L66:
+ 456 0050 4046     		mov	r0, r8
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 9
+
+
+ 457 0052 FFF7FEFF 		bl	core_sys_alloc
+ 458 0056 0746     		mov	r7, r0
+ 459 0058 60B9     		cbnz	r0, .L63
+ 460 005a F305     		lsls	r3, r6, #23
+ 461 005c D8D5     		bpl	.L57
+ 462 005e 2046     		mov	r0, r4
+ 463 0060 FFF7FEFF 		bl	core_sys_free
+ 464 0064 D4E7     		b	.L57
+ 465              	.L68:
+ 466 0066 1C46     		mov	r4, r3
+ 467 0068 E2E7     		b	.L59
+ 468              	.L67:
+ 469 006a 4FF40078 		mov	r8, #512
+ 470 006e 1746     		mov	r7, r2
+ 471 0070 0126     		movs	r6, #1
+ 472 0072 E4E7     		b	.L58
+ 473              	.L63:
+ 474 0074 46F40076 		orr	r6, r6, #512
+ 475              	.L62:
+ 476              		.syntax unified
+ 477              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 478 0078 EFF3108B 		MRS fp, primask
+ 479              	@ 0 "" 2
+ 480              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 481 007c 72B6     		cpsid i
+ 482              	@ 0 "" 2
+ 483              		.thumb
+ 484              		.syntax unified
+ 485 007e 15B3     		cbz	r5, .L69
+ 486 0080 A969     		ldr	r1, [r5, #24]
+ 487              	.L64:
+ 488 0082 154A     		ldr	r2, .L81
+ 489 0084 28F00703 		bic	r3, r8, #7
+ 490 0088 3B44     		add	r3, r3, r7
+ 491 008a 2046     		mov	r0, r4
+ 492 008c FFF7FEFF 		bl	tsk_init
+ 493 0090 16F0010F 		tst	r6, #1
+ 494 0094 0CBF     		ite	eq
+ 495 0096 4FF0FF33 		moveq	r3, #-1
+ 496 009a 0023     		movne	r3, #0
+ 497 009c A363     		str	r3, [r4, #56]
+ 498 009e 04F14400 		add	r0, r4, #68
+ 499 00a2 FFF7FEFF 		bl	flg_init
+ 500 00a6 E664     		str	r6, [r4, #76]
+ 501 00a8 05B1     		cbz	r5, .L65
+ 502 00aa 2D68     		ldr	r5, [r5]
+ 503              	.L65:
+ 504 00ac 2565     		str	r5, [r4, #80]
+ 505 00ae C4F85490 		str	r9, [r4, #84]
+ 506 00b2 C4F858A0 		str	r10, [r4, #88]
+ 507 00b6 E765     		str	r7, [r4, #92]
+ 508 00b8 C4F86080 		str	r8, [r4, #96]
+ 509              		.syntax unified
+ 510              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 511 00bc 8BF31088 		MSR primask, fp
+ 512              	@ 0 "" 2
+ 513              		.thumb
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 10
+
+
+ 514              		.syntax unified
+ 515 00c0 2046     		mov	r0, r4
+ 516 00c2 BDE8F88F 		pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 517              	.L69:
+ 518 00c6 1821     		movs	r1, #24
+ 519 00c8 DBE7     		b	.L64
+ 520              	.L60:
+ 521 00ca 4FF40078 		mov	r8, #512
+ 522 00ce 002C     		cmp	r4, #0
+ 523 00d0 BED1     		bne	.L66
+ 524 00d2 2746     		mov	r7, r4
+ 525 00d4 B3E7     		b	.L58
+ 526              	.L82:
+ 527 00d6 00BF     		.align	2
+ 528              	.L81:
+ 529 00d8 00000000 		.word	thread_handler
+ 530              		.size	osThreadNew, .-osThreadNew
+ 531              		.section	.text.osThreadGetName,"ax",%progbits
+ 532              		.align	1
+ 533              		.global	osThreadGetName
+ 534              		.syntax unified
+ 535              		.thumb
+ 536              		.thumb_func
+ 537              		.fpu fpv4-sp-d16
+ 538              		.type	osThreadGetName, %function
+ 539              	osThreadGetName:
+ 540              		@ args = 0, pretend = 0, frame = 0
+ 541              		@ frame_needed = 0, uses_anonymous_args = 0
+ 542              		@ link register save eliminated.
+ 543              		.syntax unified
+ 544              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 545 0000 EFF30583 		MRS r3, ipsr
+ 546              	@ 0 "" 2
+ 547              		.thumb
+ 548              		.syntax unified
+ 549 0004 13B9     		cbnz	r3, .L85
+ 550 0006 10B1     		cbz	r0, .L83
+ 551 0008 006D     		ldr	r0, [r0, #80]
+ 552 000a 7047     		bx	lr
+ 553              	.L85:
+ 554 000c 0020     		movs	r0, #0
+ 555              	.L83:
+ 556 000e 7047     		bx	lr
+ 557              		.size	osThreadGetName, .-osThreadGetName
+ 558              		.section	.text.osThreadGetId,"ax",%progbits
+ 559              		.align	1
+ 560              		.global	osThreadGetId
+ 561              		.syntax unified
+ 562              		.thumb
+ 563              		.thumb_func
+ 564              		.fpu fpv4-sp-d16
+ 565              		.type	osThreadGetId, %function
+ 566              	osThreadGetId:
+ 567              		@ args = 0, pretend = 0, frame = 0
+ 568              		@ frame_needed = 0, uses_anonymous_args = 0
+ 569              		@ link register save eliminated.
+ 570              		.syntax unified
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 11
+
+
+ 571              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 572 0000 EFF30583 		MRS r3, ipsr
+ 573              	@ 0 "" 2
+ 574              		.thumb
+ 575              		.syntax unified
+ 576 0004 13B9     		cbnz	r3, .L89
+ 577 0006 024B     		ldr	r3, .L90
+ 578 0008 1868     		ldr	r0, [r3]
+ 579 000a 7047     		bx	lr
+ 580              	.L89:
+ 581 000c 0020     		movs	r0, #0
+ 582 000e 7047     		bx	lr
+ 583              	.L91:
+ 584              		.align	2
+ 585              	.L90:
+ 586 0010 00000000 		.word	System
+ 587              		.size	osThreadGetId, .-osThreadGetId
+ 588              		.section	.text.osThreadGetState,"ax",%progbits
+ 589              		.align	1
+ 590              		.global	osThreadGetState
+ 591              		.syntax unified
+ 592              		.thumb
+ 593              		.thumb_func
+ 594              		.fpu fpv4-sp-d16
+ 595              		.type	osThreadGetState, %function
+ 596              	osThreadGetState:
+ 597              		@ args = 0, pretend = 0, frame = 0
+ 598              		@ frame_needed = 0, uses_anonymous_args = 0
+ 599              		@ link register save eliminated.
+ 600              		.syntax unified
+ 601              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 602 0000 EFF30583 		MRS r3, ipsr
+ 603              	@ 0 "" 2
+ 604              		.thumb
+ 605              		.syntax unified
+ 606 0004 33B9     		cbnz	r3, .L96
+ 607 0006 28B1     		cbz	r0, .L96
+ 608 0008 4368     		ldr	r3, [r0, #4]
+ 609 000a 022B     		cmp	r3, #2
+ 610 000c 02D8     		bhi	.L96
+ 611 000e 034A     		ldr	r2, .L97
+ 612 0010 D056     		ldrsb	r0, [r2, r3]
+ 613 0012 7047     		bx	lr
+ 614              	.L96:
+ 615 0014 4FF0FF30 		mov	r0, #-1
+ 616 0018 7047     		bx	lr
+ 617              	.L98:
+ 618 001a 00BF     		.align	2
+ 619              	.L97:
+ 620 001c 00000000 		.word	.LANCHOR0
+ 621              		.size	osThreadGetState, .-osThreadGetState
+ 622              		.section	.text.osThreadGetStackSize,"ax",%progbits
+ 623              		.align	1
+ 624              		.global	osThreadGetStackSize
+ 625              		.syntax unified
+ 626              		.thumb
+ 627              		.thumb_func
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 12
+
+
+ 628              		.fpu fpv4-sp-d16
+ 629              		.type	osThreadGetStackSize, %function
+ 630              	osThreadGetStackSize:
+ 631              		@ args = 0, pretend = 0, frame = 0
+ 632              		@ frame_needed = 0, uses_anonymous_args = 0
+ 633              		@ link register save eliminated.
+ 634              		.syntax unified
+ 635              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 636 0000 EFF30583 		MRS r3, ipsr
+ 637              	@ 0 "" 2
+ 638              		.thumb
+ 639              		.syntax unified
+ 640 0004 1BB9     		cbnz	r3, .L101
+ 641 0006 00B1     		cbz	r0, .L99
+ 642 0008 036E     		ldr	r3, [r0, #96]
+ 643              	.L99:
+ 644 000a 1846     		mov	r0, r3
+ 645 000c 7047     		bx	lr
+ 646              	.L101:
+ 647 000e 0023     		movs	r3, #0
+ 648 0010 FBE7     		b	.L99
+ 649              		.size	osThreadGetStackSize, .-osThreadGetStackSize
+ 650              		.section	.text.osThreadGetStackSpace,"ax",%progbits
+ 651              		.align	1
+ 652              		.global	osThreadGetStackSpace
+ 653              		.syntax unified
+ 654              		.thumb
+ 655              		.thumb_func
+ 656              		.fpu fpv4-sp-d16
+ 657              		.type	osThreadGetStackSpace, %function
+ 658              	osThreadGetStackSpace:
+ 659              		@ args = 0, pretend = 0, frame = 0
+ 660              		@ frame_needed = 0, uses_anonymous_args = 0
+ 661              		@ link register save eliminated.
+ 662              		.syntax unified
+ 663              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 664 0000 EFF30583 		MRS r3, ipsr
+ 665              	@ 0 "" 2
+ 666              		.thumb
+ 667              		.syntax unified
+ 668 0004 0020     		movs	r0, #0
+ 669 0006 7047     		bx	lr
+ 670              		.size	osThreadGetStackSpace, .-osThreadGetStackSpace
+ 671              		.section	.text.osThreadSetPriority,"ax",%progbits
+ 672              		.align	1
+ 673              		.global	osThreadSetPriority
+ 674              		.syntax unified
+ 675              		.thumb
+ 676              		.thumb_func
+ 677              		.fpu fpv4-sp-d16
+ 678              		.type	osThreadSetPriority, %function
+ 679              	osThreadSetPriority:
+ 680              		@ args = 0, pretend = 0, frame = 0
+ 681              		@ frame_needed = 0, uses_anonymous_args = 0
+ 682 0000 38B5     		push	{r3, r4, r5, lr}
+ 683 0002 0346     		mov	r3, r0
+ 684              		.syntax unified
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 13
+
+
+ 685              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 686 0004 EFF30584 		MRS r4, ipsr
+ 687              	@ 0 "" 2
+ 688              		.thumb
+ 689              		.syntax unified
+ 690 0008 6CB9     		cbnz	r4, .L108
+ 691 000a 78B1     		cbz	r0, .L110
+ 692 000c 4D1E     		subs	r5, r1, #1
+ 693 000e 372D     		cmp	r5, #55
+ 694 0010 0CD8     		bhi	.L110
+ 695              		.syntax unified
+ 696              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 697 0012 EFF31085 		MRS r5, primask
+ 698              	@ 0 "" 2
+ 699              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 700 0016 72B6     		cpsid i
+ 701              	@ 0 "" 2
+ 702              		.thumb
+ 703              		.syntax unified
+ 704 0018 9962     		str	r1, [r3, #40]
+ 705 001a FFF7FEFF 		bl	core_tsk_prio
+ 706              		.syntax unified
+ 707              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 708 001e 85F31088 		MSR primask, r5
+ 709              	@ 0 "" 2
+ 710              		.thumb
+ 711              		.syntax unified
+ 712 0022 2046     		mov	r0, r4
+ 713 0024 38BD     		pop	{r3, r4, r5, pc}
+ 714              	.L108:
+ 715 0026 6FF00500 		mvn	r0, #5
+ 716 002a 38BD     		pop	{r3, r4, r5, pc}
+ 717              	.L110:
+ 718 002c 6FF00300 		mvn	r0, #3
+ 719 0030 38BD     		pop	{r3, r4, r5, pc}
+ 720              		.size	osThreadSetPriority, .-osThreadSetPriority
+ 721              		.section	.text.osThreadGetPriority,"ax",%progbits
+ 722              		.align	1
+ 723              		.global	osThreadGetPriority
+ 724              		.syntax unified
+ 725              		.thumb
+ 726              		.thumb_func
+ 727              		.fpu fpv4-sp-d16
+ 728              		.type	osThreadGetPriority, %function
+ 729              	osThreadGetPriority:
+ 730              		@ args = 0, pretend = 0, frame = 0
+ 731              		@ frame_needed = 0, uses_anonymous_args = 0
+ 732              		@ link register save eliminated.
+ 733              		.syntax unified
+ 734              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 735 0000 EFF30583 		MRS r3, ipsr
+ 736              	@ 0 "" 2
+ 737              		.thumb
+ 738              		.syntax unified
+ 739 0004 13B9     		cbnz	r3, .L114
+ 740 0006 08B1     		cbz	r0, .L114
+ 741 0008 C06A     		ldr	r0, [r0, #44]
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 14
+
+
+ 742 000a 7047     		bx	lr
+ 743              	.L114:
+ 744 000c 4FF0FF30 		mov	r0, #-1
+ 745 0010 7047     		bx	lr
+ 746              		.size	osThreadGetPriority, .-osThreadGetPriority
+ 747              		.section	.text.osThreadYield,"ax",%progbits
+ 748              		.align	1
+ 749              		.global	osThreadYield
+ 750              		.syntax unified
+ 751              		.thumb
+ 752              		.thumb_func
+ 753              		.fpu fpv4-sp-d16
+ 754              		.type	osThreadYield, %function
+ 755              	osThreadYield:
+ 756              		@ args = 0, pretend = 0, frame = 0
+ 757              		@ frame_needed = 0, uses_anonymous_args = 0
+ 758 0000 10B5     		push	{r4, lr}
+ 759              		.syntax unified
+ 760              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 761 0002 EFF30584 		MRS r4, ipsr
+ 762              	@ 0 "" 2
+ 763              		.thumb
+ 764              		.syntax unified
+ 765 0006 1CB9     		cbnz	r4, .L117
+ 766 0008 FFF7FEFF 		bl	tsk_yield
+ 767 000c 2046     		mov	r0, r4
+ 768 000e 10BD     		pop	{r4, pc}
+ 769              	.L117:
+ 770 0010 6FF00500 		mvn	r0, #5
+ 771 0014 10BD     		pop	{r4, pc}
+ 772              		.size	osThreadYield, .-osThreadYield
+ 773              		.section	.text.osThreadSuspend,"ax",%progbits
+ 774              		.align	1
+ 775              		.global	osThreadSuspend
+ 776              		.syntax unified
+ 777              		.thumb
+ 778              		.thumb_func
+ 779              		.fpu fpv4-sp-d16
+ 780              		.type	osThreadSuspend, %function
+ 781              	osThreadSuspend:
+ 782              		@ args = 0, pretend = 0, frame = 0
+ 783              		@ frame_needed = 0, uses_anonymous_args = 0
+ 784 0000 08B5     		push	{r3, lr}
+ 785              		.syntax unified
+ 786              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 787 0002 EFF30583 		MRS r3, ipsr
+ 788              	@ 0 "" 2
+ 789              		.thumb
+ 790              		.syntax unified
+ 791 0006 6BB9     		cbnz	r3, .L120
+ 792 0008 094B     		ldr	r3, .L122
+ 793 000a 1B68     		ldr	r3, [r3]
+ 794 000c 8342     		cmp	r3, r0
+ 795 000e 0CD1     		bne	.L121
+ 796 0010 4FF0FF31 		mov	r1, #-1
+ 797 0014 0748     		ldr	r0, .L122+4
+ 798 0016 FFF7FEFF 		bl	tmr_waitFor
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 15
+
+
+ 799 001a 0030     		adds	r0, r0, #0
+ 800 001c 18BF     		it	ne
+ 801 001e 0120     		movne	r0, #1
+ 802 0020 4042     		negs	r0, r0
+ 803 0022 08BD     		pop	{r3, pc}
+ 804              	.L120:
+ 805 0024 6FF00500 		mvn	r0, #5
+ 806 0028 08BD     		pop	{r3, pc}
+ 807              	.L121:
+ 808 002a 6FF00300 		mvn	r0, #3
+ 809 002e 08BD     		pop	{r3, pc}
+ 810              	.L123:
+ 811              		.align	2
+ 812              	.L122:
+ 813 0030 00000000 		.word	System
+ 814 0034 00000000 		.word	WAIT
+ 815              		.size	osThreadSuspend, .-osThreadSuspend
+ 816              		.section	.text.osThreadResume,"ax",%progbits
+ 817              		.align	1
+ 818              		.global	osThreadResume
+ 819              		.syntax unified
+ 820              		.thumb
+ 821              		.thumb_func
+ 822              		.fpu fpv4-sp-d16
+ 823              		.type	osThreadResume, %function
+ 824              	osThreadResume:
+ 825              		@ args = 0, pretend = 0, frame = 0
+ 826              		@ frame_needed = 0, uses_anonymous_args = 0
+ 827 0000 10B5     		push	{r4, lr}
+ 828              		.syntax unified
+ 829              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 830 0002 EFF30584 		MRS r4, ipsr
+ 831              	@ 0 "" 2
+ 832              		.thumb
+ 833              		.syntax unified
+ 834 0006 2CB9     		cbnz	r4, .L126
+ 835 0008 38B1     		cbz	r0, .L127
+ 836 000a 2146     		mov	r1, r4
+ 837 000c FFF7FEFF 		bl	tsk_resume
+ 838 0010 2046     		mov	r0, r4
+ 839 0012 10BD     		pop	{r4, pc}
+ 840              	.L126:
+ 841 0014 6FF00500 		mvn	r0, #5
+ 842 0018 10BD     		pop	{r4, pc}
+ 843              	.L127:
+ 844 001a 6FF00300 		mvn	r0, #3
+ 845 001e 10BD     		pop	{r4, pc}
+ 846              		.size	osThreadResume, .-osThreadResume
+ 847              		.section	.text.osThreadDetach,"ax",%progbits
+ 848              		.align	1
+ 849              		.global	osThreadDetach
+ 850              		.syntax unified
+ 851              		.thumb
+ 852              		.thumb_func
+ 853              		.fpu fpv4-sp-d16
+ 854              		.type	osThreadDetach, %function
+ 855              	osThreadDetach:
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 16
+
+
+ 856              		@ args = 0, pretend = 0, frame = 0
+ 857              		@ frame_needed = 0, uses_anonymous_args = 0
+ 858 0000 38B5     		push	{r3, r4, r5, lr}
+ 859 0002 0546     		mov	r5, r0
+ 860              		.syntax unified
+ 861              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 862 0004 EFF30584 		MRS r4, ipsr
+ 863              	@ 0 "" 2
+ 864              		.thumb
+ 865              		.syntax unified
+ 866 0008 54B9     		cbnz	r4, .L130
+ 867 000a 60B1     		cbz	r0, .L131
+ 868 000c 836B     		ldr	r3, [r0, #56]
+ 869 000e 0133     		adds	r3, r3, #1
+ 870 0010 0CD0     		beq	.L132
+ 871 0012 FFF7FEFF 		bl	tsk_detach
+ 872 0016 2846     		mov	r0, r5
+ 873 0018 FFF7FEFF 		bl	thread_delete
+ 874 001c 2046     		mov	r0, r4
+ 875 001e 38BD     		pop	{r3, r4, r5, pc}
+ 876              	.L130:
+ 877 0020 6FF00500 		mvn	r0, #5
+ 878 0024 38BD     		pop	{r3, r4, r5, pc}
+ 879              	.L131:
+ 880 0026 6FF00300 		mvn	r0, #3
+ 881 002a 38BD     		pop	{r3, r4, r5, pc}
+ 882              	.L132:
+ 883 002c 6FF00200 		mvn	r0, #2
+ 884 0030 38BD     		pop	{r3, r4, r5, pc}
+ 885              		.size	osThreadDetach, .-osThreadDetach
+ 886              		.section	.text.osThreadJoin,"ax",%progbits
+ 887              		.align	1
+ 888              		.global	osThreadJoin
+ 889              		.syntax unified
+ 890              		.thumb
+ 891              		.thumb_func
+ 892              		.fpu fpv4-sp-d16
+ 893              		.type	osThreadJoin, %function
+ 894              	osThreadJoin:
+ 895              		@ args = 0, pretend = 0, frame = 0
+ 896              		@ frame_needed = 0, uses_anonymous_args = 0
+ 897 0000 10B5     		push	{r4, lr}
+ 898 0002 0446     		mov	r4, r0
+ 899              		.syntax unified
+ 900              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 901 0004 EFF30583 		MRS r3, ipsr
+ 902              	@ 0 "" 2
+ 903              		.thumb
+ 904              		.syntax unified
+ 905 0008 53B9     		cbnz	r3, .L136
+ 906 000a 60B1     		cbz	r0, .L137
+ 907 000c FFF7FEFF 		bl	tsk_join
+ 908 0010 08B1     		cbz	r0, .L135
+ 909 0012 0130     		adds	r0, r0, #1
+ 910 0014 0AD1     		bne	.L145
+ 911              	.L135:
+ 912 0016 2046     		mov	r0, r4
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 17
+
+
+ 913 0018 FFF7FEFF 		bl	thread_delete
+ 914 001c 0020     		movs	r0, #0
+ 915 001e 10BD     		pop	{r4, pc}
+ 916              	.L136:
+ 917 0020 6FF00500 		mvn	r0, #5
+ 918 0024 10BD     		pop	{r4, pc}
+ 919              	.L137:
+ 920 0026 6FF00300 		mvn	r0, #3
+ 921 002a 10BD     		pop	{r4, pc}
+ 922              	.L145:
+ 923 002c 6FF00200 		mvn	r0, #2
+ 924 0030 10BD     		pop	{r4, pc}
+ 925              		.size	osThreadJoin, .-osThreadJoin
+ 926              		.section	.text.osThreadExit,"ax",%progbits
+ 927              		.align	1
+ 928              		.global	osThreadExit
+ 929              		.syntax unified
+ 930              		.thumb
+ 931              		.thumb_func
+ 932              		.fpu fpv4-sp-d16
+ 933              		.type	osThreadExit, %function
+ 934              	osThreadExit:
+ 935              		@ Volatile: function does not return.
+ 936              		@ args = 0, pretend = 0, frame = 0
+ 937              		@ frame_needed = 0, uses_anonymous_args = 0
+ 938 0000 08B5     		push	{r3, lr}
+ 939 0002 FFF7FEFF 		bl	tsk_stop
+ 940              		.size	osThreadExit, .-osThreadExit
+ 941              		.section	.text.osThreadTerminate,"ax",%progbits
+ 942              		.align	1
+ 943              		.global	osThreadTerminate
+ 944              		.syntax unified
+ 945              		.thumb
+ 946              		.thumb_func
+ 947              		.fpu fpv4-sp-d16
+ 948              		.type	osThreadTerminate, %function
+ 949              	osThreadTerminate:
+ 950              		@ args = 0, pretend = 0, frame = 0
+ 951              		@ frame_needed = 0, uses_anonymous_args = 0
+ 952 0000 38B5     		push	{r3, r4, r5, lr}
+ 953 0002 0546     		mov	r5, r0
+ 954              		.syntax unified
+ 955              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 956 0004 EFF30584 		MRS r4, ipsr
+ 957              	@ 0 "" 2
+ 958              		.thumb
+ 959              		.syntax unified
+ 960 0008 54B9     		cbnz	r4, .L149
+ 961 000a 60B1     		cbz	r0, .L150
+ 962 000c FFF7FEFF 		bl	tsk_kill
+ 963 0010 AB6B     		ldr	r3, [r5, #56]
+ 964 0012 0133     		adds	r3, r3, #1
+ 965 0014 02D1     		bne	.L151
+ 966 0016 2846     		mov	r0, r5
+ 967 0018 FFF7FEFF 		bl	thread_delete
+ 968              	.L151:
+ 969 001c 2046     		mov	r0, r4
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 18
+
+
+ 970 001e 38BD     		pop	{r3, r4, r5, pc}
+ 971              	.L149:
+ 972 0020 6FF00500 		mvn	r0, #5
+ 973 0024 38BD     		pop	{r3, r4, r5, pc}
+ 974              	.L150:
+ 975 0026 6FF00300 		mvn	r0, #3
+ 976 002a 38BD     		pop	{r3, r4, r5, pc}
+ 977              		.size	osThreadTerminate, .-osThreadTerminate
+ 978              		.section	.text.osThreadGetCount,"ax",%progbits
+ 979              		.align	1
+ 980              		.global	osThreadGetCount
+ 981              		.syntax unified
+ 982              		.thumb
+ 983              		.thumb_func
+ 984              		.fpu fpv4-sp-d16
+ 985              		.type	osThreadGetCount, %function
+ 986              	osThreadGetCount:
+ 987              		@ args = 0, pretend = 0, frame = 0
+ 988              		@ frame_needed = 0, uses_anonymous_args = 0
+ 989 0000 10B5     		push	{r4, lr}
+ 990              		.syntax unified
+ 991              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 992 0002 EFF30583 		MRS r3, ipsr
+ 993              	@ 0 "" 2
+ 994              		.thumb
+ 995              		.syntax unified
+ 996 0006 BBB9     		cbnz	r3, .L159
+ 997              		.syntax unified
+ 998              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 999 0008 EFF31081 		MRS r1, primask
+ 1000              	@ 0 "" 2
+ 1001              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 1002 000c 72B6     		cpsid i
+ 1003              	@ 0 "" 2
+ 1004              		.thumb
+ 1005              		.syntax unified
+ 1006 000e 0B4B     		ldr	r3, .L160
+ 1007 0010 DA68     		ldr	r2, [r3, #12]
+ 1008 0012 0120     		movs	r0, #1
+ 1009              	.L154:
+ 1010 0014 9A42     		cmp	r2, r3
+ 1011 0016 06D1     		bne	.L155
+ 1012 0018 094B     		ldr	r3, .L160+4
+ 1013 001a DA68     		ldr	r2, [r3, #12]
+ 1014              	.L156:
+ 1015 001c 9A42     		cmp	r2, r3
+ 1016 001e 05D1     		bne	.L158
+ 1017              		.syntax unified
+ 1018              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 1019 0020 81F31088 		MSR primask, r1
+ 1020              	@ 0 "" 2
+ 1021              		.thumb
+ 1022              		.syntax unified
+ 1023 0024 10BD     		pop	{r4, pc}
+ 1024              	.L155:
+ 1025 0026 0130     		adds	r0, r0, #1
+ 1026 0028 D268     		ldr	r2, [r2, #12]
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 19
+
+
+ 1027 002a F3E7     		b	.L154
+ 1028              	.L158:
+ 1029 002c 5468     		ldr	r4, [r2, #4]
+ 1030 002e D268     		ldr	r2, [r2, #12]
+ 1031 0030 022C     		cmp	r4, #2
+ 1032 0032 08BF     		it	eq
+ 1033 0034 0130     		addeq	r0, r0, #1
+ 1034 0036 F1E7     		b	.L156
+ 1035              	.L159:
+ 1036 0038 0020     		movs	r0, #0
+ 1037 003a 10BD     		pop	{r4, pc}
+ 1038              	.L161:
+ 1039              		.align	2
+ 1040              	.L160:
+ 1041 003c 00000000 		.word	IDLE
+ 1042 0040 00000000 		.word	WAIT
+ 1043              		.size	osThreadGetCount, .-osThreadGetCount
+ 1044              		.section	.text.osThreadEnumerate,"ax",%progbits
+ 1045              		.align	1
+ 1046              		.global	osThreadEnumerate
+ 1047              		.syntax unified
+ 1048              		.thumb
+ 1049              		.thumb_func
+ 1050              		.fpu fpv4-sp-d16
+ 1051              		.type	osThreadEnumerate, %function
+ 1052              	osThreadEnumerate:
+ 1053              		@ args = 0, pretend = 0, frame = 0
+ 1054              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1055 0000 70B5     		push	{r4, r5, r6, lr}
+ 1056              		.syntax unified
+ 1057              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1058 0002 EFF30583 		MRS r3, ipsr
+ 1059              	@ 0 "" 2
+ 1060              		.thumb
+ 1061              		.syntax unified
+ 1062 0006 1BBB     		cbnz	r3, .L173
+ 1063 0008 78B1     		cbz	r0, .L162
+ 1064 000a 71B1     		cbz	r1, .L162
+ 1065              		.syntax unified
+ 1066              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 1067 000c EFF31085 		MRS r5, primask
+ 1068              	@ 0 "" 2
+ 1069              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 1070 0010 72B6     		cpsid i
+ 1071              	@ 0 "" 2
+ 1072              		.thumb
+ 1073              		.syntax unified
+ 1074 0012 104A     		ldr	r2, .L180
+ 1075 0014 0260     		str	r2, [r0]
+ 1076 0016 D468     		ldr	r4, [r2, #12]
+ 1077 0018 0123     		movs	r3, #1
+ 1078              	.L164:
+ 1079 001a 9442     		cmp	r4, r2
+ 1080 001c 07D1     		bne	.L165
+ 1081              	.L168:
+ 1082 001e 0E4C     		ldr	r4, .L180+4
+ 1083 0020 E268     		ldr	r2, [r4, #12]
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 20
+
+
+ 1084              	.L166:
+ 1085 0022 A242     		cmp	r2, r4
+ 1086 0024 0AD1     		bne	.L170
+ 1087              	.L172:
+ 1088              		.syntax unified
+ 1089              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 1090 0026 85F31088 		MSR primask, r5
+ 1091              	@ 0 "" 2
+ 1092              		.thumb
+ 1093              		.syntax unified
+ 1094              	.L162:
+ 1095 002a 1846     		mov	r0, r3
+ 1096 002c 70BD     		pop	{r4, r5, r6, pc}
+ 1097              	.L165:
+ 1098 002e 9942     		cmp	r1, r3
+ 1099 0030 F5D0     		beq	.L168
+ 1100 0032 40F82340 		str	r4, [r0, r3, lsl #2]
+ 1101 0036 0133     		adds	r3, r3, #1
+ 1102 0038 E468     		ldr	r4, [r4, #12]
+ 1103 003a EEE7     		b	.L164
+ 1104              	.L170:
+ 1105 003c 8B42     		cmp	r3, r1
+ 1106 003e F2D2     		bcs	.L172
+ 1107 0040 5668     		ldr	r6, [r2, #4]
+ 1108 0042 022E     		cmp	r6, #2
+ 1109 0044 04BF     		itt	eq
+ 1110 0046 40F82320 		streq	r2, [r0, r3, lsl #2]
+ 1111 004a 0133     		addeq	r3, r3, #1
+ 1112 004c D268     		ldr	r2, [r2, #12]
+ 1113 004e E8E7     		b	.L166
+ 1114              	.L173:
+ 1115 0050 0023     		movs	r3, #0
+ 1116 0052 EAE7     		b	.L162
+ 1117              	.L181:
+ 1118              		.align	2
+ 1119              	.L180:
+ 1120 0054 00000000 		.word	IDLE
+ 1121 0058 00000000 		.word	WAIT
+ 1122              		.size	osThreadEnumerate, .-osThreadEnumerate
+ 1123              		.section	.text.osThreadFlagsSet,"ax",%progbits
+ 1124              		.align	1
+ 1125              		.global	osThreadFlagsSet
+ 1126              		.syntax unified
+ 1127              		.thumb
+ 1128              		.thumb_func
+ 1129              		.fpu fpv4-sp-d16
+ 1130              		.type	osThreadFlagsSet, %function
+ 1131              	osThreadFlagsSet:
+ 1132              		@ args = 0, pretend = 0, frame = 0
+ 1133              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1134              		@ link register save eliminated.
+ 1135 0000 20B1     		cbz	r0, .L182
+ 1136 0002 0029     		cmp	r1, #0
+ 1137 0004 02DB     		blt	.L182
+ 1138 0006 4430     		adds	r0, r0, #68
+ 1139 0008 FFF7FEBF 		b	flg_give
+ 1140              	.L182:
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 21
+
+
+ 1141 000c 6FF00300 		mvn	r0, #3
+ 1142 0010 7047     		bx	lr
+ 1143              		.size	osThreadFlagsSet, .-osThreadFlagsSet
+ 1144              		.section	.text.osThreadFlagsClear,"ax",%progbits
+ 1145              		.align	1
+ 1146              		.global	osThreadFlagsClear
+ 1147              		.syntax unified
+ 1148              		.thumb
+ 1149              		.thumb_func
+ 1150              		.fpu fpv4-sp-d16
+ 1151              		.type	osThreadFlagsClear, %function
+ 1152              	osThreadFlagsClear:
+ 1153              		@ args = 0, pretend = 0, frame = 0
+ 1154              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1155              		@ link register save eliminated.
+ 1156 0000 0146     		mov	r1, r0
+ 1157              		.syntax unified
+ 1158              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1159 0002 EFF30583 		MRS r3, ipsr
+ 1160              	@ 0 "" 2
+ 1161              		.thumb
+ 1162              		.syntax unified
+ 1163 0006 23B9     		cbnz	r3, .L188
+ 1164 0008 034B     		ldr	r3, .L189
+ 1165 000a 1868     		ldr	r0, [r3]
+ 1166 000c 4430     		adds	r0, r0, #68
+ 1167 000e FFF7FEBF 		b	flg_clear
+ 1168              	.L188:
+ 1169 0012 6FF00500 		mvn	r0, #5
+ 1170 0016 7047     		bx	lr
+ 1171              	.L190:
+ 1172              		.align	2
+ 1173              	.L189:
+ 1174 0018 00000000 		.word	System
+ 1175              		.size	osThreadFlagsClear, .-osThreadFlagsClear
+ 1176              		.section	.text.osThreadFlagsGet,"ax",%progbits
+ 1177              		.align	1
+ 1178              		.global	osThreadFlagsGet
+ 1179              		.syntax unified
+ 1180              		.thumb
+ 1181              		.thumb_func
+ 1182              		.fpu fpv4-sp-d16
+ 1183              		.type	osThreadFlagsGet, %function
+ 1184              	osThreadFlagsGet:
+ 1185              		@ args = 0, pretend = 0, frame = 0
+ 1186              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1187              		@ link register save eliminated.
+ 1188              		.syntax unified
+ 1189              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1190 0000 EFF30583 		MRS r3, ipsr
+ 1191              	@ 0 "" 2
+ 1192              		.thumb
+ 1193              		.syntax unified
+ 1194 0004 1BB9     		cbnz	r3, .L193
+ 1195 0006 034B     		ldr	r3, .L194
+ 1196 0008 1B68     		ldr	r3, [r3]
+ 1197 000a 986C     		ldr	r0, [r3, #72]
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 22
+
+
+ 1198 000c 7047     		bx	lr
+ 1199              	.L193:
+ 1200 000e 6FF00500 		mvn	r0, #5
+ 1201 0012 7047     		bx	lr
+ 1202              	.L195:
+ 1203              		.align	2
+ 1204              	.L194:
+ 1205 0014 00000000 		.word	System
+ 1206              		.size	osThreadFlagsGet, .-osThreadFlagsGet
+ 1207              		.section	.text.osThreadFlagsWait,"ax",%progbits
+ 1208              		.align	1
+ 1209              		.global	osThreadFlagsWait
+ 1210              		.syntax unified
+ 1211              		.thumb
+ 1212              		.thumb_func
+ 1213              		.fpu fpv4-sp-d16
+ 1214              		.type	osThreadFlagsWait, %function
+ 1215              	osThreadFlagsWait:
+ 1216              		@ args = 0, pretend = 0, frame = 0
+ 1217              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1218 0000 10B5     		push	{r4, lr}
+ 1219 0002 1346     		mov	r3, r2
+ 1220 0004 0446     		mov	r4, r0
+ 1221              		.syntax unified
+ 1222              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1223 0006 EFF30582 		MRS r2, ipsr
+ 1224              	@ 0 "" 2
+ 1225              		.thumb
+ 1226              		.syntax unified
+ 1227 000a 8AB9     		cbnz	r2, .L200
+ 1228 000c 0028     		cmp	r0, #0
+ 1229 000e 12DB     		blt	.L201
+ 1230 0010 0A4A     		ldr	r2, .L205
+ 1231 0012 1068     		ldr	r0, [r2]
+ 1232 0014 0A46     		mov	r2, r1
+ 1233 0016 4430     		adds	r0, r0, #68
+ 1234 0018 2146     		mov	r1, r4
+ 1235 001a FFF7FEFF 		bl	flg_waitFor
+ 1236 001e 28B1     		cbz	r0, .L197
+ 1237 0020 0230     		adds	r0, r0, #2
+ 1238 0022 0CBF     		ite	eq
+ 1239 0024 6FF00104 		mvneq	r4, #1
+ 1240 0028 6FF00204 		mvnne	r4, #2
+ 1241              	.L197:
+ 1242 002c 2046     		mov	r0, r4
+ 1243 002e 10BD     		pop	{r4, pc}
+ 1244              	.L200:
+ 1245 0030 6FF00504 		mvn	r4, #5
+ 1246 0034 FAE7     		b	.L197
+ 1247              	.L201:
+ 1248 0036 6FF00304 		mvn	r4, #3
+ 1249 003a F7E7     		b	.L197
+ 1250              	.L206:
+ 1251              		.align	2
+ 1252              	.L205:
+ 1253 003c 00000000 		.word	System
+ 1254              		.size	osThreadFlagsWait, .-osThreadFlagsWait
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 23
+
+
+ 1255              		.section	.text.osDelay,"ax",%progbits
+ 1256              		.align	1
+ 1257              		.global	osDelay
+ 1258              		.syntax unified
+ 1259              		.thumb
+ 1260              		.thumb_func
+ 1261              		.fpu fpv4-sp-d16
+ 1262              		.type	osDelay, %function
+ 1263              	osDelay:
+ 1264              		@ args = 0, pretend = 0, frame = 0
+ 1265              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1266 0000 08B5     		push	{r3, lr}
+ 1267 0002 0146     		mov	r1, r0
+ 1268              		.syntax unified
+ 1269              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1270 0004 EFF30583 		MRS r3, ipsr
+ 1271              	@ 0 "" 2
+ 1272              		.thumb
+ 1273              		.syntax unified
+ 1274 0008 43B9     		cbnz	r3, .L210
+ 1275 000a 0648     		ldr	r0, .L212
+ 1276 000c FFF7FEFF 		bl	tmr_waitFor
+ 1277 0010 831C     		adds	r3, r0, #2
+ 1278 0012 0CBF     		ite	eq
+ 1279 0014 0020     		moveq	r0, #0
+ 1280 0016 4FF0FF30 		movne	r0, #-1
+ 1281 001a 08BD     		pop	{r3, pc}
+ 1282              	.L210:
+ 1283 001c 6FF00500 		mvn	r0, #5
+ 1284 0020 08BD     		pop	{r3, pc}
+ 1285              	.L213:
+ 1286 0022 00BF     		.align	2
+ 1287              	.L212:
+ 1288 0024 00000000 		.word	WAIT
+ 1289              		.size	osDelay, .-osDelay
+ 1290              		.section	.text.osDelayUntil,"ax",%progbits
+ 1291              		.align	1
+ 1292              		.global	osDelayUntil
+ 1293              		.syntax unified
+ 1294              		.thumb
+ 1295              		.thumb_func
+ 1296              		.fpu fpv4-sp-d16
+ 1297              		.type	osDelayUntil, %function
+ 1298              	osDelayUntil:
+ 1299              		@ args = 0, pretend = 0, frame = 0
+ 1300              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1301 0000 08B5     		push	{r3, lr}
+ 1302 0002 0146     		mov	r1, r0
+ 1303              		.syntax unified
+ 1304              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1305 0004 EFF30583 		MRS r3, ipsr
+ 1306              	@ 0 "" 2
+ 1307              		.thumb
+ 1308              		.syntax unified
+ 1309 0008 43B9     		cbnz	r3, .L217
+ 1310 000a 0648     		ldr	r0, .L219
+ 1311 000c FFF7FEFF 		bl	tmr_waitUntil
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 24
+
+
+ 1312 0010 831C     		adds	r3, r0, #2
+ 1313 0012 0CBF     		ite	eq
+ 1314 0014 0020     		moveq	r0, #0
+ 1315 0016 4FF0FF30 		movne	r0, #-1
+ 1316 001a 08BD     		pop	{r3, pc}
+ 1317              	.L217:
+ 1318 001c 6FF00500 		mvn	r0, #5
+ 1319 0020 08BD     		pop	{r3, pc}
+ 1320              	.L220:
+ 1321 0022 00BF     		.align	2
+ 1322              	.L219:
+ 1323 0024 00000000 		.word	WAIT
+ 1324              		.size	osDelayUntil, .-osDelayUntil
+ 1325              		.section	.text.osTimerNew,"ax",%progbits
+ 1326              		.align	1
+ 1327              		.global	osTimerNew
+ 1328              		.syntax unified
+ 1329              		.thumb
+ 1330              		.thumb_func
+ 1331              		.fpu fpv4-sp-d16
+ 1332              		.type	osTimerNew, %function
+ 1333              	osTimerNew:
+ 1334              		@ args = 0, pretend = 0, frame = 0
+ 1335              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1336 0000 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 1337 0004 0646     		mov	r6, r0
+ 1338 0006 8846     		mov	r8, r1
+ 1339 0008 9146     		mov	r9, r2
+ 1340 000a 1D46     		mov	r5, r3
+ 1341 000c 0F46     		mov	r7, r1
+ 1342              		.syntax unified
+ 1343              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1344 000e EFF30583 		MRS r3, ipsr
+ 1345              	@ 0 "" 2
+ 1346              		.thumb
+ 1347              		.syntax unified
+ 1348 0012 13B1     		cbz	r3, .L222
+ 1349              	.L224:
+ 1350 0014 0020     		movs	r0, #0
+ 1351 0016 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 1352              	.L222:
+ 1353 001a 0028     		cmp	r0, #0
+ 1354 001c FAD0     		beq	.L224
+ 1355 001e 2DB1     		cbz	r5, .L225
+ 1356 0020 EB68     		ldr	r3, [r5, #12]
+ 1357 0022 1BB1     		cbz	r3, .L225
+ 1358 0024 302B     		cmp	r3, #48
+ 1359 0026 F5D1     		bne	.L224
+ 1360 0028 AC68     		ldr	r4, [r5, #8]
+ 1361 002a 3CB9     		cbnz	r4, .L226
+ 1362              	.L225:
+ 1363 002c 3020     		movs	r0, #48
+ 1364 002e FFF7FEFF 		bl	core_sys_alloc
+ 1365 0032 0028     		cmp	r0, #0
+ 1366 0034 EED0     		beq	.L224
+ 1367 0036 48F48077 		orr	r7, r8, #256
+ 1368 003a 0446     		mov	r4, r0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 25
+
+
+ 1369              	.L226:
+ 1370              		.syntax unified
+ 1371              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 1372 003c EFF31088 		MRS r8, primask
+ 1373              	@ 0 "" 2
+ 1374              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 1375 0040 72B6     		cpsid i
+ 1376              	@ 0 "" 2
+ 1377              		.thumb
+ 1378              		.syntax unified
+ 1379 0042 0849     		ldr	r1, .L241
+ 1380 0044 2046     		mov	r0, r4
+ 1381 0046 FFF7FEFF 		bl	tmr_init
+ 1382 004a 2762     		str	r7, [r4, #32]
+ 1383 004c 05B1     		cbz	r5, .L227
+ 1384 004e 2D68     		ldr	r5, [r5]
+ 1385              	.L227:
+ 1386 0050 6562     		str	r5, [r4, #36]
+ 1387 0052 A662     		str	r6, [r4, #40]
+ 1388 0054 C4F82C90 		str	r9, [r4, #44]
+ 1389              		.syntax unified
+ 1390              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 1391 0058 88F31088 		MSR primask, r8
+ 1392              	@ 0 "" 2
+ 1393              		.thumb
+ 1394              		.syntax unified
+ 1395 005c 2046     		mov	r0, r4
+ 1396 005e BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 1397              	.L242:
+ 1398 0062 00BF     		.align	2
+ 1399              	.L241:
+ 1400 0064 00000000 		.word	timer_handler
+ 1401              		.size	osTimerNew, .-osTimerNew
+ 1402              		.section	.text.osTimerGetName,"ax",%progbits
+ 1403              		.align	1
+ 1404              		.global	osTimerGetName
+ 1405              		.syntax unified
+ 1406              		.thumb
+ 1407              		.thumb_func
+ 1408              		.fpu fpv4-sp-d16
+ 1409              		.type	osTimerGetName, %function
+ 1410              	osTimerGetName:
+ 1411              		@ args = 0, pretend = 0, frame = 0
+ 1412              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1413              		@ link register save eliminated.
+ 1414              		.syntax unified
+ 1415              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1416 0000 EFF30583 		MRS r3, ipsr
+ 1417              	@ 0 "" 2
+ 1418              		.thumb
+ 1419              		.syntax unified
+ 1420 0004 13B9     		cbnz	r3, .L245
+ 1421 0006 10B1     		cbz	r0, .L243
+ 1422 0008 406A     		ldr	r0, [r0, #36]
+ 1423 000a 7047     		bx	lr
+ 1424              	.L245:
+ 1425 000c 0020     		movs	r0, #0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 26
+
+
+ 1426              	.L243:
+ 1427 000e 7047     		bx	lr
+ 1428              		.size	osTimerGetName, .-osTimerGetName
+ 1429              		.section	.text.osTimerStart,"ax",%progbits
+ 1430              		.align	1
+ 1431              		.global	osTimerStart
+ 1432              		.syntax unified
+ 1433              		.thumb
+ 1434              		.thumb_func
+ 1435              		.fpu fpv4-sp-d16
+ 1436              		.type	osTimerStart, %function
+ 1437              	osTimerStart:
+ 1438              		@ args = 0, pretend = 0, frame = 0
+ 1439              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1440 0000 10B5     		push	{r4, lr}
+ 1441 0002 0A46     		mov	r2, r1
+ 1442              		.syntax unified
+ 1443              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1444 0004 EFF30584 		MRS r4, ipsr
+ 1445              	@ 0 "" 2
+ 1446              		.thumb
+ 1447              		.syntax unified
+ 1448 0008 54B9     		cbnz	r4, .L250
+ 1449 000a 60B1     		cbz	r0, .L251
+ 1450 000c 036A     		ldr	r3, [r0, #32]
+ 1451 000e 13F0010F 		tst	r3, #1
+ 1452 0012 14BF     		ite	ne
+ 1453 0014 0A46     		movne	r2, r1
+ 1454 0016 0022     		moveq	r2, #0
+ 1455 0018 FFF7FEFF 		bl	tmr_start
+ 1456 001c 2046     		mov	r0, r4
+ 1457 001e 10BD     		pop	{r4, pc}
+ 1458              	.L250:
+ 1459 0020 6FF00500 		mvn	r0, #5
+ 1460 0024 10BD     		pop	{r4, pc}
+ 1461              	.L251:
+ 1462 0026 6FF00300 		mvn	r0, #3
+ 1463 002a 10BD     		pop	{r4, pc}
+ 1464              		.size	osTimerStart, .-osTimerStart
+ 1465              		.section	.text.osTimerStop,"ax",%progbits
+ 1466              		.align	1
+ 1467              		.global	osTimerStop
+ 1468              		.syntax unified
+ 1469              		.thumb
+ 1470              		.thumb_func
+ 1471              		.fpu fpv4-sp-d16
+ 1472              		.type	osTimerStop, %function
+ 1473              	osTimerStop:
+ 1474              		@ args = 0, pretend = 0, frame = 0
+ 1475              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1476 0000 10B5     		push	{r4, lr}
+ 1477              		.syntax unified
+ 1478              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1479 0002 EFF30584 		MRS r4, ipsr
+ 1480              	@ 0 "" 2
+ 1481              		.thumb
+ 1482              		.syntax unified
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 27
+
+
+ 1483 0006 24B9     		cbnz	r4, .L255
+ 1484 0008 30B1     		cbz	r0, .L256
+ 1485 000a FFF7FEFF 		bl	tmr_kill
+ 1486 000e 2046     		mov	r0, r4
+ 1487 0010 10BD     		pop	{r4, pc}
+ 1488              	.L255:
+ 1489 0012 6FF00500 		mvn	r0, #5
+ 1490 0016 10BD     		pop	{r4, pc}
+ 1491              	.L256:
+ 1492 0018 6FF00300 		mvn	r0, #3
+ 1493 001c 10BD     		pop	{r4, pc}
+ 1494              		.size	osTimerStop, .-osTimerStop
+ 1495              		.section	.text.osTimerIsRunning,"ax",%progbits
+ 1496              		.align	1
+ 1497              		.global	osTimerIsRunning
+ 1498              		.syntax unified
+ 1499              		.thumb
+ 1500              		.thumb_func
+ 1501              		.fpu fpv4-sp-d16
+ 1502              		.type	osTimerIsRunning, %function
+ 1503              	osTimerIsRunning:
+ 1504              		@ args = 0, pretend = 0, frame = 0
+ 1505              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1506              		@ link register save eliminated.
+ 1507              		.syntax unified
+ 1508              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1509 0000 EFF30583 		MRS r3, ipsr
+ 1510              	@ 0 "" 2
+ 1511              		.thumb
+ 1512              		.syntax unified
+ 1513 0004 33B9     		cbnz	r3, .L259
+ 1514 0006 18B1     		cbz	r0, .L257
+ 1515 0008 4368     		ldr	r3, [r0, #4]
+ 1516 000a 0033     		adds	r3, r3, #0
+ 1517 000c 18BF     		it	ne
+ 1518 000e 0123     		movne	r3, #1
+ 1519              	.L257:
+ 1520 0010 1846     		mov	r0, r3
+ 1521 0012 7047     		bx	lr
+ 1522              	.L259:
+ 1523 0014 0023     		movs	r3, #0
+ 1524 0016 FBE7     		b	.L257
+ 1525              		.size	osTimerIsRunning, .-osTimerIsRunning
+ 1526              		.section	.text.osTimerDelete,"ax",%progbits
+ 1527              		.align	1
+ 1528              		.global	osTimerDelete
+ 1529              		.syntax unified
+ 1530              		.thumb
+ 1531              		.thumb_func
+ 1532              		.fpu fpv4-sp-d16
+ 1533              		.type	osTimerDelete, %function
+ 1534              	osTimerDelete:
+ 1535              		@ args = 0, pretend = 0, frame = 0
+ 1536              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1537 0000 38B5     		push	{r3, r4, r5, lr}
+ 1538 0002 0446     		mov	r4, r0
+ 1539              		.syntax unified
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 28
+
+
+ 1540              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1541 0004 EFF30583 		MRS r3, ipsr
+ 1542              	@ 0 "" 2
+ 1543              		.thumb
+ 1544              		.syntax unified
+ 1545 0008 7BB9     		cbnz	r3, .L266
+ 1546 000a 88B1     		cbz	r0, .L267
+ 1547              		.syntax unified
+ 1548              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 1549 000c EFF31085 		MRS r5, primask
+ 1550              	@ 0 "" 2
+ 1551              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 1552 0010 72B6     		cpsid i
+ 1553              	@ 0 "" 2
+ 1554              		.thumb
+ 1555              		.syntax unified
+ 1556 0012 FFF7FEFF 		bl	tmr_kill
+ 1557 0016 236A     		ldr	r3, [r4, #32]
+ 1558 0018 DB05     		lsls	r3, r3, #23
+ 1559 001a 02D5     		bpl	.L265
+ 1560 001c 2046     		mov	r0, r4
+ 1561 001e FFF7FEFF 		bl	core_sys_free
+ 1562              	.L265:
+ 1563              		.syntax unified
+ 1564              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 1565 0022 85F31088 		MSR primask, r5
+ 1566              	@ 0 "" 2
+ 1567              		.thumb
+ 1568              		.syntax unified
+ 1569 0026 0020     		movs	r0, #0
+ 1570 0028 38BD     		pop	{r3, r4, r5, pc}
+ 1571              	.L266:
+ 1572 002a 6FF00500 		mvn	r0, #5
+ 1573 002e 38BD     		pop	{r3, r4, r5, pc}
+ 1574              	.L267:
+ 1575 0030 6FF00300 		mvn	r0, #3
+ 1576 0034 38BD     		pop	{r3, r4, r5, pc}
+ 1577              		.size	osTimerDelete, .-osTimerDelete
+ 1578              		.section	.text.osEventFlagsNew,"ax",%progbits
+ 1579              		.align	1
+ 1580              		.global	osEventFlagsNew
+ 1581              		.syntax unified
+ 1582              		.thumb
+ 1583              		.thumb_func
+ 1584              		.fpu fpv4-sp-d16
+ 1585              		.type	osEventFlagsNew, %function
+ 1586              	osEventFlagsNew:
+ 1587              		@ args = 0, pretend = 0, frame = 0
+ 1588              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1589 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 1590 0002 0546     		mov	r5, r0
+ 1591              		.syntax unified
+ 1592              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1593 0004 EFF30586 		MRS r6, ipsr
+ 1594              	@ 0 "" 2
+ 1595              		.thumb
+ 1596              		.syntax unified
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 29
+
+
+ 1597 0008 0EB1     		cbz	r6, .L272
+ 1598              	.L275:
+ 1599 000a 0020     		movs	r0, #0
+ 1600 000c F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 1601              	.L272:
+ 1602 000e 28B1     		cbz	r0, .L274
+ 1603 0010 C368     		ldr	r3, [r0, #12]
+ 1604 0012 1BB1     		cbz	r3, .L274
+ 1605 0014 102B     		cmp	r3, #16
+ 1606 0016 F8D1     		bne	.L275
+ 1607 0018 8468     		ldr	r4, [r0, #8]
+ 1608 001a 3CB9     		cbnz	r4, .L276
+ 1609              	.L274:
+ 1610 001c 1020     		movs	r0, #16
+ 1611 001e FFF7FEFF 		bl	core_sys_alloc
+ 1612 0022 0028     		cmp	r0, #0
+ 1613 0024 F1D0     		beq	.L275
+ 1614 0026 0446     		mov	r4, r0
+ 1615 0028 4FF48076 		mov	r6, #256
+ 1616              	.L276:
+ 1617              		.syntax unified
+ 1618              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 1619 002c EFF31087 		MRS r7, primask
+ 1620              	@ 0 "" 2
+ 1621              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 1622 0030 72B6     		cpsid i
+ 1623              	@ 0 "" 2
+ 1624              		.thumb
+ 1625              		.syntax unified
+ 1626 0032 2046     		mov	r0, r4
+ 1627 0034 FFF7FEFF 		bl	flg_init
+ 1628 0038 A660     		str	r6, [r4, #8]
+ 1629 003a 05B1     		cbz	r5, .L277
+ 1630 003c 2D68     		ldr	r5, [r5]
+ 1631              	.L277:
+ 1632 003e E560     		str	r5, [r4, #12]
+ 1633              		.syntax unified
+ 1634              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 1635 0040 87F31088 		MSR primask, r7
+ 1636              	@ 0 "" 2
+ 1637              		.thumb
+ 1638              		.syntax unified
+ 1639 0044 2046     		mov	r0, r4
+ 1640 0046 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 1641              		.size	osEventFlagsNew, .-osEventFlagsNew
+ 1642              		.section	.text.osEventFlagsGetName,"ax",%progbits
+ 1643              		.align	1
+ 1644              		.global	osEventFlagsGetName
+ 1645              		.syntax unified
+ 1646              		.thumb
+ 1647              		.thumb_func
+ 1648              		.fpu fpv4-sp-d16
+ 1649              		.type	osEventFlagsGetName, %function
+ 1650              	osEventFlagsGetName:
+ 1651              		@ args = 0, pretend = 0, frame = 0
+ 1652              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1653              		@ link register save eliminated.
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 30
+
+
+ 1654              		.syntax unified
+ 1655              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1656 0000 EFF30583 		MRS r3, ipsr
+ 1657              	@ 0 "" 2
+ 1658              		.thumb
+ 1659              		.syntax unified
+ 1660 0004 13B9     		cbnz	r3, .L290
+ 1661 0006 10B1     		cbz	r0, .L288
+ 1662 0008 C068     		ldr	r0, [r0, #12]
+ 1663 000a 7047     		bx	lr
+ 1664              	.L290:
+ 1665 000c 0020     		movs	r0, #0
+ 1666              	.L288:
+ 1667 000e 7047     		bx	lr
+ 1668              		.size	osEventFlagsGetName, .-osEventFlagsGetName
+ 1669              		.section	.text.osEventFlagsSet,"ax",%progbits
+ 1670              		.align	1
+ 1671              		.global	osEventFlagsSet
+ 1672              		.syntax unified
+ 1673              		.thumb
+ 1674              		.thumb_func
+ 1675              		.fpu fpv4-sp-d16
+ 1676              		.type	osEventFlagsSet, %function
+ 1677              	osEventFlagsSet:
+ 1678              		@ args = 0, pretend = 0, frame = 0
+ 1679              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1680              		@ link register save eliminated.
+ 1681 0000 18B1     		cbz	r0, .L292
+ 1682 0002 0029     		cmp	r1, #0
+ 1683 0004 01DB     		blt	.L292
+ 1684 0006 FFF7FEBF 		b	flg_give
+ 1685              	.L292:
+ 1686 000a 6FF00300 		mvn	r0, #3
+ 1687 000e 7047     		bx	lr
+ 1688              		.size	osEventFlagsSet, .-osEventFlagsSet
+ 1689              		.section	.text.osEventFlagsClear,"ax",%progbits
+ 1690              		.align	1
+ 1691              		.global	osEventFlagsClear
+ 1692              		.syntax unified
+ 1693              		.thumb
+ 1694              		.thumb_func
+ 1695              		.fpu fpv4-sp-d16
+ 1696              		.type	osEventFlagsClear, %function
+ 1697              	osEventFlagsClear:
+ 1698              		@ args = 0, pretend = 0, frame = 0
+ 1699              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1700              		@ link register save eliminated.
+ 1701 0000 18B1     		cbz	r0, .L297
+ 1702 0002 0029     		cmp	r1, #0
+ 1703 0004 01DB     		blt	.L297
+ 1704 0006 FFF7FEBF 		b	flg_clear
+ 1705              	.L297:
+ 1706 000a 6FF00300 		mvn	r0, #3
+ 1707 000e 7047     		bx	lr
+ 1708              		.size	osEventFlagsClear, .-osEventFlagsClear
+ 1709              		.section	.text.osEventFlagsGet,"ax",%progbits
+ 1710              		.align	1
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 31
+
+
+ 1711              		.global	osEventFlagsGet
+ 1712              		.syntax unified
+ 1713              		.thumb
+ 1714              		.thumb_func
+ 1715              		.fpu fpv4-sp-d16
+ 1716              		.type	osEventFlagsGet, %function
+ 1717              	osEventFlagsGet:
+ 1718              		@ args = 0, pretend = 0, frame = 0
+ 1719              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1720              		@ link register save eliminated.
+ 1721 0000 00B1     		cbz	r0, .L302
+ 1722 0002 4068     		ldr	r0, [r0, #4]
+ 1723              	.L302:
+ 1724 0004 7047     		bx	lr
+ 1725              		.size	osEventFlagsGet, .-osEventFlagsGet
+ 1726              		.section	.text.osEventFlagsWait,"ax",%progbits
+ 1727              		.align	1
+ 1728              		.global	osEventFlagsWait
+ 1729              		.syntax unified
+ 1730              		.thumb
+ 1731              		.thumb_func
+ 1732              		.fpu fpv4-sp-d16
+ 1733              		.type	osEventFlagsWait, %function
+ 1734              	osEventFlagsWait:
+ 1735              		@ args = 0, pretend = 0, frame = 0
+ 1736              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1737 0000 10B5     		push	{r4, lr}
+ 1738 0002 0C46     		mov	r4, r1
+ 1739 0004 88B1     		cbz	r0, .L312
+ 1740 0006 0029     		cmp	r1, #0
+ 1741 0008 0FDB     		blt	.L312
+ 1742              		.syntax unified
+ 1743              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1744 000a EFF30581 		MRS r1, ipsr
+ 1745              	@ 0 "" 2
+ 1746              		.thumb
+ 1747              		.syntax unified
+ 1748 000e 01B1     		cbz	r1, .L307
+ 1749 0010 5BB9     		cbnz	r3, .L312
+ 1750              	.L307:
+ 1751 0012 2146     		mov	r1, r4
+ 1752 0014 FFF7FEFF 		bl	flg_waitFor
+ 1753 0018 28B1     		cbz	r0, .L306
+ 1754 001a 0230     		adds	r0, r0, #2
+ 1755 001c 0CBF     		ite	eq
+ 1756 001e 6FF00104 		mvneq	r4, #1
+ 1757 0022 6FF00204 		mvnne	r4, #2
+ 1758              	.L306:
+ 1759 0026 2046     		mov	r0, r4
+ 1760 0028 10BD     		pop	{r4, pc}
+ 1761              	.L312:
+ 1762 002a 6FF00304 		mvn	r4, #3
+ 1763 002e FAE7     		b	.L306
+ 1764              		.size	osEventFlagsWait, .-osEventFlagsWait
+ 1765              		.section	.text.osEventFlagsDelete,"ax",%progbits
+ 1766              		.align	1
+ 1767              		.global	osEventFlagsDelete
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 32
+
+
+ 1768              		.syntax unified
+ 1769              		.thumb
+ 1770              		.thumb_func
+ 1771              		.fpu fpv4-sp-d16
+ 1772              		.type	osEventFlagsDelete, %function
+ 1773              	osEventFlagsDelete:
+ 1774              		@ args = 0, pretend = 0, frame = 0
+ 1775              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1776 0000 38B5     		push	{r3, r4, r5, lr}
+ 1777 0002 0446     		mov	r4, r0
+ 1778              		.syntax unified
+ 1779              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1780 0004 EFF30583 		MRS r3, ipsr
+ 1781              	@ 0 "" 2
+ 1782              		.thumb
+ 1783              		.syntax unified
+ 1784 0008 7BB9     		cbnz	r3, .L322
+ 1785 000a 88B1     		cbz	r0, .L323
+ 1786              		.syntax unified
+ 1787              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 1788 000c EFF31085 		MRS r5, primask
+ 1789              	@ 0 "" 2
+ 1790              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 1791 0010 72B6     		cpsid i
+ 1792              	@ 0 "" 2
+ 1793              		.thumb
+ 1794              		.syntax unified
+ 1795 0012 FFF7FEFF 		bl	flg_kill
+ 1796 0016 A368     		ldr	r3, [r4, #8]
+ 1797 0018 DB05     		lsls	r3, r3, #23
+ 1798 001a 02D5     		bpl	.L321
+ 1799 001c 2046     		mov	r0, r4
+ 1800 001e FFF7FEFF 		bl	core_sys_free
+ 1801              	.L321:
+ 1802              		.syntax unified
+ 1803              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 1804 0022 85F31088 		MSR primask, r5
+ 1805              	@ 0 "" 2
+ 1806              		.thumb
+ 1807              		.syntax unified
+ 1808 0026 0020     		movs	r0, #0
+ 1809 0028 38BD     		pop	{r3, r4, r5, pc}
+ 1810              	.L322:
+ 1811 002a 6FF00500 		mvn	r0, #5
+ 1812 002e 38BD     		pop	{r3, r4, r5, pc}
+ 1813              	.L323:
+ 1814 0030 6FF00300 		mvn	r0, #3
+ 1815 0034 38BD     		pop	{r3, r4, r5, pc}
+ 1816              		.size	osEventFlagsDelete, .-osEventFlagsDelete
+ 1817              		.section	.text.osMutexNew,"ax",%progbits
+ 1818              		.align	1
+ 1819              		.global	osMutexNew
+ 1820              		.syntax unified
+ 1821              		.thumb
+ 1822              		.thumb_func
+ 1823              		.fpu fpv4-sp-d16
+ 1824              		.type	osMutexNew, %function
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 33
+
+
+ 1825              	osMutexNew:
+ 1826              		@ args = 0, pretend = 0, frame = 0
+ 1827              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1828 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 1829 0002 0546     		mov	r5, r0
+ 1830              		.syntax unified
+ 1831              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1832 0004 EFF30586 		MRS r6, ipsr
+ 1833              	@ 0 "" 2
+ 1834              		.thumb
+ 1835              		.syntax unified
+ 1836 0008 0EB1     		cbz	r6, .L328
+ 1837              	.L331:
+ 1838 000a 0020     		movs	r0, #0
+ 1839 000c F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 1840              	.L328:
+ 1841 000e 30B1     		cbz	r0, .L330
+ 1842 0010 C368     		ldr	r3, [r0, #12]
+ 1843 0012 4668     		ldr	r6, [r0, #4]
+ 1844 0014 1BB1     		cbz	r3, .L330
+ 1845 0016 182B     		cmp	r3, #24
+ 1846 0018 F7D1     		bne	.L331
+ 1847 001a 8468     		ldr	r4, [r0, #8]
+ 1848 001c 3CB9     		cbnz	r4, .L332
+ 1849              	.L330:
+ 1850 001e 1820     		movs	r0, #24
+ 1851 0020 FFF7FEFF 		bl	core_sys_alloc
+ 1852 0024 0028     		cmp	r0, #0
+ 1853 0026 F0D0     		beq	.L331
+ 1854 0028 46F48076 		orr	r6, r6, #256
+ 1855 002c 0446     		mov	r4, r0
+ 1856              	.L332:
+ 1857              		.syntax unified
+ 1858              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 1859 002e EFF31087 		MRS r7, primask
+ 1860              	@ 0 "" 2
+ 1861              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 1862 0032 72B6     		cpsid i
+ 1863              	@ 0 "" 2
+ 1864              		.thumb
+ 1865              		.syntax unified
+ 1866 0034 2046     		mov	r0, r4
+ 1867 0036 FFF7FEFF 		bl	mtx_init
+ 1868 003a 2661     		str	r6, [r4, #16]
+ 1869 003c 05B1     		cbz	r5, .L333
+ 1870 003e 2D68     		ldr	r5, [r5]
+ 1871              	.L333:
+ 1872 0040 6561     		str	r5, [r4, #20]
+ 1873              		.syntax unified
+ 1874              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 1875 0042 87F31088 		MSR primask, r7
+ 1876              	@ 0 "" 2
+ 1877              		.thumb
+ 1878              		.syntax unified
+ 1879 0046 2046     		mov	r0, r4
+ 1880 0048 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 1881              		.size	osMutexNew, .-osMutexNew
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 34
+
+
+ 1882              		.section	.text.osMutexGetName,"ax",%progbits
+ 1883              		.align	1
+ 1884              		.global	osMutexGetName
+ 1885              		.syntax unified
+ 1886              		.thumb
+ 1887              		.thumb_func
+ 1888              		.fpu fpv4-sp-d16
+ 1889              		.type	osMutexGetName, %function
+ 1890              	osMutexGetName:
+ 1891              		@ args = 0, pretend = 0, frame = 0
+ 1892              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1893              		@ link register save eliminated.
+ 1894              		.syntax unified
+ 1895              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1896 0000 EFF30583 		MRS r3, ipsr
+ 1897              	@ 0 "" 2
+ 1898              		.thumb
+ 1899              		.syntax unified
+ 1900 0004 13B9     		cbnz	r3, .L346
+ 1901 0006 10B1     		cbz	r0, .L344
+ 1902 0008 4069     		ldr	r0, [r0, #20]
+ 1903 000a 7047     		bx	lr
+ 1904              	.L346:
+ 1905 000c 0020     		movs	r0, #0
+ 1906              	.L344:
+ 1907 000e 7047     		bx	lr
+ 1908              		.size	osMutexGetName, .-osMutexGetName
+ 1909              		.section	.text.osMutexAcquire,"ax",%progbits
+ 1910              		.align	1
+ 1911              		.global	osMutexAcquire
+ 1912              		.syntax unified
+ 1913              		.thumb
+ 1914              		.thumb_func
+ 1915              		.fpu fpv4-sp-d16
+ 1916              		.type	osMutexAcquire, %function
+ 1917              	osMutexAcquire:
+ 1918              		@ args = 0, pretend = 0, frame = 0
+ 1919              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1920 0000 08B5     		push	{r3, lr}
+ 1921              		.syntax unified
+ 1922              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1923 0002 EFF30582 		MRS r2, ipsr
+ 1924              	@ 0 "" 2
+ 1925              		.thumb
+ 1926              		.syntax unified
+ 1927 0006 52B9     		cbnz	r2, .L352
+ 1928 0008 60B1     		cbz	r0, .L353
+ 1929 000a FFF7FEFF 		bl	mtx_waitFor
+ 1930 000e 58B1     		cbz	r0, .L348
+ 1931 0010 831C     		adds	r3, r0, #2
+ 1932 0012 0CBF     		ite	eq
+ 1933 0014 6FF00100 		mvneq	r0, #1
+ 1934 0018 6FF00200 		mvnne	r0, #2
+ 1935 001c 08BD     		pop	{r3, pc}
+ 1936              	.L352:
+ 1937 001e 6FF00500 		mvn	r0, #5
+ 1938 0022 08BD     		pop	{r3, pc}
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 35
+
+
+ 1939              	.L353:
+ 1940 0024 6FF00300 		mvn	r0, #3
+ 1941              	.L348:
+ 1942 0028 08BD     		pop	{r3, pc}
+ 1943              		.size	osMutexAcquire, .-osMutexAcquire
+ 1944              		.section	.text.osMutexRelease,"ax",%progbits
+ 1945              		.align	1
+ 1946              		.global	osMutexRelease
+ 1947              		.syntax unified
+ 1948              		.thumb
+ 1949              		.thumb_func
+ 1950              		.fpu fpv4-sp-d16
+ 1951              		.type	osMutexRelease, %function
+ 1952              	osMutexRelease:
+ 1953              		@ args = 0, pretend = 0, frame = 0
+ 1954              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1955 0000 08B5     		push	{r3, lr}
+ 1956              		.syntax unified
+ 1957              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1958 0002 EFF30582 		MRS r2, ipsr
+ 1959              	@ 0 "" 2
+ 1960              		.thumb
+ 1961              		.syntax unified
+ 1962 0006 42B9     		cbnz	r2, .L358
+ 1963 0008 50B1     		cbz	r0, .L359
+ 1964 000a FFF7FEFF 		bl	mtx_give
+ 1965 000e 0028     		cmp	r0, #0
+ 1966 0010 0CBF     		ite	eq
+ 1967 0012 0020     		moveq	r0, #0
+ 1968 0014 6FF00200 		mvnne	r0, #2
+ 1969 0018 08BD     		pop	{r3, pc}
+ 1970              	.L358:
+ 1971 001a 6FF00500 		mvn	r0, #5
+ 1972 001e 08BD     		pop	{r3, pc}
+ 1973              	.L359:
+ 1974 0020 6FF00300 		mvn	r0, #3
+ 1975 0024 08BD     		pop	{r3, pc}
+ 1976              		.size	osMutexRelease, .-osMutexRelease
+ 1977              		.section	.text.osMutexGetOwner,"ax",%progbits
+ 1978              		.align	1
+ 1979              		.global	osMutexGetOwner
+ 1980              		.syntax unified
+ 1981              		.thumb
+ 1982              		.thumb_func
+ 1983              		.fpu fpv4-sp-d16
+ 1984              		.type	osMutexGetOwner, %function
+ 1985              	osMutexGetOwner:
+ 1986              		@ args = 0, pretend = 0, frame = 0
+ 1987              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1988              		@ link register save eliminated.
+ 1989              		.syntax unified
+ 1990              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 1991 0000 EFF30583 		MRS r3, ipsr
+ 1992              	@ 0 "" 2
+ 1993              		.thumb
+ 1994              		.syntax unified
+ 1995 0004 13B9     		cbnz	r3, .L363
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 36
+
+
+ 1996 0006 10B1     		cbz	r0, .L361
+ 1997 0008 4068     		ldr	r0, [r0, #4]
+ 1998 000a 7047     		bx	lr
+ 1999              	.L363:
+ 2000 000c 0020     		movs	r0, #0
+ 2001              	.L361:
+ 2002 000e 7047     		bx	lr
+ 2003              		.size	osMutexGetOwner, .-osMutexGetOwner
+ 2004              		.section	.text.osMutexDelete,"ax",%progbits
+ 2005              		.align	1
+ 2006              		.global	osMutexDelete
+ 2007              		.syntax unified
+ 2008              		.thumb
+ 2009              		.thumb_func
+ 2010              		.fpu fpv4-sp-d16
+ 2011              		.type	osMutexDelete, %function
+ 2012              	osMutexDelete:
+ 2013              		@ args = 0, pretend = 0, frame = 0
+ 2014              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2015 0000 38B5     		push	{r3, r4, r5, lr}
+ 2016 0002 0446     		mov	r4, r0
+ 2017              		.syntax unified
+ 2018              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2019 0004 EFF30583 		MRS r3, ipsr
+ 2020              	@ 0 "" 2
+ 2021              		.thumb
+ 2022              		.syntax unified
+ 2023 0008 7BB9     		cbnz	r3, .L368
+ 2024 000a 88B1     		cbz	r0, .L369
+ 2025              		.syntax unified
+ 2026              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 2027 000c EFF31085 		MRS r5, primask
+ 2028              	@ 0 "" 2
+ 2029              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 2030 0010 72B6     		cpsid i
+ 2031              	@ 0 "" 2
+ 2032              		.thumb
+ 2033              		.syntax unified
+ 2034 0012 FFF7FEFF 		bl	mtx_kill
+ 2035 0016 2369     		ldr	r3, [r4, #16]
+ 2036 0018 DB05     		lsls	r3, r3, #23
+ 2037 001a 02D5     		bpl	.L367
+ 2038 001c 2046     		mov	r0, r4
+ 2039 001e FFF7FEFF 		bl	core_sys_free
+ 2040              	.L367:
+ 2041              		.syntax unified
+ 2042              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 2043 0022 85F31088 		MSR primask, r5
+ 2044              	@ 0 "" 2
+ 2045              		.thumb
+ 2046              		.syntax unified
+ 2047 0026 0020     		movs	r0, #0
+ 2048 0028 38BD     		pop	{r3, r4, r5, pc}
+ 2049              	.L368:
+ 2050 002a 6FF00500 		mvn	r0, #5
+ 2051 002e 38BD     		pop	{r3, r4, r5, pc}
+ 2052              	.L369:
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 37
+
+
+ 2053 0030 6FF00300 		mvn	r0, #3
+ 2054 0034 38BD     		pop	{r3, r4, r5, pc}
+ 2055              		.size	osMutexDelete, .-osMutexDelete
+ 2056              		.section	.text.osSemaphoreNew,"ax",%progbits
+ 2057              		.align	1
+ 2058              		.global	osSemaphoreNew
+ 2059              		.syntax unified
+ 2060              		.thumb
+ 2061              		.thumb_func
+ 2062              		.fpu fpv4-sp-d16
+ 2063              		.type	osSemaphoreNew, %function
+ 2064              	osSemaphoreNew:
+ 2065              		@ args = 0, pretend = 0, frame = 0
+ 2066              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2067 0000 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 2068 0004 8146     		mov	r9, r0
+ 2069 0006 8846     		mov	r8, r1
+ 2070 0008 1546     		mov	r5, r2
+ 2071              		.syntax unified
+ 2072              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2073 000a EFF30586 		MRS r6, ipsr
+ 2074              	@ 0 "" 2
+ 2075              		.thumb
+ 2076              		.syntax unified
+ 2077 000e 16B1     		cbz	r6, .L374
+ 2078              	.L377:
+ 2079 0010 0020     		movs	r0, #0
+ 2080 0012 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 2081              	.L374:
+ 2082 0016 2AB1     		cbz	r2, .L376
+ 2083 0018 D368     		ldr	r3, [r2, #12]
+ 2084 001a 1BB1     		cbz	r3, .L376
+ 2085 001c 142B     		cmp	r3, #20
+ 2086 001e F7D1     		bne	.L377
+ 2087 0020 9468     		ldr	r4, [r2, #8]
+ 2088 0022 3CB9     		cbnz	r4, .L378
+ 2089              	.L376:
+ 2090 0024 1420     		movs	r0, #20
+ 2091 0026 FFF7FEFF 		bl	core_sys_alloc
+ 2092 002a 0028     		cmp	r0, #0
+ 2093 002c F0D0     		beq	.L377
+ 2094 002e 0446     		mov	r4, r0
+ 2095 0030 4FF48076 		mov	r6, #256
+ 2096              	.L378:
+ 2097              		.syntax unified
+ 2098              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 2099 0034 EFF31087 		MRS r7, primask
+ 2100              	@ 0 "" 2
+ 2101              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 2102 0038 72B6     		cpsid i
+ 2103              	@ 0 "" 2
+ 2104              		.thumb
+ 2105              		.syntax unified
+ 2106 003a 4A46     		mov	r2, r9
+ 2107 003c 4146     		mov	r1, r8
+ 2108 003e 2046     		mov	r0, r4
+ 2109 0040 FFF7FEFF 		bl	sem_init
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 38
+
+
+ 2110 0044 E660     		str	r6, [r4, #12]
+ 2111 0046 05B1     		cbz	r5, .L379
+ 2112 0048 2D68     		ldr	r5, [r5]
+ 2113              	.L379:
+ 2114 004a 2561     		str	r5, [r4, #16]
+ 2115              		.syntax unified
+ 2116              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 2117 004c 87F31088 		MSR primask, r7
+ 2118              	@ 0 "" 2
+ 2119              		.thumb
+ 2120              		.syntax unified
+ 2121 0050 2046     		mov	r0, r4
+ 2122 0052 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 2123              		.size	osSemaphoreNew, .-osSemaphoreNew
+ 2124              		.section	.text.osSemaphoreGetName,"ax",%progbits
+ 2125              		.align	1
+ 2126              		.global	osSemaphoreGetName
+ 2127              		.syntax unified
+ 2128              		.thumb
+ 2129              		.thumb_func
+ 2130              		.fpu fpv4-sp-d16
+ 2131              		.type	osSemaphoreGetName, %function
+ 2132              	osSemaphoreGetName:
+ 2133              		@ args = 0, pretend = 0, frame = 0
+ 2134              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2135              		@ link register save eliminated.
+ 2136              		.syntax unified
+ 2137              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2138 0000 EFF30583 		MRS r3, ipsr
+ 2139              	@ 0 "" 2
+ 2140              		.thumb
+ 2141              		.syntax unified
+ 2142 0004 13B9     		cbnz	r3, .L392
+ 2143 0006 10B1     		cbz	r0, .L390
+ 2144 0008 0069     		ldr	r0, [r0, #16]
+ 2145 000a 7047     		bx	lr
+ 2146              	.L392:
+ 2147 000c 0020     		movs	r0, #0
+ 2148              	.L390:
+ 2149 000e 7047     		bx	lr
+ 2150              		.size	osSemaphoreGetName, .-osSemaphoreGetName
+ 2151              		.section	.text.osSemaphoreAcquire,"ax",%progbits
+ 2152              		.align	1
+ 2153              		.global	osSemaphoreAcquire
+ 2154              		.syntax unified
+ 2155              		.thumb
+ 2156              		.thumb_func
+ 2157              		.fpu fpv4-sp-d16
+ 2158              		.type	osSemaphoreAcquire, %function
+ 2159              	osSemaphoreAcquire:
+ 2160              		@ args = 0, pretend = 0, frame = 0
+ 2161              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2162 0000 08B5     		push	{r3, lr}
+ 2163 0002 68B1     		cbz	r0, .L400
+ 2164              		.syntax unified
+ 2165              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2166 0004 EFF30583 		MRS r3, ipsr
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 39
+
+
+ 2167              	@ 0 "" 2
+ 2168              		.thumb
+ 2169              		.syntax unified
+ 2170 0008 03B1     		cbz	r3, .L396
+ 2171 000a 49B9     		cbnz	r1, .L400
+ 2172              	.L396:
+ 2173 000c FFF7FEFF 		bl	sem_waitFor
+ 2174 0010 40B1     		cbz	r0, .L394
+ 2175 0012 831C     		adds	r3, r0, #2
+ 2176 0014 0CBF     		ite	eq
+ 2177 0016 6FF00100 		mvneq	r0, #1
+ 2178 001a 6FF00200 		mvnne	r0, #2
+ 2179 001e 08BD     		pop	{r3, pc}
+ 2180              	.L400:
+ 2181 0020 6FF00300 		mvn	r0, #3
+ 2182              	.L394:
+ 2183 0024 08BD     		pop	{r3, pc}
+ 2184              		.size	osSemaphoreAcquire, .-osSemaphoreAcquire
+ 2185              		.section	.text.osSemaphoreRelease,"ax",%progbits
+ 2186              		.align	1
+ 2187              		.global	osSemaphoreRelease
+ 2188              		.syntax unified
+ 2189              		.thumb
+ 2190              		.thumb_func
+ 2191              		.fpu fpv4-sp-d16
+ 2192              		.type	osSemaphoreRelease, %function
+ 2193              	osSemaphoreRelease:
+ 2194              		@ args = 0, pretend = 0, frame = 0
+ 2195              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2196 0000 08B5     		push	{r3, lr}
+ 2197 0002 40B1     		cbz	r0, .L408
+ 2198 0004 0021     		movs	r1, #0
+ 2199 0006 FFF7FEFF 		bl	sem_sendFor
+ 2200 000a 0028     		cmp	r0, #0
+ 2201 000c 0CBF     		ite	eq
+ 2202 000e 0020     		moveq	r0, #0
+ 2203 0010 6FF00200 		mvnne	r0, #2
+ 2204 0014 08BD     		pop	{r3, pc}
+ 2205              	.L408:
+ 2206 0016 6FF00300 		mvn	r0, #3
+ 2207 001a 08BD     		pop	{r3, pc}
+ 2208              		.size	osSemaphoreRelease, .-osSemaphoreRelease
+ 2209              		.section	.text.osSemaphoreGetCount,"ax",%progbits
+ 2210              		.align	1
+ 2211              		.global	osSemaphoreGetCount
+ 2212              		.syntax unified
+ 2213              		.thumb
+ 2214              		.thumb_func
+ 2215              		.fpu fpv4-sp-d16
+ 2216              		.type	osSemaphoreGetCount, %function
+ 2217              	osSemaphoreGetCount:
+ 2218              		@ args = 0, pretend = 0, frame = 0
+ 2219              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2220              		@ link register save eliminated.
+ 2221 0000 00B1     		cbz	r0, .L410
+ 2222 0002 4068     		ldr	r0, [r0, #4]
+ 2223              	.L410:
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 40
+
+
+ 2224 0004 7047     		bx	lr
+ 2225              		.size	osSemaphoreGetCount, .-osSemaphoreGetCount
+ 2226              		.section	.text.osSemaphoreDelete,"ax",%progbits
+ 2227              		.align	1
+ 2228              		.global	osSemaphoreDelete
+ 2229              		.syntax unified
+ 2230              		.thumb
+ 2231              		.thumb_func
+ 2232              		.fpu fpv4-sp-d16
+ 2233              		.type	osSemaphoreDelete, %function
+ 2234              	osSemaphoreDelete:
+ 2235              		@ args = 0, pretend = 0, frame = 0
+ 2236              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2237 0000 38B5     		push	{r3, r4, r5, lr}
+ 2238 0002 0446     		mov	r4, r0
+ 2239              		.syntax unified
+ 2240              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2241 0004 EFF30583 		MRS r3, ipsr
+ 2242              	@ 0 "" 2
+ 2243              		.thumb
+ 2244              		.syntax unified
+ 2245 0008 7BB9     		cbnz	r3, .L416
+ 2246 000a 88B1     		cbz	r0, .L417
+ 2247              		.syntax unified
+ 2248              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 2249 000c EFF31085 		MRS r5, primask
+ 2250              	@ 0 "" 2
+ 2251              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 2252 0010 72B6     		cpsid i
+ 2253              	@ 0 "" 2
+ 2254              		.thumb
+ 2255              		.syntax unified
+ 2256 0012 FFF7FEFF 		bl	sem_kill
+ 2257 0016 E368     		ldr	r3, [r4, #12]
+ 2258 0018 DB05     		lsls	r3, r3, #23
+ 2259 001a 02D5     		bpl	.L415
+ 2260 001c 2046     		mov	r0, r4
+ 2261 001e FFF7FEFF 		bl	core_sys_free
+ 2262              	.L415:
+ 2263              		.syntax unified
+ 2264              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 2265 0022 85F31088 		MSR primask, r5
+ 2266              	@ 0 "" 2
+ 2267              		.thumb
+ 2268              		.syntax unified
+ 2269 0026 0020     		movs	r0, #0
+ 2270 0028 38BD     		pop	{r3, r4, r5, pc}
+ 2271              	.L416:
+ 2272 002a 6FF00500 		mvn	r0, #5
+ 2273 002e 38BD     		pop	{r3, r4, r5, pc}
+ 2274              	.L417:
+ 2275 0030 6FF00300 		mvn	r0, #3
+ 2276 0034 38BD     		pop	{r3, r4, r5, pc}
+ 2277              		.size	osSemaphoreDelete, .-osSemaphoreDelete
+ 2278              		.section	.text.osMemoryPoolNew,"ax",%progbits
+ 2279              		.align	1
+ 2280              		.global	osMemoryPoolNew
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 41
+
+
+ 2281              		.syntax unified
+ 2282              		.thumb
+ 2283              		.thumb_func
+ 2284              		.fpu fpv4-sp-d16
+ 2285              		.type	osMemoryPoolNew, %function
+ 2286              	osMemoryPoolNew:
+ 2287              		@ args = 0, pretend = 0, frame = 0
+ 2288              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2289 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 2290 0004 CE1C     		adds	r6, r1, #3
+ 2291 0006 26F00306 		bic	r6, r6, #3
+ 2292 000a 0436     		adds	r6, r6, #4
+ 2293 000c 0746     		mov	r7, r0
+ 2294 000e 8846     		mov	r8, r1
+ 2295 0010 1546     		mov	r5, r2
+ 2296 0012 4643     		muls	r6, r0, r6
+ 2297              		.syntax unified
+ 2298              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2299 0014 EFF30589 		MRS r9, ipsr
+ 2300              	@ 0 "" 2
+ 2301              		.thumb
+ 2302              		.syntax unified
+ 2303 0018 B9F1000F 		cmp	r9, #0
+ 2304 001c 02D0     		beq	.L422
+ 2305              	.L426:
+ 2306 001e 0020     		movs	r0, #0
+ 2307 0020 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 2308              	.L422:
+ 2309 0024 22B3     		cbz	r2, .L433
+ 2310 0026 D368     		ldr	r3, [r2, #12]
+ 2311 0028 03B3     		cbz	r3, .L434
+ 2312 002a 1C2B     		cmp	r3, #28
+ 2313 002c 9468     		ldr	r4, [r2, #8]
+ 2314 002e F6D1     		bne	.L426
+ 2315              	.L425:
+ 2316 0030 6B69     		ldr	r3, [r5, #20]
+ 2317 0032 A3B3     		cbz	r3, .L427
+ 2318 0034 9E42     		cmp	r6, r3
+ 2319 0036 F2D1     		bne	.L426
+ 2320 0038 D5F810A0 		ldr	r10, [r5, #16]
+ 2321 003c 3CB9     		cbnz	r4, .L428
+ 2322              	.L424:
+ 2323 003e 1C20     		movs	r0, #28
+ 2324 0040 FFF7FEFF 		bl	core_sys_alloc
+ 2325 0044 0028     		cmp	r0, #0
+ 2326 0046 EAD0     		beq	.L426
+ 2327 0048 0446     		mov	r4, r0
+ 2328 004a 4FF48079 		mov	r9, #256
+ 2329              	.L428:
+ 2330 004e BAF1000F 		cmp	r10, #0
+ 2331 0052 11D1     		bne	.L429
+ 2332              	.L432:
+ 2333 0054 3046     		mov	r0, r6
+ 2334 0056 FFF7FEFF 		bl	core_sys_alloc
+ 2335 005a 8246     		mov	r10, r0
+ 2336 005c 50B9     		cbnz	r0, .L430
+ 2337 005e 19F4807F 		tst	r9, #256
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 42
+
+
+ 2338 0062 DCD0     		beq	.L426
+ 2339 0064 2046     		mov	r0, r4
+ 2340 0066 FFF7FEFF 		bl	core_sys_free
+ 2341 006a D8E7     		b	.L426
+ 2342              	.L434:
+ 2343 006c 4C46     		mov	r4, r9
+ 2344 006e DFE7     		b	.L425
+ 2345              	.L433:
+ 2346 0070 9246     		mov	r10, r2
+ 2347 0072 E4E7     		b	.L424
+ 2348              	.L430:
+ 2349 0074 49F40079 		orr	r9, r9, #512
+ 2350              	.L429:
+ 2351              		.syntax unified
+ 2352              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 2353 0078 EFF31086 		MRS r6, primask
+ 2354              	@ 0 "" 2
+ 2355              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 2356 007c 72B6     		cpsid i
+ 2357              	@ 0 "" 2
+ 2358              		.thumb
+ 2359              		.syntax unified
+ 2360 007e 5346     		mov	r3, r10
+ 2361 0080 4246     		mov	r2, r8
+ 2362 0082 3946     		mov	r1, r7
+ 2363 0084 2046     		mov	r0, r4
+ 2364 0086 FFF7FEFF 		bl	mem_init
+ 2365 008a C4F81490 		str	r9, [r4, #20]
+ 2366 008e 05B1     		cbz	r5, .L431
+ 2367 0090 2D68     		ldr	r5, [r5]
+ 2368              	.L431:
+ 2369 0092 A561     		str	r5, [r4, #24]
+ 2370              		.syntax unified
+ 2371              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 2372 0094 86F31088 		MSR primask, r6
+ 2373              	@ 0 "" 2
+ 2374              		.thumb
+ 2375              		.syntax unified
+ 2376 0098 2046     		mov	r0, r4
+ 2377 009a BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 2378              	.L427:
+ 2379 009e 002C     		cmp	r4, #0
+ 2380 00a0 D8D1     		bne	.L432
+ 2381 00a2 A246     		mov	r10, r4
+ 2382 00a4 CBE7     		b	.L424
+ 2383              		.size	osMemoryPoolNew, .-osMemoryPoolNew
+ 2384              		.section	.text.osMemoryPoolGetName,"ax",%progbits
+ 2385              		.align	1
+ 2386              		.global	osMemoryPoolGetName
+ 2387              		.syntax unified
+ 2388              		.thumb
+ 2389              		.thumb_func
+ 2390              		.fpu fpv4-sp-d16
+ 2391              		.type	osMemoryPoolGetName, %function
+ 2392              	osMemoryPoolGetName:
+ 2393              		@ args = 0, pretend = 0, frame = 0
+ 2394              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 43
+
+
+ 2395              		@ link register save eliminated.
+ 2396              		.syntax unified
+ 2397              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2398 0000 EFF30583 		MRS r3, ipsr
+ 2399              	@ 0 "" 2
+ 2400              		.thumb
+ 2401              		.syntax unified
+ 2402 0004 13B9     		cbnz	r3, .L445
+ 2403 0006 10B1     		cbz	r0, .L443
+ 2404 0008 8069     		ldr	r0, [r0, #24]
+ 2405 000a 7047     		bx	lr
+ 2406              	.L445:
+ 2407 000c 0020     		movs	r0, #0
+ 2408              	.L443:
+ 2409 000e 7047     		bx	lr
+ 2410              		.size	osMemoryPoolGetName, .-osMemoryPoolGetName
+ 2411              		.section	.text.osMemoryPoolAlloc,"ax",%progbits
+ 2412              		.align	1
+ 2413              		.global	osMemoryPoolAlloc
+ 2414              		.syntax unified
+ 2415              		.thumb
+ 2416              		.thumb_func
+ 2417              		.fpu fpv4-sp-d16
+ 2418              		.type	osMemoryPoolAlloc, %function
+ 2419              	osMemoryPoolAlloc:
+ 2420              		@ args = 0, pretend = 0, frame = 8
+ 2421              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2422 0000 07B5     		push	{r0, r1, r2, lr}
+ 2423 0002 0A46     		mov	r2, r1
+ 2424 0004 40B1     		cbz	r0, .L447
+ 2425              		.syntax unified
+ 2426              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2427 0006 EFF30583 		MRS r3, ipsr
+ 2428              	@ 0 "" 2
+ 2429              		.thumb
+ 2430              		.syntax unified
+ 2431 000a 03B1     		cbz	r3, .L449
+ 2432 000c 39B9     		cbnz	r1, .L457
+ 2433              	.L449:
+ 2434 000e 01A9     		add	r1, sp, #4
+ 2435 0010 FFF7FEFF 		bl	mem_waitFor
+ 2436 0014 18B9     		cbnz	r0, .L457
+ 2437 0016 0198     		ldr	r0, [sp, #4]
+ 2438              	.L447:
+ 2439 0018 03B0     		add	sp, sp, #12
+ 2440              		@ sp needed
+ 2441 001a 5DF804FB 		ldr	pc, [sp], #4
+ 2442              	.L457:
+ 2443 001e 0020     		movs	r0, #0
+ 2444 0020 FAE7     		b	.L447
+ 2445              		.size	osMemoryPoolAlloc, .-osMemoryPoolAlloc
+ 2446              		.section	.text.osMemoryPoolFree,"ax",%progbits
+ 2447              		.align	1
+ 2448              		.global	osMemoryPoolFree
+ 2449              		.syntax unified
+ 2450              		.thumb
+ 2451              		.thumb_func
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 44
+
+
+ 2452              		.fpu fpv4-sp-d16
+ 2453              		.type	osMemoryPoolFree, %function
+ 2454              	osMemoryPoolFree:
+ 2455              		@ args = 0, pretend = 0, frame = 0
+ 2456              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2457 0000 08B5     		push	{r3, lr}
+ 2458 0002 18B1     		cbz	r0, .L460
+ 2459 0004 FFF7FEFF 		bl	mem_give
+ 2460 0008 0020     		movs	r0, #0
+ 2461 000a 08BD     		pop	{r3, pc}
+ 2462              	.L460:
+ 2463 000c 6FF00300 		mvn	r0, #3
+ 2464 0010 08BD     		pop	{r3, pc}
+ 2465              		.size	osMemoryPoolFree, .-osMemoryPoolFree
+ 2466              		.section	.text.osMemoryPoolGetCapacity,"ax",%progbits
+ 2467              		.align	1
+ 2468              		.global	osMemoryPoolGetCapacity
+ 2469              		.syntax unified
+ 2470              		.thumb
+ 2471              		.thumb_func
+ 2472              		.fpu fpv4-sp-d16
+ 2473              		.type	osMemoryPoolGetCapacity, %function
+ 2474              	osMemoryPoolGetCapacity:
+ 2475              		@ args = 0, pretend = 0, frame = 0
+ 2476              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2477              		@ link register save eliminated.
+ 2478 0000 00B1     		cbz	r0, .L461
+ 2479 0002 8068     		ldr	r0, [r0, #8]
+ 2480              	.L461:
+ 2481 0004 7047     		bx	lr
+ 2482              		.size	osMemoryPoolGetCapacity, .-osMemoryPoolGetCapacity
+ 2483              		.section	.text.osMemoryPoolGetBlockSize,"ax",%progbits
+ 2484              		.align	1
+ 2485              		.global	osMemoryPoolGetBlockSize
+ 2486              		.syntax unified
+ 2487              		.thumb
+ 2488              		.thumb_func
+ 2489              		.fpu fpv4-sp-d16
+ 2490              		.type	osMemoryPoolGetBlockSize, %function
+ 2491              	osMemoryPoolGetBlockSize:
+ 2492              		@ args = 0, pretend = 0, frame = 0
+ 2493              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2494              		@ link register save eliminated.
+ 2495 0000 00B1     		cbz	r0, .L464
+ 2496 0002 C068     		ldr	r0, [r0, #12]
+ 2497              	.L464:
+ 2498 0004 7047     		bx	lr
+ 2499              		.size	osMemoryPoolGetBlockSize, .-osMemoryPoolGetBlockSize
+ 2500              		.section	.text.osMemoryPoolGetCount,"ax",%progbits
+ 2501              		.align	1
+ 2502              		.global	osMemoryPoolGetCount
+ 2503              		.syntax unified
+ 2504              		.thumb
+ 2505              		.thumb_func
+ 2506              		.fpu fpv4-sp-d16
+ 2507              		.type	osMemoryPoolGetCount, %function
+ 2508              	osMemoryPoolGetCount:
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 45
+
+
+ 2509              		@ args = 0, pretend = 0, frame = 0
+ 2510              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2511              		@ link register save eliminated.
+ 2512 0000 8368     		ldr	r3, [r0, #8]
+ 2513              		.syntax unified
+ 2514              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 2515 0002 EFF31081 		MRS r1, primask
+ 2516              	@ 0 "" 2
+ 2517              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 2518 0006 72B6     		cpsid i
+ 2519              	@ 0 "" 2
+ 2520              		.thumb
+ 2521              		.syntax unified
+ 2522 0008 4268     		ldr	r2, [r0, #4]
+ 2523              	.L468:
+ 2524 000a 1AB9     		cbnz	r2, .L469
+ 2525              		.syntax unified
+ 2526              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 2527 000c 81F31088 		MSR primask, r1
+ 2528              	@ 0 "" 2
+ 2529              		.thumb
+ 2530              		.syntax unified
+ 2531 0010 1846     		mov	r0, r3
+ 2532 0012 7047     		bx	lr
+ 2533              	.L469:
+ 2534 0014 013B     		subs	r3, r3, #1
+ 2535 0016 1268     		ldr	r2, [r2]
+ 2536 0018 F7E7     		b	.L468
+ 2537              		.size	osMemoryPoolGetCount, .-osMemoryPoolGetCount
+ 2538              		.section	.text.osMemoryPoolGetSpace,"ax",%progbits
+ 2539              		.align	1
+ 2540              		.global	osMemoryPoolGetSpace
+ 2541              		.syntax unified
+ 2542              		.thumb
+ 2543              		.thumb_func
+ 2544              		.fpu fpv4-sp-d16
+ 2545              		.type	osMemoryPoolGetSpace, %function
+ 2546              	osMemoryPoolGetSpace:
+ 2547              		@ args = 0, pretend = 0, frame = 0
+ 2548              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2549              		@ link register save eliminated.
+ 2550 0000 38B1     		cbz	r0, .L470
+ 2551              		.syntax unified
+ 2552              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 2553 0002 EFF31082 		MRS r2, primask
+ 2554              	@ 0 "" 2
+ 2555              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 2556 0006 72B6     		cpsid i
+ 2557              	@ 0 "" 2
+ 2558              		.thumb
+ 2559              		.syntax unified
+ 2560 0008 4368     		ldr	r3, [r0, #4]
+ 2561 000a 0020     		movs	r0, #0
+ 2562              	.L472:
+ 2563 000c 13B9     		cbnz	r3, .L473
+ 2564              		.syntax unified
+ 2565              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 46
+
+
+ 2566 000e 82F31088 		MSR primask, r2
+ 2567              	@ 0 "" 2
+ 2568              		.thumb
+ 2569              		.syntax unified
+ 2570              	.L470:
+ 2571 0012 7047     		bx	lr
+ 2572              	.L473:
+ 2573 0014 0130     		adds	r0, r0, #1
+ 2574 0016 1B68     		ldr	r3, [r3]
+ 2575 0018 F8E7     		b	.L472
+ 2576              		.size	osMemoryPoolGetSpace, .-osMemoryPoolGetSpace
+ 2577              		.section	.text.osMemoryPoolDelete,"ax",%progbits
+ 2578              		.align	1
+ 2579              		.global	osMemoryPoolDelete
+ 2580              		.syntax unified
+ 2581              		.thumb
+ 2582              		.thumb_func
+ 2583              		.fpu fpv4-sp-d16
+ 2584              		.type	osMemoryPoolDelete, %function
+ 2585              	osMemoryPoolDelete:
+ 2586              		@ args = 0, pretend = 0, frame = 0
+ 2587              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2588 0000 38B5     		push	{r3, r4, r5, lr}
+ 2589 0002 0446     		mov	r4, r0
+ 2590              		.syntax unified
+ 2591              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2592 0004 EFF30583 		MRS r3, ipsr
+ 2593              	@ 0 "" 2
+ 2594              		.thumb
+ 2595              		.syntax unified
+ 2596 0008 ABB9     		cbnz	r3, .L479
+ 2597 000a B8B1     		cbz	r0, .L480
+ 2598              		.syntax unified
+ 2599              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 2600 000c EFF31085 		MRS r5, primask
+ 2601              	@ 0 "" 2
+ 2602              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 2603 0010 72B6     		cpsid i
+ 2604              	@ 0 "" 2
+ 2605              		.thumb
+ 2606              		.syntax unified
+ 2607 0012 FFF7FEFF 		bl	mem_kill
+ 2608 0016 6369     		ldr	r3, [r4, #20]
+ 2609 0018 9A05     		lsls	r2, r3, #22
+ 2610 001a 02D5     		bpl	.L477
+ 2611 001c 2069     		ldr	r0, [r4, #16]
+ 2612 001e FFF7FEFF 		bl	core_sys_free
+ 2613              	.L477:
+ 2614 0022 6369     		ldr	r3, [r4, #20]
+ 2615 0024 DB05     		lsls	r3, r3, #23
+ 2616 0026 02D5     		bpl	.L478
+ 2617 0028 2046     		mov	r0, r4
+ 2618 002a FFF7FEFF 		bl	core_sys_free
+ 2619              	.L478:
+ 2620              		.syntax unified
+ 2621              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 2622 002e 85F31088 		MSR primask, r5
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 47
+
+
+ 2623              	@ 0 "" 2
+ 2624              		.thumb
+ 2625              		.syntax unified
+ 2626 0032 0020     		movs	r0, #0
+ 2627 0034 38BD     		pop	{r3, r4, r5, pc}
+ 2628              	.L479:
+ 2629 0036 6FF00500 		mvn	r0, #5
+ 2630 003a 38BD     		pop	{r3, r4, r5, pc}
+ 2631              	.L480:
+ 2632 003c 6FF00300 		mvn	r0, #3
+ 2633 0040 38BD     		pop	{r3, r4, r5, pc}
+ 2634              		.size	osMemoryPoolDelete, .-osMemoryPoolDelete
+ 2635              		.section	.text.osMessageQueueNew,"ax",%progbits
+ 2636              		.align	1
+ 2637              		.global	osMessageQueueNew
+ 2638              		.syntax unified
+ 2639              		.thumb
+ 2640              		.thumb_func
+ 2641              		.fpu fpv4-sp-d16
+ 2642              		.type	osMessageQueueNew, %function
+ 2643              	osMessageQueueNew:
+ 2644              		@ args = 0, pretend = 0, frame = 0
+ 2645              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2646 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 2647 0004 01F10308 		add	r8, r1, #3
+ 2648 0008 28F00308 		bic	r8, r8, #3
+ 2649 000c 8146     		mov	r9, r0
+ 2650 000e 8A46     		mov	r10, r1
+ 2651 0010 1546     		mov	r5, r2
+ 2652 0012 00FB08F8 		mul	r8, r0, r8
+ 2653              		.syntax unified
+ 2654              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2655 0016 EFF30586 		MRS r6, ipsr
+ 2656              	@ 0 "" 2
+ 2657              		.thumb
+ 2658              		.syntax unified
+ 2659 001a 16B1     		cbz	r6, .L488
+ 2660              	.L492:
+ 2661 001c 0020     		movs	r0, #0
+ 2662 001e BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 2663              	.L488:
+ 2664 0022 02B3     		cbz	r2, .L499
+ 2665 0024 D368     		ldr	r3, [r2, #12]
+ 2666 0026 E3B1     		cbz	r3, .L500
+ 2667 0028 242B     		cmp	r3, #36
+ 2668 002a 9468     		ldr	r4, [r2, #8]
+ 2669 002c F6D1     		bne	.L492
+ 2670              	.L491:
+ 2671 002e 6B69     		ldr	r3, [r5, #20]
+ 2672 0030 7BB3     		cbz	r3, .L493
+ 2673 0032 9845     		cmp	r8, r3
+ 2674 0034 F2D1     		bne	.L492
+ 2675 0036 2F69     		ldr	r7, [r5, #16]
+ 2676 0038 3CB9     		cbnz	r4, .L494
+ 2677              	.L490:
+ 2678 003a 2420     		movs	r0, #36
+ 2679 003c FFF7FEFF 		bl	core_sys_alloc
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 48
+
+
+ 2680 0040 0028     		cmp	r0, #0
+ 2681 0042 EBD0     		beq	.L492
+ 2682 0044 0446     		mov	r4, r0
+ 2683 0046 4FF48076 		mov	r6, #256
+ 2684              	.L494:
+ 2685 004a 87B9     		cbnz	r7, .L495
+ 2686              	.L498:
+ 2687 004c 4046     		mov	r0, r8
+ 2688 004e FFF7FEFF 		bl	core_sys_alloc
+ 2689 0052 0746     		mov	r7, r0
+ 2690 0054 48B9     		cbnz	r0, .L496
+ 2691 0056 F305     		lsls	r3, r6, #23
+ 2692 0058 E0D5     		bpl	.L492
+ 2693 005a 2046     		mov	r0, r4
+ 2694 005c FFF7FEFF 		bl	core_sys_free
+ 2695 0060 DCE7     		b	.L492
+ 2696              	.L500:
+ 2697 0062 3446     		mov	r4, r6
+ 2698 0064 E3E7     		b	.L491
+ 2699              	.L499:
+ 2700 0066 1746     		mov	r7, r2
+ 2701 0068 E7E7     		b	.L490
+ 2702              	.L496:
+ 2703 006a 46F40076 		orr	r6, r6, #512
+ 2704              	.L495:
+ 2705              		.syntax unified
+ 2706              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 2707 006e EFF31088 		MRS r8, primask
+ 2708              	@ 0 "" 2
+ 2709              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 2710 0072 72B6     		cpsid i
+ 2711              	@ 0 "" 2
+ 2712              		.thumb
+ 2713              		.syntax unified
+ 2714 0074 3B46     		mov	r3, r7
+ 2715 0076 5246     		mov	r2, r10
+ 2716 0078 4946     		mov	r1, r9
+ 2717 007a 2046     		mov	r0, r4
+ 2718 007c FFF7FEFF 		bl	box_init
+ 2719 0080 E661     		str	r6, [r4, #28]
+ 2720 0082 05B1     		cbz	r5, .L497
+ 2721 0084 2D68     		ldr	r5, [r5]
+ 2722              	.L497:
+ 2723 0086 2562     		str	r5, [r4, #32]
+ 2724              		.syntax unified
+ 2725              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 2726 0088 88F31088 		MSR primask, r8
+ 2727              	@ 0 "" 2
+ 2728              		.thumb
+ 2729              		.syntax unified
+ 2730 008c 2046     		mov	r0, r4
+ 2731 008e BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 2732              	.L493:
+ 2733 0092 002C     		cmp	r4, #0
+ 2734 0094 DAD1     		bne	.L498
+ 2735 0096 2746     		mov	r7, r4
+ 2736 0098 CFE7     		b	.L490
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 49
+
+
+ 2737              		.size	osMessageQueueNew, .-osMessageQueueNew
+ 2738              		.section	.text.osMessageQueueGetName,"ax",%progbits
+ 2739              		.align	1
+ 2740              		.global	osMessageQueueGetName
+ 2741              		.syntax unified
+ 2742              		.thumb
+ 2743              		.thumb_func
+ 2744              		.fpu fpv4-sp-d16
+ 2745              		.type	osMessageQueueGetName, %function
+ 2746              	osMessageQueueGetName:
+ 2747              		@ args = 0, pretend = 0, frame = 0
+ 2748              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2749              		@ link register save eliminated.
+ 2750              		.syntax unified
+ 2751              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2752 0000 EFF30583 		MRS r3, ipsr
+ 2753              	@ 0 "" 2
+ 2754              		.thumb
+ 2755              		.syntax unified
+ 2756 0004 13B9     		cbnz	r3, .L511
+ 2757 0006 10B1     		cbz	r0, .L509
+ 2758 0008 006A     		ldr	r0, [r0, #32]
+ 2759 000a 7047     		bx	lr
+ 2760              	.L511:
+ 2761 000c 0020     		movs	r0, #0
+ 2762              	.L509:
+ 2763 000e 7047     		bx	lr
+ 2764              		.size	osMessageQueueGetName, .-osMessageQueueGetName
+ 2765              		.section	.text.osMessageQueuePut,"ax",%progbits
+ 2766              		.align	1
+ 2767              		.global	osMessageQueuePut
+ 2768              		.syntax unified
+ 2769              		.thumb
+ 2770              		.thumb_func
+ 2771              		.fpu fpv4-sp-d16
+ 2772              		.type	osMessageQueuePut, %function
+ 2773              	osMessageQueuePut:
+ 2774              		@ args = 0, pretend = 0, frame = 0
+ 2775              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2776 0000 08B5     		push	{r3, lr}
+ 2777 0002 78B1     		cbz	r0, .L520
+ 2778 0004 71B1     		cbz	r1, .L520
+ 2779              		.syntax unified
+ 2780              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2781 0006 EFF30582 		MRS r2, ipsr
+ 2782              	@ 0 "" 2
+ 2783              		.thumb
+ 2784              		.syntax unified
+ 2785 000a 02B1     		cbz	r2, .L515
+ 2786 000c 53B9     		cbnz	r3, .L520
+ 2787              	.L515:
+ 2788 000e 1A46     		mov	r2, r3
+ 2789 0010 FFF7FEFF 		bl	box_sendFor
+ 2790 0014 40B1     		cbz	r0, .L513
+ 2791 0016 831C     		adds	r3, r0, #2
+ 2792 0018 0CBF     		ite	eq
+ 2793 001a 6FF00100 		mvneq	r0, #1
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 50
+
+
+ 2794 001e 6FF00200 		mvnne	r0, #2
+ 2795 0022 08BD     		pop	{r3, pc}
+ 2796              	.L520:
+ 2797 0024 6FF00300 		mvn	r0, #3
+ 2798              	.L513:
+ 2799 0028 08BD     		pop	{r3, pc}
+ 2800              		.size	osMessageQueuePut, .-osMessageQueuePut
+ 2801              		.section	.text.osMessageQueueGet,"ax",%progbits
+ 2802              		.align	1
+ 2803              		.global	osMessageQueueGet
+ 2804              		.syntax unified
+ 2805              		.thumb
+ 2806              		.thumb_func
+ 2807              		.fpu fpv4-sp-d16
+ 2808              		.type	osMessageQueueGet, %function
+ 2809              	osMessageQueueGet:
+ 2810              		@ args = 0, pretend = 0, frame = 0
+ 2811              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2812 0000 08B5     		push	{r3, lr}
+ 2813 0002 78B1     		cbz	r0, .L532
+ 2814 0004 71B1     		cbz	r1, .L532
+ 2815              		.syntax unified
+ 2816              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2817 0006 EFF30582 		MRS r2, ipsr
+ 2818              	@ 0 "" 2
+ 2819              		.thumb
+ 2820              		.syntax unified
+ 2821 000a 02B1     		cbz	r2, .L527
+ 2822 000c 53B9     		cbnz	r3, .L532
+ 2823              	.L527:
+ 2824 000e 1A46     		mov	r2, r3
+ 2825 0010 FFF7FEFF 		bl	box_waitFor
+ 2826 0014 40B1     		cbz	r0, .L525
+ 2827 0016 831C     		adds	r3, r0, #2
+ 2828 0018 0CBF     		ite	eq
+ 2829 001a 6FF00100 		mvneq	r0, #1
+ 2830 001e 6FF00200 		mvnne	r0, #2
+ 2831 0022 08BD     		pop	{r3, pc}
+ 2832              	.L532:
+ 2833 0024 6FF00300 		mvn	r0, #3
+ 2834              	.L525:
+ 2835 0028 08BD     		pop	{r3, pc}
+ 2836              		.size	osMessageQueueGet, .-osMessageQueueGet
+ 2837              		.section	.text.osMessageQueueGetCapacity,"ax",%progbits
+ 2838              		.align	1
+ 2839              		.global	osMessageQueueGetCapacity
+ 2840              		.syntax unified
+ 2841              		.thumb
+ 2842              		.thumb_func
+ 2843              		.fpu fpv4-sp-d16
+ 2844              		.type	osMessageQueueGetCapacity, %function
+ 2845              	osMessageQueueGetCapacity:
+ 2846              		@ args = 0, pretend = 0, frame = 0
+ 2847              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2848              		@ link register save eliminated.
+ 2849 0000 00B1     		cbz	r0, .L537
+ 2850 0002 8068     		ldr	r0, [r0, #8]
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 51
+
+
+ 2851              	.L537:
+ 2852 0004 7047     		bx	lr
+ 2853              		.size	osMessageQueueGetCapacity, .-osMessageQueueGetCapacity
+ 2854              		.section	.text.osMessageQueueGetMsgSize,"ax",%progbits
+ 2855              		.align	1
+ 2856              		.global	osMessageQueueGetMsgSize
+ 2857              		.syntax unified
+ 2858              		.thumb
+ 2859              		.thumb_func
+ 2860              		.fpu fpv4-sp-d16
+ 2861              		.type	osMessageQueueGetMsgSize, %function
+ 2862              	osMessageQueueGetMsgSize:
+ 2863              		@ args = 0, pretend = 0, frame = 0
+ 2864              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2865              		@ link register save eliminated.
+ 2866 0000 00B1     		cbz	r0, .L540
+ 2867 0002 8069     		ldr	r0, [r0, #24]
+ 2868              	.L540:
+ 2869 0004 7047     		bx	lr
+ 2870              		.size	osMessageQueueGetMsgSize, .-osMessageQueueGetMsgSize
+ 2871              		.section	.text.osMessageQueueGetCount,"ax",%progbits
+ 2872              		.align	1
+ 2873              		.global	osMessageQueueGetCount
+ 2874              		.syntax unified
+ 2875              		.thumb
+ 2876              		.thumb_func
+ 2877              		.fpu fpv4-sp-d16
+ 2878              		.type	osMessageQueueGetCount, %function
+ 2879              	osMessageQueueGetCount:
+ 2880              		@ args = 0, pretend = 0, frame = 0
+ 2881              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2882              		@ link register save eliminated.
+ 2883 0000 00B1     		cbz	r0, .L543
+ 2884 0002 4068     		ldr	r0, [r0, #4]
+ 2885              	.L543:
+ 2886 0004 7047     		bx	lr
+ 2887              		.size	osMessageQueueGetCount, .-osMessageQueueGetCount
+ 2888              		.section	.text.osMessageQueueGetSpace,"ax",%progbits
+ 2889              		.align	1
+ 2890              		.global	osMessageQueueGetSpace
+ 2891              		.syntax unified
+ 2892              		.thumb
+ 2893              		.thumb_func
+ 2894              		.fpu fpv4-sp-d16
+ 2895              		.type	osMessageQueueGetSpace, %function
+ 2896              	osMessageQueueGetSpace:
+ 2897              		@ args = 0, pretend = 0, frame = 0
+ 2898              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2899              		@ link register save eliminated.
+ 2900 0000 38B1     		cbz	r0, .L546
+ 2901              		.syntax unified
+ 2902              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 2903 0002 EFF31083 		MRS r3, primask
+ 2904              	@ 0 "" 2
+ 2905              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 2906 0006 72B6     		cpsid i
+ 2907              	@ 0 "" 2
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 52
+
+
+ 2908              		.thumb
+ 2909              		.syntax unified
+ 2910 0008 8268     		ldr	r2, [r0, #8]
+ 2911 000a 4068     		ldr	r0, [r0, #4]
+ 2912 000c 101A     		subs	r0, r2, r0
+ 2913              		.syntax unified
+ 2914              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 2915 000e 83F31088 		MSR primask, r3
+ 2916              	@ 0 "" 2
+ 2917              		.thumb
+ 2918              		.syntax unified
+ 2919              	.L546:
+ 2920 0012 7047     		bx	lr
+ 2921              		.size	osMessageQueueGetSpace, .-osMessageQueueGetSpace
+ 2922              		.section	.text.osMessageQueueReset,"ax",%progbits
+ 2923              		.align	1
+ 2924              		.global	osMessageQueueReset
+ 2925              		.syntax unified
+ 2926              		.thumb
+ 2927              		.thumb_func
+ 2928              		.fpu fpv4-sp-d16
+ 2929              		.type	osMessageQueueReset, %function
+ 2930              	osMessageQueueReset:
+ 2931              		@ args = 0, pretend = 0, frame = 0
+ 2932              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2933 0000 10B5     		push	{r4, lr}
+ 2934              		.syntax unified
+ 2935              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2936 0002 EFF30584 		MRS r4, ipsr
+ 2937              	@ 0 "" 2
+ 2938              		.thumb
+ 2939              		.syntax unified
+ 2940 0006 24B9     		cbnz	r4, .L551
+ 2941 0008 30B1     		cbz	r0, .L552
+ 2942 000a FFF7FEFF 		bl	box_kill
+ 2943 000e 2046     		mov	r0, r4
+ 2944 0010 10BD     		pop	{r4, pc}
+ 2945              	.L551:
+ 2946 0012 6FF00500 		mvn	r0, #5
+ 2947 0016 10BD     		pop	{r4, pc}
+ 2948              	.L552:
+ 2949 0018 6FF00300 		mvn	r0, #3
+ 2950 001c 10BD     		pop	{r4, pc}
+ 2951              		.size	osMessageQueueReset, .-osMessageQueueReset
+ 2952              		.section	.text.osMessageQueueDelete,"ax",%progbits
+ 2953              		.align	1
+ 2954              		.global	osMessageQueueDelete
+ 2955              		.syntax unified
+ 2956              		.thumb
+ 2957              		.thumb_func
+ 2958              		.fpu fpv4-sp-d16
+ 2959              		.type	osMessageQueueDelete, %function
+ 2960              	osMessageQueueDelete:
+ 2961              		@ args = 0, pretend = 0, frame = 0
+ 2962              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2963 0000 38B5     		push	{r3, r4, r5, lr}
+ 2964 0002 0446     		mov	r4, r0
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 53
+
+
+ 2965              		.syntax unified
+ 2966              	@ 195 "CMSIS/include/cmsis_gcc.h" 1
+ 2967 0004 EFF30583 		MRS r3, ipsr
+ 2968              	@ 0 "" 2
+ 2969              		.thumb
+ 2970              		.syntax unified
+ 2971 0008 ABB9     		cbnz	r3, .L557
+ 2972 000a B8B1     		cbz	r0, .L558
+ 2973              		.syntax unified
+ 2974              	@ 345 "CMSIS/include/cmsis_gcc.h" 1
+ 2975 000c EFF31085 		MRS r5, primask
+ 2976              	@ 0 "" 2
+ 2977              	@ 128 "CMSIS/include/cmsis_gcc.h" 1
+ 2978 0010 72B6     		cpsid i
+ 2979              	@ 0 "" 2
+ 2980              		.thumb
+ 2981              		.syntax unified
+ 2982 0012 FFF7FEFF 		bl	box_kill
+ 2983 0016 E369     		ldr	r3, [r4, #28]
+ 2984 0018 9A05     		lsls	r2, r3, #22
+ 2985 001a 02D5     		bpl	.L555
+ 2986 001c 6069     		ldr	r0, [r4, #20]
+ 2987 001e FFF7FEFF 		bl	core_sys_free
+ 2988              	.L555:
+ 2989 0022 E369     		ldr	r3, [r4, #28]
+ 2990 0024 DB05     		lsls	r3, r3, #23
+ 2991 0026 02D5     		bpl	.L556
+ 2992 0028 2046     		mov	r0, r4
+ 2993 002a FFF7FEFF 		bl	core_sys_free
+ 2994              	.L556:
+ 2995              		.syntax unified
+ 2996              	@ 373 "CMSIS/include/cmsis_gcc.h" 1
+ 2997 002e 85F31088 		MSR primask, r5
+ 2998              	@ 0 "" 2
+ 2999              		.thumb
+ 3000              		.syntax unified
+ 3001 0032 0020     		movs	r0, #0
+ 3002 0034 38BD     		pop	{r3, r4, r5, pc}
+ 3003              	.L557:
+ 3004 0036 6FF00500 		mvn	r0, #5
+ 3005 003a 38BD     		pop	{r3, r4, r5, pc}
+ 3006              	.L558:
+ 3007 003c 6FF00300 		mvn	r0, #3
+ 3008 0040 38BD     		pop	{r3, r4, r5, pc}
+ 3009              		.size	osMessageQueueDelete, .-osMessageQueueDelete
+ 3010              		.section	.rodata.CSWTCH.54,"a",%progbits
+ 3011              		.set	.LANCHOR0,. + 0
+ 3012              		.type	CSWTCH.54, %object
+ 3013              		.size	CSWTCH.54, 3
+ 3014              	CSWTCH.54:
+ 3015 0000 04       		.byte	4
+ 3016 0001 01       		.byte	1
+ 3017 0002 03       		.byte	3
+ 3018              		.section	.rodata.osKernelGetInfo.str1.1,"aMS",%progbits,1
+ 3019              	.LC0:
+ 3020 0000 53746174 		.ascii	"StateOS v4.5\000"
+ 3020      654F5320 
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 54
+
+
+ 3020      76342E35 
+ 3020      00
+ 3021              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 6.2.1 20161205 (release) [ARM/embedded-6-bran
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 55
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 cmsis_os2.c
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:13     .text.timer_handler:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:19     .text.timer_handler:00000000 timer_handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:31     .text.timer_handler:0000000c $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:34     .text.thread_handler:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:40     .text.thread_handler:00000000 thread_handler
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:53     .text.thread_handler:00000010 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:56     .text.thread_delete:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:62     .text.thread_delete:00000000 thread_delete
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:99     .text.osKernelGetInfo:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:106    .text.osKernelGetInfo:00000000 osKernelGetInfo
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:136    .text.osKernelGetInfo:0000002c $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:141    .text.osKernelGetState:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:148    .text.osKernelGetState:00000000 osKernelGetState
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:165    .text.osKernelStart:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:172    .text.osKernelStart:00000000 osKernelStart
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:189    .text.osKernelInitialize:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:196    .text.osKernelInitialize:00000000 osKernelInitialize
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:203    .text.osKernelLock:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:210    .text.osKernelLock:00000000 osKernelLock
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:236    .text.osKernelUnlock:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:243    .text.osKernelUnlock:00000000 osKernelUnlock
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:269    .text.osKernelRestoreLock:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:276    .text.osKernelRestoreLock:00000000 osKernelRestoreLock
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:302    .text.osKernelSuspend:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:309    .text.osKernelSuspend:00000000 osKernelSuspend
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:317    .text.osKernelResume:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:324    .text.osKernelResume:00000000 osKernelResume
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:331    .text.osKernelGetTickCount:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:338    .text.osKernelGetTickCount:00000000 osKernelGetTickCount
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:348    .text.osKernelGetTickFreq:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:355    .text.osKernelGetTickFreq:00000000 osKernelGetTickFreq
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:364    .text.osKernelGetTickFreq:00000004 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:367    .text.osKernelGetSysTimerCount:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:374    .text.osKernelGetSysTimerCount:00000000 osKernelGetSysTimerCount
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:383    .text.osKernelGetSysTimerFreq:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:390    .text.osKernelGetSysTimerFreq:00000000 osKernelGetSysTimerFreq
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:399    .text.osKernelGetSysTimerFreq:00000004 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:402    .text.osThreadNew:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:409    .text.osThreadNew:00000000 osThreadNew
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:529    .text.osThreadNew:000000d8 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:532    .text.osThreadGetName:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:539    .text.osThreadGetName:00000000 osThreadGetName
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:559    .text.osThreadGetId:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:566    .text.osThreadGetId:00000000 osThreadGetId
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:586    .text.osThreadGetId:00000010 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:589    .text.osThreadGetState:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:596    .text.osThreadGetState:00000000 osThreadGetState
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:620    .text.osThreadGetState:0000001c $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:623    .text.osThreadGetStackSize:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:630    .text.osThreadGetStackSize:00000000 osThreadGetStackSize
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:651    .text.osThreadGetStackSpace:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:658    .text.osThreadGetStackSpace:00000000 osThreadGetStackSpace
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:672    .text.osThreadSetPriority:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:679    .text.osThreadSetPriority:00000000 osThreadSetPriority
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:722    .text.osThreadGetPriority:00000000 $t
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 56
+
+
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:729    .text.osThreadGetPriority:00000000 osThreadGetPriority
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:748    .text.osThreadYield:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:755    .text.osThreadYield:00000000 osThreadYield
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:774    .text.osThreadSuspend:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:781    .text.osThreadSuspend:00000000 osThreadSuspend
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:813    .text.osThreadSuspend:00000030 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:817    .text.osThreadResume:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:824    .text.osThreadResume:00000000 osThreadResume
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:848    .text.osThreadDetach:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:855    .text.osThreadDetach:00000000 osThreadDetach
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:887    .text.osThreadJoin:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:894    .text.osThreadJoin:00000000 osThreadJoin
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:927    .text.osThreadExit:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:934    .text.osThreadExit:00000000 osThreadExit
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:942    .text.osThreadTerminate:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:949    .text.osThreadTerminate:00000000 osThreadTerminate
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:979    .text.osThreadGetCount:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:986    .text.osThreadGetCount:00000000 osThreadGetCount
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1041   .text.osThreadGetCount:0000003c $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1045   .text.osThreadEnumerate:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1052   .text.osThreadEnumerate:00000000 osThreadEnumerate
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1120   .text.osThreadEnumerate:00000054 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1124   .text.osThreadFlagsSet:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1131   .text.osThreadFlagsSet:00000000 osThreadFlagsSet
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1145   .text.osThreadFlagsClear:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1152   .text.osThreadFlagsClear:00000000 osThreadFlagsClear
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1174   .text.osThreadFlagsClear:00000018 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1177   .text.osThreadFlagsGet:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1184   .text.osThreadFlagsGet:00000000 osThreadFlagsGet
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1205   .text.osThreadFlagsGet:00000014 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1208   .text.osThreadFlagsWait:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1215   .text.osThreadFlagsWait:00000000 osThreadFlagsWait
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1253   .text.osThreadFlagsWait:0000003c $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1256   .text.osDelay:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1263   .text.osDelay:00000000 osDelay
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1288   .text.osDelay:00000024 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1291   .text.osDelayUntil:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1298   .text.osDelayUntil:00000000 osDelayUntil
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1323   .text.osDelayUntil:00000024 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1326   .text.osTimerNew:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1333   .text.osTimerNew:00000000 osTimerNew
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1400   .text.osTimerNew:00000064 $d
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1403   .text.osTimerGetName:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1410   .text.osTimerGetName:00000000 osTimerGetName
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1430   .text.osTimerStart:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1437   .text.osTimerStart:00000000 osTimerStart
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1466   .text.osTimerStop:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1473   .text.osTimerStop:00000000 osTimerStop
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1496   .text.osTimerIsRunning:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1503   .text.osTimerIsRunning:00000000 osTimerIsRunning
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1527   .text.osTimerDelete:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1534   .text.osTimerDelete:00000000 osTimerDelete
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1579   .text.osEventFlagsNew:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1586   .text.osEventFlagsNew:00000000 osEventFlagsNew
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1643   .text.osEventFlagsGetName:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1650   .text.osEventFlagsGetName:00000000 osEventFlagsGetName
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1670   .text.osEventFlagsSet:00000000 $t
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 57
+
+
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1677   .text.osEventFlagsSet:00000000 osEventFlagsSet
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1690   .text.osEventFlagsClear:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1697   .text.osEventFlagsClear:00000000 osEventFlagsClear
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1710   .text.osEventFlagsGet:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1717   .text.osEventFlagsGet:00000000 osEventFlagsGet
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1727   .text.osEventFlagsWait:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1734   .text.osEventFlagsWait:00000000 osEventFlagsWait
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1766   .text.osEventFlagsDelete:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1773   .text.osEventFlagsDelete:00000000 osEventFlagsDelete
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1818   .text.osMutexNew:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1825   .text.osMutexNew:00000000 osMutexNew
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1883   .text.osMutexGetName:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1890   .text.osMutexGetName:00000000 osMutexGetName
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1910   .text.osMutexAcquire:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1917   .text.osMutexAcquire:00000000 osMutexAcquire
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1945   .text.osMutexRelease:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1952   .text.osMutexRelease:00000000 osMutexRelease
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1978   .text.osMutexGetOwner:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:1985   .text.osMutexGetOwner:00000000 osMutexGetOwner
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2005   .text.osMutexDelete:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2012   .text.osMutexDelete:00000000 osMutexDelete
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2057   .text.osSemaphoreNew:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2064   .text.osSemaphoreNew:00000000 osSemaphoreNew
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2125   .text.osSemaphoreGetName:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2132   .text.osSemaphoreGetName:00000000 osSemaphoreGetName
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2152   .text.osSemaphoreAcquire:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2159   .text.osSemaphoreAcquire:00000000 osSemaphoreAcquire
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2186   .text.osSemaphoreRelease:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2193   .text.osSemaphoreRelease:00000000 osSemaphoreRelease
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2210   .text.osSemaphoreGetCount:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2217   .text.osSemaphoreGetCount:00000000 osSemaphoreGetCount
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2227   .text.osSemaphoreDelete:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2234   .text.osSemaphoreDelete:00000000 osSemaphoreDelete
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2279   .text.osMemoryPoolNew:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2286   .text.osMemoryPoolNew:00000000 osMemoryPoolNew
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2385   .text.osMemoryPoolGetName:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2392   .text.osMemoryPoolGetName:00000000 osMemoryPoolGetName
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2412   .text.osMemoryPoolAlloc:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2419   .text.osMemoryPoolAlloc:00000000 osMemoryPoolAlloc
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2447   .text.osMemoryPoolFree:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2454   .text.osMemoryPoolFree:00000000 osMemoryPoolFree
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2467   .text.osMemoryPoolGetCapacity:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2474   .text.osMemoryPoolGetCapacity:00000000 osMemoryPoolGetCapacity
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2484   .text.osMemoryPoolGetBlockSize:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2491   .text.osMemoryPoolGetBlockSize:00000000 osMemoryPoolGetBlockSize
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2501   .text.osMemoryPoolGetCount:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2508   .text.osMemoryPoolGetCount:00000000 osMemoryPoolGetCount
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2539   .text.osMemoryPoolGetSpace:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2546   .text.osMemoryPoolGetSpace:00000000 osMemoryPoolGetSpace
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2578   .text.osMemoryPoolDelete:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2585   .text.osMemoryPoolDelete:00000000 osMemoryPoolDelete
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2636   .text.osMessageQueueNew:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2643   .text.osMessageQueueNew:00000000 osMessageQueueNew
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2739   .text.osMessageQueueGetName:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2746   .text.osMessageQueueGetName:00000000 osMessageQueueGetName
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2766   .text.osMessageQueuePut:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2773   .text.osMessageQueuePut:00000000 osMessageQueuePut
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 58
+
+
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2802   .text.osMessageQueueGet:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2809   .text.osMessageQueueGet:00000000 osMessageQueueGet
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2838   .text.osMessageQueueGetCapacity:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2845   .text.osMessageQueueGetCapacity:00000000 osMessageQueueGetCapacity
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2855   .text.osMessageQueueGetMsgSize:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2862   .text.osMessageQueueGetMsgSize:00000000 osMessageQueueGetMsgSize
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2872   .text.osMessageQueueGetCount:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2879   .text.osMessageQueueGetCount:00000000 osMessageQueueGetCount
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2889   .text.osMessageQueueGetSpace:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2896   .text.osMessageQueueGetSpace:00000000 osMessageQueueGetSpace
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2923   .text.osMessageQueueReset:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2930   .text.osMessageQueueReset:00000000 osMessageQueueReset
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2953   .text.osMessageQueueDelete:00000000 $t
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:2960   .text.osMessageQueueDelete:00000000 osMessageQueueDelete
+C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s:3014   .rodata.CSWTCH.54:00000000 CSWTCH.54
+
+UNDEFINED SYMBOLS
+WAIT
+tsk_stop
+System
+core_sys_free
+strncpy
+core_sys_alloc
+tsk_init
+flg_init
+core_tsk_prio
+tsk_yield
+tmr_waitFor
+tsk_resume
+tsk_detach
+tsk_join
+tsk_kill
+IDLE
+flg_give
+flg_clear
+flg_waitFor
+tmr_waitUntil
+tmr_init
+tmr_start
+tmr_kill
+flg_kill
+mtx_init
+mtx_waitFor
+mtx_give
+mtx_kill
+sem_init
+sem_waitFor
+sem_sendFor
+sem_kill
+mem_init
+mem_waitFor
+mem_give
+mem_kill
+box_init
+box_sendFor
+box_waitFor
+box_kill
+ARM GAS  C:\Users\SZYMAN~1.RAJ\AppData\Local\Temp\ccMAyaZN.s 			page 59
+
+

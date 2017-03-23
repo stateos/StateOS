@@ -27,7 +27,7 @@ void master(void *arg)
 
 int main(void)
 {
-	LED_Config();
+	LED_Init();
 	osKernelInitialize();
 	sem = osSemaphoreNew(1, 0, NULL);
 	osThreadNew(slave,  NULL, NULL);
