@@ -32,6 +32,7 @@ Features:
 4.7
 - updated macros for task and timer objects
 - updated examples
+- added tsk_getPrio / tsk_setPrio inline functions
 ---------
 4.6
 - added JOINABLE and DETACHED constants

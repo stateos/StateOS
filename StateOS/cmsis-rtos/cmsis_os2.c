@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    06.03.2017
+    @date    24.03.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -352,7 +352,7 @@ osPriority_t osThreadGetPriority (osThreadId_t thread_id)
 	if (IS_IRQ_MODE() || (thread_id == NULL))
 		return osPriorityError;
 
-	return (osPriority_t)thread->tsk.prio;
+	return (osPriority_t)thread->tsk.basic;
 }
 
 osStatus_t osThreadYield (void)

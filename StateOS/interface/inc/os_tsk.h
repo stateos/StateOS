@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    22.03.2017
+    @date    24.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -621,6 +621,41 @@ void tsk_prio( unsigned prio );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : tsk_setPrio                                                                                    *
+ *                                                                                                                    *
+ * Description       : the same as tsk_prio (set current task priority)                                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   prio            : new task priority value                                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+__STATIC_INLINE
+void tsk_setPrio( unsigned prio ) { tsk_prio(prio); }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_getPrio                                                                                    *
+ *                                                                                                                    *
+ * Description       : get current task priority                                                                      *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : current task priority value                                                                    *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+__STATIC_INLINE
+unsigned tsk_getPrio( void ) { return Current->basic; }
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : tsk_waitUntil                                                                                  *
  *                                                                                                                    *
  * Description       : delay execution of current task until given timepoint and wait for flags or message            *
@@ -880,8 +915,10 @@ namespace ThisTask
 	void     flip      ( fun_t  * _state )                  {        tsk_flip      (_state);              }
 	void     stop      ( void )                             {        tsk_stop      ();                    }
 	void     prio      ( unsigned _prio )                   {        tsk_prio      (_prio);               }
+	void     setPrio   ( unsigned _prio )                   {        tsk_setPrio   (_prio);               }
+	unsigned getPrio   ( void )                             { return tsk_getPrio   ();                    }
+	unsigned prio      ( void )                             { return tsk_getPrio   ();                    }
 
-	unsigned prio      ( void )                             { return Current->prio;                       }
 	void     kill      ( void )                             {        tsk_kill      (Current);             }
 	void     detach    ( void )                             {        tsk_detach    (Current);             }
 
@@ -926,6 +963,8 @@ struct TaskT : public __tsk
 	void     resume    ( unsigned _event )                  {        tsk_resume    (this, _event);        }
 	void     resumeISR ( unsigned _event )                  {        tsk_resumeISR (this, _event);        }
 
+	unsigned prio      ( void )                             { return __tsk::basic;                        }
+	unsigned getPrio   ( void )                             { return __tsk::basic;                        }
 	bool     operator! ( void )                             { return __tsk::obj.id == ID_STOPPED;         }
 
 	private:
