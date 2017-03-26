@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    10.03.2017
+    @date    25.03.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -131,57 +131,6 @@ struct __sys
 #endif
 #endif
 };
-
-/* -------------------------------------------------------------------------- */
-
-// task context
-
-typedef struct __ctx ctx_t;
-
-struct __ctx
-{
-	// context saved by the software
-	unsigned r4, r5, r6, r7, r8, r9, r10, r11;
-	unsigned lr;  // EXC_RETURN
-	// context saved by the hardware
-	unsigned r0, r1, r2, r3;
-	unsigned r12; // ip
-	unsigned r14; // lr
-	fun_t  * pc;
-	unsigned psr;
-};
-
-#define _CTX_INIT( pc ) { 0, 0, 0, 0, 0, 0, 0, 0, 0xFFFFFFFD, 0, 0, 0, 0, 0, 0, pc, 0x01000000 }
-
-/* -------------------------------------------------------------------------- */
-
-__STATIC_INLINE
-void port_ctx_init( ctx_t *ctx, fun_t *pc )
-{
-	ctx->lr  = 0xFFFFFFFD; // EXC_RETURN: return from psp
-	ctx->pc  = pc;
-	ctx->psr = 0x01000000;
-}
-
-/* -------------------------------------------------------------------------- */
-
-// is procedure inside ISR?
-__STATIC_INLINE
-bool port_isr_inside( void )
-{
-	return (__get_IPSR() != 0U);
-}
-
-// are interrupts masked?
-__STATIC_INLINE
-bool port_isr_masked( void )
-{
-#if __CORTEX_M >= 3
-	return (__get_PRIMASK() != 0U) || (__get_BASEPRI() != 0U);
-#else
-	return (__get_PRIMASK() != 0U);
-#endif
-}
 
 /* -------------------------------------------------------------------------- */
 
