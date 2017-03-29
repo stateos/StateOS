@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    01.03.2017
+    @date    29.03.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -153,7 +153,6 @@ unsigned priv_tmr_wait( tmr_t *tmr, unsigned time, unsigned(*wait)() )
 {
 	unsigned event = E_SUCCESS;
 
-	assert(!port_isr_inside() || !time);
 	assert(tmr);
 
 	port_sys_lock();
@@ -172,6 +171,8 @@ unsigned priv_tmr_wait( tmr_t *tmr, unsigned time, unsigned(*wait)() )
 unsigned tmr_waitUntil( tmr_t *tmr, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	return priv_tmr_wait(tmr, time, core_tsk_waitUntil);
 }
 
@@ -179,6 +180,8 @@ unsigned tmr_waitUntil( tmr_t *tmr, unsigned time )
 unsigned tmr_waitFor( tmr_t *tmr, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside() || !delay);
+
 	return priv_tmr_wait(tmr, delay, core_tsk_waitFor);
 }
 

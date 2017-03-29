@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    01.03.2017
+    @date    29.03.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -115,7 +115,6 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, unsigned time, unsigned(*wai
 {
 	unsigned event = E_SUCCESS;
 
-	assert(!port_isr_inside() || !time);
 	assert(msg);
 	assert(data);
 
@@ -145,6 +144,8 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, unsigned time, unsigned(*wai
 unsigned msg_waitUntil( msg_t *msg, unsigned *data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	return priv_msg_wait(msg, data, time, core_tsk_waitUntil);
 }
 
@@ -152,6 +153,8 @@ unsigned msg_waitUntil( msg_t *msg, unsigned *data, unsigned time )
 unsigned msg_waitFor( msg_t *msg, unsigned *data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside() || !delay);
+
 	return priv_msg_wait(msg, data, delay, core_tsk_waitFor);
 }
 
@@ -162,7 +165,6 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, unsigned time, unsigned(*wait
 {
 	unsigned event = E_SUCCESS;
 
-	assert(!port_isr_inside() || !time);
 	assert(msg);
 
 	port_sys_lock();
@@ -191,6 +193,8 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, unsigned time, unsigned(*wait
 unsigned msg_sendUntil( msg_t *msg, unsigned data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	return priv_msg_send(msg, data, time, core_tsk_waitUntil);
 }
 
@@ -198,6 +202,8 @@ unsigned msg_sendUntil( msg_t *msg, unsigned data, unsigned time )
 unsigned msg_sendFor( msg_t *msg, unsigned data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside() || !delay);
+
 	return priv_msg_send(msg, data, delay, core_tsk_waitFor);
 }
 

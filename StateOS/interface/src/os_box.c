@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    01.03.2017
+    @date    29.03.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -124,7 +124,6 @@ unsigned priv_box_wait( box_t *box, void *data, unsigned time, unsigned(*wait)()
 {
 	unsigned event = E_SUCCESS;
 
-	assert(!port_isr_inside() || !time);
 	assert(box);
 	assert(data);
 
@@ -154,6 +153,8 @@ unsigned priv_box_wait( box_t *box, void *data, unsigned time, unsigned(*wait)()
 unsigned box_waitUntil( box_t *box, void *data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	return priv_box_wait(box, data, time, core_tsk_waitUntil);
 }
 
@@ -161,6 +162,8 @@ unsigned box_waitUntil( box_t *box, void *data, unsigned time )
 unsigned box_waitFor( box_t *box, void *data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside() || !delay);
+
 	return priv_box_wait(box, data, delay, core_tsk_waitFor);
 }
 
@@ -171,7 +174,6 @@ unsigned priv_box_send( box_t *box, void *data, unsigned time, unsigned(*wait)()
 {
 	unsigned event = E_SUCCESS;
 
-	assert(!port_isr_inside() || !time);
 	assert(box);
 	assert(data);
 
@@ -201,6 +203,8 @@ unsigned priv_box_send( box_t *box, void *data, unsigned time, unsigned(*wait)()
 unsigned box_sendUntil( box_t *box, const void *data, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	return priv_box_send(box, (void*)data, time, core_tsk_waitUntil);
 }
 
@@ -208,6 +212,8 @@ unsigned box_sendUntil( box_t *box, const void *data, unsigned time )
 unsigned box_sendFor( box_t *box, const void *data, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside() || !delay);
+
 	return priv_box_send(box, (void*)data, delay, core_tsk_waitFor);
 }
 
