@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    10.03.2017
+    @date    29.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,7 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __sem sem_t, *sem_id;
+typedef struct __sem sem_t;
 
 struct __sem
 {
@@ -50,6 +50,8 @@ struct __sem
 	unsigned count; // semaphore's current value
 	unsigned limit; // semaphore's value limit
 };
+
+typedef struct __sem sem_id[];
 
 /* -------------------------------------------------------------------------- */
 

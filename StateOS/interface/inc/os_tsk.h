@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    24.03.2017
+    @date    29.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -78,6 +78,8 @@ struct __tsk
 	char     libspace[96];
 #endif
 };
+
+typedef struct __tsk tsk_id[];
 
 #ifdef __CC_ARM
 #pragma pop
@@ -163,7 +165,7 @@ struct __tsk
  **********************************************************************************************************************/
 
 #define             OS_WRK( tsk, prio, state, size )  \
-                       fun_t state;                    \
+                       void state( void );             \
                        stk_t tsk##__stk[ASIZE( size )]; \
                        tsk_t tsk[1] = { _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ) }
 
@@ -234,7 +236,7 @@ struct __tsk
  **********************************************************************************************************************/
 
 #define         static_WRK( tsk, prio, state, size )  \
-                static fun_t state;                    \
+                static void state( void );             \
                 static stk_t tsk##__stk[ASIZE( size )]; \
                 static tsk_t tsk[1] = { _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ) }
 
@@ -270,7 +272,7 @@ struct __tsk
  **********************************************************************************************************************/
 
 #define         static_DEF( tsk, prio, size )             \
-                static_TSK( tsk, prio, tsk##__fun, size ); \
+                static_WRK( tsk, prio, tsk##__fun, size ); \
                 static void tsk##__fun( void )
 
 /**********************************************************************************************************************

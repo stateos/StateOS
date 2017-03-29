@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    10.03.2017
+    @date    29.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,7 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __mtx mtx_t, *mtx_id;
+typedef struct __mtx mtx_t;
 
 struct __mtx
 {
@@ -51,6 +51,8 @@ struct __mtx
 	unsigned count; // mutex's curent value
 	mtx_t  * list;  // list of mutexes held by owner
 };
+
+typedef struct __mtx mtx_id[];
 
 /**********************************************************************************************************************
  *                                                                                                                    *

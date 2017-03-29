@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    10.03.2017
+    @date    29.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,7 +41,7 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __box box_t, *box_id;
+typedef struct __box box_t;
 
 struct __box
 {
@@ -54,6 +54,8 @@ struct __box
 	char   * data;  // queue data
 	unsigned size;  // size of a single mail (in bytes)
 };
+
+typedef struct __box box_id[];
 
 /**********************************************************************************************************************
  *                                                                                                                    *

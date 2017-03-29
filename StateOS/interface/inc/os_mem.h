@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    10.03.2017
+    @date    29.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,7 +41,7 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __mem mem_t, *mem_id;
+typedef struct __mem mem_t;
 
 struct __mem
 {
@@ -51,6 +51,8 @@ struct __mem
 	unsigned size;  // size of memory object (in words)
 	void   * data;  // pointer to memory pool buffer
 };
+
+typedef struct __mem mem_id[];
 
 /* -------------------------------------------------------------------------- */
 
