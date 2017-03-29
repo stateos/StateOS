@@ -18,7 +18,7 @@ void slave()
 {
 	tsk_start(mas);
 
-	LEDR = 1;
+	LEDB = 1;
 	for (;;); // BREAKPOINT: 2 (fast mutex)
 }
 
@@ -30,6 +30,6 @@ int main()
 	tsk_start(sla);
 	mtx_give(mtx);
 
-	LEDB = 1;
-	for (;;); // BREAKPOINT: 3 (cooperative kernel)
+	LEDR = 1;
+	for (;;); // BREAKPOINT: 3 (error)
 }
