@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    14.03.2017
+    @date    29.03.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -131,7 +131,6 @@ unsigned priv_mtx_wait( mtx_t *mtx, unsigned time, unsigned(*wait)() )
 {
 	unsigned event = E_TIMEOUT;
 
-	assert(!port_isr_inside());
 	assert(mtx);
 
 	port_sys_lock();
@@ -168,6 +167,8 @@ unsigned priv_mtx_wait( mtx_t *mtx, unsigned time, unsigned(*wait)() )
 unsigned mtx_waitUntil( mtx_t *mtx, unsigned time )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	return priv_mtx_wait(mtx, time, core_tsk_waitUntil);
 }
 
@@ -175,6 +176,8 @@ unsigned mtx_waitUntil( mtx_t *mtx, unsigned time )
 unsigned mtx_waitFor( mtx_t *mtx, unsigned delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert(!port_isr_inside());
+
 	return priv_mtx_wait(mtx, delay, core_tsk_waitFor);
 }
 
