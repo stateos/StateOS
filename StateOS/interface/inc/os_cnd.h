@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    30.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,14 +42,12 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __cnd cnd_t;
+typedef struct __cnd cnd_t, * const cnd_id;
 
 struct __cnd
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 };
-
-typedef struct __cnd cnd_id[];
 
 /* -------------------------------------------------------------------------- */
 
@@ -83,8 +81,9 @@ typedef struct __cnd cnd_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_CND( cnd ) \
-                       cnd_t cnd[1] = { _CND_INIT() }
+#define             OS_CND( cnd )                     \
+                       cnd_t cnd##__cnd = _CND_INIT(); \
+                       cnd_t * const cnd = & cnd##__cnd
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -97,8 +96,9 @@ typedef struct __cnd cnd_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_CND( cnd ) \
-                static cnd_t cnd[1] = { _CND_INIT() }
+#define         static_CND( cnd )                     \
+                static cnd_t cnd##__cnd = _CND_INIT(); \
+                static cnd_t * const cnd = & cnd##__cnd
 
 /**********************************************************************************************************************
  *                                                                                                                    *

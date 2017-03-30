@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    30.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,7 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __sem sem_t;
+typedef struct __sem sem_t, * const sem_id;
 
 struct __sem
 {
@@ -50,8 +50,6 @@ struct __sem
 	unsigned count; // semaphore's current value
 	unsigned limit; // semaphore's value limit
 };
-
-typedef struct __sem sem_id[];
 
 /* -------------------------------------------------------------------------- */
 
@@ -97,8 +95,9 @@ typedef struct __sem sem_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_SEM( sem, init, limit ) \
-                       sem_t sem[1] = { _SEM_INIT( init, limit ) }
+#define             OS_SEM( sem, init, limit )                     \
+                       sem_t sem##__sem = _SEM_INIT( init, limit ); \
+                       sem_t * const sem = & sem##__sem
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -116,8 +115,9 @@ typedef struct __sem sem_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_SEM( sem, init, limit ) \
-                static sem_t sem[1] = { _SEM_INIT( init, limit ) }
+#define         static_SEM( sem, init, limit )                     \
+                static sem_t sem##__sem = _SEM_INIT( init, limit ); \
+                static sem_t * const sem = & sem##__sem
 
 /**********************************************************************************************************************
  *                                                                                                                    *

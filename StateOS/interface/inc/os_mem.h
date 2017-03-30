@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    30.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,7 +41,7 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __mem mem_t;
+typedef struct __mem mem_t, * const mem_id;
 
 struct __mem
 {
@@ -51,8 +51,6 @@ struct __mem
 	unsigned size;  // size of memory object (in words)
 	void   * data;  // pointer to memory pool buffer
 };
-
-typedef struct __mem mem_id[];
 
 /* -------------------------------------------------------------------------- */
 
@@ -110,9 +108,10 @@ typedef struct __mem mem_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_MEM( mem, limit, size )                     \
-                       void *mem##__buf[limit * (1 + MSIZE(size))]; \
-                       mem_t mem[1] = { _MEM_INIT( limit, size, mem##__buf ) }
+#define             OS_MEM( mem, limit, size )                                \
+                       void*mem##__buf[limit*(1+MSIZE(size))];                 \
+                       mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
+                       mem_t * const mem = & mem##__mem
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -127,9 +126,10 @@ typedef struct __mem mem_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_MEM( mem, limit, size )                     \
-                static void *mem##__buf[limit * (1 + MSIZE(size))]; \
-                static mem_t mem[1] = { _MEM_INIT( limit, size, mem##__buf ) }
+#define         static_MEM( mem, limit, size )                                \
+                static void*mem##__buf[limit*(1+MSIZE(size))];                 \
+                static mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
+                static mem_t * const mem = & mem##__mem
 
 /**********************************************************************************************************************
  *                                                                                                                    *

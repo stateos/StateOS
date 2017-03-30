@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    30.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -79,8 +79,6 @@ struct __tsk
 #endif
 };
 
-typedef struct __tsk tsk_id[];
-
 #ifdef __CC_ARM
 #pragma pop
 #endif
@@ -127,8 +125,9 @@ typedef struct __tsk tsk_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _TSK_CREATE( _prio, _state, _top ) \
-            & (tsk_t) _TSK_INIT( _prio, _state, _top )
+#ifndef __cplusplus
+#define               _TSK_CREATE( _prio, _state, _top ) & (tsk_t) _TSK_INIT( _prio, _state, _top )
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -164,10 +163,11 @@ typedef struct __tsk tsk_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_WRK( tsk, prio, state, size )  \
-                       void state( void );             \
-                       stk_t tsk##__stk[ASIZE( size )]; \
-                       tsk_t tsk[1] = { _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ) }
+#define             OS_WRK( tsk, prio, state, size )                                         \
+                       void state( void );                                                    \
+                       stk_t tsk##__stk[ASIZE( size )];                                        \
+                       tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ); \
+                       tsk_t * const tsk = & tsk##__tsk
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -235,10 +235,11 @@ typedef struct __tsk tsk_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_WRK( tsk, prio, state, size )  \
-                static void state( void );             \
-                static stk_t tsk##__stk[ASIZE( size )]; \
-                static tsk_t tsk[1] = { _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ) }
+#define         static_WRK( tsk, prio, state, size )                                         \
+                static void state( void );                                                    \
+                static stk_t tsk##__stk[ASIZE( size )];                                        \
+                static tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ); \
+                static tsk_t * const tsk = & tsk##__tsk
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -334,7 +335,7 @@ typedef struct __tsk tsk_id[];
 
 #ifndef __cplusplus
 #define                WRK_CREATE( prio, state, size ) \
-                      _TSK_CREATE( prio, state, _TSK_STACK( size ) )
+             & (tsk_t) WRK_INIT( prio, state, size )
 #endif
 
 /**********************************************************************************************************************

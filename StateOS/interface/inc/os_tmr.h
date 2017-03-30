@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    30.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -51,8 +51,6 @@ struct __tmr
 	unsigned period;
 };
 
-typedef struct __tmr tmr_id[];
-
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : _TMR_INIT                                                                                      *
@@ -84,9 +82,10 @@ typedef struct __tmr tmr_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_TMR( tmr, state )  \
-                       void state( void ); \
-                       tmr_t tmr[1] = { _TMR_INIT( state ) }
+#define             OS_TMR( tmr, state )                    \
+                       void state( void );                   \
+                       tmr_t tmr##__tmr = _TMR_INIT( state ); \
+                       tmr_t * const tmr = & tmr##__tmr
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -101,9 +100,10 @@ typedef struct __tmr tmr_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_TMR( tmr, state )  \
-                static void state( void ); \
-                static tmr_t tmr[1] = { _TMR_INIT( state ) }
+#define         static_TMR( tmr, state )                    \
+                static void state( void );                   \
+                static tmr_t tmr##__tmr = _TMR_INIT( state ); \
+                static tmr_t * const tmr = & tmr##__tmr
 
 /**********************************************************************************************************************
  *                                                                                                                    *

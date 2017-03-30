@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    30.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -43,15 +43,13 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __mut mut_t;
+typedef struct __mut mut_t, * const mut_id;
 
 struct __mut
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 	tsk_t  * owner; // owner task
 };
-
-typedef struct __mut mut_id[];
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -80,8 +78,9 @@ typedef struct __mut mut_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_MUT( mut ) \
-                       mut_t mut[1] = { _MUT_INIT() }
+#define             OS_MUT( mut )                     \
+                       mut_t mut##__mut = _MUT_INIT(); \
+                       mut_t * const mut = & mut##__mut
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -94,8 +93,9 @@ typedef struct __mut mut_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_MUT( mut ) \
-                static mut_t mut[1] = { _MUT_INIT() }
+#define         static_MUT( mut )                     \
+                static mut_t mut##__mut = _MUT_INIT(); \
+                static mut_t * const mut = & mut##__mut
 
 /**********************************************************************************************************************
  *                                                                                                                    *

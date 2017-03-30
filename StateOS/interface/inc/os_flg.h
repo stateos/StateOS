@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    30.03.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,15 +41,13 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __flg flg_t;
+typedef struct __flg flg_t, * const flg_id;
 
 struct __flg
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 	unsigned flags; // flag's current value
 };
-
-typedef struct __flg flg_id[];
 
 /* -------------------------------------------------------------------------- */
 
@@ -91,8 +89,9 @@ typedef struct __flg flg_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_FLG( flg ) \
-                       flg_t flg[1] = { _FLG_INIT() }
+#define             OS_FLG( flg )                     \
+                       flg_t flg##__flg = _FLG_INIT(); \
+                       flg_t * const flg = & flg##__flg
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -105,8 +104,9 @@ typedef struct __flg flg_id[];
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_FLG( flg ) \
-                static flg_t flg[1] = { _FLG_INIT() }
+#define         static_FLG( flg )                     \
+                static flg_t flg##__flg = _FLG_INIT(); \
+                static flg_t * const flg = & flg##__flg
 
 /**********************************************************************************************************************
  *                                                                                                                    *
