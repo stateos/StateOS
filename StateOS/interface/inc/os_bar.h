@@ -82,7 +82,7 @@ struct __bar
 
 #define             OS_BAR( bar, limit )                     \
                        bar_t bar##__bar = _BAR_INIT( limit ); \
-                       bar_t * const bar = & bar##__bar
+                       bar_id bar = & bar##__bar
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -98,7 +98,7 @@ struct __bar
 
 #define         static_BAR( bar, limit )                     \
                 static bar_t bar##__bar = _BAR_INIT( limit ); \
-                static bar_t * const bar = & bar##__bar
+                static bar_id bar = & bar##__bar
 
 /**********************************************************************************************************************
  *                                                                                                                    *

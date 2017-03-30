@@ -91,7 +91,7 @@ struct __sig
 
 #define             OS_SIG( sig, type )                     \
                        sig_t sig##__sig = _SIG_INIT( type ); \
-                       sig_t * const sig = & sig##__sig
+                       sig_id sig = & sig##__sig
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -109,7 +109,7 @@ struct __sig
 
 #define         static_SIG( sig, type )                     \
                 static sig_t sig##__sig = _SIG_INIT( type ); \
-                static sig_t * const sig = & sig##__sig
+                static sig_id sig = & sig##__sig
 
 /**********************************************************************************************************************
  *                                                                                                                    *

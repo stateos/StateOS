@@ -78,7 +78,7 @@ struct __lst
 
 #define             OS_LST( lst )                     \
                        lst_t lst##__lst = _LST_INIT(); \
-                       lst_t * const lst = & lst##__lst
+                       lst_id lst = & lst##__lst
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -93,7 +93,7 @@ struct __lst
 
 #define         static_LST( lst )                     \
                 static lst_t lst##__lst = _LST_INIT(); \
-                static lst * const lst = & lst##__lst
+                static lst_id lst = & lst##__lst
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -77,7 +77,7 @@ struct __evt
 
 #define             OS_EVT( evt )                     \
                        evt_t evt##__evt = _EVT_INIT(); \
-                       evt_t * const evt = & evt##__evt
+                       evt_id evt = & evt##__evt
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -92,7 +92,7 @@ struct __evt
 
 #define         static_EVT( evt )                     \
                 static evt_t evt##__evt = _EVT_INIT(); \
-                static evt_t * const evt = & evt##__evt
+                static evt_id evt = & evt##__evt
 
 /**********************************************************************************************************************
  *                                                                                                                    *

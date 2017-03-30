@@ -107,7 +107,7 @@ struct __msg
 #define             OS_MSG( msg, limit )                                \
                        unsigned msg##__buf[limit];                       \
                        msg_t msg##__msg = _MSG_INIT( limit, msg##__buf ); \
-                       msg_t * const msg = & msg##__msg
+                       msg_id msg = & msg##__msg
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -124,7 +124,7 @@ struct __msg
 #define         static_MSG( msg, limit )                                \
                 static unsigned msg##__buf[limit];                       \
                 static msg_t msg##__msg = _MSG_INIT( limit, msg##__buf ); \
-                static msg_t * const msg = & msg##__msg
+                static msg_id msg = & msg##__msg
 
 /**********************************************************************************************************************
  *                                                                                                                    *

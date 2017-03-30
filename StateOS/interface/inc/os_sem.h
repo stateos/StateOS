@@ -97,7 +97,7 @@ struct __sem
 
 #define             OS_SEM( sem, init, limit )                     \
                        sem_t sem##__sem = _SEM_INIT( init, limit ); \
-                       sem_t * const sem = & sem##__sem
+                       sem_id sem = & sem##__sem
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -117,7 +117,7 @@ struct __sem
 
 #define         static_SEM( sem, init, limit )                     \
                 static sem_t sem##__sem = _SEM_INIT( init, limit ); \
-                static sem_t * const sem = & sem##__sem
+                static sem_id sem = & sem##__sem
 
 /**********************************************************************************************************************
  *                                                                                                                    *

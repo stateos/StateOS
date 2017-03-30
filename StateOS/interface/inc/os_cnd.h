@@ -83,7 +83,7 @@ struct __cnd
 
 #define             OS_CND( cnd )                     \
                        cnd_t cnd##__cnd = _CND_INIT(); \
-                       cnd_t * const cnd = & cnd##__cnd
+                       cnd_id cnd = & cnd##__cnd
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -98,7 +98,7 @@ struct __cnd
 
 #define         static_CND( cnd )                     \
                 static cnd_t cnd##__cnd = _CND_INIT(); \
-                static cnd_t * const cnd = & cnd##__cnd
+                static cnd_id cnd = & cnd##__cnd
 
 /**********************************************************************************************************************
  *                                                                                                                    *

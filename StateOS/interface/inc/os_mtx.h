@@ -81,7 +81,7 @@ struct __mtx
 
 #define             OS_MTX( mtx )                     \
                        mtx_t mtx##__mtx = _MTX_INIT(); \
-                       mtx_t * const mtx = & mtx##__mtx
+                       mtx_id mtx = & mtx##__mtx
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -96,7 +96,7 @@ struct __mtx
 
 #define         static_MTX( mtx )                     \
                 static mtx_t mtx##__mtx = _MTX_INIT(); \
-                static mtx_t * const mtx = & mtx##__mtx
+                static mtx_id mtx = & mtx##__mtx
 
 /**********************************************************************************************************************
  *                                                                                                                    *

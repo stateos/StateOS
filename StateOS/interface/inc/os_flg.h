@@ -91,7 +91,7 @@ struct __flg
 
 #define             OS_FLG( flg )                     \
                        flg_t flg##__flg = _FLG_INIT(); \
-                       flg_t * const flg = & flg##__flg
+                       flg_id flg = & flg##__flg
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -106,7 +106,7 @@ struct __flg
 
 #define         static_FLG( flg )                     \
                 static flg_t flg##__flg = _FLG_INIT(); \
-                static flg_t * const flg = & flg##__flg
+                static flg_id flg = & flg##__flg
 
 /**********************************************************************************************************************
  *                                                                                                                    *

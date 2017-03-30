@@ -80,7 +80,7 @@ struct __mut
 
 #define             OS_MUT( mut )                     \
                        mut_t mut##__mut = _MUT_INIT(); \
-                       mut_t * const mut = & mut##__mut
+                       mut_id mut = & mut##__mut
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -95,7 +95,7 @@ struct __mut
 
 #define         static_MUT( mut )                     \
                 static mut_t mut##__mut = _MUT_INIT(); \
-                static mut_t * const mut = & mut##__mut
+                static mut_id mut = & mut##__mut
 
 /**********************************************************************************************************************
  *                                                                                                                    *
