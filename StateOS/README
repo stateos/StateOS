@@ -34,6 +34,7 @@ Features:
 - updated examples
 - added tsk_getPrio / tsk_setPrio inline functions
 - reorganized kernel directories
+- updated objects definitions
 ---------
 4.6
 - added JOINABLE and DETACHED constants
