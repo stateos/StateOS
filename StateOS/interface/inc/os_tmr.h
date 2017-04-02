@@ -88,6 +88,23 @@ struct __tmr
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : OS_TMR_DEF                                                                                     *
+ *                                                                                                                    *
+ * Description       : define and initilize a timer object and timer callback procedure                               *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : name of a pointer to timer object                                                              *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define             OS_TMR_DEF( tmr )                            \
+                       void tmr##__fun( void );                   \
+                       tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun ); \
+                       tmr_id tmr = & tmr##__tmr;                   \
+                       void tmr##__fun( void )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : static_TMR                                                                                     *
  *                                                                                                                    *
  * Description       : define and initilize a static timer object                                                     *
@@ -102,6 +119,23 @@ struct __tmr
 #define         static_TMR( tmr, state )                     \
                 static tmr_t tmr##__tmr = _TMR_INIT( state ); \
                 static tmr_id tmr = & tmr##__tmr
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_TMR_DEF                                                                                 *
+ *                                                                                                                    *
+ * Description       : define and initilize a static timer object and timer callback procedure                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : name of a pointer to timer object                                                              *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define         static_TMR_DEF( tmr )                            \
+                static void tmr##__fun();                         \
+                static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun ); \
+                static tmr_id tmr = & tmr##__tmr;                   \
+                static void tmr##__fun()
 
 /**********************************************************************************************************************
  *                                                                                                                    *
