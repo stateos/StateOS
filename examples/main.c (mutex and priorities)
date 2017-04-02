@@ -2,8 +2,6 @@
 #include <os.h>
 
 OS_MTX(mtx);
-OS_TSK(mas, 2, master);
-OS_TSK(sla, 1, slave);
 
 void master()
 {
@@ -14,6 +12,8 @@ void master()
 	for (;;); // BREAKPOINT: 1 (priority inheritance mutex)
 }
 
+OS_TSK(mas, 2, master);
+
 void slave()
 {
 	tsk_start(mas);
@@ -21,6 +21,8 @@ void slave()
 	LEDB = 1;
 	for (;;); // BREAKPOINT: 2 (fast mutex)
 }
+
+OS_TSK(sla, 1, slave);
 
 int main()
 {

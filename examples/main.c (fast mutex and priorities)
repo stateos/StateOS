@@ -2,8 +2,6 @@
 #include <os.h>
 
 OS_MUT(mut);
-OS_TSK(mas, 2, master);
-OS_TSK(sla, 1, slave);
 
 void master()
 {
@@ -21,6 +19,9 @@ void slave()
 	LEDB = 1;
 	for (;;); // BREAKPOINT: 2 (fast mutex)
 }
+
+OS_TSK(mas, 2, master);
+OS_TSK(sla, 1, slave);
 
 int main()
 {

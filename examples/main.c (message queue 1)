@@ -2,8 +2,6 @@
 #include <os.h>
 
 OS_MSG(msg, 1);
-OS_WRK(sla, 0, slave,  256);
-OS_WRK(mas, 0, master, 256);
 
 void slave()
 {
@@ -26,6 +24,9 @@ void master()
 		msg_give(msg, ++x);
 	}
 }
+
+OS_WRK(sla, 0, slave,  256);
+OS_WRK(mas, 0, master, 256);
 
 int main()
 {

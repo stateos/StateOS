@@ -2,8 +2,6 @@
 #include <os.h>
 
 static_MUT(mut);
-static_TSK(sla, 0, slave);
-static_TSK(mas, 0, master);
 
 void slave()
 {
@@ -18,6 +16,9 @@ void master()
 	tsk_delay(SEC);
 	mut_give(mut);
 }
+
+static_TSK(sla, 0, slave);
+static_TSK(mas, 0, master);
 
 int main()
 {

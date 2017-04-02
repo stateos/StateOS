@@ -2,8 +2,6 @@
 #include <os.h>
 
 OS_BOX(box, 1, sizeof(unsigned));
-OS_WRK(sla, 0, slave,  256);
-OS_WRK(mas, 0, master, 256);
 
 void slave()
 {
@@ -27,6 +25,9 @@ void master()
 		box_give(box, &x);
 	}
 }
+
+OS_WRK(sla, 0, slave,  256);
+OS_WRK(mas, 0, master, 256);
 
 int main()
 {

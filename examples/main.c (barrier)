@@ -2,8 +2,6 @@
 #include <os.h>
 
 OS_BAR(bar, 2);
-OS_TSK(sla, 0, slave);
-OS_TSK(mas, 0, master);
 
 void slave()
 {
@@ -16,6 +14,9 @@ void master()
 	tsk_delay(1000*MSEC);
 	bar_wait(bar);
 }
+
+OS_TSK(sla, 0, slave);
+OS_TSK(mas, 0, master);
 
 int main()
 {

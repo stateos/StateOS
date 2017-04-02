@@ -3,8 +3,6 @@
 
 OS_MTX(mtx);
 OS_CND(cnd);
-OS_TSK(sla, 0, slave);
-OS_TSK(mas, 0, master);
 
 void slave()
 {
@@ -21,6 +19,9 @@ void master()
 	cnd_give(cnd, cndOne);
 	mtx_give(mtx);
 }
+
+OS_TSK(sla, 0, slave);
+OS_TSK(mas, 0, master);
 
 int main()
 {
