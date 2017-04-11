@@ -29,6 +29,10 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+4.9
+- changed tsk_suspend / tsk_resume functions
+- added tsk_suspend example
+---------
 4.8
 - updated OS_TMR / static_TMR macros
 - added OS_TMR_DEF / static_TMR_DEF macros

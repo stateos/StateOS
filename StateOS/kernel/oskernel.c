@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    21.03.2017
+    @date    11.04.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -192,15 +192,11 @@ void core_tsk_unlink( tsk_t *tsk, unsigned event )
 /* -------------------------------------------------------------------------- */
 
 static
-unsigned priv_tsk_wait( tsk_t *cur, obj_t *obj )
+void priv_tsk_wait( tsk_t *tsk, void *obj )
 {
-	core_tsk_append((tsk_t *)cur, obj);
-	priv_tsk_remove((tsk_t *)cur);
-	core_tmr_insert((tmr_t *)cur, ID_DELAYED);
-
-	port_ctx_switchLock();
-
-	return cur->event;
+	core_tsk_append((tsk_t *)tsk, obj);
+	priv_tsk_remove((tsk_t *)tsk);
+	core_tmr_insert((tmr_t *)tsk, ID_DELAYED);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -215,7 +211,10 @@ unsigned core_tsk_waitUntil( void *obj, unsigned time )
 	if (cur->delay == IMMEDIATE)
 	return E_TIMEOUT;
 
-	return priv_tsk_wait(cur, obj);
+	priv_tsk_wait(cur, obj);
+	port_ctx_switchLock();
+
+	return cur->event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -230,7 +229,21 @@ unsigned core_tsk_waitFor( void *obj, unsigned delay )
 	if (cur->delay == IMMEDIATE)
 	return E_TIMEOUT;
 
-	return priv_tsk_wait(cur, obj);
+	priv_tsk_wait(cur, obj);
+	port_ctx_switchLock();
+
+	return cur->event;
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tsk_suspend( tsk_t *tsk )
+{
+	tsk->delay = INFINITE;
+
+	priv_tsk_wait(tsk, &WAIT);
+	if (tsk == System.cur)
+		port_ctx_switchLock();
 }
 
 /* -------------------------------------------------------------------------- */

@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    24.03.2017
+    @date    11.04.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -367,27 +367,34 @@ osStatus_t osThreadYield (void)
 
 osStatus_t osThreadSuspend (osThreadId_t thread_id)
 {
-	if (IS_IRQ_MODE())
-		return osErrorISR;
-	if (thread_id != Current)
-		return osErrorParameter;
+	osThread_t *thread = thread_id;
 
-	if (tsk_suspend() != E_SUCCESS)
-		return osError;
-
-	return osOK;
-}
-
-osStatus_t osThreadResume (osThreadId_t thread_id)
-{
 	if (IS_IRQ_MODE())
 		return osErrorISR;
 	if (thread_id == NULL)
 		return osErrorParameter;
 
-	tsk_resume(thread_id, E_SUCCESS);
+	switch (tsk_suspend(&thread->tsk))
+	{
+		case E_SUCCESS: return osOK;
+		default:        return osError;
+	}
+}
 
-	return osOK;
+osStatus_t osThreadResume (osThreadId_t thread_id)
+{
+	osThread_t *thread = thread_id;
+
+	if (IS_IRQ_MODE())
+		return osErrorISR;
+	if (thread_id == NULL)
+		return osErrorParameter;
+
+	switch (tsk_resume(&thread->tsk))
+	{
+		case E_SUCCESS: return osOK;
+		default:        return osError;
+	}
 }
 
 osStatus_t osThreadDetach (osThreadId_t thread_id)

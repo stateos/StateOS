@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    11.04.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -300,17 +300,45 @@ void tsk_give( tsk_t *tsk, unsigned flags )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_resume( tsk_t *tsk, unsigned event )
+unsigned tsk_suspend( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned event = E_STOPPED;
+	
+	assert(tsk);
+
+	port_sys_lock();
+
+	if (tsk->obj.id == ID_READY)
+	{
+		core_tsk_suspend(tsk);
+		event = E_SUCCESS;
+	}
+
+	port_sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_resume( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event = E_STOPPED;
+
 	assert(tsk);
 
 	port_sys_lock();
 
 	if ((tsk->obj.id == ID_DELAYED) && (tsk->guard == &WAIT))
-		core_tsk_wakeup(tsk, event);
+	{
+		core_tsk_wakeup(tsk, E_STOPPED);
+		event = E_SUCCESS;
+	}
 
 	port_sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

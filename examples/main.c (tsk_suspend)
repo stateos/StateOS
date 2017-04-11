@@ -1,0 +1,23 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+OS_TSK_DEF(sla, 0)
+{
+	LED_Tick();
+}
+
+OS_TSK_DEF(mas, 0)
+{
+	tsk_suspend(sla);
+	tsk_delay(SEC);
+	tsk_resume(sla);
+}
+
+int main()
+{
+	LED_Init();
+
+	tsk_start(sla);
+	tsk_start(mas);
+	tsk_sleep();
+}

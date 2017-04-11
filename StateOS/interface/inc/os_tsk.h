@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    02.04.2017
+    @date    11.04.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -769,7 +769,7 @@ void tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_TIMEOUT       : task object successfully finished countdown                                                    *
- *   'another'       : task was resumed with 'another' event value (tsk_resume)                                       *
+ *   E_STOPPED       : task object was resumed (tsk_resume)                                                           *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -791,7 +791,7 @@ unsigned tsk_sleepUntil( unsigned time ) { return tmr_waitUntil(&WAIT, time); }
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_TIMEOUT       : task object successfully finished countdown                                                    *
- *   'another'       : task was resumed with 'another' event value (tsk_resume)                                       *
+ *   E_STOPPED       : task object was resumed (tsk_resume)                                                           *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -809,7 +809,7 @@ unsigned tsk_sleepFor( unsigned delay ) { return tmr_waitFor(&WAIT, delay); }
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   'another'       : task was resumed with 'another' event value (tsk_resume)                                       *
+ *   E_STOPPED       : task object was resumed (tsk_resume)                                                           *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -831,7 +831,7 @@ unsigned tsk_sleep( void ) { return tmr_wait(&WAIT); }
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_TIMEOUT       : task object successfully finished countdown                                                    *
- *   'another'       : task was resumed with 'another' event value (tsk_resume)                                       *
+ *   E_STOPPED       : task object was resumed (tsk_resume)                                                           *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
@@ -844,37 +844,40 @@ unsigned tsk_delay( unsigned delay ) { return tsk_sleepFor(delay); }
  *                                                                                                                    *
  * Name              : tsk_suspend                                                                                    *
  *                                                                                                                    *
- * Description       : the same as tsk_sleep, delay indefinitly execution of current task                             *
+ * Description       : delay indefinitly execution of given task                                                      *
+ *                     tasks from delayed queue can not be suspended                                                  *
  *                                                                                                                    *
  * Parameters        : none                                                                                           *
  *                                                                                                                    *
  * Return                                                                                                             *
- *   'another'       : task was resumed with 'another' event value (tsk_resume)                                       *
+ *   E_SUCCESS       : task was successfully suspended                                                                *
+ *   E_STOPPED       : task can not be suspended                                                                      *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-__STATIC_INLINE
-unsigned tsk_suspend( void ) { return tsk_sleep(); }
+unsigned tsk_suspend( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : tsk_resume                                                                                     *
  *                                                                                                                    *
  * Description       : resume execution of given delayed task                                                         *
+ *                     only suspended and sleeping tasks can be resumed                                               *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   tsk             : pointer to delayed task object                                                                 *
- *   event           : the value at which the given task is woken up                                                  *
  *                                                                                                                    *
- * Return            : none                                                                                           *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : task was successfully resumed                                                                  *
+ *   E_STOPPED       : task can not be resumed                                                                        *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-void tsk_resume( tsk_t *tsk, unsigned event );
+unsigned tsk_resume( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -886,14 +889,16 @@ void tsk_resume( tsk_t *tsk, unsigned event );
  *   tsk             : pointer to delayed task object                                                                 *
  *   event           : the value at which the given task is woken up                                                  *
  *                                                                                                                    *
- * Return            : none                                                                                           *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : task was successfully resumed                                                                  *
+ *   E_STOPPED       : task can not be resumed                                                                        *
  *                                                                                                                    *
  * Note              : use only in handler mode                                                                       *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-void tsk_resumeISR( tsk_t *tsk, unsigned event ) { tsk_resume(tsk, event); }
+unsigned tsk_resumeISR( tsk_t *tsk ) { return tsk_resume(tsk); }
 
 #ifdef __cplusplus
 }
@@ -924,6 +929,7 @@ namespace ThisTask
 
 	void     kill      ( void )                             {        tsk_kill      (Current);             }
 	void     detach    ( void )                             {        tsk_detach    (Current);             }
+	void     suspend   ( void )                             {        tsk_suspend   (Current);             }
 
 	unsigned waitUntil ( unsigned _flags, unsigned _time )  { return tsk_waitUntil (_flags, _time);       }
 	unsigned waitFor   ( unsigned _flags, unsigned _delay ) { return tsk_waitFor   (_flags, _delay);      }
@@ -932,7 +938,6 @@ namespace ThisTask
 	unsigned sleepFor  ( unsigned _delay )                  { return tsk_sleepFor  (_delay);              }
 	unsigned sleep     ( void )                             { return tsk_sleep     ();                    }
 	unsigned delay     ( unsigned _delay )                  { return tsk_delay     (_delay);              }
-	unsigned suspend   ( void )                             { return tsk_suspend   ();                    }
 }
 
 /**********************************************************************************************************************
@@ -963,8 +968,9 @@ struct TaskT : public __tsk
 	void     startFrom ( fun_t  * _state )                  {        tsk_startFrom (this, _state);        }
 	void     give      ( unsigned _flags )                  {        tsk_give      (this, _flags);        }
 	void     giveISR   ( unsigned _flags )                  {        tsk_giveISR   (this, _flags);        }
-	void     resume    ( unsigned _event )                  {        tsk_resume    (this, _event);        }
-	void     resumeISR ( unsigned _event )                  {        tsk_resumeISR (this, _event);        }
+	unsigned suspend   ( void )                             { return tsk_suspend   (this);                }
+	unsigned resume    ( void )                             { return tsk_resume    (this);                }
+	unsigned resumeISR ( void )                             { return tsk_resumeISR (this);                }
 
 	unsigned prio      ( void )                             { return __tsk::basic;                        }
 	unsigned getPrio   ( void )                             { return __tsk::basic;                        }
