@@ -149,7 +149,7 @@ typedef enum {
 /// Entry point of a thread.
 typedef void (*osThreadFunc_t) (void *argument);
  
-/// Entry point of a timer call back function.
+/// Timer callback function.
 typedef void (*osTimerFunc_t) (void *argument);
  
 /// Timer type.
@@ -175,8 +175,8 @@ typedef enum {
 #define osFlagsErrorISR       0xFFFFFFFAU ///< osErrorISR (-6).
  
 /// Thread attributes (attr_bits in \ref osThreadAttr_t).
-#define osThreadDetached      0x00000000U ///< Thread created in detached state (default)
-#define osThreadJoinable      0x00000001U ///< Thread created in joinable state
+#define osThreadDetached      0x00000000U ///< Thread created in detached mode (default)
+#define osThreadJoinable      0x00000001U ///< Thread created in joinable mode
  
 /// Mutex attributes (attr_bits in \ref osMutexAttr_t).
 #define osMutexRecursive      0x00000001U ///< Recursive mutex.
@@ -338,7 +338,7 @@ void osKernelResume (uint32_t sleep_ticks);
 uint64_t osKernelGetTickCount (void);
  
 /// Get the RTOS kernel tick frequency.
-/// \return frequency of the kernel tick.
+/// \return frequency of the kernel tick in hertz, i.e. kernel ticks per second.
 uint32_t osKernelGetTickFreq (void);
  
 /// Get the RTOS kernel system timer count.
@@ -346,7 +346,7 @@ uint32_t osKernelGetTickFreq (void);
 uint32_t osKernelGetSysTimerCount (void);
  
 /// Get the RTOS kernel system timer frequency.
-/// \return frequency of the system timer.
+/// \return frequency of the system timer in hertz, i.e. timer ticks per second.
 uint32_t osKernelGetSysTimerFreq (void);
  
  
@@ -478,9 +478,9 @@ osStatus_t osDelayUntil (uint64_t ticks);
 //  ==== Timer Management Functions ====
  
 /// Create and Initialize a timer.
-/// \param[in]     func          start address of a timer call back function.
-/// \param[in]     type          osTimerOnce for one-shot or osTimerPeriodic for periodic behavior.
-/// \param[in]     argument      argument to the timer call back function.
+/// \param[in]     func          function pointer to callback function.
+/// \param[in]     type          \ref osTimerOnce for one-shot or \ref osTimerPeriodic for periodic behavior.
+/// \param[in]     argument      argument to the timer callback function.
 /// \param[in]     attr          timer attributes; NULL: default values.
 /// \return timer ID for reference by other functions or NULL in case of error.
 osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, const osTimerAttr_t *attr);
