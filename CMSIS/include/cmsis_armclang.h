@@ -1,8 +1,8 @@
 /**************************************************************************//**
  * @file     cmsis_armclang.h
  * @brief    CMSIS compiler ARMCLANG (ARM compiler V6) header file
- * @version  V5.0.2
- * @date     13. February 2017
+ * @version  V5.0.3
+ * @date     27. March 2017
  ******************************************************************************/
 /*
  * Copyright (c) 2009-2017 ARM Limited. All rights reserved.
@@ -21,6 +21,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+//lint -esym(9058, IRQn)   disable MISRA 2012 Rule 2.4 for IRQn
 
 #ifndef __CMSIS_ARMCLANG_H
 #define __CMSIS_ARMCLANG_H
@@ -57,6 +59,7 @@
 #ifndef   __UNALIGNED_UINT32        /* deprecated */
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wpacked"
+//lint -esym(9058, T_UINT32)  disable MISRA 2012 Rule 2.4 for T_UINT32
   struct __attribute__((packed)) T_UINT32 { uint32_t v; };
   #pragma clang diagnostic pop
   #define __UNALIGNED_UINT32(x)                  (((struct T_UINT32 *)(x))->v)
@@ -64,6 +67,7 @@
 #ifndef   __UNALIGNED_UINT16_WRITE
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wpacked"
+//lint -esym(9058, T_UINT16_WRITE)  disable MISRA 2012 Rule 2.4 for T_UINT16_WRITE
   __PACKED_STRUCT T_UINT16_WRITE { uint16_t v; };
   #pragma clang diagnostic pop
   #define __UNALIGNED_UINT16_WRITE(addr, val)    (void)((((struct T_UINT16_WRITE *)(void *)(addr))->v) = (val))
@@ -71,6 +75,7 @@
 #ifndef   __UNALIGNED_UINT16_READ
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wpacked"
+//lint -esym(9058, T_UINT16_READ)  disable MISRA 2012 Rule 2.4 for T_UINT16_READ
   __PACKED_STRUCT T_UINT16_READ { uint16_t v; };
   #pragma clang diagnostic pop
   #define __UNALIGNED_UINT16_READ(addr)          (((const struct T_UINT16_READ *)(const void *)(addr))->v)
@@ -78,6 +83,7 @@
 #ifndef   __UNALIGNED_UINT32_WRITE
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wpacked"
+//lint -esym(9058, T_UINT32_WRITE)  disable MISRA 2012 Rule 2.4 for T_UINT32_WRITE
   __PACKED_STRUCT T_UINT32_WRITE { uint32_t v; };
   #pragma clang diagnostic pop
   #define __UNALIGNED_UINT32_WRITE(addr, val)    (void)((((struct T_UINT32_WRITE *)(void *)(addr))->v) = (val))
@@ -316,6 +322,33 @@ __attribute__((always_inline)) __STATIC_INLINE void __set_MSP(uint32_t topOfMain
 __attribute__((always_inline)) __STATIC_INLINE void __TZ_set_MSP_NS(uint32_t topOfMainStack)
 {
   __ASM volatile ("MSR msp_ns, %0" : : "r" (topOfMainStack) : );
+}
+#endif
+
+
+#if (defined (__ARM_FEATURE_CMSE ) && (__ARM_FEATURE_CMSE == 3))
+/**
+  \brief   Get Stack Pointer (non-secure)
+  \details Returns the current value of the non-secure Stack Pointer (SP) when in secure state.
+  \return               SP Register value
+ */
+__attribute__((always_inline)) __STATIC_INLINE uint32_t __TZ_get_SP_NS(void)
+{
+  register uint32_t result;
+
+  __ASM volatile ("MRS %0, sp_ns" : "=r" (result) );
+  return(result);
+}
+
+
+/**
+  \brief   Set Stack Pointer (non-secure)
+  \details Assigns the given value to the non-secure Stack Pointer (SP) when in secure state.
+  \param [in]    topOfStack  Stack Pointer value to set
+ */
+__attribute__((always_inline)) __STATIC_INLINE void __TZ_set_SP_NS(uint32_t topOfStack)
+{
+  __ASM volatile ("MSR sp_ns, %0" : : "r" (topOfStack) : );
 }
 #endif
 
