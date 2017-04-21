@@ -173,6 +173,7 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+// force yield system control to the next process
 __STATIC_INLINE
 void port_ctx_switch( void )
 {
@@ -181,6 +182,7 @@ void port_ctx_switch( void )
 
 /* -------------------------------------------------------------------------- */
 
+// reset context switch indicator
 __STATIC_INLINE
 void port_ctx_reset( void )
 {
