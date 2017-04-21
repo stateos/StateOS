@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    30.03.2017
+    @date    21.04.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -71,16 +71,6 @@ extern "C" {
 
 #define JOINABLE   ((void*) 0) // task in joinable state
 #define DETACHED   ((void*)-1) // task in detached state
-
-/* -------------------------------------------------------------------------- */
-
-#define ASIZE( size ) \
- (((unsigned)( size )+(sizeof(stk_t)-1))/sizeof(stk_t))
-
-/* -------------------------------------------------------------------------- */
-
-#define UMIN( a, b ) \
- ((unsigned)( a )<(unsigned)( b )?(unsigned)( a ):(unsigned)( b ))
 
 /* -------------------------------------------------------------------------- */
 

@@ -37,6 +37,16 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+typedef  uint64_t             stk_t;
+
+extern   stk_t              __initial_sp[];
+#define  MAIN_TOP           __initial_sp
+
+#define ASIZE( size ) \
+ (((unsigned)( size )+(sizeof(stk_t)-1))/sizeof(stk_t))
+
+/* -------------------------------------------------------------------------- */
+
 // task context
 
 typedef struct __ctx ctx_t;

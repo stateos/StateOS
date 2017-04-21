@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    30.03.2017
+    @date    21.04.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,6 +57,11 @@ struct __sem
 #define semNormal    ( ~0U ) // counting semaphore
 #define semCounting  ( ~0U ) // counting semaphore
 #define semMASK      ( ~0U )
+
+/* -------------------------------------------------------------------------- */
+
+#define UMIN( a, b ) \
+ ((unsigned)( a )<(unsigned)( b )?(unsigned)( a ):(unsigned)( b ))
 
 /**********************************************************************************************************************
  *                                                                                                                    *
