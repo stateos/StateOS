@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    21.04.2017
+    @date    22.04.2017
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 #ifndef __STATEOSPORT_H
 #define __STATEOSPORT_H
 
-#include <stdint.h>
+#include <stm32f4xx.h>
 #include <osconfig.h>
 
 #ifdef __cplusplus
@@ -40,12 +40,6 @@ extern "C" {
 
 #define GLUE( a, b, c )            a##b##c
 #define  CAT( a, b, c )       GLUE(a, b, c)
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef  __CORTEX_M
-#error   osconfig.h: Include CMSIS device peripheral access layer header file!
-#endif
 
 /* -------------------------------------------------------------------------- */
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    10.03.2017
+    @date    22.04.2017
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -27,8 +27,6 @@
  ******************************************************************************/
 
 #pragma once
-
-#include <stm32f4xx.h>
 
 // ----------------------------
 // cpu frequency in Hz
@@ -76,7 +74,7 @@
 // ----------------------------
 // default task stack size in bytes
 // default value: 256
-#define  OS_STACK_SIZE      512
+#define  OS_STACK_SIZE      256
 
 // ----------------------------
 // idle task stack size in bytes
