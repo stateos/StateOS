@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    22.04.2017
+    @date    24.04.2017
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -76,13 +76,11 @@ extern "C" {
 #define  OS_FREQUENCY      1000 /* Hz */
 #endif
 
-#else
+#endif //OS_FREQUENCY
 
 #if     (OS_TIMER == 0) && (OS_FREQUENCY > 1000)
 #error   osconfig.h: Incorrect OS_FREQUENCY value!
 #endif
-
-#endif //OS_FREQUENCY
 
 /* -------------------------------------------------------------------------- */
 

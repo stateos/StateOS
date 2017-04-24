@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     08.06.2016
+#date     23.04.2017
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -13,12 +13,13 @@ QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board 
 
 #----------------------------------------------------------#
 
-PROJECT    ?=
+PROJECT    ?= $(notdir $(CURDIR))
 DEFS       ?= __MICROLIB
 LIBS       ?=
 DIRS       ?=
 KEYS       ?=
 INCS       ?=
+OPTF       ?= z
 SCRIPT     ?=
 
 #----------------------------------------------------------#
@@ -53,7 +54,6 @@ CXX_EXT    := .cpp
 
 INC_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $d*.h $d*.hpp))))
 LIB_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $d*.lib))))
-MAKE_FILES :=     $(notdir $(foreach d,$(VPATH),$(wildcard $d*makefile* $d*.mk)))
 OBJ_SRCS   :=              $(foreach d,$(VPATH),$(wildcard $d*.o))
 AS_SRCS    :=              $(foreach d,$(VPATH),$(wildcard $d*$(AS_EXT)))
 C_SRCS     :=              $(foreach d,$(VPATH),$(wildcard $d*$(C_EXT)))
@@ -90,10 +90,10 @@ TXTS       := $(OBJS:.o=.txt)
 #----------------------------------------------------------#
 
 COMMON_F    = --target=arm-arm-none-eabi -mthumb -mcpu=cortex-m4
-ifeq ($(filter qemu,$(MAKECMDGOALS)),)
+ifneq ($(MAKECMDGOALS),qemu)
 COMMON_F   += -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffast-math
 endif
-COMMON_F   += -Oz -ffunction-sections -fdata-sections # -flto
+COMMON_F   += -O$(OPTF) -ffunction-sections -fdata-sections # -flto
 COMMON_F   += -Wall -Wextra # -Wpedantic
 COMMON_F   += -MD -MP
 COMMON_F   += # --debug
@@ -167,18 +167,16 @@ all : $(LSS) print_elf_size
 
 lib : $(LIB) print_size
 
-$(ELF) : $(OBJS_ALL) $(SCRIPT)
+$(ELF) : $(MAKEFILE_LIST) $(OBJS_ALL) $(SCRIPT)
 	$(info Linking target: $(ELF))
 ifeq ($(strip $(SCRIPT)),)
 	$(error No scatter file in project)
 endif
 	$(LD) $(LD_FLAGS) $(OBJS_ALL) $(LIBS_F) $(LIB_DIRS_F) -o $@
 
-$(LIB) : $(OBJS_ALL)
+$(LIB) : $(MAKEFILE_LIST) $(OBJS_ALL)
 	$(info Building library: $(LIB))
 	$(AR) -r $@ $?
-
-$(OBJS) : $(MAKE_FILES)
 
 %.o : %$(AS_EXT)
 	$(info Assembling file: $<)

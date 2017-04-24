@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     08.06.2016
+#date     23.04.2017
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -13,12 +13,13 @@ QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board 
 
 #----------------------------------------------------------#
 
-PROJECT    ?=
+PROJECT    ?= $(notdir $(CURDIR))
 DEFS       ?= __MICROLIB
 LIBS       ?=
 DIRS       ?=
 KEYS       ?=
 INCS       ?=
+OPTF       ?= space
 SCRIPT     ?=
 
 #----------------------------------------------------------#
@@ -53,7 +54,6 @@ CXX_EXT    := .cpp
 
 INC_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $d*.h $d*.hpp))))
 LIB_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $d*.lib))))
-MAKE_FILES :=     $(notdir $(foreach d,$(VPATH),$(wildcard $d*makefile* $d*.mk)))
 OBJ_SRCS   :=              $(foreach d,$(VPATH),$(wildcard $d*.o))
 AS_SRCS    :=              $(foreach d,$(VPATH),$(wildcard $d*$(AS_EXT)))
 C_SRCS     :=              $(foreach d,$(VPATH),$(wildcard $d*$(C_EXT)))
@@ -92,17 +92,17 @@ TXTS       := $(OBJS:.o=.txt)
 #----------------------------------------------------------#
 
 CORE_F     := --cpu=cortex-m4
-ifeq ($(filter qemu,$(MAKECMDGOALS)),)
+ifneq ($(MAKECMDGOALS),qemu)
 CORE_F     += --fpu=fpv4-sp --apcs=/hardfp/interwork
 endif
 COMMON_F    = --md --depend=$(@:.o=.d) # --feedback=$(FED)
 COMMON_F   += # --debug
 
-OPTIM_F    := -Ospace --split_sections --interleave
+OPTIM_F    := -O$(OPTF) --split_sections --interleave
 
 AS_FLAGS    = # --list=$(@:.o=.lst)
-C_FLAGS     = --c99   --forceinline --asm --asm_dir=$(@D) # --list --list_dir=$(@D)
-CXX_FLAGS   = --cpp11 --forceinline --asm --asm_dir=$(@D) # --list --list_dir=$(@D)
+C_FLAGS     = --c99   --forceinline # --asm --asm_dir=$(@D) # --list --list_dir=$(@D)
+CXX_FLAGS   = --cpp11 --forceinline # --asm --asm_dir=$(@D) # --list --list_dir=$(@D)
 LD_FLAGS    = --strict --scatter=$(SCRIPT) --symbols --list_mapping_symbols
 LD_FLAGS   += --map --info common,sizes,summarysizes,totals,veneers,unused --list=$(MAP) # --callgraph
 
@@ -172,18 +172,16 @@ all : $(LSS) print_elf_size
 
 lib : $(LIB) print_size
 
-$(ELF) : $(OBJS_ALL) $(SCRIPT)
+$(ELF) : $(MAKEFILE_LIST) $(OBJS_ALL) $(SCRIPT)
 	$(info Linking target: $(ELF))
 ifeq ($(strip $(SCRIPT)),)
 	$(error No scatter file in project)
 endif
 	$(LD) $(LD_FLAGS) $(OBJS_ALL) $(LIBS_F) $(LIB_DIRS_F) -o $@
 
-$(LIB) : $(OBJS_ALL)
+$(LIB) : $(MAKEFILE_LIST) $(OBJS_ALL)
 	$(info Building library: $(LIB))
 	$(AR) -r $@ $?
-
-$(OBJS) : $(MAKE_FILES)
 
 %.o : %$(AS_EXT)
 	$(info Assembling file: $<)
