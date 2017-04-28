@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    21.04.2017
+    @date    28.04.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -38,11 +38,11 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#define USEC       (unsigned)(OS_FREQUENCY)/1000000U
-#define MSEC       (unsigned)(OS_FREQUENCY)/1000U
-#define  SEC       (unsigned)(OS_FREQUENCY)
-#define  MIN       (unsigned)(OS_FREQUENCY)*60U
-#define HOUR       (unsigned)(OS_FREQUENCY)*3600U
+#define USEC       (unsigned)((OS_FREQUENCY)/1000000)
+#define MSEC       (unsigned)((OS_FREQUENCY)/1000)
+#define  SEC       (unsigned)((OS_FREQUENCY)*1)
+#define  MIN       (unsigned)((OS_FREQUENCY)*60)
+#define HOUR       (unsigned)((OS_FREQUENCY)*3600)
 
 /* -------------------------------------------------------------------------- */
 
