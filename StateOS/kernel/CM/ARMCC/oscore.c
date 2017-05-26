@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    08.03.2017
+    @date    15.05.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -36,7 +36,6 @@
 __asm void PendSV_Handler( void )
 {
 	PRESERVE8
-	IMPORT core_tsk_handler
 
 #if __CORTEX_M < 3
 
@@ -75,7 +74,7 @@ priv_ctx_enter
 
 #endif//__CORTEX_M
 
-	bl    core_tsk_handler
+	bl    __cpp(core_tsk_handler)
 
 #if __CORTEX_M < 3
 
@@ -122,10 +121,9 @@ priv_ctx_exit
 __asm void core_tsk_flip( void *sp )
 {
 	PRESERVE8
-	IMPORT core_tsk_loop
 
 	mov   sp,    r0
-	bl    core_tsk_loop
+	bl    __cpp(core_tsk_loop)
 	
 	ALIGN
 }

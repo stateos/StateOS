@@ -75,7 +75,7 @@ void PendSV_Handler( void )
 
 #endif//__CORTEX_M
 
-"	bl    core_tsk_handler         \n"
+"	bl  %[core_tsk_handler]        \n"
 
 #if __CORTEX_M < 3
 
@@ -114,7 +114,8 @@ void PendSV_Handler( void )
 
 #endif//__CORTEX_M
 
-:::	"memory"
+::	[core_tsk_handler] "i" (core_tsk_handler)
+:	"memory"
 	);
 }
 
@@ -126,9 +127,10 @@ void core_tsk_flip(/*void *sp*/)
 	__asm volatile
 	(
 "	mov   sp,    r0                \n"
-"	bl    core_tsk_loop            \n"
+"	bl  %[core_tsk_loop]           \n"
 	
-:::	"memory"
+::	[core_tsk_loop] "i" (core_tsk_loop)
+:	"memory"
 	);
 }
 	
