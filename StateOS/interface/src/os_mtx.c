@@ -75,7 +75,6 @@ void priv_mtx_link( mtx_t *mtx, tsk_t *tsk )
 	{
 		mtx->list = tsk->mlist;
 		tsk->mlist = mtx;
-		tsk->mtree = 0;
 	}
 }
 
@@ -158,6 +157,7 @@ unsigned priv_mtx_wait( mtx_t *mtx, unsigned time, unsigned(*wait)() )
 
 		Current->mtree = mtx->owner;
 		event = wait(mtx, time);
+		Current->mtree = 0;
 	}
 	
 	port_sys_unlock();
