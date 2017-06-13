@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    11.04.2017
+    @date    13.06.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -62,7 +62,8 @@ struct __tsk
 	unsigned prio;  // current priority
 
 	void   * guard; // object that controls the pending process
-	mtx_t  * list;  // list of mutexes held
+	tsk_t  * mtree; // tree of tasks waiting for mutexes
+	mtx_t  * mlist; // list of mutexes held
 	tsk_t  * join;  // list of joined tasks
 
 	union  {
@@ -102,9 +103,9 @@ struct __tsk
  **********************************************************************************************************************/
 
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
-#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, 0, { 0 }, { 0 }, { 0 } }
+#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
 #else
-#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, 0, { 0 }, { 0 } }
+#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 } }
 #endif
 
 /**********************************************************************************************************************

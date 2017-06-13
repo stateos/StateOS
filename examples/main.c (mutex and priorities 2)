@@ -1,0 +1,54 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+OS_MTX(mtx2);
+OS_MTX(mtx1);
+
+OS_TSK_DEF(tsk4, 4)
+{
+	mtx_wait(mtx2);
+	mtx_give(mtx2);
+
+	LEDs = 15;
+	for (;;); // BREAKPOINT: 1 (priority inheritance mutex)
+}
+
+OS_TSK_DEF(tsk3, 3)
+{
+	tsk_start(tsk4);
+
+	LEDO = 1;
+	for (;;); // BREAKPOINT: 2 (error)
+}
+
+OS_TSK_DEF(tsk2, 2)
+{
+	mtx_wait(mtx2);
+	mtx_wait(mtx1);
+	mtx_give(mtx1);
+	mtx_give(mtx2);
+
+	LEDG = 1;
+	for (;;);
+}
+
+OS_TSK_DEF(tsk1, 1)
+{
+	tsk_start(tsk2);
+
+	LEDB = 1;
+	for (;;); // BREAKPOINT: 3 (fast mutex)
+}
+
+int main()
+{
+	LED_Init();
+	
+	mtx_wait(mtx1);
+	tsk_start(tsk1);
+	tsk_start(tsk3);
+	mtx_give(mtx1);
+
+	LEDR = 1;
+	for (;;); // BREAKPOINT: 4 (error)
+}

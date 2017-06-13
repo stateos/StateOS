@@ -33,6 +33,7 @@ Features:
 - changed tsk_suspend / tsk_resume functions
 - added tsk_suspend example
 - rebuilded port / core files
+- fixed bug in mutex object
 ---------
 4.8
 - updated OS_TMR / static_TMR macros
