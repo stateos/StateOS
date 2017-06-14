@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    12.04.2017
+    @date    14.06.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -142,7 +142,7 @@ void osKernelResume (uint32_t sleep_ticks)
 	(void) sleep_ticks;
 }
 
-uint64_t osKernelGetTickCount (void)
+uint32_t osKernelGetTickCount (void)
 {
 	return Counter;
 }
@@ -567,7 +567,7 @@ osStatus_t osDelay (uint32_t ticks)
 	}
 }
 
-osStatus_t osDelayUntil (uint64_t ticks)
+osStatus_t osDelayUntil (uint32_t ticks)
 {
 	if (IS_IRQ_MODE())
 		return osErrorISR;

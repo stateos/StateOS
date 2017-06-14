@@ -29,6 +29,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+5.0
+- updated cmsis-rtos2 api to version 2.1.1
+---------
 4.9
 - changed tsk_suspend / tsk_resume functions
 - added tsk_suspend example
