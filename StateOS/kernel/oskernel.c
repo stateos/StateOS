@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    13.06.2017
+    @date    16.06.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -284,6 +284,8 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 {
 	mtx_t *mtx;
 	
+	assert(prio >= tsk->basic);
+
 	for (mtx = tsk->mlist; mtx; mtx = mtx->list)
 	{
 		if (mtx->queue)
