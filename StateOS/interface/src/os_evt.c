@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.c
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    06.07.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,7 +78,7 @@ void evt_kill( evt_t *evt )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_evt_wait( evt_t *evt, unsigned time, unsigned(*wait)() )
+unsigned priv_evt_wait( evt_t *evt, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -95,7 +95,7 @@ unsigned priv_evt_wait( evt_t *evt, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitUntil( evt_t *evt, unsigned time )
+unsigned evt_waitUntil( evt_t *evt, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -104,7 +104,7 @@ unsigned evt_waitUntil( evt_t *evt, unsigned time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitFor( evt_t *evt, unsigned delay )
+unsigned evt_waitFor( evt_t *evt, uint32_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());

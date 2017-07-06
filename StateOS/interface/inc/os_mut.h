@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    30.03.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -206,7 +206,7 @@ void mut_kill( mut_t *mut );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned mut_waitUntil( mut_t *mut, unsigned time );
+unsigned mut_waitUntil( mut_t *mut, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -230,7 +230,7 @@ unsigned mut_waitUntil( mut_t *mut, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned mut_waitFor( mut_t *mut, unsigned delay );
+unsigned mut_waitFor( mut_t *mut, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -320,8 +320,8 @@ struct FastMutex : public __mut
 	~FastMutex( void ) { assert(owner == nullptr); }
 
 	void     kill     ( void )            {        mut_kill     (this);         }
-	unsigned waitUntil( unsigned _time  ) { return mut_waitUntil(this, _time);  }
-	unsigned waitFor  ( unsigned _delay ) { return mut_waitFor  (this, _delay); }
+	unsigned waitUntil( uint32_t _time  ) { return mut_waitUntil(this, _time);  }
+	unsigned waitFor  ( uint32_t _delay ) { return mut_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return mut_wait     (this);         }
 	unsigned take     ( void )            { return mut_take     (this);         }
 	unsigned give     ( void )            { return mut_give     (this);         }

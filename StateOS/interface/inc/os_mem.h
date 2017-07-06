@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    30.03.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -267,7 +267,7 @@ void mem_kill( mem_t *mem );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned mem_waitUntil( mem_t *mem, void **data, unsigned time );
+unsigned mem_waitUntil( mem_t *mem, void **data, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -292,7 +292,7 @@ unsigned mem_waitUntil( mem_t *mem, void **data, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned mem_waitFor( mem_t *mem, void **data, unsigned delay );
+unsigned mem_waitFor( mem_t *mem, void **data, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -424,14 +424,14 @@ struct MemoryPoolT : public __mem
 	 MemoryPoolT( void ): __mem _MEM_INIT(_limit, _size, _data) { mem_bind(this); }
 	~MemoryPoolT( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                          {        mem_kill     (this);                }
-	unsigned waitUntil( void **_data, unsigned _time )  { return mem_waitUntil(this, _data, _time);  }
-	unsigned waitFor  ( void **_data, unsigned _delay ) { return mem_waitFor  (this, _data, _delay); }
-	unsigned wait     ( void **_data )                  { return mem_wait     (this, _data);         }
-	unsigned take     ( void **_data )                  { return mem_take     (this, _data);         }
-	unsigned takeISR  ( void **_data )                  { return mem_takeISR  (this, _data);         }
-	void     give     ( void  *_data )                  {        mem_give     (this, _data);         }
-	void     giveISR  ( void  *_data )                  {        mem_giveISR  (this, _data);         }
+	void     kill     ( void )                       {        mem_kill     (this);                }
+	unsigned waitUntil( void **_data, uint32_t _time )  { return mem_waitUntil(this, _data, _time);  }
+	unsigned waitFor  ( void **_data, uint32_t _delay ) { return mem_waitFor  (this, _data, _delay); }
+	unsigned wait     ( void **_data )               { return mem_wait     (this, _data);         }
+	unsigned take     ( void **_data )               { return mem_take     (this, _data);         }
+	unsigned takeISR  ( void **_data )               { return mem_takeISR  (this, _data);         }
+	void     give     ( void  *_data )               {        mem_give     (this, _data);         }
+	void     giveISR  ( void  *_data )               {        mem_giveISR  (this, _data);         }
 
 	private:
 	void *_data[_limit * (1 + MSIZE(_size))];
@@ -452,8 +452,8 @@ struct MemoryPoolT : public __mem
 template<unsigned _limit, class T>
 struct MemoryPoolTT : public MemoryPoolT<_limit, sizeof(T)>
 {
-	unsigned waitUntil( T **_data, unsigned _time )  { return mem_waitUntil(this, (void**)_data, _time);  }
-	unsigned waitFor  ( T **_data, unsigned _delay ) { return mem_waitFor  (this, (void**)_data, _delay); }
+	unsigned waitUntil( T **_data, uint32_t _time )  { return mem_waitUntil(this, (void**)_data, _time);  }
+	unsigned waitFor  ( T **_data, uint32_t _delay ) { return mem_waitFor  (this, (void**)_data, _delay); }
 	unsigned wait     ( T **_data )                  { return mem_wait     (this, (void**)_data);         }
 	unsigned take     ( T **_data )                  { return mem_take     (this, (void**)_data);         }
 	unsigned takeISR  ( T **_data )                  { return mem_takeISR  (this, (void**)_data);         }

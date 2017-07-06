@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    16.06.2017
+    @date    06.07.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -201,7 +201,7 @@ void priv_tsk_wait( tsk_t *tsk, void *obj )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitUntil( void *obj, unsigned time )
+unsigned core_tsk_waitUntil( void *obj, uint32_t time )
 {
 	tsk_t *cur = System.cur;
 
@@ -219,7 +219,7 @@ unsigned core_tsk_waitUntil( void *obj, unsigned time )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitFor( void *obj, unsigned delay )
+unsigned core_tsk_waitFor( void *obj, uint32_t delay )
 {
 	tsk_t *cur = System.cur;
 
@@ -284,14 +284,13 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 {
 	mtx_t *mtx;
 	
-	assert(prio >= tsk->basic);
+	if (prio < tsk->basic)
+		prio = tsk->basic;
 
 	for (mtx = tsk->mlist; mtx; mtx = mtx->list)
-	{
 		if (mtx->queue)
-		if (prio < mtx->queue->prio)
-			prio = mtx->queue->prio;
-	}
+			if (prio < mtx->queue->prio)
+				prio = mtx->queue->prio;
 
 	if (tsk->prio != prio)
 	{

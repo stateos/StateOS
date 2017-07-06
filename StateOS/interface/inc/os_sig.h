@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    30.03.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -231,7 +231,7 @@ void sig_kill( sig_t *sig );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned sig_waitUntil( sig_t *sig, unsigned time );
+unsigned sig_waitUntil( sig_t *sig, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -254,7 +254,7 @@ unsigned sig_waitUntil( sig_t *sig, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned sig_waitFor( sig_t *sig, unsigned delay );
+unsigned sig_waitFor( sig_t *sig, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -415,8 +415,8 @@ struct Signal : public __sig
 	~Signal( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        sig_kill     (this);         }
-	unsigned waitUntil( unsigned _time  ) { return sig_waitUntil(this, _time);  }
-	unsigned waitFor  ( unsigned _delay ) { return sig_waitFor  (this, _delay); }
+	unsigned waitUntil( uint32_t _time  ) { return sig_waitUntil(this, _time);  }
+	unsigned waitFor  ( uint32_t _delay ) { return sig_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return sig_wait     (this);         }
 	unsigned take     ( void )            { return sig_take     (this);         }
 	unsigned takeISR  ( void )            { return sig_takeISR  (this);         }

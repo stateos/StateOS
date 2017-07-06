@@ -1,9 +1,9 @@
 /******************************************************************************
 
-    @file    StateOS: oslibc.c
+    @file    StateOS: os.c
     @author  Rajmund Szymanski
-    @date    05.07.2017
-    @brief   This file provides set of variables and functions for StateOS.
+    @date    06.07.2017
+    @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
 
@@ -28,30 +28,19 @@
 
 #include <os.h>
 
-#if defined(__CSMC__)
-
 /* -------------------------------------------------------------------------- */
-
-void *sbreak( int size )
+uint32_t sys_time( void )
+/* -------------------------------------------------------------------------- */
 {
-	extern char  _memory[];
-	extern char  _stack[];
-	static char *_brk = _memory;
-	       char * brk = NULL;
+	uint32_t cnt;
 
-	port_sys_lock();
+	port_cnt_lock();
 
-	if (_brk + size < _stack - 4096)
-	{
-		 brk  = _brk;
-		_brk += size;
-	}
+	cnt = Counter;
 
-	port_sys_unlock();
+	port_cnt_unlock();
 
-	return brk;
+	return cnt;
 }
 
 /* -------------------------------------------------------------------------- */
-
-#endif // __CSMC__

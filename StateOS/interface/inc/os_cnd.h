@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    30.03.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -210,7 +210,7 @@ void cnd_kill( cnd_t *cnd );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, unsigned time );
+unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -235,7 +235,7 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, unsigned delay );
+unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -326,8 +326,8 @@ struct ConditionVariable : public __cnd
 	~ConditionVariable( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                         {        cnd_kill     (this);               }
-	unsigned waitUntil( mtx_t *_mtx, unsigned _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
-	unsigned waitFor  ( mtx_t *_mtx, unsigned _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
+	unsigned waitUntil( mtx_t *_mtx, uint32_t _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
+	unsigned waitFor  ( mtx_t *_mtx, uint32_t _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
 	unsigned wait     ( mtx_t *_mtx )                  { return cnd_wait     (this, _mtx);         }
 	void     give     ( bool   _all = cndAll )         {        cnd_give     (this, _all);         }
 	void     giveISR  ( bool   _all = cndAll )         {        cnd_giveISR  (this, _all);         }

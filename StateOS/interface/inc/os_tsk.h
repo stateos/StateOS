@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    13.06.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -51,8 +51,8 @@ struct __tsk
 	obj_t    obj;   // object header
 
 	fun_t  * state; // callback procedure
-	unsigned start;
-	unsigned delay;
+	uint32_t    start;
+	uint32_t    delay;
 	tsk_t  * back;  // previous process in the DELAYED queue
 
 	void   * sp;    // stack pointer
@@ -677,7 +677,7 @@ unsigned tsk_getPrio( void ) { return Current->basic; }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned tsk_waitUntil( unsigned flags, unsigned time );
+unsigned tsk_waitUntil( unsigned flags, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -700,7 +700,7 @@ unsigned tsk_waitUntil( unsigned flags, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned tsk_waitFor( unsigned flags, unsigned delay );
+unsigned tsk_waitFor( unsigned flags, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -777,7 +777,7 @@ void tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-unsigned tsk_sleepUntil( unsigned time ) { return tmr_waitUntil(&WAIT, time); }
+unsigned tsk_sleepUntil( uint32_t time ) { return tmr_waitUntil(&WAIT, time); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -799,7 +799,7 @@ unsigned tsk_sleepUntil( unsigned time ) { return tmr_waitUntil(&WAIT, time); }
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-unsigned tsk_sleepFor( unsigned delay ) { return tmr_waitFor(&WAIT, delay); }
+unsigned tsk_sleepFor( uint32_t delay ) { return tmr_waitFor(&WAIT, delay); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -839,7 +839,7 @@ unsigned tsk_sleep( void ) { return tmr_wait(&WAIT); }
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-unsigned tsk_delay( unsigned delay ) { return tsk_sleepFor(delay); }
+unsigned tsk_delay( uint32_t delay ) { return tsk_sleepFor(delay); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -932,13 +932,13 @@ namespace ThisTask
 	void     detach    ( void )                             {        tsk_detach    (Current);             }
 	void     suspend   ( void )                             {        tsk_suspend   (Current);             }
 
-	unsigned waitUntil ( unsigned _flags, unsigned _time )  { return tsk_waitUntil (_flags, _time);       }
-	unsigned waitFor   ( unsigned _flags, unsigned _delay ) { return tsk_waitFor   (_flags, _delay);      }
+	unsigned waitUntil ( unsigned _flags, uint32_t _time )  { return tsk_waitUntil (_flags, _time);       }
+	unsigned waitFor   ( unsigned _flags, uint32_t _delay ) { return tsk_waitFor   (_flags, _delay);      }
 	unsigned wait      ( unsigned _flags )                  { return tsk_wait      (_flags);              }
-	unsigned sleepUntil( unsigned _time )                   { return tsk_sleepUntil(_time);               }
-	unsigned sleepFor  ( unsigned _delay )                  { return tsk_sleepFor  (_delay);              }
+	unsigned sleepUntil( uint32_t _time )                   { return tsk_sleepUntil(_time);               }
+	unsigned sleepFor  ( uint32_t _delay )                  { return tsk_sleepFor  (_delay);              }
 	unsigned sleep     ( void )                             { return tsk_sleep     ();                    }
-	unsigned delay     ( unsigned _delay )                  { return tsk_delay     (_delay);              }
+	unsigned delay     ( uint32_t _delay )                  { return tsk_delay     (_delay);              }
 }
 
 /**********************************************************************************************************************

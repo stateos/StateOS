@@ -32,6 +32,10 @@ Features:
 5.0
 - updated cmsis-rtos2 api to version 2.1.1
 - updated osport header file
+- system counter is always 32-bit size
+- added port_cnt_lock / port_cnt_unlock macros
+- added sys_time function for read current value of system counter
+- updated cmsis-rtos2 osKernelGetSysTimerCount function
 ---------
 4.9
 - changed tsk_suspend / tsk_resume functions

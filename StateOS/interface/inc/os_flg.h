@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    30.03.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -223,7 +223,7 @@ void flg_kill( flg_t *flg );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned time );
+unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -253,7 +253,7 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned time
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned delay );
+unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -436,8 +436,8 @@ struct Flag : public __flg
 	~Flag( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                                             {        flg_kill     (this);                        }
-	unsigned waitUntil( unsigned _flags, unsigned _mode, unsigned _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
-	unsigned waitFor  ( unsigned _flags, unsigned _mode, unsigned _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
+	unsigned waitUntil( unsigned _flags, unsigned _mode, uint32_t _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
+	unsigned waitFor  ( unsigned _flags, unsigned _mode, uint32_t _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
 	unsigned wait     ( unsigned _flags, unsigned _mode = flgAll )         { return flg_wait     (this, _flags, _mode);         }
 	unsigned take     ( unsigned _flags, unsigned _mode = flgAll )         { return flg_take     (this, _flags, _mode);         }
 	unsigned takeISR  ( unsigned _flags, unsigned _mode = flgAll )         { return flg_takeISR  (this, _flags, _mode);         }

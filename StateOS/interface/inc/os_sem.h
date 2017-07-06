@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    21.04.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -253,7 +253,7 @@ void sem_kill( sem_t *sem );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned sem_waitUntil( sem_t *sem, unsigned time );
+unsigned sem_waitUntil( sem_t *sem, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -277,7 +277,7 @@ unsigned sem_waitUntil( sem_t *sem, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned sem_waitFor( sem_t *sem, unsigned delay );
+unsigned sem_waitFor( sem_t *sem, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -362,7 +362,7 @@ unsigned sem_takeISR( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned sem_sendUntil( sem_t *sem, unsigned time );
+unsigned sem_sendUntil( sem_t *sem, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -386,7 +386,7 @@ unsigned sem_sendUntil( sem_t *sem, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned sem_sendFor( sem_t *sem, unsigned delay );
+unsigned sem_sendFor( sem_t *sem, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -481,13 +481,13 @@ struct Semaphore : public __sem
 	~Semaphore( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        sem_kill     (this);         }
-	unsigned waitUntil( unsigned _time  ) { return sem_waitUntil(this, _time);  }
-	unsigned waitFor  ( unsigned _delay ) { return sem_waitFor  (this, _delay); }
+	unsigned waitUntil( uint32_t _time  ) { return sem_waitUntil(this, _time);  }
+	unsigned waitFor  ( uint32_t _delay ) { return sem_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return sem_wait     (this);         }
 	unsigned take     ( void )            { return sem_take     (this);         }
 	unsigned takeISR  ( void )            { return sem_takeISR  (this);         }
-	unsigned sendUntil( unsigned _time  ) { return sem_sendUntil(this, _time);  }
-	unsigned sendFor  ( unsigned _delay ) { return sem_sendFor  (this, _delay); }
+	unsigned sendUntil( uint32_t _time  ) { return sem_sendUntil(this, _time);  }
+	unsigned sendFor  ( uint32_t _delay ) { return sem_sendFor  (this, _delay); }
 	unsigned send     ( void )            { return sem_send     (this);         }
 	unsigned give     ( void )            { return sem_give     (this);         }
 	unsigned giveISR  ( void )            { return sem_giveISR  (this);         }

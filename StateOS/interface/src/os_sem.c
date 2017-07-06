@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    06.07.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -85,7 +85,7 @@ void sem_kill( sem_t *sem )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sem_wait( sem_t *sem, unsigned time, unsigned(*wait)() )
+unsigned priv_sem_wait( sem_t *sem, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -106,7 +106,7 @@ unsigned priv_sem_wait( sem_t *sem, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sem_waitUntil( sem_t *sem, unsigned time )
+unsigned sem_waitUntil( sem_t *sem, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -115,7 +115,7 @@ unsigned sem_waitUntil( sem_t *sem, unsigned time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sem_waitFor( sem_t *sem, unsigned delay )
+unsigned sem_waitFor( sem_t *sem, uint32_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);
@@ -125,7 +125,7 @@ unsigned sem_waitFor( sem_t *sem, unsigned delay )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sem_send( sem_t *sem, unsigned time, unsigned(*wait)() )
+unsigned priv_sem_send( sem_t *sem, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -146,7 +146,7 @@ unsigned priv_sem_send( sem_t *sem, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sem_sendUntil( sem_t *sem, unsigned time )
+unsigned sem_sendUntil( sem_t *sem, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -155,7 +155,7 @@ unsigned sem_sendUntil( sem_t *sem, unsigned time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sem_sendFor( sem_t *sem, unsigned delay )
+unsigned sem_sendFor( sem_t *sem, uint32_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);

@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    21.04.2017
+    @date    06.07.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -37,12 +37,15 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+typedef  uint32_t             lck_t;
 typedef  uint64_t             stk_t;
+
+/* -------------------------------------------------------------------------- */
 
 extern   stk_t              __initial_sp[];
 #define  MAIN_TOP           __initial_sp
 
-#define ASIZE( size ) \
+#define  ASIZE( size ) \
  (((unsigned)( size )+(sizeof(stk_t)-1))/sizeof(stk_t))
 
 /* -------------------------------------------------------------------------- */
@@ -127,11 +130,14 @@ bool port_isr_masked( void )
 
 #endif
 
-#define  port_sys_lock()      do { unsigned __LOCK = port_get_lock(); port_set_lock()
+#define  port_sys_lock()      do { lck_t __LOCK = port_get_lock(); port_set_lock()
 #define  port_sys_unlock()         port_put_lock(__LOCK); } while(0)
 
 #define  port_isr_lock()      do { port_set_lock()
 #define  port_isr_unlock()         port_clr_lock(); } while(0)
+
+#define  port_cnt_lock()
+#define  port_cnt_unlock()
 
 /* -------------------------------------------------------------------------- */
 

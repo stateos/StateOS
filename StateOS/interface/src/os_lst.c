@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    06.07.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,7 +78,7 @@ void lst_kill( lst_t *lst )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_lst_wait( lst_t *lst, void **data, unsigned time, unsigned(*wait)() )
+unsigned priv_lst_wait( lst_t *lst, void **data, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -105,7 +105,7 @@ unsigned priv_lst_wait( lst_t *lst, void **data, unsigned time, unsigned(*wait)(
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned lst_waitUntil( lst_t *lst, void **data, unsigned time )
+unsigned lst_waitUntil( lst_t *lst, void **data, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -114,7 +114,7 @@ unsigned lst_waitUntil( lst_t *lst, void **data, unsigned time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned lst_waitFor( lst_t *lst, void **data, unsigned delay )
+unsigned lst_waitFor( lst_t *lst, void **data, uint32_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);

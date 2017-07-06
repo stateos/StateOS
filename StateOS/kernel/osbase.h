@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    29.04.2017
+    @date    06.07.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -35,42 +35,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* -------------------------------------------------------------------------- */
-
-#define USEC       (unsigned)((OS_FREQUENCY)/1000000.0+0.5)
-#define MSEC       (unsigned)((OS_FREQUENCY)/   1000.0+0.5)
-#define  SEC       (unsigned)((OS_FREQUENCY)*      1.0+0.5)
-#define  MIN       (unsigned)((OS_FREQUENCY)*     60.0+0.5)
-#define HOUR       (unsigned)((OS_FREQUENCY)*   3600.0+0.5)
-
-/* -------------------------------------------------------------------------- */
-
-#define ID_STOPPED ( 0U) // task or timer stopped
-#define ID_READY   ( 1U) // task ready to run
-#define ID_DELAYED ( 2U) // task waiting or suspended
-#define ID_TIMER   ( 3U) // timer in the countdown state
-#define ID_IDLE    ( 4U) // idle process
-
-/* -------------------------------------------------------------------------- */
-
-#define E_SUCCESS  ( 0U) // process released by taking the supervising object
-#define E_STOPPED  (~0U) // process released by killing the supervising object
-#define E_TIMEOUT  (~1U) // process released by the end of the timer countdown
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef IMMEDIATE
-#define IMMEDIATE  ( 0U) // no waiting
-#endif
-#ifndef INFINITE
-#define INFINITE   (~0U) // infinite waiting
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#define JOINABLE   ((void*) 0) // task in joinable state
-#define DETACHED   ((void*)-1) // task in detached state
 
 /* -------------------------------------------------------------------------- */
 
@@ -114,12 +78,48 @@ struct __sys
 	tsk_t  * cur;   // pointer to the current task control block
 #if OS_TIMER == 0
 	volatile
-	unsigned cnt;   // system timer counter
+	uint32_t    cnt;   // system timer counter
 #if OS_ROBIN
-	unsigned dly;   // task switch counter
+	uint32_t    dly;   // task switch counter
 #endif
 #endif
 };
+
+/* -------------------------------------------------------------------------- */
+
+#define USEC       (uint32_t)((OS_FREQUENCY)/1000000.0+0.5)
+#define MSEC       (uint32_t)((OS_FREQUENCY)/   1000.0+0.5)
+#define  SEC       (uint32_t)((OS_FREQUENCY)*      1.0+0.5)
+#define  MIN       (uint32_t)((OS_FREQUENCY)*     60.0+0.5)
+#define HOUR       (uint32_t)((OS_FREQUENCY)*   3600.0+0.5)
+
+/* -------------------------------------------------------------------------- */
+
+#define ID_STOPPED ( 0U) // task or timer stopped
+#define ID_READY   ( 1U) // task ready to run
+#define ID_DELAYED ( 2U) // task waiting or suspended
+#define ID_TIMER   ( 3U) // timer in the countdown state
+#define ID_IDLE    ( 4U) // idle process
+
+/* -------------------------------------------------------------------------- */
+
+#define E_SUCCESS  ( 0U) // process released by taking the supervising object
+#define E_STOPPED  (~0U) // process released by killing the supervising object
+#define E_TIMEOUT  (~1U) // process released by the end of the timer countdown
+
+/* -------------------------------------------------------------------------- */
+
+#ifndef IMMEDIATE
+#define IMMEDIATE  (uint32_t)( 0UL) // no waiting
+#endif
+#ifndef INFINITE
+#define INFINITE   (uint32_t)(~0UL) // infinite waiting
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#define JOINABLE   ((void*) 0) // task in joinable state
+#define DETACHED   ((void*)-1) // task in detached state
 
 /* -------------------------------------------------------------------------- */
 

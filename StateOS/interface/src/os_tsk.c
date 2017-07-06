@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    13.06.2017
+    @date    06.07.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -249,7 +249,7 @@ void tsk_prio( unsigned prio )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_tsk_wait( unsigned flags, unsigned time, unsigned(*wait)() )
+unsigned priv_tsk_wait( unsigned flags, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -265,7 +265,7 @@ unsigned priv_tsk_wait( unsigned flags, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitUntil( unsigned flags, unsigned time )
+unsigned tsk_waitUntil( unsigned flags, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -274,7 +274,7 @@ unsigned tsk_waitUntil( unsigned flags, unsigned time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitFor( unsigned flags, unsigned delay )
+unsigned tsk_waitFor( unsigned flags, uint32_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());

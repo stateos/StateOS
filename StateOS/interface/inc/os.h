@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    24.02.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -173,6 +173,20 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
 #define                sys_unlockISR() \
                        port_sys_unlock()
 
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sys_time                                                                                       *
+ *                                                                                                                    *
+ * Description       : return current value of system counter                                                         *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : current value of system counter                                                                *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+uint32_t sys_time( void );
+
 #ifdef __cplusplus
 }
 #endif
@@ -187,7 +201,7 @@ struct CriticalSection
 	~CriticalSection( void ) { port_put_lock(state); }
 
 	private:
-	unsigned state;
+	lck_t state;
 };
 
 #endif

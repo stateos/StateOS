@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    14.06.2017
+    @date    06.07.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -128,7 +128,6 @@ int32_t osKernelRestoreLock (int32_t lock)
 		return (int32_t)osErrorISR;
 
 	port_put_lock(lock);
-	lock = port_get_lock();
 	return lock;
 }
 
@@ -144,7 +143,7 @@ void osKernelResume (uint32_t sleep_ticks)
 
 uint32_t osKernelGetTickCount (void)
 {
-	return Counter;
+	return sys_time();
 }
 
 uint32_t osKernelGetTickFreq (void)
@@ -154,20 +153,34 @@ uint32_t osKernelGetTickFreq (void)
 
 uint32_t osKernelGetSysTimerCount (void)
 {
-#if   OS_TIMER
-	return Counter;
+#if OS_TIMER
+	return sys_time();
 #else
-	uint32_t tck, cnt;
+	uint32_t cnt;
+	uint32_t tck;
 
-	do { cnt = Counter; tck = SysTick->VAL; } while (cnt != Counter);
+	port_sys_lock();
 
-	return (cnt + 1U) * (osKernelGetSysTimerFreq() / OS_FREQUENCY) - tck;
+	cnt = sys_time();
+	tck = SysTick->VAL;
+
+	if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)
+	{
+		cnt++;
+		tck = SysTick->VAL;
+	}
+
+	cnt = (cnt + 1U) * (SysTick->LOAD + 1U) - tck;
+
+	port_sys_unlock();
+
+	return cnt;
 #endif
 }
 
 uint32_t osKernelGetSysTimerFreq (void)
 {
-#if   OS_TIMER
+#if OS_TIMER
 	return  OS_FREQUENCY;
 #elif CPU_FREQUENCY/OS_FREQUENCY-1 <= SysTick_LOAD_RELOAD_Msk
 	return CPU_FREQUENCY;

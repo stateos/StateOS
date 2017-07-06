@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    13.06.2017
+    @date    06.07.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -126,7 +126,7 @@ void mtx_kill( mtx_t *mtx )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mtx_wait( mtx_t *mtx, unsigned time, unsigned(*wait)() )
+unsigned priv_mtx_wait( mtx_t *mtx, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_TIMEOUT;
@@ -166,7 +166,7 @@ unsigned priv_mtx_wait( mtx_t *mtx, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mtx_waitUntil( mtx_t *mtx, unsigned time )
+unsigned mtx_waitUntil( mtx_t *mtx, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -175,7 +175,7 @@ unsigned mtx_waitUntil( mtx_t *mtx, unsigned time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mtx_waitFor( mtx_t *mtx, unsigned delay )
+unsigned mtx_waitFor( mtx_t *mtx, uint32_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.c
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    06.07.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -82,7 +82,7 @@ void sig_kill( sig_t *sig )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sig_wait( sig_t *sig, unsigned time, unsigned(*wait)() )
+unsigned priv_sig_wait( sig_t *sig, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -106,7 +106,7 @@ unsigned priv_sig_wait( sig_t *sig, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitUntil( sig_t *sig, unsigned time )
+unsigned sig_waitUntil( sig_t *sig, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -115,7 +115,7 @@ unsigned sig_waitUntil( sig_t *sig, unsigned time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitFor( sig_t *sig, unsigned delay )
+unsigned sig_waitFor( sig_t *sig, uint32_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);

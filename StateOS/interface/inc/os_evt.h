@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    30.03.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -202,7 +202,7 @@ void evt_kill( evt_t *evt );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned evt_waitUntil( evt_t *evt, unsigned time );
+unsigned evt_waitUntil( evt_t *evt, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -225,7 +225,7 @@ unsigned evt_waitUntil( evt_t *evt, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned evt_waitFor( evt_t *evt, unsigned delay );
+unsigned evt_waitFor( evt_t *evt, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -310,8 +310,8 @@ struct Event : public __evt
 	~Event( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        evt_kill     (this);         }
-	unsigned waitUntil( unsigned _time  ) { return evt_waitUntil(this, _time);  }
-	unsigned waitFor  ( unsigned _delay ) { return evt_waitFor  (this, _delay); }
+	unsigned waitUntil( uint32_t _time  ) { return evt_waitUntil(this, _time);  }
+	unsigned waitFor  ( uint32_t _delay ) { return evt_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return evt_wait     (this);         }
 	void     give     ( unsigned _event ) {        evt_give     (this, _event); }
 	void     giveISR  ( unsigned _event ) {        evt_giveISR  (this, _event); }

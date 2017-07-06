@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    30.03.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -205,7 +205,7 @@ void lst_kill( lst_t *lst );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned lst_waitUntil( lst_t *lst, void **data, unsigned time );
+unsigned lst_waitUntil( lst_t *lst, void **data, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -230,7 +230,7 @@ unsigned lst_waitUntil( lst_t *lst, void **data, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned lst_waitFor( lst_t *lst, void **data, unsigned delay );
+unsigned lst_waitFor( lst_t *lst, void **data, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -361,8 +361,8 @@ struct List : public __lst
 	~List( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                          {        lst_kill     (this);                }
-	unsigned waitUntil( void **_data, unsigned _time )  { return lst_waitUntil(this, _data, _time);  }
-	unsigned waitFor  ( void **_data, unsigned _delay ) { return lst_waitFor  (this, _data, _delay); }
+	unsigned waitUntil( void **_data, uint32_t _time )  { return lst_waitUntil(this, _data, _time);  }
+	unsigned waitFor  ( void **_data, uint32_t _delay ) { return lst_waitFor  (this, _data, _delay); }
 	unsigned wait     ( void **_data )                  { return lst_wait     (this, _data);         }
 	unsigned take     ( void **_data )                  { return lst_take     (this, _data);         }
 	unsigned takeISR  ( void **_data )                  { return lst_takeISR  (this, _data);         }

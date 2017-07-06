@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    15.05.2017
+    @date    05.07.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -26,10 +26,9 @@
 
  ******************************************************************************/
 
-#if defined(__GNUC__) && !defined(__ARMCC_VERSION)
-
-#include <stddef.h>
 #include <oskernel.h>
+
+#if defined(__GNUC__) && !defined(__ARMCC_VERSION)
 
 /* -------------------------------------------------------------------------- */
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    06.07.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -95,7 +95,7 @@ void priv_tmr_start( tmr_t *tmr )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_startUntil( tmr_t *tmr, unsigned time )
+void tmr_startUntil( tmr_t *tmr, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tmr);
@@ -112,7 +112,7 @@ void tmr_startUntil( tmr_t *tmr, unsigned time )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_start( tmr_t *tmr, unsigned delay, unsigned period )
+void tmr_start( tmr_t *tmr, uint32_t delay, uint32_t period )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tmr);
@@ -129,7 +129,7 @@ void tmr_start( tmr_t *tmr, unsigned delay, unsigned period )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_startFrom( tmr_t *tmr, unsigned delay, unsigned period, fun_t *proc )
+void tmr_startFrom( tmr_t *tmr, uint32_t delay, uint32_t period, fun_t *proc )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tmr);
@@ -148,7 +148,7 @@ void tmr_startFrom( tmr_t *tmr, unsigned delay, unsigned period, fun_t *proc )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_tmr_wait( tmr_t *tmr, unsigned time, unsigned(*wait)() )
+unsigned priv_tmr_wait( tmr_t *tmr, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -168,7 +168,7 @@ unsigned priv_tmr_wait( tmr_t *tmr, unsigned time, unsigned(*wait)() )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_waitUntil( tmr_t *tmr, unsigned time )
+unsigned tmr_waitUntil( tmr_t *tmr, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -177,7 +177,7 @@ unsigned tmr_waitUntil( tmr_t *tmr, unsigned time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_waitFor( tmr_t *tmr, unsigned delay )
+unsigned tmr_waitFor( tmr_t *tmr, uint32_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);

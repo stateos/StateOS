@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    29.03.2017
+    @date    06.07.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,7 +78,7 @@ void flg_kill( flg_t *flg )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, unsigned time, unsigned(*wait)() )
+unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *cur = Current;
@@ -103,7 +103,7 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, unsigned time
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned time )
+unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -112,7 +112,7 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned time
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned delay )
+unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, uint32_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);

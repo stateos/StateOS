@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    30.03.2017
+    @date    06.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -212,7 +212,7 @@ void bar_kill( bar_t *bar );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned bar_waitUntil( bar_t *bar, unsigned time );
+unsigned bar_waitUntil( bar_t *bar, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -235,7 +235,7 @@ unsigned bar_waitUntil( bar_t *bar, unsigned time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned bar_waitFor( bar_t *bar, unsigned delay );
+unsigned bar_waitFor( bar_t *bar, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -283,8 +283,8 @@ struct Barrier : public __bar
 	~Barrier( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        bar_kill     (this);         }
-	unsigned waitUntil( unsigned _time  ) { return bar_waitUntil(this, _time);  }
-	unsigned waitFor  ( unsigned _delay ) { return bar_waitFor  (this, _delay); }
+	unsigned waitUntil( uint32_t _time  ) { return bar_waitUntil(this, _time);  }
+	unsigned waitFor  ( uint32_t _delay ) { return bar_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return bar_wait     (this);         }
 };
 
