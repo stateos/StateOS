@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    24.04.2017
+    @date    06.07.2017
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -178,6 +178,9 @@ void port_ctx_switch( void )
 __STATIC_INLINE
 void port_ctx_reset( void )
 {
+#if OS_TIMER == 0
+	SysTick->CTRL;
+#endif
 #if OS_ROBIN && OS_TIMER
 	SysTick->VAL = 0;
 #endif
