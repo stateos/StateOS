@@ -12,7 +12,7 @@ void slave()
 
 void master()
 {
-	static unsigned time = 0;
+	static uint32_t time = 0;
 
 	tsk_sleepUntil(time += SEC);
 	tsk_flip(slave);

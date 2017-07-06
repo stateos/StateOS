@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-void proc( unsigned &led, unsigned timePoint )
+void proc( unsigned &led, uint32_t timePoint )
 {
 	for (;;)
 	{

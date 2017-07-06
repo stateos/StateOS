@@ -5,7 +5,7 @@ void proc()
 {
 	static 	 unsigned i = 0;
 	volatile unsigned*led;
-	         unsigned timePoint;
+	         uint32_t timePoint;
 
 	switch (i++)
 	{

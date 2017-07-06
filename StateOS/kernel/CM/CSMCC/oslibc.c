@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    05.07.2017
+    @date    06.07.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -26,9 +26,9 @@
 
  ******************************************************************************/
 
-#include <os.h>
-
 #if defined(__CSMC__)
+
+#include <os.h>
 
 /* -------------------------------------------------------------------------- */
 
