@@ -201,7 +201,7 @@ void port_tmr_stop( void )
 
 // set time breakpoint
 __STATIC_INLINE
-void port_tmr_start( unsigned timeout )
+void port_tmr_start( uint32_t timeout )
 {
 #if OS_ROBIN && OS_TIMER
 	OS_TIM->CCR1 = timeout;
