@@ -36,6 +36,7 @@ Features:
 - added port_cnt_lock / port_cnt_unlock macros
 - added sys_time function for read current value of system counter
 - updated cmsis-rtos2 osKernelGetSysTimerCount function
+- reorganized port directories
 ---------
 4.9
 - changed tsk_suspend / tsk_resume functions
