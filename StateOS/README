@@ -37,6 +37,8 @@ Features:
 - added sys_time function for read current value of system counter
 - updated cmsis-rtos2 osKernelGetSysTimerCount function
 - reorganized port directories
+- optionally included c++ functional library (not available for all compilers)
+- added examplees for new feature
 ---------
 4.9
 - changed tsk_suspend / tsk_resume functions
