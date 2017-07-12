@@ -1,10 +1,9 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-auto led = Led();
-auto tmr = startTimerPeriodic(SEC, [] { led.tick(); });
-
 int main()
 {
+	auto led = Led();
+	auto tmr = startTimerPeriodic(SEC, [&] { led.tick(); });
 	ThisTask::sleep();
 }
