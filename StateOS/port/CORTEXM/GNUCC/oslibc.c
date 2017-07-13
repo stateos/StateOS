@@ -26,10 +26,9 @@
 
  ******************************************************************************/
 
-#include <os.h>
-
 #if defined(__GNUC__) && !defined(__ARMCC_VERSION)
 
+#include <oskernel.h>
 #include <errno.h>
 #include <sys/stat.h>
 
