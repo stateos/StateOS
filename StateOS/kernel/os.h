@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    13.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -30,21 +30,21 @@
 #define __STATEOS_H
 
 #include <string.h>
-#include <oskernel.h>
-#include <os_sig.h> // signal
-#include <os_evt.h> // event
-#include <os_flg.h> // flag
-#include <os_bar.h> // barrier
-#include <os_sem.h> // semaphore
-#include <os_mtx.h> // mutex
-#include <os_mut.h> // fast mutex
-#include <os_cnd.h> // condition variable
-#include <os_lst.h> // list
-#include <os_mem.h> // memory pool
-#include <os_box.h> // mailbox queue
-#include <os_msg.h> // message queue
-#include <os_tmr.h> // timer
-#include <os_tsk.h> // task
+#include "oskernel.h"
+#include "inc/os_sig.h" // signal
+#include "inc/os_evt.h" // event
+#include "inc/os_flg.h" // flag
+#include "inc/os_bar.h" // barrier
+#include "inc/os_sem.h" // semaphore
+#include "inc/os_mtx.h" // mutex
+#include "inc/os_mut.h" // fast mutex
+#include "inc/os_cnd.h" // condition variable
+#include "inc/os_lst.h" // list
+#include "inc/os_mem.h" // memory pool
+#include "inc/os_box.h" // mailbox queue
+#include "inc/os_msg.h" // message queue
+#include "inc/os_tmr.h" // timer
+#include "inc/os_tsk.h" // task
 
 #ifdef __cplusplus
 extern "C" {

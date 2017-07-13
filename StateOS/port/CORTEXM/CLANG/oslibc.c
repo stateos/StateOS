@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    13.07.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -26,10 +26,10 @@
 
  ******************************************************************************/
 
+#include <os.h>
+
 #if  defined(__ARMCOMPILER_VERSION)
 #if !defined(__MICROLIB)
-
-#include <os.h>
 
 /* -------------------------------------------------------------------------- */
 
