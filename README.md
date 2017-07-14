@@ -2,9 +2,11 @@ StateOS
 =======
 
 Free, extremely simple, amazingly tiny and very fast real-time operating system (RTOS) designed for deeply embedded applications.
-Target: ARM Cortex-M, STM8 families.
+Target: ARM Cortex-M family.
 It was inspired by the concept of a state machine.
-Procedure executed by the task (task state) doesn't have to be noreturn-type. It will be executed into an infinite loop. There's a dedicated function for immediate change the task state.
+Procedure executed by the task (task state) doesn't have to be noreturn-type.
+It will be executed into an infinite loop.
+There's a dedicated function for immediate change the task state.
 
 Features
 --------
