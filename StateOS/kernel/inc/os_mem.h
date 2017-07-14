@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    14.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -424,14 +424,14 @@ struct MemoryPoolT : public __mem
 	 MemoryPoolT( void ): __mem _MEM_INIT(_limit, _size, _data) { mem_bind(this); }
 	~MemoryPoolT( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                       {        mem_kill     (this);                }
+	void     kill     ( void )                          {        mem_kill     (this);                }
 	unsigned waitUntil( void **_data, uint32_t _time )  { return mem_waitUntil(this, _data, _time);  }
 	unsigned waitFor  ( void **_data, uint32_t _delay ) { return mem_waitFor  (this, _data, _delay); }
-	unsigned wait     ( void **_data )               { return mem_wait     (this, _data);         }
-	unsigned take     ( void **_data )               { return mem_take     (this, _data);         }
-	unsigned takeISR  ( void **_data )               { return mem_takeISR  (this, _data);         }
-	void     give     ( void  *_data )               {        mem_give     (this, _data);         }
-	void     giveISR  ( void  *_data )               {        mem_giveISR  (this, _data);         }
+	unsigned wait     ( void **_data )                  { return mem_wait     (this, _data);         }
+	unsigned take     ( void **_data )                  { return mem_take     (this, _data);         }
+	unsigned takeISR  ( void **_data )                  { return mem_takeISR  (this, _data);         }
+	void     give     ( void  *_data )                  {        mem_give     (this, _data);         }
+	void     giveISR  ( void  *_data )                  {        mem_giveISR  (this, _data);         }
 
 	private:
 	void *_data[_limit * (1 + MSIZE(_size))];

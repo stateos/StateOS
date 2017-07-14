@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    14.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -483,17 +483,17 @@ struct MailBoxQueueT : public __box
 	 MailBoxQueueT( void ): __box _BOX_INIT(_limit, _size, _data) {}
 	~MailBoxQueueT( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                            {        box_kill     (this);                }
+	void     kill     ( void )                               {        box_kill     (this);                }
 	unsigned waitUntil(       void *_data, uint32_t _time  ) { return box_waitUntil(this, _data, _time);  }
 	unsigned waitFor  (       void *_data, uint32_t _delay ) { return box_waitFor  (this, _data, _delay); }
-	unsigned wait     (       void *_data )               { return box_wait     (this, _data);         }
-	unsigned take     (       void *_data )               { return box_take     (this, _data);         }
-	unsigned takeISR  (       void *_data )               { return box_takeISR  (this, _data);         }
+	unsigned wait     (       void *_data )                  { return box_wait     (this, _data);         }
+	unsigned take     (       void *_data )                  { return box_take     (this, _data);         }
+	unsigned takeISR  (       void *_data )                  { return box_takeISR  (this, _data);         }
 	unsigned sendUntil( const void *_data, uint32_t _time  ) { return box_sendUntil(this, _data, _time);  }
 	unsigned sendFor  ( const void *_data, uint32_t _delay ) { return box_sendFor  (this, _data, _delay); }
-	unsigned send     ( const void *_data )               { return box_send     (this, _data);         }
-	unsigned give     ( const void *_data )               { return box_give     (this, _data);         }
-	unsigned giveISR  ( const void *_data )               { return box_giveISR  (this, _data);         }
+	unsigned send     ( const void *_data )                  { return box_send     (this, _data);         }
+	unsigned give     ( const void *_data )                  { return box_give     (this, _data);         }
+	unsigned giveISR  ( const void *_data )                  { return box_giveISR  (this, _data);         }
 
 	private:
 	char _data[_limit * _size];
