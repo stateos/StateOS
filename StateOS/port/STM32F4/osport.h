@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    12.07.2017
+    @date    22.07.2017
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -149,12 +149,20 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 #ifndef  OS_FUNCTIONAL
+
+#if      defined(__CC_ARM) || defined(__CSMC__)
+#define  OS_FUNCTIONAL        0 /* c++ functional library header not included */
+#else
 #define  OS_FUNCTIONAL        1 /* include c++ functional library header      */
 #endif
 
-#if      OS_FUNCTIONAL && defined(__cplusplus) && defined(__CC_ARM)
+#elif    OS_FUNCTIONAL
+
+#if      defined(__cplusplus) && defined(__CC_ARM)
 #error   c++ functional library not allowed for this compiler.
 #endif
+
+#endif //OS_FUNCTIONAL
 
 /* -------------------------------------------------------------------------- */
 

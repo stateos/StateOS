@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    12.07.2017
+    @date    22.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -529,8 +529,13 @@ struct Timer : public __tmr
 {
 	 explicit
 	 Timer( void ):         __tmr _TMR_INIT(0) {}
+#if OS_FUNCTIONAL
 	 explicit
 	 Timer( FUN_t _state ): __tmr _TMR_INIT((fun_t *) run), _start(_state) {}
+#else
+	 explicit
+	 Timer( FUN_t _state ): __tmr _TMR_INIT(_state) {}
+#endif
 	~Timer( void ) { assert(obj.id == ID_STOPPED); }
 
 	void kill         ( void )                                            {        tmr_kill         (this);                                 }
@@ -538,8 +543,12 @@ struct Timer : public __tmr
 	void start        ( uint32_t _delay, uint32_t _period )               {        tmr_start        (this, _delay, _period);                }
 	void startFor     ( uint32_t _delay )                                 {        tmr_startFor     (this, _delay);                         }
 	void startPeriodic( uint32_t _period )                                {        tmr_startPeriodic(this,         _period);                }
+#if OS_FUNCTIONAL
 	void startFrom    ( uint32_t _delay, uint32_t _period, FUN_t _state ) {        _start = _state;
 	                                                                               tmr_startFrom    (this, _delay, _period, (fun_t *) run); }
+#else
+	void startFrom    ( uint32_t _delay, uint32_t _period, FUN_t _state ) {        tmr_startFrom    (this, _delay, _period, _state);        }
+#endif
 	void stop         ( void )                                            {        tmr_stop         (this);                                 }
 
 	unsigned waitUntil( uint32_t _time )                                  { return tmr_waitUntil    (this, _time);                          }
@@ -549,10 +558,11 @@ struct Timer : public __tmr
 	unsigned takeISR  ( void )                                            { return tmr_takeISR      (this);                                 }
 
 	bool     operator!( void )                                            { return __tmr::obj.id == ID_STOPPED;                             }
-
+#if OS_FUNCTIONAL
 	static
 	void     run( Timer &tmr ) { tmr._start(); }
 	FUN_t    _start;
+#endif
 };
 
 /**********************************************************************************************************************
@@ -660,8 +670,12 @@ struct startTimerPeriodic : public Timer
 
 namespace ThisTimer
 {
+#if OS_FUNCTIONAL
 	static inline void flipISR ( FUN_t    _state ) { ((Timer *) WAIT.obj.next)->_start = _state;
 	                                                 tmr_flipISR ((fun_t *) Timer::run);         }
+#else
+	static inline void flipISR ( FUN_t    _state ) { tmr_flipISR (_state);                       }
+#endif
 	static inline void delayISR( uint32_t _delay ) { tmr_delayISR(_delay);                       }
 }
 

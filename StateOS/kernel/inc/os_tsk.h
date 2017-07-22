@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    12.07.2017
+    @date    22.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -926,15 +926,23 @@ unsigned tsk_resumeISR( tsk_t *tsk ) { return tsk_resume(tsk); }
 struct baseTask : public __tsk
 {
 	 explicit
+#if OS_FUNCTIONAL
 	 baseTask( const unsigned _prio, FUN_t _state, stk_t *_stack ): __tsk _TSK_INIT(_prio, (fun_t *) run, _stack), _start(_state) {}
+#else
+	 baseTask( const unsigned _prio, FUN_t _state, stk_t *_stack ): __tsk _TSK_INIT(_prio, _state, _stack) {}
+#endif
 	~baseTask( void ) { assert(obj.id == ID_STOPPED); }
 
 	void     kill     ( void )            {        tsk_kill      (this);                }
 	void     detach   ( void )            {        tsk_detach    (this);                }
 	unsigned join     ( void )            { return tsk_join      (this);                }
 	void     start    ( void )            {        tsk_start     (this);                }
+#if OS_FUNCTIONAL
 	void     startFrom( FUN_t    _state ) {        _start = _state;
 	                                               tsk_startFrom (this, (fun_t *) run); }
+#else
+	void     startFrom( FUN_t    _state ) {        tsk_startFrom (this, _state);        }
+#endif
 	void     give     ( unsigned _flags ) {        tsk_give      (this, _flags);        }
 	void     giveISR  ( unsigned _flags ) {        tsk_giveISR   (this, _flags);        }
 	unsigned suspend  ( void )            { return tsk_suspend   (this);                }
@@ -944,10 +952,11 @@ struct baseTask : public __tsk
 	unsigned prio     ( void )            { return __tsk::basic;                        }
 	unsigned getPrio  ( void )            { return __tsk::basic;                        }
 	bool     operator!( void )            { return __tsk::obj.id == ID_STOPPED;         }
-
+#if OS_FUNCTIONAL
 	static
 	void     run( baseTask &tsk ) { tsk._start(); }
 	FUN_t    _start;
+#endif
 };
 
 /**********************************************************************************************************************
@@ -1047,8 +1056,12 @@ namespace ThisTask
 {
 	static inline void     pass      ( void )                             {        tsk_pass      ();                        }
 	static inline void     yield     ( void )                             {        tsk_yield     ();                        }
+#if OS_FUNCTIONAL
 	static inline void     flip      ( FUN_t    _state )                  {        ((baseTask *) Current)->_start = _state;
 	                                                                               tsk_flip      ((fun_t *) baseTask::run); }
+#else
+	static inline void     flip      ( FUN_t    _state )                  {        tsk_flip      (_state);                  }
+#endif
 	static inline void     stop      ( void )                             {        tsk_stop      ();                        }
 	static inline void     prio      ( unsigned _prio )                   {        tsk_prio      (_prio);                   }
 	static inline void     setPrio   ( unsigned _prio )                   {        tsk_setPrio   (_prio);                   }
