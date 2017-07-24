@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    23.07.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -29,8 +29,40 @@
 #ifndef __STATEOSKERNEL_H
 #define __STATEOSKERNEL_H
 
+/* -------------------------------------------------------------------------- */
+
+#ifndef  OS_ASSERT
+#define  OS_ASSERT            0 /* do not include standard assertions         */
+#endif
+
+#if     (OS_ASSERT == 0)
+#ifndef  NDEBUG
+#define  NDEBUG
+#endif
+#endif
+
+#ifndef  NDEBUG
+#define  __ASSERT_MSG
+#endif
+
+#include <assert.h>
 #include <stdlib.h>
 #include <oscore.h>
+
+/* -------------------------------------------------------------------------- */
+
+#ifdef __cplusplus
+
+#if OS_FUNCTIONAL
+#include <functional>
+typedef std::function<void()> FUN_t;
+#else
+typedef               void (* FUN_t)( void );
+#endif
+
+#endif
+
+/* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
 extern "C" {
@@ -180,7 +212,5 @@ void *core_tsk_handler( void *sp );
 #ifdef __cplusplus
 }
 #endif
-
-/* -------------------------------------------------------------------------- */
 
 #endif//__STATEOSKERNEL_H

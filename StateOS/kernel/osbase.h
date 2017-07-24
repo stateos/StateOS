@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    14.07.2017
+    @date    23.07.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -31,17 +31,6 @@
 
 #include <stdbool.h>
 #include <osport.h>
-
-/* -------------------------------------------------------------------------- */
-
-#if defined(__cplusplus) && (OS_FUNCTIONAL)
-#include <functional>
-typedef std::function<void()> FUN_t;
-#else
-typedef               void (* FUN_t)( void );
-#endif
-
-/* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
 extern "C" {

@@ -31,6 +31,7 @@ Features:
 ---------
 5.1
 - updated access to the c++ functional library
+- updated port files
 ---------
 5.0
 - updated cmsis-rtos2 api to version 2.1.1

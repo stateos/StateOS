@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    22.07.2017
+    @date    23.07.2017
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -94,91 +94,6 @@ extern "C" {
 
 #if     (OS_ROBIN > OS_FREQUENCY)
 #error   osconfig.h: Incorrect OS_ROBIN value!
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef  OS_HEAP_SIZE
-#define  OS_HEAP_SIZE         0 /* default system heap: all free memory       */
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef  OS_STACK_SIZE
-#define  OS_STACK_SIZE      256 /* default task stack size in bytes           */
-#endif
-
-#ifndef  OS_IDLE_STACK
-#define  OS_IDLE_STACK      128 /* idle task stack size in bytes              */
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef  OS_LOCK_LEVEL
-#define  OS_LOCK_LEVEL        0 /* critical section blocks all interrupts */
-#endif
-
-#if      OS_LOCK_LEVEL >= (1<<__NVIC_PRIO_BITS)
-#error   osconfig.h: Incorrect OS_LOCK_LEVEL value! Must be less then (1<<__NVIC_PRIO_BITS).
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef  OS_MAIN_PRIO
-#define  OS_MAIN_PRIO         0 /* priority of main process                   */
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef  OS_ASSERT
-#define  OS_ASSERT            0 /* do not include standard assertions         */
-#endif
-
-#if     (OS_ASSERT == 0)
-#ifndef  NDEBUG
-#define  NDEBUG
-#endif
-#endif
-
-#ifndef  NDEBUG
-#define  __ASSERT_MSG
-#endif
-
-#include <assert.h>
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef  OS_FUNCTIONAL
-
-#if      defined(__CC_ARM) || defined(__CSMC__)
-#define  OS_FUNCTIONAL        0 /* c++ functional library header not included */
-#else
-#define  OS_FUNCTIONAL        1 /* include c++ functional library header      */
-#endif
-
-#elif    OS_FUNCTIONAL
-
-#if      defined(__cplusplus) && defined(__CC_ARM)
-#error   c++ functional library not allowed for this compiler.
-#endif
-
-#endif //OS_FUNCTIONAL
-
-/* -------------------------------------------------------------------------- */
-
-#if      defined(__CSMC__)
-
-#ifndef  __CONSTRUCTOR
-#define  __CONSTRUCTOR
-#warning No compiler specific solution for __CONSTRUCTOR. __CONSTRUCTOR is ignored.
-#endif
-
-#else
-
-#ifndef  __CONSTRUCTOR
-#define  __CONSTRUCTOR      __attribute__((constructor))
-#endif
-
 #endif
 
 /* -------------------------------------------------------------------------- */
