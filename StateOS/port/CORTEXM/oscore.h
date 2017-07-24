@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    23.07.2017
+    @date    24.07.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -87,23 +87,6 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#if      defined(__CSMC__)
-
-#ifndef  __CONSTRUCTOR
-#define  __CONSTRUCTOR
-#warning No compiler specific solution for __CONSTRUCTOR. __CONSTRUCTOR is ignored.
-#endif
-
-#else
-
-#ifndef  __CONSTRUCTOR
-#define  __CONSTRUCTOR      __attribute__((constructor))
-#endif
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
 typedef  uint32_t             lck_t;
 typedef  uint64_t             stk_t;
 
@@ -113,7 +96,7 @@ extern   stk_t              __initial_sp[];
 #define  MAIN_TOP           __initial_sp
 
 #define  ASIZE( size ) \
- (((unsigned)( size )+(sizeof(stk_t)-1))/sizeof(stk_t))
+  (((unsigned)( size )+(sizeof(stk_t)-1))/sizeof(stk_t))
 
 /* -------------------------------------------------------------------------- */
 

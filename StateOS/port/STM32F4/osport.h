@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    23.07.2017
+    @date    24.07.2017
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include <stm32f4xx.h>
 #include <osconfig.h>
+#include <osdefs.h>
 
 #ifdef __cplusplus
 extern "C" {
