@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    22.07.2017
+    @date    27.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -536,7 +536,7 @@ struct Timer : public __tmr
 	 explicit
 	 Timer( FUN_t _state ): __tmr _TMR_INIT(_state) {}
 #endif
-	~Timer( void ) { assert(obj.id == ID_STOPPED); }
+	~Timer( void ) { assert(__tmr::obj.id == ID_STOPPED); }
 
 	void kill         ( void )                                            {        tmr_kill         (this);                                 }
 	void startUntil   ( uint32_t _time )                                  {        tmr_startUntil   (this, _time);                          }
