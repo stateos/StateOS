@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    22.07.2017
+    @date    31.07.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -121,7 +121,7 @@ void core_tsk_remove( tsk_t *tsk )
 {
 	tsk->obj.id = ID_STOPPED;
 	priv_tsk_remove(tsk);
-	if (tsk == System.cur)
+	if (tsk == Current)
 		port_ctx_switchNow();
 }
 
@@ -152,9 +152,9 @@ void core_tsk_loop( void )
 	{
 		port_clr_lock();
 #if OS_FUNCTIONAL
-		System.cur->state(System.cur);
+		Current->state(Current);
 #else
-		System.cur->state();
+		Current->state();
 #endif
 		port_set_lock();
 		core_ctx_switch();
@@ -207,7 +207,7 @@ void priv_tsk_wait( tsk_t *tsk, void *obj )
 
 unsigned core_tsk_waitUntil( void *obj, uint32_t time )
 {
-	tsk_t *cur = System.cur;
+	tsk_t *cur = Current;
 
 	cur->start = Counter;
 	cur->delay = time - cur->start;
@@ -225,7 +225,7 @@ unsigned core_tsk_waitUntil( void *obj, uint32_t time )
 
 unsigned core_tsk_waitFor( void *obj, uint32_t delay )
 {
-	tsk_t *cur = System.cur;
+	tsk_t *cur = Current;
 
 	cur->start = Counter;
 	cur->delay = delay;
@@ -246,7 +246,7 @@ void core_tsk_suspend( tsk_t *tsk )
 	tsk->delay = INFINITE;
 
 	priv_tsk_wait(tsk, &WAIT);
-	if (tsk == System.cur)
+	if (tsk == Current)
 		port_ctx_switchLock();
 }
 
@@ -300,7 +300,7 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 	{
 		tsk->prio = prio;
 
-		if (tsk == System.cur)
+		if (tsk == Current)
 		{
 			tsk = tsk->obj.next;
 			if (tsk->prio > prio)
@@ -334,7 +334,7 @@ void *core_tsk_handler( void *sp )
 	port_isr_lock();
 	core_ctx_reset();
 
-	cur = System.cur;
+	cur = Current;
 	cur->sp = sp;
 
 	nxt = IDLE.obj.next;
@@ -346,7 +346,7 @@ void *core_tsk_handler( void *sp )
 		nxt = IDLE.obj.next;
 	}
 
-	System.cur = nxt;
+	Current = nxt;
 	sp = nxt->sp;
 
 	port_isr_unlock();
