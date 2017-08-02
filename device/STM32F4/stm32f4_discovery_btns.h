@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    stm32f4_discovery_btns.h
  * @author  Rajmund Szymanski
- * @date    04.10.2016
+ * @date    23.03.2017
  * @brief   This file contains definitions for STM32F4-Discovery Kit.
  ******************************************************************************/
 
@@ -20,7 +20,7 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-// config user button (PA0)
+// init user button (PA0)
 
 static inline
 void BTN_Init( void )

@@ -6,7 +6,7 @@
 #**********************************************************#
 
 ARMCC      := c:/sys/arm/armcc/bin/
-GNUCC      := c:/sys/gcc/bin/arm-none-eabi-
+GNUCC      := c:/sys/gcc-arm/bin/arm-none-eabi-
 OPENOCD    := c:/sys/tools/openocd/bin-x64/openocd
 STLINK     := c:/sys/tools/st-link/st-link_cli -Q -c SWD UR
 QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery

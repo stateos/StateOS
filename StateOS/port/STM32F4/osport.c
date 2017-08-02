@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    09.12.2016
+    @date    01.08.2017
     @brief   StateOS port file for STM32F4 uC.
 
  ******************************************************************************
@@ -32,7 +32,7 @@
 
 void port_sys_init( void )
 {
-#if OS_TIMER
+#if OS_TICKLESS
 
 /******************************************************************************
  Put here configuration of system timer for tick-less mode
@@ -42,14 +42,14 @@ void port_sys_init( void )
 	#error Incorrect Timer frequency!
 	#endif
 
-	RCC->APB1ENR |= OS_TIM_CLK_ENABLE;
+	RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 	#if OS_ROBIN
-	NVIC_SetPriority(OS_TIM_IRQn, 0xFF);
-	NVIC_EnableIRQ(OS_TIM_IRQn);
+	NVIC_SetPriority(TIM2_IRQn, 0xFF);
+	NVIC_EnableIRQ(TIM2_IRQn);
 	#endif
-	OS_TIM->PSC  = CPU_FREQUENCY/OS_FREQUENCY/2-1;
-	OS_TIM->EGR  = TIM_EGR_UG;
-	OS_TIM->CR1  = TIM_CR1_CEN;
+	TIM2->PSC  = CPU_FREQUENCY/OS_FREQUENCY/2-1;
+	TIM2->EGR  = TIM_EGR_UG;
+	TIM2->CR1  = TIM_CR1_CEN;
 
 /******************************************************************************
  End of configuration
@@ -83,7 +83,7 @@ void port_sys_init( void )
  End of configuration
 *******************************************************************************/
 
-#else //OS_TIMER == 0
+#else //OS_TICKLESS == 0
 
 /******************************************************************************
  Put here configuration of system timer for non-tick-less mode
@@ -109,7 +109,7 @@ void port_sys_init( void )
  End of configuration
 *******************************************************************************/
 
-#endif//OS_TIMER
+#endif//OS_TICKLESS
 
 /******************************************************************************
  Put here configuration of interrupt for context switch
@@ -124,7 +124,7 @@ void port_sys_init( void )
 
 /* -------------------------------------------------------------------------- */
 
-#if OS_TIMER == 0
+#if OS_TICKLESS == 0
 
 /******************************************************************************
  Put here the procedure of interrupt handler of system timer for non-tick-less mode
@@ -132,6 +132,7 @@ void port_sys_init( void )
 
 void SysTick_Handler( void )
 {
+	SysTick->CTRL;
 	System.cnt++;
 #if OS_ROBIN
 	core_tmr_handler();
@@ -145,24 +146,26 @@ void SysTick_Handler( void )
  End of the procedure of interrupt handler
 *******************************************************************************/
 
-#endif//OS_TIMER
+#endif//OS_TICKLESS
 
 /* -------------------------------------------------------------------------- */
 
-#if OS_TIMER != 0 && OS_ROBIN
+#if OS_TICKLESS != 0
+#if OS_ROBIN
 
 /******************************************************************************
  Put here procedures of interrupt handlers of system timer for tick-less mode witch preemption
 *******************************************************************************/
 
-void OS_TIM_IRQHandler( void )
+void TIM2_IRQHandler( void )
 {
-	OS_TIM->SR = 0;
+	TIM2->SR = 0;
 	core_tmr_handler();
 }
 
 void SysTick_Handler( void )
 {
+	SysTick->CTRL;
 	core_ctx_switch();
 }
 
@@ -170,6 +173,7 @@ void SysTick_Handler( void )
  End of the procedure of interrupt handler
 *******************************************************************************/
 
+#endif
 #endif
 
 /* -------------------------------------------------------------------------- */

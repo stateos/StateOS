@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    31.07.2017
+    @date    01.08.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 static
 void priv_tsk_idle( void )
 {
-#if OS_ROBIN || OS_TIMER == 0
+#if OS_ROBIN || OS_TICKLESS == 0
 	__WFI();
 #endif
 }
@@ -393,7 +393,7 @@ void core_tmr_remove( tmr_t *tmr )
 
 /* -------------------------------------------------------------------------- */
 
-#if OS_ROBIN && OS_TIMER
+#if OS_ROBIN && OS_TICKLESS
 
 static
 bool priv_tmr_expired( tmr_t *tmr )
