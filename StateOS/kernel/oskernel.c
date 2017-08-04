@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    01.08.2017
+    @date    04.08.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -30,7 +30,7 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-// SYSTEM KERNEL SERVICES
+// SYSTEM INTERNAL SERVICES
 /* -------------------------------------------------------------------------- */
 
 static
@@ -40,23 +40,6 @@ void priv_tsk_idle( void )
 	__WFI();
 #endif
 }
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef MAIN_TOP
-static  struct { stk_t STK[ASIZE(OS_STACK_SIZE)]; } MAIN_STACK;
-#define MAIN_TOP &MAIN_STACK+1
-#endif
-
-static  union  { stk_t STK[ASIZE(OS_IDLE_STACK)];
-        struct { char  stk[sizeof(stk_t[ASIZE(OS_IDLE_STACK)])-sizeof(ctx_t)]; ctx_t ctx; } CTX; } IDLE_STACK =
-               { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
-#define IDLE_TOP &IDLE_STACK+1
-#define IDLE_SP  &IDLE_STACK.CTX.ctx
-
-tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_TOP, .sp=IDLE_SP, .state=priv_tsk_idle }; // idle task and tasks queue
-sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
 
@@ -82,6 +65,144 @@ void priv_rdy_remove( obj_t *obj )
 	nxt->prev = prv;
 	prv->next = nxt;
 }
+
+/* -------------------------------------------------------------------------- */
+// SYSTEM TIMER SERVICES
+/* -------------------------------------------------------------------------- */
+
+tmr_t WAIT = { { .id=ID_TIMER, .prev=&WAIT, .next=&WAIT }, .delay=INFINITE }; // timers queue
+
+/* -------------------------------------------------------------------------- */
+
+static
+void priv_tmr_insert( tmr_t *tmr, unsigned id )
+{
+	tmr_t *nxt = &WAIT;
+	tmr->obj.id = id;
+
+	if    (tmr->delay != INFINITE)
+	do     nxt = nxt->obj.next;
+	while (nxt->delay != INFINITE &&
+	       nxt->delay <= tmr->start + tmr->delay - nxt->start);
+
+	priv_rdy_insert(&tmr->obj, &nxt->obj);
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tmr_insert( tmr_t *tmr, unsigned id )
+{
+	priv_tmr_insert(tmr, id);
+	port_tmr_force();
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tmr_remove( tmr_t *tmr )
+{
+	tmr->obj.id = ID_STOPPED;
+	priv_rdy_remove(&tmr->obj);
+}
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_ROBIN && OS_TICKLESS
+
+static
+bool priv_tmr_expired( tmr_t *tmr )
+{
+	port_tmr_stop();
+
+	if (tmr->delay == INFINITE)
+	return false; // return if timer counting indefinitly
+
+	if (tmr->delay <= Counter - tmr->start)
+	return true;  // return if timer finished counting
+
+	port_tmr_start(tmr->start + tmr->delay);
+
+	if (tmr->delay >  Counter - tmr->start)
+	return false; // return if timer still counts
+
+	port_tmr_stop();
+
+	return true;  // however timer finished counting
+}
+
+/* -------------------------------------------------------------------------- */
+
+#else
+
+static
+bool priv_tmr_expired( tmr_t *tmr )
+{
+	if (tmr->delay >= Counter - tmr->start + 1)
+	return false; // return if timer still counts or counting indefinitly
+
+	return true;  // timer finished counting
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+static
+void priv_tmr_wakeup( tmr_t *tmr, unsigned event )
+{
+	tmr->start += tmr->delay;
+	tmr->delay  = tmr->period;
+
+	if (tmr->state)
+#if OS_FUNCTIONAL
+		tmr->state(tmr);
+#else
+		tmr->state();
+#endif
+	core_tmr_remove(tmr);
+	if (tmr->delay)
+		priv_tmr_insert(tmr, ID_TIMER);
+
+	core_all_wakeup(tmr, event);
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tmr_handler( void )
+{
+	tmr_t *tmr;
+
+	port_isr_lock();
+
+	while (priv_tmr_expired(tmr = WAIT.obj.next))
+	{
+		if (tmr->obj.id == ID_TIMER)
+			priv_tmr_wakeup((tmr_t *)tmr, E_SUCCESS);
+
+		else      /* id == ID_DELAYED */
+			core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
+	}
+
+	port_isr_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+// SYSTEM TASK SERVICES
+/* -------------------------------------------------------------------------- */
+
+#ifndef MAIN_TOP
+static  struct { stk_t STK[ASIZE(OS_STACK_SIZE)]; } MAIN_STACK;
+#define MAIN_TOP &MAIN_STACK+1
+#endif
+
+static  union  { stk_t STK[ASIZE(OS_IDLE_STACK)];
+        struct { char  stk[sizeof(stk_t[ASIZE(OS_IDLE_STACK)])-sizeof(ctx_t)]; ctx_t ctx; } CTX; } IDLE_STACK =
+               { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
+#define IDLE_TOP &IDLE_STACK+1
+#define IDLE_SP  &IDLE_STACK.CTX.ctx
+
+tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
+tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_TOP, .sp=IDLE_SP, .state=priv_tsk_idle }; // idle task and tasks queue
+sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
 
@@ -352,124 +473,6 @@ void *core_tsk_handler( void *sp )
 	port_isr_unlock();
 
 	return sp;
-}
-
-/* -------------------------------------------------------------------------- */
-// SYSTEM TIMER SERVICES
-/* -------------------------------------------------------------------------- */
-
-tmr_t WAIT = { { .id=ID_TIMER, .prev=&WAIT, .next=&WAIT }, .delay=INFINITE }; // timers queue
-
-/* -------------------------------------------------------------------------- */
-static
-void priv_tmr_insert( tmr_t *tmr, unsigned id )
-{
-	tmr_t *nxt = &WAIT;
-	tmr->obj.id = id;
-
-	if    (tmr->delay != INFINITE)
-	do     nxt = nxt->obj.next;
-	while (nxt->delay != INFINITE &&
-	       nxt->delay <= tmr->start + tmr->delay - nxt->start);
-
-	priv_rdy_insert(&tmr->obj, &nxt->obj);
-}
-
-/* -------------------------------------------------------------------------- */
-
-void core_tmr_insert( tmr_t *tmr, unsigned id )
-{
-	priv_tmr_insert(tmr, id);
-	port_tmr_force();
-}
-
-/* -------------------------------------------------------------------------- */
-
-void core_tmr_remove( tmr_t *tmr )
-{
-	tmr->obj.id = ID_STOPPED;
-	priv_rdy_remove(&tmr->obj);
-}
-
-/* -------------------------------------------------------------------------- */
-
-#if OS_ROBIN && OS_TICKLESS
-
-static
-bool priv_tmr_expired( tmr_t *tmr )
-{
-	port_tmr_stop();
-
-	if (tmr->delay == INFINITE)
-	return false; // return if timer counting indefinitly
-
-	if (tmr->delay <= Counter - tmr->start)
-	return true;  // return if timer finished counting
-
-	port_tmr_start(tmr->start + tmr->delay);
-
-	if (tmr->delay >  Counter - tmr->start)
-	return false; // return if timer still counts
-
-	port_tmr_stop();
-
-	return true;  // however timer finished counting
-}
-
-/* -------------------------------------------------------------------------- */
-
-#else
-
-static
-bool priv_tmr_expired( tmr_t *tmr )
-{
-	if (tmr->delay >= Counter - tmr->start + 1)
-	return false; // return if timer still counts or counting indefinitly
-
-	return true;  // timer finished counting
-}
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-static
-void priv_tmr_wakeup( tmr_t *tmr, unsigned event )
-{
-	tmr->start += tmr->delay;
-	tmr->delay  = tmr->period;
-
-	if (tmr->state)
-#if OS_FUNCTIONAL
-		tmr->state(tmr);
-#else
-		tmr->state();
-#endif
-	core_tmr_remove(tmr);
-	if (tmr->delay)
-		priv_tmr_insert(tmr, ID_TIMER);
-
-	core_all_wakeup(tmr, event);
-}
-
-/* -------------------------------------------------------------------------- */
-
-void core_tmr_handler( void )
-{
-	tmr_t *tmr;
-
-	port_isr_lock();
-
-	while (priv_tmr_expired(tmr = WAIT.obj.next))
-	{
-		if (tmr->obj.id == ID_TIMER)
-			priv_tmr_wakeup((tmr_t *)tmr, E_SUCCESS);
-
-		else      /* id == ID_DELAYED */
-			core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
-	}
-
-	port_isr_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
