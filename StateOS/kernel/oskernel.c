@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    04.08.2017
+    @date    05.08.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -90,6 +90,14 @@ void priv_tmr_insert( tmr_t *tmr, unsigned id )
 
 /* -------------------------------------------------------------------------- */
 
+static
+void priv_tmr_remove( tmr_t *tmr )
+{
+	priv_rdy_remove(&tmr->obj);
+}
+
+/* -------------------------------------------------------------------------- */
+
 void core_tmr_insert( tmr_t *tmr, unsigned id )
 {
 	priv_tmr_insert(tmr, id);
@@ -101,7 +109,7 @@ void core_tmr_insert( tmr_t *tmr, unsigned id )
 void core_tmr_remove( tmr_t *tmr )
 {
 	tmr->obj.id = ID_STOPPED;
-	priv_rdy_remove(&tmr->obj);
+	priv_tmr_remove(tmr);
 }
 
 /* -------------------------------------------------------------------------- */
