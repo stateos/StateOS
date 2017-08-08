@@ -36,6 +36,7 @@ void port_sys_init( void )
 
 /******************************************************************************
  Non-tick-less mode: configuration of system timer
+ It must generate interrupts with frequency OS_FREQUENCY
 *******************************************************************************/
 
 	#if (CPU_FREQUENCY/OS_FREQUENCY-1 <= SysTick_LOAD_RELOAD_Msk)
@@ -62,6 +63,7 @@ void port_sys_init( void )
 
 /******************************************************************************
  Tick-less mode: configuration of system timer
+ It must be rescaled to frequency OS_FREQUENCY
 *******************************************************************************/
 
 	#if CPU_FREQUENCY/OS_FREQUENCY/2-1 > UINT16_MAX
@@ -84,7 +86,8 @@ void port_sys_init( void )
 	#if OS_ROBIN
 
 /******************************************************************************
- Tick-less mode with preemption: configuration of interrupt for context switch triggering
+ Tick-less mode with preemption: configuration of timer for context switch triggering
+ It must generate interrupts with frequency OS_ROBIN
 *******************************************************************************/
 
 	#if (CPU_FREQUENCY/OS_ROBIN-1 <= SysTick_LOAD_RELOAD_Msk)
