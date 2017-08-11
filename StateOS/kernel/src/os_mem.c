@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    11.08.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,9 @@
 void mem_bind( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
+	void   **ptr;
+	unsigned cnt;
+
 	assert(!port_isr_inside());
 	assert(mem);
 	assert(mem->limit);
@@ -40,8 +43,8 @@ void mem_bind( mem_t *mem )
 
 	port_sys_lock();
 	
-	void   **ptr = mem->data;
-	unsigned cnt = mem->limit;
+	ptr = mem->data;
+	cnt = mem->limit;
 
 	mem->next = 0;
 	while (cnt--) { mem_give(mem, ++ptr); ptr += mem->size; }
@@ -115,6 +118,8 @@ static
 unsigned priv_mem_wait( mem_t *mem, void **data, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
+	void   **ptr;
+	unsigned cnt;
 	unsigned event = E_SUCCESS;
 
 	assert(mem);
@@ -135,8 +140,8 @@ unsigned priv_mem_wait( mem_t *mem, void **data, uint32_t time, unsigned(*wait)(
 	
 	if (event == E_SUCCESS)
 	{
-		void   **ptr = *data;
-		unsigned cnt = mem->size;
+		ptr = *data;
+		cnt = mem->size;
 		while (cnt--) *ptr++ = 0;
 	}
 
@@ -167,12 +172,15 @@ unsigned mem_waitFor( mem_t *mem, void **data, uint32_t delay )
 void mem_give( mem_t *mem, void *data )
 /* -------------------------------------------------------------------------- */
 {
+	tsk_t *tsk;
+	que_t *ptr;
+
 	assert(mem);
 	assert(data);
 
 	port_sys_lock();
 
-	tsk_t *tsk = core_one_wakeup(mem, E_SUCCESS);
+	tsk = core_one_wakeup(mem, E_SUCCESS);
 
 	if (tsk)
 	{
@@ -180,7 +188,7 @@ void mem_give( mem_t *mem, void *data )
 	}
 	else
 	{
-		que_t *ptr = (que_t *)&(mem->next);
+		ptr = (que_t *)&(mem->next);
 		while (ptr->next) ptr = ptr->next;
 		ptr->next = (que_t *)data - 1;
 		ptr->next->next = 0;

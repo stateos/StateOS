@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    11.08.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -126,12 +126,15 @@ unsigned lst_waitFor( lst_t *lst, void **data, uint32_t delay )
 void lst_give( lst_t *lst, void *data )
 /* -------------------------------------------------------------------------- */
 {
+	tsk_t *tsk;
+	que_t *ptr;
+
 	assert(lst);
 	assert(data);
 
 	port_sys_lock();
 
-	tsk_t *tsk = core_one_wakeup(lst, E_SUCCESS);
+	tsk = core_one_wakeup(lst, E_SUCCESS);
 
 	if (tsk)
 	{
@@ -139,7 +142,7 @@ void lst_give( lst_t *lst, void *data )
 	}
 	else
 	{
-		que_t *ptr = (que_t *)&(lst->next);
+		ptr = (que_t *)&(lst->next);
 		while (ptr->next) ptr = ptr->next;
 		ptr->next = (que_t *)data - 1;
 		ptr->next->next = 0;

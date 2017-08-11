@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    11.08.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -113,6 +113,7 @@ static
 unsigned priv_msg_wait( msg_t *msg, unsigned *data, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
+	tsk_t  * tsk;
 	unsigned event = E_SUCCESS;
 
 	assert(msg);
@@ -130,7 +131,7 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, uint32_t time, unsigned(*wai
 	{
 		priv_msg_get(msg, data);
 
-		tsk_t *tsk = core_one_wakeup(msg, E_SUCCESS);
+		tsk = core_one_wakeup(msg, E_SUCCESS);
 
 		if (tsk) priv_msg_put(msg, tsk->msg);
 	}
@@ -163,6 +164,7 @@ static
 unsigned priv_msg_send( msg_t *msg, unsigned data, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
+	tsk_t  * tsk;
 	unsigned event = E_SUCCESS;
 
 	assert(msg);
@@ -179,7 +181,7 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, uint32_t time, unsigned(*wait
 	{
 		priv_msg_put(msg, data);
 
-		tsk_t *tsk = core_one_wakeup(msg, E_SUCCESS);
+		tsk = core_one_wakeup(msg, E_SUCCESS);
 
 		if (tsk) priv_msg_get(msg, tsk->data);
 	}
