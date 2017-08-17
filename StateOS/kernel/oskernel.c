@@ -203,7 +203,7 @@ static  struct { stk_t STK[ASIZE(OS_STACK_SIZE)]; } MAIN_STACK;
 #endif
 
 static  union  { stk_t STK[ASIZE(OS_IDLE_STACK)];
-        struct { char  stk[sizeof(stk_t[ASIZE(OS_IDLE_STACK)])-sizeof(ctx_t)]; ctx_t ctx; } CTX; } IDLE_STACK =
+        struct { char  stk[sizeof(stk_t)*ASIZE(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; } IDLE_STACK =
                { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
 #define IDLE_TOP &IDLE_STACK+1
 #define IDLE_SP  &IDLE_STACK.CTX.ctx
