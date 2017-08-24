@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    24.07.2017
+    @date    24.08.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -189,6 +189,8 @@ bool port_isr_masked( void )
 #define  port_cnt_lock()
 #define  port_cnt_unlock()
 
+#define  port_set_barrier() __ISB()
+
 /* -------------------------------------------------------------------------- */
 
 __STATIC_INLINE
@@ -204,6 +206,7 @@ __STATIC_INLINE
 void port_ctx_switchLock( void )
 {
 	port_ctx_switchNow();
+	port_set_barrier();
 	port_set_lock();
 }
 
