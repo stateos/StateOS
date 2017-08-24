@@ -198,6 +198,7 @@ void port_ctx_switchNow( void )
 {
 	port_ctx_switch();
 	port_clr_lock();
+	port_set_barrier();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -206,7 +207,6 @@ __STATIC_INLINE
 void port_ctx_switchLock( void )
 {
 	port_ctx_switchNow();
-	port_set_barrier();
 	port_set_lock();
 }
 
