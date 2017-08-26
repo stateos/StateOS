@@ -35,6 +35,7 @@ Features:
 - added osdefs.h header file
 - used Current instead of System.cur
 - used config OS_TICKLESS instead of OS_TIMER
+- added stack assertion
 ---------
 5.0
 - updated cmsis-rtos2 api to version 2.1.1

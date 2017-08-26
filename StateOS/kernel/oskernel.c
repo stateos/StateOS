@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    16.08.2017
+    @date    26.08.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -457,6 +457,8 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 void *core_tsk_handler( void *sp )
 {
 	tsk_t *cur, *nxt;
+
+	stk_assert();
 #if OS_ROBIN == 0
 	core_tmr_handler();
 #endif

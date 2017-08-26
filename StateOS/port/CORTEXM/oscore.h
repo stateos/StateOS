@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    24.08.2017
+    @date    26.08.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -49,6 +49,10 @@ extern "C" {
 
 #ifndef  OS_IDLE_STACK
 #define  OS_IDLE_STACK      128 /* idle task stack size in bytes              */
+#endif
+
+#ifndef  OS_CHECK_SIZE
+#define  OS_CHECK_SIZE       32 /* minimum assertion stack size in bytes      */
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -149,6 +153,21 @@ bool port_isr_masked( void )
 #else
 	return (__get_PRIMASK() != 0U);
 #endif
+}
+
+/* -------------------------------------------------------------------------- */
+
+// get current stack pointer
+__STATIC_INLINE
+void * port_get_sp( void )
+{
+	unsigned sp;
+#if defined(__CC_ARM)
+	sp = __current_sp();
+#else
+	__ASM volatile ("mov %0, sp" : "=r" (sp));
+#endif
+	return (void *) sp;
 }
 
 /* -------------------------------------------------------------------------- */
