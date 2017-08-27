@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    26.08.2017
+    @date    13.07.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -186,22 +186,6 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  **********************************************************************************************************************/
 
 uint32_t sys_time( void );
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : stk_assert                                                                                     *
- *                                                                                                                    *
- * Description       : check stack integrity of current task                                                          *
- *                                                                                                                    *
- * Parameters        : none                                                                                           *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
-#define                stk_assert()             \
-                       assert((Current==&MAIN)|| \
-                             ((stk_t*)port_get_sp()>(stk_t*)Current->top-((Current==&IDLE)?ASIZE(OS_IDLE_STACK):ASIZE(OS_STACK_SIZE))+ASIZE(OS_CHECK_SIZE)))
 
 #ifdef __cplusplus
 }
