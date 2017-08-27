@@ -161,7 +161,13 @@ bool port_isr_masked( void )
 __STATIC_INLINE
 void * port_get_sp( void )
 {
-	return (void *) __get_PSP();
+	unsigned sp;
+#if defined(__CC_ARM)
+	sp = __current_sp();
+#else
+	__ASM volatile ("mov %0, sp" : "=r" (sp));
+#endif
+	return (void *) sp;
 }
 
 /* -------------------------------------------------------------------------- */
