@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    27.07.2017
+    @date    27.08.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -55,8 +55,8 @@ struct __tsk
 	uint32_t delay;
 	tsk_t  * back;  // previous process in the DELAYED queue
 
-	void   * sp;    // stack pointer
-	void   * top;   // top of stack
+	void   * sp;    // current stack pointer
+	stk_t  * top;   // top of stack
 
 	unsigned basic; // basic priority
 	unsigned prio;  // current priority
