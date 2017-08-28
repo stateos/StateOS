@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    27.08.2017
+    @date    28.08.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,6 +57,7 @@ struct __tsk
 
 	void   * sp;    // current stack pointer
 	stk_t  * top;   // top of stack
+	stk_t  * stack; // base of stack
 
 	unsigned basic; // basic priority
 	unsigned prio;  // current priority
@@ -94,7 +95,8 @@ struct __tsk
  *   prio            : initial task priority (any unsigned int value)                                                 *
  *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
  *                     it will be executed into an infinite system-implemented loop                                   *
- *   top             : top of task's private stack storage                                                            *
+ *   stack           : base of task's private stack storage                                                           *
+ *   size            : size of task private stack (in bytes)                                                          *
  *                                                                                                                    *
  * Return            : task object                                                                                    *
  *                                                                                                                    *
@@ -103,9 +105,11 @@ struct __tsk
  **********************************************************************************************************************/
 
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
-#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
+#define               _TSK_INIT( _prio, _state, _stack, _size ) \
+                       { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
 #else
-#define               _TSK_INIT( _prio, _state, _top ) { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _top, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 } }
+#define               _TSK_INIT( _prio, _state, _stack, _size ) \
+                       { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 } }
 #endif
 
 /**********************************************************************************************************************
@@ -118,7 +122,8 @@ struct __tsk
  *   prio            : initial task priority (any unsigned int value)                                                 *
  *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
  *                     it will be executed into an infinite system-implemented loop                                   *
- *   top             : top of task's private stack storage                                                            *
+ *   stack           : base of task's private stack storage                                                           *
+ *   size            : size of task private stack (in bytes)                                                          *
  *                                                                                                                    *
  * Return            : pointer to task object                                                                         *
  *                                                                                                                    *
@@ -127,7 +132,8 @@ struct __tsk
  **********************************************************************************************************************/
 
 #ifndef __cplusplus
-#define               _TSK_CREATE( _prio, _state, _top ) & (tsk_t) _TSK_INIT( _prio, _state, _top )
+#define               _TSK_CREATE( _prio, _state, _stack, _size ) \
+            & (tsk_t) _TSK_INIT( _prio, _state, _stack, _size )
 #endif
 
 /**********************************************************************************************************************
@@ -139,14 +145,15 @@ struct __tsk
  * Parameters                                                                                                         *
  *   size            : size of task's private stack storage (in bytes)                                                *
  *                                                                                                                    *
- * Return            : top of task's private stack storage                                                            *
+ * Return            : base of task's private stack storage                                                           *
  *                                                                                                                    *
  * Note              : for internal use                                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
 #ifndef __cplusplus
-#define               _TSK_STACK( _size ) ( stk_t[ASIZE( _size )] ){ 0 } + ASIZE( _size )
+#define               _TSK_STACK( _size ) \
+                       ( stk_t[ASIZE( _size )] ){ 0 }
 #endif
 
 /**********************************************************************************************************************
@@ -164,9 +171,9 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_WRK( tsk, prio, state, size )                                          \
-                       stk_t tsk##__stk[ASIZE( size )];                                        \
-                       tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ); \
+#define             OS_WRK( tsk, prio, state, size )                                \
+                       stk_t tsk##__stk[ASIZE( size )];                              \
+                       tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk, size ); \
                        tsk_id tsk = & tsk##__tsk
 
 /**********************************************************************************************************************
@@ -236,9 +243,9 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_WRK( tsk, prio, state, size )                                          \
-                static stk_t tsk##__stk[ASIZE( size )];                                        \
-                static tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk + ASIZE( size ) ); \
+#define         static_WRK( tsk, prio, state, size )                                \
+                static stk_t tsk##__stk[ASIZE( size )];                              \
+                static tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk, size ); \
                 static tsk_id tsk = & tsk##__tsk
 
 /**********************************************************************************************************************
@@ -313,7 +320,7 @@ struct __tsk
 
 #ifndef __cplusplus
 #define                WRK_INIT( prio, state, size ) \
-                      _TSK_INIT( prio, state, _TSK_STACK( size ) )
+                      _TSK_INIT( prio, state, _TSK_STACK( size ), size )
 #endif
 
 /**********************************************************************************************************************
@@ -394,7 +401,8 @@ struct __tsk
  *   prio            : initial task priority (any unsigned int value)                                                 *
  *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
  *                     it will be executed into an infinite system-implemented loop                                   *
- *   stack           : top of task's private stack storage                                                            *
+ *   stack           : base of task's private stack storage                                                           *
+ *   size            : size of task private stack (in bytes)                                                          *
  *                                                                                                                    *
  * Return            : task object                                                                                    *
  *                                                                                                                    *
@@ -402,7 +410,7 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack );
+void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -917,9 +925,10 @@ unsigned tsk_resumeISR( tsk_t *tsk ) { return tsk_resume(tsk); }
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
  *   prio            : initial task priority (any unsigned int value)                                                 *
- *   stack           : initial value of task private stack pointer                                                    *
  *   state           : task state (initial task function) doesn't have to be noreturn-type                            *
  *                     it will be executed into an infinite system-implemented loop                                   *
+ *   stack           : base of task's private stack storage                                                           *
+ *   size            : size of task private stack (in bytes)                                                          *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -927,9 +936,9 @@ struct baseTask : public __tsk
 {
 	 explicit
 #if OS_FUNCTIONAL
-	 baseTask( const unsigned _prio, FUN_t _state, stk_t *_stack ): __tsk _TSK_INIT(_prio, (fun_t *) run, _stack), _start(_state) {}
+	 baseTask( const unsigned _prio, FUN_t _state, stk_t *_stack, unsigned _size ): __tsk _TSK_INIT(_prio, (fun_t *) run, _stack, _size), _start(_state) {}
 #else
-	 baseTask( const unsigned _prio, FUN_t _state, stk_t *_stack ): __tsk _TSK_INIT(_prio, _state, _stack) {}
+	 baseTask( const unsigned _prio, FUN_t _state, stk_t *_stack, unsigned _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 #endif
 	~baseTask( void ) { assert(__tsk::obj.id == ID_STOPPED); }
 
@@ -977,7 +986,7 @@ template<unsigned _size>
 struct TaskT : public baseTask
 {
 	explicit
-	TaskT( const unsigned _prio, FUN_t _state ): baseTask(_prio, _state, _stack+ASIZE(_size)) {}
+	TaskT( const unsigned _prio, FUN_t _state ): baseTask(_prio, _state, _stack, _size) {}
 
 	private:
 	stk_t _stack[ASIZE(_size)];

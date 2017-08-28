@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    13.07.2017
+    @date    28.08.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -186,6 +186,21 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  **********************************************************************************************************************/
 
 uint32_t sys_time( void );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : stk_assert                                                                                     *
+ *                                                                                                                    *
+ * Description       : check stack integrity of current task                                                          *
+ *                                                                                                                    *
+ * Parameters        : none                                                                                           *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define                stk_assert() \
+                       assert((Current == &MAIN) || (port_get_sp() >= (void *)Current->stack))
 
 #ifdef __cplusplus
 }

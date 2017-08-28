@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    10.08.2017
+    @date    28.08.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -209,7 +209,7 @@ static void thread_delete (osThreadId_t thread_id)
 	if (thread->tsk.obj.id == ID_STOPPED)
 	{
 		if ((thread->flags & osFlagSystemMemory) != 0U)
-			sys_free(thread->stack);
+			sys_free(thread->tsk.stack);
 		if ((thread->flags & osFlagSystemObject) != 0U)
 			sys_free(thread);
 	}
@@ -275,15 +275,13 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 
 	sys_lock();
 
-	tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, (uint64_t *)stack_mem + stack_size/8);
+	tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, (uint64_t *)stack_mem, stack_size);
 	thread->tsk.join = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
 	flg_init(&thread->flg);
 	thread->flags = flags;
 	thread->name = (attr == NULL) ? NULL : attr->name;
 	thread->func = func;
 	thread->arg = argument;
-	thread->stack = stack_mem;
-	thread->size = stack_size;
 
 	sys_unlock();
 
@@ -331,15 +329,23 @@ uint32_t osThreadGetStackSize (osThreadId_t thread_id)
 	if (IS_IRQ_MODE() || (thread_id == NULL))
 		return 0U;
 
-	return thread->size;
+	return (uint32_t) thread->tsk.top - (uint32_t) thread->tsk.stack;
 }
 
 uint32_t osThreadGetStackSpace (osThreadId_t thread_id)
 {
+	osThread_t *thread = thread_id;
+
 	if (IS_IRQ_MODE() || (thread_id == NULL))
 		return 0U;
 
-	return 0U;
+	if (&thread->tsk == &MAIN)
+		return 0U;
+
+	if (&thread->tsk != Current)
+		return (uint32_t) thread->tsk.sp - (uint32_t) thread->tsk.stack;
+
+	return (uint32_t) port_get_sp() - (uint32_t) thread->tsk.stack;
 }
 
 osStatus_t osThreadSetPriority (osThreadId_t thread_id, osPriority_t priority)

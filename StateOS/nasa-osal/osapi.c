@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    01.03.2017
+    @date    28.08.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -1010,19 +1010,18 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 				{
 					if (!stack_size) stack_size = OS_STACK_SIZE;
 					stack = sys_alloc(stack_size);
+					if (stack) rec->used = 1;
 				}
 				if (!stack)
 					status = OS_ERROR;
 				else
 				{
 					*task_id = (rec - OS_task_table) / sizeof(OS_task_record_t);
-					tsk_init(&rec->tsk, ~priority, task_handler, (uint64 *)stack + stack_size/8);
+					tsk_init(&rec->tsk, ~priority, task_handler, (uint64 *)stack, stack_size);
 					strcpy(rec->name, task_name);
 					rec->creator = OS_TaskGetId();
-					rec->used = 1;
+					rec->used++;
 					rec->handler = function_pointer;
-					rec->stack = stack_pointer ? 0 : stack;
-					rec->size = stack_size;
 					rec->delete_handler = NULL;
 					status = OS_SUCCESS;
 				}
@@ -1051,8 +1050,8 @@ int32 OS_TaskDelete(uint32 task_id)
 		if (rec->delete_handler)
 			rec->delete_handler();
 		tsk_kill(&rec->tsk);
-		if (rec->stack)
-			sys_free(rec->stack);
+		if (rec->used > 1)
+			sys_free(rec->tsk.stack);
 		rec->used = 0;
 		status = OS_SUCCESS;
 	}
@@ -1185,7 +1184,7 @@ int32 OS_TaskGetInfo(uint32 task_id, OS_task_prop_t *task_prop)
 	{
 		strcpy(task_prop->name, rec->name);
 		task_prop->creator = rec->creator;
-		task_prop->stack_size = rec->size;
+		task_prop->stack_size = (uint32_t) rec->tsk.top - (uint32_t) rec->tsk.stack;
 		task_prop->priority = ~rec->tsk.basic;
 		task_prop->OStask_id = (uint32) &rec->tsk;
 		status = OS_SUCCESS;

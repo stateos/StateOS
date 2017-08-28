@@ -2,7 +2,7 @@
 
     @file    StateOS: oscmsis.h
     @author  Rajmund Szymanski
-    @date    19.06.2017
+    @date    28.08.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -63,8 +63,6 @@ struct __Thread
 	const char   * name;  // task name
 	osThreadFunc_t func;  // task function
 	void         * arg;   // task function argument
-	void         * stack; // task stack
-	uint32_t       size;  // task stack size
 };
 
 typedef struct __Thread osThread_t;

@@ -2,7 +2,7 @@
 
     @file    StateOS: osnasa.h
     @author  Rajmund Szymanski
-    @date    23.02.2017
+    @date    28.08.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -90,8 +90,6 @@ typedef struct
 	uint32 creator;
 	uint32 used;
 	void (*handler)(void);
-	void  *stack;
-	uint32 size;
 	void (*delete_handler)(void);
 }	OS_task_record_t;
 

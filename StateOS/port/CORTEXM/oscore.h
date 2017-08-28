@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    24.08.2017
+    @date    28.08.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -149,6 +149,15 @@ bool port_isr_masked( void )
 #else
 	return (__get_PRIMASK() != 0U);
 #endif
+}
+
+/* -------------------------------------------------------------------------- */
+
+// get current stack pointer
+__STATIC_INLINE
+void * port_get_sp( void )
+{
+	return (void *) __get_PSP();
 }
 
 /* -------------------------------------------------------------------------- */

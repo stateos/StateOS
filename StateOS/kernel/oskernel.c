@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    27.08.2017
+    @date    28.08.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -179,6 +179,8 @@ void core_tmr_handler( void )
 {
 	tmr_t *tmr;
 
+	stk_assert();
+
 	port_isr_lock();
 
 	while (priv_tmr_expired(tmr = WAIT.obj.next))
@@ -198,18 +200,20 @@ void core_tmr_handler( void )
 /* -------------------------------------------------------------------------- */
 
 #ifndef MAIN_TOP
-static  struct { stk_t STK[ASIZE(OS_STACK_SIZE)]; } MAIN_STK;
-#define MAIN_TOP (stk_t*)(&MAIN_STK+1)
+static  struct { stk_t STK[ASIZE(OS_STACK_SIZE)]; } MAIN_STACK;
+#define MAIN_STK (stk_t*)(&MAIN_STACK)
+#define MAIN_TOP (stk_t*)(&MAIN_STACK+1)
 #endif
 
 static  union  { stk_t STK[ASIZE(OS_IDLE_STACK)];
         struct { char  stk[ASIZE(OS_IDLE_STACK)*sizeof(stk_t)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
-        IDLE_STK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
-#define IDLE_TOP (stk_t*)(&IDLE_STK+1)
-#define IDLE_SP           &IDLE_STK.CTX.ctx
+        IDLE_STACK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
+#define IDLE_STK (stk_t*)(&IDLE_STACK)
+#define IDLE_TOP (stk_t*)(&IDLE_STACK+1)
+#define IDLE_SP          (&IDLE_STACK.CTX.ctx)
 
 tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .top=IDLE_TOP, .sp=IDLE_SP, .state=priv_tsk_idle }; // idle task and tasks queue
+tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .stack=IDLE_STK, .top=IDLE_TOP, .sp=IDLE_SP, .state=priv_tsk_idle }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
@@ -457,8 +461,11 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 void *core_tsk_handler( void *sp )
 {
 	tsk_t *cur, *nxt;
+
 #if OS_ROBIN == 0
 	core_tmr_handler();
+#else
+	stk_assert();
 #endif
 	port_isr_lock();
 	core_ctx_reset();
