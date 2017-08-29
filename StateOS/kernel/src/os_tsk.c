@@ -28,6 +28,9 @@
 
 #include <os.h>
 
+#define ALHI( size ) (((size_t)( size )+sizeof(stk_t)-1)&~(sizeof(stk_t)-1))
+#define ALLO( size ) (((size_t)( size )                )&~(sizeof(stk_t)-1))
+
 /* -------------------------------------------------------------------------- */
 void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size )
 /* -------------------------------------------------------------------------- */
@@ -45,8 +48,8 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 	tsk->prio  = prio;
 	tsk->basic = prio;
 	tsk->state = state;
-	tsk->stack = (stk_t *)(((size_t)stack+sizeof(stk_t)-1)&~(sizeof(stk_t)-1));
-	tsk->top   = (stk_t *)(((size_t)stack+size           )&~(sizeof(stk_t)-1));
+	tsk->stack = stack;
+	tsk->top   = (stk_t *) ALLO((size_t)stack+size);
 
 	core_ctx_init(tsk);
 	core_tsk_insert(tsk);
@@ -65,6 +68,8 @@ tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size )
 
 	if (size == 0)
 		size = OS_STACK_SIZE;
+
+	size = ALHI(size)+ALHI(sizeof(tsk_t))-sizeof(tsk);
 
 	port_sys_lock();
 
