@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    01.08.2017
+    @date    29.08.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -62,6 +62,11 @@ typedef               void (* FUN_t)( void );
 #endif
 
 #endif
+
+/* -------------------------------------------------------------------------- */
+
+#define  ASIZE( size ) \
+    (((size_t)( size )+sizeof(stk_t)-1)/sizeof(stk_t))
 
 /* -------------------------------------------------------------------------- */
 
