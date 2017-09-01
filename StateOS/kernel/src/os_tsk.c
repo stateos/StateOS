@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    31.08.2017
+    @date    01.09.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -61,6 +61,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
+	stk_t *stk;
 	tsk_t *tsk;
 
 	assert(!port_isr_inside());
@@ -69,15 +70,16 @@ tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size )
 	if (size == 0)
 		size = OS_STACK_SIZE;
 
-	size = ALHI(sizeof(tsk_t) + size) - sizeof(tsk_t);
-
 	port_sys_lock();
 
-	tsk = core_sys_alloc(sizeof(tsk_t) + size);
+	stk = core_sys_alloc(size);
+	assert(stk);
 
-	if (tsk)
-		tsk_init(tsk, prio, state, (stk_t *)(tsk + 1), size);
+	tsk = core_sys_alloc(sizeof(tsk_t));
+	assert(tsk);
 
+	tsk_init(tsk, prio, state, stk, size);
+	
 	port_sys_unlock();
 
 	return tsk;
