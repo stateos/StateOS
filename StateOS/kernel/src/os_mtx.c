@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    11.08.2017
+    @date    01.09.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -53,9 +53,9 @@ mtx_t *mtx_create( void )
 	port_sys_lock();
 
 	mtx = core_sys_alloc(sizeof(mtx_t));
+	assert(mtx);
 
-	if (mtx)
-		mtx_init(mtx);
+	mtx_init(mtx);
 
 	port_sys_unlock();
 

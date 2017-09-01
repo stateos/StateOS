@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.c
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    01.09.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -58,9 +58,9 @@ bar_t *bar_create( unsigned limit )
 	port_sys_lock();
 
 	bar = core_sys_alloc(sizeof(bar_t));
+	assert(bar);
 
-	if (bar)
-		bar_init(bar, limit);
+	bar_init(bar, limit);
 
 	port_sys_unlock();
 

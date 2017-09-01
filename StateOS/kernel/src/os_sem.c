@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    01.09.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -58,9 +58,9 @@ sem_t *sem_create( unsigned init, unsigned limit )
 	port_sys_lock();
 
 	sem = core_sys_alloc(sizeof(sem_t));
+	assert(sem);
 
-	if (sem)
-		sem_init(sem, init, limit);
+	sem_init(sem, init, limit);
 
 	port_sys_unlock();
 

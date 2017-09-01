@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    11.08.2017
+    @date    01.09.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -53,9 +53,9 @@ lst_t *lst_create( void )
 	port_sys_lock();
 
 	lst = core_sys_alloc(sizeof(lst_t));
+	assert(lst);
 
-	if (lst)
-		lst_init(lst);
+	lst_init(lst);
 
 	port_sys_unlock();
 
