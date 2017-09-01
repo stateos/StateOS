@@ -55,8 +55,6 @@ sig_t *sig_create( unsigned type )
 	port_sys_lock();
 
 	sig = core_sys_alloc(sizeof(sig_t));
-	assert(sig);
-
 	sig_init(sig, type);
 
 	port_sys_unlock();

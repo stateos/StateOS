@@ -73,11 +73,7 @@ tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size )
 	port_sys_lock();
 
 	stk = core_sys_alloc(size);
-	assert(stk);
-
 	tsk = core_sys_alloc(sizeof(tsk_t));
-	assert(tsk);
-
 	tsk_init(tsk, prio, state, stk, size);
 	
 	port_sys_unlock();

@@ -59,8 +59,6 @@ msg_t *msg_create( unsigned limit )
 	port_sys_lock();
 
 	msg = core_sys_alloc(sizeof(msg_t) + limit * sizeof(unsigned));
-	assert(msg);
-
 	msg_init(msg, limit, msg + 1);
 
 	port_sys_unlock();

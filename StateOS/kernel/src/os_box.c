@@ -62,8 +62,6 @@ box_t *box_create( unsigned limit, unsigned size )
 	port_sys_lock();
 
 	box = core_sys_alloc(sizeof(box_t) + limit * size);
-	assert(box);
-
 	box_init(box, limit, size, box + 1);
 
 	port_sys_unlock();

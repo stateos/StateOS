@@ -53,8 +53,6 @@ lst_t *lst_create( void )
 	port_sys_lock();
 
 	lst = core_sys_alloc(sizeof(lst_t));
-	assert(lst);
-
 	lst_init(lst);
 
 	port_sys_unlock();

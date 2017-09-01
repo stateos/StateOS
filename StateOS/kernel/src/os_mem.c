@@ -85,13 +85,11 @@ mem_t *mem_create( unsigned limit, unsigned size )
 	assert(limit);
 	assert(size);
 
-	port_sys_lock();
-
 	size = MSIZE(size);
 
-	mem = core_sys_alloc(sizeof(mem_t) + limit * (1 + size) * sizeof(void*));
-	assert(mem);
+	port_sys_lock();
 
+	mem = core_sys_alloc(sizeof(mem_t) + limit * (1 + size) * sizeof(void*));
 	mem_init(mem, limit, size, mem + 1);
 
 	port_sys_unlock();

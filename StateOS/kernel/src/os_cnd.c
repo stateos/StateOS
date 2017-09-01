@@ -53,8 +53,6 @@ cnd_t *cnd_create( void )
 	port_sys_lock();
 
 	cnd = core_sys_alloc(sizeof(cnd_t));
-	assert(cnd);
-
 	cnd_init(cnd);
 
 	port_sys_unlock();

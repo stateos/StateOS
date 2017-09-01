@@ -58,8 +58,6 @@ bar_t *bar_create( unsigned limit )
 	port_sys_lock();
 
 	bar = core_sys_alloc(sizeof(bar_t));
-	assert(bar);
-
 	bar_init(bar, limit);
 
 	port_sys_unlock();

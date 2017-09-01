@@ -53,8 +53,6 @@ evt_t *evt_create( void )
 	port_sys_lock();
 
 	evt = core_sys_alloc(sizeof(evt_t));
-	assert(evt);
-
 	evt_init(evt);
 
 	port_sys_unlock();

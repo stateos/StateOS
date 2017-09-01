@@ -58,8 +58,6 @@ sem_t *sem_create( unsigned init, unsigned limit )
 	port_sys_lock();
 
 	sem = core_sys_alloc(sizeof(sem_t));
-	assert(sem);
-
 	sem_init(sem, init, limit);
 
 	port_sys_unlock();

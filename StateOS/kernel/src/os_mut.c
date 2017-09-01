@@ -53,8 +53,6 @@ mut_t *mut_create( void )
 	port_sys_lock();
 
 	mut = core_sys_alloc(sizeof(mut_t));
-	assert(mut);
-
 	mut_init(mut);
 
 	port_sys_unlock();

@@ -55,8 +55,6 @@ tmr_t *tmr_create( fun_t *state )
 	port_sys_lock();
 
 	tmr = core_sys_alloc(sizeof(tmr_t));
-	assert(tmr);
-
 	tmr_init(tmr, state);
 
 	port_sys_unlock();

@@ -53,8 +53,6 @@ flg_t *flg_create( void )
 	port_sys_lock();
 
 	flg = core_sys_alloc(sizeof(flg_t));
-	assert(flg);
-
 	flg_init(flg);
 
 	port_sys_unlock();

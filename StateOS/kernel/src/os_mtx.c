@@ -53,8 +53,6 @@ mtx_t *mtx_create( void )
 	port_sys_lock();
 
 	mtx = core_sys_alloc(sizeof(mtx_t));
-	assert(mtx);
-
 	mtx_init(mtx);
 
 	port_sys_unlock();
