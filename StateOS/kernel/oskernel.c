@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    28.08.2017
+    @date    03.09.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -26,7 +26,6 @@
 
  ******************************************************************************/
 
-#include <stdlib.h>
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
@@ -206,7 +205,7 @@ static  struct { stk_t STK[ASIZE(OS_STACK_SIZE)]; } MAIN_STACK;
 #endif
 
 static  union  { stk_t STK[ASIZE(OS_IDLE_STACK)];
-        struct { char  stk[ASIZE(OS_IDLE_STACK)*sizeof(stk_t)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
+        struct { char  stk[ABOVE(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
         IDLE_STACK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
 #define IDLE_STK (stk_t*)(&IDLE_STACK)
 #define IDLE_TOP (stk_t*)(&IDLE_STACK+1)
@@ -262,9 +261,11 @@ void core_tsk_remove( tsk_t *tsk )
 
 void core_ctx_init( tsk_t *tsk )
 {
-	ctx_t *ctx = (ctx_t *)tsk->top - 1;
-	port_ctx_init(ctx, core_tsk_loop);
-	tsk->sp = ctx;
+#if OS_ASSERT
+	memset(tsk->stack, 0xFF, (size_t)tsk->top - (size_t)tsk->stack);
+#endif
+	tsk->sp = (ctx_t *)tsk->top - 1;
+	port_ctx_init(tsk->sp, core_tsk_loop);
 }
 
 /* -------------------------------------------------------------------------- */

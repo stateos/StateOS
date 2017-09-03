@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    02.09.2017
+    @date    03.09.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -28,9 +28,6 @@
 
 #include <os.h>
 
-#define ALHI( size ) (((size_t)( size )+sizeof(stk_t)-1)&~(sizeof(stk_t)-1))
-#define ALLO( size ) (((size_t)( size )                )&~(sizeof(stk_t)-1))
-
 /* -------------------------------------------------------------------------- */
 void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size )
 /* -------------------------------------------------------------------------- */
@@ -43,16 +40,13 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 
 	port_sys_lock();
 
-#if OS_ASSERT
-	memset(stack, 0xFF, size);
-#endif
 	memset(tsk, 0, sizeof(tsk_t));
 	
 	tsk->prio  = prio;
 	tsk->basic = prio;
 	tsk->state = state;
 	tsk->stack = stack;
-	tsk->top   = (stk_t *) ALLO((size_t)stack + size);
+	tsk->top   = (stk_t *) BELOW((size_t)stack + size);
 
 	core_ctx_init(tsk);
 	core_tsk_insert(tsk);
