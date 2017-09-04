@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    01.09.2017
+    @date    04.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,7 +57,7 @@ struct __tsk
 
 	void   * sp;    // current stack pointer
 	stk_t  * top;   // top of stack
-	stk_t  * stack; // base of stack
+	void   * stack; // base of stack
 
 	unsigned basic; // basic priority
 	unsigned prio;  // current priority
@@ -410,7 +410,7 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size );
+void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned size );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
