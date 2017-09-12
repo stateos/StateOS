@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    03.09.2017
+    @date    12.09.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -200,16 +200,16 @@ void core_tmr_handler( void )
 
 #ifndef MAIN_TOP
 static  struct { stk_t STK[ASIZE(OS_STACK_SIZE)]; } MAIN_STACK;
-#define MAIN_STK (stk_t*)(&MAIN_STACK)
+#define MAIN_STK (void *)(&MAIN_STACK)
 #define MAIN_TOP (stk_t*)(&MAIN_STACK+1)
 #endif
 
 static  union  { stk_t STK[ASIZE(OS_IDLE_STACK)];
         struct { char  stk[ABOVE(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
         IDLE_STACK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
-#define IDLE_STK (stk_t*)(&IDLE_STACK)
+#define IDLE_STK (void *)(&IDLE_STACK)
 #define IDLE_TOP (stk_t*)(&IDLE_STACK+1)
-#define IDLE_SP          (&IDLE_STACK.CTX.ctx)
+#define IDLE_SP  (void *)(&IDLE_STACK.CTX.ctx)
 
 tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
 tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .stack=IDLE_STK, .top=IDLE_TOP, .sp=IDLE_SP, .state=priv_tsk_idle }; // idle task and tasks queue

@@ -29,6 +29,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+5.2
+- added BinarySemaphore c++ class
+---------
 5.1
 - updated access to the c++ functional library
 - updated port files

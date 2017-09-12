@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    12.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -477,7 +477,7 @@ unsigned sem_giveISR( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
 struct Semaphore : public __sem
 {
 	explicit
-	 Semaphore( const unsigned _init, const unsigned _limit = semNormal ): __sem _SEM_INIT(_init, _limit) {}
+	 Semaphore( const unsigned _init, const unsigned _limit = semCounting ): __sem _SEM_INIT(_init, _limit) {}
 	~Semaphore( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        sem_kill     (this);         }
@@ -491,6 +491,24 @@ struct Semaphore : public __sem
 	unsigned send     ( void )            { return sem_send     (this);         }
 	unsigned give     ( void )            { return sem_give     (this);         }
 	unsigned giveISR  ( void )            { return sem_giveISR  (this);         }
+};
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : BinarySemaphore                                                                                *
+ *                                                                                                                    *
+ * Description       : create and initilize a binary semaphore object                                                 *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   init            : initial value of semaphore counter                                                             *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+struct BinarySemaphore : public Semaphore
+{
+	explicit
+	 BinarySemaphore( const unsigned _init ): Semaphore(_init, semBinary) {}
+	~BinarySemaphore( void ) { assert(queue == nullptr); }
 };
 
 #endif

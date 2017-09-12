@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    04.09.2017
+    @date    11.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -406,7 +406,7 @@ struct __tsk
  *                                                                                                                    *
  * Return            : task object                                                                                    *
  *                                                                                                                    *
- * Note              : use only in 'C' code                                                                           *
+ * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
