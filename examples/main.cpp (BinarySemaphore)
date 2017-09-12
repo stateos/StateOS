@@ -3,7 +3,7 @@
 
 int main()
 {
-	Semaphore sem(0);
+	BinarySemaphore sem(0);
 
 	startTask sla(0, [&]
 	{

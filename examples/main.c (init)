@@ -24,7 +24,7 @@ int main()
 	LED_Init();
 
 	sem_init(&sem, 0, semBinary);
-	tsk_init(&sla, 0, slave,  &sla_stk[STKSIZE]);
-	tsk_init(&mas, 0, master, &mas_stk[STKSIZE]);
+	tsk_init(&sla, 0, slave,  sla_stk, sizeof(sla_stk));
+	tsk_init(&mas, 0, master, mas_stk, sizeof(mas_stk));
 	tsk_stop();
 }
