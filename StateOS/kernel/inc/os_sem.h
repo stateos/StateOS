@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    12.09.2017
+    @date    13.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -507,7 +507,7 @@ struct Semaphore : public __sem
 struct BinarySemaphore : public Semaphore
 {
 	explicit
-	 BinarySemaphore( const unsigned _init ): Semaphore(_init, semBinary) {}
+	 BinarySemaphore( const unsigned _init = 0 ): Semaphore(_init, semBinary) {}
 	~BinarySemaphore( void ) { assert(queue == nullptr); }
 };
 
