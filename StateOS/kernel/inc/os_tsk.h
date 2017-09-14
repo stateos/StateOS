@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    11.09.2017
+    @date    14.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -414,7 +414,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : tsk_create                                                                                     *
+ * Name              : wrk_create                                                                                     *
  *                                                                                                                    *
  * Description       : create and initilize complete work area for task object and start the task                     *
  *                                                                                                                    *
@@ -431,11 +431,11 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size );
+tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Name              : tsk_new                                                                                        *
+ * Name              : tsk_create                                                                                     *
  *                                                                                                                    *
  * Description       : create and initilize complete work area for task obj. with stack size defined by OS_STACK_SIZE *
  *                                                                                                                    *
@@ -452,7 +452,7 @@ tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size );
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-tsk_t *tsk_new( unsigned prio, fun_t *state ) { return tsk_create(prio, state, OS_STACK_SIZE); }
+tsk_t *tsk_create( unsigned prio, fun_t *state ) { return wrk_create(prio, state, OS_STACK_SIZE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

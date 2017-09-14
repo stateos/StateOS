@@ -11,7 +11,7 @@ void slave()
 
 void master()
 {
-	tsk_delay(SEC);
+	tsk_delay(1000*MSEC);
 	sem_give(sem);
 }
 
@@ -20,7 +20,7 @@ int main()
 	LED_Init();
 
 	sem = sem_create(0, semNormal);
-	tsk_new(0, slave);
-	tsk_new(0, master);
+	wrk_create(0, slave,  256);
+	wrk_create(0, master, 256);
 	tsk_stop();
 }

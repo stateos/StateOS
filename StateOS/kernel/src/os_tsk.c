@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    04.09.2017
+    @date    14.09.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -55,7 +55,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
 }
 
 /* -------------------------------------------------------------------------- */
-tsk_t *tsk_create( unsigned prio, fun_t *state, unsigned size )
+tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	stk_t *stk;
