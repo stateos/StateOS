@@ -58,21 +58,17 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
 tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	stk_t *stk;
 	tsk_t *tsk;
 
 	assert(!port_isr_inside());
 	assert(state);
-
-	if (size == 0)
-		size = OS_STACK_SIZE;
+	assert(size);
 
 	port_sys_lock();
 
-	stk = core_sys_alloc(size);
-	tsk = core_sys_alloc(sizeof(tsk_t));
-	tsk_init(tsk, prio, state, stk, size);
-	
+	tsk = core_sys_alloc(sizeof(tsk_t) + size);
+	tsk_init(tsk, prio, state, tsk + 1, size);
+
 	port_sys_unlock();
 
 	return tsk;
