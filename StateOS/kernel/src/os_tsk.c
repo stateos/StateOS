@@ -230,8 +230,9 @@ void tsk_flip( fun_t *state )
 
 	port_set_lock();
 
-	core_ctx_switch();
 	Current->state = state;
+
+	core_ctx_switch();
 	core_tsk_flip(Current->top);
 }
 
