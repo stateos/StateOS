@@ -32,6 +32,7 @@ Features:
 5.2
 - added BinarySemaphore c++ class
 - renamed functions: tsk_create to wrk_create and tsk_new to tsk_create
+- added aliases for xxx_create functions and XXX_CREATE macro definitions
 ---------
 5.1
 - updated access to the c++ functional library
