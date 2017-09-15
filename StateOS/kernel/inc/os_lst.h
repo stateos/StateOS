@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -117,6 +117,7 @@ struct __lst
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : LST_CREATE                                                                                     *
+ * Alias             : LST_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a list object                                                             *
  *                                                                                                                    *
@@ -131,6 +132,8 @@ struct __lst
 #ifndef __cplusplus
 #define                LST_CREATE() \
              & (lst_t) LST_INIT()
+#define                LST_NEW \
+                       LST_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -153,6 +156,7 @@ void lst_init( lst_t *lst );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : lst_create                                                                                     *
+ * Alias             : lst_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new list object                                                         *
  *                                                                                                                    *
@@ -166,6 +170,8 @@ void lst_init( lst_t *lst );
  **********************************************************************************************************************/
 
 lst_t *lst_create( void );
+__STATIC_INLINE
+lst_t *lst_new   ( void ) { return lst_create(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

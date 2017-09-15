@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -136,6 +136,7 @@ struct __sig
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : SIG_CREATE                                                                                     *
+ * Alias             : SIG_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a signal object                                                           *
  *                                                                                                                    *
@@ -153,6 +154,8 @@ struct __sig
 #ifndef __cplusplus
 #define                SIG_CREATE( type ) \
              & (sig_t) SIG_INIT( type )
+#define                SIG_NEW \
+                       SIG_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -178,6 +181,7 @@ void sig_init( sig_t *sig, unsigned type );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : sig_create                                                                                     *
+ * Alias             : sig_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new signal object                                                       *
  *                                                                                                                    *
@@ -194,6 +198,8 @@ void sig_init( sig_t *sig, unsigned type );
  **********************************************************************************************************************/
 
 sig_t *sig_create( unsigned type );
+__STATIC_INLINE
+sig_t *sig_new   ( unsigned type ) { return sig_create(type); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

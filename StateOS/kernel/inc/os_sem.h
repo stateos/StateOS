@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    13.09.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -151,6 +151,7 @@ struct __sem
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : SEM_CREATE                                                                                     *
+ * Alias             : SEM_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a semaphore object                                                        *
  *                                                                                                                    *
@@ -170,6 +171,8 @@ struct __sem
 #ifndef __cplusplus
 #define                SEM_CREATE( init, limit ) \
              & (sem_t) SEM_INIT( init, limit )
+#define                SEM_NEW \
+                       SEM_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -197,6 +200,7 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : sem_create                                                                                     *
+ * Alias             : sem_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new semaphore object                                                    *
  *                                                                                                                    *
@@ -215,6 +219,8 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit );
  **********************************************************************************************************************/
 
 sem_t *sem_create( unsigned init, unsigned limit );
+__STATIC_INLINE
+sem_t *sem_new   ( unsigned init, unsigned limit ) { return sem_create(init, limit); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

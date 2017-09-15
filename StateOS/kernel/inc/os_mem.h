@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    14.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -155,6 +155,7 @@ struct __mem
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : MEM_CREATE                                                                                     *
+ * Alias             : MEM_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a memory pool object                                                      *
  *                                                                                                                    *
@@ -171,6 +172,8 @@ struct __mem
 #ifndef __cplusplus
 #define                MEM_CREATE( limit, size ) \
              & (mem_t) MEM_INIT( limit, size )
+#define                MEM_NEW \
+                       MEM_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -213,6 +216,7 @@ void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : mem_create                                                                                     *
+ * Alias             : mem_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new memory pool object                                                  *
  *                                                                                                                    *
@@ -228,6 +232,8 @@ void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data );
  **********************************************************************************************************************/
 
 mem_t *mem_create( unsigned limit, unsigned size );
+__STATIC_INLINE
+mem_t *mem_new   ( unsigned limit, unsigned size ) { return mem_create(limit, size); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

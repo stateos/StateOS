@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -130,6 +130,7 @@ struct __flg
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : FLG_CREATE                                                                                     *
+ * Alias             : FLG_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a flag object                                                             *
  *                                                                                                                    *
@@ -144,6 +145,8 @@ struct __flg
 #ifndef __cplusplus
 #define                FLG_CREATE() \
              & (flg_t) FLG_INIT()
+#define                FLG_NEW \
+                       FLG_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -166,6 +169,7 @@ void flg_init( flg_t *flg );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : flg_create                                                                                     *
+ * Alias             : flg_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new flag object                                                         *
  *                                                                                                                    *
@@ -179,6 +183,8 @@ void flg_init( flg_t *flg );
  **********************************************************************************************************************/
 
 flg_t *flg_create( void );
+__STATIC_INLINE
+flg_t *flg_new   ( void ) { return flg_create(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

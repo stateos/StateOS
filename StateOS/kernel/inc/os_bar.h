@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -123,6 +123,7 @@ struct __bar
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : BAR_CREATE                                                                                     *
+ * Alias             : BAR_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a barrier object                                                          *
  *                                                                                                                    *
@@ -138,6 +139,8 @@ struct __bar
 #ifndef __cplusplus
 #define                BAR_CREATE( limit ) \
              & (bar_t) BAR_INIT( limit )
+#define                BAR_NEW \
+                       BAR_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -161,6 +164,7 @@ void bar_init( bar_t *bar, unsigned limit );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : bar_create                                                                                     *
+ * Alias             : bar_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new barrier object                                                      *
  *                                                                                                                    *
@@ -175,6 +179,8 @@ void bar_init( bar_t *bar, unsigned limit );
  **********************************************************************************************************************/
 
 bar_t *bar_create( unsigned limit );
+__STATIC_INLINE
+bar_t *bar_new   ( unsigned limit ) { return bar_create(limit); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

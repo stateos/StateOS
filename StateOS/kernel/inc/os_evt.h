@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -116,6 +116,7 @@ struct __evt
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : EVT_CREATE                                                                                     *
+ * Alias             : EVT_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize an event object                                                           *
  *                                                                                                                    *
@@ -130,6 +131,8 @@ struct __evt
 #ifndef __cplusplus
 #define                EVT_CREATE() \
              & (evt_t) EVT_INIT()
+#define                EVT_NEW \
+                       EVT_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -152,6 +155,7 @@ void evt_init( evt_t *evt );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : evt_create                                                                                     *
+ * Alias             : evt_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new event object                                                        *
  *                                                                                                                    *
@@ -165,6 +169,8 @@ void evt_init( evt_t *evt );
  **********************************************************************************************************************/
 
 evt_t *evt_create( void );
+__STATIC_INLINE
+evt_t *evt_new   ( void ) { return evt_create(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

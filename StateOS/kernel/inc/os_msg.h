@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -149,6 +149,7 @@ struct __msg
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : MSG_CREATE                                                                                     *
+ * Alias             : MSG_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a message queue object                                                    *
  *                                                                                                                    *
@@ -164,6 +165,8 @@ struct __msg
 #ifndef __cplusplus
 #define                MSG_CREATE( limit ) \
              & (msg_t) MSG_INIT( limit )
+#define                MSG_NEW \
+                       MSG_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -188,6 +191,7 @@ void msg_init( msg_t *msg, unsigned limit, void *data );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : msg_create                                                                                     *
+ * Alias             : msg_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new message queue object                                                *
  *                                                                                                                    *
@@ -202,6 +206,8 @@ void msg_init( msg_t *msg, unsigned limit, void *data );
  **********************************************************************************************************************/
 
 msg_t *msg_create( unsigned limit );
+__STATIC_INLINE
+msg_t *msg_new   ( unsigned limit ) { return msg_create(limit); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

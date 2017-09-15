@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -122,6 +122,7 @@ struct __cnd
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : CND_CREATE                                                                                     *
+ * Alias             : CND_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a condition variable object                                               *
  *                                                                                                                    *
@@ -136,6 +137,8 @@ struct __cnd
 #ifndef __cplusplus
 #define                CND_CREATE() \
              & (cnd_t) CND_INIT()
+#define                CND_NEW \
+                       CND_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -158,6 +161,7 @@ void cnd_init( cnd_t *cnd );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : cnd_create                                                                                     *
+ * Alias             : cnd_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new condition variable object                                           *
  *                                                                                                                    *
@@ -171,6 +175,8 @@ void cnd_init( cnd_t *cnd );
  **********************************************************************************************************************/
 
 cnd_t *cnd_create( void );
+__STATIC_INLINE
+cnd_t *cnd_new   ( void ) { return cnd_create(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    14.09.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -326,6 +326,7 @@ struct __tsk
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : WRK_CREATE                                                                                     *
+ * Alias             : WRK_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize complete work area for task object                                        *
  *                                                                                                                    *
@@ -344,6 +345,8 @@ struct __tsk
 #ifndef __cplusplus
 #define                WRK_CREATE( prio, state, size ) \
              & (tsk_t) WRK_INIT( prio, state, size )
+#define                WRK_NEW \
+                       WRK_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -371,6 +374,7 @@ struct __tsk
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : TSK_CREATE                                                                                     *
+ * Alias             : TSK_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize complete work area for task obj. with stack size defined by OS_STACK_SIZE *
  *                                                                                                                    *
@@ -388,6 +392,8 @@ struct __tsk
 #ifndef __cplusplus
 #define                TSK_CREATE( prio, state ) \
                        WRK_CREATE( prio, state, OS_STACK_SIZE )
+#define                TSK_NEW \
+                       TSK_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -415,6 +421,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : wrk_create                                                                                     *
+ * Alias             : wrk_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize complete work area for task object and start the task                     *
  *                                                                                                                    *
@@ -432,10 +439,13 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
  **********************************************************************************************************************/
 
 tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size );
+__STATIC_INLINE
+tsk_t *wrk_new   ( unsigned prio, fun_t *state, unsigned size ) { return wrk_create(prio, state, size); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : tsk_create                                                                                     *
+ * Alias             : tsk_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize complete work area for task obj. with stack size defined by OS_STACK_SIZE *
  *                                                                                                                    *
@@ -453,6 +463,8 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size );
 
 __STATIC_INLINE
 tsk_t *tsk_create( unsigned prio, fun_t *state ) { return wrk_create(prio, state, OS_STACK_SIZE); }
+__STATIC_INLINE
+tsk_t *tsk_new   ( unsigned prio, fun_t *state ) { return wrk_create(prio, state, OS_STACK_SIZE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -566,6 +578,7 @@ unsigned tsk_join( tsk_t *tsk );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : tsk_yield                                                                                      *
+ * Alias             : tsk_pass                                                                                       *
  *                                                                                                                    *
  * Description       : yield system control to the next task with the same priority in READY queue                    *
  *                                                                                                                    *
@@ -578,23 +591,8 @@ unsigned tsk_join( tsk_t *tsk );
  **********************************************************************************************************************/
 
 void tsk_yield( void );
-
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tsk_pass                                                                                       *
- *                                                                                                                    *
- * Description       : the same as tsk_yield (force context switch)                                                   *
- *                                                                                                                    *
- * Parameters        : none                                                                                           *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
-
 __STATIC_INLINE
-void tsk_pass( void ) { tsk_yield(); }
+void tsk_pass ( void ) { tsk_yield(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

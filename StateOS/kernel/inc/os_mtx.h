@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -120,6 +120,7 @@ struct __mtx
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : MTX_CREATE                                                                                     *
+ * Alias             : MTX_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a mutex object                                                            *
  *                                                                                                                    *
@@ -134,6 +135,8 @@ struct __mtx
 #ifndef __cplusplus
 #define                MTX_CREATE() \
              & (mtx_t) MTX_INIT()
+#define                MTX_NEW \
+                       MTX_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -156,6 +159,7 @@ void mtx_init( mtx_t *mtx );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : mtx_create                                                                                     *
+ * Alias             : mtx_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new mutex object                                                        *
  *                                                                                                                    *
@@ -169,6 +173,8 @@ void mtx_init( mtx_t *mtx );
  **********************************************************************************************************************/
 
 mtx_t *mtx_create( void );
+__STATIC_INLINE
+mtx_t *mtx_new   ( void ) { return mtx_create(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

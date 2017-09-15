@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    14.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -154,6 +154,7 @@ struct __box
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : BOX_CREATE                                                                                     *
+ * Alias             : BOX_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a mailbox queue object                                                    *
  *                                                                                                                    *
@@ -170,6 +171,8 @@ struct __box
 #ifndef __cplusplus
 #define                BOX_CREATE( limit, size ) \
              & (box_t) BOX_INIT( limit, size )
+#define                BOX_NEW \
+                       BOX_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -195,6 +198,7 @@ void box_init( box_t *box, unsigned limit, unsigned size, void *data );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : box_create                                                                                     *
+ * Alias             : box_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new mailbox queue object                                                *
  *                                                                                                                    *
@@ -210,6 +214,8 @@ void box_init( box_t *box, unsigned limit, unsigned size, void *data );
  **********************************************************************************************************************/
 
 box_t *box_create( unsigned limit, unsigned size );
+__STATIC_INLINE
+box_t *box_new   ( unsigned limit, unsigned size ) { return box_create(limit, size); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *

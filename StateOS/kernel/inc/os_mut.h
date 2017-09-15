@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    06.07.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -119,6 +119,7 @@ struct __mut
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : MUT_CREATE                                                                                     *
+ * Alias             : MUT_NEW                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a fast mutex object                                                       *
  *                                                                                                                    *
@@ -133,6 +134,8 @@ struct __mut
 #ifndef __cplusplus
 #define                MUT_CREATE() \
              & (mut_t) MUT_INIT()
+#define                MUT_NEW \
+                       MUT_CREATE
 #endif
 
 /**********************************************************************************************************************
@@ -155,6 +158,7 @@ void mut_init( mut_t *mut );
 /**********************************************************************************************************************
  *                                                                                                                    *
  * Name              : mut_create                                                                                     *
+ * Alias             : mut_new                                                                                        *
  *                                                                                                                    *
  * Description       : create and initilize a new fast mutex object                                                   *
  *                                                                                                                    *
@@ -168,6 +172,8 @@ void mut_init( mut_t *mut );
  **********************************************************************************************************************/
 
 mut_t *mut_create( void );
+__STATIC_INLINE
+mut_t *mut_new   ( void ) { return mut_create(); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
