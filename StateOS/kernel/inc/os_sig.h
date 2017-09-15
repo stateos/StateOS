@@ -153,7 +153,7 @@ struct __sig
 
 #ifndef __cplusplus
 #define                SIG_CREATE( type ) \
-             & (sig_t) SIG_INIT( type )
+             & (sig_t) SIG_INIT  ( type )
 #define                SIG_NEW \
                        SIG_CREATE
 #endif

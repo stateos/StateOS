@@ -164,7 +164,7 @@ struct __msg
 
 #ifndef __cplusplus
 #define                MSG_CREATE( limit ) \
-             & (msg_t) MSG_INIT( limit )
+             & (msg_t) MSG_INIT  ( limit )
 #define                MSG_NEW \
                        MSG_CREATE
 #endif

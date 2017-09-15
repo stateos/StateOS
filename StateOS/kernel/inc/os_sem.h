@@ -170,7 +170,7 @@ struct __sem
 
 #ifndef __cplusplus
 #define                SEM_CREATE( init, limit ) \
-             & (sem_t) SEM_INIT( init, limit )
+             & (sem_t) SEM_INIT  ( init, limit )
 #define                SEM_NEW \
                        SEM_CREATE
 #endif

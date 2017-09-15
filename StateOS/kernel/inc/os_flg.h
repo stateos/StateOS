@@ -144,7 +144,7 @@ struct __flg
 
 #ifndef __cplusplus
 #define                FLG_CREATE() \
-             & (flg_t) FLG_INIT()
+             & (flg_t) FLG_INIT  ()
 #define                FLG_NEW \
                        FLG_CREATE
 #endif

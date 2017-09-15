@@ -136,7 +136,7 @@ struct __cnd
 
 #ifndef __cplusplus
 #define                CND_CREATE() \
-             & (cnd_t) CND_INIT()
+             & (cnd_t) CND_INIT  ()
 #define                CND_NEW \
                        CND_CREATE
 #endif

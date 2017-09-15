@@ -177,7 +177,7 @@ struct __tmr
 
 #ifndef __cplusplus
 #define                TMR_CREATE( state ) \
-             & (tmr_t) TMR_INIT( state )
+             & (tmr_t) TMR_INIT  ( state )
 #define                TMR_NEW \
                        TMR_CREATE
 #endif

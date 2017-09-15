@@ -171,7 +171,7 @@ struct __mem
 
 #ifndef __cplusplus
 #define                MEM_CREATE( limit, size ) \
-             & (mem_t) MEM_INIT( limit, size )
+             & (mem_t) MEM_INIT  ( limit, size )
 #define                MEM_NEW \
                        MEM_CREATE
 #endif

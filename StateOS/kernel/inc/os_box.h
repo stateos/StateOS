@@ -170,7 +170,7 @@ struct __box
 
 #ifndef __cplusplus
 #define                BOX_CREATE( limit, size ) \
-             & (box_t) BOX_INIT( limit, size )
+             & (box_t) BOX_INIT  ( limit, size )
 #define                BOX_NEW \
                        BOX_CREATE
 #endif

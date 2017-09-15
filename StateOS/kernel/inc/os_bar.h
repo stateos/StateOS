@@ -138,7 +138,7 @@ struct __bar
 
 #ifndef __cplusplus
 #define                BAR_CREATE( limit ) \
-             & (bar_t) BAR_INIT( limit )
+             & (bar_t) BAR_INIT  ( limit )
 #define                BAR_NEW \
                        BAR_CREATE
 #endif

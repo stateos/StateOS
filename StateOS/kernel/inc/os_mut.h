@@ -133,7 +133,7 @@ struct __mut
 
 #ifndef __cplusplus
 #define                MUT_CREATE() \
-             & (mut_t) MUT_INIT()
+             & (mut_t) MUT_INIT  ()
 #define                MUT_NEW \
                        MUT_CREATE
 #endif
