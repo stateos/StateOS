@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    28.08.2017
+    @date    15.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -94,7 +94,7 @@ void *sys_alloc( size_t size ) { return core_sys_alloc(size); }
  * Description       : system free procedure                                                                          *
  *                                                                                                                    *
  * Parameters                                                                                                         *
- *   ptr             : pointer to a memory block previously allocated with sys_alloc or xxx_create                    *
+ *   ptr             : pointer to a memory block previously allocated with sys_alloc, xxx_create or xxx_new functions *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
