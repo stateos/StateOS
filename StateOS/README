@@ -34,6 +34,8 @@ Features:
 - renamed functions: tsk_create to wrk_create and tsk_new to tsk_create
 - added aliases for xxx_create functions and XXX_CREATE macro definitions
 - updated c++ code
+- added OS_TMR_START, OS_WRK_START and OS_TSK_START macros
+  only available for compilers supporting the "constructor" function attribute or its equivalent
 ---------
 5.1
 - updated access to the c++ functional library

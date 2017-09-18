@@ -90,7 +90,8 @@ struct __tmr
  *                                                                                                                    *
  * Name              : OS_TMR_DEF                                                                                     *
  *                                                                                                                    *
- * Description       : define and initilize a timer object and timer callback procedure                               *
+ * Description       : define and initilize complete timer object                                                     *
+ *                     timer callback procedure (function body) must be defined immediately below                     *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   tmr             : name of a pointer to timer object                                                              *
@@ -105,9 +106,35 @@ struct __tmr
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : OS_TMR_START                                                                                   *
+ *                                                                                                                    *
+ * Description       : define, initilize and start complete timer object                                              *
+ *                     timer callback procedure (function body) must be defined immediately below                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : name of a pointer to timer object                                                              *
+ *   delay           : duration of time (maximum number of ticks to countdown) for first expiration                   *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *   period          : duration of time (maximum number of ticks to countdown) for all next expirations               *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define             OS_TMR_START( tmr, delay, period )                          \
+                       void tmr##__fun( void );                                  \
+                       tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                \
+                       tmr_id tmr = & tmr##__tmr;                                  \
+         __CONSTRUCTOR void tmr##__start( void ) { tmr_start(tmr, delay, period); } \
+                       void tmr##__fun( void )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : static_TMR                                                                                     *
  *                                                                                                                    *
- * Description       : define and initilize a static timer object                                                     *
+ * Description       : define and initilize static timer object                                                       *
+ *                     timer callback procedure (function body) must be defined immediately below                     *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   tmr             : name of a pointer to timer object                                                              *
@@ -124,7 +151,8 @@ struct __tmr
  *                                                                                                                    *
  * Name              : static_TMR_DEF                                                                                 *
  *                                                                                                                    *
- * Description       : define and initilize a static timer object and timer callback procedure                        *
+ * Description       : define and initilize static timer object                                                       *
+ *                     timer callback procedure (function body) must be defined immediately below                     *
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   tmr             : name of a pointer to timer object                                                              *
@@ -132,10 +160,35 @@ struct __tmr
  **********************************************************************************************************************/
 
 #define         static_TMR_DEF( tmr )                            \
-                static void tmr##__fun();                         \
+                static void tmr##__fun( void );                   \
                 static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun ); \
                 static tmr_id tmr = & tmr##__tmr;                   \
-                static void tmr##__fun()
+                static void tmr##__fun( void )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_TMR_START                                                                               *
+ *                                                                                                                    *
+ * Description       : define, initilize and start static timer object                                                *
+ *                     timer callback procedure (function body) must be defined immediately below                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : name of a pointer to timer object                                                              *
+ *   delay           : duration of time (maximum number of ticks to countdown) for first expiration                   *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *   period          : duration of time (maximum number of ticks to countdown) for all next expirations               *
+ *                     IMMEDIATE: don't countdown                                                                     *
+ *                     INFINITE:  countdown indefinitly                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define         static_TMR_START( tmr, delay, period )                          \
+                static void tmr##__fun( void );                                  \
+                static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                \
+                static tmr_id tmr = & tmr##__tmr;                                  \
+  __CONSTRUCTOR static void tmr##__start( void ) { tmr_start(tmr, delay, period); } \
+                static void tmr##__fun( void )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
