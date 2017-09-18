@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    15.09.2017
+    @date    18.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -537,37 +537,38 @@ struct Timer : public __tmr
 	 Timer( void ):         __tmr _TMR_INIT(0) {}
 #if OS_FUNCTIONAL
 	 explicit
-	 Timer( FUN_t _state ): __tmr _TMR_INIT((fun_t *) run), _start(_state) {}
+	 Timer( FUN_t _state ): __tmr _TMR_INIT(_run), _fun(_state) {}
+	~Timer( void ) { assert(__tmr::obj.id == ID_STOPPED); _fun = nullptr; }
 #else
 	 explicit
 	 Timer( FUN_t _state ): __tmr _TMR_INIT(_state) {}
-#endif
 	~Timer( void ) { assert(__tmr::obj.id == ID_STOPPED); }
-
-	void kill         ( void )                                            {        tmr_kill         (this);                                 }
-	void startUntil   ( uint32_t _time )                                  {        tmr_startUntil   (this, _time);                          }
-	void start        ( uint32_t _delay, uint32_t _period )               {        tmr_start        (this, _delay, _period);                }
-	void startFor     ( uint32_t _delay )                                 {        tmr_startFor     (this, _delay);                         }
-	void startPeriodic( uint32_t _period )                                {        tmr_startPeriodic(this,         _period);                }
-#if OS_FUNCTIONAL
-	void startFrom    ( uint32_t _delay, uint32_t _period, FUN_t _state ) {        _start = _state;
-	                                                                               tmr_startFrom    (this, _delay, _period, (fun_t *) run); }
-#else
-	void startFrom    ( uint32_t _delay, uint32_t _period, FUN_t _state ) {        tmr_startFrom    (this, _delay, _period, _state);        }
 #endif
-	void stop         ( void )                                            {        tmr_stop         (this);                                 }
 
-	unsigned waitUntil( uint32_t _time )                                  { return tmr_waitUntil    (this, _time);                          }
-	unsigned waitFor  ( uint32_t _delay )                                 { return tmr_waitFor      (this, _delay);                         }
-	unsigned wait     ( void )                                            { return tmr_wait         (this);                                 }
-	unsigned take     ( void )                                            { return tmr_take         (this);                                 }
-	unsigned takeISR  ( void )                                            { return tmr_takeISR      (this);                                 }
+	void kill         ( void )                                            {        tmr_kill         (this);                          }
+	void startUntil   ( uint32_t _time )                                  {        tmr_startUntil   (this, _time);                   }
+	void start        ( uint32_t _delay, uint32_t _period )               {        tmr_start        (this, _delay, _period);         }
+	void startFor     ( uint32_t _delay )                                 {        tmr_startFor     (this, _delay);                  }
+	void startPeriodic( uint32_t _period )                                {        tmr_startPeriodic(this,         _period);         }
+#if OS_FUNCTIONAL
+	void startFrom    ( uint32_t _delay, uint32_t _period, FUN_t _state ) {        _fun = _state;
+	                                                                               tmr_startFrom    (this, _delay, _period, _run);   }
+#else
+	void startFrom    ( uint32_t _delay, uint32_t _period, FUN_t _state ) {        tmr_startFrom    (this, _delay, _period, _state); }
+#endif
+	void stop         ( void )                                            {        tmr_stop         (this);                          }
 
-	bool     operator!( void )                                            { return __tmr::obj.id == ID_STOPPED;                             }
+	unsigned waitUntil( uint32_t _time )                                  { return tmr_waitUntil    (this, _time);                   }
+	unsigned waitFor  ( uint32_t _delay )                                 { return tmr_waitFor      (this, _delay);                  }
+	unsigned wait     ( void )                                            { return tmr_wait         (this);                          }
+	unsigned take     ( void )                                            { return tmr_take         (this);                          }
+	unsigned takeISR  ( void )                                            { return tmr_takeISR      (this);                          }
+
+	bool     operator!( void )                                            { return __tmr::obj.id == ID_STOPPED;                      }
 #if OS_FUNCTIONAL
 	static
-	void     run( Timer &tmr ) { tmr._start(); }
-	FUN_t    _start;
+	void     _run( void ) { ((Timer *) WAIT.obj.next)->_fun(); }
+	FUN_t    _fun;
 #endif
 };
 
@@ -677,12 +678,12 @@ struct startTimerPeriodic : public Timer
 namespace ThisTimer
 {
 #if OS_FUNCTIONAL
-	static inline void flipISR ( FUN_t    _state ) { ((Timer *) WAIT.obj.next)->_start = _state;
-	                                                 tmr_flipISR ((fun_t *) Timer::run);         }
+	static inline void flipISR ( FUN_t    _state ) { ((Timer *) WAIT.obj.next)->_fun = _state;
+	                                                 tmr_flipISR (Timer::_run);                }
 #else
-	static inline void flipISR ( FUN_t    _state ) { tmr_flipISR (_state);                       }
+	static inline void flipISR ( FUN_t    _state ) { tmr_flipISR (_state);                     }
 #endif
-	static inline void delayISR( uint32_t _delay ) { tmr_delayISR(_delay);                       }
+	static inline void delayISR( uint32_t _delay ) { tmr_delayISR(_delay);                     }
 }
 
 #endif//__cplusplus
