@@ -1,0 +1,37 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+auto led = Led();
+auto sem = Semaphore(0);
+
+struct slaTask : public startTask
+{
+	slaTask(): startTask(0, run) {}
+
+	private:
+	static void run()
+	{
+		sem.wait();
+		led.tick();
+	}
+};
+	
+struct masTask : public startTask
+{
+	masTask(): startTask(0, run) {}
+
+	private:
+	static void run()
+	{
+		ThisTask::sleepFor(SEC);
+		sem.give();
+	}
+};
+
+auto sla = slaTask();
+auto mas = masTask();
+
+int main()
+{
+	ThisTask::sleep();
+}
