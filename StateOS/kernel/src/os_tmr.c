@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    01.09.2017
+    @date    19.09.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -124,6 +124,14 @@ void tmr_start( tmr_t *tmr, uint32_t delay, uint32_t period )
 	priv_tmr_start(tmr);
 
 	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tmr_ctor( tmr_t *tmr, uint32_t delay, uint32_t period )
+/* -------------------------------------------------------------------------- */
+{
+	sys_init();
+	tmr_start(tmr, delay, period);
 }
 
 /* -------------------------------------------------------------------------- */
