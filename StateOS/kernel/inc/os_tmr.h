@@ -106,6 +106,26 @@ struct __tmr
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Name              : OS_TMR_UNTIL                                                                                   *
+ *                                                                                                                    *
+ * Description       : define, initilize and start complete timer object                                              *
+ *                     timer callback procedure (function body) must be defined immediately below                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : name of a pointer to timer object                                                              *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define             OS_TMR_UNTIL( tmr, time )                                                \
+                       void tmr##__fun( void );                                               \
+                       tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                             \
+                       tmr_id tmr = & tmr##__tmr;                                               \
+         __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
+                       void tmr##__fun( void )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Name              : OS_TMR_START                                                                                   *
  *                                                                                                                    *
  * Description       : define, initilize and start complete timer object                                              *
@@ -164,6 +184,26 @@ struct __tmr
                 static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun ); \
                 static tmr_id tmr = & tmr##__tmr;                   \
                 static void tmr##__fun( void )
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : static_TMR_UNTIL                                                                               *
+ *                                                                                                                    *
+ * Description       : define, initilize and start static timer object                                                *
+ *                     timer callback procedure (function body) must be defined immediately below                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tmr             : name of a pointer to timer object                                                              *
+ *   time            : timepoint value                                                                                *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+#define         static_TMR_UNTIL( tmr, time )                                                \
+                static void tmr##__fun( void );                                               \
+                static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                             \
+                static tmr_id tmr = & tmr##__tmr;                                               \
+  __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
+                static  void tmr##__fun( void )
 
 /**********************************************************************************************************************
  *                                                                                                                    *

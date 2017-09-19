@@ -37,6 +37,7 @@ Features:
 - added OS_TMR_START, OS_WRK_START and OS_TSK_START macros
   only available for compilers supporting the "constructor" function attribute or its equivalent
 - added examples for new feature
+- added OS_TMR_UNTIL macro (with tmr_startUntil function) similar to OS_TMR_START macro (with tmr_start function)
 ---------
 5.1
 - updated access to the c++ functional library
