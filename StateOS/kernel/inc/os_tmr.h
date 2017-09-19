@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    18.09.2017
+    @date    19.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -122,11 +122,11 @@ struct __tmr
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_TMR_START( tmr, delay, period )                          \
-                       void tmr##__fun( void );                                  \
-                       tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                \
-                       tmr_id tmr = & tmr##__tmr;                                  \
-         __CONSTRUCTOR void tmr##__start( void ) { tmr_start(tmr, delay, period); } \
+#define             OS_TMR_START( tmr, delay, period )                                           \
+                       void tmr##__fun( void );                                                   \
+                       tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                                 \
+                       tmr_id tmr = & tmr##__tmr;                                                   \
+         __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_start(tmr, delay, period); } \
                        void tmr##__fun( void )
 
 /**********************************************************************************************************************
@@ -183,11 +183,11 @@ struct __tmr
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_TMR_START( tmr, delay, period )                          \
-                static void tmr##__fun( void );                                  \
-                static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                \
-                static tmr_id tmr = & tmr##__tmr;                                  \
-  __CONSTRUCTOR static void tmr##__start( void ) { tmr_start(tmr, delay, period); } \
+#define         static_TMR_START( tmr, delay, period )                                           \
+                static void tmr##__fun( void );                                                   \
+                static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                                 \
+                static tmr_id tmr = & tmr##__tmr;                                                   \
+  __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_start(tmr, delay, period); } \
                 static void tmr##__fun( void )
 
 /**********************************************************************************************************************
@@ -641,9 +641,9 @@ struct Timer : public __tmr
 struct startTimerUntil : public Timer
 {
 	explicit
-	startTimerUntil( const uint32_t _time ):               Timer()       { tmr_startUntil(this, _time); }
+	startTimerUntil( const uint32_t _time ):               Timer()       { port_sys_init(); tmr_startUntil(this, _time); }
 	explicit
-	startTimerUntil( const uint32_t _time, FUN_t _state ): Timer(_state) { tmr_startUntil(this, _time); }
+	startTimerUntil( const uint32_t _time, FUN_t _state ): Timer(_state) { port_sys_init(); tmr_startUntil(this, _time); }
 };
 
 /**********************************************************************************************************************
@@ -668,9 +668,9 @@ struct startTimerUntil : public Timer
 struct startTimer : public Timer
 {
 	explicit
-	startTimer( const uint32_t _delay, const uint32_t _period ):               Timer()       { tmr_start(this, _delay, _period); }
+	startTimer( const uint32_t _delay, const uint32_t _period ):               Timer()       { port_sys_init(); tmr_start(this, _delay, _period); }
 	explicit
-	startTimer( const uint32_t _delay, const uint32_t _period, FUN_t _state ): Timer(_state) { tmr_start(this, _delay, _period); }
+	startTimer( const uint32_t _delay, const uint32_t _period, FUN_t _state ): Timer(_state) { port_sys_init(); tmr_start(this, _delay, _period); }
 };
 
 /**********************************************************************************************************************
@@ -688,12 +688,12 @@ struct startTimer : public Timer
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-struct startTimerFor : public Timer
+struct startTimerFor : public startTimer
 {
 	explicit
-	startTimerFor( const uint32_t _delay ):               Timer()       { tmr_startFor(this, _delay); }
+	startTimerFor( const uint32_t _delay ):               startTimer(_delay, 0)         {}
 	explicit
-	startTimerFor( const uint32_t _delay, FUN_t _state ): Timer(_state) { tmr_startFor(this, _delay); }
+	startTimerFor( const uint32_t _delay, FUN_t _state ): startTimer(_delay, 0, _state) {}
 };
 
 /**********************************************************************************************************************
@@ -712,12 +712,12 @@ struct startTimerFor : public Timer
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-struct startTimerPeriodic : public Timer
+struct startTimerPeriodic : public startTimer
 {
 	explicit
-	startTimerPeriodic( const uint32_t _period ):               Timer()       { tmr_startPeriodic(this, _period); }
+	startTimerPeriodic( const uint32_t _period ):               startTimer(_period, _period)         {}
 	explicit
-	startTimerPeriodic( const uint32_t _period, FUN_t _state ): Timer(_state) { tmr_startPeriodic(this, _period); }
+	startTimerPeriodic( const uint32_t _period, FUN_t _state ): startTimer(_period, _period, _state) {}
 };
 
 /**********************************************************************************************************************

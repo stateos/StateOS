@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    18.09.2017
+    @date    19.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -242,10 +242,10 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_WRK_START( tsk, prio, size )               \
-                       void tsk##__fun( void );                    \
-                    OS_WRK( tsk, prio, tsk##__fun, size );          \
-         __CONSTRUCTOR void tsk##__start( void ) { tsk_start(tsk); } \
+#define             OS_WRK_START( tsk, prio, size )                                \
+                       void tsk##__fun( void );                                     \
+                    OS_WRK( tsk, prio, tsk##__fun, size );                           \
+         __CONSTRUCTOR void tsk##__start( void ) { port_sys_init(); tsk_start(tsk); } \
                        void tsk##__fun( void )
 
 /**********************************************************************************************************************
@@ -350,10 +350,10 @@ struct __tsk
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_WRK_START( tsk, prio, size )               \
-                static void tsk##__fun( void );                    \
-                static_WRK( tsk, prio, tsk##__fun, size );          \
-  __CONSTRUCTOR static void tsk##__start( void ) { tsk_start(tsk); } \
+#define         static_WRK_START( tsk, prio, size )                                \
+                static void tsk##__fun( void );                                     \
+                static_WRK( tsk, prio, tsk##__fun, size );                           \
+  __CONSTRUCTOR static void tsk##__start( void ) { port_sys_init(); tsk_start(tsk); } \
                 static void tsk##__fun( void )
 
 /**********************************************************************************************************************
@@ -1103,7 +1103,7 @@ template<unsigned _size>
 struct startTaskT : public TaskT<_size>
 {
 	explicit
-	startTaskT( const unsigned _prio, FUN_t _state ): TaskT<_size>(_prio, _state) { tsk_start(this); }
+	startTaskT( const unsigned _prio, FUN_t _state ): TaskT<_size>(_prio, _state) { port_sys_init(); tsk_start(this); }
 };
 
 /**********************************************************************************************************************
