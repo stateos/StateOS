@@ -32,12 +32,13 @@ Features:
 5.2
 - added BinarySemaphore c++ class
 - renamed functions: tsk_create to wrk_create and tsk_new to tsk_create
-- added aliases for xxx_create functions and XXX_CREATE macro definitions
+- added aliases for xxx_create functions (xxx_new) and XXX_CREATE macro definitions (XXX_NEW)
 - updated c++ code
 - added OS_TMR_START, OS_WRK_START and OS_TSK_START macros
   only available for compilers supporting the "constructor" function attribute or its equivalent
 - added examples for new feature
 - added OS_TMR_UNTIL macro (with tmr_startUntil function) similar to OS_TMR_START macro (with tmr_start function)
+- in non-tick-less mode each task has its own time slice
 ---------
 5.1
 - updated access to the c++ functional library

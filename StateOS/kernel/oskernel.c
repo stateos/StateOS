@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    17.09.2017
+    @date    26.09.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -218,7 +218,9 @@ static
 void priv_tsk_insert( tsk_t *tsk )
 {
 	tsk_t *nxt = &IDLE;
-
+#if OS_ROBIN && OS_TICKLESS == 0
+	tsk->slice = 0;
+#endif
 	if    (tsk->prio)
 	do     nxt = nxt->obj.next;
 	while (tsk->prio <= nxt->prio);
@@ -469,10 +471,14 @@ void *core_tsk_handler( void *sp )
 
 	nxt = IDLE.obj.next;
 
+#if OS_ROBIN && OS_TICKLESS == 0
+	if (cur == nxt || (nxt->slice >= OS_FREQUENCY/OS_ROBIN && (nxt->slice = 0) == 0))
+#else
 	if (cur == nxt)
+#endif
 	{
-		priv_tsk_remove(cur);
-		priv_tsk_insert(cur);
+		priv_tsk_remove(nxt);
+		priv_tsk_insert(nxt);
 		nxt = IDLE.obj.next;
 	}
 

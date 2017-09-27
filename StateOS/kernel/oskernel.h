@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    03.09.2017
+    @date    26.09.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -117,9 +117,6 @@ void core_tsk_loop( void );
 __STATIC_INLINE
 void core_ctx_reset( void )
 {
-#if OS_ROBIN && OS_TICKLESS == 0
-	System.dly = 0;
-#endif
 	port_ctx_reset();
 }
 

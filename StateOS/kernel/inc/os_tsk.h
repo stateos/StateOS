@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    19.09.2017
+    @date    26.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -67,6 +67,7 @@ struct __tsk
 	mtx_t  * mlist; // list of mutexes held
 	tsk_t  * join;  // list of joined tasks
 
+	uint32_t slice;	// time slice
 	union  {
 	unsigned mode;  // used by flag object
 	void   * data;  // used by mailbox queue object
@@ -106,10 +107,10 @@ struct __tsk
 
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
+                       { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
 #else
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 } }
+                       { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 } }
 #endif
 
 /**********************************************************************************************************************

@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    01.08.2017
+    @date    26.09.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -79,9 +79,6 @@ struct __sys
 #if OS_TICKLESS == 0
 	volatile
 	uint32_t cnt;   // system timer counter
-#if OS_ROBIN
-	uint32_t dly;   // task switch counter
-#endif
 #endif
 };
 
