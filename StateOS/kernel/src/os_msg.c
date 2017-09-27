@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    01.09.2017
+    @date    27.09.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 #include <os.h>
 
 /* -------------------------------------------------------------------------- */
-void msg_init( msg_t *msg, unsigned limit, void *data )
+void msg_init( msg_t *msg, unsigned limit, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -59,7 +59,7 @@ msg_t *msg_create( unsigned limit )
 	port_sys_lock();
 
 	msg = core_sys_alloc(sizeof(msg_t) + limit * sizeof(unsigned));
-	msg_init(msg, limit, msg + 1);
+	msg_init(msg, limit, (unsigned *)(msg + 1));
 
 	port_sys_unlock();
 

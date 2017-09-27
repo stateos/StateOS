@@ -70,7 +70,7 @@ struct __tsk
 	uint32_t slice;	// time slice
 	union  {
 	unsigned mode;  // used by flag object
-	void   * data;  // used by mailbox queue object
+	void   * data;  // used by queue objects
 	unsigned msg;   // used by message queue object
 	};
 	union  {

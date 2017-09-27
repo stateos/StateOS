@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    26.09.2017
+    @date    27.09.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -554,6 +554,22 @@ void *core_sys_alloc( size_t size )
 void core_sys_free( void *ptr )
 {
 	free(ptr);
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_TICKLESS == 0
+
+void core_sys_tick( void )
+{
+	System.cnt++;
+	#if OS_ROBIN
+	core_tmr_handler();
+	if (++System.cur->slice >= OS_FREQUENCY/OS_ROBIN)
+		core_ctx_switch();
+	#endif
 }
 
 #endif

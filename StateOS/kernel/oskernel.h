@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    26.09.2017
+    @date    27.09.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -215,6 +215,11 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio );
 // reset context switch timer counter
 // return a pointer to the stack pointer of the next READY task the highest priority
 void *core_tsk_handler( void *sp );
+
+/* -------------------------------------------------------------------------- */
+
+// internal handler of system timer
+void core_sys_tick( void );
 
 /* -------------------------------------------------------------------------- */
 
