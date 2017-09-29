@@ -10,21 +10,16 @@ void proc(volatile unsigned *led, uint32_t timePoint)
 	}
 }
 
-OS_WRK_DEF(t1, 0, 256) { proc(&LED[0], SEC/8*0); }
-OS_WRK_DEF(t2, 0, 256) { proc(&LED[1], SEC/8*1); }
-OS_WRK_DEF(t3, 0, 256) { proc(&LED[2], SEC/8*2); }
-OS_WRK_DEF(t4, 0, 256) { proc(&LED[3], SEC/8*3); }
-OS_WRK_DEF(t5, 0, 256) { proc(&GRN,    SEC/8*4); }
+OS_TSK_START(t1, 0) { proc(&LED[0], SEC/8*0); }
+OS_TSK_START(t2, 0) { proc(&LED[1], SEC/8*1); }
+OS_TSK_START(t3, 0) { proc(&LED[2], SEC/8*2); }
+OS_TSK_START(t4, 0) { proc(&LED[3], SEC/8*3); }
+OS_TSK_START(t5, 0) { proc(&GRN,    SEC/8*4); }
 
 int main()
 {
     LED_Init();
     GRN_Init();
-	
-	tsk_start(t1);
-	tsk_start(t2);
-	tsk_start(t3);
-	tsk_start(t4);
-	tsk_start(t5);
+
 	tsk_stop();
 }
