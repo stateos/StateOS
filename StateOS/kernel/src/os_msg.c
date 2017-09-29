@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    27.09.2017
+    @date    29.09.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -58,8 +58,8 @@ msg_t *msg_create( unsigned limit )
 
 	port_sys_lock();
 
-	msg = core_sys_alloc(sizeof(msg_t) + limit * sizeof(unsigned));
-	msg_init(msg, limit, (unsigned *)(msg + 1));
+	msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + limit * sizeof(unsigned));
+	msg_init(msg, limit, (void *)ABOVE(msg + 1));
 
 	port_sys_unlock();
 

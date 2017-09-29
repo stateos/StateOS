@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    27.09.2017
+    @date    25.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
