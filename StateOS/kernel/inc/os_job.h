@@ -451,6 +451,7 @@ unsigned job_giveISR( job_t *job, fun_t *proc ) { return job_sendFor(job, proc, 
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
  *   limit           : size of a queue (max number of stored job procedures)                                          *
+ *   prio            : job queue priority                                                                             *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
