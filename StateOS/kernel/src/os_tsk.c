@@ -242,8 +242,7 @@ void tsk_prio( unsigned prio )
 	port_sys_lock();
 
 	Current->basic = prio;
-
-	core_tsk_prio(Current, prio);
+	core_cur_prio(prio);
 
 	port_sys_unlock();
 }

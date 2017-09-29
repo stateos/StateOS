@@ -1,0 +1,12 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+auto led = Led();
+auto job = JobQueueT<1>();
+auto sla = startTask(0, [] { job.wait(); });
+auto tmr = startTimerPeriodic(SEC, [] { job.give([] { led.tick(); }); });
+
+int main()
+{
+	ThisTask::sleep();
+}

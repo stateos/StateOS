@@ -40,6 +40,9 @@ Features:
 - added OS_TMR_UNTIL macro (with tmr_startUntil function) similar to OS_TMR_START macro (with tmr_start function)
 - in non-tick-less mode each task has its own time slice
 - internal system timer handler moved to kernel
+- added internal function core_cur_prio
+- added job queue object
+- added examples for new feature
 ---------
 5.1
 - updated access to the c++ functional library
