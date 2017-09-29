@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    26.09.2017
+    @date    29.09.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -241,6 +241,8 @@ struct __tsk
  *   prio            : initial task priority (any unsigned int value)                                                 *
  *   size            : size of task private stack (in bytes)                                                          *
  *                                                                                                                    *
+ * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent *
+ *                                                                                                                    *
  **********************************************************************************************************************/
 
 #define             OS_WRK_START( tsk, prio, size )                                \
@@ -259,6 +261,8 @@ struct __tsk
  * Parameters                                                                                                         *
  *   tsk             : name of a pointer to task object                                                               *
  *   prio            : initial task priority (any unsigned int value)                                                 *
+ *                                                                                                                    *
+ * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
@@ -349,6 +353,8 @@ struct __tsk
  *   prio            : initial task priority (any unsigned int value)                                                 *
  *   size            : size of task private stack (in bytes)                                                          *
  *                                                                                                                    *
+ * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent *
+ *                                                                                                                    *
  **********************************************************************************************************************/
 
 #define         static_WRK_START( tsk, prio, size )                                \
@@ -367,6 +373,8 @@ struct __tsk
  * Parameters                                                                                                         *
  *   tsk             : name of a pointer to task object                                                               *
  *   prio            : initial task priority (any unsigned int value)                                                 *
+ *                                                                                                                    *
+ * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
