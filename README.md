@@ -24,6 +24,7 @@ Features
 - memory pools
 - message queues
 - mailbox queues
+- job queues
 - timers (one-shot, periodic)
 - cmsis-rtos api
 - cmsis-rtos2 api
