@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    15.09.2017
+    @date    02.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -472,22 +472,24 @@ unsigned box_giveISR( box_t *box, const void *data ) { return box_sendFor(box, d
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Class             : MailBoxQueue                                                                                   *
+ * Class             : baseMailBoxQueue                                                                               *
  *                                                                                                                    *
  * Description       : create and initilize a mailbox queue object                                                    *
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
  *   limit           : size of a queue (max number of stored mails)                                                   *
  *   size            : size of a single mail (in bytes)                                                               *
+ *   data            : mailbox queue data buffer                                                                      *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-template<unsigned _limit, unsigned _size>
-struct MailBoxQueueT : public __box
+struct baseMailBoxQueue : public __box
 {
-	explicit
-	 MailBoxQueueT( void ): __box _BOX_INIT(_limit, _size, _data) {}
-	~MailBoxQueueT( void ) { assert(queue == nullptr); }
+	 explicit
+	 baseMailBoxQueue( const unsigned _limit, const unsigned _size, char * const _data ): __box _BOX_INIT(_limit, _size, _data) {}
+	~baseMailBoxQueue( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                               {        box_kill     (this);                }
 	unsigned waitUntil(       void *_data, uint32_t _time  ) { return box_waitUntil(this, _data, _time);  }
@@ -500,6 +502,25 @@ struct MailBoxQueueT : public __box
 	unsigned send     ( const void *_data )                  { return box_send     (this, _data);         }
 	unsigned give     ( const void *_data )                  { return box_give     (this, _data);         }
 	unsigned giveISR  ( const void *_data )                  { return box_giveISR  (this, _data);         }
+};
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : MailBoxQueue                                                                                   *
+ *                                                                                                                    *
+ * Description       : create and initilize a mailbox queue object                                                    *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   limit           : size of a queue (max number of stored mails)                                                   *
+ *   size            : size of a single mail (in bytes)                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+template<unsigned _limit, unsigned _size>
+struct MailBoxQueueT : public baseMailBoxQueue
+{
+	explicit
+	MailBoxQueueT( void ): baseMailBoxQueue(_limit, _size, _data) {}
 
 	private:
 	char _data[_limit * _size];
@@ -520,16 +541,8 @@ struct MailBoxQueueT : public __box
 template<unsigned _limit, class T>
 struct MailBoxQueueTT : public MailBoxQueueT<_limit, sizeof(T)>
 {
-	unsigned waitUntil( T *_data, uint32_t _time  ) { return box_waitUntil(this, _data, _time);  }
-	unsigned waitFor  ( T *_data, uint32_t _delay ) { return box_waitFor  (this, _data, _delay); }
-	unsigned wait     ( T *_data )                  { return box_wait     (this, _data);         }
-	unsigned take     ( T *_data )                  { return box_take     (this, _data);         }
-	unsigned takeISR  ( T *_data )                  { return box_takeISR  (this, _data);         }
-	unsigned sendUntil( T *_data, uint32_t _time  ) { return box_sendUntil(this, _data, _time);  }
-	unsigned sendFor  ( T *_data, uint32_t _delay ) { return box_sendFor  (this, _data, _delay); }
-	unsigned send     ( T *_data )                  { return box_send     (this, _data);         }
-	unsigned give     ( T *_data )                  { return box_give     (this, _data);         }
-	unsigned giveISR  ( T *_data )                  { return box_giveISR  (this, _data);         }
+	explicit
+	MailBoxQueueTT( void ): MailBoxQueueT<_limit, sizeof(T)>() {}
 };
 
 #endif
