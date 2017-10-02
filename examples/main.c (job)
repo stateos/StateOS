@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-OS_JOB(job, 1, 0);
+OS_JOB(job, 1);
 
 void tick()
 {
