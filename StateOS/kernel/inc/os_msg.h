@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    25.09.2017
+    @date    02.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -464,21 +464,23 @@ unsigned msg_giveISR( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data
 
 /**********************************************************************************************************************
  *                                                                                                                    *
- * Class             : MessageQueue                                                                                   *
+ * Class             : baseMessageQueue                                                                               *
  *                                                                                                                    *
  * Description       : create and initilize a message queue object                                                    *
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
  *   limit           : size of a queue (max number of stored messages)                                                *
+ *   data            : message queue data buffer                                                                      *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-template<unsigned _limit>
-struct MessageQueueT : public __msg
+struct baseMessageQueue : public __msg
 {
-	explicit
-	 MessageQueueT( void ): __msg _MSG_INIT(_limit, _data) {}
-	~MessageQueueT( void ) { assert(queue == nullptr); }
+	 explicit
+	 baseMessageQueue( const unsigned _limit, unsigned * const _data ): __msg _MSG_INIT(_limit, _data) {}
+	~baseMessageQueue( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                            {        msg_kill     (this);                }
 	unsigned waitUntil( unsigned*_data, uint32_t _time  ) { return msg_waitUntil(this, _data, _time);  }
@@ -491,6 +493,24 @@ struct MessageQueueT : public __msg
 	unsigned send     ( unsigned _data )                  { return msg_send     (this, _data);         }
 	unsigned give     ( unsigned _data )                  { return msg_give     (this, _data);         }
 	unsigned giveISR  ( unsigned _data )                  { return msg_giveISR  (this, _data);         }
+};
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Class             : MessageQueue                                                                                   *
+ *                                                                                                                    *
+ * Description       : create and initilize a message queue object                                                    *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   limit           : size of a queue (max number of stored messages)                                                *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+template<unsigned _limit>
+struct MessageQueueT : public baseMessageQueue
+{
+	explicit
+	MessageQueueT( void ): baseMessageQueue(_limit, _data) {}
 
 	private:
 	unsigned _data[_limit];
