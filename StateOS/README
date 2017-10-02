@@ -43,6 +43,7 @@ Features:
 - added internal function core_cur_prio
 - added job queue object
 - added examples for new feature
+- changed internal implementation of some objects
 ---------
 5.1
 - updated access to the c++ functional library
