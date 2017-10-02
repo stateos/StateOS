@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.h
     @author  Rajmund Szymanski
-    @date    29.09.2017
+    @date    02.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 #ifndef __STATEOS_JOB_H
 #define __STATEOS_JOB_H
 
-#include <oskernel.h>
+#include "os_box.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,19 +41,7 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __job job_t, * const job_id;
-
-struct __job
-{
-	tsk_t  * queue; // inherited from semaphore
-	unsigned count; // inherited from semaphore
-	unsigned limit; // inherited from semaphore
-
-	unsigned first; // first element to read from queue
-	unsigned next;  // next element to write into queue
-	fun_t ** data;  // job queue data
-	unsigned prio;  // job queue priority
-};
+typedef struct __box job_t, * const job_id;
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -64,7 +52,6 @@ struct __job
  * Parameters                                                                                                         *
  *   limit           : size of a queue (max number of stored job procedures)                                          *
  *   data            : job queue data buffer                                                                          *
- *   prio            : job queue priority                                                                             *
  *                                                                                                                    *
  * Return            : job queue object                                                                               *
  *                                                                                                                    *
@@ -72,7 +59,8 @@ struct __job
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _JOB_INIT( _limit, _data, _prio ) { 0, 0, _limit, 0, 0, _data, _prio }
+#define               _JOB_INIT( _limit, _data ) \
+                      _BOX_INIT( _limit, sizeof(fun_t *), (char *)_data )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -102,13 +90,12 @@ struct __job
  * Parameters                                                                                                         *
  *   job             : name of a pointer to job queue object                                                          *
  *   limit           : size of a queue (max number of stored job procedures)                                          *
- *   prio            : job queue priority                                                                             *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define             OS_JOB( job, limit, prio )                                \
-                       fun_t*job##__buf[limit];                                \
-                       job_t job##__job = _JOB_INIT( limit, job##__buf, prio ); \
+#define             OS_JOB( job, limit )                                 \
+                       fun_t *job##__buf[limit];                          \
+                       job_t  job##__job = _JOB_INIT( limit, job##__buf ); \
                        job_id job = & job##__job
 
 /**********************************************************************************************************************
@@ -120,13 +107,12 @@ struct __job
  * Parameters                                                                                                         *
  *   job             : name of a pointer to job queue object                                                          *
  *   limit           : size of a queue (max number of stored job procedures)                                          *
- *   prio            : job queue priority                                                                             *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_JOB( job, limit, prio )                                \
-                static fun_t*job##__buf[limit];                                \
-                static job_t job##__job = _JOB_INIT( limit, job##__buf, prio ); \
+#define         static_JOB( job, limit )                                \
+                static fun_t*job##__buf[limit];                          \
+                static job_t job##__job = _JOB_INIT( limit, job##__buf ); \
                 static job_id job = & job##__job
 
 /**********************************************************************************************************************
@@ -137,7 +123,6 @@ struct __job
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   limit           : size of a queue (max number of stored job procedures)                                          *
- *   prio            : job queue priority                                                                             *
  *                                                                                                                    *
  * Return            : job queue object                                                                               *
  *                                                                                                                    *
@@ -146,8 +131,8 @@ struct __job
  **********************************************************************************************************************/
 
 #ifndef __cplusplus
-#define                JOB_INIT( limit, prio ) \
-                      _JOB_INIT( limit, _JOB_DATA( limit ), prio )
+#define                JOB_INIT( limit ) \
+                      _JOB_INIT( limit, _JOB_DATA( limit ) )
 #endif
 
 /**********************************************************************************************************************
@@ -159,7 +144,6 @@ struct __job
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   limit           : size of a queue (max number of stored job procedures)                                          *
- *   prio            : job queue priority                                                                             *
  *                                                                                                                    *
  * Return            : pointer to job queue object                                                                    *
  *                                                                                                                    *
@@ -168,8 +152,8 @@ struct __job
  **********************************************************************************************************************/
 
 #ifndef __cplusplus
-#define                JOB_CREATE( limit, prio ) \
-             & (job_t) JOB_INIT  ( limit, prio )
+#define                JOB_CREATE( limit ) \
+             & (job_t) JOB_INIT  ( limit )
 #define                JOB_NEW \
                        JOB_CREATE
 #endif
@@ -184,7 +168,6 @@ struct __job
  *   job             : pointer to job queue object                                                                    *
  *   limit           : size of a queue (max number of stored job procedures)                                          *
  *   data            : job queue data buffer                                                                          *
- *   prio            : job queue priority                                                                             *
  *                                                                                                                    *
  * Return            : none                                                                                           *
  *                                                                                                                    *
@@ -192,7 +175,8 @@ struct __job
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-void job_init( job_t *job, unsigned limit, fun_t **data, unsigned prio );
+__STATIC_INLINE
+void job_init( job_t *job, unsigned limit, fun_t **data ) { box_init(job, limit, sizeof(fun_t *), data); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -203,7 +187,6 @@ void job_init( job_t *job, unsigned limit, fun_t **data, unsigned prio );
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   limit           : size of a queue (max number of stored job procedures)                                          *
- *   prio            : job queue priority                                                                             *
  *                                                                                                                    *
  * Return            : pointer to job queue object (job queue successfully created)                                   *
  *   0               : job queue not created (not enough free memory)                                                 *
@@ -212,9 +195,10 @@ void job_init( job_t *job, unsigned limit, fun_t **data, unsigned prio );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-job_t *job_create( unsigned limit, unsigned prio );
 __STATIC_INLINE
-job_t *job_new   ( unsigned limit, unsigned prio ) { return job_create(limit, prio); }
+job_t *job_create( unsigned limit ) { return box_create(limit, sizeof(fun_t *)); }
+__STATIC_INLINE
+job_t *job_new   ( unsigned limit ) { return box_create(limit, sizeof(fun_t *)); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -231,7 +215,8 @@ job_t *job_new   ( unsigned limit, unsigned prio ) { return job_create(limit, pr
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-void job_kill( job_t *job );
+__STATIC_INLINE
+void job_kill( job_t *job ) { box_kill(job); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -253,7 +238,8 @@ void job_kill( job_t *job );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned job_waitUntil( job_t *job, uint32_t time );
+__STATIC_INLINE
+unsigned job_waitUntil( job_t *job, uint32_t time ) { fun_t *fun; unsigned event = box_waitUntil(job, &fun, time); if (event == E_SUCCESS) fun(); return event; }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -277,7 +263,8 @@ unsigned job_waitUntil( job_t *job, uint32_t time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned job_waitFor( job_t *job, uint32_t delay );
+__STATIC_INLINE
+unsigned job_waitFor( job_t *job, uint32_t delay ) { fun_t *fun; unsigned event = box_waitFor(job, &fun, delay); if (event == E_SUCCESS) fun(); return event; }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -330,7 +317,7 @@ unsigned job_take( job_t *job ) { return job_waitFor(job, IMMEDIATE); }
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   job             : pointer to job queue object                                                                    *
- *   proc            : pointer to job procedure                                                                       *
+ *   fun             : pointer to job procedure                                                                       *
  *   time            : timepoint value                                                                                *
  *                                                                                                                    *
  * Return                                                                                                             *
@@ -342,7 +329,8 @@ unsigned job_take( job_t *job ) { return job_waitFor(job, IMMEDIATE); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned job_sendUntil( job_t *job, fun_t *proc, uint32_t time );
+__STATIC_INLINE
+unsigned job_sendUntil( job_t *job, fun_t *fun, uint32_t time ) { unsigned event = box_sendUntil(job, &fun, time); return event; }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -353,7 +341,7 @@ unsigned job_sendUntil( job_t *job, fun_t *proc, uint32_t time );
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   job             : pointer to job queue object                                                                    *
- *   proc            : pointer to job procedure                                                                       *
+ *   fun             : pointer to job procedure                                                                       *
  *   delay           : duration of time (maximum number of ticks to wait while the job queue object is full)          *
  *                     IMMEDIATE: don't wait if the job queue object is full                                          *
  *                     INFINITE:  wait indefinitly while the job queue object is full                                 *
@@ -367,7 +355,8 @@ unsigned job_sendUntil( job_t *job, fun_t *proc, uint32_t time );
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-unsigned job_sendFor( job_t *job, fun_t *proc, uint32_t delay );
+__STATIC_INLINE
+unsigned job_sendFor( job_t *job, fun_t *fun, uint32_t delay ) { unsigned event = box_sendFor(job, &fun, delay); return event; }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -378,7 +367,7 @@ unsigned job_sendFor( job_t *job, fun_t *proc, uint32_t delay );
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   job             : pointer to job queue object                                                                    *
- *   proc            : pointer to job procedure                                                                       *
+ *   fun             : pointer to job procedure                                                                       *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : job data was successfully transfered to the job queue object                                   *
@@ -389,7 +378,7 @@ unsigned job_sendFor( job_t *job, fun_t *proc, uint32_t delay );
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-unsigned job_send( job_t *job, fun_t *proc ) { return job_sendFor(job, proc, INFINITE); }
+unsigned job_send( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, INFINITE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -400,7 +389,7 @@ unsigned job_send( job_t *job, fun_t *proc ) { return job_sendFor(job, proc, INF
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   job             : pointer to job queue object                                                                    *
- *   proc            : pointer to job procedure                                                                       *
+ *   fun             : pointer to job procedure                                                                       *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : job data was successfully transfered to the job queue object                                   *
@@ -411,7 +400,7 @@ unsigned job_send( job_t *job, fun_t *proc ) { return job_sendFor(job, proc, INF
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-unsigned job_give( job_t *job, fun_t *proc ) { return job_sendFor(job, proc, IMMEDIATE); }
+unsigned job_give( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, IMMEDIATE); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -422,7 +411,7 @@ unsigned job_give( job_t *job, fun_t *proc ) { return job_sendFor(job, proc, IMM
  *                                                                                                                    *
  * Parameters                                                                                                         *
  *   job             : pointer to job queue object                                                                    *
- *   proc            : pointer to job procedure                                                                       *
+ *   fun             : pointer to job procedure                                                                       *
  *                                                                                                                    *
  * Return                                                                                                             *
  *   E_SUCCESS       : job data was successfully transfered to the job queue object                                   *
@@ -433,7 +422,7 @@ unsigned job_give( job_t *job, fun_t *proc ) { return job_sendFor(job, proc, IMM
  **********************************************************************************************************************/
 
 __STATIC_INLINE
-unsigned job_giveISR( job_t *job, fun_t *proc ) { return job_sendFor(job, proc, IMMEDIATE); }
+unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, IMMEDIATE); }
 
 #ifdef __cplusplus
 }
@@ -445,36 +434,55 @@ unsigned job_giveISR( job_t *job, fun_t *proc ) { return job_sendFor(job, proc, 
 
 /**********************************************************************************************************************
  *                                                                                                                    *
+ * Class             : baseJobQueue                                                                                   *
+ *                                                                                                                    *
+ * Description       : create and initilize a job queue object                                                        *
+ *                                                                                                                    *
+ * Constructor parameters                                                                                             *
+ *   limit           : size of a queue (max number of stored job procedures)                                          *
+ *   data            : job queue data buffer                                                                          *
+ *                                                                                                                    *
+ * Note              : for internal use                                                                               *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+struct baseJobQueue : public __box
+{
+	 explicit
+	 baseJobQueue( const unsigned _limit, FUN_t * const _data ): __box _BOX_INIT( _limit, sizeof(FUN_t), reinterpret_cast<char *>(_data) ) {}
+	~baseJobQueue( void ) { assert(queue == nullptr); }
+
+	void     kill     ( void )                        {                              box_kill     (this);                                                              }
+	unsigned waitUntil( uint32_t _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
+	unsigned waitFor  ( uint32_t _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
+	unsigned wait     ( void )                        { FUN_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned take     ( void )                        { FUN_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned sendUntil( FUN_t _fun, uint32_t _time )  {             unsigned event = box_sendUntil(this, &_fun, _time);                                  return event; }
+	unsigned sendFor  ( FUN_t _fun, uint32_t _delay ) {             unsigned event = box_sendFor  (this, &_fun, _delay);                                 return event; }
+	unsigned send     ( FUN_t _fun )                  {             unsigned event = box_send     (this, &_fun);                                         return event; }
+	unsigned give     ( FUN_t _fun )                  {             unsigned event = box_give     (this, &_fun);                                         return event; }
+	unsigned giveISR  ( FUN_t _fun )                  {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
+};
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
  * Class             : JobQueue                                                                                       *
  *                                                                                                                    *
  * Description       : create and initilize a job queue object                                                        *
  *                                                                                                                    *
  * Constructor parameters                                                                                             *
  *   limit           : size of a queue (max number of stored job procedures)                                          *
- *   prio            : job queue priority                                                                             *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
 template<unsigned _limit>
-struct JobQueueT : public __job
+struct JobQueueT : public baseJobQueue
 {
-	 explicit
-	 JobQueueT( unsigned _prio = 0 ): __job _JOB_INIT(_limit, _data, _prio) {}
-	~JobQueueT( void ) { assert(queue == nullptr); }
-
-	void     kill     ( void )                          {        job_kill     (this);                }
-	unsigned waitUntil( uint32_t _time  )               { return job_waitUntil(this, _time);         }
-	unsigned waitFor  ( uint32_t _delay )               { return job_waitFor  (this, _delay);        }
-	unsigned wait     ( void )                          { return job_wait     (this);                }
-	unsigned take     ( void )                          { return job_take     (this);                }
-	unsigned sendUntil( fun_t *_proc, uint32_t _time  ) { return job_sendUntil(this, _proc, _time);  }
-	unsigned sendFor  ( fun_t *_proc, uint32_t _delay ) { return job_sendFor  (this, _proc, _delay); }
-	unsigned send     ( fun_t *_proc )                  { return job_send     (this, _proc);         }
-	unsigned give     ( fun_t *_proc )                  { return job_give     (this, _proc);         }
-	unsigned giveISR  ( fun_t *_proc )                  { return job_giveISR  (this, _proc);         }
+	explicit
+	JobQueueT( void ): baseJobQueue(_limit, _data) {}
 
 	private:
-	fun_t *_data[_limit];
+	FUN_t _data[_limit];
 };
 
 #endif
