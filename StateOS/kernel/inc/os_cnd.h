@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    15.09.2017
+    @date    02.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -327,7 +327,7 @@ void cnd_giveISR( cnd_t *cnd, bool all ) { cnd_give(cnd, all); }
 
 struct ConditionVariable : public __cnd
 {
-	explicit
+	 explicit
 	 ConditionVariable( void ): __cnd _CND_INIT() {}
 	~ConditionVariable( void ) { assert(queue == nullptr); }
 

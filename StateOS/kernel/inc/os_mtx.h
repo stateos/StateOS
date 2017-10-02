@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    15.09.2017
+    @date    02.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -322,7 +322,7 @@ unsigned mtx_give( mtx_t *mtx );
 
 struct Mutex : public __mtx
 {
-	explicit
+	 explicit
 	 Mutex( void ): __mtx _MTX_INIT() {}
 	~Mutex( void ) { assert(owner == nullptr); }
 

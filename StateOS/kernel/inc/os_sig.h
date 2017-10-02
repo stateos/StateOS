@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    15.09.2017
+    @date    02.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -416,7 +416,7 @@ void sig_clearISR( sig_t *sig ) { sig_clear(sig); }
 
 struct Signal : public __sig
 {
-	explicit
+	 explicit
 	 Signal( const unsigned _type = sigClear ): __sig _SIG_INIT(_type) {}
 	~Signal( void ) { assert(queue == nullptr); }
 

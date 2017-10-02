@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    15.09.2017
+    @date    02.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -362,7 +362,7 @@ void lst_giveISR( lst_t *lst, void *data ) { lst_give(lst, data); }
 
 struct List : public __lst
 {
-	explicit
+	 explicit
 	 List( void ): __lst _LST_INIT() {}
 	~List( void ) { assert(queue == nullptr); }
 

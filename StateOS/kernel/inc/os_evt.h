@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    15.09.2017
+    @date    02.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -311,7 +311,7 @@ void evt_giveISR( evt_t *evt, unsigned event ) { evt_give(evt, event); }
 
 struct Event : public __evt
 {
-	explicit
+	 explicit
 	 Event( void ): __evt _EVT_INIT() {}
 	~Event( void ) { assert(queue == nullptr); }
 

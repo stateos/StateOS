@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    15.09.2017
+    @date    02.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -321,7 +321,7 @@ unsigned mut_give( mut_t *mut );
 
 struct FastMutex : public __mut
 {
-	explicit
+	 explicit
 	 FastMutex( void ): __mut _MUT_INIT() {}
 	~FastMutex( void ) { assert(owner == nullptr); }
 

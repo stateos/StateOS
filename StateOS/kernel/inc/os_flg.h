@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    15.09.2017
+    @date    02.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -437,7 +437,7 @@ unsigned flg_clearISR( flg_t *flg, unsigned flags ) { return flg_clear(flg, flag
 
 struct Flag : public __flg
 {
-	explicit
+	 explicit
 	 Flag( void ): __flg _FLG_INIT() {}
 	~Flag( void ) { assert(queue == nullptr); }
 
