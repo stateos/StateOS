@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    29.09.2017
+    @date    03.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -26,7 +26,8 @@
 
  ******************************************************************************/
 
-#include <os.h>
+#include "inc/os_mem.h"
+#include "inc/os_tsk.h"
 
 /* -------------------------------------------------------------------------- */
 void mem_bind( mem_t *mem )

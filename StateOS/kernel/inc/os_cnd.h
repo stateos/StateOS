@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    02.10.2017
+    @date    03.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,8 @@
 #ifndef __STATEOS_CND_H
 #define __STATEOS_CND_H
 
-#include <oskernel.h>
+#include "oskernel.h"
+#include "os_mtx.h"
 
 #ifdef __cplusplus
 extern "C" {

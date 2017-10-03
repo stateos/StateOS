@@ -44,6 +44,7 @@ Features:
 - added job queue object
 - added examples for new feature
 - changed internal implementation of some objects
+- updated inclusion of header files
 ---------
 5.1
 - updated access to the c++ functional library

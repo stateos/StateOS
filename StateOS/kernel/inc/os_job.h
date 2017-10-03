@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.h
     @author  Rajmund Szymanski
-    @date    02.10.2017
+    @date    03.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -29,6 +29,7 @@
 #ifndef __STATEOS_JOB_H
 #define __STATEOS_JOB_H
 
+#include "oskernel.h"
 #include "os_box.h"
 
 #ifdef __cplusplus

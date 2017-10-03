@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    01.09.2017
+    @date    03.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -26,7 +26,7 @@
 
  ******************************************************************************/
 
-#include <os.h>
+#include "inc/os_sem.h"
 
 /* -------------------------------------------------------------------------- */
 void sem_init( sem_t *sem, unsigned init, unsigned limit )

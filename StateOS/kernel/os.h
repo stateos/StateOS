@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    02.10.2017
+    @date    03.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,6 @@
 #ifndef __STATEOS_H
 #define __STATEOS_H
 
-#include <string.h>
 #include "oskernel.h"
 #include "inc/os_sig.h" // signal
 #include "inc/os_evt.h" // event
