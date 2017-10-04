@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    04.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -200,7 +200,7 @@ uint32_t sys_time( void );
  **********************************************************************************************************************/
 
 #define                stk_assert() \
-                       assert((Current == &MAIN) || (port_get_sp() >= (void *)Current->stack))
+                       assert((Current == &MAIN) || (port_get_sp() >= Current->stack))
 
 #ifdef __cplusplus
 }
