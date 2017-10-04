@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 
 language: c++
 
@@ -16,3 +16,5 @@ before_install:
 before_script: arm-none-eabi-gcc --version
 
 script: make all GNUCC=arm-none-eabi- -f makefile.gnucc
+
+group: stable
