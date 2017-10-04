@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    04.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1019,11 +1019,11 @@ struct baseTask : public __tsk
 {
 #if OS_FUNCTIONAL
 	 explicit
-	 baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, unsigned _size ): __tsk _TSK_INIT(_prio, _run, _stack, _size), _fun(_state) {}
+	 baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, _run, _stack, _size), _fun(_state) {}
 	~baseTask( void ) { assert(__tsk::obj.id == ID_STOPPED); }
 #else
 	 explicit
-	 baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, unsigned _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
+	 baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 	~baseTask( void ) { assert(__tsk::obj.id == ID_STOPPED); }
 #endif
 
