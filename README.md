@@ -8,6 +8,8 @@ Procedure executed by the task (task state) doesn't have to be noreturn-type.
 It will be executed into an infinite loop.
 There's a dedicated function for immediate change the task state.
 
+[![Build Status](https://travis-ci.org/stateos/StateOS.svg)](https://travis-ci.org/stateos/StateOS)
+
 Features
 --------
 
