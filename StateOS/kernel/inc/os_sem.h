@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    05.10.2017
+    @date    03.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -482,17 +482,17 @@ unsigned sem_giveISR( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
 
 struct Semaphore : public __sem
 {
-	 explicit
+	explicit
 	 Semaphore( const unsigned _init, const unsigned _limit = semCounting ): __sem _SEM_INIT(_init, _limit) {}
 	~Semaphore( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        sem_kill     (this);         }
-	unsigned waitUntil( uint32_t _time )  { return sem_waitUntil(this, _time);  }
+	unsigned waitUntil( uint32_t _time  ) { return sem_waitUntil(this, _time);  }
 	unsigned waitFor  ( uint32_t _delay ) { return sem_waitFor  (this, _delay); }
 	unsigned wait     ( void )            { return sem_wait     (this);         }
 	unsigned take     ( void )            { return sem_take     (this);         }
 	unsigned takeISR  ( void )            { return sem_takeISR  (this);         }
-	unsigned sendUntil( uint32_t _time )  { return sem_sendUntil(this, _time);  }
+	unsigned sendUntil( uint32_t _time  ) { return sem_sendUntil(this, _time);  }
 	unsigned sendFor  ( uint32_t _delay ) { return sem_sendFor  (this, _delay); }
 	unsigned send     ( void )            { return sem_send     (this);         }
 	unsigned give     ( void )            { return sem_give     (this);         }
@@ -512,8 +512,9 @@ struct Semaphore : public __sem
 
 struct BinarySemaphore : public Semaphore
 {
-	explicit
-	BinarySemaphore( const unsigned _init = 0 ): Semaphore(_init, semBinary) {}
+	 explicit
+	 BinarySemaphore( const unsigned _init = 0 ): Semaphore(_init, semBinary) {}
+	~BinarySemaphore( void ) { assert(queue == nullptr); }
 };
 
 #endif
