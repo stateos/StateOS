@@ -41,7 +41,7 @@ void PendSV_Handler( void )
 
 "	mrs   r0,    PSP               \n"
 "	mov   r3,    lr                \n"
-"	lsls  r3,  # 29                \n"
+"	lsl   r3,  # 29                \n"
 "	bmi   priv_ctx_enter           \n"
 "	mov   r0,    sp                \n"
 "	sub   sp,  # 36                \n"
@@ -74,7 +74,7 @@ void PendSV_Handler( void )
 
 #endif//__CORTEX_M
 
-"	bl  %[core_tsk_handler]        \n"
+"	bl    core_tsk_handler         \n"
 
 #if __CORTEX_M < 3
 
@@ -89,7 +89,7 @@ void PendSV_Handler( void )
 "	ldm   r0!, { r4  - r7 }        \n"
 "	add   r0,  # 20                \n"
 "	mov   r3,    lr                \n"
-"	lsls  r3,  # 29                \n"
+"	lsl   r3,  # 29                \n"
 "	bmi   priv_ctx_exit            \n"
 "	mov   sp,    r0                \n"
 "	bx    lr                       \n"
@@ -113,8 +113,7 @@ void PendSV_Handler( void )
 
 #endif//__CORTEX_M
 
-::	[core_tsk_handler] "i" (core_tsk_handler)
-:	"memory"
+:::	"memory"
 	);
 }
 
@@ -126,10 +125,9 @@ void core_tsk_flip( void *sp )
 	__asm volatile
 	(
 "	mov   sp,  %[sp]               \n"
-"	bl  %[core_tsk_loop]           \n"
+"	bl    core_tsk_loop            \n"
 	
-::	[sp] "r" (sp),
-	[core_tsk_loop] "i" (core_tsk_loop)
+::	[sp] "r" (sp)
 :	"memory"
 	);
 }
