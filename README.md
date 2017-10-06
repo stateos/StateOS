@@ -1,4 +1,4 @@
-StateOS
+StateOS [![Build Status](https://travis-ci.org/stateos/StateOS.svg)](https://travis-ci.org/stateos/StateOS)
 =======
 
 Free, extremely simple, amazingly tiny and very fast real-time operating system (RTOS) designed for deeply embedded applications.
@@ -7,8 +7,6 @@ It was inspired by the concept of a state machine.
 Procedure executed by the task (task state) doesn't have to be noreturn-type.
 It will be executed into an infinite loop.
 There's a dedicated function for immediate change the task state.
-
-[![Build Status](https://travis-ci.org/stateos/StateOS.svg)](https://travis-ci.org/stateos/StateOS)
 
 Features
 --------
