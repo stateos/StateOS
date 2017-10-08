@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    08.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -88,12 +88,12 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, uint32_t time
 
 	port_sys_lock();
 
-	cur->mode  = mode;
-	cur->flags = flags;
-	if ((mode & flgIgnore)  == 0) cur->flags &= ~flg->flags;
+	cur->tmp.mode  = mode;
+	cur->evt.flags = flags;
+	if ((mode & flgIgnore)  == 0) cur->evt.flags &= ~flg->flags;
 	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
 
-	if (cur->flags && ((mode & flgAll) || (cur->flags == flags)))
+	if (cur->evt.flags && ((mode & flgAll) || (cur->evt.flags == flags)))
 		event = wait(flg, time);
 
 	port_sys_unlock();
@@ -133,12 +133,12 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 
 	for (tsk = flg->queue; tsk; tsk = tsk->obj.queue)
 	{
-		if (tsk->flags & flags)
+		if (tsk->evt.flags & flags)
 		{
-			if ((tsk->mode & flgProtect) == 0)
-			flg->flags &= ~tsk->flags;
-			tsk->flags &= ~flags;
-			if (tsk->flags && (tsk->mode & flgAll)) continue;
+			if ((tsk->tmp.mode & flgProtect) == 0)
+			flg->flags &= ~tsk->evt.flags;
+			tsk->evt.flags &= ~flags;
+			if (tsk->evt.flags && (tsk->tmp.mode & flgAll)) continue;
 			core_one_wakeup(tsk = tsk->back, E_SUCCESS);
 		}
 	}

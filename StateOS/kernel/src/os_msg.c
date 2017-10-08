@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    08.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -122,7 +122,7 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, uint32_t time, unsigned(*wai
 
 	if (msg->count == 0)
 	{
-		Current->data = data;
+		Current->tmp.data = data;
 
 		event = wait(msg, time);
 	}
@@ -132,7 +132,7 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, uint32_t time, unsigned(*wai
 
 		tsk = core_one_wakeup(msg, E_SUCCESS);
 
-		if (tsk) priv_msg_put(msg, tsk->msg);
+		if (tsk) priv_msg_put(msg, tsk->tmp.msg);
 	}
 
 	port_sys_unlock();
@@ -172,7 +172,7 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, uint32_t time, unsigned(*wait
 
 	if (msg->count >= msg->limit)
 	{
-		Current->msg = data;
+		Current->tmp.msg = data;
 
 		event = wait(msg, time);
 	}
@@ -182,7 +182,7 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, uint32_t time, unsigned(*wait
 
 		tsk = core_one_wakeup(msg, E_SUCCESS);
 
-		if (tsk) priv_msg_get(msg, tsk->data);
+		if (tsk) priv_msg_get(msg, tsk->tmp.data);
 	}
 
 	port_sys_unlock();

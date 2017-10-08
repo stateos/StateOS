@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    04.10.2017
+    @date    08.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -43,11 +43,6 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#ifdef __CC_ARM
-#pragma push
-#pragma anon_unions
-#endif
-
 struct __tsk
 {
 	obj_t    obj;   // object header
@@ -74,20 +69,15 @@ struct __tsk
 	unsigned mode;  // used by flag object
 	void   * data;  // used by queue objects
 	unsigned msg;   // used by message queue object
-	fun_t  * fun;   // used by job queue object
-	};
+	}        tmp;
 	union  {
 	unsigned flags; // used by flag object: all flags to wait
 	unsigned event; // wakeup event
-	};
+	}        evt;
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 	char     libspace[96];
 #endif
 };
-
-#ifdef __CC_ARM
-#pragma pop
-#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
