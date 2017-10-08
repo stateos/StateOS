@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    08.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,18 @@ extern "C" {
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-typedef struct __box job_t, * const job_id;
+typedef struct __job job_t, * const job_id;
+
+struct __job
+{
+	tsk_t  * queue; // inherited from semaphore
+	unsigned count; // inherited from semaphore
+	unsigned limit; // inherited from semaphore
+
+	unsigned first; // first element to read from queue
+	unsigned next;  // next element to write into queue
+	fun_t ** data;  // job queue data
+};
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -60,8 +71,7 @@ typedef struct __box job_t, * const job_id;
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _JOB_INIT( _limit, _data ) \
-                      _BOX_INIT( _limit, sizeof(fun_t *), (char *)_data )
+#define               _JOB_INIT( _limit, _data ) { 0, 0, _limit, 0, 0, _data }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -111,9 +121,9 @@ typedef struct __box job_t, * const job_id;
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define         static_JOB( job, limit )                                \
-                static fun_t*job##__buf[limit];                          \
-                static job_t job##__job = _JOB_INIT( limit, job##__buf ); \
+#define         static_JOB( job, limit )                                 \
+                static fun_t *job##__buf[limit];                          \
+                static job_t  job##__job = _JOB_INIT( limit, job##__buf ); \
                 static job_id job = & job##__job
 
 /**********************************************************************************************************************
@@ -176,8 +186,7 @@ typedef struct __box job_t, * const job_id;
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-__STATIC_INLINE
-void job_init( job_t *job, unsigned limit, fun_t **data ) { box_init(job, limit, sizeof(fun_t *), data); }
+void job_init( job_t *job, unsigned limit, fun_t **data );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -196,10 +205,9 @@ void job_init( job_t *job, unsigned limit, fun_t **data ) { box_init(job, limit,
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+job_t *job_create( unsigned limit );
 __STATIC_INLINE
-job_t *job_create( unsigned limit ) { return box_create(limit, sizeof(fun_t *)); }
-__STATIC_INLINE
-job_t *job_new   ( unsigned limit ) { return box_create(limit, sizeof(fun_t *)); }
+job_t *job_new   ( unsigned limit ) { return job_create(limit); }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -216,8 +224,7 @@ job_t *job_new   ( unsigned limit ) { return box_create(limit, sizeof(fun_t *));
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-__STATIC_INLINE
-void job_kill( job_t *job ) { box_kill(job); }
+void job_kill( job_t *job );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -239,8 +246,7 @@ void job_kill( job_t *job ) { box_kill(job); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-__STATIC_INLINE
-unsigned job_waitUntil( job_t *job, uint32_t time ) { fun_t *fun; unsigned event = box_waitUntil(job, &fun, time); if (event == E_SUCCESS) fun(); return event; }
+unsigned job_waitUntil( job_t *job, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -264,8 +270,7 @@ unsigned job_waitUntil( job_t *job, uint32_t time ) { fun_t *fun; unsigned event
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-__STATIC_INLINE
-unsigned job_waitFor( job_t *job, uint32_t delay ) { fun_t *fun; unsigned event = box_waitFor(job, &fun, delay); if (event == E_SUCCESS) fun(); return event; }
+unsigned job_waitFor( job_t *job, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -330,8 +335,7 @@ unsigned job_take( job_t *job ) { return job_waitFor(job, IMMEDIATE); }
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-__STATIC_INLINE
-unsigned job_sendUntil( job_t *job, fun_t *fun, uint32_t time ) { unsigned event = box_sendUntil(job, &fun, time); return event; }
+unsigned job_sendUntil( job_t *job, fun_t *fun, uint32_t time );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -356,8 +360,7 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, uint32_t time ) { unsigned event
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-__STATIC_INLINE
-unsigned job_sendFor( job_t *job, fun_t *fun, uint32_t delay ) { unsigned event = box_sendFor(job, &fun, delay); return event; }
+unsigned job_sendFor( job_t *job, fun_t *fun, uint32_t delay );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

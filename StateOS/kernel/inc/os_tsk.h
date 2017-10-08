@@ -69,6 +69,7 @@ struct __tsk
 	unsigned mode;  // used by flag object
 	void   * data;  // used by queue objects
 	unsigned msg;   // used by message queue object
+	fun_t  * fun;   // used by job queue object
 	}        tmp;
 	union  {
 	unsigned flags; // used by flag object: all flags to wait
