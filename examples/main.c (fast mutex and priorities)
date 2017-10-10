@@ -12,6 +12,8 @@ void master()
 	for (;;); // BREAKPOINT: 1 (priority inheritance mutex)
 }
 
+OS_TSK(mas, 2, master);
+
 void slave()
 {
 	tsk_start(mas);
@@ -20,7 +22,6 @@ void slave()
 	for (;;); // BREAKPOINT: 2 (fast mutex)
 }
 
-OS_TSK(mas, 2, master);
 OS_TSK(sla, 1, slave);
 
 int main()
