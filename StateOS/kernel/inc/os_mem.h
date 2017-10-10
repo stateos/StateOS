@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    10.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -481,6 +481,12 @@ struct MemoryPoolTT : public MemoryPoolT<_limit, sizeof(T)>
 {
 	explicit
 	MemoryPoolTT( void ): MemoryPoolT<_limit, sizeof(T)>() {}
+
+	unsigned waitUntil( T **_data, uint32_t _time )  { return mem_waitUntil(this, _data, _time);  }
+	unsigned waitFor  ( T **_data, uint32_t _delay ) { return mem_waitFor  (this, _data, _delay); }
+	unsigned wait     ( T **_data )                  { return mem_wait     (this, _data);         }
+	unsigned take     ( T **_data )                  { return mem_take     (this, _data);         }
+	unsigned takeISR  ( T **_data )                  { return mem_takeISR  (this, _data);         }
 };
 
 #endif
