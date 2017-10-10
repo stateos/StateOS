@@ -482,11 +482,11 @@ struct MemoryPoolTT : public MemoryPoolT<_limit, sizeof(T)>
 	explicit
 	MemoryPoolTT( void ): MemoryPoolT<_limit, sizeof(T)>() {}
 
-	unsigned waitUntil( T **_data, uint32_t _time )  { return mem_waitUntil(this, _data, _time);  }
-	unsigned waitFor  ( T **_data, uint32_t _delay ) { return mem_waitFor  (this, _data, _delay); }
-	unsigned wait     ( T **_data )                  { return mem_wait     (this, _data);         }
-	unsigned take     ( T **_data )                  { return mem_take     (this, _data);         }
-	unsigned takeISR  ( T **_data )                  { return mem_takeISR  (this, _data);         }
+	unsigned waitUntil( T **_data, uint32_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
+	unsigned waitFor  ( T **_data, uint32_t _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), _delay); }
+	unsigned wait     ( T **_data )                  { return mem_wait     (this, reinterpret_cast<void **>(_data));         }
+	unsigned take     ( T **_data )                  { return mem_take     (this, reinterpret_cast<void **>(_data));         }
+	unsigned takeISR  ( T **_data )                  { return mem_takeISR  (this, reinterpret_cast<void **>(_data));         }
 };
 
 #endif
