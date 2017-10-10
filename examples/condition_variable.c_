@@ -8,8 +8,8 @@ void slave()
 {
 	mtx_wait(mtx);
 	cnd_wait(cnd, mtx);
-	mtx_give(mtx);
 	LED_Tick();
+	mtx_give(mtx);
 }
 
 void master()
