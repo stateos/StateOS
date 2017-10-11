@@ -18,8 +18,8 @@ OS_TSK_START(t5, 0) { proc(&GRN,    SEC/8*4); }
 
 int main()
 {
-    LED_Init();
-    GRN_Init();
+	LED_Init();
+	GRN_Init();
 
 	tsk_stop();
 }
