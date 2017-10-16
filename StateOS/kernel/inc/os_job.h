@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.h
     @author  Rajmund Szymanski
-    @date    08.10.2017
+    @date    16.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -450,6 +450,8 @@ unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, IM
  *                                                                                                                    *
  **********************************************************************************************************************/
 
+#if OS_FUNCTIONAL
+
 struct baseJobQueue : public __box
 {
 	 explicit
@@ -467,6 +469,28 @@ struct baseJobQueue : public __box
 	unsigned give     ( FUN_t _fun )                  {             unsigned event = box_give     (this, &_fun);                                         return event; }
 	unsigned giveISR  ( FUN_t _fun )                  {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
 };
+
+#else
+
+struct baseJobQueue : public __job
+{
+	 explicit
+	 baseJobQueue( const unsigned _limit, FUN_t * const _data ): __job _JOB_INIT( _limit, _data ) {}
+	~baseJobQueue( void ) { assert(queue == nullptr); }
+
+	void     kill     ( void )                        {        job_kill     (this);               }
+	unsigned waitUntil( uint32_t _time )              { return job_waitUntil(this, _time);        }
+	unsigned waitFor  ( uint32_t _delay )             { return job_waitFor  (this, _delay);       }
+	unsigned wait     ( void )                        { return job_wait     (this);               }
+	unsigned take     ( void )                        { return job_take     (this);               }
+	unsigned sendUntil( FUN_t _fun, uint32_t _time )  { return job_sendUntil(this, _fun, _time);  }
+	unsigned sendFor  ( FUN_t _fun, uint32_t _delay ) { return job_sendFor  (this, _fun, _delay); }
+	unsigned send     ( FUN_t _fun )                  { return job_send     (this, _fun);         }
+	unsigned give     ( FUN_t _fun )                  { return job_give     (this, _fun);         }
+	unsigned giveISR  ( FUN_t _fun )                  { return job_giveISR  (this, _fun);         }
+};
+
+#endif
 
 /**********************************************************************************************************************
  *                                                                                                                    *
