@@ -59,10 +59,10 @@ struct __tsk
 	unsigned basic; // basic priority
 	unsigned prio;  // current priority
 
+	tsk_t  * join;  // joinable state
 	void   * guard; // object that controls the pending process
 	tsk_t  * mtree; // tree of tasks waiting for mutexes
 	mtx_t  * mlist; // list of mutexes held
-	tsk_t  * join;  // list of joined tasks
 
 	uint32_t slice;	// time slice
 	union  {

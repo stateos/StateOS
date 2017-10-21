@@ -117,6 +117,7 @@ struct __sys
 
 #define JOINABLE   (tsk_t *) ( 0UL) // task in joinable state
 #define DETACHED   (tsk_t *) (~0UL) // task in detached state
+#define SEPARATE   (tsk_t *) (~1UL) // task in separate state
 
 /* -------------------------------------------------------------------------- */
 

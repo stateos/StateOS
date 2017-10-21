@@ -177,8 +177,8 @@ unsigned tsk_detach( tsk_t *tsk )
 	{
 		if (tsk->join != DETACHED)
 		{
+			core_tsk_wakeup(tsk->join, E_TIMEOUT);
 			tsk->join = DETACHED;
-			core_all_wakeup(&tsk->join, E_TIMEOUT);
 			event = E_SUCCESS;
 		}
 	}
