@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    08.10.2017
+    @date    21.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -171,10 +171,13 @@ void tsk_detach( tsk_t *tsk )
 
 	port_sys_lock();
 
-	if ((tsk->join != DETACHED) && (tsk->obj.id != ID_STOPPED))
+	if (tsk->obj.id != ID_STOPPED)
 	{
-		core_all_wakeup(&tsk->join, E_TIMEOUT);
-		tsk->join = DETACHED;
+		if (tsk->join != DETACHED)
+		{
+			tsk->join = DETACHED;
+			core_all_wakeup(&tsk->join, E_TIMEOUT);
+		}
 	}
 
 	port_sys_unlock();
@@ -184,7 +187,7 @@ void tsk_detach( tsk_t *tsk )
 unsigned tsk_join( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned event = E_SUCCESS;
 
 	assert(!port_isr_inside());
 	assert(tsk);
@@ -194,9 +197,7 @@ unsigned tsk_join( tsk_t *tsk )
 	if (tsk->join == DETACHED)
 		event = E_TIMEOUT;
 	else
-	if (tsk->obj.id == ID_STOPPED)
-		event = E_SUCCESS;
-	else
+	if (tsk->obj.id != ID_STOPPED)
 		event = core_tsk_waitFor(&tsk->join, INFINITE);
 
 	port_sys_unlock();

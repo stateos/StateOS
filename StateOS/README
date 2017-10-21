@@ -30,6 +30,15 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+5.3
+- updated inclusion of header files
+- fixed bug for CM0 and gcc compiler
+- updated job queue object
+- updated core_sys_alloc functions
+- updated memory pool object
+- updated internal MSIZE definition
+- updated tsk_detach / tsk_join functions
+---------
 5.2
 - added BinarySemaphore c++ class
 - renamed functions: tsk_create to wrk_create and tsk_new to tsk_create
