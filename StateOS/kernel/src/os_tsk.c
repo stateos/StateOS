@@ -127,7 +127,7 @@ void tsk_stop( void )
 		mtx_kill(Current->mlist);
 
 	if (Current->join != DETACHED)
-		core_all_wakeup(&Current->join, E_SUCCESS);
+		core_tsk_wakeup(Current->join, E_SUCCESS);
 
 	core_tsk_remove(Current);
 
@@ -148,7 +148,7 @@ void tsk_kill( tsk_t *tsk )
 		mtx_kill(tsk->mlist);
 
 	if (tsk->join != DETACHED)
-		core_all_wakeup(&tsk->join, E_STOPPED);
+		core_tsk_wakeup(tsk->join, E_STOPPED);
 
 	if (tsk->obj.id == ID_READY)
 		core_tsk_remove(tsk);
@@ -163,9 +163,11 @@ void tsk_kill( tsk_t *tsk )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_detach( tsk_t *tsk )
+unsigned tsk_detach( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned event = E_TIMEOUT;
+
 	assert(!port_isr_inside());
 	assert(tsk);
 
@@ -177,10 +179,13 @@ void tsk_detach( tsk_t *tsk )
 		{
 			tsk->join = DETACHED;
 			core_all_wakeup(&tsk->join, E_TIMEOUT);
+			event = E_SUCCESS;
 		}
 	}
 
 	port_sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -194,7 +199,7 @@ unsigned tsk_join( tsk_t *tsk )
 
 	port_sys_lock();
 
-	if (tsk->join == DETACHED)
+	if (tsk->join != JOINABLE)
 		event = E_TIMEOUT;
 	else
 	if (tsk->obj.id != ID_STOPPED)

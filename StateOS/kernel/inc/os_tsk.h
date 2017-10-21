@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    08.10.2017
+    @date    21.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -622,13 +622,15 @@ void tsk_kill( tsk_t *tsk );
  * Parameters                                                                                                         *
  *   tsk             : pointer to task object                                                                         *
  *                                                                                                                    *
- * Return            : none                                                                                           *
+ * Return                                                                                                             *
+ *   E_SUCCESS       : given task was successfully detached                                                           *
+ *   E_TIMEOUT       : given task can not be detached                                                                 *
  *                                                                                                                    *
  * Note              : use only in thread mode                                                                        *
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-void tsk_detach( tsk_t *tsk );
+unsigned tsk_detach( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -1019,7 +1021,7 @@ struct baseTask : public __tsk
 #endif
 
 	void     kill     ( void )            {        tsk_kill      (this);         }
-	void     detach   ( void )            {        tsk_detach    (this);         }
+	unsigned detach   ( void )            { return tsk_detach    (this);         }
 	unsigned join     ( void )            { return tsk_join      (this);         }
 	void     start    ( void )            {        tsk_start     (this);         }
 #if OS_FUNCTIONAL
@@ -1154,7 +1156,7 @@ namespace ThisTask
 	static inline unsigned prio      ( void )                             { return tsk_getPrio   ();                      }
 
 	static inline void     kill      ( void )                             {        tsk_kill      (Current);               }
-	static inline void     detach    ( void )                             {        tsk_detach    (Current);               }
+	static inline unsigned detach    ( void )                             { return tsk_detach    (Current);               }
 	static inline void     suspend   ( void )                             {        tsk_suspend   (Current);               }
 
 	static inline unsigned waitUntil ( unsigned _flags, uint32_t _time )  { return tsk_waitUntil (_flags, _time);         }
