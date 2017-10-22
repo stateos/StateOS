@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    04.09.2017
+    @date    22.10.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -213,6 +213,7 @@ int32 OS_QueueCreate(uint32 *queue_id, const char *queue_name, uint32 queue_dept
 				{
 					*queue_id = (rec - OS_queue_table) / sizeof(OS_queue_record_t);
 					box_init(&rec->box, queue_depth, data_size, data);
+					rec->box.res = data;
 					strcpy(rec->name, queue_name);
 					rec->creator = OS_TaskGetId();
 					rec->used = 1;
@@ -240,8 +241,7 @@ int32 OS_QueueDelete(uint32 queue_id)
 		status = OS_INVALID_POINTER;
 	else
 	{
-		box_kill(&rec->box);
-		sys_free(rec->box.data);
+		box_delete(&rec->box);
 		rec->used = 0;
 		status = OS_SUCCESS;
 	}
@@ -430,7 +430,7 @@ int32 OS_BinSemDelete(uint32 sem_id)
 		status = OS_INVALID_POINTER;
 	else
 	{
-		sem_kill(&rec->sem);
+		sem_delete(&rec->sem);
 		rec->used = 0;
 		status = OS_SUCCESS;
 	}
@@ -647,7 +647,7 @@ int32 OS_CountSemDelete(uint32 sem_id)
 		status = OS_INVALID_POINTER;
 	else
 	{
-		sem_kill(&rec->sem);
+		sem_delete(&rec->sem);
 		rec->used = 0;
 		status = OS_SUCCESS;
 	}
@@ -845,7 +845,7 @@ int32 OS_MutSemDelete(uint32 sem_id)
 		status = OS_INVALID_POINTER;
 	else
 	{
-		mtx_kill(&rec->mtx);
+		mtx_delete(&rec->mtx);
 		rec->used = 0;
 		status = OS_SUCCESS;
 	}
@@ -1010,7 +1010,6 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 				{
 					if (!stack_size) stack_size = OS_STACK_SIZE;
 					stack = sys_alloc(stack_size);
-					if (stack) rec->used = 1;
 				}
 				if (!stack)
 					status = OS_ERROR;
@@ -1018,9 +1017,10 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 				{
 					*task_id = (rec - OS_task_table) / sizeof(OS_task_record_t);
 					tsk_init(&rec->tsk, ~priority, task_handler, stack, stack_size);
+					if (stack_pointer == 0) rec->tsk.obj.res = stack;
 					strcpy(rec->name, task_name);
 					rec->creator = OS_TaskGetId();
-					rec->used++;
+					rec->used = 1;
 					rec->handler = function_pointer;
 					rec->delete_handler = NULL;
 					status = OS_SUCCESS;
@@ -1049,9 +1049,7 @@ int32 OS_TaskDelete(uint32 task_id)
 	{
 		if (rec->delete_handler)
 			rec->delete_handler();
-		tsk_kill(&rec->tsk);
-		if (rec->used > 1)
-			sys_free(rec->tsk.stack);
+		tsk_delete(&rec->tsk);
 		rec->used = 0;
 		status = OS_SUCCESS;
 	}
@@ -1522,7 +1520,7 @@ int32 OS_TimerDelete(uint32 timer_id)
 		status = OS_INVALID_POINTER;
 	else
 	{
-		tmr_kill(&rec->tmr);
+		tmr_delete(&rec->tmr);
 		rec->used = 0;
 		status = OS_SUCCESS;
 	}
