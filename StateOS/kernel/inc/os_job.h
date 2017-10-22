@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.h
     @author  Rajmund Szymanski
-    @date    16.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,7 @@ typedef struct __job job_t, * const job_id;
 struct __job
 {
 	tsk_t  * queue; // inherited from semaphore
+	void   * res;   // allocated job queue object's resource
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
@@ -71,7 +72,7 @@ struct __job
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _JOB_INIT( _limit, _data ) { 0, 0, _limit, 0, 0, _data }
+#define               _JOB_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -225,6 +226,23 @@ job_t *job_new   ( unsigned limit ) { return job_create(limit); }
  **********************************************************************************************************************/
 
 void job_kill( job_t *job );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : job_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the job queue object and free allocated resource                                         *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   job             : pointer to job queue object                                                                    *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void job_delete( job_t *job );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

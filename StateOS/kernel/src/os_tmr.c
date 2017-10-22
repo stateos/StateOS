@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -56,6 +56,7 @@ tmr_t *tmr_create( fun_t *state )
 
 	tmr = core_sys_alloc(sizeof(tmr_t));
 	tmr_init(tmr, state);
+	tmr->obj.res = tmr;
 
 	port_sys_unlock();
 
@@ -76,6 +77,18 @@ void tmr_kill( tmr_t *tmr )
 		core_all_wakeup(tmr, E_STOPPED);
 		core_tmr_remove(tmr);
 	}
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tmr_delete( tmr_t *tmr )
+/* -------------------------------------------------------------------------- */
+{
+	port_sys_lock();
+
+	tmr_kill(tmr);
+	core_sys_free(tmr->obj.res);
 
 	port_sys_unlock();
 }

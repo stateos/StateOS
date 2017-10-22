@@ -38,6 +38,7 @@ Features:
 - updated memory pool object
 - updated internal MSIZE definition
 - updated tsk_detach / tsk_join functions
+- added xxx_delete functions
 ---------
 5.2
 - added BinarySemaphore c++ class

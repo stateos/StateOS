@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.c
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -54,6 +54,7 @@ mut_t *mut_create( void )
 
 	mut = core_sys_alloc(sizeof(mut_t));
 	mut_init(mut);
+	mut->res = mut;
 
 	port_sys_unlock();
 
@@ -70,6 +71,18 @@ void mut_kill( mut_t *mut )
 	port_sys_lock();
 
 	core_all_wakeup(mut, E_STOPPED);
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void mut_delete( mut_t *mut )
+/* -------------------------------------------------------------------------- */
+{
+	port_sys_lock();
+
+	mut_kill(mut);
+	core_sys_free(mut->res);
 
 	port_sys_unlock();
 }

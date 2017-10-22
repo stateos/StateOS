@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,7 @@ typedef struct __mtx mtx_t, * const mtx_id;
 struct __mtx
 {
 	tsk_t  * queue; // next process in the DELAYED queue
+	void   * res;   // allocated mutex object's resource
 	tsk_t  * owner; // owner task
 	unsigned count; // mutex's curent value
 	mtx_t  * list;  // list of mutexes held by owner
@@ -66,7 +67,7 @@ struct __mtx
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _MTX_INIT() { 0, 0, 0, 0 }
+#define               _MTX_INIT() { 0, 0, 0, 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -192,6 +193,23 @@ mtx_t *mtx_new   ( void ) { return mtx_create(); }
  **********************************************************************************************************************/
 
 void mtx_kill( mtx_t *mtx );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : mtx_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the mutex object and free allocated resource                                             *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mtx             : pointer to mutex object                                                                        *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void mtx_delete( mtx_t *mtx );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

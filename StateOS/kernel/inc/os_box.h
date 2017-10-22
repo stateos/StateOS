@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -46,6 +46,7 @@ typedef struct __box box_t, * const box_id;
 struct __box
 {
 	tsk_t  * queue; // inherited from semaphore
+	void   * res;   // allocated mailbox queue object's resource
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
@@ -72,7 +73,7 @@ struct __box
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _BOX_INIT( _limit, _size, _data ) { 0, 0, _limit, 0, 0, _data, _size }
+#define               _BOX_INIT( _limit, _size, _data ) { 0, 0, 0, _limit, 0, 0, _data, _size }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -233,6 +234,23 @@ box_t *box_new   ( unsigned limit, unsigned size ) { return box_create(limit, si
  **********************************************************************************************************************/
 
 void box_kill( box_t *box );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : box_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the mailbox queue object and free allocated resource                                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   box             : pointer to mailbox queue object                                                                *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void box_delete( box_t *box );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,6 +48,7 @@ typedef struct __mut mut_t, * const mut_id;
 struct __mut
 {
 	tsk_t  * queue; // next process in the DELAYED queue
+	void   * res;   // allocated fast mutex object's resource
 	tsk_t  * owner; // owner task
 };
 
@@ -65,7 +66,7 @@ struct __mut
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _MUT_INIT() { 0, 0 }
+#define               _MUT_INIT() { 0, 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -191,6 +192,23 @@ mut_t *mut_new   ( void ) { return mut_create(); }
  **********************************************************************************************************************/
 
 void mut_kill( mut_t *mut );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : mut_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the fast mutex object and free allocated resource                                        *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mut             : pointer to fast mutex object                                                                   *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void mut_delete( mut_t *mut );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

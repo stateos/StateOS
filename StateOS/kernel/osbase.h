@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    21.10.2017
+    @date    22.10.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -62,6 +62,7 @@ typedef struct __obj obj_t;
 struct __obj
 {
 	tsk_t  * queue; // next process in the DELAYED queue
+	void   * res;   // allocated object's resource
 	unsigned id;    // object id: ID_STOPPED, ID_READY, ID_DELAYED, ID_TIMER, ID_IDLE
 	void   * prev;  // previous object (timer, task) in the READY queue
 	void   * next;  // next object (timer, task) in the READY queue
@@ -117,7 +118,6 @@ struct __sys
 
 #define JOINABLE   (tsk_t *) ( 0UL) // task in joinable state
 #define DETACHED   (tsk_t *) (~0UL) // task in detached state
-#define SEPARATE   (tsk_t *) (~1UL) // task in separate state
 
 /* -------------------------------------------------------------------------- */
 

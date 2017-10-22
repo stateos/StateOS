@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -46,6 +46,7 @@ typedef struct __lst lst_t, * const lst_id;
 struct __lst
 {
 	tsk_t  * queue; // next process in the DELAYED queue
+	void   * res;   // allocated list object's resource
 	que_t  * next;  // next memory object in the queue, previously created in the memory pool
 };
 
@@ -63,7 +64,7 @@ struct __lst
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _LST_INIT() { 0, 0 }
+#define               _LST_INIT() { 0, 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -189,6 +190,23 @@ lst_t *lst_new   ( void ) { return lst_create(); }
  **********************************************************************************************************************/
 
 void lst_kill( lst_t *lst );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : lst_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the list object and free allocated resource                                              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   lst             : pointer to list object                                                                         *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void lst_delete( lst_t *lst );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.c
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -56,6 +56,7 @@ sig_t *sig_create( unsigned type )
 
 	sig = core_sys_alloc(sizeof(sig_t));
 	sig_init(sig, type);
+	sig->res = sig;
 
 	port_sys_unlock();
 
@@ -74,6 +75,18 @@ void sig_kill( sig_t *sig )
 	sig->flag = 0;
 	
 	core_all_wakeup(sig, E_STOPPED);
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void sig_delete( sig_t *sig )
+/* -------------------------------------------------------------------------- */
+{
+	port_sys_lock();
+
+	sig_kill(sig);
+	core_sys_free(sig->res);
 
 	port_sys_unlock();
 }

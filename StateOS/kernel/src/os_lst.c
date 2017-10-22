@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    08.10.2017
+    @date    22.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -55,6 +55,7 @@ lst_t *lst_create( void )
 
 	lst = core_sys_alloc(sizeof(lst_t));
 	lst_init(lst);
+	lst->res = lst;
 
 	port_sys_unlock();
 
@@ -71,6 +72,18 @@ void lst_kill( lst_t *lst )
 	port_sys_lock();
 
 	core_all_wakeup(lst, E_STOPPED);
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void lst_delete( lst_t *lst )
+/* -------------------------------------------------------------------------- */
+{
+	port_sys_lock();
+
+	lst_kill(lst);
+	core_sys_free(lst->res);
 
 	port_sys_unlock();
 }

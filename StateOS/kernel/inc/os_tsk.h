@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    21.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -101,10 +101,10 @@ struct __tsk
 
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
+                       { { 0, 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
 #else
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { { 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 } }
+                       { { 0, 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 } }
 #endif
 
 /**********************************************************************************************************************
@@ -612,6 +612,23 @@ void tsk_stop( void );
  **********************************************************************************************************************/
 
 void tsk_kill( tsk_t *tsk );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : tsk_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the task object and free allocated resource                                              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   tsk             : pointer to task object                                                                         *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void tsk_delete( tsk_t *tsk );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

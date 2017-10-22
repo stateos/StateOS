@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    18.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -46,8 +46,10 @@ typedef struct __mem mem_t, * const mem_id;
 struct __mem
 {
 	tsk_t  * queue; // inherited from list
+	void   * res;   // allocated memory pool object's resource
 	que_t  * next;  // inherited from list
 	unsigned limit; // size of a memory pool (max number of objects)
+
 	unsigned size;  // size of memory object (in words)
 	void   * data;  // pointer to memory pool buffer
 };
@@ -73,7 +75,7 @@ struct __mem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _MEM_INIT( _limit, _size, _data ) { 0, 0, _limit, MSIZE(_size), _data }
+#define               _MEM_INIT( _limit, _size, _data ) { 0, 0, 0, _limit, MSIZE(_size), _data }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -251,6 +253,23 @@ mem_t *mem_new   ( unsigned limit, unsigned size ) { return mem_create(limit, si
  **********************************************************************************************************************/
 
 void mem_kill( mem_t *mem );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : mem_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the memory pool object and free allocated resource                                       *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   mem             : pointer to memory pool object                                                                  *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void mem_delete( mem_t *mem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

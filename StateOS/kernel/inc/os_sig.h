@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -46,6 +46,7 @@ typedef struct __sig sig_t, * const sig_id;
 struct __sig
 {
 	tsk_t  * queue; // next process in the DELAYED queue
+	void   * res;   // allocated signal object's resource
 	unsigned flag;  // signal's current value
 	unsigned type;  // signal type: sigClear, sigProtect
 };
@@ -73,7 +74,7 @@ struct __sig
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _SIG_INIT( _type ) { 0, 0, (_type)&sigMASK }
+#define               _SIG_INIT( _type ) { 0, 0, 0, (_type)&sigMASK }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -217,6 +218,23 @@ sig_t *sig_new   ( unsigned type ) { return sig_create(type); }
  **********************************************************************************************************************/
 
 void sig_kill( sig_t *sig );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sig_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the signal object and free allocated resource                                            *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sig             : pointer to signal object                                                                       *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void sig_delete( sig_t *sig );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

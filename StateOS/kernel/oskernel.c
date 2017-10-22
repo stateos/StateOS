@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    10.10.2017
+    @date    22.10.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -530,7 +530,7 @@ void *core_sys_alloc( size_t size )
 	stk_t *temp;
 	void  *base;
 
-	if (size == 0) return 0;
+	assert(size);
 
 	temp = heap + ASIZE(size);
 	if (temp > HeapEnd) return 0;
@@ -545,6 +545,8 @@ void *core_sys_alloc( size_t size )
 
 void core_sys_free( void *ptr )
 {
+	assert(ptr == 0);
+
 	(void) ptr;
 }
 
@@ -556,7 +558,7 @@ void *core_sys_alloc( size_t size )
 {
 	void *base;
 
-	if (size == 0) return 0;
+	assert(size);
 
 	base = malloc(size);
 	if (base == 0) return 0;

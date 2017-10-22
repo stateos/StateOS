@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.c
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -54,6 +54,7 @@ evt_t *evt_create( void )
 
 	evt = core_sys_alloc(sizeof(evt_t));
 	evt_init(evt);
+	evt->res = evt;
 
 	port_sys_unlock();
 
@@ -70,6 +71,18 @@ void evt_kill( evt_t *evt )
 	port_sys_lock();
 
 	core_all_wakeup(evt, E_STOPPED);
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void evt_delete( evt_t *evt )
+/* -------------------------------------------------------------------------- */
+{
+	port_sys_lock();
+
+	evt_kill(evt);
+	core_sys_free(evt->res);
 
 	port_sys_unlock();
 }

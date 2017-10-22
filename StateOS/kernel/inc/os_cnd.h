@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,6 +48,7 @@ typedef struct __cnd cnd_t, * const cnd_id;
 struct __cnd
 {
 	tsk_t  * queue; // next process in the DELAYED queue
+	void   * res;   // allocated condition variable object's resource
 };
 
 /* -------------------------------------------------------------------------- */
@@ -69,7 +70,7 @@ struct __cnd
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _CND_INIT() { 0 }
+#define               _CND_INIT() { 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -195,6 +196,23 @@ cnd_t *cnd_new   ( void ) { return cnd_create(); }
  **********************************************************************************************************************/
 
 void cnd_kill( cnd_t *cnd );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : cnd_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the condition variable object and free allocated resource                                *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   cnd             : pointer to condition variable object                                                           *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void cnd_delete( cnd_t *cnd );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

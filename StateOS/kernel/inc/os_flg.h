@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -46,6 +46,7 @@ typedef struct __flg flg_t, * const flg_id;
 struct __flg
 {
 	tsk_t  * queue; // next process in the DELAYED queue
+	void   * res;   // allocated flag object's resource
 	unsigned flags; // flag's current value
 };
 
@@ -76,7 +77,7 @@ struct __flg
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _FLG_INIT() { 0, 0 }
+#define               _FLG_INIT() { 0, 0, 0 }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -202,6 +203,23 @@ flg_t *flg_new   ( void ) { return flg_create(); }
  **********************************************************************************************************************/
 
 void flg_kill( flg_t *flg );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : flg_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the flag object and free allocated resource                                              *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   flg             : pointer to flag object                                                                         *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void flg_delete( flg_t *flg );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

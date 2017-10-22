@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,7 @@ typedef struct __bar bar_t, * const bar_id;
 struct __bar
 {
 	tsk_t  * queue; // next process in the DELAYED queue
+	void   * res;   // allocated barier object's resource
 	unsigned count; // barrier's current value
 	unsigned limit; // barrier's value limit
 };
@@ -66,7 +67,7 @@ struct __bar
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _BAR_INIT( _limit ) { 0, _limit, _limit }
+#define               _BAR_INIT( _limit ) { 0, 0, _limit, _limit }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -198,6 +199,23 @@ bar_t *bar_new   ( unsigned limit ) { return bar_create(limit); }
  **********************************************************************************************************************/
 
 void bar_kill( bar_t *bar );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : bar_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the barrier object and free allocated resource                                           *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   bar             : pointer to barrier object                                                                      *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void bar_delete( bar_t *bar );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

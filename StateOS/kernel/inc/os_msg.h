@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,7 @@ typedef struct __msg msg_t, * const msg_id;
 struct __msg
 {
 	tsk_t  * queue; // inherited from semaphore
+	void   * res;   // allocated message queue object's resource
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
@@ -71,7 +72,7 @@ struct __msg
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _MSG_INIT( _limit, _data ) { 0, 0, _limit, 0, 0, _data }
+#define               _MSG_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -225,6 +226,23 @@ msg_t *msg_new   ( unsigned limit ) { return msg_create(limit); }
  **********************************************************************************************************************/
 
 void msg_kill( msg_t *msg );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : msg_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the message queue object and free allocated resource                                     *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   msg             : pointer to message queue object                                                                *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void msg_delete( msg_t *msg );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    05.10.2017
+    @date    22.10.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -47,6 +47,7 @@ typedef struct __sem sem_t, * const sem_id;
 struct __sem
 {
 	tsk_t  * queue; // next process in the DELAYED queue
+	void   * res;   // allocated semaphore object's resource
 	unsigned count; // semaphore's current value
 	unsigned limit; // semaphore's value limit
 };
@@ -82,7 +83,7 @@ struct __sem
  *                                                                                                                    *
  **********************************************************************************************************************/
 
-#define               _SEM_INIT( _init, _limit ) { 0, UMIN(_init,_limit), _limit }
+#define               _SEM_INIT( _init, _limit ) { 0, 0, UMIN(_init,_limit), _limit }
 
 /**********************************************************************************************************************
  *                                                                                                                    *
@@ -238,6 +239,23 @@ sem_t *sem_new   ( unsigned init, unsigned limit ) { return sem_create(init, lim
  **********************************************************************************************************************/
 
 void sem_kill( sem_t *sem );
+
+/**********************************************************************************************************************
+ *                                                                                                                    *
+ * Name              : sem_delete                                                                                     *
+ *                                                                                                                    *
+ * Description       : reset the semaphore object and free allocated resource                                         *
+ *                                                                                                                    *
+ * Parameters                                                                                                         *
+ *   sem             : pointer to semaphore object                                                                    *
+ *                                                                                                                    *
+ * Return            : none                                                                                           *
+ *                                                                                                                    *
+ * Note              : use only in thread mode                                                                        *
+ *                                                                                                                    *
+ **********************************************************************************************************************/
+
+void sem_delete( sem_t *sem );
 
 /**********************************************************************************************************************
  *                                                                                                                    *

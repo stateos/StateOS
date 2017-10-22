@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    08.10.2017
+    @date    22.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -92,6 +92,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 
 	mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + limit * (1 + size) * sizeof(void*));
 	mem_init(mem, limit, size, (void *)ABOVE(mem + 1));
+	mem->res = mem;
 
 	port_sys_unlock();
 
@@ -108,6 +109,18 @@ void mem_kill( mem_t *mem )
 	port_sys_lock();
 
 	core_all_wakeup(mem, E_STOPPED);
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void mem_delete( mem_t *mem )
+/* -------------------------------------------------------------------------- */
+{
+	port_sys_lock();
+
+	mem_kill(mem);
+	core_sys_free(mem->res);
 
 	port_sys_unlock();
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.c
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    22.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -54,6 +54,7 @@ cnd_t *cnd_create( void )
 
 	cnd = core_sys_alloc(sizeof(cnd_t));
 	cnd_init(cnd);
+	cnd->res = cnd;
 
 	port_sys_unlock();
 
@@ -70,6 +71,18 @@ void cnd_kill( cnd_t *cnd )
 	port_sys_lock();
 
 	core_all_wakeup(cnd, E_STOPPED);
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void cnd_delete( cnd_t *cnd )
+/* -------------------------------------------------------------------------- */
+{
+	port_sys_lock();
+
+	cnd_kill(cnd);
+	core_sys_free(cnd->res);
 
 	port_sys_unlock();
 }

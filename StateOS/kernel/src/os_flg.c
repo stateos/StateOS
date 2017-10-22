@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    08.10.2017
+    @date    22.10.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -55,6 +55,7 @@ flg_t *flg_create( void )
 
 	flg = core_sys_alloc(sizeof(flg_t));
 	flg_init(flg);
+	flg->res = flg;
 
 	port_sys_unlock();
 
@@ -71,6 +72,18 @@ void flg_kill( flg_t *flg )
 	port_sys_lock();
 
 	core_all_wakeup(flg, E_STOPPED);
+
+	port_sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void flg_delete( flg_t *flg )
+/* -------------------------------------------------------------------------- */
+{
+	port_sys_lock();
+
+	flg_kill(flg);
+	core_sys_free(flg->res);
 
 	port_sys_unlock();
 }
