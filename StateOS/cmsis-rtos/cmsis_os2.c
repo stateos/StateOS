@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    04.09.2017
+    @date    22.10.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -200,23 +200,6 @@ static void thread_handler (void)
 	tsk_stop();
 }
 
-static void thread_delete (osThreadId_t thread_id)
-{
-	osThread_t *thread = thread_id;
-
-	sys_lock();
-
-	if (thread->tsk.obj.id == ID_STOPPED)
-	{
-		if ((thread->flags & osFlagSystemMemory) != 0U)
-			sys_free(thread->tsk.stack);
-		if ((thread->flags & osFlagSystemObject) != 0U)
-			sys_free(thread);
-	}
-
-	sys_unlock();
-}
-
 /*---------------------------------------------------------------------------*/
 
 osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAttr_t *attr)
@@ -245,37 +228,40 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 		
 		if (attr->stack_size != 0U)
 		{
-			stack_size = attr->stack_size;
+			stack_size = ABOVE(attr->stack_size);
 			if (attr->stack_mem != NULL)
 				stack_mem = attr->stack_mem;
 		}
 	}
 
+	if (thread == NULL && stack_mem == NULL)
+	{
+		thread = sys_alloc(ABOVE(osThreadCbSize) + stack_size);
+		stack_mem = (void *)ABOVE(thread + 1);
+		if (thread == NULL)
+			return NULL;
+	}
+	else
 	if (thread == NULL)
 	{
 		thread = sys_alloc(osThreadCbSize);
 		if (thread == NULL)
 			return NULL;
-
-		flags |= osFlagSystemObject;
 	}
-
+	else
 	if (stack_mem == NULL)
 	{
 		stack_mem = sys_alloc(stack_size);
 		if (stack_mem == NULL)
-		{
-			if ((flags & osFlagSystemObject) != 0U)
-				sys_free(thread);
 			return NULL;
-		}
-
-		flags |= osFlagSystemMemory;
 	}	
 
 	sys_lock();
 
 	tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, stack_mem, stack_size);
+	if (attr->cb_mem    == NULL || attr->cb_size    == 0U) thread->tsk.obj.res = thread;
+	else
+	if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.obj.res = stack_mem;
 	thread->tsk.join = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
 	flg_init(&thread->flg);
 	thread->flags = flags;
@@ -426,13 +412,12 @@ osStatus_t osThreadDetach (osThreadId_t thread_id)
 		return osErrorISR;
 	if (thread_id == NULL)
 		return osErrorParameter;
-	if (thread->tsk.join == DETACHED)
-		return osErrorResource;
 
-	tsk_detach(&thread->tsk);
-
-	thread_delete(thread_id);
-	return osOK;
+	switch (tsk_detach(&thread->tsk))
+	{
+		case E_SUCCESS: return osOK;
+		default:        return osErrorResource;
+	}
 }
 
 osStatus_t osThreadJoin (osThreadId_t thread_id)
@@ -447,12 +432,9 @@ osStatus_t osThreadJoin (osThreadId_t thread_id)
 	switch (tsk_join(&thread->tsk))
 	{
 		case E_SUCCESS:
-		case E_STOPPED: break;
+		case E_STOPPED: return osOK;
 		default:        return osErrorResource;
 	}
-
-	thread_delete(thread_id);
-	return osOK;
 }
 
 __NO_RETURN void osThreadExit (void)
@@ -469,10 +451,7 @@ osStatus_t osThreadTerminate (osThreadId_t thread_id)
 	if (thread_id == NULL)
 		return osErrorParameter;
 
-	tsk_kill(&thread->tsk);
-
-	if (thread->tsk.join == DETACHED)
-		thread_delete(thread_id);
+	tsk_delete(&thread->tsk);
 
 	return osOK;
 }
@@ -632,13 +611,12 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 		timer = sys_alloc(osTimerCbSize);
 		if (timer == NULL)
 			return NULL;
-
-		flags |= osFlagSystemObject;
 	}
 
 	sys_lock();
 
 	tmr_init(&timer->tmr, timer_handler);
+	if (attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.obj.res = timer;
 	timer->flags = flags;
 	timer->name = (attr == NULL) ? NULL : attr->name;
 	timer->func = func;
@@ -706,13 +684,7 @@ osStatus_t osTimerDelete (osTimerId_t timer_id)
 	if (timer_id == NULL)
 		return osErrorParameter;
 
-	sys_lock();
-
-	tmr_kill(&timer->tmr);
-	if ((timer->flags & osFlagSystemObject) != 0U)
-		sys_free(timer);
-
-	sys_unlock();
+	tmr_delete(&timer->tmr);
 
 	return osOK;
 }
@@ -742,13 +714,12 @@ osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 		ef = sys_alloc(osEventFlagsCbSize);
 		if (ef == NULL)
 			return NULL;
-
-		flags |= osFlagSystemObject;
 	}
 
 	sys_lock();
 
 	flg_init(&ef->flg);
+	if (attr->cb_mem == NULL || attr->cb_size == 0U) ef->flg.res = ef;
 	ef->flags = flags;
 	ef->name = (attr == NULL) ? NULL : attr->name;
 
@@ -823,13 +794,7 @@ osStatus_t osEventFlagsDelete (osEventFlagsId_t ef_id)
 	if (ef_id == NULL)
 		return osErrorParameter;
 
-	sys_lock();
-
-	flg_kill(&ef->flg);
-	if ((ef->flags & osFlagSystemObject) != 0U)
-		sys_free(ef);
-
-	sys_unlock();
+	flg_delete(&ef->flg);
 
 	return osOK;
 }
@@ -861,13 +826,12 @@ osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 		mutex = sys_alloc(osMutexCbSize);
 		if (mutex == NULL)
 			return NULL;
-
-		flags |= osFlagSystemObject;
 	}
 
 	sys_lock();
 
 	mtx_init(&mutex->mtx);
+	if (attr->cb_mem == NULL || attr->cb_size == 0U) mutex->mtx.res = mutex;
 	mutex->flags = flags;
 	mutex->name = (attr == NULL) ? NULL : attr->name;
 
@@ -938,13 +902,7 @@ osStatus_t osMutexDelete (osMutexId_t mutex_id)
 	if (mutex_id == NULL)
 		return osErrorParameter;
 
-	sys_lock();
-
-	mtx_kill(&mutex->mtx);
-	if ((mutex->flags & osFlagSystemObject) != 0U)
-		sys_free(mutex);
-
-	sys_unlock();
+	mtx_delete(&mutex->mtx);
 
 	return osOK;
 }
@@ -974,13 +932,12 @@ osSemaphoreId_t osSemaphoreNew (uint32_t max_count, uint32_t initial_count, cons
 		semaphore = sys_alloc(osSemaphoreCbSize);
 		if (semaphore == NULL)
 			return NULL;
-
-		flags |= osFlagSystemObject;
 	}
 
 	sys_lock();
 
 	sem_init(&semaphore->sem, initial_count, max_count);
+	if (attr->cb_mem == NULL || attr->cb_size == 0U) semaphore->sem.res = semaphore;
 	semaphore->flags = flags;
 	semaphore->name = (attr == NULL) ? NULL : attr->name;
 
@@ -1049,13 +1006,7 @@ osStatus_t osSemaphoreDelete (osSemaphoreId_t semaphore_id)
 	if (semaphore_id == NULL)
 		return osErrorParameter;
 
-	sys_lock();
-
-	sem_kill(&semaphore->sem);
-	if ((semaphore->flags & osFlagSystemObject) != 0)
-		sys_free(semaphore);
-
-	sys_unlock();
+	sem_delete(&semaphore->sem);
 
 	return osOK;
 }
@@ -1089,31 +1040,34 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 		}
 	}
 
+	if (mp == NULL && data == NULL)
+	{
+		mp = sys_alloc(ABOVE(osMemoryPoolCbSize) + size);
+		data = (void *)ABOVE(mp + 1);
+		if (mp == NULL)
+			return NULL;
+	}
+	else
 	if (mp == NULL)
 	{
 		mp = sys_alloc(osMemoryPoolCbSize);
 		if (mp == NULL)
 			return NULL;
-
-		flags |= osFlagSystemObject;
 	}
-
+	else
 	if (data == NULL)
 	{
 		data = sys_alloc(size);
 		if (data == NULL)
-		{
-			if ((flags & osFlagSystemObject) != 0U)
-				sys_free(mp);
 			return NULL;
-		}
-
-		flags |= osFlagSystemMemory;
 	}
 
 	sys_lock();
 
 	mem_init(&mp->mem, block_count, block_size, data);
+	if (attr->cb_mem == NULL || attr->cb_size == 0U) mp->mem.res = mp;
+	else
+	if (attr->mp_mem == NULL || attr->mp_size == 0U) mp->mem.res = data;
 	mp->flags = flags;
 	mp->name = (attr == NULL) ? NULL : attr->name;
 
@@ -1226,15 +1180,7 @@ osStatus_t osMemoryPoolDelete (osMemoryPoolId_t mp_id)
 	if (mp_id == NULL)
 		return osErrorParameter;
 
-	sys_lock();
-
-	mem_kill(&mp->mem);
-	if ((mp->flags & osFlagSystemMemory) != 0U)
-		sys_free(mp->mem.data);
-	if ((mp->flags & osFlagSystemObject) != 0U)
-		sys_free(mp);
-
-	sys_unlock();
+	mem_delete(&mp->mem);
 
 	return osOK;
 }
@@ -1268,31 +1214,34 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 		}
 	}
 
+	if (mq == NULL && data == NULL)
+	{
+		mq = sys_alloc(ABOVE(osMessageQueueCbSize) + size);
+		data = (void *)ABOVE(mq + 1);
+		if (mq == NULL)
+			return NULL;
+	}
+	else
 	if (mq == NULL)
 	{
 		mq = sys_alloc(osMessageQueueCbSize);
 		if (mq == NULL)
 			return NULL;
-
-		flags |= osFlagSystemObject;
 	}
-
+	else
 	if (data == NULL)
 	{
 		data = sys_alloc(size);
 		if (data == NULL)
-		{
-			if ((flags & osFlagSystemObject) != 0U)
-				sys_free(mq);
 			return NULL;
-		}
-
-		flags |= osFlagSystemMemory;
 	}
 
 	sys_lock();
 
 	box_init(&mq->box, msg_count, msg_size, data);
+	if (attr->cb_mem == NULL || attr->cb_size == 0U) mq->box.res = mq;
+	else
+	if (attr->mq_mem == NULL || attr->mq_size == 0U) mq->box.res = data;
 	mq->flags = flags;
 	mq->name = (attr == NULL) ? NULL : attr->name;
 
@@ -1421,15 +1370,7 @@ osStatus_t osMessageQueueDelete (osMessageQueueId_t mq_id)
 	if (mq_id == NULL)
 		return osErrorParameter;
 
-	sys_lock();
-
-	box_kill(&mq->box);
-	if ((mq->flags & osFlagSystemMemory) != 0U)
-		sys_free(mq->box.data);
-	if ((mq->flags & osFlagSystemObject) != 0U)
-		sys_free(mq);
-
-	sys_unlock();
+	box_delete(&mq->box);
 
 	return osOK;
 }
