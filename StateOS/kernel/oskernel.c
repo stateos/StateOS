@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    23.10.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -26,7 +26,9 @@
 
  ******************************************************************************/
 
-#include "os.h"
+#include "oskernel.h"
+#include "inc/os_tmr.h"
+#include "inc/os_tsk.h"
 
 /* -------------------------------------------------------------------------- */
 // SYSTEM INTERNAL SERVICES
@@ -175,7 +177,7 @@ void core_tmr_handler( void )
 {
 	tmr_t *tmr;
 
-	stk_assert();
+	core_stk_assert();
 
 	port_isr_lock();
 
@@ -485,7 +487,7 @@ void *core_tsk_handler( void *sp )
 #if OS_ROBIN == 0
 	core_tmr_handler();
 #else
-	stk_assert();
+	core_stk_assert();
 #endif
 	port_isr_lock();
 	core_ctx_reset();

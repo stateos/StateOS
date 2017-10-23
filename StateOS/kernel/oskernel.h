@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    03.10.2017
+    @date    23.10.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -94,6 +94,11 @@ extern sys_t System; // system data
 #define Counter System.cnt
 #endif
 #define Current System.cur
+
+/* -------------------------------------------------------------------------- */
+
+#define core_stk_assert() \
+        assert((Current == &MAIN) || (port_get_sp() >= Current->stack))
 
 /* -------------------------------------------------------------------------- */
 
