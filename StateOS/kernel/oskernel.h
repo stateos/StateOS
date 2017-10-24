@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    23.10.2017
+    @date    24.10.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -35,18 +35,18 @@
 
 /* -------------------------------------------------------------------------- */
 
-#ifndef  OS_ASSERT
-#define  OS_ASSERT            0 /* do not include standard assertions         */
+#ifndef OS_ASSERT
+#define OS_ASSERT             0 /* do not include standard assertions         */
 #endif
 
-#if     (OS_ASSERT == 0)
-#ifndef  NDEBUG
-#define  NDEBUG
+#if     OS_ASSERT == 0
+#ifndef NDEBUG
+#define NDEBUG
 #endif
 #endif
 
-#ifndef  NDEBUG
-#define  __ASSERT_MSG
+#ifndef NDEBUG
+#define __ASSERT_MSG
 #endif
 
 #include <assert.h>
@@ -66,14 +66,14 @@ typedef     void (* FUN_t)( void );
 
 /* -------------------------------------------------------------------------- */
 
-#define  ASIZE( size ) \
-    (((size_t)( size )+sizeof(stk_t)-1)/ (sizeof(stk_t)  ))
+#define ASIZE( size ) \
+   (((size_t)( size )+sizeof(stk_t)-1)/ (sizeof(stk_t)  ))
 
-#define  ABOVE( size ) \
-    (((size_t)( size )+sizeof(stk_t)-1)&~(sizeof(stk_t)-1))
+#define ABOVE( size ) \
+   (((size_t)( size )+sizeof(stk_t)-1)&~(sizeof(stk_t)-1))
 
-#define  BELOW( size ) \
-    (((size_t)( size )                )&~(sizeof(stk_t)-1))
+#define BELOW( size ) \
+   (((size_t)( size )                )&~(sizeof(stk_t)-1))
 
 /* -------------------------------------------------------------------------- */
 
