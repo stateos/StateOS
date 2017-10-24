@@ -53,7 +53,7 @@
 
 /* -------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 
 #if OS_FUNCTIONAL
 #include <functional>
