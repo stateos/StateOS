@@ -39,7 +39,6 @@ Features:
 - updated internal MSIZE definition
 - updated tsk_detach / tsk_join functions
 - added xxx_delete functions
-- updated inclusion of header files
 ---------
 5.2
 - added BinarySemaphore c++ class
