@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    13.07.2017
+    @date    31.10.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -74,7 +74,7 @@ void PendSV_Handler( void )
 
 #endif//__CORTEX_M
 
-"	bl    core_tsk_handler         \n"
+"	bl  %[core_tsk_handler]        \n"
 
 #if __CORTEX_M < 3
 
@@ -113,7 +113,8 @@ void PendSV_Handler( void )
 
 #endif//__CORTEX_M
 
-:::	"memory"
+::	[core_tsk_handler] "i" (core_tsk_handler)
+:	"memory"
 	);
 }
 
@@ -125,9 +126,10 @@ void core_tsk_flip( void *sp )
 	__asm volatile
 	(
 "	mov   sp,  %[sp]               \n"
-"	bl    core_tsk_loop            \n"
+"	bl  %[core_tsk_loop]           \n"
 	
-::	[sp] "r" (sp)
+::	[sp] "r" (sp),
+	[core_tsk_loop] "i" (core_tsk_loop)
 :	"memory"
 	);
 }
