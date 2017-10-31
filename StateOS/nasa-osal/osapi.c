@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    27.10.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -370,7 +370,7 @@ int32 OS_QueueGetInfo(uint32 queue_id, OS_queue_prop_t *queue_prop)
 ** Semaphore API
 */
 
-int32 OS_BinSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_value, uint32 options)
+int32 OS_BinSemCreate(uint32 *semaphore_id, const char *sem_name, uint32 sem_initial_value, uint32 options)
 {
 	OS_bin_sem_record_t *rec;
 	int32 status;
@@ -379,7 +379,7 @@ int32 OS_BinSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_v
 
 	sys_lock();
 
-	if (!sem_id || !sem_name)
+	if (!semaphore_id || !sem_name)
 		status = OS_INVALID_POINTER;
 	else if (strlen(sem_name) >= OS_MAX_API_NAME)
 		status = OS_ERR_NAME_TOO_LONG;
@@ -402,7 +402,7 @@ int32 OS_BinSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_v
 				status = OS_ERR_NO_FREE_IDS;
 			else
 			{
-				*sem_id = (rec - OS_bin_sem_table) / sizeof(OS_bin_sem_record_t);
+				*semaphore_id = (rec - OS_bin_sem_table) / sizeof(OS_bin_sem_record_t);
 				sem_init(&rec->sem, sem_initial_value, semBinary);
 				strcpy(rec->name, sem_name);
 				rec->creator = OS_TaskGetId();
@@ -417,14 +417,14 @@ int32 OS_BinSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_v
 	return status;
 }
 
-int32 OS_BinSemDelete(uint32 sem_id)
+int32 OS_BinSemDelete(uint32 semaphore_id)
 {
-	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_BIN_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -440,14 +440,14 @@ int32 OS_BinSemDelete(uint32 sem_id)
 	return status;
 }
 
-int32 OS_BinSemFlush(uint32 sem_id)
+int32 OS_BinSemFlush(uint32 semaphore_id)
 {
-	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_BIN_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -462,14 +462,14 @@ int32 OS_BinSemFlush(uint32 sem_id)
 	return status;
 }
 
-int32 OS_BinSemGive(uint32 sem_id)
+int32 OS_BinSemGive(uint32 semaphore_id)
 {
-	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_BIN_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -484,14 +484,14 @@ int32 OS_BinSemGive(uint32 sem_id)
 	return status;
 }
 
-int32 OS_BinSemTake(uint32 sem_id)
+int32 OS_BinSemTake(uint32 semaphore_id)
 {
-	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_BIN_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -506,14 +506,14 @@ int32 OS_BinSemTake(uint32 sem_id)
 	return status;
 }
 
-int32 OS_BinSemTimedWait(uint32 sem_id, uint32 msecs)
+int32 OS_BinSemTimedWait(uint32 semaphore_id, uint32 msecs)
 {
-	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_BIN_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -529,14 +529,14 @@ int32 OS_BinSemTimedWait(uint32 sem_id, uint32 msecs)
 	return status;
 }
 
-int32 OS_BinSemGetIdByName(uint32 *sem_id, const char *sem_name)
+int32 OS_BinSemGetIdByName(uint32 *semaphore_id, const char *sem_name)
 {
 	OS_bin_sem_record_t *rec;
 	int32 status;
 
 	sys_lock();
 
-	if (!sem_id || !sem_name)
+	if (!semaphore_id || !sem_name)
 		status = OS_INVALID_POINTER;
 	else if (strlen(sem_name) >= OS_MAX_API_NAME)
 		status = OS_ERR_NAME_TOO_LONG;
@@ -551,7 +551,7 @@ int32 OS_BinSemGetIdByName(uint32 *sem_id, const char *sem_name)
 			status = OS_ERR_NAME_NOT_FOUND;
 		else
 		{
-			*sem_id = (rec - OS_bin_sem_table) / sizeof(OS_bin_sem_record_t);
+			*semaphore_id = (rec - OS_bin_sem_table) / sizeof(OS_bin_sem_record_t);
 			status = OS_SUCCESS;
 		}
 	}
@@ -561,14 +561,14 @@ int32 OS_BinSemGetIdByName(uint32 *sem_id, const char *sem_name)
 	return status;
 }
 
-int32 OS_BinSemGetInfo(uint32 sem_id, OS_bin_sem_prop_t *bin_prop)
+int32 OS_BinSemGetInfo(uint32 semaphore_id, OS_bin_sem_prop_t *bin_prop)
 {
-	OS_bin_sem_record_t *rec = &OS_bin_sem_table[sem_id];
+	OS_bin_sem_record_t *rec = &OS_bin_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_BIN_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_BIN_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (!bin_prop || !rec->used)
 		status = OS_INVALID_POINTER;
@@ -587,7 +587,7 @@ int32 OS_BinSemGetInfo(uint32 sem_id, OS_bin_sem_prop_t *bin_prop)
 
 /*---------------------------------------------------------------------------*/
 
-int32 OS_CountSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial_value, uint32 options)
+int32 OS_CountSemCreate(uint32 *semaphore_id, const char *sem_name, uint32 sem_initial_value, uint32 options)
 {
 	OS_count_sem_record_t *rec;
 	int32 status;
@@ -596,7 +596,7 @@ int32 OS_CountSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial
 
 	sys_lock();
 
-	if (!sem_id || !sem_name)
+	if (!semaphore_id || !sem_name)
 		status = OS_INVALID_POINTER;
 	else if (strlen(sem_name) >= OS_MAX_API_NAME)
 		status = OS_ERR_NAME_TOO_LONG;
@@ -619,7 +619,7 @@ int32 OS_CountSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial
 				status = OS_ERR_NO_FREE_IDS;
 			else
 			{
-				*sem_id = (rec - OS_count_sem_table) / sizeof(OS_count_sem_record_t);
+				*semaphore_id = (rec - OS_count_sem_table) / sizeof(OS_count_sem_record_t);
 				sem_init(&rec->sem, sem_initial_value, semCounting);
 				strcpy(rec->name, sem_name);
 				rec->creator = OS_TaskGetId();
@@ -634,14 +634,14 @@ int32 OS_CountSemCreate(uint32 *sem_id, const char *sem_name, uint32 sem_initial
 	return status;
 }
 
-int32 OS_CountSemDelete(uint32 sem_id)
+int32 OS_CountSemDelete(uint32 semaphore_id)
 {
-	OS_count_sem_record_t *rec = &OS_count_sem_table[sem_id];
+	OS_count_sem_record_t *rec = &OS_count_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_COUNT_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_COUNT_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -657,14 +657,14 @@ int32 OS_CountSemDelete(uint32 sem_id)
 	return status;
 }
 
-int32 OS_CountSemGive(uint32 sem_id)
+int32 OS_CountSemGive(uint32 semaphore_id)
 {
-	OS_count_sem_record_t *rec = &OS_count_sem_table[sem_id];
+	OS_count_sem_record_t *rec = &OS_count_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_COUNT_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_COUNT_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -679,14 +679,14 @@ int32 OS_CountSemGive(uint32 sem_id)
 	return status;
 }
 
-int32 OS_CountSemTake(uint32 sem_id)
+int32 OS_CountSemTake(uint32 semaphore_id)
 {
-	OS_count_sem_record_t *rec = &OS_count_sem_table[sem_id];
+	OS_count_sem_record_t *rec = &OS_count_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_COUNT_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_COUNT_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -701,14 +701,14 @@ int32 OS_CountSemTake(uint32 sem_id)
 	return status;
 }
 
-int32 OS_CountSemTimedWait(uint32 sem_id, uint32 msecs)
+int32 OS_CountSemTimedWait(uint32 semaphore_id, uint32 msecs)
 {
-	OS_count_sem_record_t *rec = &OS_count_sem_table[sem_id];
+	OS_count_sem_record_t *rec = &OS_count_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_COUNT_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_COUNT_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -724,14 +724,14 @@ int32 OS_CountSemTimedWait(uint32 sem_id, uint32 msecs)
 	return status;
 }
 
-int32 OS_CountSemGetIdByName(uint32 *sem_id, const char *sem_name)
+int32 OS_CountSemGetIdByName(uint32 *semaphore_id, const char *sem_name)
 {
 	OS_count_sem_record_t *rec;
 	int32 status;
 
 	sys_lock();
 
-	if (!sem_id || !sem_name)
+	if (!semaphore_id || !sem_name)
 		status = OS_INVALID_POINTER;
 	else if (strlen(sem_name) >= OS_MAX_API_NAME)
 		status = OS_ERR_NAME_TOO_LONG;
@@ -746,7 +746,7 @@ int32 OS_CountSemGetIdByName(uint32 *sem_id, const char *sem_name)
 			status = OS_ERR_NAME_NOT_FOUND;
 		else
 		{
-			*sem_id = (rec - OS_count_sem_table) / sizeof(OS_count_sem_record_t);
+			*semaphore_id = (rec - OS_count_sem_table) / sizeof(OS_count_sem_record_t);
 			status = OS_SUCCESS;
 		}
 	}
@@ -756,14 +756,14 @@ int32 OS_CountSemGetIdByName(uint32 *sem_id, const char *sem_name)
 	return status;
 }
 
-int32 OS_CountSemGetInfo(uint32 sem_id, OS_count_sem_prop_t *count_prop)
+int32 OS_CountSemGetInfo(uint32 semaphore_id, OS_count_sem_prop_t *count_prop)
 {
-	OS_count_sem_record_t *rec = &OS_count_sem_table[sem_id];
+	OS_count_sem_record_t *rec = &OS_count_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_COUNT_SEMAPHORES)
+	if (semaphore_id >= OS_MAX_COUNT_SEMAPHORES)
 		status = OS_ERR_INVALID_ID;
 	else if (!count_prop || !rec->used)
 		status = OS_INVALID_POINTER;
@@ -785,7 +785,7 @@ int32 OS_CountSemGetInfo(uint32 sem_id, OS_count_sem_prop_t *count_prop)
 ** Mutex API
 */
 
-int32 OS_MutSemCreate(uint32 *sem_id, const char *sem_name, uint32 options)
+int32 OS_MutSemCreate(uint32 *semaphore_id, const char *sem_name, uint32 options)
 {
 	OS_mut_sem_record_t *rec;
 	int32 status;
@@ -794,7 +794,7 @@ int32 OS_MutSemCreate(uint32 *sem_id, const char *sem_name, uint32 options)
 
 	sys_lock();
 
-	if (!sem_id || !sem_name)
+	if (!semaphore_id || !sem_name)
 		status = OS_INVALID_POINTER;
 	else if (strlen(sem_name) >= OS_MAX_API_NAME)
 		status = OS_ERR_NAME_TOO_LONG;
@@ -817,7 +817,7 @@ int32 OS_MutSemCreate(uint32 *sem_id, const char *sem_name, uint32 options)
 				status = OS_ERR_NO_FREE_IDS;
 			else
 			{
-				*sem_id = (rec - OS_mut_sem_table) / sizeof(OS_mut_sem_record_t);
+				*semaphore_id = (rec - OS_mut_sem_table) / sizeof(OS_mut_sem_record_t);
 				mtx_init(&rec->mtx);
 				strcpy(rec->name, sem_name);
 				rec->creator = OS_TaskGetId();
@@ -832,14 +832,14 @@ int32 OS_MutSemCreate(uint32 *sem_id, const char *sem_name, uint32 options)
 	return status;
 }
 
-int32 OS_MutSemDelete(uint32 sem_id)
+int32 OS_MutSemDelete(uint32 semaphore_id)
 {
-	OS_mut_sem_record_t *rec = &OS_mut_sem_table[sem_id];
+	OS_mut_sem_record_t *rec = &OS_mut_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_MUTEXES)
+	if (semaphore_id >= OS_MAX_MUTEXES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -855,14 +855,14 @@ int32 OS_MutSemDelete(uint32 sem_id)
 	return status;
 }
 
-int32 OS_MutSemGive(uint32 sem_id)
+int32 OS_MutSemGive(uint32 semaphore_id)
 {
-	OS_mut_sem_record_t *rec = &OS_mut_sem_table[sem_id];
+	OS_mut_sem_record_t *rec = &OS_mut_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_MUTEXES)
+	if (semaphore_id >= OS_MAX_MUTEXES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -877,14 +877,14 @@ int32 OS_MutSemGive(uint32 sem_id)
 	return status;
 }
 
-int32 OS_MutSemTake(uint32 sem_id)
+int32 OS_MutSemTake(uint32 semaphore_id)
 {
-	OS_mut_sem_record_t *rec = &OS_mut_sem_table[sem_id];
+	OS_mut_sem_record_t *rec = &OS_mut_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_MUTEXES)
+	if (semaphore_id >= OS_MAX_MUTEXES)
 		status = OS_ERR_INVALID_ID;
 	else if (rec->used == 0)
 		status = OS_INVALID_POINTER;
@@ -899,14 +899,14 @@ int32 OS_MutSemTake(uint32 sem_id)
 	return status;
 }
 
-int32 OS_MutSemGetIdByName(uint32 *sem_id, const char *sem_name)
+int32 OS_MutSemGetIdByName(uint32 *semaphore_id, const char *sem_name)
 {
 	OS_mut_sem_record_t *rec;
 	int32 status;
 
 	sys_lock();
 
-	if (!sem_id || !sem_name)
+	if (!semaphore_id || !sem_name)
 		status = OS_INVALID_POINTER;
 	else if (strlen(sem_name) >= OS_MAX_API_NAME)
 		status = OS_ERR_NAME_TOO_LONG;
@@ -921,7 +921,7 @@ int32 OS_MutSemGetIdByName(uint32 *sem_id, const char *sem_name)
 			status = OS_ERR_NAME_NOT_FOUND;
 		else
 		{
-			*sem_id = (rec - OS_mut_sem_table) / sizeof(OS_mut_sem_record_t);
+			*semaphore_id = (rec - OS_mut_sem_table) / sizeof(OS_mut_sem_record_t);
 			status = OS_SUCCESS;
 		}
 	}
@@ -931,14 +931,14 @@ int32 OS_MutSemGetIdByName(uint32 *sem_id, const char *sem_name)
 	return status;
 }
 
-int32 OS_MutSemGetInfo(uint32 sem_id, OS_mut_sem_prop_t *mut_prop)
+int32 OS_MutSemGetInfo(uint32 semaphore_id, OS_mut_sem_prop_t *mut_prop)
 {
-	OS_mut_sem_record_t *rec = &OS_mut_sem_table[sem_id];
+	OS_mut_sem_record_t *rec = &OS_mut_sem_table[semaphore_id];
 	int32 status;
 
 	sys_lock();
 
-	if (sem_id >= OS_MAX_MUTEXES)
+	if (semaphore_id >= OS_MAX_MUTEXES)
 		status = OS_ERR_INVALID_ID;
 	else if (!mut_prop || !rec->used)
 		status = OS_INVALID_POINTER;
