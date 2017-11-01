@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    13.07.2017
+    @date    01.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -40,8 +40,8 @@ __asm void PendSV_Handler( void )
 
 	mrs   r0,    PSP
 	mov   r3,    lr
-	lsls  r3,  # 29
-	bmi   priv_ctx_enter
+	lsrs  r3,  # 3
+	bcs   priv_ctx_enter
 	mov   r0,    sp
 	sub   sp,  # 36
 priv_ctx_enter
@@ -54,6 +54,27 @@ priv_ctx_enter
 	mov   r7,    lr
 	stm   r0!, { r3  - r7 }
 	subs  r0,  # 36
+
+	bl    __cpp(core_tsk_handler)
+
+	adds  r0,  # 16
+	ldm   r0!, { r3  - r7 }
+	mov   r8,    r3
+	mov   r9,    r4
+	mov   r10,   r5
+	mov   r11,   r6
+	mov   lr,    r7
+	subs  r0,  # 36
+	ldm   r0!, { r4  - r7 }
+	adds  r0,  # 20
+	mov   r3,    lr
+	lsrs  r3,  # 3
+	bcs   priv_ctx_exit
+	mov   sp,    r0
+	bx    lr
+priv_ctx_exit
+	msr   PSP,   r0
+	bx    lr
 
 #else //__CORTEX_M
 
@@ -71,32 +92,7 @@ priv_ctx_enter
 #endif
 	stmdb r0!, { r4  - r11, lr }
 
-#endif//__CORTEX_M
-
 	bl    __cpp(core_tsk_handler)
-
-#if __CORTEX_M < 3
-
-	adds  r0,  # 16
-	ldm   r0!, { r3  - r7 }
-	mov   r8,    r3
-	mov   r9,    r4
-	mov   r10,   r5
-	mov   r11,   r6
-	mov   lr,    r7
-	subs  r0,  # 36
-	ldm   r0!, { r4  - r7 }
-	adds  r0,  # 20
-	mov   r3,    lr
-	lsls  r3,  # 29
-	bmi   priv_ctx_exit
-	mov   sp,    r0
-	bx    lr
-priv_ctx_exit
-	msr   PSP,   r0
-	bx    lr
-
-#else //__CORTEX_M
 
 	ldmia r0!, { r4  - r11, lr }
 #if __FPU_USED
