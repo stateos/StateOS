@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    04.11.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -57,9 +57,7 @@ osStatus_t osKernelInitialize (void)
 {
 	if (IS_IRQ_MODE())
 		return osErrorISR;
-#if defined(__CSMC__)
-	sys_init();
-#endif
+
 	tsk_prio(osPriorityISR);
 	return osOK;
 }
