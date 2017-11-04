@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     stm32f4xx.ld
 @author   Rajmund Szymanski
-@date     28.02.2017
+@date     29.04.2017
 @brief    Linker script for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -23,8 +23,6 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
-	__text_start = ORIGIN(ROM);
-
 	.text :
 	{
 		KEEP (*(.vectors))
@@ -72,9 +70,6 @@ SECTIONS
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		__exidx_end = .;
 	} > ROM
-
-	__text_end  = .;
-	__text_size = . - __text_start;
 
 	.ccm (NOLOAD):
 	{

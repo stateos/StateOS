@@ -30,6 +30,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+5.4
+- added startup files for cosmic compiler
+---------
 5.3
 - updated inclusion of header files
 - fixed bug for CM0 and gcc compiler

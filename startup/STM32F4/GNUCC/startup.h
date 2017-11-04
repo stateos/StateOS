@@ -23,7 +23,17 @@ char  __proc_stack[proc_stack] __attribute__ ((used, section(".proc_stack")));
  Prototypes of external functions
 *******************************************************************************/
 
+#ifndef USE_CRT
+
 int main( void );
+
+#else //USE_CRT
+
+void hardware_init_hook( void ) __attribute__ ((weak));
+void software_init_hook( void ) __attribute__ ((weak));
+void             _start( void ) __attribute__ ((noreturn));
+
+#endif//USE_CRT
 
 /*******************************************************************************
  Symbols defined in linker script
@@ -69,6 +79,8 @@ void __startup_data_init( void )
 	__startup_memset(__bss_start, __bss_end, 0);
 }
 
+#ifndef USE_CRT
+
 #ifndef __NOSTARTFILES
 
 void __libc_init_array( void );
@@ -109,6 +121,8 @@ void _start( void )
 	/* Go into an infinite loop */
 	for (;;);
 }
+
+#endif//USE_CRT
 
 static inline __attribute__ ((noreturn))
 void __main( void )

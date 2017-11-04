@@ -1,10 +1,11 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     03.11.2017
+#date     02.11.2017
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
+COSMIC     := c:/sys/cosmic/cxstm32/
 GNUCC      := c:/sys/arm-gcc/bin/arm-none-eabi-
 OPENOCD    := c:/sys/tools/openocd/bin-x64/openocd
 STLINK     := c:/sys/tools/st-link/st-link_cli -Q -c SWD UR
@@ -13,29 +14,34 @@ QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board 
 #----------------------------------------------------------#
 
 PROJECT    ?= $(notdir $(CURDIR))
-DEFS       ?= USE_NANO
+DEFS       ?=
 LIBS       ?=
 DIRS       ?=
 KEYS       ?=
 INCS       ?=
-OPTF       ?= 2 # s
+OPTF       ?=
 SCRIPT     ?=
 
 #----------------------------------------------------------#
 
-DEFS       += STM32F407xx
-KEYS       += .gnucc *
+DEFS       += STM32F407xx __ARM__
+KEYS       += .csmcc *
+LIBS       += crtsi libilc libm
+ifeq ($(filter qemu,$(MAKECMDGOALS)),)
+LIBS       += libflc
+endif
+MODEL      := modlc
 
 #----------------------------------------------------------#
 
-AS         := $(GNUCC)gcc -x assembler-with-cpp
-CC         := $(GNUCC)gcc
-CXX        := $(GNUCC)g++
-COPY       := $(GNUCC)objcopy
-DUMP       := $(GNUCC)objdump
+AS         := $(COSMIC)cxcorm
+CC         := $(COSMIC)cxcorm
+COPY       := $(COSMIC)cvdwarf
+DUMP       := $(COSMIC)chex
+LABS       := $(COSMIC)clabs
 SIZE       := $(GNUCC)size
-LD         := $(GNUCC)g++
-AR         := $(GNUCC)ar
+LD         := $(COSMIC)clnk
+AR         := $(COSMIC)clib
 GDB        := $(GNUCC)gdb
 
 RM         ?= rm -f
@@ -48,19 +54,17 @@ VPATH      := $(sort $(call DTREE,) $(foreach d,$(DIRS),$(call DTREE,$d/)))
 
 #----------------------------------------------------------#
 
-AS_EXT     := .S
+AS_EXT     := .s
 C_EXT      := .c
-CXX_EXT    := .cpp
 
-INC_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $d*.h $d*.hpp))))
-LIB_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $dlib*.a $d*.ld))))
+INC_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $d*.h))))
+LIB_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $d*.cxm))))
 OBJ_SRCS   :=              $(foreach d,$(VPATH),$(wildcard $d*.o))
 AS_SRCS    :=              $(foreach d,$(VPATH),$(wildcard $d*$(AS_EXT)))
 C_SRCS     :=              $(foreach d,$(VPATH),$(wildcard $d*$(C_EXT)))
-CXX_SRCS   :=              $(foreach d,$(VPATH),$(wildcard $d*$(CXX_EXT)))
-LIB_SRCS   :=     $(notdir $(foreach d,$(VPATH),$(wildcard $dlib*.a)))
+LIB_SRCS   :=     $(notdir $(foreach d,$(VPATH),$(wildcard $d*.cxm)))
 ifeq ($(strip $(SCRIPT)),)
-SCRIPT     :=  $(firstword $(foreach d,$(VPATH),$(wildcard $d*.ld)))
+SCRIPT     :=  $(firstword $(foreach d,$(VPATH),$(wildcard $d*.lkf)))
 else
 SCRIPT     :=  $(firstword $(foreach d,$(VPATH),$(wildcard $d$(SCRIPT))))
 endif
@@ -68,77 +72,47 @@ ifeq ($(strip $(PROJECT)),)
 PROJECT    :=     $(notdir $(CURDIR))
 endif
 
-AS_SRCS    := $(AS_SRCS:%.s=)
+AS_SRCS    := $(AS_SRCS:%.S=)
 
 #----------------------------------------------------------#
 
-BIN        := $(PROJECT).bin
+BIN        := $(PROJECT).cxm
 ELF        := $(PROJECT).elf
-HEX        := $(PROJECT).hex
-LIB        := lib$(PROJECT).a
-LSS        := $(PROJECT).lss
+HEX        := $(PROJECT).s19
+LIB        := $(PROJECT).cxm
 MAP        := $(PROJECT).map
 
 OBJS       := $(AS_SRCS:%$(AS_EXT)=%.o)
 OBJS       += $(C_SRCS:%$(C_EXT)=%.o)
-OBJS       += $(CXX_SRCS:%$(CXX_EXT)=%.o)
-DEPS       := $(OBJS:.o=.d)
-LSTS       := $(OBJS:.o=.lst)
+LSTS       := $(OBJS:.o=.ls)
+TXTS       := $(OBJS:.o=.la)
 
 #----------------------------------------------------------#
 
-COMMON_F    = -mthumb -mcpu=cortex-m4
-ifneq ($(MAKECMDGOALS),qemu)
-COMMON_F   += -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffast-math
+AS_FLAGS   := #-ax
+AS_FLAGS   += -l -ep
+C_FLAGS    := #+debug
+C_FLAGS    += #+strict +warn
+C_FLAGS    += +$(MODEL) -pc99 -l -pad
+ifeq ($(filter qemu,$(MAKECMDGOALS)),)
+C_FLAGS    += +fpu
 endif
-COMMON_F   += -O$(OPTF) -ffunction-sections -fdata-sections
-ifneq ($(filter USE_LTO,$(DEFS)),)
-COMMON_F   += -flto
-endif
-COMMON_F   += -Wall -Wextra -Wshadow # -Wpedantic
-COMMON_F   += -MD -MP
-COMMON_F   += # -Wa,-amhls=$(@:.o=.lst)
-COMMON_F   += # -g -ggdb
-
-AS_FLAGS    =
-C_FLAGS     = -std=gnu11
-CXX_FLAGS   = -std=gnu++11 -fno-rtti -fno-exceptions # -fno-use-cxa-atexit
-LD_FLAGS    = -Wl,-T$(SCRIPT),-Map=$(MAP),--cref,--no-warn-mismatch,--gc-sections
+LD_FLAGS   := -m $(MAP)
 
 #----------------------------------------------------------#
 
-ifneq ($(strip $(CXX_SRCS)),)
-DEFS       += __USES_CXX
-else
-ifeq ($(filter USE_CRT,$(DEFS)),)
-DEFS       += __NOSTARTFILES
-LD_FLAGS   +=  -nostartfiles
-endif
-endif
-ifneq ($(filter USE_NANO,$(DEFS)),)
-LD_FLAGS   += --specs=nano.specs
-endif
-ifneq ($(filter USE_NOHOST,$(DEFS)),)
-LD_FLAGS   += --specs=nosys.specs
-endif
-ifneq ($(filter USE_SEMIHOST,$(DEFS)),)
-LD_FLAGS   += --specs=rdimon.specs
-endif
+DEFS_F     := $(DEFS:%=-d%)
 
-#----------------------------------------------------------#
-
-DEFS_F     := $(DEFS:%=-D%)
-LIBS       += $(LIB_SRCS:lib%.a=%)
-LIBS_F     := $(LIBS:%=-l%)
+LIB_DIRS_F := $(LIB_DIRS:%=-l%)
+LIBS_F     := $(LIBS:%=%.cxm)
+LIBS_F     += $(LIB_SRCS:$(BIN)=)
 OBJS_ALL   := $(sort $(OBJ_SRCS) $(OBJS))
 INC_DIRS   += $(INCS:%=%/)
-INC_DIRS_F := $(INC_DIRS:%=-I%)
-LIB_DIRS_F := $(LIB_DIRS:%=-L%)
+INC_DIRS_F := $(INC_DIRS:%=-i%)
 
-AS_FLAGS   += $(COMMON_F) $(DEFS_F) $(INC_DIRS_F)
-C_FLAGS    += $(COMMON_F) $(DEFS_F) $(INC_DIRS_F)
-CXX_FLAGS  += $(COMMON_F) $(DEFS_F) $(INC_DIRS_F)
-LD_FLAGS   += $(COMMON_F)
+AS_FLAGS   += $(DEFS_F)
+C_FLAGS    += $(DEFS_F) $(INC_DIRS_F)
+LD_FLAGS   += $(LIB_DIRS_F)
 
 #----------------------------------------------------------#
 
@@ -167,56 +141,42 @@ DEBUG_CMD  += -ex "c"
 
 #----------------------------------------------------------#
 
-all : $(LSS) print_elf_size
+all : $(ELF) print_elf_size
 
-lib : $(LIB) print_size
+lib : $(OBJS_ALL)
+	$(info Creating library: $(LIB))
+	$(AR) -c -p $(LIB) $?
 
-$(ELF) : $(OBJS_ALL) $(SCRIPT)
-	$(info Linking target: $(ELF))
+$(BIN) : $(OBJS_ALL) $(SCRIPT)
+	$(info Creating BIN image: $(BIN))
 ifeq ($(strip $(SCRIPT)),)
-	$(error No linker script in project)
+	$(error No linker file in project)
 endif
-	$(LD) $(LD_FLAGS) $(OBJS_ALL) $(LIBS_F) $(LIB_DIRS_F) -o $@
-
-$(LIB) : $(OBJS_ALL)
-	$(info Building library: $(LIB))
-	$(AR) -r $@ $?
+	$(LD) -o $@ $(LD_FLAGS) $(SCRIPT) $(OBJS_ALL) $(LIBS_F)
 
 $(OBJS) : $(MAKEFILE_LIST)
 
 %.o : %$(AS_EXT)
-	$(info Assembling file: $<)
-	$(AS) $(AS_FLAGS) -c $< -o $@
+	$(AS) $(AS_FLAGS) $<
 
 %.o : %$(C_EXT)
-	$(info Compiling file: $<)
-	$(CC) $(C_FLAGS) -c $< -o $@
+	$(CC) $(C_FLAGS) $<
 
-%.o : %$(CXX_EXT)
-	$(info Compiling file: $<)
-	$(CXX) $(CXX_FLAGS) -c $< -o $@
-
-$(BIN) : $(ELF)
-	$(info Creating BIN image: $(BIN))
-	$(COPY) -O binary $< $@
-
-$(HEX) : $(ELF)
+$(HEX) : $(BIN)
 	$(info Creating HEX image: $(HEX))
-	$(COPY) -O ihex $< $@
+	$(DUMP) -o $@ $<
 
-$(LSS) : $(ELF)
-	$(info Creating extended listing: $(LSS))
-	$(DUMP) --demangle -S $< > $@
+$(ELF) : $(BIN)
+	$(info Creating ELF image: $(ELF))
+	$(COPY) $<
+#	$(info Creating absolute listings)
+#	$(LABS) $<
 
-print_size :
-	$(info Size of modules:)
-	$(SIZE) -B -t --common $(OBJS_ALL)
-
-print_elf_size : # print_size
+print_elf_size :
 	$(info Size of target file:)
 	$(SIZE) -B $(ELF)
 
-GENERATED = $(BIN) $(ELF) $(HEX) $(LIB) $(LSS) $(MAP) $(DEPS) $(LSTS) $(OBJS)
+GENERATED = $(BIN) $(ELF) $(HEX) $(LIB) $(MAP) $(LSTS) $(OBJS) $(TXTS)
 
 clean :
 	$(info Removing all generated output files)
@@ -249,5 +209,3 @@ reset :
 #	$(STLINK) -HardRst
 
 .PHONY : all lib clean flash server debug remote qemu reset
-
--include $(DEPS)

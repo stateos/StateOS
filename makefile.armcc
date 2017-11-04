@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     23.04.2017
+#date     03.11.2017
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -19,7 +19,7 @@ LIBS       ?=
 DIRS       ?=
 KEYS       ?=
 INCS       ?=
-OPTF       ?= space
+OPTF       ?= 2 # space
 SCRIPT     ?=
 
 #----------------------------------------------------------#
@@ -37,6 +37,7 @@ DUMP       := $(ARMCC)fromelf
 SIZE       := $(GNUCC)size
 LD         := $(ARMCC)armlink
 AR         := $(ARMCC)armar
+GDB        := $(GNUCC)gdb
 
 RM         ?= rm -f
 
@@ -166,22 +167,30 @@ OOCD_EXEC  := -c "reset run"
 #terminate OOCD after programming
 OOCD_EXIT  := -c shutdown
 
+#gdb command line
+DEBUG_CMD  := -ex "target remote localhost:3333"
+DEBUG_CMD  += -ex "mon reset halt"
+DEBUG_CMD  += -ex "tbreak main"
+DEBUG_CMD  += -ex "c"
+
 #----------------------------------------------------------#
 
 all : $(LSS) print_elf_size
 
 lib : $(LIB) print_size
 
-$(ELF) : $(MAKEFILE_LIST) $(OBJS_ALL) $(SCRIPT)
+$(ELF) : $(OBJS_ALL) $(SCRIPT)
 	$(info Linking target: $(ELF))
 ifeq ($(strip $(SCRIPT)),)
 	$(error No scatter file in project)
 endif
 	$(LD) $(LD_FLAGS) $(OBJS_ALL) $(LIBS_F) $(LIB_DIRS_F) -o $@
 
-$(LIB) : $(MAKEFILE_LIST) $(OBJS_ALL)
+$(LIB) : $(OBJS_ALL)
 	$(info Building library: $(LIB))
 	$(AR) -r $@ $?
+
+$(OBJS) : $(MAKEFILE_LIST)
 
 %.o : %$(AS_EXT)
 	$(info Assembling file: $<)
@@ -211,7 +220,7 @@ print_size :
 	$(info Size of modules:)
 	$(SIZE) -B -t --common $(OBJS_ALL)
 
-print_elf_size : print_size
+print_elf_size : # print_size
 	$(info Size of target file:)
 	$(SIZE) -B $(ELF)
 
@@ -223,11 +232,19 @@ clean :
 
 flash : all $(HEX)
 	$(info Programing device...)
-#	$(STLINK) -P $(HEX) -V -Rst
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_EXEC) $(OOCD_EXIT)
+#	$(STLINK) -P $(HEX) -V -Rst
+
+server : all
+	$(info Debugging server...)
+	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE)
 
 debug : all
 	$(info Debugging device...)
+	$(GDB) --nx $(DEBUG_CMD) $(ELF)
+
+remote : all
+	$(info Remote device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_DEBG) $(OOCD_EXEC)
 
 qemu : all
@@ -236,9 +253,9 @@ qemu : all
 
 reset :
 	$(info Reseting device...)
-#	$(STLINK) -HardRst
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_EXEC) $(OOCD_EXIT)
+#	$(STLINK) -HardRst
 
-.PHONY : all lib clean flash debug reset qemu
+.PHONY : all lib clean flash server debug remote qemu reset
 
 -include $(DEPS)

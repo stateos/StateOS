@@ -1,0 +1,27 @@
+#***********************************************************
+# file     stm32f4xx.lkf
+# author   Rajmund Szymanski
+# date     03.11.2017
+# brief    Link command file for STM32F407VG
+#***********************************************************
+
+# segment.vector:
++seg .vector -b 0x08000000 -m 0x00100000 -n .vector -k
+# segment code, constants:
++seg .text   -a .vector              -r2 -n .text
++seg .const  -a .text                -r2 -n .const  -it
+# segment ccm:
++seg .ccm    -b 0x10000000 -m 0x00010000 -n .ccm
+# segment ram:
++seg .data   -b 0x20000000 -m 0x00020000 -n .data   -id
++seg .bss    -a .data                -r2 -n .bss
+
+@*
+
++def __sdata=start(.data)   # init value of data pointer
++def __sram=start(.bss)     # start of ram to clear
++def __eram=end(.bss)       # end of ram to clear
++def __memory=end(.bss)
++def __stack=0x20020000     # init value of stack pointer
++def ___initial_sp=__stack
++def ___initial_msp=__stack

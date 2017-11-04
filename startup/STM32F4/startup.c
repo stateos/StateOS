@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.c
 @author   Rajmund Szymanski
-@date     30.12.2016
+@date     04.11.2017
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -39,6 +39,14 @@
 
 extern char __initial_msp[];
 extern char __initial_sp [];
+
+/*******************************************************************************
+ Cosmic compiler does not know the keyword __attribute__
+*******************************************************************************/
+
+#ifdef  __CSMC__
+#define __attribute__(attribute)
+#endif
 
 /*******************************************************************************
  Default fault handler
@@ -180,11 +188,13 @@ void FMPI2C1_ER_IRQHandler        (void) __attribute__ ((weak, alias("Fault_Hand
 /*******************************************************************************
  Vector table for STM32F4xx (Cortex-M4F)
 *******************************************************************************/
-
-void (* const vectors[])(void) __attribute__ ((used, section(".vectors"))) =
+#ifdef  __CSMC__
+#pragma section const { vector }
+#endif
+void (* const isr_vectors[])(void) __attribute__ ((used, section(".vectors"))) =
 {
 	/* Initial stack pointer */
-	(void(*)(void))__initial_msp,
+	(void(*)(void)) __initial_msp,
 
 	/* Core exceptions */
 	Reset_Handler,      /* Reset                                   */
@@ -322,6 +332,8 @@ void (* const vectors[])(void) __attribute__ ((used, section(".vectors"))) =
 #include "CLANG/startup.h"
 #elif defined(__GNUC__)
 #include "GNUCC/startup.h"
+#elif defined(__CSMC__)
+#include "CSMCC/startup.h"
 #else
 #error Unknown compiler!
 #endif
@@ -334,7 +346,7 @@ void Reset_Handler( void )
 {
 #if proc_stack_size > 0
 	/* Initialize the process stack pointer */
-	__set_PSP((unsigned)__initial_sp);
+	__set_PSP((uint32_t) __initial_sp);
 	__set_CONTROL(CONTROL_SPSEL_Msk);
 #endif
 #if __FPU_USED
