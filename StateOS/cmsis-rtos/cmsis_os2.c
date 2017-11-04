@@ -226,9 +226,8 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 		
 		if (attr->stack_size != 0U)
 		{
-			stack_size = ABOVE(attr->stack_size);
-			if (attr->stack_mem != NULL)
-				stack_mem = attr->stack_mem;
+			stack_size = attr->stack_size;
+			stack_mem  = attr->stack_mem;
 		}
 	}
 
