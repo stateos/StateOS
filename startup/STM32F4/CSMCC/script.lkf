@@ -5,16 +5,16 @@
 # brief    Link command file for STM32F407VG
 #***********************************************************
 
-# segment.vector:
-+seg .vector -b 0x08000000 -m 0x00100000 -n .vector -k
+# segment vectors:
++seg .vectors -b 0x08000000 -m 0x00100000 -n .vectors -k
 # segment code, constants:
-+seg .text   -a .vector              -r2 -n .text
-+seg .const  -a .text                -r2 -n .const  -it
++seg .text    -a .vectors             -r2 -n .text
++seg .const   -a .text                -r2 -n .const  -it
 # segment ccm:
-+seg .ccm    -b 0x10000000 -m 0x00010000 -n .ccm
++seg .ccm     -b 0x10000000 -m 0x00010000 -n .ccm
 # segment ram:
-+seg .data   -b 0x20000000 -m 0x00020000 -n .data   -id
-+seg .bss    -a .data                -r2 -n .bss
++seg .data    -b 0x20000000 -m 0x00020000 -n .data   -id
++seg .bss     -a .data                -r2 -n .bss
 
 @*
 

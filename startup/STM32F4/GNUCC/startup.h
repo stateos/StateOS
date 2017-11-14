@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     24.10.2016
+@date     14.11.2017
 @brief    Startup file header for gcc compiler.
 *******************************************************************************/
 
@@ -20,6 +20,13 @@ char  __proc_stack[proc_stack] __attribute__ ((used, section(".proc_stack")));
 #endif
 
 /*******************************************************************************
+ Additional definitions
+*******************************************************************************/
+
+#define __ALIAS(function) __attribute__ ((weak, alias(#function)))
+#define __VECTORS         __attribute__ ((used, section(".vectors")))
+
+/*******************************************************************************
  Prototypes of external functions
 *******************************************************************************/
 
@@ -29,11 +36,13 @@ int main( void );
 
 #else //USE_CRT
 
-void hardware_init_hook( void ) __attribute__ ((weak));
-void software_init_hook( void ) __attribute__ ((weak));
-void             _start( void ) __attribute__ ((noreturn));
+__WEAK      void hardware_init_hook( void );
+__WEAK      void software_init_hook( void );
+__NO_RETURN void             _start( void );
 
 #endif//USE_CRT
+
+__NO_RETURN __ALIAS(Fault_Handler) void _exit( int );
 
 /*******************************************************************************
  Symbols defined in linker script
@@ -58,19 +67,19 @@ extern void(*   __fini_array_end  [])();
  Default reset procedures
 *******************************************************************************/
 
-static inline
+__STATIC_INLINE
 void __startup_memcpy( unsigned *dst_, unsigned *end_, unsigned *src_ )
 {
 	while (dst_ < end_) *dst_++ = *src_++;
 }
 
-static inline
+__STATIC_INLINE
 void __startup_memset( unsigned *dst_, unsigned *end_, unsigned val_ )
 {
 	while (dst_ < end_) *dst_++ = val_;
 }
 
-static inline
+__STATIC_INLINE
 void __startup_data_init( void )
 {
 	/* Initialize the data segment */
@@ -88,20 +97,20 @@ void __libc_fini_array( void );
 
 #else //__NOSTARTFILES
 
-static inline
+__STATIC_INLINE
 void __startup_call_array( void(**dst_)(), void(**end_)() )
 {
 	while (dst_ < end_)(*dst_++)();
 }
 
-static inline
+__STATIC_INLINE
 void __libc_init_array( void )
 {
 //	__startup_call_array(__preinit_array_start, __preinit_array_end);
 	__startup_call_array(__init_array_start, __init_array_end);
 }
 
-static inline
+__STATIC_INLINE
 void __libc_fini_array( void )
 {
 //	__startup_call_array(__fini_array_start, __fini_array_end);
@@ -109,7 +118,7 @@ void __libc_fini_array( void )
 
 #endif//__NOSTARTFILES
 
-static inline __attribute__ ((noreturn))
+__STATIC_INLINE __NO_RETURN
 void _start( void )
 {
 	/* Call global & static constructors */
@@ -124,7 +133,7 @@ void _start( void )
 
 #endif//USE_CRT
 
-static inline __attribute__ ((noreturn))
+__STATIC_INLINE __NO_RETURN
 void __main( void )
 {
 	/* Initialize data segments */
