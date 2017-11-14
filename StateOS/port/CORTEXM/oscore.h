@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    24.10.2017
+    @date    14.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -73,7 +73,7 @@ extern "C" {
 
 #ifndef OS_FUNCTIONAL
 
-#if   defined(__CC_ARM) || defined(__CSMC__)
+#if   defined(__CC_ARM) || defined(__CSMC__) || defined(__ICCARM__)
 #define OS_FUNCTIONAL         0 /* c++ functional library header not included */
 #else
 #define OS_FUNCTIONAL         1 /* include c++ functional library header      */
@@ -81,7 +81,7 @@ extern "C" {
 
 #elif   OS_FUNCTIONAL
 
-#if   defined(__CC_ARM) || defined(__CSMC__)
+#if   defined(__CC_ARM) || defined(__CSMC__) || defined(__ICCARM__)
 #error  c++ functional library not allowed for this compiler.
 #endif
 
