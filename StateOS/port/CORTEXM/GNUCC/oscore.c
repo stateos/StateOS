@@ -139,10 +139,10 @@ void core_tsk_flip( void *sp )
 	(
 "	.syntax	unified                \n"
 
-"	mov   sp,    %0                \n"
+"	mov   sp,  %[sp]               \n"
 "	bl  %[core_tsk_loop]           \n"
 
-::	"r" (sp),
+::	[sp] "r" (sp),
 	[core_tsk_loop] "i" (core_tsk_loop)
 :	"memory"
 	);

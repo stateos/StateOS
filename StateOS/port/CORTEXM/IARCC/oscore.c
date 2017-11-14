@@ -37,8 +37,6 @@
 __attribute__((naked))
 void PendSV_Handler( void )
 {
-	void *sp;
-
 	__ASM volatile
 	(
 "	mrs   r0,    PSP               \n"
@@ -57,14 +55,8 @@ void PendSV_Handler( void )
 "	stm   r0!, { r3  - r7 }        \n"
 "	subs  r0,  # 36                \n"
 
-:	"=r0" (sp)
-::	"memory"
-	);
+"	bl %c[core_tsk_handler]        \n"
 
-	sp = core_tsk_handler(sp);
-
-	__ASM volatile
-	(
 "	adds  r0,  # 16                \n"
 "	ldm   r0!, { r3  - r7 }        \n"
 "	mov   r8,    r3                \n"
@@ -83,7 +75,7 @@ void PendSV_Handler( void )
 "2:	msr   PSP,   r0                \n"
 "	bx    lr                       \n"
 
-::	"r0" (sp)
+::	[core_tsk_handler] "i" (core_tsk_handler)
 :	"memory"
 	);
 }
@@ -97,8 +89,6 @@ void PendSV_Handler( void )
 __attribute__((naked))
 void PendSV_Handler( void )
 {
-	void *sp;
-
 	__ASM volatile
 	(
 "	tst   lr,  # 4                 \n"
@@ -115,14 +105,8 @@ void PendSV_Handler( void )
 #endif
 "	stmdb r0!, { r4  - r11, lr }   \n"
 
-:	"=r0" (sp)
-::	"memory"
-	);
+"	bl %c[core_tsk_handler]        \n"
 
-	sp = core_tsk_handler(sp);
-
-	__ASM volatile
-	(
 "	ldmia r0!, { r4  - r11, lr }   \n"
 #if __FPU_USED
 "	tst   lr,  # 16                \n"
@@ -135,7 +119,7 @@ void PendSV_Handler( void )
 "	moveq sp,    r0                \n"
 "	bx    lr                       \n"
 
-::	"r0" (sp)
+::	[core_tsk_handler] "i" (core_tsk_handler)
 :	"memory"
 	);
 }
@@ -149,13 +133,15 @@ void core_tsk_flip( void *sp )
 {
 	__ASM volatile
 	(
-"	mov   sp,    r0                \n"
+"	mov   sp,  %[sp]               \n"
+"	b  %c[core_tsk_loop]           \n"
 
-::	"r0" (sp)
+::	[sp] "r" (sp),
+	[core_tsk_loop] "i" (core_tsk_loop)
 :	"memory"
 	);
 
-	core_tsk_loop();
+	for(;;);
 }
 	
 /* -------------------------------------------------------------------------- */
