@@ -18,8 +18,8 @@
  Prototypes of external functions
 *******************************************************************************/
 
-__NO_RETURN void __iar_program_start( void );
 __WEAK      void       port_sys_init( void );
+__NO_RETURN void __iar_program_start( void );
 
 /*******************************************************************************
  Default reset procedures
