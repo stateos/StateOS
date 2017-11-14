@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    13.11.2017
+    @date    14.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -37,17 +37,17 @@
 __attribute__((naked))
 void PendSV_Handler( void )
 {
-	register void *sp __ASM("r0");
-
 	__ASM volatile
 	(
+"	.syntax	unified                \n"
+
 "	mrs   r0,    PSP               \n"
 "	mov   r3,    lr                \n"
-"	lsr   r3,  # 3                 \n"
+"	lsrs  r3,    r3, # 3           \n"
 "	bcs   1f                       \n"
 "	mov   r0,    sp                \n"
 "	sub   sp,  # 36                \n"
-"1:	sub   r0,  # 36                \n"
+"1:	subs  r0,  # 36                \n"
 "	stm   r0!, { r4  - r7 }        \n"
 "	mov   r3,    r8                \n"
 "	mov   r4,    r9                \n"
@@ -55,35 +55,29 @@ void PendSV_Handler( void )
 "	mov   r6,    r11               \n"
 "	mov   r7,    lr                \n"
 "	stm   r0!, { r3  - r7 }        \n"
-"	sub   r0,  # 36                \n"
+"	subs  r0,  # 36                \n"
 
-:	"=r" (sp)
-::	"memory"
-	);
+"	bl  %[core_tsk_handler]        \n"
 
-	sp = core_tsk_handler(sp);
-
-	__ASM volatile
-	(
-"	add   r0,  # 16                \n"
+"	adds  r0,  # 16                \n"
 "	ldm   r0!, { r3  - r7 }        \n"
 "	mov   r8,    r3                \n"
 "	mov   r9,    r4                \n"
 "	mov   r10,   r5                \n"
 "	mov   r11,   r6                \n"
 "	mov   lr,    r7                \n"
-"	sub   r0,  # 36                \n"
+"	subs  r0,  # 36                \n"
 "	ldm   r0!, { r4  - r7 }        \n"
-"	add   r0,  # 20                \n"
+"	adds  r0,  # 20                \n"
 "	mov   r3,    lr                \n"
-"	lsr   r3,  # 3                 \n"
+"	lsrs  r3,    r3, # 3           \n"
 "	bcs   2f                       \n"
 "	mov   sp,    r0                \n"
 "	bx    lr                       \n"
 "2:	msr   PSP,   r0                \n"
 "	bx    lr                       \n"
 
-::	"r" (sp)
+::	[core_tsk_handler] "i" (core_tsk_handler)
 :	"memory"
 	);
 }
@@ -97,10 +91,10 @@ void PendSV_Handler( void )
 __attribute__((naked))
 void PendSV_Handler( void )
 {
-	register void *sp __ASM("r0");
-
 	__ASM volatile
 	(
+"	.syntax	unified                \n"
+
 "	tst   lr,  # 4                 \n"
 "	itee  ne                       \n"
 "	mrsne r0,    PSP               \n"
@@ -115,14 +109,8 @@ void PendSV_Handler( void )
 #endif
 "	stmdb r0!, { r4  - r11, lr }   \n"
 
-:	"=r" (sp)
-::	"memory"
-	);
+"	bl  %[core_tsk_handler]        \n"
 
-	sp = core_tsk_handler(sp);
-
-	__ASM volatile
-	(
 "	ldmia r0!, { r4  - r11, lr }   \n"
 #if __FPU_USED
 "	tst   lr,  # 16                \n"
@@ -135,7 +123,7 @@ void PendSV_Handler( void )
 "	moveq sp,    r0                \n"
 "	bx    lr                       \n"
 
-::	"r" (sp)
+::	[core_tsk_handler] "i" (core_tsk_handler)
 :	"memory"
 	);
 }
@@ -149,13 +137,15 @@ void core_tsk_flip( void *sp )
 {
 	__ASM volatile
 	(
-"	mov   sp,    %0                \n"
+"	.syntax	unified                \n"
 
-::	"r" (sp)
+"	mov   sp,    %0                \n"
+"	bl  %[core_tsk_loop]           \n"
+
+::	"r" (sp),
+	[core_tsk_loop] "i" (core_tsk_loop)
 :	"memory"
 	);
-
-	core_tsk_loop();
 }
 	
 /* -------------------------------------------------------------------------- */

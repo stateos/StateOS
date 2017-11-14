@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    13.11.2017
+    @date    14.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -37,11 +37,11 @@
 __attribute__((naked))
 void PendSV_Handler( void )
 {
-	__asm volatile
+	__ASM volatile
 	(
 "	mrs   r0,    PSP               \n"
 "	mov   r3,    lr                \n"
-"	lsrs  r3,  # 3                 \n"
+"	lsrs  r3,    r3, # 3           \n"
 "	bcs   1f                       \n"
 "	mov   r0,    sp                \n"
 "	sub   sp,  # 36                \n"
@@ -68,7 +68,7 @@ void PendSV_Handler( void )
 "	ldm   r0!, { r4  - r7 }        \n"
 "	adds  r0,  # 20                \n"
 "	mov   r3,    lr                \n"
-"	lsrs  r3,  # 3                 \n"
+"	lsrs  r3,    r3, # 3           \n"
 "	bcs   2f                       \n"
 "	mov   sp,    r0                \n"
 "	bx    lr                       \n"
@@ -89,7 +89,7 @@ void PendSV_Handler( void )
 __attribute__((naked))
 void PendSV_Handler( void )
 {
-	__asm volatile
+	__ASM volatile
 	(
 "	tst   lr,  # 4                 \n"
 "	itee  ne                       \n"
@@ -131,11 +131,11 @@ void PendSV_Handler( void )
 __attribute__((naked))
 void core_tsk_flip(/*void *sp*/)
 {
-	__asm volatile
+	__ASM volatile
 	(
 "	mov   sp,    r0                \n"
 "	bl  %[core_tsk_loop]           \n"
-	
+
 ::	[core_tsk_loop] "i" (core_tsk_loop)
 :	"memory"
 	);

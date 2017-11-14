@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    13.11.2017
+    @date    14.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -40,7 +40,7 @@ __asm void PendSV_Handler( void )
 
 	mrs   r0,    PSP
 	mov   r3,    lr
-	lsrs  r3,  # 3
+	lsrs  r3,    r3, # 3
 	bcs  %f1
 	mov   r0,    sp
 	sub   sp,  # 36
@@ -67,7 +67,7 @@ __asm void PendSV_Handler( void )
 	ldm   r0!, { r4  - r7 }
 	adds  r0,  # 20
 	mov   r3,    lr
-	lsrs  r3,  # 3
+	lsrs  r3,    r3, # 3
 	bcs  %f2
 	mov   sp,    r0
 	bx    lr

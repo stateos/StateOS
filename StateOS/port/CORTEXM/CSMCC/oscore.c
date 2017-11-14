@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    13.11.2017
+    @date    14.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -37,15 +37,15 @@
 void PendSV_Handler( void )
 {
 	#asm
-	xref  _core_tsk_handler
+	xref _core_tsk_handler
 
 	mrs   r0,    PSP
 	mov   r3,    lr
-	lsrs  r3,  # 3
+	lsrs  r3,    r3, # 3
 	bcs   _1
 	mov   r0,    sp
 	sub   sp,  # 36
-_1:	sub   r0,  # 36
+_1:	subs  r0,  # 36
 	stm   r0!, { r4  - r7 }
 	mov   r3,    r8
 	mov   r4,    r9
@@ -53,22 +53,22 @@ _1:	sub   r0,  # 36
 	mov   r6,    r11
 	mov   r7,    lr
 	stm   r0!, { r3  - r7 }
-	sub   r0,  # 36
+	subs  r0,  # 36
 
-	bl    _core_tsk_handler
+	bl   _core_tsk_handler
 
-	add   r0,  # 16
+	adds  r0,  # 16
 	ldm   r0!, { r3  - r7 }
 	mov   r8,    r3
 	mov   r9,    r4
 	mov   r10,   r5
 	mov   r11,   r6
 	mov   lr,    r7
-	sub   r0,  # 36
+	subs  r0,  # 36
 	ldm   r0!, { r4  - r7 }
-	add   r0,  # 20
+	adds  r0,  # 20
 	mov   r3,    lr
-	lsrs  r3,  # 3
+	lsrs  r3,    r3, # 3
 	bcs   _2
 	mov   sp,    r0
 	bx    lr
@@ -87,7 +87,7 @@ _2:	msr   PSP,   r0
 void PendSV_Handler( void )
 {
 	#asm
-	xref  _core_tsk_handler
+	xref _core_tsk_handler
 
 	tst   lr,  # 4                      ; process stack used?
 	itee  ne
@@ -103,7 +103,7 @@ void PendSV_Handler( void )
 #endif
 	stmdb r0!, { r4  - r11, lr }
 
-	bl    _core_tsk_handler
+	bl   _core_tsk_handler
 
 	ldmia r0!, { r4  - r11, lr }
 #if __FPU_USED
@@ -127,10 +127,10 @@ void PendSV_Handler( void )
 void core_tsk_flip( void *sp )
 {
 	#asm
-	xref  _core_tsk_loop
+	xref _core_tsk_loop
 
 	mov   sp,    r0
-	bl    _core_tsk_loop
+	bl   _core_tsk_loop
 
 	#endasm
 }
