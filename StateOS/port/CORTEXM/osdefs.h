@@ -38,11 +38,10 @@
 #warning No compiler specific solution for __CONSTRUCTOR. __CONSTRUCTOR is ignored.
 #endif
 
-#elif defined(__ICCARM__) && !defined(__cplusplus)
+#elif defined(__ICCARM__)
 
 #ifndef __CONSTRUCTOR
 #define __CONSTRUCTOR
-#warning No compiler specific solution for __CONSTRUCTOR. __CONSTRUCTOR is ignored.
 #endif
 
 #else
