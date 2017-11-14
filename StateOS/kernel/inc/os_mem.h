@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    14.11.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -477,10 +477,10 @@ template<unsigned _limit, unsigned _size>
 struct MemoryPoolT : public baseMemoryPool
 {
 	explicit
-	MemoryPoolT( void ): baseMemoryPool(_limit, _size, reinterpret_cast<void *>(_data)) {}
+	MemoryPoolT( void ): baseMemoryPool(_limit, _size, reinterpret_cast<void *>(data_)) {}
 
 	private:
-	void *_data[_limit * (1 + MSIZE(_size))];
+	void *data_[_limit * (1 + MSIZE(_size))];
 };
 
 /**********************************************************************************************************************

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    14.11.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -528,10 +528,10 @@ template<unsigned _limit>
 struct MessageQueueT : public baseMessageQueue
 {
 	explicit
-	MessageQueueT( void ): baseMessageQueue(_limit, _data) {}
+	MessageQueueT( void ): baseMessageQueue(_limit, data_) {}
 
 	private:
-	unsigned _data[_limit];
+	unsigned data_[_limit];
 };
 
 #endif

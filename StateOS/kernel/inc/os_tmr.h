@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    14.11.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -655,7 +655,7 @@ struct Timer : public __tmr
 	 Timer( void ):         __tmr _TMR_INIT(0) {}
 #if OS_FUNCTIONAL
 	 explicit
-	 Timer( FUN_t _state ): __tmr _TMR_INIT(_run), _fun(_state) {}
+	 Timer( FUN_t _state ): __tmr _TMR_INIT(run_), fun_(_state) {}
 	~Timer( void ) { assert(__tmr::obj.id == ID_STOPPED); }
 #else
 	 explicit
@@ -669,8 +669,8 @@ struct Timer : public __tmr
 	void startFor     ( uint32_t _delay )                                 {        tmr_startFor     (this, _delay);                  }
 	void startPeriodic( uint32_t _period )                                {        tmr_startPeriodic(this,         _period);         }
 #if OS_FUNCTIONAL
-	void startFrom    ( uint32_t _delay, uint32_t _period, FUN_t _state ) {        _fun = _state;
-	                                                                               tmr_startFrom    (this, _delay, _period, _run);   }
+	void startFrom    ( uint32_t _delay, uint32_t _period, FUN_t _state ) {        fun_ = _state;
+	                                                                               tmr_startFrom    (this, _delay, _period, run_);   }
 #else
 	void startFrom    ( uint32_t _delay, uint32_t _period, FUN_t _state ) {        tmr_startFrom    (this, _delay, _period, _state); }
 #endif
@@ -685,8 +685,8 @@ struct Timer : public __tmr
 	bool     operator!( void )                                            { return __tmr::obj.id == ID_STOPPED;                      }
 #if OS_FUNCTIONAL
 	static
-	void     _run( void ) { ((Timer *) WAIT.obj.next)->_fun(); }
-	FUN_t    _fun;
+	void     run_( void ) { ((Timer *) WAIT.obj.next)->fun_(); }
+	FUN_t    fun_;
 #endif
 };
 
@@ -796,8 +796,8 @@ struct startTimerPeriodic : public startTimer
 namespace ThisTimer
 {
 #if OS_FUNCTIONAL
-	static inline void flipISR ( FUN_t    _state ) { ((Timer *) WAIT.obj.next)->_fun = _state;
-	                                                 tmr_flipISR (Timer::_run);                }
+	static inline void flipISR ( FUN_t    _state ) { ((Timer *) WAIT.obj.next)->fun_ = _state;
+	                                                 tmr_flipISR (Timer::run_);                }
 #else
 	static inline void flipISR ( FUN_t    _state ) { tmr_flipISR (_state);                     }
 #endif

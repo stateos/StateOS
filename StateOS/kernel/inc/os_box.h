@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    14.11.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -538,10 +538,10 @@ template<unsigned _limit, unsigned _size>
 struct MailBoxQueueT : public baseMailBoxQueue
 {
 	explicit
-	MailBoxQueueT( void ): baseMailBoxQueue(_limit, _size, _data) {}
+	MailBoxQueueT( void ): baseMailBoxQueue(_limit, _size, data_) {}
 
 	private:
-	char _data[_limit * _size];
+	char data_[_limit * _size];
 };
 
 /**********************************************************************************************************************
