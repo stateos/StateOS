@@ -14,7 +14,7 @@ QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board 
 #----------------------------------------------------------#
 
 PROJECT    ?= $(notdir $(CURDIR))
-DEFS       ?=
+DEFS       ?= __ARM__
 LIBS       ?=
 DIRS       ?=
 KEYS       ?=
@@ -107,12 +107,6 @@ LD_FLAGS   += --config_def $(filter main_stack_size%,$(DEFS))
 endif
 ifneq ($(filter proc_stack_size%,$(DEFS)),)
 LD_FLAGS   += --config_def $(filter proc_stack_size%,$(DEFS))
-endif
-
-#----------------------------------------------------------#
-
-ifneq ($(strip $(CXX_SRCS)),)
-DEFS       += __USES_CXX
 endif
 
 #----------------------------------------------------------#

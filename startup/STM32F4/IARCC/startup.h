@@ -28,10 +28,8 @@ __WEAK      void       port_sys_init( void );
 __STATIC_INLINE __NO_RETURN
 void __main( void )
 {
-#ifndef __USES_CXX
 	/* Call the os initialization procedure */
 	port_sys_init();
-#endif
 	/* Call the application's entry point */
 	__iar_program_start();
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    01.11.2017
+    @date    13.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -32,20 +32,19 @@
 
 /* -------------------------------------------------------------------------- */
 
+#if __CORTEX_M < 3
+
 __asm void PendSV_Handler( void )
 {
 	PRESERVE8
 
-#if __CORTEX_M < 3
-
 	mrs   r0,    PSP
 	mov   r3,    lr
 	lsrs  r3,  # 3
-	bcs   priv_ctx_enter
+	bcs  %f1
 	mov   r0,    sp
 	sub   sp,  # 36
-priv_ctx_enter
-	subs  r0,  # 36
+1	subs  r0,  # 36
 	stm   r0!, { r4  - r7 }
 	mov   r3,    r8
 	mov   r4,    r9
@@ -69,14 +68,24 @@ priv_ctx_enter
 	adds  r0,  # 20
 	mov   r3,    lr
 	lsrs  r3,  # 3
-	bcs   priv_ctx_exit
+	bcs  %f2
 	mov   sp,    r0
 	bx    lr
-priv_ctx_exit
-	msr   PSP,   r0
+2	msr   PSP,   r0
 	bx    lr
 
-#else //__CORTEX_M
+	ALIGN
+}
+
+#endif//__CORTEX_M
+
+/* -------------------------------------------------------------------------- */
+
+#if __CORTEX_M >= 3
+
+__asm void PendSV_Handler( void )
+{
+	PRESERVE8
 
 	tst   lr,  # 4                      ; process stack used?
 	itee  ne
@@ -106,10 +115,10 @@ priv_ctx_exit
 	moveq sp,    r0
 	bx    lr
 
-#endif//__CORTEX_M
-
 	ALIGN
 }
+
+#endif//__CORTEX_M
 
 /* -------------------------------------------------------------------------- */
 

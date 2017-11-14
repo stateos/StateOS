@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    01.11.2017
+    @date    13.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -32,21 +32,22 @@
 
 /* -------------------------------------------------------------------------- */
 
+#if __CORTEX_M < 3
+
 __attribute__((naked))
 void PendSV_Handler( void )
 {
-	__asm volatile
-	(
-#if __CORTEX_M < 3
+	register void *sp __ASM("r0");
 
+	__ASM volatile
+	(
 "	mrs   r0,    PSP               \n"
 "	mov   r3,    lr                \n"
 "	lsr   r3,  # 3                 \n"
-"	bcs   priv_ctx_enter           \n"
+"	bcs   1f                       \n"
 "	mov   r0,    sp                \n"
 "	sub   sp,  # 36                \n"
-"priv_ctx_enter:                   \n"
-"	sub   r0,  # 36                \n"
+"1:	sub   r0,  # 36                \n"
 "	stm   r0!, { r4  - r7 }        \n"
 "	mov   r3,    r8                \n"
 "	mov   r4,    r9                \n"
@@ -56,9 +57,14 @@ void PendSV_Handler( void )
 "	stm   r0!, { r3  - r7 }        \n"
 "	sub   r0,  # 36                \n"
 
-"	ldr   r1, =%[core_tsk_handler] \n"
-"	blx   r1                       \n"
+:	"=r" (sp)
+::	"memory"
+	);
 
+	sp = core_tsk_handler(sp);
+
+	__ASM volatile
+	(
 "	add   r0,  # 16                \n"
 "	ldm   r0!, { r3  - r7 }        \n"
 "	mov   r8,    r3                \n"
@@ -71,15 +77,30 @@ void PendSV_Handler( void )
 "	add   r0,  # 20                \n"
 "	mov   r3,    lr                \n"
 "	lsr   r3,  # 3                 \n"
-"	bcs   priv_ctx_exit            \n"
+"	bcs   2f                       \n"
 "	mov   sp,    r0                \n"
 "	bx    lr                       \n"
-"priv_ctx_exit:                    \n"
-"	msr   PSP,   r0                \n"
+"2:	msr   PSP,   r0                \n"
 "	bx    lr                       \n"
 
-#else //__CORTEX_M
+::	"r" (sp)
+:	"memory"
+	);
+}
 
+#endif//__CORTEX_M
+
+/* -------------------------------------------------------------------------- */
+
+#if __CORTEX_M >= 3
+
+__attribute__((naked))
+void PendSV_Handler( void )
+{
+	register void *sp __ASM("r0");
+
+	__ASM volatile
+	(
 "	tst   lr,  # 4                 \n"
 "	itee  ne                       \n"
 "	mrsne r0,    PSP               \n"
@@ -94,8 +115,14 @@ void PendSV_Handler( void )
 #endif
 "	stmdb r0!, { r4  - r11, lr }   \n"
 
-"	bl  %[core_tsk_handler]        \n"
+:	"=r" (sp)
+::	"memory"
+	);
 
+	sp = core_tsk_handler(sp);
+
+	__ASM volatile
+	(
 "	ldmia r0!, { r4  - r11, lr }   \n"
 #if __FPU_USED
 "	tst   lr,  # 16                \n"
@@ -108,37 +135,27 @@ void PendSV_Handler( void )
 "	moveq sp,    r0                \n"
 "	bx    lr                       \n"
 
-#endif//__CORTEX_M
-
-::	[core_tsk_handler] "i" (core_tsk_handler)
+::	"r" (sp)
 :	"memory"
 	);
 }
+
+#endif//__CORTEX_M
 
 /* -------------------------------------------------------------------------- */
 
 __attribute__((naked))
 void core_tsk_flip( void *sp )
 {
-	__asm volatile
+	__ASM volatile
 	(
-"	mov   sp,  %[sp]               \n"
+"	mov   sp,    %0                \n"
 
-#if __CORTEX_M < 3
-
-"	ldr   r1, =%[core_tsk_loop]    \n"
-"	blx   r1                       \n"
-
-#else //__CORTEX_M
-
-"	bl  %[core_tsk_loop]           \n"
-	
-#endif//__CORTEX_M
-
-::	[sp] "r" (sp),
-	[core_tsk_loop] "i" (core_tsk_loop)
+::	"r" (sp)
 :	"memory"
 	);
+
+	core_tsk_loop();
 }
 	
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    01.11.2017
+    @date    13.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -32,21 +32,20 @@
 
 /* -------------------------------------------------------------------------- */
 
+#if __CORTEX_M < 3
+
 __attribute__((naked))
 void PendSV_Handler( void )
 {
 	__asm volatile
 	(
-#if __CORTEX_M < 3
-
 "	mrs   r0,    PSP               \n"
 "	mov   r3,    lr                \n"
 "	lsrs  r3,  # 3                 \n"
-"	bcs   priv_ctx_enter           \n"
+"	bcs   1f                       \n"
 "	mov   r0,    sp                \n"
 "	sub   sp,  # 36                \n"
-"priv_ctx_enter:                   \n"
-"	subs  r0,  # 36                \n"
+"1:	subs  r0,  # 36                \n"
 "	stm   r0!, { r4  - r7 }        \n"
 "	mov   r3,    r8                \n"
 "	mov   r4,    r9                \n"
@@ -70,15 +69,28 @@ void PendSV_Handler( void )
 "	adds  r0,  # 20                \n"
 "	mov   r3,    lr                \n"
 "	lsrs  r3,  # 3                 \n"
-"	bcs   priv_ctx_exit            \n"
+"	bcs   2f                       \n"
 "	mov   sp,    r0                \n"
 "	bx    lr                       \n"
-"priv_ctx_exit:                    \n"
-"	msr   PSP,   r0                \n"
+"2:	msr   PSP,   r0                \n"
 "	bx    lr                       \n"
 
-#else //__CORTEX_M
+::	[core_tsk_handler] "i" (core_tsk_handler)
+:	"memory"
+	);
+}
 
+#endif//__CORTEX_M
+
+/* -------------------------------------------------------------------------- */
+
+#if __CORTEX_M >= 3
+
+__attribute__((naked))
+void PendSV_Handler( void )
+{
+	__asm volatile
+	(
 "	tst   lr,  # 4                 \n"
 "	itee  ne                       \n"
 "	mrsne r0,    PSP               \n"
@@ -107,12 +119,12 @@ void PendSV_Handler( void )
 "	moveq sp,    r0                \n"
 "	bx    lr                       \n"
 
-#endif//__CORTEX_M
-
 ::	[core_tsk_handler] "i" (core_tsk_handler)
 :	"memory"
 	);
 }
+
+#endif//__CORTEX_M
 
 /* -------------------------------------------------------------------------- */
 

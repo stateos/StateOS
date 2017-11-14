@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    13.11.2017
+    @date    14.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -43,11 +43,11 @@ void PendSV_Handler( void )
 	(
 "	mrs   r0,    PSP               \n"
 "	mov   r3,    lr                \n"
-"	lsr   r3,  # 3                 \n"
+"	lsrs  r3,    r3,  # 3          \n"
 "	bcs   1f                       \n"
 "	mov   r0,    sp                \n"
 "	sub   sp,  # 36                \n"
-"1:	sub   r0,  # 36                \n"
+"1:	sub   r0,    r0,  # 36         \n"
 "	stm   r0!, { r4  - r7 }        \n"
 "	mov   r3,    r8                \n"
 "	mov   r4,    r9                \n"
@@ -55,7 +55,7 @@ void PendSV_Handler( void )
 "	mov   r6,    r11               \n"
 "	mov   r7,    lr                \n"
 "	stm   r0!, { r3  - r7 }        \n"
-"	sub   r0,  # 36                \n"
+"	sub   r0,    r0,  # 36         \n"
 
 :	"=r0" (sp)
 ::	"memory"
@@ -65,18 +65,18 @@ void PendSV_Handler( void )
 
 	__ASM volatile
 	(
-"	add   r0,  # 16                \n"
+"	add   r0,    r0,  # 16         \n"
 "	ldm   r0!, { r3  - r7 }        \n"
 "	mov   r8,    r3                \n"
 "	mov   r9,    r4                \n"
 "	mov   r10,   r5                \n"
 "	mov   r11,   r6                \n"
 "	mov   lr,    r7                \n"
-"	sub   r0,  # 36                \n"
+"	sub   r0,    r0,  # 36         \n"
 "	ldm   r0!, { r4  - r7 }        \n"
-"	add   r0,  # 20                \n"
+"	add   r0,    r0,  # 20         \n"
 "	mov   r3,    lr                \n"
-"	lsr   r3,  # 3                 \n"
+"	lsrs  r3,    r3,  # 3          \n"
 "	bcs   2f                       \n"
 "	mov   sp,    r0                \n"
 "	bx    lr                       \n"
