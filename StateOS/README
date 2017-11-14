@@ -32,6 +32,7 @@ Features:
 ---------
 5.4
 - added startup files for cosmic compiler
+- added support for IAR compiler
 ---------
 5.3
 - updated inclusion of header files
