@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     03.11.2017
+#date     15.11.2017
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -228,15 +228,15 @@ flash : all $(HEX)
 #	$(STLINK) -P $(HEX) -V -Rst
 
 server : all
-	$(info Debugging server...)
+	$(info Starting server...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE)
 
 debug : all
 	$(info Debugging device...)
 	$(GDB) --nx $(DEBUG_CMD) $(ELF)
 
-remote : all
-	$(info Remote device...)
+monitor : all
+	$(info Monitoring device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_DEBG) $(OOCD_EXEC)
 
 qemu : all
@@ -248,6 +248,6 @@ reset :
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_EXEC) $(OOCD_EXIT)
 #	$(STLINK) -HardRst
 
-.PHONY : all lib clean flash server debug remote qemu reset
+.PHONY : all lib clean flash server debug monitor qemu reset
 
 -include $(DEPS)

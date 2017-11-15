@@ -26,10 +26,7 @@ SCRIPT     ?=
 
 DEFS       += STM32F407xx __ARM__
 KEYS       += .csmcc *
-LIBS       += crtsi libilc libm
-ifeq ($(filter qemu,$(MAKECMDGOALS)),)
-LIBS       += libflc
-endif
+LIBS       += crtsi libilc libm libflc
 MODEL      := modlc
 
 #----------------------------------------------------------#
@@ -94,7 +91,7 @@ AS_FLAGS   += -l -ep
 C_FLAGS    := #+debug
 C_FLAGS    += #+strict +warn
 C_FLAGS    += +$(MODEL) -pc99 -l -pad
-ifeq ($(filter qemu,$(MAKECMDGOALS)),)
+ifneq ($(MAKECMDGOALS),qemu)
 C_FLAGS    += +fpu
 endif
 LD_FLAGS   := -m $(MAP)
@@ -188,15 +185,15 @@ flash : all $(HEX)
 #	$(STLINK) -P $(HEX) -V -Rst
 
 server : all
-	$(info Debugging server...)
+	$(info Starting server...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE)
 
 debug : all
 	$(info Debugging device...)
 	$(GDB) --nx $(DEBUG_CMD) $(ELF)
 
-remote : all
-	$(info Remote device...)
+monitor : all
+	$(info Monitoring device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_DEBG) $(OOCD_EXEC)
 
 qemu : all
@@ -208,4 +205,4 @@ reset :
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_EXEC) $(OOCD_EXIT)
 #	$(STLINK) -HardRst
 
-.PHONY : all lib clean flash server debug remote qemu reset
+.PHONY : all lib clean flash server debug monitor qemu reset
