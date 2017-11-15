@@ -1,11 +1,11 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     02.11.2017
+#date     15.11.2017
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
-COSMIC     := c:/sys/cosmic/cxstm32/
+CSMCC      := c:/sys/cosmic/cxstm32/
 GNUCC      := c:/sys/gcc/arm/bin/arm-none-eabi-
 OPENOCD    := c:/sys/tools/openocd/bin-x64/openocd
 STLINK     := c:/sys/tools/st-link/st-link_cli -Q -c SWD UR
@@ -34,14 +34,14 @@ MODEL      := modlc
 
 #----------------------------------------------------------#
 
-AS         := $(COSMIC)cxcorm
-CC         := $(COSMIC)cxcorm
-COPY       := $(COSMIC)cvdwarf
-DUMP       := $(COSMIC)chex
-LABS       := $(COSMIC)clabs
+AS         := $(CSMCC)cxcorm
+CC         := $(CSMCC)cxcorm
+COPY       := $(CSMCC)cvdwarf
+DUMP       := $(CSMCC)chex
+LABS       := $(CSMCC)clabs
 SIZE       := $(GNUCC)size
-LD         := $(COSMIC)clnk
-AR         := $(COSMIC)clib
+LD         := $(CSMCC)clnk
+AR         := $(CSMCC)clib
 GDB        := $(GNUCC)gdb
 
 RM         ?= rm -f

@@ -1,11 +1,11 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     03.11.2017
+#date     15.11.2017
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
-ARMCC      := c:/sys/arm/armclang/bin/
+CLANG      := c:/sys/arm/armclang/bin/
 GNUCC      := c:/sys/gcc/arm/bin/arm-none-eabi-
 OPENOCD    := c:/sys/tools/openocd/bin-x64/openocd
 STLINK     := c:/sys/tools/st-link/st-link_cli -Q -c SWD UR
@@ -29,14 +29,14 @@ KEYS       += .clang *
 
 #----------------------------------------------------------#
 
-AS         := $(ARMCC)armclang -x assembler-with-cpp
-CC         := $(ARMCC)armclang
-CXX        := $(ARMCC)armclang
-COPY       := $(ARMCC)fromelf
-DUMP       := $(ARMCC)fromelf
+AS         := $(CLANG)armclang -x assembler-with-cpp
+CC         := $(CLANG)armclang
+CXX        := $(CLANG)armclang
+COPY       := $(CLANG)fromelf
+DUMP       := $(CLANG)fromelf
 SIZE       := $(GNUCC)size
-LD         := $(ARMCC)armlink
-AR         := $(ARMCC)armar
+LD         := $(CLANG)armlink
+AR         := $(CLANG)armar
 GDB        := $(GNUCC)gdb
 
 RM         ?= rm -f
@@ -129,17 +129,17 @@ clist=$(subst $(space),$(comma),$(strip $1))
 
 #----------------------------------------------------------#
 
-ARM_INC    := $(ARMCC)../include
-ARM_LIB    := $(ARMCC)../lib
+ARM_INC    := $(CLANG)../include
+ARM_LIB    := $(CLANG)../lib
 
 DEFS_F     := $(DEFS:%=-D%)
 LIBS_F     := $(LIBS:%=%.lib)
 LIBS_F     += $(LIB_SRCS)
 OBJS_ALL   := $(sort $(OBJ_SRCS) $(OBJS))
 INC_DIRS   += $(INCS:%=%/)
-INC_DIRS   += $(ARMCC)../../RV31/INC/
+INC_DIRS   += $(CLANG)../../RV31/INC/
 INC_DIRS_F := $(INC_DIRS:%=-I%)
-LIB_DIRS   += $(ARMCC)../../RV31/LIB/
+LIB_DIRS   += $(CLANG)../../RV31/LIB/
 LIB_DIRS_F := --libpath=$(ARM_LIB)
 LIB_DIRS_F += --userlibpath=$(call clist, $(LIB_DIRS))
 
