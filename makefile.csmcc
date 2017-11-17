@@ -26,14 +26,20 @@ SCRIPT     ?=
 
 DEFS       += STM32F407xx __ARM__
 KEYS       += .csmcc *
-LIBS       += crtsi libilc libm libflc
+ifneq ($(MAKECMDGOALS),qemu)
+LIBS       += libfpulc #libdpulc
+else
+LIBS       += libflc   #libdlc
+endif
+LIBS       += libilc libm crtsi
 MODEL      := modlc
 
 #----------------------------------------------------------#
 
 AS         := $(CSMCC)cxcorm
 CC         := $(CSMCC)cxcorm
-COPY       := $(CSMCC)cvdwarf
+DWARF      := $(CSMCC)cvdwarf
+COPY       := $(GNUCC)objcopy
 DUMP       := $(CSMCC)chex
 LABS       := $(CSMCC)clabs
 SIZE       := $(GNUCC)size
@@ -73,7 +79,8 @@ AS_SRCS    := $(AS_SRCS:%.S=)
 
 #----------------------------------------------------------#
 
-BIN        := $(PROJECT).cxm
+BIN        := $(PROJECT).bin
+CXM        := $(PROJECT).cxm
 ELF        := $(PROJECT).elf
 HEX        := $(PROJECT).s19
 LIB        := $(PROJECT).cxm
@@ -81,6 +88,7 @@ MAP        := $(PROJECT).map
 
 OBJS       := $(AS_SRCS:%$(AS_EXT)=%.o)
 OBJS       += $(C_SRCS:%$(C_EXT)=%.o)
+DEPS       := $(OBJS:.o=.d)
 LSTS       := $(OBJS:.o=.ls)
 TXTS       := $(OBJS:.o=.la)
 
@@ -94,7 +102,7 @@ C_FLAGS    += +$(MODEL) -pc99 -l -pad
 ifneq ($(MAKECMDGOALS),qemu)
 C_FLAGS    += +fpu
 endif
-LD_FLAGS   := -m $(MAP)
+LD_FLAGS   := -m $(MAP) -p
 
 #----------------------------------------------------------#
 
@@ -102,7 +110,7 @@ DEFS_F     := $(DEFS:%=-d%)
 
 LIB_DIRS_F := $(LIB_DIRS:%=-l%)
 LIBS_F     := $(LIBS:%=%.cxm)
-LIBS_F     += $(LIB_SRCS:$(BIN)=)
+LIBS_F     += $(LIB_SRCS:$(CXM)=)
 OBJS_ALL   := $(sort $(OBJ_SRCS) $(OBJS))
 INC_DIRS   += $(INCS:%=%/)
 INC_DIRS_F := $(INC_DIRS:%=-i%)
@@ -144,8 +152,8 @@ lib : $(OBJS_ALL)
 	$(info Creating library: $(LIB))
 	$(AR) -c -p $(LIB) $?
 
-$(BIN) : $(OBJS_ALL) $(SCRIPT)
-	$(info Creating BIN image: $(BIN))
+$(CXM) : $(OBJS_ALL) $(SCRIPT)
+	$(info Creating CXM image: $(CXM))
 ifeq ($(strip $(SCRIPT)),)
 	$(error No linker file in project)
 endif
@@ -159,21 +167,28 @@ $(OBJS) : $(MAKEFILE_LIST)
 %.o : %$(C_EXT)
 	$(CC) $(C_FLAGS) $<
 
-$(HEX) : $(BIN)
-	$(info Creating HEX image: $(HEX))
-	$(DUMP) -o $@ $<
+%.d : %$(C_EXT)
+#	$(CC) $(C_FLAGS) -sm $< > $@
 
-$(ELF) : $(BIN)
+$(ELF) : $(CXM)
 	$(info Creating ELF image: $(ELF))
-	$(COPY) $<
+	$(DWARF) $<
 #	$(info Creating absolute listings)
 #	$(LABS) $<
+
+$(BIN) : $(ELF)
+	$(info Creating BIN image: $(BIN))
+	$(COPY) -O binary $< $@
+
+$(HEX) : $(CXM)
+	$(info Creating HEX image: $(HEX))
+	$(DUMP) -o $@ $<
 
 print_elf_size :
 	$(info Size of target file:)
 	$(SIZE) -B $(ELF)
 
-GENERATED = $(BIN) $(ELF) $(HEX) $(LIB) $(MAP) $(LSTS) $(OBJS) $(TXTS)
+GENERATED = $(BIN) $(CXM) $(ELF) $(HEX) $(LIB) $(MAP) $(DEPS) $(LSTS) $(OBJS) $(TXTS)
 
 clean :
 	$(info Removing all generated output files)
@@ -206,3 +221,5 @@ reset :
 #	$(STLINK) -HardRst
 
 .PHONY : all lib clean flash server debug monitor qemu reset
+
+-include $(DEPS)

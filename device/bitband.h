@@ -21,7 +21,7 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#ifndef __GNUC__
+#if !defined(__GNUC__) && !defined(__ICCARM__)
 
 #define __bit_ctz01( mask ) ((((mask) << 31) == 0) ? 1 : 0)
 #define __bit_ctz02( mask ) ((((mask) << 31) == 0) ? ( 1 + __bit_ctz01((mask) >>  1)) : __bit_ctz01(mask))
@@ -57,7 +57,7 @@ extern "C" {
 // green_led = 1;
 /* -------------------------------------------------------------------------- */
 
-#define BB(var, msk)  BITBAND(var)[__builtin_ctz(msk)]
+#define BB(var, msk)  BITBAND(var)[POSITION_VAL(msk)]
 
 // bit-banding with bit mask example:
 // #define GPIOA_enable BB(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN)
