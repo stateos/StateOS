@@ -27,11 +27,10 @@ SCRIPT     ?=
 DEFS       += STM32F407xx __ARM__
 KEYS       += .csmcc *
 ifneq ($(MAKECMDGOALS),qemu)
-LIBS       += libfpulc #libdpulc
+LIBS       += crtsi libfpulc libilc libm
 else
-LIBS       += libflc   #libdlc
+LIBS       += crtsi libflc   libilc libm
 endif
-LIBS       += libilc libm crtsi
 MODEL      := modlc
 
 #----------------------------------------------------------#
