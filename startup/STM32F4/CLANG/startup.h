@@ -1,18 +1,27 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     14.11.2017
+@date     21.11.2017
 @brief    Startup file header for armclang compiler.
 *******************************************************************************/
 
 #pragma once
 
+#define NUM(n) #n"\n"
+#define STR(n) NUM(n)
+
 /*******************************************************************************
  Configuration of stacks and heap
 *******************************************************************************/
 
-#define NUM(n) #n
-#define STR(n) NUM(n)
+#ifndef   main_stack_size
+#define   main_stack_size   0 // <- default size of main stack
+#endif
+#ifndef   proc_stack_size
+#define   proc_stack_size   0 // <- default size of process stack
+#endif
+#define __main_stack_size (((main_stack_size)+7)&(~7))
+#define __proc_stack_size (((proc_stack_size)+7)&(~7))
 
 __attribute__ ((naked))
 void __user_stacks_and_heap_config( void )
@@ -21,28 +30,28 @@ void __user_stacks_and_heap_config( void )
 	(
 "               .pushsection .heap, \"w\",\"nobits\"\n"
 "__heap_base    =       .               \n"
-"__heap_limit   =      "STR(__ram_end - proc_stack)"\n"
+"__heap_limit   =      "STR(__ram_end - __proc_stack_size)
 "               .popsection             \n"
-                #if     main_stack_size > 0
+                #if     __main_stack_size > 0
 "               .pushsection .stack,\"w\",\"nobits\"\n"
-"               .space "STR(main_stack)"\n"
 "               .align  3               \n"
+"               .space "STR(__main_stack_size)
 "__initial_msp  =       .               \n"
 "               .popsection             \n"
                 #else
 "__initial_msp  =       __heap_limit    \n"
                 #endif
-                #if     proc_stack_size > 0
+                #if     __proc_stack_size > 0
 "               .pushsection .heap, \"w\",\"nobits\"\n"
-"               .space "STR(proc_stack)"\n"
 "               .align  3               \n"
+"               .space "STR(__proc_stack_size)
 "               .popsection             \n"
-"__initial_sp   =      "STR(__ram_end) "\n"
+"__initial_sp   =      "STR(__ram_end)
                 #else
 "__initial_sp   =       __initial_msp   \n"
                 #endif
 
-				#if     proc_stack_size > 0
+				#if     __proc_stack_size > 0
                 #ifndef __MICROLIB
 "               .global __use_two_region_memory\n"
                 #endif

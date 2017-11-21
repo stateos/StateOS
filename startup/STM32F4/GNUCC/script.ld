@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     stm32f4xx.ld
 @author   Rajmund Szymanski
-@date     29.04.2017
+@date     21.11.2017
 @brief    Linker script for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -18,6 +18,9 @@ __ccm_start = ORIGIN(CCM);
 __ccm_end   = ORIGIN(CCM) + LENGTH(CCM);
 __ram_start = ORIGIN(RAM);
 __ram_end   = ORIGIN(RAM) + LENGTH(RAM);
+
+PROVIDE(main_stack_size = 0);
+PROVIDE(proc_stack_size = 0);
 
 ENTRY(Reset_Handler)
 
@@ -71,20 +74,26 @@ SECTIONS
 		__exidx_end = .;
 	} > ROM
 
-	.ccm (NOLOAD):
+	.ccm (NOLOAD) : ALIGN(4)
 	{
-		*(.ccm)
-	} > CCM
+		__ccm_start = .;
+		*(.ccm*)
+		. = ALIGN(4);
+		__ccm_end = .;
+	} > CCM AT > CCM
 
-	.bkp (NOLOAD):
+	.bkp (NOLOAD) : ALIGN(4)
 	{
-		*(.bkp)
-	} > BKP
+		__bkp_start = .;
+		*(.bkp*)
+		. = ALIGN(4);
+		__bkp_end = .;
+	} > BKP AT > BKP
 
-	.main_stack (NOLOAD): ALIGN(8)
+	.main_stack (NOLOAD) : ALIGN(8)
 	{
 		__main_stack_start = .;
-		KEEP (*(.main_stack))
+		. += main_stack_size;
 		. = ALIGN(8);
 		__main_stack_end = .;
 	} > RAM
@@ -103,7 +112,7 @@ SECTIONS
 
 	__data_size = SIZEOF(.data);
 
-	.bss : ALIGN(4)
+	.bss (NOLOAD) : ALIGN(4)
 	{
 		__bss_start = .;
 		*(.bss* .gnu.linkonce.b.*)
@@ -114,35 +123,37 @@ SECTIONS
 
 	__bss_size = SIZEOF(.bss);
 
-	.proc_stack (NOLOAD): ALIGN(8)
+	.heap (NOLOAD) : ALIGN(8)
 	{
-		KEEP (*(.proc_stack))
+		__heap_start = .;
+		__heap_end = __proc_stack_start;
+	} > RAM
+
+	.proc_stack __ram_end - __proc_stack_size (NOLOAD) : ALIGN(8)
+	{
+		__proc_stack_start = .;
+		. += proc_stack_size;
 		. = ALIGN(8);
+		__proc_stack_end = .;
 	} > RAM
 
 	__proc_stack_size = SIZEOF(.proc_stack);
 
-	__heap_start = LOADADDR(.proc_stack);
-	__heap_end   = __ram_end - __proc_stack_size;
-
-	__proc_stack_start = __heap_end;
-	__proc_stack_end   = __ram_end;
-
 	__initial_msp = __main_stack_size ? __main_stack_end : __heap_end;
 	__initial_sp  = __proc_stack_size ? __proc_stack_end : __initial_msp;
-
-	PROVIDE(__data_start__ = __data_start);
-	PROVIDE(__data_end__   = __data_end);
-	PROVIDE(__bss_start__  = __bss_start);
-	PROVIDE(__bss_end__    = __bss_end);
-	PROVIDE(__end__        = __bss_end);
-	PROVIDE(__heap_base__  = __heap_start);
-	PROVIDE(__heap_end__   = __heap_end);
-	PROVIDE(__heap_base    = __heap_start);
-	PROVIDE(__heap_limit   = __heap_end);
-	PROVIDE(__stack        = __initial_sp);
-
-	PROVIDE(__process_stack_start = __proc_stack_start);
-	PROVIDE(__process_stack_size  = __proc_stack_size);
-	PROVIDE(__process_stack_end   = __proc_stack_end);
 }
+
+PROVIDE(__data_start__ = __data_start);
+PROVIDE(__data_end__   = __data_end);
+PROVIDE(__bss_start__  = __bss_start);
+PROVIDE(__bss_end__    = __bss_end);
+PROVIDE(__end__        = __bss_end);
+PROVIDE(__heap_base__  = __heap_start);
+PROVIDE(__heap_end__   = __heap_end);
+PROVIDE(__heap_base    = __heap_start);
+PROVIDE(__heap_limit   = __heap_end);
+PROVIDE(__stack        = __initial_sp);
+
+PROVIDE(__process_stack_start = __proc_stack_start);
+PROVIDE(__process_stack_size  = __proc_stack_size);
+PROVIDE(__process_stack_end   = __proc_stack_end);

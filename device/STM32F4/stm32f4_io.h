@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    stm32f4_io.h
  * @author  Rajmund Szymanski
- * @date    28.12.2016
+ * @date    03.05.2017
  * @brief   This file contains macro definitions for the STM32F4XX GPIO ports.
  ******************************************************************************/
 
@@ -142,7 +142,7 @@ struct __gpio_config
 #define GPIO_Pin_13       (1UL<<13U)
 #define GPIO_Pin_14       (1UL<<14U)
 #define GPIO_Pin_15       (1UL<<15U)
-#define GPIO_Pin_All     ((1UL<<16U)-1)
+#define GPIO_Pin_All     ((1UL<<16U)-1UL)
 
 #define GPIO_Input_NoPull                (GPIO_Input | GPIO_NoPull)
 #define GPIO_Input_PullUp                (GPIO_Input | GPIO_PullUp)
@@ -194,22 +194,22 @@ static inline
 uint32_t __stretch( uint32_t pins )
 {
 	return 
-	((pins & 0x0001u) * 0x0001u) |
-	((pins & 0x0002u) * 0x0002u) |
-	((pins & 0x0004u) * 0x0004u) |
-	((pins & 0x0008u) * 0x0008u) |
-	((pins & 0x0010u) * 0x0010u) |
-	((pins & 0x0020u) * 0x0020u) |
-	((pins & 0x0040u) * 0x0040u) |
-	((pins & 0x0080u) * 0x0080u) |
-	((pins & 0x0100u) * 0x0100u) |
-	((pins & 0x0200u) * 0x0200u) |
-	((pins & 0x0400u) * 0x0400u) |
-	((pins & 0x0800u) * 0x0800u) |
-	((pins & 0x1000u) * 0x1000u) |
-	((pins & 0x2000u) * 0x2000u) |
-	((pins & 0x4000u) * 0x4000u) |
-	((pins & 0x8000u) * 0x8000u) ;
+	((pins & 0x0001UL) * 0x0001UL) |
+	((pins & 0x0002UL) * 0x0002UL) |
+	((pins & 0x0004UL) * 0x0004UL) |
+	((pins & 0x0008UL) * 0x0008UL) |
+	((pins & 0x0010UL) * 0x0010UL) |
+	((pins & 0x0020UL) * 0x0020UL) |
+	((pins & 0x0040UL) * 0x0040UL) |
+	((pins & 0x0080UL) * 0x0080UL) |
+	((pins & 0x0100UL) * 0x0100UL) |
+	((pins & 0x0200UL) * 0x0200UL) |
+	((pins & 0x0400UL) * 0x0400UL) |
+	((pins & 0x0800UL) * 0x0800UL) |
+	((pins & 0x1000UL) * 0x1000UL) |
+	((pins & 0x2000UL) * 0x2000UL) |
+	((pins & 0x4000UL) * 0x4000UL) |
+	((pins & 0x8000UL) * 0x8000UL) ;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -219,20 +219,20 @@ void __pinini( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	uint32_t high;
 
-	if (pins*GPIO_OUT(cfg))    gpio->BSRR    = (pins&GPIO_Pin_All)*GPIO_OUT(cfg);
-	if (pins*GPIO_OTYPE(cfg))  gpio->OTYPER  |= pins*GPIO_OTYPE(cfg);
+	if (0UL != pins*GPIO_OUT(cfg))    gpio->BSRR    = (pins&GPIO_Pin_All)*GPIO_OUT(cfg);
+	if (0UL != pins*GPIO_OTYPE(cfg))  gpio->OTYPER  |= pins*GPIO_OTYPE(cfg);
 
 	pins = __stretch(pins);
 
-	if (pins*GPIO_MODE(cfg))   gpio->MODER   |= pins*GPIO_MODE(cfg);
-	if (pins*GPIO_OSPEED(cfg)) gpio->OSPEEDR |= pins*GPIO_OSPEED(cfg);
-	if (pins*GPIO_PUPD(cfg))   gpio->PUPDR   |= pins*GPIO_PUPD(cfg);
+	if (0UL != pins*GPIO_MODE(cfg))   gpio->MODER   |= pins*GPIO_MODE(cfg);
+	if (0UL != pins*GPIO_OSPEED(cfg)) gpio->OSPEEDR |= pins*GPIO_OSPEED(cfg);
+	if (0UL != pins*GPIO_PUPD(cfg))   gpio->PUPDR   |= pins*GPIO_PUPD(cfg);
 
 	high = __stretch(pins >> 16);
 	pins = __stretch(pins);
 
-	if (pins*GPIO_AF(cfg))     gpio->AFR[0]  |= pins*GPIO_AF(cfg);
-	if (high*GPIO_AF(cfg))     gpio->AFR[1]  |= high*GPIO_AF(cfg);
+	if (0UL != pins*GPIO_AF(cfg))     gpio->AFR[0]  |= pins*GPIO_AF(cfg);
+	if (0UL != high*GPIO_AF(cfg))     gpio->AFR[1]  |= high*GPIO_AF(cfg);
 }
 
 /* -------------------------------------------------------------------------- */

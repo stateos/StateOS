@@ -1,23 +1,11 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     14.11.2017
+@date     21.11.2017
 @brief    Startup file header for gcc compiler.
 *******************************************************************************/
 
 #pragma once
-
-/*******************************************************************************
- Configuration of stacks
-*******************************************************************************/
-
-#if     main_stack_size > 0
-char  __main_stack[main_stack] __attribute__ ((used, section(".main_stack")));
-#endif
-
-#if     proc_stack_size > 0
-char  __proc_stack[proc_stack] __attribute__ ((used, section(".proc_stack")));
-#endif
 
 /*******************************************************************************
  Additional definitions

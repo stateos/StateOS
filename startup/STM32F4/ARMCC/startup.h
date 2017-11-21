@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     14.11.2017
+@date     21.11.2017
 @brief    Startup file header for armcc compiler.
 *******************************************************************************/
 
@@ -11,21 +11,30 @@
  Configuration of stacks and heap
 *******************************************************************************/
 
-#if     main_stack_size > 0
-char  __main_stack[main_stack] __attribute__ ((used, section(".stack"), zero_init));
+#ifndef   main_stack_size
+#define   main_stack_size   0 // <- default size of main stack
+#endif
+#ifndef   proc_stack_size
+#define   proc_stack_size   0 // <- default size of process stack
+#endif
+#define __main_stack_size (((main_stack_size)+7)&(~7))
+#define __proc_stack_size (((proc_stack_size)+7)&(~7))
+
+#if       main_stack_size > 0
+char    __main_stack[__main_stack_size] __ALIGNED(8) __attribute__ ((used, section(".stack"), zero_init));
 #endif
 
-#if     proc_stack_size > 0
-char  __proc_stack[proc_stack] __attribute__ ((used, section(".heap"),  zero_init));
+#if       proc_stack_size > 0
+char    __proc_stack[__proc_stack_size] __ALIGNED(8) __attribute__ ((used, section(".heap"),  zero_init));
 #endif
 
 __attribute__ ((section(".heap")))
 __asm void __user_stacks_and_heap_config( void )
 {
 __heap_base     EQU     .
-__heap_limit    EQU     __ram_end - proc_stack
+__heap_limit    EQU     __ram_end - __proc_stack_size
                 #if     main_stack_size > 0
-__initial_msp   EQU     __ram_start + main_stack
+__initial_msp   EQU     __ram_start + __main_stack_size
                 #else
 __initial_msp   EQU     __heap_limit
                 #endif

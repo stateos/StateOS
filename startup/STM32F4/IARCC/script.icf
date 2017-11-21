@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     stm32f4xx.icf
 @author   Rajmund Szymanski
-@date     07.11.2017
+@date     21.11.2017
 @brief    Linker script for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -57,4 +57,9 @@ define exported symbol __initial_msp = __RAM_start__ + __main_stack_size;
 } else {
 define exported symbol __initial_msp = __RAM_end__   - __proc_stack_size;
 }
+if (__proc_stack_size > 0) {
 define exported symbol __initial_sp  = __RAM_end__;
+} else {
+define exported symbol __initial_sp  = __initial_msp;
+}
+define exported symbol HEAP$$Limit   = __RAM_end__   - __proc_stack_size;
