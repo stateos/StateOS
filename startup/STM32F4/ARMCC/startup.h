@@ -11,12 +11,6 @@
  Configuration of stacks and heap
 *******************************************************************************/
 
-#ifndef   main_stack_size
-#define   main_stack_size   0 // <- default size of main stack
-#endif
-#ifndef   proc_stack_size
-#define   proc_stack_size   0 // <- default size of process stack
-#endif
 #define __main_stack_size (((main_stack_size)+7)&(~7))
 #define __proc_stack_size (((proc_stack_size)+7)&(~7))
 

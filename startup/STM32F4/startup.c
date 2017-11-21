@@ -19,6 +19,17 @@
 #define __ram_end   0x20020000
 
 /*******************************************************************************
+ Configuration of stacks
+*******************************************************************************/
+
+#ifndef   main_stack_size
+#define   main_stack_size    0    // <- default size of main stack
+#endif
+#ifndef   proc_stack_size
+#define   proc_stack_size    0    // <- default size of process stack
+#endif
+
+/*******************************************************************************
  Initial stacks' pointers
 *******************************************************************************/
 
