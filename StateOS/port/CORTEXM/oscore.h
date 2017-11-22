@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    14.11.2017
+    @date    22.11.2017
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -129,6 +129,15 @@ void port_ctx_init( ctx_t *ctx, fun_t *pc )
 	ctx->pc  = pc;
 	ctx->psr = 0x01000000;
 }
+
+/* -------------------------------------------------------------------------- */
+
+#if   defined(__CSMC__)
+
+#define __get_BASEPRI()     __ASM("mrs r0,basepri")
+#define __set_BASEPRI(val)  __ASM("msr basepri,r0", val)
+
+#endif
 
 /* -------------------------------------------------------------------------- */
 // is procedure inside ISR?

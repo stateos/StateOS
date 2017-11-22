@@ -34,6 +34,7 @@ Features:
 - added startup files for cosmic compiler
 - added support for IAR compiler
 - updated support for CMSIS-RTOS2 API
+- added some definitions for CSMCC
 ---------
 5.3
 - updated inclusion of header files
