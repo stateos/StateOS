@@ -33,6 +33,7 @@ Features:
 5.4
 - added startup files for cosmic compiler
 - added support for IAR compiler
+- updated support for CMSIS-RTOS2 API
 ---------
 5.3
 - updated inclusion of header files

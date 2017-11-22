@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    04.11.2017
+    @date    22.11.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -55,7 +55,7 @@
 
 osStatus_t osKernelInitialize (void)
 {
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 
 	tsk_prio(osPriorityISR);
@@ -64,14 +64,11 @@ osStatus_t osKernelInitialize (void)
 
 osStatus_t osKernelGetInfo (osVersion_t *version, char *id_buf, uint32_t id_size)
 {
-	if (IS_IRQ_MODE())
-		return osErrorISR;
+	if (version == NULL)
+		return osError;
 
-	if (version != NULL)
-	{
-		version->api    = osVersionAPI;
-		version->kernel = osVersionKernel;
-	}
+	version->api    = osVersionAPI;
+	version->kernel = osVersionKernel;
 
 	if (id_buf != NULL)
 		strncpy(id_buf, osKernelId, id_size);
@@ -81,15 +78,12 @@ osStatus_t osKernelGetInfo (osVersion_t *version, char *id_buf, uint32_t id_size
 
 osKernelState_t osKernelGetState (void)
 {
-	if (IS_IRQ_MODE())
-		return osKernelError;
-
 	return osKernelRunning;
 }
 
 osStatus_t osKernelStart (void)
 {
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 
 	tsk_prio(osPriorityNormal);
@@ -100,7 +94,7 @@ int32_t osKernelLock (void)
 {
 	int32_t lock;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return (int32_t)osErrorISR;
 
 	lock = port_get_lock();
@@ -112,7 +106,7 @@ int32_t osKernelUnlock (void)
 {
 	int32_t lock;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return (int32_t)osErrorISR;
 
 	lock = port_get_lock();
@@ -122,7 +116,7 @@ int32_t osKernelUnlock (void)
 
 int32_t osKernelRestoreLock (int32_t lock)
 {
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return (int32_t)osErrorISR;
 
 	port_put_lock(lock);
@@ -157,7 +151,7 @@ uint32_t osKernelGetSysTimerCount (void)
 	uint32_t cnt;
 	uint32_t tck;
 
-	port_sys_lock();
+	sys_lock();
 
 	cnt = sys_time();
 	tck = SysTick->VAL;
@@ -170,7 +164,7 @@ uint32_t osKernelGetSysTimerCount (void)
 
 	cnt = (cnt + 1U) * (SysTick->LOAD + 1U) - tck;
 
-	port_sys_unlock();
+	sys_unlock();
 
 	return cnt;
 #endif
@@ -207,7 +201,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	void       * stack_mem  = NULL;
 	uint32_t     stack_size = osThreadStackSize(OS_STACK_SIZE);
 
-	if (IS_IRQ_MODE() || (func == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (func == NULL))
 		return NULL;
 
 	if (attr != NULL)
@@ -275,7 +269,7 @@ const char *osThreadGetName (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
 
-	if (IS_IRQ_MODE() || (thread_id == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_id == NULL))
 		return NULL;
 
 	return thread->name;
@@ -283,7 +277,7 @@ const char *osThreadGetName (osThreadId_t thread_id)
 
 osThreadId_t osThreadGetId (void)
 {
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
 
 	return Current;
@@ -293,7 +287,7 @@ osThreadState_t osThreadGetState (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
 
-	if (IS_IRQ_MODE() || (thread_id == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_id == NULL))
 		return osThreadError;
 
 	switch (thread->tsk.obj.id)
@@ -305,37 +299,11 @@ osThreadState_t osThreadGetState (osThreadId_t thread_id)
 	}
 }
 
-uint32_t osThreadGetStackSize (osThreadId_t thread_id)
-{
-	osThread_t *thread = thread_id;
-
-	if (IS_IRQ_MODE() || (thread_id == NULL))
-		return 0U;
-
-	return (uint32_t) thread->tsk.top - (uint32_t) thread->tsk.stack;
-}
-
-uint32_t osThreadGetStackSpace (osThreadId_t thread_id)
-{
-	osThread_t *thread = thread_id;
-
-	if (IS_IRQ_MODE() || (thread_id == NULL))
-		return 0U;
-
-	if (&thread->tsk == &MAIN)
-		return 0U;
-
-	if (&thread->tsk != Current)
-		return (uint32_t) thread->tsk.sp - (uint32_t) thread->tsk.stack;
-
-	return (uint32_t) port_get_sp() - (uint32_t) thread->tsk.stack;
-}
-
 osStatus_t osThreadSetPriority (osThreadId_t thread_id, osPriority_t priority)
 {
 	osThread_t *thread = thread_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if ((thread_id == NULL) || (priority < osPriorityIdle) || (priority > osPriorityISR))
 		return osErrorParameter;
@@ -353,7 +321,7 @@ osPriority_t osThreadGetPriority (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
 
-	if (IS_IRQ_MODE() || (thread_id == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_id == NULL))
 		return osPriorityError;
 
 	return (osPriority_t)thread->tsk.basic;
@@ -361,7 +329,7 @@ osPriority_t osThreadGetPriority (osThreadId_t thread_id)
 
 osStatus_t osThreadYield (void)
 {
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 
 	tsk_yield();
@@ -373,7 +341,7 @@ osStatus_t osThreadSuspend (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (thread_id == NULL)
 		return osErrorParameter;
@@ -381,7 +349,7 @@ osStatus_t osThreadSuspend (osThreadId_t thread_id)
 	switch (tsk_suspend(&thread->tsk))
 	{
 		case E_SUCCESS: return osOK;
-		default:        return osError;
+		default:        return osErrorResource;
 	}
 }
 
@@ -389,7 +357,7 @@ osStatus_t osThreadResume (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (thread_id == NULL)
 		return osErrorParameter;
@@ -397,7 +365,7 @@ osStatus_t osThreadResume (osThreadId_t thread_id)
 	switch (tsk_resume(&thread->tsk))
 	{
 		case E_SUCCESS: return osOK;
-		default:        return osError;
+		default:        return osErrorResource;
 	}
 }
 
@@ -405,7 +373,7 @@ osStatus_t osThreadDetach (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (thread_id == NULL)
 		return osErrorParameter;
@@ -421,7 +389,7 @@ osStatus_t osThreadJoin (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (thread_id == NULL)
 		return osErrorParameter;
@@ -434,7 +402,8 @@ osStatus_t osThreadJoin (osThreadId_t thread_id)
 	}
 }
 
-__NO_RETURN void osThreadExit (void)
+__NO_RETURN
+void osThreadExit (void)
 {
 	tsk_stop();
 }
@@ -443,7 +412,7 @@ osStatus_t osThreadTerminate (osThreadId_t thread_id)
 {
 	osThread_t *thread = thread_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (thread_id == NULL)
 		return osErrorParameter;
@@ -453,13 +422,39 @@ osStatus_t osThreadTerminate (osThreadId_t thread_id)
 	return osOK;
 }
 
+uint32_t osThreadGetStackSize (osThreadId_t thread_id)
+{
+	osThread_t *thread = thread_id;
+
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_id == NULL))
+		return 0U;
+
+	return (uint32_t) thread->tsk.top - (uint32_t) thread->tsk.stack;
+}
+
+uint32_t osThreadGetStackSpace (osThreadId_t thread_id)
+{
+	osThread_t *thread = thread_id;
+
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_id == NULL))
+		return 0U;
+
+	if (&thread->tsk == &MAIN)
+		return 0U;
+
+	if (&thread->tsk != Current)
+		return (uint32_t) thread->tsk.sp - (uint32_t) thread->tsk.stack;
+
+	return (uint32_t) port_get_sp() - (uint32_t) thread->tsk.stack;
+}
+
 uint32_t osThreadGetCount (void)
 {
 	tsk_t  * tsk;
 	tmr_t  * tmr;
 	uint32_t count = 0;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return 0U;
 
 	sys_lock();
@@ -484,7 +479,7 @@ uint32_t osThreadEnumerate (osThreadId_t *thread_array, uint32_t array_items)
 	tmr_t  * tmr;
 	uint32_t count = 0;
 
-	if (IS_IRQ_MODE() || (thread_array == NULL) || (array_items == 0U))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_array == NULL) || (array_items == 0U))
 		return 0U;
 
 	sys_lock();
@@ -503,6 +498,8 @@ uint32_t osThreadEnumerate (osThreadId_t *thread_array, uint32_t array_items)
 	return count;
 }
 
+/*---------------------------------------------------------------------------*/
+
 uint32_t osThreadFlagsSet (osThreadId_t thread_id, uint32_t flags)
 {
 	osThread_t *thread = thread_id;
@@ -517,7 +514,7 @@ uint32_t osThreadFlagsClear (uint32_t flags)
 {
 	osThread_t *thread = (osThread_t *)Current;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
 
 	return flg_clear(&thread->flg, flags);
@@ -527,7 +524,7 @@ uint32_t osThreadFlagsGet (void)
 {
 	osThread_t *thread = (osThread_t *)Current;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
 
 	return thread->flg.flags;
@@ -537,7 +534,7 @@ uint32_t osThreadFlagsWait (uint32_t flags, uint32_t options, uint32_t timeout)
 {
 	osThread_t *thread = (osThread_t *)Current;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
 	if ((flags & osFlagsError) != 0U)
 		return osFlagsErrorParameter;
@@ -550,9 +547,11 @@ uint32_t osThreadFlagsWait (uint32_t flags, uint32_t options, uint32_t timeout)
 	}
 }
 
+/*---------------------------------------------------------------------------*/
+
 osStatus_t osDelay (uint32_t ticks)
 {
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 
 	switch (tsk_sleepFor(ticks))
@@ -564,7 +563,7 @@ osStatus_t osDelay (uint32_t ticks)
 
 osStatus_t osDelayUntil (uint32_t ticks)
 {
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 
 	switch (tsk_sleepUntil(ticks))
@@ -590,7 +589,7 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 	osTimer_t * timer = NULL;
 	uint32_t    flags = type;
 
-	if (IS_IRQ_MODE() || (func == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (func == NULL))
 		return NULL;
 
 	if (attr != NULL)
@@ -628,7 +627,7 @@ const char *osTimerGetName (osTimerId_t timer_id)
 {
 	osTimer_t *timer = timer_id;
 
-	if (IS_IRQ_MODE() || (timer_id == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (timer_id == NULL))
 		return NULL;
 
 	return timer->name;
@@ -638,7 +637,7 @@ osStatus_t osTimerStart (osTimerId_t timer_id, uint32_t ticks)
 {
 	osTimer_t *timer = timer_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (timer_id == NULL)
 		return osErrorParameter;
@@ -652,7 +651,7 @@ osStatus_t osTimerStop (osTimerId_t timer_id)
 {
 	osTimer_t *timer = timer_id;
 	
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (timer_id == NULL)
 		return osErrorParameter;
@@ -666,7 +665,7 @@ uint32_t osTimerIsRunning (osTimerId_t timer_id)
 {
 	osTimer_t *timer = timer_id;
 
-	if (IS_IRQ_MODE() || (timer_id == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (timer_id == NULL))
 		return 0U;
 
 	return (timer->tmr.obj.id != ID_STOPPED);
@@ -676,7 +675,7 @@ osStatus_t osTimerDelete (osTimerId_t timer_id)
 {
 	osTimer_t *timer = timer_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (timer_id == NULL)
 		return osErrorParameter;
@@ -693,7 +692,7 @@ osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 	osEventFlags_t * ef    = NULL;
 	uint32_t         flags = 0U;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
 
 	if (attr != NULL)
@@ -723,16 +722,6 @@ osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 	sys_unlock();
 
 	return ef;
-}
-
-const char *osEventFlagsGetName (osEventFlagsId_t ef_id)
-{
-	osEventFlags_t *ef = ef_id;
-
-	if (IS_IRQ_MODE() || (ef_id == NULL))
-		return NULL;
-
-	return ef->name;
 }
 
 uint32_t osEventFlagsSet (osEventFlagsId_t ef_id, uint32_t flags)
@@ -771,7 +760,7 @@ uint32_t osEventFlagsWait (osEventFlagsId_t ef_id, uint32_t flags, uint32_t opti
 
 	if ((ef_id == NULL) || ((flags & osFlagsError) != 0U))
 		return osFlagsErrorParameter;
-	if (IS_IRQ_MODE() && (timeout != 0U))
+	if ((IS_IRQ_MODE() || IS_IRQ_MASKED()) && (timeout != 0U))
 		return osFlagsErrorParameter;
 
 	switch (flg_waitFor(&ef->flg, flags, options, timeout))
@@ -786,7 +775,7 @@ osStatus_t osEventFlagsDelete (osEventFlagsId_t ef_id)
 {
 	osEventFlags_t *ef = ef_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (ef_id == NULL)
 		return osErrorParameter;
@@ -796,6 +785,16 @@ osStatus_t osEventFlagsDelete (osEventFlagsId_t ef_id)
 	return osOK;
 }
 
+const char *osEventFlagsGetName (osEventFlagsId_t ef_id)
+{
+	osEventFlags_t *ef = ef_id;
+
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (ef_id == NULL))
+		return NULL;
+
+	return ef->name;
+}
+
 /*---------------------------------------------------------------------------*/
 
 osMutexId_t osMutexNew (const osMutexAttr_t *attr)
@@ -803,7 +802,7 @@ osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 	osMutex_t * mutex = NULL;
 	uint32_t    flags = 0U;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
 
 	if (attr != NULL)
@@ -841,7 +840,7 @@ const char *osMutexGetName (osMutexId_t mutex_id)
 {
 	osMutex_t *mutex = mutex_id;
 
-	if (IS_IRQ_MODE() || (mutex_id == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (mutex_id == NULL))
 		return NULL;
 
 	return mutex->name;
@@ -851,7 +850,7 @@ osStatus_t osMutexAcquire (osMutexId_t mutex_id, uint32_t timeout)
 {
 	osMutex_t *mutex = mutex_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (mutex_id == NULL)
 		return osErrorParameter;
@@ -868,7 +867,7 @@ osStatus_t osMutexRelease (osMutexId_t mutex_id)
 {
 	osMutex_t *mutex = mutex_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (mutex_id == NULL)
 		return osErrorParameter;
@@ -884,7 +883,7 @@ osThreadId_t osMutexGetOwner (osMutexId_t mutex_id)
 {
 	osMutex_t *mutex = mutex_id;
 
-	if (IS_IRQ_MODE() || (mutex_id == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (mutex_id == NULL))
 		return NULL;
 
 	return mutex->mtx.owner;
@@ -894,7 +893,7 @@ osStatus_t osMutexDelete (osMutexId_t mutex_id)
 {
 	osMutex_t *mutex = mutex_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (mutex_id == NULL)
 		return osErrorParameter;
@@ -911,7 +910,7 @@ osSemaphoreId_t osSemaphoreNew (uint32_t max_count, uint32_t initial_count, cons
 	osSemaphore_t *semaphore = NULL;
 	uint32_t    flags = 0U;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
 
 	if (attr != NULL)
@@ -947,7 +946,7 @@ const char *osSemaphoreGetName (osSemaphoreId_t semaphore_id)
 {
 	osSemaphore_t *semaphore = semaphore_id;
 
-	if (IS_IRQ_MODE() || (semaphore_id == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (semaphore_id == NULL))
 		return NULL;
 
 	return semaphore->name;
@@ -959,7 +958,7 @@ osStatus_t osSemaphoreAcquire (osSemaphoreId_t semaphore_id, uint32_t timeout)
 
 	if (semaphore_id == NULL)
 		return osErrorParameter;
-	if (IS_IRQ_MODE() && (timeout != 0U))
+	if ((IS_IRQ_MODE() || IS_IRQ_MASKED()) && (timeout != 0U))
 		return osErrorParameter;
 
 	switch (sem_waitFor(&semaphore->sem, timeout))
@@ -998,7 +997,7 @@ osStatus_t osSemaphoreDelete (osSemaphoreId_t semaphore_id)
 {
 	osSemaphore_t *semaphore = semaphore_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (semaphore_id == NULL)
 		return osErrorParameter;
@@ -1017,7 +1016,7 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 	void           * data  = NULL;
 	uint32_t         size  = osMemoryPoolMemSize(block_count, block_size);
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
 
 	if (attr != NULL)
@@ -1077,7 +1076,7 @@ const char *osMemoryPoolGetName (osMemoryPoolId_t mp_id)
 {
 	osMemoryPool_t *mp = mp_id;
 
-	if (IS_IRQ_MODE() || (mp_id == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (mp_id == NULL))
 		return NULL;
 
 	return mp->name;
@@ -1090,7 +1089,7 @@ void *osMemoryPoolAlloc (osMemoryPoolId_t mp_id, uint32_t timeout)
 
 	if (mp_id == NULL)
 		return NULL;
-	if (IS_IRQ_MODE() && (timeout != 0U))
+	if ((IS_IRQ_MODE() || IS_IRQ_MASKED()) && (timeout != 0U))
 		return NULL;
 
 	switch (mem_waitFor(&mp->mem, &block, timeout))
@@ -1172,7 +1171,7 @@ osStatus_t osMemoryPoolDelete (osMemoryPoolId_t mp_id)
 {
 	osMemoryPool_t *mp = mp_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (mp_id == NULL)
 		return osErrorParameter;
@@ -1191,7 +1190,7 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 	void             * data  = NULL;
 	uint32_t           size  = osMessageQueueMemSize(msg_count, msg_size);
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
 
 	if (attr != NULL)
@@ -1251,7 +1250,7 @@ const char *osMessageQueueGetName (osMessageQueueId_t mq_id)
 {
 	osMessageQueue_t *mq = mq_id;
 
-	if (IS_IRQ_MODE() || (mq_id == NULL))
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (mq_id == NULL))
 		return NULL;
 
 	return mq->name;
@@ -1266,7 +1265,7 @@ osStatus_t osMessageQueuePut (osMessageQueueId_t mq_id, const void *msg_ptr, uin
 	if ((mq_id == NULL) || (msg_ptr == NULL))
 		return osErrorParameter;
 
-	if (IS_IRQ_MODE() && (timeout != 0U))
+	if ((IS_IRQ_MODE() || IS_IRQ_MASKED()) && (timeout != 0U))
 		return osErrorParameter;
 
 	switch (box_sendFor(&mq->box, msg_ptr, timeout))
@@ -1286,7 +1285,7 @@ osStatus_t osMessageQueueGet (osMessageQueueId_t mq_id, void *msg_ptr, uint8_t *
 	if ((mq_id == NULL) || (msg_ptr == NULL))
 		return osErrorParameter;
 
-	if (IS_IRQ_MODE() && (timeout != 0U))
+	if ((IS_IRQ_MODE() || IS_IRQ_MASKED()) && (timeout != 0U))
 		return osErrorParameter;
 
 	switch (box_waitFor(&mq->box, msg_ptr, timeout))
@@ -1348,7 +1347,7 @@ osStatus_t osMessageQueueReset (osMessageQueueId_t mq_id)
 {
 	osMessageQueue_t *mq = mq_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (mq_id == NULL)
 		return osErrorParameter;
@@ -1362,7 +1361,7 @@ osStatus_t osMessageQueueDelete (osMessageQueueId_t mq_id)
 {
 	osMessageQueue_t *mq = mq_id;
 
-	if (IS_IRQ_MODE())
+	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (mq_id == NULL)
 		return osErrorParameter;
