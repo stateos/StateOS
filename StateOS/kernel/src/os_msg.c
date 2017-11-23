@@ -60,7 +60,7 @@ msg_t *msg_create( unsigned limit )
 	port_sys_lock();
 
 	msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + limit * sizeof(unsigned));
-	msg_init(msg, limit, (void *)(msg + 1));
+	msg_init(msg, limit, (void *)((size_t)msg + ABOVE(sizeof(msg_t))));
 	msg->res = msg;
 
 	port_sys_unlock();

@@ -91,7 +91,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 	port_sys_lock();
 
 	mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + limit * (1 + size) * sizeof(void*));
-	mem_init(mem, limit, size, (void *)(mem + 1));
+	mem_init(mem, limit, size, (void *)((size_t)mem + ABOVE(sizeof(mem_t))));
 	mem->res = mem;
 
 	port_sys_unlock();

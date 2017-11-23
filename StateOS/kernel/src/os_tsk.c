@@ -68,7 +68,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 
 	size = ABOVE(size);
 	tsk = core_sys_alloc(ABOVE(sizeof(tsk_t)) + size);
-	tsk_init(tsk, prio, state, (void *)(tsk + 1), size);
+	tsk_init(tsk, prio, state, (void *)((size_t)tsk + ABOVE(sizeof(tsk_t))), size);
 	tsk->obj.res = tsk;
 
 	port_sys_unlock();
