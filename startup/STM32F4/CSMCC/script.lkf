@@ -1,7 +1,7 @@
 #***********************************************************
 # file     stm32f4xx.lkf
 # author   Rajmund Szymanski
-# date     15.11.2017
+# date     23.11.2017
 # brief    Link command file for STM32F407VG
 #***********************************************************
 
@@ -27,6 +27,7 @@
 # segment ram:
 +seg .data    -b __RAM_start -m __RAM_size -n .data -id
 +seg .bss     -a .data                 -r2 -n .bss
++seg .heap    -a .bss                  -r3 -n .heap
 # segment stack:
 +seg .stack   -e __RAM_start+__RAM_size    -n .stack
 # segment bkp:
@@ -36,8 +37,8 @@
 
 +def __sdata=start(.data)   # init value of data pointer
 +def __sram=start(.bss)     # start of ram to clear
-+def __eram=end(.bss)       # end of ram to clear
-+def __memory=end(.bss)
++def __eram=start(.heap)    # end of ram to clear
++def __memory=start(.heap)
 +def __stack=end(.stack)    # init value of stack pointer
 +def ___initial_sp=__stack
 +def ___initial_msp=__stack
