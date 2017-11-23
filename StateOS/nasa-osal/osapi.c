@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    27.10.2017
+    @date    23.11.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -96,9 +96,6 @@ static void local_timer_handler( void )
 
 int32 OS_API_Init(void)
 {
-#if defined(__CSMC__)
-	sys_init();
-#endif
 	tmr_startFrom(&local_timer, MSEC, MSEC, local_timer_handler);
 
 	return OS_SUCCESS;
