@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    23.11.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -59,7 +59,7 @@ job_t *job_create( unsigned limit )
 	port_sys_lock();
 
 	job = core_sys_alloc(ABOVE(sizeof(job_t)) + limit * sizeof(fun_t *));
-	job_init(job, limit, (void *)ABOVE(job + 1));
+	job_init(job, limit, (void *)(job + 1));
 	job->res = job;
 
 	port_sys_unlock();

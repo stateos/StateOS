@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    23.11.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -63,7 +63,7 @@ box_t *box_create( unsigned limit, unsigned size )
 	port_sys_lock();
 
 	box = core_sys_alloc(ABOVE(sizeof(box_t)) + limit * size);
-	box_init(box, limit, size, (void *)ABOVE(box + 1));
+	box_init(box, limit, size, (void *)(box + 1));
 	box->res = box;
 
 	port_sys_unlock();

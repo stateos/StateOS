@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    22.11.2017
+    @date    23.11.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -228,7 +228,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	if (thread == NULL && stack_mem == NULL)
 	{
 		thread = sys_alloc(ABOVE(osThreadCbSize) + stack_size);
-		stack_mem = (void *)ABOVE(thread + 1);
+		stack_mem = (void *)(thread + 1);
 		if (thread == NULL)
 			return NULL;
 	}
@@ -1039,7 +1039,7 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 	if (mp == NULL && data == NULL)
 	{
 		mp = sys_alloc(ABOVE(osMemoryPoolCbSize) + size);
-		data = (void *)ABOVE(mp + 1);
+		data = (void *)(mp + 1);
 		if (mp == NULL)
 			return NULL;
 	}
@@ -1213,7 +1213,7 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 	if (mq == NULL && data == NULL)
 	{
 		mq = sys_alloc(ABOVE(osMessageQueueCbSize) + size);
-		data = (void *)ABOVE(mq + 1);
+		data = (void *)(mq + 1);
 		if (mq == NULL)
 			return NULL;
 	}
