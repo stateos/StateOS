@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    23.10.2017
+    @date    26.10.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -515,67 +515,6 @@ void *core_tsk_handler( void *sp )
 
 	return sp;
 }
-
-/* -------------------------------------------------------------------------- */
-// SYSTEM ALLOC/FREE SERVICES
-/* -------------------------------------------------------------------------- */
-
-#if OS_HEAP_SIZE
-
-void *core_sys_alloc( size_t size )
-{
-	static  stk_t    Heap[ASIZE(OS_HEAP_SIZE)] = { 0 };
-	#define HeapEnd (Heap+ASIZE(OS_HEAP_SIZE))
-
-	static
-	stk_t *heap = Heap;
-	stk_t *temp;
-	void  *base;
-
-	assert(size);
-
-	temp = heap + ASIZE(size);
-	if (temp > HeapEnd) return 0;
-
-	base = heap;
-	heap = temp;
-
-	return base; // memset(base, 0, size);
-}
-
-/* -------------------------------------------------------------------------- */
-
-void core_sys_free( void *ptr )
-{
-	assert(ptr == 0);
-
-	(void) ptr;
-}
-
-/* -------------------------------------------------------------------------- */
-
-#else
-
-void *core_sys_alloc( size_t size )
-{
-	void *base;
-
-	assert(size);
-
-	base = malloc(size);
-	if (base == 0) return 0;
-
-	return memset(base, 0, size);
-}
-
-/* -------------------------------------------------------------------------- */
-
-void core_sys_free( void *ptr )
-{
-	free(ptr);
-}
-
-#endif
 
 /* -------------------------------------------------------------------------- */
 
