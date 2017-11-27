@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    26.11.2017
+    @date    27.11.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -34,39 +34,43 @@
 
 #if OS_HEAP_SIZE
 
+static  stk_t    Heap[ASIZE(OS_HEAP_SIZE)] = { 0 };
+#define HeapEnd (Heap+ASIZE(OS_HEAP_SIZE))
+
 void *core_sys_alloc( size_t size )
 {
-	static  stk_t    Heap[ASIZE(OS_HEAP_SIZE)] = { 0 };
-	#define HeapEnd (Heap+ASIZE(OS_HEAP_SIZE))
-
 	static
 	stk_t *heap = Heap;
-	stk_t *temp;
-	void  *base = 0;
+	stk_t *base;
+	stk_t *next;
 
 	assert(size);
+	assert(ASIZE(size));
 
 	port_sys_lock();
 
-	temp = heap + ASIZE(size);
-	if (temp <= HeapEnd)
+	base = 0;
+	next = heap + ASIZE(size);
+	if (next <= HeapEnd)
 	{
-		base = heap;
-		heap = temp;
+		base = heap; // memset(heap, 0, size);
+		heap = next;
 	}
 
 	port_sys_unlock();
 
-	return base; // memset(base, 0, size);
+	assert(base);
+
+	return base;
 }
 
 /* -------------------------------------------------------------------------- */
 
-void core_sys_free( void *ptr )
+void core_sys_free( void *base )
 {
-	assert(ptr == 0);
+	assert(base == 0);
 
-	(void) ptr;
+	(void) base;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -80,16 +84,20 @@ void *core_sys_alloc( size_t size )
 	assert(size);
 
 	base = malloc(size);
-	if (base == 0) return 0;
 
-	return memset(base, 0, size);
+	assert(base);
+
+	if (base)
+		base = memset(base, 0, size);
+
+	return base;
 }
 
 /* -------------------------------------------------------------------------- */
 
-void core_sys_free( void *ptr )
+void core_sys_free( void *base )
 {
-	free(ptr);
+	free(base);
 }
 
 #endif
