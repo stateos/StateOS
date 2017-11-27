@@ -36,6 +36,7 @@ Features:
 - updated support for CMSIS-RTOS2 API
 - added some definitions for CSMCC
 - moved alloc/free functions to osalloc.c file
+- updated alloc/free functions
 ---------
 5.3
 - updated inclusion of header files

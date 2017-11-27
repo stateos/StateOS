@@ -34,43 +34,83 @@
 
 #if OS_HEAP_SIZE
 
-static  stk_t    Heap[ASIZE(OS_HEAP_SIZE)] = { 0 };
-#define HeapEnd (Heap+ASIZE(OS_HEAP_SIZE))
+typedef struct __hdr hdr_t;
+
+struct __hdr
+{
+	hdr_t  * next;
+	size_t   size;
+};
+
+#define HSIZE( size ) \
+   (((size_t)( size )+sizeof(hdr_t)-1)/sizeof(hdr_t))
+
+static
+hdr_t Heap[HSIZE(OS_HEAP_SIZE)] = { { Heap + HSIZE(OS_HEAP_SIZE) - 1, HSIZE(OS_HEAP_SIZE) - 1 } };
 
 void *core_sys_alloc( size_t size )
 {
-	static
-	stk_t *heap = Heap;
-	stk_t *base;
-	stk_t *next;
+	hdr_t *heap;
+	hdr_t *next;
 
-	assert(size);
-	assert(ASIZE(size));
+	assert(HSIZE(size));
+
+	size = HSIZE(size) + 1;
 
 	port_sys_lock();
 
-	base = 0;
-	next = heap + ASIZE(size);
-	if (next <= HeapEnd)
+	for (heap = Heap; heap; heap = heap->next)
 	{
-		base = heap; // memset(heap, 0, size);
-		heap = next;
+		if (heap->size == 0)				// memory segment has already been allocated
+			continue;
+
+		while ((next = heap->next)->size)	// it is possible to merge adjacent free memory segments
+		{
+			heap->next = next->next;
+			heap->size += next->size;
+		}
+
+		if (heap->size < size)				// memory segment is too small
+			continue;
+
+		if (heap->size > size)				// memory segment is larger than necessary
+		{
+			next = heap + size;
+			next->next = heap->next;
+			next->size = heap->size - size;
+		}
+
+		heap = memset(heap, 0, size * sizeof(hdr_t));
+		heap->next = next;
+		heap = heap + 1;
+		break;								// memory segment was successfully allocated
 	}
 
 	port_sys_unlock();
 
-	assert(base);
+	assert(heap);
 
-	return base;
+	return heap;
 }
 
 /* -------------------------------------------------------------------------- */
 
 void core_sys_free( void *base )
 {
-	assert(base == 0);
+	hdr_t *heap;
 
-	(void) base;
+	port_sys_lock();
+
+	for (heap = Heap; heap; heap = heap->next)
+	{
+		if (heap + 1 != base)
+			continue;
+
+		heap->size = heap->next - heap;
+		break;								// memory segment was successfully released
+	}
+
+	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -85,10 +125,10 @@ void *core_sys_alloc( size_t size )
 
 	base = malloc(size);
 
-	assert(base);
-
 	if (base)
 		base = memset(base, 0, size);
+
+	assert(base);
 
 	return base;
 }
