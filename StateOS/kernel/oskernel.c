@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    26.10.2017
+    @date    28.11.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -198,16 +198,16 @@ void core_tmr_handler( void )
 /* -------------------------------------------------------------------------- */
 
 #ifndef MAIN_TOP
-static  stk_t     MAIN_STK[ASIZE(OS_STACK_SIZE)];
-#define MAIN_TOP (MAIN_STK+ASIZE(OS_STACK_SIZE))
+static  stk_t     MAIN_STK[SSIZE(OS_STACK_SIZE)];
+#define MAIN_TOP (MAIN_STK+SSIZE(OS_STACK_SIZE))
 #endif
 
-static  union  { stk_t STK[ASIZE(OS_IDLE_STACK)];
+static  union  { stk_t STK[SSIZE(OS_IDLE_STACK)];
         struct { char  stk[ABOVE(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
         IDLE_STACK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
 #define IDLE_STK (void *)(&IDLE_STACK)
 //      IDLE_TOP (stk_t*)(&IDLE_STACK+1) // because of the SDCC
-#define IDLE_TOP (stk_t*)(&IDLE_STACK)+ASIZE(OS_IDLE_STACK)
+#define IDLE_TOP (stk_t*)(&IDLE_STACK)+SSIZE(OS_IDLE_STACK)
 #define IDLE_SP  (void *)(&IDLE_STACK.CTX.ctx)
 
 tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task

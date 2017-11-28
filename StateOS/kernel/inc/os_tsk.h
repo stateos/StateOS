@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    14.11.2017
+    @date    28.11.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -101,10 +101,10 @@ struct __tsk
 
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { { 0, 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
+                       { { 0, 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
 #else
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { { 0, 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+ASIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 } }
+                       { { 0, 0, 0, 0, 0 }, _state, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 } }
 #endif
 
 /**********************************************************************************************************************
@@ -148,7 +148,7 @@ struct __tsk
 
 #ifndef __cplusplus
 #define               _TSK_STACK( _size ) \
-                       ( stk_t[ASIZE( _size )] ){ 0 }
+                       ( stk_t[SSIZE( _size )] ){ 0 }
 #endif
 
 /**********************************************************************************************************************
@@ -167,7 +167,7 @@ struct __tsk
  **********************************************************************************************************************/
 
 #define             OS_WRK( tsk, prio, state, size )                                \
-                       stk_t tsk##__stk[ASIZE( size )];                              \
+                       stk_t tsk##__stk[SSIZE( size )];                              \
                        tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk, size ); \
                        tsk_id tsk = & tsk##__tsk
 
@@ -279,7 +279,7 @@ struct __tsk
  **********************************************************************************************************************/
 
 #define         static_WRK( tsk, prio, state, size )                                \
-                static stk_t tsk##__stk[ASIZE( size )];                              \
+                static stk_t tsk##__stk[SSIZE( size )];                              \
                 static tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk, size ); \
                 static tsk_id tsk = & tsk##__tsk
 
@@ -1084,7 +1084,7 @@ struct TaskT : public baseTask
 	TaskT( const unsigned _prio, FUN_t _state ): baseTask(_prio, _state, stack_, _size) {}
 
 	private:
-	stk_t stack_[ASIZE(_size)];
+	stk_t stack_[SSIZE(_size)];
 };
 
 /**********************************************************************************************************************

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    14.11.2017
+    @date    28.11.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,7 +57,7 @@ struct __mem
 /* -------------------------------------------------------------------------- */
 
 #define MSIZE( size ) \
- ((unsigned)(((size_t)( size )+(sizeof(void*)-1))/sizeof(void*)))
+ ALIGNED_SIZE( size, que_t )
 
 /**********************************************************************************************************************
  *                                                                                                                    *
