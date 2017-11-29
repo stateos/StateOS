@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    28.11.2017
+    @date    29.11.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -71,7 +71,7 @@ void priv_rdy_remove( obj_t *obj )
 // SYSTEM TIMER SERVICES
 /* -------------------------------------------------------------------------- */
 
-tmr_t WAIT = { { .id=ID_TIMER, .prev=&WAIT, .next=&WAIT }, .delay=INFINITE }; // timers queue
+tmr_t WAIT = { .obj={ .id=ID_TIMER, .prev=&WAIT, .next=&WAIT }, .delay=INFINITE }; // timers queue
 
 /* -------------------------------------------------------------------------- */
 
@@ -210,8 +210,8 @@ static  union  { stk_t STK[SSIZE(OS_IDLE_STACK)];
 #define IDLE_TOP (stk_t*)(&IDLE_STACK)+SSIZE(OS_IDLE_STACK)
 #define IDLE_SP  (void *)(&IDLE_STACK.CTX.ctx)
 
-tsk_t MAIN = { { .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .stack=IDLE_STK, .top=IDLE_TOP, .sp=IDLE_SP, .state=priv_tsk_idle }; // idle task and tasks queue
+tsk_t MAIN = { .obj={ .id=ID_READY, .prev=&IDLE, .next=&IDLE }, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
+tsk_t IDLE = { .obj={ .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN }, .state=priv_tsk_idle, .sp=IDLE_SP, .top=IDLE_TOP, .stack=IDLE_STK }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */

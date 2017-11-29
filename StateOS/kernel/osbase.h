@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    29.11.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -67,6 +67,8 @@ struct __obj
 	void   * prev;  // previous object (timer, task) in the READY queue
 	void   * next;  // next object (timer, task) in the READY queue
 };
+
+#define               _OBJ_INIT() { 0, 0, 0, 0, 0 }
 
 /* -------------------------------------------------------------------------- */
 
