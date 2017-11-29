@@ -82,7 +82,7 @@ void *core_sys_alloc( size_t size )
 		if (heap->size < size)				// memory segment is too small
 			continue;
 
-		if (heap->size > size)				// memory segment is larger than necessary
+		if (heap->size > size)				// memory segment is larger than required
 		{
 			next = heap + size;
 			next->next = heap->next;
