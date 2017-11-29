@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    28.11.2017
+    @date    29.11.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -34,6 +34,8 @@
 
 #if OS_HEAP_SIZE
 
+/* -------------------------------------------------------------------------- */
+
 typedef struct __hdr hdr_t;
 
 struct __hdr
@@ -42,11 +44,18 @@ struct __hdr
 	size_t   size;
 };
 
+/* -------------------------------------------------------------------------- */
+
 #define HSIZE( size ) \
  ALIGNED_SIZE( size, hdr_t )
 
+/* -------------------------------------------------------------------------- */
+
 static
-hdr_t Heap[HSIZE(OS_HEAP_SIZE)] = { { Heap + HSIZE(OS_HEAP_SIZE) - 1, HSIZE(OS_HEAP_SIZE) - 1 } };
+hdr_t Heap[HSIZE(OS_HEAP_SIZE)] =
+  { { Heap+HSIZE(OS_HEAP_SIZE)-1, HSIZE(OS_HEAP_SIZE)-1 } };
+
+/* -------------------------------------------------------------------------- */
 
 void *core_sys_alloc( size_t size )
 {
@@ -99,11 +108,13 @@ void core_sys_free( void *base )
 {
 	hdr_t *heap;
 
+	base = (hdr_t *) base - 1;
+
 	port_sys_lock();
 
 	for (heap = Heap; heap; heap = heap->next)
 	{
-		if (heap + 1 != base)
+		if (heap != base)					// this is not the memory segment we are looking for
 			continue;
 
 		heap->size = heap->next - heap;
