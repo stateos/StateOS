@@ -55,7 +55,6 @@ struct __sem
 /* -------------------------------------------------------------------------- */
 
 #define semBinary    (  1U ) // binary semaphore
-#define semNormal    ( ~0U ) // counting semaphore
 #define semCounting  ( ~0U ) // counting semaphore
 #define semMASK      ( ~0U )
 
