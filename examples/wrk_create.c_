@@ -19,7 +19,7 @@ int main()
 {
 	LED_Init();
 
-	sem = sem_create(0, semNormal);
+	sem = sem_create(0, semCounting);
 	wrk_create(0, slave,  256);
 	wrk_create(0, master, 256);
 	tsk_stop();
