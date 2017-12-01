@@ -18,13 +18,13 @@
  *      Name:    cmsis_os2.c
  *      Purpose: CMSIS RTOS2 wrapper for StateOS
  *
- *---------------------------------------------------------------------------*/
+ * -------------------------------------------------------------------------- */
 
 /******************************************************************************
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    24.11.2017
+    @date    01.12.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -51,7 +51,7 @@
 #include <string.h>
 #include <oscmsis.h>
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 osStatus_t osKernelInitialize (void)
 {
@@ -181,7 +181,7 @@ uint32_t osKernelGetSysTimerFreq (void)
 #endif
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 static void thread_handler (void)
 {
@@ -192,7 +192,7 @@ static void thread_handler (void)
 	tsk_stop();
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAttr_t *attr)
 {
@@ -500,7 +500,7 @@ uint32_t osThreadEnumerate (osThreadId_t *thread_array, uint32_t array_items)
 	return count;
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 uint32_t osThreadFlagsSet (osThreadId_t thread_id, uint32_t flags)
 {
@@ -549,7 +549,7 @@ uint32_t osThreadFlagsWait (uint32_t flags, uint32_t options, uint32_t timeout)
 	}
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 osStatus_t osDelay (uint32_t ticks)
 {
@@ -575,7 +575,7 @@ osStatus_t osDelayUntil (uint32_t ticks)
 	}
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 static void timer_handler (void)
 {
@@ -584,7 +584,7 @@ static void timer_handler (void)
 	cur->func(cur->arg);
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, const osTimerAttr_t *attr)
 {
@@ -687,7 +687,7 @@ osStatus_t osTimerDelete (osTimerId_t timer_id)
 	return osOK;
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 {
@@ -797,7 +797,7 @@ const char *osEventFlagsGetName (osEventFlagsId_t ef_id)
 	return ef->name;
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 {
@@ -905,7 +905,7 @@ osStatus_t osMutexDelete (osMutexId_t mutex_id)
 	return osOK;
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 osSemaphoreId_t osSemaphoreNew (uint32_t max_count, uint32_t initial_count, const osSemaphoreAttr_t *attr)
 {
@@ -1009,7 +1009,7 @@ osStatus_t osSemaphoreDelete (osSemaphoreId_t semaphore_id)
 	return osOK;
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, const osMemoryPoolAttr_t *attr)
 {
@@ -1183,7 +1183,7 @@ osStatus_t osMemoryPoolDelete (osMemoryPoolId_t mp_id)
 	return osOK;
 }
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
 
 osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, const osMessageQueueAttr_t *attr)
 {

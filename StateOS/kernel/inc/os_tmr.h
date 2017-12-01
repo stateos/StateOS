@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    29.11.2017
+    @date    01.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -35,11 +35,11 @@
 extern "C" {
 #endif
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : timer                                                                                          *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : timer
+ *
+ ******************************************************************************/
 
 struct __tmr
 {
@@ -51,52 +51,52 @@ struct __tmr
 	uint32_t period;
 };
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : _TMR_INIT                                                                                      *
- *                                                                                                                    *
- * Description       : create and initilize a timer object                                                            *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   state           : callback procedure                                                                             *
- *                     0: no callback                                                                                 *
- *                                                                                                                    *
- * Return            : timer object                                                                                   *
- *                                                                                                                    *
- * Note              : for internal use                                                                               *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : _TMR_INIT
+ *
+ * Description       : create and initialize a timer object
+ *
+ * Parameters
+ *   state           : callback procedure
+ *                     0: no callback
+ *
+ * Return            : timer object
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
 
 #define               _TMR_INIT( _state ) { _OBJ_INIT(), _state, 0, 0, 0 }
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : OS_TMR                                                                                         *
- *                                                                                                                    *
- * Description       : define and initilize a timer object                                                            *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : name of a pointer to timer object                                                              *
- *   state           : callback procedure                                                                             *
- *                     0: no callback                                                                                 *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : OS_TMR
+ *
+ * Description       : define and initialize a timer object
+ *
+ * Parameters
+ *   tmr             : name of a pointer to timer object
+ *   state           : callback procedure
+ *                     0: no callback
+ *
+ ******************************************************************************/
 
 #define             OS_TMR( tmr, state )                     \
                        tmr_t tmr##__tmr = _TMR_INIT( state ); \
                        tmr_id tmr = & tmr##__tmr
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : OS_TMR_DEF                                                                                     *
- *                                                                                                                    *
- * Description       : define and initilize complete timer object                                                     *
- *                     timer callback procedure (function body) must be defined immediately below                     *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : name of a pointer to timer object                                                              *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : OS_TMR_DEF
+ *
+ * Description       : define and initialize complete timer object
+ *                     timer callback procedure (function body) must be defined immediately below
+ *
+ * Parameters
+ *   tmr             : name of a pointer to timer object
+ *
+ ******************************************************************************/
 
 #define             OS_TMR_DEF( tmr )                            \
                        void tmr##__fun( void );                   \
@@ -104,20 +104,20 @@ struct __tmr
                        tmr_id tmr = & tmr##__tmr;                   \
                        void tmr##__fun( void )
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : OS_TMR_UNTIL                                                                                   *
- *                                                                                                                    *
- * Description       : define, initilize and start complete timer object                                              *
- *                     timer callback procedure (function body) must be defined immediately below                     *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : name of a pointer to timer object                                                              *
- *   time            : timepoint value                                                                                *
- *                                                                                                                    *
- * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : OS_TMR_UNTIL
+ *
+ * Description       : define, initialize and start complete timer object
+ *                     timer callback procedure (function body) must be defined immediately below
+ *
+ * Parameters
+ *   tmr             : name of a pointer to timer object
+ *   time            : timepoint value
+ *
+ * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent
+ *
+ ******************************************************************************/
 
 #define             OS_TMR_UNTIL( tmr, time )                                                \
                        void tmr##__fun( void );                                               \
@@ -126,25 +126,25 @@ struct __tmr
          __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
                        void tmr##__fun( void )
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : OS_TMR_START                                                                                   *
- *                                                                                                                    *
- * Description       : define, initilize and start complete timer object                                              *
- *                     timer callback procedure (function body) must be defined immediately below                     *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : name of a pointer to timer object                                                              *
- *   delay           : duration of time (maximum number of ticks to countdown) for first expiration                   *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *   period          : duration of time (maximum number of ticks to countdown) for all next expirations               *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *                                                                                                                    *
- * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : OS_TMR_START
+ *
+ * Description       : define, initialize and start complete timer object
+ *                     timer callback procedure (function body) must be defined immediately below
+ *
+ * Parameters
+ *   tmr             : name of a pointer to timer object
+ *   delay           : duration of time (maximum number of ticks to countdown) for first expiration
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   period          : duration of time (maximum number of ticks to countdown) for all next expirations
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *
+ * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent
+ *
+ ******************************************************************************/
 
 #define             OS_TMR_START( tmr, delay, period )                                           \
                        void tmr##__fun( void );                                                   \
@@ -153,35 +153,35 @@ struct __tmr
          __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_start(tmr, delay, period); } \
                        void tmr##__fun( void )
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : static_TMR                                                                                     *
- *                                                                                                                    *
- * Description       : define and initilize static timer object                                                       *
- *                     timer callback procedure (function body) must be defined immediately below                     *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : name of a pointer to timer object                                                              *
- *   state           : callback procedure                                                                             *
- *                     0: no callback                                                                                 *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : static_TMR
+ *
+ * Description       : define and initialize static timer object
+ *                     timer callback procedure (function body) must be defined immediately below
+ *
+ * Parameters
+ *   tmr             : name of a pointer to timer object
+ *   state           : callback procedure
+ *                     0: no callback
+ *
+ ******************************************************************************/
 
 #define         static_TMR( tmr, state )                     \
                 static tmr_t tmr##__tmr = _TMR_INIT( state ); \
                 static tmr_id tmr = & tmr##__tmr
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : static_TMR_DEF                                                                                 *
- *                                                                                                                    *
- * Description       : define and initilize static timer object                                                       *
- *                     timer callback procedure (function body) must be defined immediately below                     *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : name of a pointer to timer object                                                              *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : static_TMR_DEF
+ *
+ * Description       : define and initialize static timer object
+ *                     timer callback procedure (function body) must be defined immediately below
+ *
+ * Parameters
+ *   tmr             : name of a pointer to timer object
+ *
+ ******************************************************************************/
 
 #define         static_TMR_DEF( tmr )                            \
                 static void tmr##__fun( void );                   \
@@ -189,20 +189,20 @@ struct __tmr
                 static tmr_id tmr = & tmr##__tmr;                   \
                 static void tmr##__fun( void )
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : static_TMR_UNTIL                                                                               *
- *                                                                                                                    *
- * Description       : define, initilize and start static timer object                                                *
- *                     timer callback procedure (function body) must be defined immediately below                     *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : name of a pointer to timer object                                                              *
- *   time            : timepoint value                                                                                *
- *                                                                                                                    *
- * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : static_TMR_UNTIL
+ *
+ * Description       : define, initialize and start static timer object
+ *                     timer callback procedure (function body) must be defined immediately below
+ *
+ * Parameters
+ *   tmr             : name of a pointer to timer object
+ *   time            : timepoint value
+ *
+ * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent
+ *
+ ******************************************************************************/
 
 #define         static_TMR_UNTIL( tmr, time )                                                \
                 static void tmr##__fun( void );                                               \
@@ -211,25 +211,25 @@ struct __tmr
   __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
                 static  void tmr##__fun( void )
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : static_TMR_START                                                                               *
- *                                                                                                                    *
- * Description       : define, initilize and start static timer object                                                *
- *                     timer callback procedure (function body) must be defined immediately below                     *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : name of a pointer to timer object                                                              *
- *   delay           : duration of time (maximum number of ticks to countdown) for first expiration                   *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *   period          : duration of time (maximum number of ticks to countdown) for all next expirations               *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *                                                                                                                    *
- * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : static_TMR_START
+ *
+ * Description       : define, initialize and start static timer object
+ *                     timer callback procedure (function body) must be defined immediately below
+ *
+ * Parameters
+ *   tmr             : name of a pointer to timer object
+ *   delay           : duration of time (maximum number of ticks to countdown) for first expiration
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   period          : duration of time (maximum number of ticks to countdown) for all next expirations
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *
+ * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent
+ *
+ ******************************************************************************/
 
 #define         static_TMR_START( tmr, delay, period )                                           \
                 static void tmr##__fun( void );                                                   \
@@ -238,43 +238,43 @@ struct __tmr
   __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_start(tmr, delay, period); } \
                 static void tmr##__fun( void )
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : TMR_INIT                                                                                       *
- *                                                                                                                    *
- * Description       : create and initilize a timer object                                                            *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   state           : callback procedure                                                                             *
- *                     0: no callback                                                                                 *
- *                                                                                                                    *
- * Return            : timer object                                                                                   *
- *                                                                                                                    *
- * Note              : use only in 'C' code                                                                           *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : TMR_INIT
+ *
+ * Description       : create and initialize a timer object
+ *
+ * Parameters
+ *   state           : callback procedure
+ *                     0: no callback
+ *
+ * Return            : timer object
+ *
+ * Note              : use only in 'C' code
+ *
+ ******************************************************************************/
 
 #ifndef __cplusplus
 #define                TMR_INIT( state ) \
                       _TMR_INIT( state )
 #endif
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : TMR_CREATE                                                                                     *
- * Alias             : TMR_NEW                                                                                        *
- *                                                                                                                    *
- * Description       : create and initilize a timer object                                                            *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   state           : callback procedure                                                                             *
- *                     0: no callback                                                                                 *
- *                                                                                                                    *
- * Return            : pointer to timer object                                                                        *
- *                                                                                                                    *
- * Note              : use only in 'C' code                                                                           *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : TMR_CREATE
+ * Alias             : TMR_NEW
+ *
+ * Description       : create and initialize a timer object
+ *
+ * Parameters
+ *   state           : callback procedure
+ *                     0: no callback
+ *
+ * Return            : pointer to timer object
+ *
+ * Note              : use only in 'C' code
+ *
+ ******************************************************************************/
 
 #ifndef __cplusplus
 #define                TMR_CREATE( state ) \
@@ -283,349 +283,349 @@ struct __tmr
                        TMR_CREATE
 #endif
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_init                                                                                       *
- *                                                                                                                    *
- * Description       : initilize a timer object                                                                       *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *   state           : callback procedure                                                                             *
- *                     0: no callback                                                                                 *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_init
+ *
+ * Description       : initialize a timer object
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   state           : callback procedure
+ *                     0: no callback
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 void tmr_init( tmr_t *tmr, fun_t *state );
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_create                                                                                     *
- * Alias             : tmr_new                                                                                        *
- *                                                                                                                    *
- * Description       : create and initilize a new timer object                                                        *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   state           : callback procedure                                                                             *
- *                     0: no callback                                                                                 *
- *                                                                                                                    *
- * Return            : pointer to timer object (timer successfully created)                                           *
- *   0               : timer not created (not enough free memory)                                                     *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_create
+ * Alias             : tmr_new
+ *
+ * Description       : create and initialize a new timer object
+ *
+ * Parameters
+ *   state           : callback procedure
+ *                     0: no callback
+ *
+ * Return            : pointer to timer object (timer successfully created)
+ *   0               : timer not created (not enough free memory)
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 tmr_t *tmr_create( fun_t *state );
 __STATIC_INLINE
 tmr_t *tmr_new   ( fun_t *state ) { return tmr_create(state); }
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_kill                                                                                       *
- *                                                                                                                    *
- * Description       : reset the timer object and wake up all waiting tasks with 'E_STOPPED' event value              *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_kill
+ *
+ * Description       : reset the timer object and wake up all waiting tasks with 'E_STOPPED' event value
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 void tmr_kill( tmr_t *tmr );
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_delete                                                                                     *
- *                                                                                                                    *
- * Description       : reset the timer object and free allocated resource                                             *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_delete
+ *
+ * Description       : reset the timer object and free allocated resource
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 void tmr_delete( tmr_t *tmr );
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_startUntil                                                                                 *
- *                                                                                                                    *
- * Description       : start/restart one-shot timer until given timepoint and then launch the callback procedure      *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *   time            : timepoint value                                                                                *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_startUntil
+ *
+ * Description       : start/restart one-shot timer until given timepoint and then launch the callback procedure
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   time            : timepoint value
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 void tmr_startUntil( tmr_t *tmr, uint32_t time );
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_start                                                                                      *
- *                                                                                                                    *
- * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure *
- *                     do this periodically if period > 0                                                             *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *   delay           : duration of time (maximum number of ticks to countdown) for first expiration                   *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *   period          : duration of time (maximum number of ticks to countdown) for all next expirations               *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_start
+ *
+ * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure
+ *                     do this periodically if period > 0
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   delay           : duration of time (maximum number of ticks to countdown) for first expiration
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   period          : duration of time (maximum number of ticks to countdown) for all next expirations
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 void tmr_start( tmr_t *tmr, uint32_t delay, uint32_t period );
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_startFor                                                                                   *
- *                                                                                                                    *
- * Description       : start/restart one-shot timer for given duration of time and then launch the callback procedure *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *   delay           : duration of time (maximum number of ticks to countdown)                                        *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_startFor
+ *
+ * Description       : start/restart one-shot timer for given duration of time and then launch the callback procedure
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   delay           : duration of time (maximum number of ticks to countdown)
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 __STATIC_INLINE
 void tmr_startFor( tmr_t *tmr, uint32_t delay ) { tmr_start(tmr, delay, 0); }
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_startPeriodic                                                                              *
- *                                                                                                                    *
- * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure *
- *                     do this periodically                                                                           *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *   period          : duration of time (maximum number of ticks to countdown)                                        *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_startPeriodic
+ *
+ * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure
+ *                     do this periodically
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   period          : duration of time (maximum number of ticks to countdown)
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 __STATIC_INLINE
 void tmr_startPeriodic( tmr_t *tmr, uint32_t period ) { tmr_start(tmr, period, period); }
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_startFrom                                                                                  *
- *                                                                                                                    *
- * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure *
- *                     do this periodically if period > 0                                                             *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *   delay           : duration of time (maximum number of ticks to countdown) for first expiration                   *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *   period          : duration of time (maximum number of ticks to countdown) for all next expirations               *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *   proc            : callback procedure                                                                             *
- *                     0: no callback                                                                                 *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_startFrom
+ *
+ * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure
+ *                     do this periodically if period > 0
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   delay           : duration of time (maximum number of ticks to countdown) for first expiration
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   period          : duration of time (maximum number of ticks to countdown) for all next expirations
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   proc            : callback procedure
+ *                     0: no callback
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 void tmr_startFrom( tmr_t *tmr, uint32_t delay, uint32_t period, fun_t *proc );
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_stop                                                                                       *
- *                                                                                                                    *
- * Description       : stop timer                                                                                     *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_stop
+ *
+ * Description       : stop timer
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 __STATIC_INLINE
 void tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0); }
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_waitUntil                                                                                  *
- *                                                                                                                    *
- * Description       : wait until given timepoint until the timer finishes countdown                                  *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *   time            : timepoint value                                                                                *
- *                                                                                                                    *
- * Return                                                                                                             *
- *   E_SUCCESS       : timer object successfully finished countdown                                                   *
- *   E_STOPPED       : timer object was killed before the specified timeout expired                                   *
- *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired                   *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_waitUntil
+ *
+ * Description       : wait until given timepoint until the timer finishes countdown
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : timer object successfully finished countdown
+ *   E_STOPPED       : timer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 unsigned tmr_waitUntil( tmr_t *tmr, uint32_t time );
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_waitFor                                                                                    *
- *                                                                                                                    *
- * Description       : wait for given duration of time until the timer finishes countdown                             *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *   delay           : duration of time (maximum number of ticks to wait for the timer finishes countdown)            *
- *                     IMMEDIATE: don't wait for the timer finishes countdown                                         *
- *                     INFINITE:  wait indefinitly until the timer finishes countdown                                 *
- *                                                                                                                    *
- * Return                                                                                                             *
- *   E_SUCCESS       : timer object successfully finished countdown                                                   *
- *   E_STOPPED       : timer object was killed before the specified timeout expired                                   *
- *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired                   *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_waitFor
+ *
+ * Description       : wait for given duration of time until the timer finishes countdown
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   delay           : duration of time (maximum number of ticks to wait for the timer finishes countdown)
+ *                     IMMEDIATE: don't wait for the timer finishes countdown
+ *                     INFINITE:  wait indefinitely until the timer finishes countdown
+ *
+ * Return
+ *   E_SUCCESS       : timer object successfully finished countdown
+ *   E_STOPPED       : timer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 unsigned tmr_waitFor( tmr_t *tmr, uint32_t delay );
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_wait                                                                                       *
- *                                                                                                                    *
- * Description       : wait indefinitly until the timer finishes countdown                                            *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *                                                                                                                    *
- * Return                                                                                                             *
- *   E_SUCCESS       : timer object successfully finished countdown                                                   *
- *   E_STOPPED       : timer object was killed before the specified timeout expired                                   *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_wait
+ *
+ * Description       : wait indefinitely until the timer finishes countdown
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *
+ * Return
+ *   E_SUCCESS       : timer object successfully finished countdown
+ *   E_STOPPED       : timer object was killed before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 __STATIC_INLINE
 unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_take                                                                                       *
- *                                                                                                                    *
- * Description       : check if the timer finishes countdown                                                          *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *                                                                                                                    *
- * Return                                                                                                             *
- *   E_SUCCESS       : timer object successfully finished countdown                                                   *
- *   E_TIMEOUT       : timer object has not yet completed counting                                                    *
- *                                                                                                                    *
- * Note              : use only in thread mode                                                                        *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_take
+ *
+ * Description       : check if the timer finishes countdown
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *
+ * Return
+ *   E_SUCCESS       : timer object successfully finished countdown
+ *   E_TIMEOUT       : timer object has not yet completed counting
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
 
 __STATIC_INLINE
 unsigned tmr_take( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_takeISR                                                                                    *
- *                                                                                                                    *
- * Description       : check if the timer finishes countdown                                                          *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   tmr             : pointer to timer object                                                                        *
- *                                                                                                                    *
- * Return                                                                                                             *
- *   E_SUCCESS       : timer object successfully finished countdown                                                   *
- *   E_TIMEOUT       : timer object has not yet completed counting                                                    *
- *                                                                                                                    *
- * Note              : use only in handler mode                                                                       *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_takeISR
+ *
+ * Description       : check if the timer finishes countdown
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *
+ * Return
+ *   E_SUCCESS       : timer object successfully finished countdown
+ *   E_TIMEOUT       : timer object has not yet completed counting
+ *
+ * Note              : use only in handler mode
+ *
+ ******************************************************************************/
 
 __STATIC_INLINE
 unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_flipISR                                                                                    *
- *                                                                                                                    *
- * Description       : change callback procedure for current periodic timer (available in next period)                *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   proc            : new callback procedure                                                                         *
- *                     0: no callback                                                                                 *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in timer callback procedure                                                           *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_flipISR
+ *
+ * Description       : change callback procedure for current periodic timer (available in next period)
+ *
+ * Parameters
+ *   proc            : new callback procedure
+ *                     0: no callback
+ *
+ * Return            : none
+ *
+ * Note              : use only in timer callback procedure
+ *
+ ******************************************************************************/
 
 __STATIC_INLINE
 void tmr_flipISR( fun_t *proc ) { ((tmr_t *)WAIT.obj.next)->state = proc; }
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Name              : tmr_delayISR                                                                                   *
- *                                                                                                                    *
- * Description       : change delay time for current timer                                                            *
- *                                                                                                                    *
- * Parameters                                                                                                         *
- *   delay           : duration of time (maximum number of ticks to countdown)                                        *
- *                     0:         current timer is stopped even if it was periodic                                    *
- *                     otherwise: current timer is restarted even if it was one-shot                                  *
- *                                                                                                                    *
- * Return            : none                                                                                           *
- *                                                                                                                    *
- * Note              : use only in timer callback procedure                                                           *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Name              : tmr_delayISR
+ *
+ * Description       : change delay time for current timer
+ *
+ * Parameters
+ *   delay           : duration of time (maximum number of ticks to countdown)
+ *                     0:         current timer is stopped even if it was periodic
+ *                     otherwise: current timer is restarted even if it was one-shot
+ *
+ * Return            : none
+ *
+ * Note              : use only in timer callback procedure
+ *
+ ******************************************************************************/
 
 __STATIC_INLINE
 void tmr_delayISR( uint32_t delay ) { ((tmr_t *)WAIT.obj.next)->delay = delay; }
@@ -638,16 +638,16 @@ void tmr_delayISR( uint32_t delay ) { ((tmr_t *)WAIT.obj.next)->delay = delay; }
 
 #ifdef __cplusplus
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Class             : Timer                                                                                          *
- *                                                                                                                    *
- * Description       : create and initilize a timer object                                                            *
- *                                                                                                                    *
- * Constructor parameters                                                                                             *
- *   state           : callback procedure                                                                             *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Class             : Timer
+ *
+ * Description       : create and initialize a timer object
+ *
+ * Constructor parameters
+ *   state           : callback procedure
+ *
+ ******************************************************************************/
 
 struct Timer : public __tmr
 {
@@ -690,18 +690,18 @@ struct Timer : public __tmr
 #endif
 };
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Class             : startTimerUntil                                                                                *
- *                                                                                                                    *
- * Description       : create and initilize a timer object                                                            *
- *                     and start one-shot timer until given timepoint and then launch the callback procedure          *
- *                                                                                                                    *
- * Constructor parameters                                                                                             *
- *   time            : timepoint value                                                                                *
- *   state           : callback procedure                                                                             *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Class             : startTimerUntil
+ *
+ * Description       : create and initialize a timer object
+ *                     and start one-shot timer until given timepoint and then launch the callback procedure
+ *
+ * Constructor parameters
+ *   time            : timepoint value
+ *   state           : callback procedure
+ *
+ ******************************************************************************/
 
 struct startTimerUntil : public Timer
 {
@@ -711,24 +711,24 @@ struct startTimerUntil : public Timer
 	startTimerUntil( const uint32_t _time, FUN_t _state ): Timer(_state) { port_sys_init(); tmr_startUntil(this, _time); }
 };
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Class             : startTimer                                                                                     *
- *                                                                                                                    *
- * Description       : create and initilize a timer object                                                            *
- *                     and start periodic timer for given duration of time and then launch the callback procedure     *
- *                     do this periodically                                                                           *
- *                                                                                                                    *
- * Constructor parameters                                                                                             *
- *   delay           : duration of time (maximum number of ticks to countdown) for first expiration                   *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *   period          : duration of time (maximum number of ticks to countdown) for all next expirations               *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *   state           : callback procedure                                                                             *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Class             : startTimer
+ *
+ * Description       : create and initialize a timer object
+ *                     and start periodic timer for given duration of time and then launch the callback procedure
+ *                     do this periodically
+ *
+ * Constructor parameters
+ *   delay           : duration of time (maximum number of ticks to countdown) for first expiration
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   period          : duration of time (maximum number of ticks to countdown) for all next expirations
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   state           : callback procedure
+ *
+ ******************************************************************************/
 
 struct startTimer : public Timer
 {
@@ -738,20 +738,20 @@ struct startTimer : public Timer
 	startTimer( const uint32_t _delay, const uint32_t _period, FUN_t _state ): Timer(_state) { port_sys_init(); tmr_start(this, _delay, _period); }
 };
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Class             : startTimerFor                                                                                  *
- *                                                                                                                    *
- * Description       : create and initilize a timer object                                                            *
- *                     and start one-shot timer for given duration of time and then launch the callback procedure     *
- *                                                                                                                    *
- * Constructor parameters                                                                                             *
- *   delay           : duration of time (maximum number of ticks to countdown)                                        *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *   state           : callback procedure                                                                             *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Class             : startTimerFor
+ *
+ * Description       : create and initialize a timer object
+ *                     and start one-shot timer for given duration of time and then launch the callback procedure
+ *
+ * Constructor parameters
+ *   delay           : duration of time (maximum number of ticks to countdown)
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   state           : callback procedure
+ *
+ ******************************************************************************/
 
 struct startTimerFor : public startTimer
 {
@@ -761,21 +761,21 @@ struct startTimerFor : public startTimer
 	startTimerFor( const uint32_t _delay, FUN_t _state ): startTimer(_delay, 0, _state) {}
 };
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Class             : startTimerPeriodic                                                                             *
- *                                                                                                                    *
- * Description       : create and initilize a timer object                                                            *
- *                     and start periodic timer for given duration of time and then launch the callback procedure     *
- *                     do this periodically                                                                           *
- *                                                                                                                    *
- * Constructor parameters                                                                                             *
- *   period          : duration of time (maximum number of ticks to countdown)                                        *
- *                     IMMEDIATE: don't countdown                                                                     *
- *                     INFINITE:  countdown indefinitly                                                               *
- *   state           : callback procedure                                                                             *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Class             : startTimerPeriodic
+ *
+ * Description       : create and initialize a timer object
+ *                     and start periodic timer for given duration of time and then launch the callback procedure
+ *                     do this periodically
+ *
+ * Constructor parameters
+ *   period          : duration of time (maximum number of ticks to countdown)
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   state           : callback procedure
+ *
+ ******************************************************************************/
 
 struct startTimerPeriodic : public startTimer
 {
@@ -785,13 +785,13 @@ struct startTimerPeriodic : public startTimer
 	startTimerPeriodic( const uint32_t _period, FUN_t _state ): startTimer(_period, _period, _state) {}
 };
 
-/**********************************************************************************************************************
- *                                                                                                                    *
- * Namespace         : ThisTimer                                                                                      *
- *                                                                                                                    *
- * Description       : provide set of functions for Current Timer                                                     *
- *                                                                                                                    *
- **********************************************************************************************************************/
+/******************************************************************************
+ *
+ * Namespace         : ThisTimer
+ *
+ * Description       : provide set of functions for Current Timer
+ *
+ ******************************************************************************/
 
 namespace ThisTimer
 {

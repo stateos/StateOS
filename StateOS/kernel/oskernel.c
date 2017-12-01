@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    29.11.2017
+    @date    01.12.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -123,7 +123,7 @@ bool priv_tmr_expired( tmr_t *tmr )
 	port_tmr_stop();
 
 	if (tmr->delay == INFINITE)
-	return false; // return if timer counting indefinitly
+	return false; // return if timer counting indefinitely
 
 	if (tmr->delay <= Counter - tmr->start)
 	return true;  // return if timer finished counting
@@ -146,7 +146,7 @@ static
 bool priv_tmr_expired( tmr_t *tmr )
 {
 	if (tmr->delay >= Counter - tmr->start + 1)
-	return false; // return if timer still counts or counting indefinitly
+	return false; // return if timer still counts or counting indefinitely
 
 	return true;  // timer finished counting
 }

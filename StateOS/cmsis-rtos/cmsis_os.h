@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * ----------------------------------------------------------------------
+ * --------------------------------------------------------------------------
  *
  * $Date:        9. June 2017
  * $Revision:    V2.1.1
@@ -123,7 +123,7 @@
  *    - osKernelGetTickCount, osKernelGetTickFreq
  *    Changed Kernel Tick type to uint32_t:
  *    - updated: osKernelGetTickCount, osDelayUntil
- *---------------------------------------------------------------------------*/
+ * -------------------------------------------------------------------------- */
 
 /******************************************************************************
 
