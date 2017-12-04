@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    04.12.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -111,20 +111,20 @@ extern sys_t System; // system data
 
 /* -------------------------------------------------------------------------- */
 
-// initiating and running the system timer
+// initiate and run the system timer
 // the port_sys_init procedure is normally called as a constructor
 __CONSTRUCTOR
 void port_sys_init( void );
 
 /* -------------------------------------------------------------------------- */
 
-// init task 'tsk' for context switch
+// initiate task 'tsk' for context switch
 void core_ctx_init( tsk_t *tsk );
 
-// save status of current process and force yield system control to the next
+// save status of the current process and force yield system control to the next
 void core_ctx_switch( void );
 
-// system infinite loop for current process
+// system infinite loop procedure for the current process
 __NO_RETURN
 void core_tsk_loop( void );
 
@@ -137,7 +137,7 @@ void core_ctx_reset( void )
 
 /* -------------------------------------------------------------------------- */
 
-// system malloc procedure
+// system malloc procedure with clearing the allocated memory
 void *core_sys_alloc( size_t size );
 
 // system free procedure
@@ -145,8 +145,7 @@ void core_sys_free( void *ptr );
 
 /* -------------------------------------------------------------------------- */
 
-// add timer 'tmr' to timers READY queue with id 'id'
-// start countdown
+// insert timer 'tmr' into timers READY queue with id 'id' and start it
 void core_tmr_insert( tmr_t *tmr, unsigned id );
 
 // remove timer 'tmr' from timers READY queue
@@ -157,36 +156,35 @@ void core_tmr_handler( void );
 
 /* -------------------------------------------------------------------------- */
 
-// reset stack and restart current task
+// reset stack and restart the current task
 __NO_RETURN
 void core_tsk_flip( void *sp );
 
-// add task 'tsk' to tasks READY queue with id ID_READY
-// force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
+// insert task 'tsk' into tasks READY queue with id ID_READY
+// force context switch if priority of task 'tsk' is greater then priority of the current task and kernel works in preemptive mode
 void core_tsk_insert( tsk_t *tsk );
 
 // remove task 'tsk' from tasks READY queue
 void core_tsk_remove( tsk_t *tsk );
 
-// append task 'tsk' to object 'obj' delayed queue
+// append task 'tsk' to the delayed queue of object 'obj'
 void core_tsk_append( tsk_t *tsk, void *obj );
 
-// remove task 'tsk' from object 'obj' delayed queue
-// with 'event' event value
+// remove task 'tsk' from the delayed queue of object 'obj' with event value 'event'
 void core_tsk_unlink( tsk_t *tsk, unsigned event );
 
-// delay execution of current task until given timepoint 'time'
-// append current task to object 'obj' delayed queue
-// remove current task from tasks READY queue
-// add current task to timers READY queue
+// delay execution of the current task until given time point 'time'
+// append the current task to the delayed queue of object 'obj'
+// remove the current task from tasks READY queue
+// insert the current task into timers READY queue
 // force context switch
 // return event value
 unsigned core_tsk_waitUntil( void *obj, uint32_t time );
 
 // delay execution of current task for given duration of time 'delay'
-// append current task to object 'obj' delayed queue
-// remove current task from tasks READY queue
-// add current task to timers READY queue
+// append the current task to the delayed queue of object 'obj'
+// remove the current task from tasks READY queue
+// insert the current task into timers READY queue
 // force context switch
 // return event value
 unsigned core_tsk_waitFor( void *obj, uint32_t delay );
@@ -194,31 +192,31 @@ unsigned core_tsk_waitFor( void *obj, uint32_t delay );
 // delay indefinitely execution of given task
 // append given task to WAIT timer delayed queue
 // remove given task from tasks READY queue
-// add given task to timers READY queue
-// force context switch if it is current task
+// insert given task into timers READY queue
+// force context switch if it is the current task
 void core_tsk_suspend( tsk_t *tsk );
 
-// resume execution of delayed task 'tsk' with 'event' event value
+// resume execution of delayed task 'tsk' with event value 'event'
 // remove task 'tsk' from guard object delayed queue
 // remove task 'tsk' from timers READY queue
-// add task 'tsk' to tasks READY queue
-// force context switch if priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode
+// insert task 'tsk' into tasks READY queue
+// force context switch if priority of task 'tsk' is greater then priority of the current task and kernel works in preemptive mode
 // return 'tsk'
 tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event );
 
-// resume execution of first task from object 'obj' delayed queue with 'event' event value
+// resume execution of first task from object 'obj' delayed queue with event value 'event'
 // remove first task from object 'obj' delayed queue
 // remove resumed task from timers READY queue
-// add resumed task to tasks READY queue
-// force context switch if priority of resumed task is greater then priority of current task and kernel works in preemptive mode
+// insert resumed task into tasks READY queue
+// force context switch if priority of resumed task is greater then priority of the current task and kernel works in preemptive mode
 // return pointer to resumed task
 tsk_t *core_one_wakeup( void *obj, unsigned event );
 
-// resume execution of all tasks from object 'obj' delayed queue with 'event' event value
+// resume execution of all tasks from object 'obj' delayed queue with event value 'event'
 // remove all tasks from object 'obj' delayed queue
 // remove all resumed tasks from timers READY queue
-// add all resumed tasks to tasks READY queue
-// force context switch if priority of any resumed task is greater then priority of current task and kernel works in preemptive mode
+// insert all resumed tasks into tasks READY queue
+// force context switch if priority of any resumed task is greater then priority of the current task and kernel works in preemptive mode
 void core_all_wakeup( void *obj, unsigned event );
 
 // set task 'tsk' priority

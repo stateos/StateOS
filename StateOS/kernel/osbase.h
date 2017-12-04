@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    29.11.2017
+    @date    04.12.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -63,7 +63,7 @@ struct __obj
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 	void   * res;   // allocated object's resource
-	unsigned id;    // object id: ID_STOPPED, ID_READY, ID_DELAYED, ID_TIMER, ID_IDLE
+	unsigned id;    // object's id: ID_STOPPED, ID_READY, ID_DELAYED, ID_TIMER, ID_IDLE
 	void   * prev;  // previous object (timer, task) in the READY queue
 	void   * next;  // next object (timer, task) in the READY queue
 };
@@ -103,9 +103,9 @@ struct __sys
 
 /* -------------------------------------------------------------------------- */
 
-#define E_SUCCESS  ( 0U) // process released by taking the supervising object
-#define E_STOPPED  (~0U) // process released by killing the supervising object
-#define E_TIMEOUT  (~1U) // process released by the end of the timer countdown
+#define E_SUCCESS  ( 0U) // process was released by taking the supervising object
+#define E_STOPPED  (~0U) // process was released by killing the supervising object
+#define E_TIMEOUT  (~1U) // process was released by the end of the timer countdown
 
 /* -------------------------------------------------------------------------- */
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    04.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -54,7 +54,7 @@ extern "C" {
  *
  * Name              : sys_init
  *
- * Description       : initialize system timer and enabled services
+ * Description       : initialize system timer and enable services
  *
  * Parameters        : none
  *
@@ -72,13 +72,13 @@ void sys_init( void ) { port_sys_init(); }
  *
  * Name              : sys_alloc
  *
- * Description       : system malloc procedure
+ * Description       : system malloc procedure with clearing the allocated memory
  *
  * Parameters
- *   size            : size of the memory block (in bytes)
+ *   size            : required size of the memory segment (in bytes)
  *
- * Return            : pointer to the beginning of allocated block of memory
- *   0               : memory block not allocated (not enough free memory)
+ * Return            : pointer to the beginning of allocated and cleared memory segment
+ *   0               : memory segment not allocated (not enough free memory)
  *
  * Note              : use only in thread mode
  *
@@ -94,7 +94,7 @@ void *sys_alloc( size_t size ) { return core_sys_alloc(size); }
  * Description       : system free procedure
  *
  * Parameters
- *   ptr             : pointer to a memory block previously allocated with sys_alloc, xxx_create or xxx_new functions
+ *   ptr             : pointer to a memory segment previously allocated with sys_alloc, xxx_create or xxx_new functions
  *
  * Return            : none
  *
@@ -109,7 +109,7 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  *
  * Name              : sys_lock
  *
- * Description       : disable interrupts / enter into critical section (in thread mode)
+ * Description       : disable interrupts / enter into critical section
  *
  * Parameters        : none
  *
@@ -126,7 +126,7 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  *
  * Name              : sys_lockISR
  *
- * Description       : disable interrupts / enter into critical section (in handler mode)
+ * Description       : disable interrupts / enter into critical section
  *
  * Parameters        : none
  *
@@ -143,7 +143,7 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  *
  * Name              : sys_unlock
  *
- * Description       : enable interrupts / exit from critical section (in thread mode)
+ * Description       : enable interrupts / exit from critical section
  *
  * Parameters        : none
  *
@@ -160,7 +160,7 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  *
  * Name              : sys_unlockISR
  *
- * Description       : enable interrupts / exit from critical section (in handler mode)
+ * Description       : enable interrupts / exit from critical section
  *
  * Parameters        : none
  *
@@ -191,7 +191,7 @@ uint32_t sys_time( void );
  *
  * Name              : stk_assert
  *
- * Description       : check stack integrity of current task
+ * Description       : check stack integrity of the current task
  *
  * Parameters        : none
  *
@@ -209,6 +209,17 @@ uint32_t sys_time( void );
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+
+/******************************************************************************
+ *
+ * Class             : CriticalSection
+ *
+ * Description       : create and initialize a critical section guard object
+ *
+ * Constructor parameters
+ *                   : none
+ *
+ ******************************************************************************/
 
 struct CriticalSection
 {
