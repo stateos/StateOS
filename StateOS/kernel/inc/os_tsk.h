@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    06.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -710,6 +710,7 @@ void tsk_flip( fun_t *state );
 /******************************************************************************
  *
  * Name              : tsk_prio
+ * Alias             : tsk_setPrio
  *
  * Description       : set current task priority
  *
@@ -722,23 +723,7 @@ void tsk_flip( fun_t *state );
  *
  ******************************************************************************/
 
-void tsk_prio( unsigned prio );
-
-/******************************************************************************
- *
- * Name              : tsk_setPrio
- *
- * Description       : the same as tsk_prio (set current task priority)
- *
- * Parameters
- *   prio            : new task priority value
- *
- * Return            : none
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
+void tsk_prio   ( unsigned prio );
 __STATIC_INLINE
 void tsk_setPrio( unsigned prio ) { tsk_prio(prio); }
 
