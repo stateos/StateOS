@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    08.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -100,11 +100,11 @@ unsigned priv_mut_wait( mut_t *mut, uint32_t time, unsigned(*wait)(void*,uint32_
 
 	if (mut->owner == 0)
 	{
-		mut->owner = Current;
+		mut->owner = System.cur;
 		event = E_SUCCESS;
 	}
 	else
-	if (mut->owner != Current)
+	if (mut->owner != System.cur)
 	{
 		event = wait(mut, time);
 	}
@@ -143,7 +143,7 @@ unsigned mut_give( mut_t *mut )
 
 	port_sys_lock();
 
-	if (mut->owner == Current)
+	if (mut->owner == System.cur)
 	{
 		mut->owner = core_one_wakeup(mut, E_SUCCESS);
 		event = E_SUCCESS;

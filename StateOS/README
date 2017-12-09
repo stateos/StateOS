@@ -35,6 +35,8 @@ Features:
 - updated kernel files
 - removed Counter definition
 - added sys_time functions
+- removed Current definition
+- added tmr_this and tsk_this functions
 ---------
 5.4
 - added startup files for cosmic compiler

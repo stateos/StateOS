@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    23.11.2017
+    @date    08.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -144,7 +144,7 @@ unsigned priv_box_wait( box_t *box, void *data, uint32_t time, unsigned(*wait)(v
 
 	if (box->count == 0)
 	{
-		Current->tmp.data = data;
+		System.cur->tmp.data = data;
 
 		event = wait(box, time);
 	}
@@ -195,7 +195,7 @@ unsigned priv_box_send( box_t *box, void *data, uint32_t time, unsigned(*wait)(v
 
 	if (box->count >= box->limit)
 	{
-		Current->tmp.data = data;
+		System.cur->tmp.data = data;
 
 		event = wait(box, time);
 	}

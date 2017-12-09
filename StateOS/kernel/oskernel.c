@@ -254,7 +254,7 @@ void core_tsk_remove( tsk_t *tsk )
 {
 	tsk->obj.id = ID_STOPPED;
 	priv_tsk_remove(tsk);
-	if (tsk == Current)
+	if (tsk == System.cur)
 		port_ctx_switchNow();
 }
 
@@ -286,7 +286,7 @@ void core_tsk_loop( void )
 	for (;;)
 	{
 		port_clr_lock();
-		Current->state();
+		System.cur->state();
 		port_set_lock();
 		core_ctx_switch();
 	}
@@ -338,7 +338,7 @@ void priv_tsk_wait( tsk_t *tsk, void *obj )
 
 unsigned core_tsk_waitUntil( void *obj, uint32_t time )
 {
-	tsk_t *cur = Current;
+	tsk_t *cur = System.cur;
 
 	cur->start = core_sys_time();
 	cur->delay = time - cur->start;
@@ -356,7 +356,7 @@ unsigned core_tsk_waitUntil( void *obj, uint32_t time )
 
 unsigned core_tsk_waitFor( void *obj, uint32_t delay )
 {
-	tsk_t *cur = Current;
+	tsk_t *cur = System.cur;
 
 	cur->start = core_sys_time();
 	cur->delay = delay;
@@ -377,7 +377,7 @@ void core_tsk_suspend( tsk_t *tsk )
 	tsk->delay = INFINITE;
 
 	priv_tsk_wait(tsk, &WAIT);
-	if (tsk == Current)
+	if (tsk == System.cur)
 		port_ctx_switchLock();
 }
 
@@ -431,7 +431,7 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 	{
 		tsk->prio = prio;
 
-		if (tsk == Current)
+		if (tsk == System.cur)
 		{
 			tsk = tsk->obj.next;
 			if (tsk->prio > prio)
@@ -459,7 +459,7 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 void core_cur_prio( unsigned prio )
 {
 	mtx_t *mtx;
-	tsk_t *tsk = Current;
+	tsk_t *tsk = System.cur;
 	
 	if (prio < tsk->basic)
 		prio = tsk->basic;
@@ -492,7 +492,7 @@ void *core_tsk_handler( void *sp )
 	port_isr_lock();
 	core_ctx_reset();
 
-	cur = Current;
+	cur = System.cur;
 	cur->sp = sp;
 
 	nxt = IDLE.obj.next;
@@ -508,7 +508,7 @@ void *core_tsk_handler( void *sp )
 		nxt = IDLE.obj.next;
 	}
 
-	Current = nxt;
+	System.cur = nxt;
 	sp = nxt->sp;
 
 	port_isr_unlock();

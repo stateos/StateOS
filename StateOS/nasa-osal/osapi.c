@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    09.12.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -958,7 +958,7 @@ int32 OS_MutSemGetInfo(uint32 semaphore_id, OS_mut_sem_prop_t *mut_prop)
 
 static void task_handler(void)
 {
-	OS_task_record_t *rec = (OS_task_record_t *) Current;
+	OS_task_record_t *rec = (OS_task_record_t *) tsk_this();
 
 	rec->handler();
 
@@ -1124,7 +1124,7 @@ int32 OS_TaskRegister(void)
 
 uint32 OS_TaskGetId(void)
 {
-	uint32 task_id = ((OS_task_record_t *) Current - OS_task_table) / sizeof(OS_task_record_t);
+	uint32 task_id = ((OS_task_record_t *) tsk_this() - OS_task_table) / sizeof(OS_task_record_t);
 
 	if (task_id >= OS_MAX_TASKS)
 		return (uint32) OS_ERR_INVALID_ID;
@@ -1422,7 +1422,7 @@ int32 OS_GetErrorName(int32 error_num, os_err_name_t *err_name)
 
 static void timer_handler(void)
 {
-	OS_timer_record_t *rec = (OS_timer_record_t *) WAIT.obj.next;
+	OS_timer_record_t *rec = (OS_timer_record_t *) tmr_this();
 	uint32 timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
 
 	rec->handler(timer_id);

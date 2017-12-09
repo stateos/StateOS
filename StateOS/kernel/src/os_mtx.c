@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    08.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -149,12 +149,12 @@ unsigned priv_mtx_wait( mtx_t *mtx, uint32_t time, unsigned(*wait)(void*,uint32_
 
 	if (mtx->owner == 0)
 	{
-		priv_mtx_link(mtx, Current);
+		priv_mtx_link(mtx, System.cur);
 
 		event = E_SUCCESS;
 	}
 	else
-	if (mtx->owner == Current)
+	if (mtx->owner == System.cur)
 	{
 		if (mtx->count < ~0U)
 		{
@@ -164,12 +164,12 @@ unsigned priv_mtx_wait( mtx_t *mtx, uint32_t time, unsigned(*wait)(void*,uint32_
 	}
 	else
 	{
-		if (mtx->owner->prio < Current->prio)
-			core_tsk_prio(mtx->owner, Current->prio);
+		if (mtx->owner->prio < System.cur->prio)
+			core_tsk_prio(mtx->owner, System.cur->prio);
 
-		Current->mtree = mtx->owner;
+		System.cur->mtree = mtx->owner;
 		event = wait(mtx, time);
-		Current->mtree = 0;
+		System.cur->mtree = 0;
 	}
 	
 	port_sys_unlock();
@@ -206,7 +206,7 @@ unsigned mtx_give( mtx_t *mtx )
 
 	port_sys_lock();
 
-	if (mtx->owner == Current)
+	if (mtx->owner == System.cur)
 	{
 		if (mtx->count)
 		{

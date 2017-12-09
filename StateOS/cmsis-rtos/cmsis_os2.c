@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    09.12.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -185,7 +185,7 @@ uint32_t osKernelGetSysTimerFreq (void)
 
 static void thread_handler (void)
 {
-	osThread_t *cur = (osThread_t *)Current;
+	osThread_t *cur = (osThread_t *) tsk_this();
 
 	cur->func(cur->arg);
 
@@ -282,7 +282,7 @@ osThreadId_t osThreadGetId (void)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
 
-	return Current;
+	return (osThreadId_t) tsk_this();
 }
 
 osThreadState_t osThreadGetState (osThreadId_t thread_id)
@@ -444,7 +444,7 @@ uint32_t osThreadGetStackSpace (osThreadId_t thread_id)
 	if (&thread->tsk == &MAIN)
 		return 0U;
 
-	if (&thread->tsk != Current)
+	if (&thread->tsk != tsk_this())
 		return (uint32_t) thread->tsk.sp - (uint32_t) thread->tsk.stack;
 
 	return (uint32_t) port_get_sp() - (uint32_t) thread->tsk.stack;
@@ -514,7 +514,7 @@ uint32_t osThreadFlagsSet (osThreadId_t thread_id, uint32_t flags)
 
 uint32_t osThreadFlagsClear (uint32_t flags)
 {
-	osThread_t *thread = (osThread_t *)Current;
+	osThread_t *thread = (osThread_t *) tsk_this();
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
@@ -524,7 +524,7 @@ uint32_t osThreadFlagsClear (uint32_t flags)
 
 uint32_t osThreadFlagsGet (void)
 {
-	osThread_t *thread = (osThread_t *)Current;
+	osThread_t *thread = (osThread_t *) tsk_this();
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
@@ -534,7 +534,7 @@ uint32_t osThreadFlagsGet (void)
 
 uint32_t osThreadFlagsWait (uint32_t flags, uint32_t options, uint32_t timeout)
 {
-	osThread_t *thread = (osThread_t *)Current;
+	osThread_t *thread = (osThread_t *) tsk_this();
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
@@ -579,7 +579,7 @@ osStatus_t osDelayUntil (uint32_t ticks)
 
 static void timer_handler (void)
 {
-	osTimer_t *cur = (osTimer_t *)WAIT.obj.next;
+	osTimer_t *cur = (osTimer_t *) tmr_this();
 
 	cur->func(cur->arg);
 }

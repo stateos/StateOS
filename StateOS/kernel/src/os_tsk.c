@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    06.12.2017
+    @date    08.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -124,15 +124,15 @@ void tsk_stop( void )
 
 	port_set_lock();
 
-	while (Current->mlist)
-		mtx_kill(Current->mlist);
+	while (System.cur->mlist)
+		mtx_kill(System.cur->mlist);
 
-	if (Current->join != DETACHED)
-		core_tsk_wakeup(Current->join, E_SUCCESS);
+	if (System.cur->join != DETACHED)
+		core_tsk_wakeup(System.cur->join, E_SUCCESS);
 	else
-		core_sys_free(Current->obj.res);
+		core_sys_free(System.cur->obj.res);
 
-	core_tsk_remove(Current);
+	core_tsk_remove(System.cur);
 
 	for (;;);
 }
@@ -257,10 +257,10 @@ void tsk_flip( fun_t *state )
 
 	port_set_lock();
 
-	Current->state = state;
+	System.cur->state = state;
 
 	core_ctx_switch();
-	core_tsk_flip(Current->top);
+	core_tsk_flip(System.cur->top);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -271,7 +271,7 @@ void tsk_prio( unsigned prio )
 
 	port_sys_lock();
 
-	Current->basic = prio;
+	System.cur->basic = prio;
 	core_cur_prio(prio);
 
 	port_sys_unlock();
@@ -286,8 +286,8 @@ unsigned priv_tsk_wait( unsigned flags, uint32_t time, unsigned(*wait)(void*,uin
 
 	port_sys_lock();
 
-	Current->evt.flags = flags;
-	event = wait(Current, time);
+	System.cur->evt.flags = flags;
+	event = wait(System.cur, time);
 
 	port_sys_unlock();
 

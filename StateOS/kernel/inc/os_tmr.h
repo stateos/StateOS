@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    09.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -282,6 +282,21 @@ struct __tmr
 #define                TMR_NEW \
                        TMR_CREATE
 #endif
+
+/******************************************************************************
+ *
+ * Name              : tmr_this
+ *
+ * Description       : return current timer object
+ *
+ * Parameters        : none
+ *
+ * Return            : current timer object
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+tmr_t *tmr_this( void ) { return (tmr_t *) WAIT.obj.next; }
 
 /******************************************************************************
  *
@@ -608,7 +623,7 @@ unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
  ******************************************************************************/
 
 __STATIC_INLINE
-void tmr_flipISR( fun_t *proc ) { ((tmr_t *)WAIT.obj.next)->state = proc; }
+void tmr_flipISR( fun_t *proc ) { tmr_this()->state = proc; }
 
 /******************************************************************************
  *
@@ -628,7 +643,7 @@ void tmr_flipISR( fun_t *proc ) { ((tmr_t *)WAIT.obj.next)->state = proc; }
  ******************************************************************************/
 
 __STATIC_INLINE
-void tmr_delayISR( uint32_t delay ) { ((tmr_t *)WAIT.obj.next)->delay = delay; }
+void tmr_delayISR( uint32_t delay ) { tmr_this()->delay = delay; }
 
 #ifdef __cplusplus
 }

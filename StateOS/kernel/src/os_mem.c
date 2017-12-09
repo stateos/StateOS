@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    23.11.2017
+    @date    08.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -146,7 +146,7 @@ unsigned priv_mem_wait( mem_t *mem, void **data, uint32_t time, unsigned(*wait)(
 	}
 	else
 	{
-		Current->tmp.data = data;
+		System.cur->tmp.data = data;
 		event = wait(mem, time);
 	}
 	

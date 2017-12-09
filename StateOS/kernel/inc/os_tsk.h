@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    06.12.2017
+    @date    09.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -474,6 +474,21 @@ struct __tsk
 
 /******************************************************************************
  *
+ * Name              : tsk_this
+ *
+ * Description       : return current task object
+ *
+ * Parameters        : none
+ *
+ * Return            : current task object
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+tsk_t *tsk_this( void ) { return System.cur; }
+
+/******************************************************************************
+ *
  * Name              : tsk_init
  *
  * Description       : initialize complete work area for task object and start the task
@@ -742,7 +757,7 @@ void tsk_setPrio( unsigned prio ) { tsk_prio(prio); }
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned tsk_getPrio( void ) { return Current->basic; }
+unsigned tsk_getPrio( void ) { return System.cur->basic; }
 
 /******************************************************************************
  *
@@ -1044,7 +1059,7 @@ struct baseTask : public __tsk
 	bool     operator!( void )            { return __tsk::obj.id == ID_STOPPED;  }
 #if OS_FUNCTIONAL
 	static
-	void     run_( void ) { ((baseTask *) Current)->fun_(); }
+	void     run_( void ) { ((baseTask *) System.cur)->fun_(); }
 	FUN_t    fun_;
 #endif
 };
@@ -1144,31 +1159,31 @@ struct startTask : public startTaskT<OS_STACK_SIZE>
 
 namespace ThisTask
 {
-	static inline void     pass      ( void )                             {        tsk_pass      ();                      }
-	static inline void     yield     ( void )                             {        tsk_yield     ();                      }
+	static inline void     pass      ( void )                             {        tsk_pass      ();                         }
+	static inline void     yield     ( void )                             {        tsk_yield     ();                         }
 #if OS_FUNCTIONAL
-	static inline void     flip      ( FUN_t    _state )                  {        ((baseTask *) Current)->fun_ = _state;
-	                                                                               tsk_flip      (baseTask::run_);        }
+	static inline void     flip      ( FUN_t    _state )                  {        ((baseTask *) System.cur)->fun_ = _state;
+	                                                                               tsk_flip      (baseTask::run_);           }
 #else
-	static inline void     flip      ( FUN_t    _state )                  {        tsk_flip      (_state);                }
+	static inline void     flip      ( FUN_t    _state )                  {        tsk_flip      (_state);                   }
 #endif
-	static inline void     stop      ( void )                             {        tsk_stop      ();                      }
-	static inline void     prio      ( unsigned _prio )                   {        tsk_prio      (_prio);                 }
-	static inline void     setPrio   ( unsigned _prio )                   {        tsk_setPrio   (_prio);                 }
-	static inline unsigned getPrio   ( void )                             { return tsk_getPrio   ();                      }
-	static inline unsigned prio      ( void )                             { return tsk_getPrio   ();                      }
+	static inline void     stop      ( void )                             {        tsk_stop      ();                         }
+	static inline void     prio      ( unsigned _prio )                   {        tsk_prio      (_prio);                    }
+	static inline void     setPrio   ( unsigned _prio )                   {        tsk_setPrio   (_prio);                    }
+	static inline unsigned getPrio   ( void )                             { return tsk_getPrio   ();                         }
+	static inline unsigned prio      ( void )                             { return tsk_getPrio   ();                         }
 
-	static inline void     kill      ( void )                             {        tsk_kill      (Current);               }
-	static inline unsigned detach    ( void )                             { return tsk_detach    (Current);               }
-	static inline void     suspend   ( void )                             {        tsk_suspend   (Current);               }
+	static inline void     kill      ( void )                             {        tsk_kill      (System.cur);               }
+	static inline unsigned detach    ( void )                             { return tsk_detach    (System.cur);               }
+	static inline void     suspend   ( void )                             {        tsk_suspend   (System.cur);               }
 
-	static inline unsigned waitUntil ( unsigned _flags, uint32_t _time )  { return tsk_waitUntil (_flags, _time);         }
-	static inline unsigned waitFor   ( unsigned _flags, uint32_t _delay ) { return tsk_waitFor   (_flags, _delay);        }
-	static inline unsigned wait      ( unsigned _flags )                  { return tsk_wait      (_flags);                }
-	static inline unsigned sleepUntil( uint32_t _time )                   { return tsk_sleepUntil(_time);                 }
-	static inline unsigned sleepFor  ( uint32_t _delay )                  { return tsk_sleepFor  (_delay);                }
-	static inline unsigned sleep     ( void )                             { return tsk_sleep     ();                      }
-	static inline unsigned delay     ( uint32_t _delay )                  { return tsk_delay     (_delay);                }
+	static inline unsigned waitUntil ( unsigned _flags, uint32_t _time )  { return tsk_waitUntil (_flags, _time);            }
+	static inline unsigned waitFor   ( unsigned _flags, uint32_t _delay ) { return tsk_waitFor   (_flags, _delay);           }
+	static inline unsigned wait      ( unsigned _flags )                  { return tsk_wait      (_flags);                   }
+	static inline unsigned sleepUntil( uint32_t _time )                   { return tsk_sleepUntil(_time);                    }
+	static inline unsigned sleepFor  ( uint32_t _delay )                  { return tsk_sleepFor  (_delay);                   }
+	static inline unsigned sleep     ( void )                             { return tsk_sleep     ();                         }
+	static inline unsigned delay     ( uint32_t _delay )                  { return tsk_delay     (_delay);                   }
 }
 
 #endif//__cplusplus

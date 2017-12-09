@@ -36,7 +36,7 @@
 __attribute__((used))
 void *__user_perthread_libspace( void )
 {
-	return &Current->libspace;  /* provide separate libspace for each task */
+	return &System.cur->libspace;  /* provide separate libspace for each task */
 }
 
 /* -------------------------------------------------------------------------- */

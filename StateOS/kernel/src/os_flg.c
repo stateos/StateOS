@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    08.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -93,7 +93,7 @@ static
 unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t *cur = Current;
+	tsk_t *cur = System.cur;
 	unsigned event = E_SUCCESS;
 
 	assert(flg);

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    23.11.2017
+    @date    08.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -135,7 +135,7 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, uint32_t time, unsigned(*wai
 
 	if (msg->count == 0)
 	{
-		Current->tmp.data = data;
+		System.cur->tmp.data = data;
 
 		event = wait(msg, time);
 	}
@@ -185,7 +185,7 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, uint32_t time, unsigned(*wait
 
 	if (msg->count >= msg->limit)
 	{
-		Current->tmp.msg = data;
+		System.cur->tmp.msg = data;
 
 		event = wait(msg, time);
 	}

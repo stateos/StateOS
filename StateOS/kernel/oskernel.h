@@ -99,12 +99,8 @@ extern sys_t System; // system data
 
 /* -------------------------------------------------------------------------- */
 
-#define Current System.cur
-
-/* -------------------------------------------------------------------------- */
-
 #define core_stk_assert() \
-        assert((Current == &MAIN) || (port_get_sp() >= Current->stack))
+        assert((System.cur == &MAIN) || (port_get_sp() >= System.cur->stack))
 
 /* -------------------------------------------------------------------------- */
 

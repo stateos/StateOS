@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    08.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -107,7 +107,7 @@ unsigned priv_lst_wait( lst_t *lst, void **data, uint32_t time, unsigned(*wait)(
 	}
 	else
 	{
-		Current->tmp.data = data;
+		System.cur->tmp.data = data;
 		event = wait(lst, time);
 	}
 	
