@@ -2,7 +2,7 @@
 
     @file    StateOS: os.c
     @author  Rajmund Szymanski
-    @date    23.10.2017
+    @date    08.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,11 +34,11 @@ uint32_t sys_time( void )
 {
 	uint32_t cnt;
 
-	port_cnt_lock();
+	port_sys_lock();
 
-	cnt = Counter;
+	cnt = core_sys_time();
 
-	port_cnt_unlock();
+	port_sys_unlock();
 
 	return cnt;
 }

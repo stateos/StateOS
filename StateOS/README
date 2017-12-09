@@ -33,6 +33,8 @@ Features:
 5.5
 - some preprocessor definitions have been changed
 - updated kernel files
+- removed Counter definition
+- added sys_time functions
 ---------
 5.4
 - added startup files for cosmic compiler

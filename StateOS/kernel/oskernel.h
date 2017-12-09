@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    04.12.2017
+    @date    08.12.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -99,9 +99,6 @@ extern sys_t System; // system data
 
 /* -------------------------------------------------------------------------- */
 
-#ifndef Counter
-#define Counter System.cnt
-#endif
 #define Current System.cur
 
 /* -------------------------------------------------------------------------- */
@@ -234,6 +231,17 @@ void core_cur_prio( unsigned prio );
 void *core_tsk_handler( void *sp );
 
 /* -------------------------------------------------------------------------- */
+
+// return current system time
+__STATIC_INLINE
+uint32_t core_sys_time( void )
+{
+#if OS_TICKLESS
+	return port_sys_time();
+#else
+	return System.cnt;
+#endif
+}
 
 // internal handler of system timer
 void core_sys_tick( void );

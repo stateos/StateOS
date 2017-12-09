@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    08.12.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -125,12 +125,12 @@ bool priv_tmr_expired( tmr_t *tmr )
 	if (tmr->delay == INFINITE)
 	return false; // return if timer counting indefinitely
 
-	if (tmr->delay <= Counter - tmr->start)
+	if (tmr->delay <= core_sys_time() - tmr->start)
 	return true;  // return if timer finished counting
 
 	port_tmr_start(tmr->start + tmr->delay);
 
-	if (tmr->delay >  Counter - tmr->start)
+	if (tmr->delay >  core_sys_time() - tmr->start)
 	return false; // return if timer still counts
 
 	port_tmr_stop();
@@ -145,7 +145,7 @@ bool priv_tmr_expired( tmr_t *tmr )
 static
 bool priv_tmr_expired( tmr_t *tmr )
 {
-	if (tmr->delay >= Counter - tmr->start + 1)
+	if (tmr->delay >= core_sys_time() - tmr->start + 1)
 	return false; // return if timer still counts or counting indefinitely
 
 	return true;  // timer finished counting
@@ -340,7 +340,7 @@ unsigned core_tsk_waitUntil( void *obj, uint32_t time )
 {
 	tsk_t *cur = Current;
 
-	cur->start = Counter;
+	cur->start = core_sys_time();
 	cur->delay = time - cur->start;
 
 	if (cur->delay == IMMEDIATE)
@@ -358,7 +358,7 @@ unsigned core_tsk_waitFor( void *obj, uint32_t delay )
 {
 	tsk_t *cur = Current;
 
-	cur->start = Counter;
+	cur->start = core_sys_time();
 	cur->delay = delay;
 
 	if (cur->delay == IMMEDIATE)
