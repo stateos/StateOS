@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -215,8 +215,9 @@ void box_init( box_t *box, unsigned limit, unsigned size, void *data );
  ******************************************************************************/
 
 box_t *box_create( unsigned limit, unsigned size );
+
 __STATIC_INLINE
-box_t *box_new   ( unsigned limit, unsigned size ) { return box_create(limit, size); }
+box_t *box_new( unsigned limit, unsigned size ) { return box_create(limit, size); }
 
 /******************************************************************************
  *
@@ -325,6 +326,7 @@ unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFI
 /******************************************************************************
  *
  * Name              : box_take
+ * ISR alias         : box_takeISR
  *
  * Description       : try to transfer mailbox data from the mailbox queue object,
  *                     don't wait if the mailbox queue object is empty
@@ -337,31 +339,12 @@ unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFI
  *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
  *   E_TIMEOUT       : mailbox queue object is empty
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned box_take( box_t *box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : box_takeISR
- *
- * Description       : try to transfer mailbox data from the mailbox queue object,
- *                     don't wait if the mailbox queue object is empty
- *
- * Parameters
- *   box             : pointer to mailbox queue object
- *   data            : pointer to store mailbox data
- *
- * Return
- *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
- *   E_TIMEOUT       : mailbox queue object is empty
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned box_takeISR( box_t *box, void *data ) { return box_waitFor(box, data, IMMEDIATE); }
@@ -439,6 +422,7 @@ unsigned box_send( box_t *box, const void *data ) { return box_sendFor(box, data
 /******************************************************************************
  *
  * Name              : box_give
+ * ISR alias         : box_giveISR
  *
  * Description       : try to transfer mailbox data to the mailbox queue object,
  *                     don't wait if the mailbox queue object is full
@@ -451,31 +435,12 @@ unsigned box_send( box_t *box, const void *data ) { return box_sendFor(box, data
  *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
  *   E_TIMEOUT       : mailbox queue object is full
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned box_give( box_t *box, const void *data ) { return box_sendFor(box, data, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : box_giveISR
- *
- * Description       : try to transfer mailbox data to the mailbox queue object,
- *                     don't wait if the mailbox queue object is full
- *
- * Parameters
- *   box             : pointer to mailbox queue object
- *   data            : pointer to mailbox data
- *
- * Return
- *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
- *   E_TIMEOUT       : mailbox queue object is full
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned box_giveISR( box_t *box, const void *data ) { return box_sendFor(box, data, IMMEDIATE); }
