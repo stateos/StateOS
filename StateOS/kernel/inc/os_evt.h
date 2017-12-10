@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -170,8 +170,9 @@ void evt_init( evt_t *evt );
  ******************************************************************************/
 
 evt_t *evt_create( void );
+
 __STATIC_INLINE
-evt_t *evt_new   ( void ) { return evt_create(); }
+evt_t *evt_new( void ) { return evt_create(); }
 
 /******************************************************************************
  *
@@ -274,6 +275,7 @@ unsigned evt_wait( evt_t *evt ) { return evt_waitFor(evt, INFINITE); }
 /******************************************************************************
  *
  * Name              : evt_give
+ * ISR alias         : evt_giveISR
  *
  * Description       : resume all tasks that are waiting on the event object
  *
@@ -283,27 +285,11 @@ unsigned evt_wait( evt_t *evt ) { return evt_waitFor(evt, INFINITE); }
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 void evt_give( evt_t *evt, unsigned event );
-
-/******************************************************************************
- *
- * Name              : evt_giveISR
- *
- * Description       : resume all tasks that are waiting on the event object
- *
- * Parameters
- *   evt             : pointer to event object
- *   event           : all waiting tasks are resumed with the 'event' value
- *
- * Return            : none
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 void evt_giveISR( evt_t *evt, unsigned event ) { evt_give(evt, event); }
