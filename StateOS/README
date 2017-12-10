@@ -37,6 +37,7 @@ Features:
 - added sys_time functions
 - removed Current definition
 - added tmr_this and tsk_this functions
+- function tmr_this renamed to tmr_thisISR
 ---------
 5.4
 - added startup files for cosmic compiler

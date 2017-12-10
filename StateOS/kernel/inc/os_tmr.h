@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    09.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -285,7 +285,7 @@ struct __tmr
 
 /******************************************************************************
  *
- * Name              : tmr_this
+ * Name              : tmr_thisISR
  *
  * Description       : return current timer object
  *
@@ -293,10 +293,12 @@ struct __tmr
  *
  * Return            : current timer object
  *
+ * Note              : use only in timer callback procedure
+ *
  ******************************************************************************/
 
 __STATIC_INLINE
-tmr_t *tmr_this( void ) { return (tmr_t *) WAIT.obj.next; }
+tmr_t *tmr_thisISR( void ) { return (tmr_t *) WAIT.obj.next; }
 
 /******************************************************************************
  *
