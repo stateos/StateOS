@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    04.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -108,6 +108,7 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
 /******************************************************************************
  *
  * Name              : sys_lock
+ * ISR alias         : sys_lockISR
  *
  * Description       : disable interrupts / enter into critical section
  *
@@ -115,26 +116,12 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 #define                sys_lock() \
                        port_sys_lock()
-
-/******************************************************************************
- *
- * Name              : sys_lockISR
- *
- * Description       : disable interrupts / enter into critical section
- *
- * Parameters        : none
- *
- * Return            : none
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 #define                sys_lockISR() \
                        port_sys_lock()
@@ -142,6 +129,7 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
 /******************************************************************************
  *
  * Name              : sys_unlock
+ * ISR alias         : sys_unlockISR
  *
  * Description       : enable interrupts / exit from critical section
  *
@@ -149,26 +137,12 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 #define                sys_unlock() \
                        port_sys_unlock()
-
-/******************************************************************************
- *
- * Name              : sys_unlockISR
- *
- * Description       : enable interrupts / exit from critical section
- *
- * Parameters        : none
- *
- * Return            : none
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 #define                sys_unlockISR() \
                        port_sys_unlock()
@@ -176,6 +150,7 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
 /******************************************************************************
  *
  * Name              : sys_time
+ * ISR alias         : sys_timeISR
  *
  * Description       : return current value of system counter
  *
@@ -183,9 +158,13 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  *
  * Return            : current value of system counter
  *
+ * Note              : may be used both in thread and handler mode
+ *
  ******************************************************************************/
 
-uint32_t sys_time( void );
+uint32_t sys_time   ( void );
+__STATIC_INLINE
+uint32_t sys_timeISR( void ) { return sys_time(); }
 
 /******************************************************************************
  *
@@ -196,6 +175,8 @@ uint32_t sys_time( void );
  * Parameters        : none
  *
  * Return            : none
+ *
+ * Note              : use only in thread mode
  *
  ******************************************************************************/
 
