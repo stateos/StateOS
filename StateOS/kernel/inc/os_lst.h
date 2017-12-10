@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -171,8 +171,9 @@ void lst_init( lst_t *lst );
  ******************************************************************************/
 
 lst_t *lst_create( void );
+
 __STATIC_INLINE
-lst_t *lst_new   ( void ) { return lst_create(); }
+lst_t *lst_new( void ) { return lst_create(); }
 
 /******************************************************************************
  *
@@ -281,6 +282,7 @@ unsigned lst_wait( lst_t *lst, void **data ) { return lst_waitFor(lst, data, INF
 /******************************************************************************
  *
  * Name              : lst_take
+ * ISR alias         : lst_takeISR
  *
  * Description       : try to get memory object from the list object,
  *                     don't wait if the list object is empty
@@ -293,31 +295,12 @@ unsigned lst_wait( lst_t *lst, void **data ) { return lst_waitFor(lst, data, INF
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
  *   E_TIMEOUT       : list object is empty
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned lst_take( lst_t *lst, void **data ) { return lst_waitFor(lst, data, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : lst_takeISR
- *
- * Description       : try to get memory object from the list object,
- *                     don't wait if the list object is empty
- *
- * Parameters
- *   lst             : pointer to list object
- *   data            : pointer to store the pointer to the memory object
- *
- * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_TIMEOUT       : list object is empty
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_waitFor(lst, data, IMMEDIATE); }
@@ -325,6 +308,7 @@ unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_waitFor(lst, data, 
 /******************************************************************************
  *
  * Name              : lst_give
+ * ISR alias         : lst_giveISR
  *
  * Description       : transfer memory object to the list object,
  *
@@ -334,27 +318,11 @@ unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_waitFor(lst, data, 
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 void lst_give( lst_t *lst, void *data );
-
-/******************************************************************************
- *
- * Name              : lst_giveISR
- *
- * Description       : transfer memory object to the list object,
- *
- * Parameters
- *   lst             : pointer to list object
- *   data            : pointer to memory object
- *
- * Return            : none
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 void lst_giveISR( lst_t *lst, void *data ) { lst_give(lst, data); }
