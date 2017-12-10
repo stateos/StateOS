@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -184,8 +184,9 @@ void flg_init( flg_t *flg );
  ******************************************************************************/
 
 flg_t *flg_create( void );
+
 __STATIC_INLINE
-flg_t *flg_new   ( void ) { return flg_create(); }
+flg_t *flg_new( void ) { return flg_create(); }
 
 /******************************************************************************
  *
@@ -309,6 +310,7 @@ unsigned flg_wait( flg_t *flg, unsigned flags, unsigned mode ) { return flg_wait
 /******************************************************************************
  *
  * Name              : flg_take
+ * ISR alias         : flg_takeISR
  *
  * Description       : don't wait on flag object until requested flags have been set
  *
@@ -326,36 +328,12 @@ unsigned flg_wait( flg_t *flg, unsigned flags, unsigned mode ) { return flg_wait
  *   E_SUCCESS       : requested flags have been set
  *   E_TIMEOUT       : requested flags have not been set
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : flg_takeISR
- *
- * Description       : don't wait on flag object until requested flags have been set
- *
- * Parameters
- *   flg             : pointer to flag object
- *   flags           : all flags to wait
- *   mode            : waiting mode
- *                     flgAny:     wait for any flags to be set
- *                     flgAll:     wait for all flags to be set
- *                     flgProtect: don't clear flags in flag object
- *                     flgIgnore:  ignore flags in flag object that have been set and not accepted before
- *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
- *
- * Return
- *   E_SUCCESS       : requested flags have been set
- *   E_TIMEOUT       : requested flags have not been set
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
@@ -363,6 +341,7 @@ unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) { return flg_w
 /******************************************************************************
  *
  * Name              : flg_give
+ * ISR alias         : flg_giveISR
  *
  * Description       : set given flags in flag object
  *
@@ -372,27 +351,11 @@ unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) { return flg_w
  *
  * Return            : flags in flag object after setting
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 unsigned flg_give( flg_t *flg, unsigned flags );
-
-/******************************************************************************
- *
- * Name              : flg_giveISR
- *
- * Description       : set given flags in flag object
- *
- * Parameters
- *   flg             : pointer to flag object
- *   flags           : all flags to set
- *
- * Return            : flags in flag object after setting
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned flg_giveISR( flg_t *flg, unsigned flags ) { return flg_give(flg, flags); }
@@ -400,6 +363,7 @@ unsigned flg_giveISR( flg_t *flg, unsigned flags ) { return flg_give(flg, flags)
 /******************************************************************************
  *
  * Name              : flg_clear
+ * ISR alias         : flg_clearISR
  *
  * Description       : clear given flags in flag object
  *
@@ -409,27 +373,11 @@ unsigned flg_giveISR( flg_t *flg, unsigned flags ) { return flg_give(flg, flags)
  *
  * Return            : flags in flag object before clearing
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 unsigned flg_clear( flg_t *flg, unsigned flags );
-
-/******************************************************************************
- *
- * Name              : flg_clearISR
- *
- * Description       : clear given flags in flag object
- *
- * Parameters
- *   flg             : pointer to flag object
- *   flags           : all flags to clear
- *
- * Return            : flags in flag object before clearing
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned flg_clearISR( flg_t *flg, unsigned flags ) { return flg_clear(flg, flags); }
