@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -207,8 +207,9 @@ void msg_init( msg_t *msg, unsigned limit, unsigned *data );
  ******************************************************************************/
 
 msg_t *msg_create( unsigned limit );
+
 __STATIC_INLINE
-msg_t *msg_new   ( unsigned limit ) { return msg_create(limit); }
+msg_t *msg_new( unsigned limit ) { return msg_create(limit); }
 
 /******************************************************************************
  *
@@ -317,6 +318,7 @@ unsigned msg_wait( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, 
 /******************************************************************************
  *
  * Name              : msg_take
+ * ISR alias         : msg_takeISR
  *
  * Description       : try to transfer message data from the message queue object,
  *                     don't wait if the message queue object is empty
@@ -329,31 +331,12 @@ unsigned msg_wait( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, 
  *   E_SUCCESS       : message data was successfully transfered from the message queue object
  *   E_TIMEOUT       : message queue object is empty
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned msg_take( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : msg_takeISR
- *
- * Description       : try to transfer message data from the message queue object,
- *                     don't wait if the message queue object is empty
- *
- * Parameters
- *   msg             : pointer to message queue object
- *   data            : pointer to store message data
- *
- * Return
- *   E_SUCCESS       : message data was successfully transfered from the message queue object
- *   E_TIMEOUT       : message queue object is empty
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned msg_takeISR( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
@@ -431,6 +414,7 @@ unsigned msg_send( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, I
 /******************************************************************************
  *
  * Name              : msg_give
+ * ISR alias         : msg_giveISR
  *
  * Description       : try to transfer message data to the message queue object,
  *                     don't wait if the message queue object is full
@@ -443,31 +427,12 @@ unsigned msg_send( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, I
  *   E_SUCCESS       : message data was successfully transfered to the message queue object
  *   E_TIMEOUT       : message queue object is full
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned msg_give( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : msg_giveISR
- *
- * Description       : try to transfer message data to the message queue object,
- *                     don't wait if the message queue object is full
- *
- * Parameters
- *   msg             : pointer to message queue object
- *   data            : message data
- *
- * Return
- *   E_SUCCESS       : message data was successfully transfered to the message queue object
- *   E_TIMEOUT       : message queue object is full
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned msg_giveISR( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
