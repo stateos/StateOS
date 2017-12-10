@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -214,8 +214,9 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit );
  ******************************************************************************/
 
 sem_t *sem_create( unsigned init, unsigned limit );
+
 __STATIC_INLINE
-sem_t *sem_new   ( unsigned init, unsigned limit ) { return sem_create(init, limit); }
+sem_t *sem_new( unsigned init, unsigned limit ) { return sem_create(init, limit); }
 
 /******************************************************************************
  *
@@ -321,6 +322,7 @@ unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
 /******************************************************************************
  *
  * Name              : sem_take
+ * ISR alias         : sem_takeISR
  *
  * Description       : try to lock the semaphore object,
  *                     don't wait if the semaphore object can't be locked immediately
@@ -332,30 +334,12 @@ unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
  *   E_SUCCESS       : semaphore object was successfully locked
  *   E_TIMEOUT       : semaphore object can't be locked immediately
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned sem_take( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : sem_takeISR
- *
- * Description       : try to lock the semaphore object,
- *                     don't wait if the semaphore object can't be locked immediately
- *
- * Parameters
- *   sem             : pointer to semaphore object
- *
- * Return
- *   E_SUCCESS       : semaphore object was successfully locked
- *   E_TIMEOUT       : semaphore object can't be locked immediately
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned sem_takeISR( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
@@ -430,6 +414,7 @@ unsigned sem_send( sem_t *sem ) { return sem_sendFor(sem, INFINITE); }
 /******************************************************************************
  *
  * Name              : sem_give
+ * ISR alias         : sem_giveISR
  *
  * Description       : try to unlock the semaphore object,
  *                     don't wait if the semaphore object can't be unlocked immediately
@@ -441,30 +426,12 @@ unsigned sem_send( sem_t *sem ) { return sem_sendFor(sem, INFINITE); }
  *   E_SUCCESS       : semaphore object was successfully unlocked
  *   E_TIMEOUT       : semaphore object can't be unlocked immediately
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned sem_give( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : sem_giveISR
- *
- * Description       : try to unlock the semaphore object,
- *                     don't wait if the semaphore object can't be unlocked immediately
- *
- * Parameters
- *   sem             : pointer to semaphore object
- *
- * Return
- *   E_SUCCESS       : semaphore object was successfully unlocked
- *   E_TIMEOUT       : semaphore object can't be unlocked immediately
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned sem_giveISR( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
