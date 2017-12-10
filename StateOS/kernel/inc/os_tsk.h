@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    09.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -482,6 +482,8 @@ struct __tsk
  *
  * Return            : current task object
  *
+ * Note              : use only in thread mode
+ *
  ******************************************************************************/
 
 __STATIC_INLINE
@@ -530,8 +532,9 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
  ******************************************************************************/
 
 tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size );
+
 __STATIC_INLINE
-tsk_t *wrk_new   ( unsigned prio, fun_t *state, unsigned size ) { return wrk_create(prio, state, size); }
+tsk_t *wrk_new( unsigned prio, fun_t *state, unsigned size ) { return wrk_create(prio, state, size); }
 
 /******************************************************************************
  *
@@ -826,6 +829,7 @@ unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, INFINITE); }
 /******************************************************************************
  *
  * Name              : tsk_give
+ * ISR alias         : tsk_giveISR
  *
  * Description       : set given flags in waiting task (tsk_wait)
  *
@@ -835,27 +839,11 @@ unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, INFINITE); }
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 void tsk_give( tsk_t *tsk, unsigned flags );
-
-/******************************************************************************
- *
- * Name              : tsk_giveISR
- *
- * Description       : resume execution of given waiting task (tsk_wait)
- *
- * Parameters
- *   tsk             : pointer to delayed task object
- *   flags           : flags or message transfered to the task
- *
- * Return            : none
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 void tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
@@ -965,6 +953,7 @@ unsigned tsk_suspend( tsk_t *tsk );
 /******************************************************************************
  *
  * Name              : tsk_resume
+ * ISR alias         : tsk_resumeISR
  *
  * Description       : resume execution of given delayed task
  *                     only suspended and sleeping tasks can be resumed
@@ -976,29 +965,11 @@ unsigned tsk_suspend( tsk_t *tsk );
  *   E_SUCCESS       : task was successfully resumed
  *   E_STOPPED       : task can not be resumed
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 unsigned tsk_resume( tsk_t *tsk );
-
-/******************************************************************************
- *
- * Name              : tsk_resumeISR
- *
- * Description       : resume execution of given delayed task
- *
- * Parameters
- *   tsk             : pointer to delayed task object
- *   event           : the value at which the given task is woken up
- *
- * Return
- *   E_SUCCESS       : task was successfully resumed
- *   E_STOPPED       : task can not be resumed
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned tsk_resumeISR( tsk_t *tsk ) { return tsk_resume(tsk); }
