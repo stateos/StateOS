@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -175,7 +175,8 @@ void mtx_init( mtx_t *mtx );
 
 mtx_t *mtx_create( void );
 __STATIC_INLINE
-mtx_t *mtx_new   ( void ) { return mtx_create(); }
+
+mtx_t *mtx_new( void ) { return mtx_create(); }
 
 /******************************************************************************
  *
