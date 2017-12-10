@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -177,8 +177,9 @@ void cnd_init( cnd_t *cnd );
  ******************************************************************************/
 
 cnd_t *cnd_create( void );
+
 __STATIC_INLINE
-cnd_t *cnd_new   ( void ) { return cnd_create(); }
+cnd_t *cnd_new( void ) { return cnd_create(); }
 
 /******************************************************************************
  *
@@ -287,6 +288,7 @@ unsigned cnd_wait( cnd_t *cnd, mtx_t *mtx ) { return cnd_waitFor(cnd, mtx, INFIN
 /******************************************************************************
  *
  * Name              : cnd_give
+ * ISR alias         : cnd_giveISR
  *
  * Description       : signal one or all tasks that are waiting on the condition variable
  *
@@ -298,29 +300,11 @@ unsigned cnd_wait( cnd_t *cnd, mtx_t *mtx ) { return cnd_waitFor(cnd, mtx, INFIN
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 void cnd_give( cnd_t *cnd, bool all );
-
-/******************************************************************************
- *
- * Name              : cnd_giveISR
- *
- * Description       : signal one or all tasks that are waiting on the condition variable
- *
- * Parameters
- *   cnd             : pointer to condition variable object
- *   all             : signal receiver
- *                     cndOne: notify one task that is waiting on the condition variable
- *                     cndAll: notify all tasks that are waiting on the condition variable
- *
- * Return            : none
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 void cnd_giveISR( cnd_t *cnd, bool all ) { cnd_give(cnd, all); }
