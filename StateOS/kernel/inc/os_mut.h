@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -174,7 +174,8 @@ void mut_init( mut_t *mut );
 
 mut_t *mut_create( void );
 __STATIC_INLINE
-mut_t *mut_new   ( void ) { return mut_create(); }
+
+mut_t *mut_new( void ) { return mut_create(); }
 
 /******************************************************************************
  *
