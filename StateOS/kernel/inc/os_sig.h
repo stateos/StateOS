@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -199,8 +199,9 @@ void sig_init( sig_t *sig, unsigned type );
  ******************************************************************************/
 
 sig_t *sig_create( unsigned type );
+
 __STATIC_INLINE
-sig_t *sig_new   ( unsigned type ) { return sig_create(type); }
+sig_t *sig_new( unsigned type ) { return sig_create(type); }
 
 /******************************************************************************
  *
@@ -303,6 +304,7 @@ unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
 /******************************************************************************
  *
  * Name              : sig_take
+ * ISR alias         : sig_takeISR
  *
  * Description       : don't wait until the signal object has been released
  *
@@ -313,29 +315,12 @@ unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
  *   E_SUCCESS       : signal object was successfully released
  *   E_TIMEOUT       : signal object is not set
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned sig_take( sig_t *sig ) { return sig_waitFor(sig, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : sig_takeISR
- *
- * Description       : don't wait until the signal object has been released
- *
- * Parameters
- *   sig             : pointer to signal object
- *
- * Return
- *   E_SUCCESS       : signal object was successfully released
- *   E_TIMEOUT       : signal object is not set
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned sig_takeISR( sig_t *sig ) { return sig_waitFor(sig, IMMEDIATE); }
@@ -343,6 +328,7 @@ unsigned sig_takeISR( sig_t *sig ) { return sig_waitFor(sig, IMMEDIATE); }
 /******************************************************************************
  *
  * Name              : sig_give
+ * ISR alias         : sig_giveISR
  *
  * Description       : resume one (sigClear) or all (sigProtect) tasks that are waiting on the signal object
  *
@@ -351,27 +337,11 @@ unsigned sig_takeISR( sig_t *sig ) { return sig_waitFor(sig, IMMEDIATE); }
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 void sig_give( sig_t *sig );
-
-/******************************************************************************
- *
- * Name              : sig_giveISR
- *
- * Description       : resume one (for auto clearing signals) or all (for normal signals) tasks
- *                     that are waiting on the signal object
- *
- * Parameters
- *   sig             : pointer to signal object
- *
- * Return            : none
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 void sig_giveISR( sig_t *sig ) { sig_give(sig); }
@@ -379,6 +349,7 @@ void sig_giveISR( sig_t *sig ) { sig_give(sig); }
 /******************************************************************************
  *
  * Name              : sig_clear
+ * ISR alias         : sig_clearISR
  *
  * Description       : reset the signal object
  *
@@ -387,26 +358,11 @@ void sig_giveISR( sig_t *sig ) { sig_give(sig); }
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 void sig_clear( sig_t *sig );
-
-/******************************************************************************
- *
- * Name              : sig_clearISR
- *
- * Description       : reset the signal object
- *
- * Parameters
- *   sig             : pointer to signal object
- *
- * Return            : none
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 void sig_clearISR( sig_t *sig ) { sig_clear(sig); }
