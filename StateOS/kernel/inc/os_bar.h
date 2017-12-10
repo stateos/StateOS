@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -180,8 +180,9 @@ void bar_init( bar_t *bar, unsigned limit );
  ******************************************************************************/
 
 bar_t *bar_create( unsigned limit );
+
 __STATIC_INLINE
-bar_t *bar_new   ( unsigned limit ) { return bar_create(limit); }
+bar_t *bar_new( unsigned limit ) { return bar_create(limit); }
 
 /******************************************************************************
  *

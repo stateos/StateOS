@@ -162,7 +162,8 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  *
  ******************************************************************************/
 
-uint32_t sys_time   ( void );
+uint32_t sys_time( void );
+
 __STATIC_INLINE
 uint32_t sys_timeISR( void ) { return sys_time(); }
 
