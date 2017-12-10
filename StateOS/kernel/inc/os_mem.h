@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -234,8 +234,9 @@ void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data );
  ******************************************************************************/
 
 mem_t *mem_create( unsigned limit, unsigned size );
+
 __STATIC_INLINE
-mem_t *mem_new   ( unsigned limit, unsigned size ) { return mem_create(limit, size); }
+mem_t *mem_new( unsigned limit, unsigned size ) { return mem_create(limit, size); }
 
 /******************************************************************************
  *
@@ -344,6 +345,7 @@ unsigned mem_wait( mem_t *mem, void **data ) { return mem_waitFor(mem, data, INF
 /******************************************************************************
  *
  * Name              : mem_take
+ * ISR alias         : mem_takeISR
  *
  * Description       : try to get memory object from the memory pool object,
  *                     don't wait if the memory pool object is empty
@@ -356,31 +358,12 @@ unsigned mem_wait( mem_t *mem, void **data ) { return mem_waitFor(mem, data, INF
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
  *   E_TIMEOUT       : memory pool object is empty
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned mem_take( mem_t *mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : mem_takeISR
- *
- * Description       : try to get memory object from the memory pool object,
- *                     don't wait if the memory pool object is empty
- *
- * Parameters
- *   mem             : pointer to memory pool object
- *   data            : pointer to store the pointer to the memory object
- *
- * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_TIMEOUT       : memory pool object is empty
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
@@ -388,6 +371,7 @@ unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_waitFor(mem, data, 
 /******************************************************************************
  *
  * Name              : mem_give
+ * ISR alias         : mem_giveISR
  *
  * Description       : transfer memory object to the memory pool object,
  *
@@ -397,27 +381,11 @@ unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_waitFor(mem, data, 
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 void mem_give( mem_t *mem, void *data );
-
-/******************************************************************************
- *
- * Name              : mem_giveISR
- *
- * Description       : transfer memory object to the memory pool object,
- *
- * Parameters
- *   mem             : pointer to memory pool object
- *   data            : pointer to memory object
- *
- * Return            : none
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 void mem_giveISR( mem_t *mem, void *data ) { mem_give(mem, data); }
