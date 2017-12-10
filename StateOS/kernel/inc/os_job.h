@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.h
     @author  Rajmund Szymanski
-    @date    01.12.2017
+    @date    10.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -207,8 +207,9 @@ void job_init( job_t *job, unsigned limit, fun_t **data );
  ******************************************************************************/
 
 job_t *job_create( unsigned limit );
+
 __STATIC_INLINE
-job_t *job_new   ( unsigned limit ) { return job_create(limit); }
+job_t *job_new( unsigned limit ) { return job_create(limit); }
 
 /******************************************************************************
  *
@@ -405,6 +406,7 @@ unsigned job_send( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, INFIN
 /******************************************************************************
  *
  * Name              : job_give
+ * ISR alias         : job_giveISR
  *
  * Description       : try to transfer job data to the job queue object,
  *                     don't wait if the job queue object is full
@@ -417,31 +419,12 @@ unsigned job_send( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, INFIN
  *   E_SUCCESS       : job data was successfully transfered to the job queue object
  *   E_TIMEOUT       : job queue object is full
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned job_give( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : job_giveISR
- *
- * Description       : try to transfer job data to the job queue object,
- *                     don't wait if the job queue object is full
- *
- * Parameters
- *   job             : pointer to job queue object
- *   fun             : pointer to job procedure
- *
- * Return
- *   E_SUCCESS       : job data was successfully transfered to the job queue object
- *   E_TIMEOUT       : job queue object is full
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, IMMEDIATE); }
