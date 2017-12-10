@@ -338,8 +338,9 @@ void tmr_init( tmr_t *tmr, fun_t *state );
  ******************************************************************************/
 
 tmr_t *tmr_create( fun_t *state );
+
 __STATIC_INLINE
-tmr_t *tmr_new   ( fun_t *state ) { return tmr_create(state); }
+tmr_t *tmr_new( fun_t *state ) { return tmr_create(state); }
 
 /******************************************************************************
  *
@@ -571,6 +572,7 @@ unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
 /******************************************************************************
  *
  * Name              : tmr_take
+ * ISR alias         : tmr_takeISR
  *
  * Description       : check if the timer finishes countdown
  *
@@ -581,29 +583,12 @@ unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
  *   E_SUCCESS       : timer object successfully finished countdown
  *   E_TIMEOUT       : timer object has not yet completed counting
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 unsigned tmr_take( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
-
-/******************************************************************************
- *
- * Name              : tmr_takeISR
- *
- * Description       : check if the timer finishes countdown
- *
- * Parameters
- *   tmr             : pointer to timer object
- *
- * Return
- *   E_SUCCESS       : timer object successfully finished countdown
- *   E_TIMEOUT       : timer object has not yet completed counting
- *
- * Note              : use only in handler mode
- *
- ******************************************************************************/
 
 __STATIC_INLINE
 unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
@@ -625,7 +610,7 @@ unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_waitFor(tmr, IMMEDIATE); }
  ******************************************************************************/
 
 __STATIC_INLINE
-void tmr_flipISR( fun_t *proc ) { tmr_this()->state = proc; }
+void tmr_flipISR( fun_t *proc ) { tmr_thisISR()->state = proc; }
 
 /******************************************************************************
  *
@@ -645,7 +630,7 @@ void tmr_flipISR( fun_t *proc ) { tmr_this()->state = proc; }
  ******************************************************************************/
 
 __STATIC_INLINE
-void tmr_delayISR( uint32_t delay ) { tmr_this()->delay = delay; }
+void tmr_delayISR( uint32_t delay ) { tmr_thisISR()->delay = delay; }
 
 #ifdef __cplusplus
 }

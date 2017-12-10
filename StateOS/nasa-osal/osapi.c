@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    09.12.2017
+    @date    10.12.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -1422,7 +1422,7 @@ int32 OS_GetErrorName(int32 error_num, os_err_name_t *err_name)
 
 static void timer_handler(void)
 {
-	OS_timer_record_t *rec = (OS_timer_record_t *) tmr_this();
+	OS_timer_record_t *rec = (OS_timer_record_t *) tmr_thisISR();
 	uint32 timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
 
 	rec->handler(timer_id);

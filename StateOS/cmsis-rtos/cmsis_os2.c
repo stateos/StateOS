@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    09.12.2017
+    @date    10.12.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -579,7 +579,7 @@ osStatus_t osDelayUntil (uint32_t ticks)
 
 static void timer_handler (void)
 {
-	osTimer_t *cur = (osTimer_t *) tmr_this();
+	osTimer_t *cur = (osTimer_t *) tmr_thisISR();
 
 	cur->func(cur->arg);
 }
