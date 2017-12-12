@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    08.12.2017
+    @date    12.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,7 @@
 void mem_bind( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
-	void   **ptr;
+	que_t  * ptr;
 	unsigned cnt;
 
 	assert(!port_isr_inside());
@@ -90,7 +90,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 
 	port_sys_lock();
 
-	mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + limit * (1 + size) * sizeof(void*));
+	mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + limit * (1 + size) * sizeof(que_t));
 	mem_init(mem, limit, size, (void *)((size_t)mem + ABOVE(sizeof(mem_t))));
 	mem->res = mem;
 
@@ -130,8 +130,6 @@ static
 unsigned priv_mem_wait( mem_t *mem, void **data, uint32_t time, unsigned(*wait)(void*,uint32_t) )
 /* -------------------------------------------------------------------------- */
 {
-	void   **ptr;
-	unsigned cnt;
 	unsigned event = E_SUCCESS;
 
 	assert(mem);
@@ -146,16 +144,13 @@ unsigned priv_mem_wait( mem_t *mem, void **data, uint32_t time, unsigned(*wait)(
 	}
 	else
 	{
+		*data = 0;
 		System.cur->tmp.data = data;
 		event = wait(mem, time);
 	}
-	
+
 	if (event == E_SUCCESS)
-	{
-		ptr = *data;
-		cnt = mem->size;
-		while (cnt--) *ptr++ = 0;
-	}
+		memset(*data, 0, mem->size * sizeof(que_t));
 
 	port_sys_unlock();
 
@@ -196,14 +191,13 @@ void mem_give( mem_t *mem, void *data )
 
 	if (tsk)
 	{
-		*(void**)tsk->tmp.data = data;
+		*(void **)tsk->tmp.data = data;
 	}
 	else
 	{
-		ptr = (que_t *)&(mem->next);
-		while (ptr->next) ptr = ptr->next;
-		ptr->next = (que_t *)data - 1;
-		ptr->next->next = 0;
+		ptr = (que_t *)data - 1;
+		ptr->next = mem->next;
+		mem->next = ptr;
 	}
 
 	port_sys_unlock();
