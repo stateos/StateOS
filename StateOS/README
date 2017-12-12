@@ -38,6 +38,8 @@ Features:
 - removed Current definition
 - added tmr_this and tsk_this functions
 - function tmr_this renamed to tmr_thisISR
+- fixed bugs in nasa-osal api
+- fixed bugs in cmsis-rtos2 api
 ---------
 5.4
 - added startup files for cosmic compiler
