@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    12.12.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -185,9 +185,10 @@ uint32_t osKernelGetSysTimerFreq (void)
 
 static void thread_handler (void)
 {
-	osThread_t *cur = (osThread_t *) tsk_this();
+	void *tmp = tsk_this(); // because of COSMIC compiler
+	osThread_t *thread = tmp;
 
-	cur->func(cur->arg);
+	thread->func(thread->arg);
 
 	tsk_stop();
 }
@@ -196,10 +197,10 @@ static void thread_handler (void)
 
 osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAttr_t *attr)
 {
-	osThread_t * thread     = NULL;
-	uint32_t     flags      = osThreadJoinable;
-	void       * stack_mem  = NULL;
-	uint32_t     stack_size = 0;
+	osThread_t *thread     = NULL;
+	uint32_t    flags      = osThreadJoinable;
+	void       *stack_mem  = NULL;
+	uint32_t    stack_size = 0;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (func == NULL))
 		return NULL;
@@ -452,8 +453,8 @@ uint32_t osThreadGetStackSpace (osThreadId_t thread_id)
 
 uint32_t osThreadGetCount (void)
 {
-	tsk_t  * tsk;
-	tmr_t  * tmr;
+	tsk_t   *tsk;
+	tmr_t   *tmr;
 	uint32_t count = 0;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
@@ -477,8 +478,8 @@ uint32_t osThreadGetCount (void)
 
 uint32_t osThreadEnumerate (osThreadId_t *thread_array, uint32_t array_items)
 {
-	tsk_t  * tsk;
-	tmr_t  * tmr;
+	tsk_t   *tsk;
+	tmr_t   *tmr;
 	uint32_t count = 0;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_array == NULL) || (array_items == 0U))
@@ -514,7 +515,8 @@ uint32_t osThreadFlagsSet (osThreadId_t thread_id, uint32_t flags)
 
 uint32_t osThreadFlagsClear (uint32_t flags)
 {
-	osThread_t *thread = (osThread_t *) tsk_this();
+	void *tmp = tsk_this(); // because of COSMIC compiler
+	osThread_t *thread = tmp;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
@@ -524,7 +526,8 @@ uint32_t osThreadFlagsClear (uint32_t flags)
 
 uint32_t osThreadFlagsGet (void)
 {
-	osThread_t *thread = (osThread_t *) tsk_this();
+	void *tmp = tsk_this(); // because of COSMIC compiler
+	osThread_t *thread = tmp;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
@@ -534,7 +537,8 @@ uint32_t osThreadFlagsGet (void)
 
 uint32_t osThreadFlagsWait (uint32_t flags, uint32_t options, uint32_t timeout)
 {
-	osThread_t *thread = (osThread_t *) tsk_this();
+	void *tmp = tsk_this(); // because of COSMIC compiler
+	osThread_t *thread = tmp;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
@@ -579,17 +583,18 @@ osStatus_t osDelayUntil (uint32_t ticks)
 
 static void timer_handler (void)
 {
-	osTimer_t *cur = (osTimer_t *) tmr_thisISR();
+	void *tmp = tmr_thisISR(); // because of COSMIC compiler
+	osTimer_t *timer = tmp;
 
-	cur->func(cur->arg);
+	timer->func(timer->arg);
 }
 
 /* -------------------------------------------------------------------------- */
 
 osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, const osTimerAttr_t *attr)
 {
-	osTimer_t * timer = NULL;
-	uint32_t    flags = type;
+	osTimer_t *timer = NULL;
+	uint32_t   flags = type;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (func == NULL))
 		return NULL;
@@ -691,8 +696,8 @@ osStatus_t osTimerDelete (osTimerId_t timer_id)
 
 osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 {
-	osEventFlags_t * ef    = NULL;
-	uint32_t         flags = 0U;
+	osEventFlags_t *ef    = NULL;
+	uint32_t        flags = 0U;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
@@ -801,8 +806,8 @@ const char *osEventFlagsGetName (osEventFlagsId_t ef_id)
 
 osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 {
-	osMutex_t * mutex = NULL;
-	uint32_t    flags = 0U;
+	osMutex_t *mutex = NULL;
+	uint32_t   flags = 0U;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
@@ -1013,10 +1018,10 @@ osStatus_t osSemaphoreDelete (osSemaphoreId_t semaphore_id)
 
 osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, const osMemoryPoolAttr_t *attr)
 {
-	osMemoryPool_t * mp    = NULL;
-	uint32_t         flags = 0U;
-	void           * data  = NULL;
-	uint32_t         size  = osMemoryPoolMemSize(block_count, block_size);
+	osMemoryPool_t *mp    = NULL;
+	uint32_t        flags = 0U;
+	void           *data  = NULL;
+	uint32_t        size  = osMemoryPoolMemSize(block_count, block_size);
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
@@ -1187,10 +1192,10 @@ osStatus_t osMemoryPoolDelete (osMemoryPoolId_t mp_id)
 
 osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, const osMessageQueueAttr_t *attr)
 {
-	osMessageQueue_t * mq    = NULL;
-	uint32_t           flags = 0U;
-	void             * data  = NULL;
-	uint32_t           size  = osMessageQueueMemSize(msg_count, msg_size);
+	osMessageQueue_t *mq    = NULL;
+	uint32_t          flags = 0U;
+	void             *data  = NULL;
+	uint32_t          size  = osMessageQueueMemSize(msg_count, msg_size);
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return NULL;
