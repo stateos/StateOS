@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    12.12.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -208,7 +208,7 @@ int32 OS_QueueCreate(uint32 *queue_id, const char *queue_name, uint32 queue_dept
 					status = OS_ERROR;
 				else
 				{
-					*queue_id = (rec - OS_queue_table) / sizeof(OS_queue_record_t);
+					*queue_id = rec - OS_queue_table;
 					box_init(&rec->box, queue_depth, data_size, data);
 					rec->box.res = data;
 					strcpy(rec->name, queue_name);
@@ -329,7 +329,7 @@ int32 OS_QueueGetIdByName(uint32 *queue_id, const char *queue_name)
 			status = OS_ERR_NAME_NOT_FOUND;
 		else
 		{
-			*queue_id = (rec - OS_queue_table) / sizeof(OS_queue_record_t);
+			*queue_id = rec - OS_queue_table;
 			status = OS_SUCCESS;
 		}
 	}
@@ -399,7 +399,7 @@ int32 OS_BinSemCreate(uint32 *semaphore_id, const char *sem_name, uint32 sem_ini
 				status = OS_ERR_NO_FREE_IDS;
 			else
 			{
-				*semaphore_id = (rec - OS_bin_sem_table) / sizeof(OS_bin_sem_record_t);
+				*semaphore_id = rec - OS_bin_sem_table;
 				sem_init(&rec->sem, sem_initial_value, semBinary);
 				strcpy(rec->name, sem_name);
 				rec->creator = OS_TaskGetId();
@@ -548,7 +548,7 @@ int32 OS_BinSemGetIdByName(uint32 *semaphore_id, const char *sem_name)
 			status = OS_ERR_NAME_NOT_FOUND;
 		else
 		{
-			*semaphore_id = (rec - OS_bin_sem_table) / sizeof(OS_bin_sem_record_t);
+			*semaphore_id = rec - OS_bin_sem_table;
 			status = OS_SUCCESS;
 		}
 	}
@@ -616,7 +616,7 @@ int32 OS_CountSemCreate(uint32 *semaphore_id, const char *sem_name, uint32 sem_i
 				status = OS_ERR_NO_FREE_IDS;
 			else
 			{
-				*semaphore_id = (rec - OS_count_sem_table) / sizeof(OS_count_sem_record_t);
+				*semaphore_id = rec - OS_count_sem_table;
 				sem_init(&rec->sem, sem_initial_value, semCounting);
 				strcpy(rec->name, sem_name);
 				rec->creator = OS_TaskGetId();
@@ -743,7 +743,7 @@ int32 OS_CountSemGetIdByName(uint32 *semaphore_id, const char *sem_name)
 			status = OS_ERR_NAME_NOT_FOUND;
 		else
 		{
-			*semaphore_id = (rec - OS_count_sem_table) / sizeof(OS_count_sem_record_t);
+			*semaphore_id = rec - OS_count_sem_table;
 			status = OS_SUCCESS;
 		}
 	}
@@ -814,7 +814,7 @@ int32 OS_MutSemCreate(uint32 *semaphore_id, const char *sem_name, uint32 options
 				status = OS_ERR_NO_FREE_IDS;
 			else
 			{
-				*semaphore_id = (rec - OS_mut_sem_table) / sizeof(OS_mut_sem_record_t);
+				*semaphore_id = rec - OS_mut_sem_table;
 				mtx_init(&rec->mtx);
 				strcpy(rec->name, sem_name);
 				rec->creator = OS_TaskGetId();
@@ -918,7 +918,7 @@ int32 OS_MutSemGetIdByName(uint32 *semaphore_id, const char *sem_name)
 			status = OS_ERR_NAME_NOT_FOUND;
 		else
 		{
-			*semaphore_id = (rec - OS_mut_sem_table) / sizeof(OS_mut_sem_record_t);
+			*semaphore_id = rec - OS_mut_sem_table;
 			status = OS_SUCCESS;
 		}
 	}
@@ -958,7 +958,8 @@ int32 OS_MutSemGetInfo(uint32 semaphore_id, OS_mut_sem_prop_t *mut_prop)
 
 static void task_handler(void)
 {
-	OS_task_record_t *rec = (OS_task_record_t *) tsk_this();
+	void *tmp = tsk_this(); // because of COSMIC compiler
+	OS_task_record_t *rec = tmp;
 
 	rec->handler();
 
@@ -1012,7 +1013,7 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 					status = OS_ERROR;
 				else
 				{
-					*task_id = (rec - OS_task_table) / sizeof(OS_task_record_t);
+					*task_id = rec - OS_task_table;
 					tsk_init(&rec->tsk, ~priority, task_handler, stack, stack_size);
 					if (stack_pointer == 0) rec->tsk.obj.res = stack;
 					strcpy(rec->name, task_name);
@@ -1124,7 +1125,9 @@ int32 OS_TaskRegister(void)
 
 uint32 OS_TaskGetId(void)
 {
-	uint32 task_id = ((OS_task_record_t *) tsk_this() - OS_task_table) / sizeof(OS_task_record_t);
+	void *tmp = tsk_this(); // because of COSMIC compiler
+	OS_task_record_t *rec = tmp;
+	uint32 task_id = rec - OS_task_table;
 
 	if (task_id >= OS_MAX_TASKS)
 		return (uint32) OS_ERR_INVALID_ID;
@@ -1154,7 +1157,7 @@ int32 OS_TaskGetIdByName(uint32 *task_id, const char *task_name)
 			status = OS_ERR_NAME_NOT_FOUND;
 		else
 		{
-			*task_id = (rec - OS_task_table) / sizeof(OS_task_record_t);
+			*task_id = rec - OS_task_table;
 			status = OS_SUCCESS;
 		}
 	}
@@ -1422,8 +1425,9 @@ int32 OS_GetErrorName(int32 error_num, os_err_name_t *err_name)
 
 static void timer_handler(void)
 {
-	OS_timer_record_t *rec = (OS_timer_record_t *) tmr_thisISR();
-	uint32 timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
+	void *tmp = tmr_thisISR(); // because of COSMIC compiler
+	OS_timer_record_t *rec = tmp;
+	uint32 timer_id = rec - OS_timer_table;
 
 	rec->handler(timer_id);
 }
@@ -1466,7 +1470,7 @@ int32 OS_TimerCreate(uint32 *timer_id, const char *timer_name, uint32 *clock_acc
 				if (clock_accuracy)
 					*clock_accuracy = 1000000 / OS_FREQUENCY;
 
-				*timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
+				*timer_id = rec - OS_timer_table;
 				tmr_init(&rec->tmr, timer_handler);
 				strcpy(rec->name, timer_name);
 				rec->creator = OS_TaskGetId();
@@ -1549,7 +1553,7 @@ int32 OS_TimerGetIdByName(uint32 *timer_id, const char *timer_name)
 			status = OS_ERR_NAME_NOT_FOUND;
 		else
 		{
-			*timer_id = (rec - OS_timer_table) / sizeof(OS_timer_record_t);
+			*timer_id = rec - OS_timer_table;
 			status = OS_SUCCESS;
 		}
 	}
