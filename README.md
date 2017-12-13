@@ -1,4 +1,4 @@
-StateOS [![Build Status](https://travis-ci.org/stateos/StateOS.svg)](https://travis-ci.org/stateos/StateOS) [![Github All Releases](https://img.shields.io/github/downloads/atom/atom/total.svg)]()
+StateOS [![Build Status](https://travis-ci.org/stateos/StateOS.svg)](https://travis-ci.org/stateos/StateOS)
 =======
 
 Free, extremely simple, amazingly tiny and very fast real-time operating system (RTOS) designed for deeply embedded applications.
