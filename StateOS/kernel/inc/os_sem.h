@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    13.12.2017
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -54,6 +54,8 @@ struct __sem
 
 /* -------------------------------------------------------------------------- */
 
+#define semDirect    (  0U ) // sem_give/sem_send functions do not increase current value of the semaphore,
+                             // but they wake up one pending task if it exists
 #define semBinary    (  1U ) // binary semaphore
 #define semCounting  ( ~0U ) // counting semaphore
 #define semMASK      ( ~0U )

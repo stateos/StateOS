@@ -40,6 +40,7 @@ Features:
 - function tmr_this renamed to tmr_thisISR
 - fixed bugs in nasa-osal api
 - fixed bugs in cmsis-rtos2 api
+- updated semaphore object (added semDirect feature)
 ---------
 5.4
 - added startup files for cosmic compiler

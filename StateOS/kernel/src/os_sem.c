@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    30.11.2017
+    @date    13.12.2017
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,7 +34,6 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit )
 {
 	assert(!port_isr_inside());
 	assert(sem);
-	assert(limit);
 	assert(init<=limit);
 
 	port_sys_lock();
@@ -54,7 +53,6 @@ sem_t *sem_create( unsigned init, unsigned limit )
 	sem_t *sem;
 
 	assert(!port_isr_inside());
-	assert(limit);
 
 	port_sys_lock();
 
@@ -146,6 +144,9 @@ unsigned priv_sem_send( sem_t *sem, uint32_t time, unsigned(*wait)(void*,uint32_
 
 	port_sys_lock();
 
+	if (sem->limit == 0)
+		core_one_wakeup(sem, E_SUCCESS);
+	else
 	if (sem->count >= sem->limit)
 		event = wait(sem, time);
 	else
@@ -161,7 +162,7 @@ unsigned priv_sem_send( sem_t *sem, uint32_t time, unsigned(*wait)(void*,uint32_
 unsigned sem_sendUntil( sem_t *sem, uint32_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_inside() || (sem && !sem->limit));
 
 	return priv_sem_send(sem, time, core_tsk_waitUntil);
 }
@@ -170,7 +171,7 @@ unsigned sem_sendUntil( sem_t *sem, uint32_t time )
 unsigned sem_sendFor( sem_t *sem, uint32_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
+	assert(!port_isr_inside() || (sem && !sem->limit) || !delay);
 
 	return priv_sem_send(sem, delay, core_tsk_waitFor);
 }
