@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    08.12.2017
+    @date    14.12.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -35,19 +35,11 @@
 
 /* -------------------------------------------------------------------------- */
 
-#ifndef OS_ASSERT
-#define OS_ASSERT             0 /* do not include standard assertions         */
-#endif
-
-#if     OS_ASSERT == 0
+#ifndef DEBUG
 #ifndef NDEBUG
 #define NDEBUG
-#endif
-#endif
-
-#ifndef NDEBUG
-#define __ASSERT_MSG
-#endif
+#endif//NDEBUG
+#endif//DEBUG
 
 #include <assert.h>
 
@@ -100,7 +92,7 @@ extern sys_t System; // system data
 /* -------------------------------------------------------------------------- */
 
 #define core_stk_assert() \
-        assert((System.cur == &MAIN) || (port_get_sp() >= System.cur->stack))
+        assert((System.cur == &MAIN) || (System.cur->stack <= port_get_sp()))
 
 /* -------------------------------------------------------------------------- */
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    01.08.2017
+    @date    14.12.2017
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -79,8 +79,3 @@
 // idle task stack size in bytes
 // default value: 128
 #define  OS_IDLE_STACK      128
-
-// ----------------------------
-// using standard assertions
-// default value: 0
-#define  OS_ASSERT            0

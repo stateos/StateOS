@@ -41,6 +41,7 @@ Features:
 - fixed bugs in nasa-osal api
 - fixed bugs in cmsis-rtos2 api
 - updated semaphore object (added semDirect feature)
+- the OS_ASSERT definition has been removed, use DEBUG/NDEBUG instead
 ---------
 5.4
 - added startup files for cosmic compiler

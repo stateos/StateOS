@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    08.12.2017
+    @date    14.12.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -262,7 +262,7 @@ void core_tsk_remove( tsk_t *tsk )
 
 void core_ctx_init( tsk_t *tsk )
 {
-#if OS_ASSERT
+#ifdef DEBUG
 	memset(tsk->stack, 0xFF, (size_t)tsk->top - (size_t)tsk->stack);
 #endif
 	tsk->sp = (ctx_t *)tsk->top - 1;
