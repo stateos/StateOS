@@ -81,10 +81,9 @@ void priv_tmr_insert( tmr_t *tmr, unsigned id )
 	tmr_t *nxt = &WAIT;
 	tmr->obj.id = id;
 
-	if    (tmr->delay != INFINITE)
-	do     nxt = nxt->obj.next;
-	while (nxt->delay != INFINITE &&
-	       nxt->delay <= tmr->start + tmr->delay - nxt->start);
+	if (tmr->delay != INFINITE)
+		do nxt = nxt->obj.next;
+		while (nxt->delay < tmr->start + tmr->delay - nxt->start);
 
 	priv_rdy_insert(&tmr->obj, &nxt->obj);
 }
@@ -165,7 +164,7 @@ void priv_tmr_wakeup( tmr_t *tmr, unsigned event )
 		tmr->state();
 
 	core_tmr_remove(tmr);
-	if (tmr->delay)
+	if (tmr->delay >= core_sys_time() - tmr->start + 1)
 		priv_tmr_insert(tmr, ID_TIMER);
 
 	core_all_wakeup(tmr, event);
@@ -223,9 +222,9 @@ void priv_tsk_insert( tsk_t *tsk )
 #if OS_ROBIN && OS_TICKLESS == 0
 	tsk->slice = 0;
 #endif
-	if    (tsk->prio)
-	do     nxt = nxt->obj.next;
-	while (tsk->prio <= nxt->prio);
+	if (tsk->prio)
+		do nxt = nxt->obj.next;
+		while (tsk->prio <= nxt->prio);
 
 	priv_rdy_insert(&tsk->obj, &nxt->obj);
 }
@@ -344,7 +343,7 @@ unsigned core_tsk_waitUntil( void *obj, uint32_t time )
 	cur->delay = time - cur->start;
 
 	if (cur->delay == IMMEDIATE)
-	return E_TIMEOUT;
+		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
 	port_ctx_switchLock();
