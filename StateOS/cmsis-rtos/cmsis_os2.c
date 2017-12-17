@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    12.12.2017
+    @date    17.12.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -174,7 +174,7 @@ uint32_t osKernelGetSysTimerFreq (void)
 {
 #if OS_TICKLESS
 	return  OS_FREQUENCY;
-#elif CPU_FREQUENCY/OS_FREQUENCY-1 <= SysTick_LOAD_RELOAD_Msk
+#elif (CPU_FREQUENCY)/(OS_FREQUENCY)-1 <= SysTick_LOAD_RELOAD_Msk
 	return CPU_FREQUENCY;
 #else
 	return  ST_FREQUENCY;

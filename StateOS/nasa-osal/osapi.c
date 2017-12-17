@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    12.12.2017
+    @date    17.12.2017
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -139,7 +139,7 @@ int32 OS_Milli2Ticks(uint32 milli_seconds)
 
 int32 OS_Tick2Micros(void)
 {
-	return 1000000 / OS_FREQUENCY;
+	return 1000000 / (OS_FREQUENCY);
 }
 
 int32 OS_GetLocalTime(OS_time_t *time_struct)
@@ -1468,7 +1468,7 @@ int32 OS_TimerCreate(uint32 *timer_id, const char *timer_name, uint32 *clock_acc
 			else
 			{
 				if (clock_accuracy)
-					*clock_accuracy = 1000000 / OS_FREQUENCY;
+					*clock_accuracy = 1000000 / (OS_FREQUENCY);
 
 				*timer_id = rec - OS_timer_table;
 				tmr_init(&rec->tmr, timer_handler);
@@ -1580,7 +1580,7 @@ int32 OS_TimerGetInfo(uint32 timer_id, OS_timer_prop_t *timer_prop)
 		timer_prop->creator = rec->creator;
 		timer_prop->start_time = rec->tmr.start;
 		timer_prop->interval_time = rec->tmr.period;
-		timer_prop->accuracy = 1000000 / OS_FREQUENCY;
+		timer_prop->accuracy = 1000000 / (OS_FREQUENCY);
 		status = OS_SUCCESS;
 	}
 
