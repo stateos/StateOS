@@ -67,7 +67,7 @@ static OS_timer_record_t     OS_timer_table    [OS_MAX_TIMERS];
 
 static OS_time_t             localtime        = { 0, 0 };
 static tmr_t                 local_timer      = TMR_INIT(0);
-static uint32                printf_enabled   = FALSE;
+static bool                  printf_enabled   = FALSE;
 
 /* -------------------------------------------------------------------------- */
 /*
