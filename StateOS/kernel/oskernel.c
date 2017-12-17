@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    14.12.2017
+    @date    17.12.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -498,7 +498,7 @@ void *core_tsk_handler( void *sp )
 	nxt = IDLE.obj.next;
 
 #if OS_ROBIN && OS_TICKLESS == 0
-	if (cur == nxt || (nxt->slice >= OS_FREQUENCY/OS_ROBIN && (nxt->slice = 0) == 0))
+	if (cur == nxt || (nxt->slice >= (OS_FREQUENCY)/(OS_ROBIN) && (nxt->slice = 0) == 0))
 #else
 	if (cur == nxt)
 #endif
@@ -525,7 +525,7 @@ void core_sys_tick( void )
 	System.cnt++;
 	#if OS_ROBIN
 	core_tmr_handler();
-	if (++System.cur->slice >= OS_FREQUENCY/OS_ROBIN)
+	if (++System.cur->slice >= (OS_FREQUENCY)/(OS_ROBIN))
 		core_ctx_switch();
 	#endif
 }
