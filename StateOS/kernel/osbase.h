@@ -87,11 +87,11 @@ struct __sys
 
 /* -------------------------------------------------------------------------- */
 
-#define USEC       (uint32_t)(((OS_FREQUENCY)+500000)/1000000)
-#define MSEC       (uint32_t)(((OS_FREQUENCY)+500)/1000)
-#define  SEC       (uint32_t)(((OS_FREQUENCY)))
-#define  MIN       (uint32_t)(((OS_FREQUENCY))*60)
-#define HOUR       (uint32_t)(((OS_FREQUENCY))*3600)
+#define USEC       (((uint32_t)(OS_FREQUENCY)+500000)/1000000)
+#define MSEC       (((uint32_t)(OS_FREQUENCY)+500)/1000)
+#define  SEC       (((uint32_t)(OS_FREQUENCY)))
+#define  MIN       (((uint32_t)(OS_FREQUENCY))*60)
+#define HOUR       (((uint32_t)(OS_FREQUENCY))*3600)
 
 /* -------------------------------------------------------------------------- */
 
