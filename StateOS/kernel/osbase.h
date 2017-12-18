@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    17.12.2017
+    @date    18.12.2017
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -87,11 +87,24 @@ struct __sys
 
 /* -------------------------------------------------------------------------- */
 
+#if OS_FREQUENCY >= 1000000
 #define USEC       (((uint32_t)(OS_FREQUENCY)+500000)/1000000)
+#endif
+#if OS_FREQUENCY >= 1000
 #define MSEC       (((uint32_t)(OS_FREQUENCY)+500)/1000)
+#endif
+#if OS_FREQUENCY <  UINT32_MAX
 #define  SEC       (((uint32_t)(OS_FREQUENCY)))
+#endif
+#if OS_FREQUENCY <  UINT32_MAX/60
 #define  MIN       (((uint32_t)(OS_FREQUENCY))*60)
+#endif
+#if OS_FREQUENCY <  UINT32_MAX/3600
 #define HOUR       (((uint32_t)(OS_FREQUENCY))*3600)
+#endif
+#if OS_FREQUENCY <  UINT32_MAX/86400
+#define  DAY       (((uint32_t)(OS_FREQUENCY))*86400)
+#endif
 
 /* -------------------------------------------------------------------------- */
 
@@ -110,16 +123,16 @@ struct __sys
 /* -------------------------------------------------------------------------- */
 
 #ifndef IMMEDIATE
-#define IMMEDIATE  (uint32_t)( 0UL) // no waiting
+#define IMMEDIATE    0UL        // no waiting
 #endif
 #ifndef INFINITE
-#define INFINITE   (uint32_t)(~0UL) // infinite waiting
+#define INFINITE     UINT32_MAX // infinite waiting
 #endif
 
 /* -------------------------------------------------------------------------- */
 
-#define JOINABLE   (tsk_t *) ( 0UL) // task in joinable state
-#define DETACHED   (tsk_t *) (~0UL) // task in detached state
+#define JOINABLE   (tsk_t *)(0)           // task in joinable state
+#define DETACHED   (tsk_t *)(UINTPTR_MAX) // task in detached state
 
 /* -------------------------------------------------------------------------- */
 
