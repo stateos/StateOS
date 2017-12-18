@@ -225,7 +225,7 @@ __STATIC_INLINE
 uint32_t core_sys_time( void )
 {
 #if OS_TICKLESS
-	return port_sys_time();
+	return System.cnt | port_sys_time();
 #else
 	return System.cnt;
 #endif

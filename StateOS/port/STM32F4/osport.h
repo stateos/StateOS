@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    08.12.2017
+    @date    18.12.2017
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -108,8 +108,10 @@ void port_ctx_switch( void )
 __STATIC_INLINE
 void port_ctx_reset( void )
 {
-#if OS_ROBIN && OS_TICKLESS
-	SysTick->VAL = 0;
+#if OS_TICKLESS
+	#if OS_ROBIN
+	TIM2->CCR1 = TIM2->CNT + (OS_FREQUENCY)/(OS_ROBIN);
+	#endif
 #endif
 }
 
@@ -119,8 +121,12 @@ void port_ctx_reset( void )
 __STATIC_INLINE
 void port_tmr_stop( void )
 {
-#if OS_ROBIN && OS_TICKLESS
+#if OS_TICKLESS
+	#if OS_ROBIN
+	TIM2->DIER = TIM_DIER_CC1IE;
+	#else
 	TIM2->DIER = 0;
+	#endif
 #endif
 }
 	
@@ -130,9 +136,13 @@ void port_tmr_stop( void )
 __STATIC_INLINE
 void port_tmr_start( uint32_t timeout )
 {
-#if OS_ROBIN && OS_TICKLESS
-	TIM2->CCR1 = timeout;
-	TIM2->DIER = TIM_DIER_CC1IE;
+#if OS_TICKLESS
+	TIM2->CCR2 = timeout;
+	#if OS_ROBIN
+	TIM2->DIER = TIM_DIER_CC2IE | TIM_DIER_CC1IE;
+	#else
+	TIM2->DIER = TIM_DIER_CC2IE;
+	#endif
 #else
 	(void) timeout;
 #endif
@@ -144,8 +154,13 @@ void port_tmr_start( uint32_t timeout )
 __STATIC_INLINE
 void port_tmr_force( void )
 {
-#if OS_ROBIN && OS_TICKLESS
-	NVIC_SetPendingIRQ(TIM2_IRQn);
+#if OS_TICKLESS
+	#if OS_ROBIN
+	TIM2->DIER = TIM_DIER_CC2IE | TIM_DIER_CC1IE;
+	#else
+	TIM2->DIER = TIM_DIER_CC2IE;
+	#endif
+	TIM2->EGR  = TIM_EGR_CC2G;
 #endif
 }
 

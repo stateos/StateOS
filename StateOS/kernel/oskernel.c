@@ -37,9 +37,7 @@
 static
 void priv_tsk_idle( void )
 {
-#if OS_ROBIN || OS_TICKLESS == 0
 	__WFI();
-#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -114,7 +112,7 @@ void core_tmr_remove( tmr_t *tmr )
 
 /* -------------------------------------------------------------------------- */
 
-#if OS_ROBIN && OS_TICKLESS
+#if OS_TICKLESS
 
 static
 bool priv_tmr_expired( tmr_t *tmr )
@@ -483,11 +481,8 @@ void *core_tsk_handler( void *sp )
 {
 	tsk_t *cur, *nxt;
 
-#if OS_ROBIN == 0
-	core_tmr_handler();
-#else
 	core_stk_assert();
-#endif
+
 	port_isr_lock();
 	core_ctx_reset();
 
@@ -522,8 +517,8 @@ void *core_tsk_handler( void *sp )
 void core_sys_tick( void )
 {
 	System.cnt++;
-	#if OS_ROBIN
 	core_tmr_handler();
+	#if OS_ROBIN
 	if (++System.cur->slice >= (OS_FREQUENCY)/(OS_ROBIN))
 		core_ctx_switch();
 	#endif

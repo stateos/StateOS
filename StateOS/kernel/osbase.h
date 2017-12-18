@@ -79,10 +79,8 @@ typedef struct __sys sys_t;
 struct __sys
 {
 	tsk_t  * cur;   // pointer to the current task control block
-#if OS_TICKLESS == 0
 	volatile
 	uint32_t cnt;   // system timer counter
-#endif
 };
 
 /* -------------------------------------------------------------------------- */

@@ -9,7 +9,7 @@ There's a dedicated function for immediate change the task state.
 ---------
 Features:
 - kernel works in preemptive or cooperative mode
-- kernel can operate in tick-less mode (32-bit timer required)
+- kernel can operate in tick-less mode
 - signals (clear, protect)
 - events
 - flags (any, all, protect, ignore)
@@ -42,6 +42,7 @@ Features:
 - fixed bugs in cmsis-rtos2 api
 - updated semaphore object (added semDirect feature)
 - the OS_ASSERT definition has been removed, use DEBUG/NDEBUG instead
+- updated tick-less mode
 ---------
 5.4
 - added startup files for cosmic compiler
