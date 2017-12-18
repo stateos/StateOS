@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    14.12.2017
+    @date    18.12.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -225,7 +225,7 @@ __STATIC_INLINE
 uint32_t core_sys_time( void )
 {
 #if OS_TICKLESS
-	return System.cnt | port_sys_time();
+	return System.cnt + port_sys_time();
 #else
 	return System.cnt;
 #endif

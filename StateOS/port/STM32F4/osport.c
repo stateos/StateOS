@@ -89,16 +89,40 @@ void port_sys_init( void )
 	TIM2->PSC  = (CPU_FREQUENCY)/(OS_FREQUENCY)/2-1;
 	TIM2->EGR  = TIM_EGR_UG;
 	TIM2->CR1  = TIM_CR1_CEN;
-	#if OS_ROBIN
-	TIM2->CCR1 = (OS_FREQUENCY)/(OS_ROBIN);
-	TIM2->DIER = TIM_DIER_UIE | TIM_DIER_CC1IE;
-	#else
-	TIM2->DIER = TIM_DIER_UIE;
-	#endif
 
 /******************************************************************************
  End of configuration
 *******************************************************************************/
+
+	#if OS_ROBIN
+
+/******************************************************************************
+ Tick-less mode with preemption: configuration of timer for context switch triggering
+ It must generate interrupts with frequency OS_ROBIN
+*******************************************************************************/
+
+	#if (CPU_FREQUENCY)/(OS_ROBIN)-1 <= SysTick_LOAD_RELOAD_Msk
+
+	SysTick_Config((CPU_FREQUENCY)/(OS_ROBIN));
+
+	#elif defined(ST_FREQUENCY) && \
+	    (ST_FREQUENCY)/(OS_ROBIN)-1 <= SysTick_LOAD_RELOAD_Msk
+
+	NVIC_SetPriority(SysTick_IRQn, 0xFF);
+
+	SysTick->LOAD = (ST_FREQUENCY)/(OS_ROBIN)-1;
+	SysTick->VAL  = 0U;
+	SysTick->CTRL = SysTick_CTRL_ENABLE_Msk|SysTick_CTRL_TICKINT_Msk;
+
+	#else
+	#error Incorrect SysTick frequency!
+	#endif
+	
+/******************************************************************************
+ End of configuration
+*******************************************************************************/
+
+	#endif//OS_ROBIN
 
 #endif//OS_TICKLESS
 
@@ -139,23 +163,31 @@ void SysTick_Handler( void )
 
 void TIM2_IRQHandler( void )
 {
-	uint32_t sr = TIM2->SR;
-	TIM2->SR = ~sr;
-
-	if (sizeof(System.cnt) > 4)     // TIM2->CNT is 32-bit (4 bytes)
-		if (sr & TIM_SR_UIF)
-			System.cnt += 1ULL<<32; // TIM2->CNT is 32-bit (4 bytes)
-	if (sr & TIM_SR_CC2IF)
-		core_tmr_handler();
-	#if OS_ROBIN
-	if (sr & TIM_SR_CC1IF)
-		core_ctx_switch();
-	#endif
+	TIM2->SR = 0;
+	core_tmr_handler();
 }
 
 /******************************************************************************
  End of the handler
 *******************************************************************************/
+
+	#if OS_ROBIN
+
+/******************************************************************************
+ Tick-less mode with preemption: interrupt handler for context switch triggering
+*******************************************************************************/
+
+void SysTick_Handler( void )
+{
+	SysTick->CTRL;
+	core_ctx_switch();
+}
+
+/******************************************************************************
+ End of the handler
+*******************************************************************************/
+
+	#endif//OS_ROBIN
 
 #endif//OS_TICKLESS
 
