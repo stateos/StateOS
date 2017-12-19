@@ -43,6 +43,7 @@ Features:
 - updated semaphore object (added semDirect feature)
 - the OS_ASSERT definition has been removed, use DEBUG/NDEBUG instead
 - updated tick-less mode
+- updated waitUntil functions
 ---------
 5.4
 - added startup files for cosmic compiler

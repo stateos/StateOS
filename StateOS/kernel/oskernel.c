@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    17.12.2017
+    @date    19.12.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -340,7 +340,7 @@ unsigned core_tsk_waitUntil( void *obj, uint32_t time )
 	cur->start = core_sys_time();
 	cur->delay = time - cur->start;
 
-	if (cur->delay == IMMEDIATE)
+	if ((int32_t)cur->delay <= 0)
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
@@ -359,7 +359,7 @@ unsigned core_tsk_waitFor( void *obj, uint32_t delay )
 	cur->delay = delay;
 
 	if (cur->delay == IMMEDIATE)
-	return E_TIMEOUT;
+		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
 	port_ctx_switchLock();
