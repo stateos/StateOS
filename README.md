@@ -12,7 +12,7 @@ Features
 --------
 
 - kernel works in preemptive or cooperative mode
-- kernel can operate in tick-less mode (32-bit timer required)
+- kernel can operate in tick-less mode
 - signals (clear, protect)
 - events
 - flags (any, all, protect, ignore)
