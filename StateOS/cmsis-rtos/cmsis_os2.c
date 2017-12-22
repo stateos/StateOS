@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    17.12.2017
+    @date    22.12.2017
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -158,8 +158,8 @@ uint32_t osKernelGetSysTimerCount (void)
 
 	if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)
 	{
-		cnt++;
 		tck = SysTick->VAL;
+		cnt++;
 	}
 
 	cnt = (cnt + 1U) * (SysTick->LOAD + 1U) - tck;
