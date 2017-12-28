@@ -44,6 +44,7 @@ Features:
 - the OS_ASSERT definition has been removed, use DEBUG/NDEBUG instead
 - updated tick-less mode
 - updated waitUntil functions
+- removed OS_TICKLESS definition, tick-less mode depends on OS_FREQUENCY value
 ---------
 5.4
 - added startup files for cosmic compiler

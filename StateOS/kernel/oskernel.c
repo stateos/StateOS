@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    19.12.2017
+    @date    28.12.2017
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -112,7 +112,7 @@ void core_tmr_remove( tmr_t *tmr )
 
 /* -------------------------------------------------------------------------- */
 
-#if OS_TICKLESS
+#if HW_TIMER_SIZE
 
 static
 bool priv_tmr_expired( tmr_t *tmr )
@@ -217,7 +217,7 @@ static
 void priv_tsk_insert( tsk_t *tsk )
 {
 	tsk_t *nxt = &IDLE;
-#if OS_ROBIN && OS_TICKLESS == 0
+#if OS_ROBIN && HW_TIMER_SIZE == 0
 	tsk->slice = 0;
 #endif
 	if (tsk->prio)
@@ -491,7 +491,7 @@ void *core_tsk_handler( void *sp )
 
 	nxt = IDLE.obj.next;
 
-#if OS_ROBIN && OS_TICKLESS == 0
+#if OS_ROBIN && HW_TIMER_SIZE == 0
 	if (cur == nxt || (nxt->slice >= (OS_FREQUENCY)/(OS_ROBIN) && (nxt->slice = 0) == 0))
 #else
 	if (cur == nxt)
@@ -512,7 +512,7 @@ void *core_tsk_handler( void *sp )
 
 /* -------------------------------------------------------------------------- */
 
-#if OS_TICKLESS == 0
+#if HW_TIMER_SIZE == 0
 
 void core_sys_tick( void )
 {

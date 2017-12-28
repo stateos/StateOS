@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    18.12.2017
+    @date    28.12.2017
     @brief   StateOS port file for STM32F4 uC.
 
  ******************************************************************************
@@ -43,7 +43,7 @@ void port_sys_init( void )
  End of check
 *******************************************************************************/
 
-#if OS_TICKLESS == 0
+#if HW_TIMER_SIZE == 0
 
 /******************************************************************************
  Non-tick-less mode: configuration of system timer
@@ -71,7 +71,7 @@ void port_sys_init( void )
  End of configuration
 *******************************************************************************/
 
-#else //OS_TICKLESS
+#else //HW_TIMER_SIZE
 
 /******************************************************************************
  Tick-less mode: configuration of system timer
@@ -124,7 +124,7 @@ void port_sys_init( void )
 
 	#endif//OS_ROBIN
 
-#endif//OS_TICKLESS
+#endif//HW_TIMER_SIZE
 
 /******************************************************************************
  Configuration of interrupt for context switch
@@ -139,7 +139,7 @@ void port_sys_init( void )
 
 /* -------------------------------------------------------------------------- */
 
-#if OS_TICKLESS == 0
+#if HW_TIMER_SIZE == 0
 
 /******************************************************************************
  Non-tick-less mode: interrupt handler of system timer
@@ -155,7 +155,7 @@ void SysTick_Handler( void )
  End of the handler
 *******************************************************************************/
 
-#else //OS_TICKLESS
+#else //HW_TIMER_SIZE
 
 /******************************************************************************
  Tick-less mode: interrupt handler of system timer
@@ -163,8 +163,11 @@ void SysTick_Handler( void )
 
 void TIM2_IRQHandler( void )
 {
-	TIM2->SR = 0;
-	core_tmr_handler();
+//	if (TIM2->SR & TIM_SR_CC1IF)
+	{
+		TIM2->SR = ~TIM_SR_CC1IF;
+		core_tmr_handler();
+	}
 }
 
 /******************************************************************************
@@ -189,7 +192,7 @@ void SysTick_Handler( void )
 
 	#endif//OS_ROBIN
 
-#endif//OS_TICKLESS
+#endif//HW_TIMER_SIZE
 
 /******************************************************************************
  Interrupt handler for context switch

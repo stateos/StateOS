@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    20.12.2017
+    @date    28.12.2017
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -102,7 +102,9 @@ __CONSTRUCTOR
 void port_sys_init( void );
 
 // return current system time in tick-less mode
+#if HW_TIMER_SIZE < 32 // because of CSMCC
 uint32_t port_sys_time( void );
+#endif
 
 /* -------------------------------------------------------------------------- */
 
@@ -227,15 +229,25 @@ void *core_tsk_handler( void *sp );
 __STATIC_INLINE
 uint32_t core_sys_time( void )
 {
-#if OS_TICKLESS
-	return port_sys_time();
-#else
+#if HW_TIMER_SIZE == 0
 	return System.cnt;
+#else
+	return port_sys_time();
 #endif
 }
 
 // internal handler of system timer
+#if HW_TIMER_SIZE == 0
 void core_sys_tick( void );
+#else
+__STATIC_INLINE
+void core_sys_tick( void )
+{
+#if HW_TIMER_SIZE < 32
+	System.cnt += 1UL << (HW_TIMER_SIZE);
+#endif
+}
+#endif
 
 /* -------------------------------------------------------------------------- */
 

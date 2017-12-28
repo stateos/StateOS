@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    18.12.2017
+    @date    28.12.2017
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -30,7 +30,9 @@
 #define __STATEOSPORT_H
 
 #include <stm32f4xx.h>
+#ifndef   NOCONFIG
 #include <osconfig.h>
+#endif
 #include <osdefs.h>
 
 #ifdef __cplusplus
@@ -39,36 +41,34 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#ifndef OS_TICKLESS
-#define OS_TICKLESS           0 /* os does not work in tick-less mode         */
-#endif
-
-/* -------------------------------------------------------------------------- */
-
 #ifndef CPU_FREQUENCY
-#error  osconfig.h: Undefined CPU_FREQUENCY value!
+#define CPU_FREQUENCY 168000000 /* Hz */
 #endif
 
 /* -------------------------------------------------------------------------- */
 
 #ifndef OS_FREQUENCY
-
-#if     OS_TICKLESS
-#define OS_FREQUENCY    1000000 /* Hz */
-#else
 #define OS_FREQUENCY       1000 /* Hz */
 #endif
 
-#endif//OS_FREQUENCY
+/* -------------------------------------------------------------------------- */
 
-#if    (OS_TICKLESS == 0) && (OS_FREQUENCY > 1000)
-#error  osconfig.h: Incorrect OS_FREQUENCY value!
+#ifdef  HW_TIMER_SIZE
+#error  HW_TIMER_SIZE is an internal definition!
+#elif   OS_FREQUENCY > 1000 
+#define HW_TIMER_SIZE        32
+#else
+#define HW_TIMER_SIZE         0
 #endif
 
 /* -------------------------------------------------------------------------- */
 // alternate clock source for SysTick
 
+#ifdef  ST_FREQUENCY
+#error  ST_FREQUENCY is an internal definition!
+#else
 #define ST_FREQUENCY        ((CPU_FREQUENCY)/8)
+#endif
 
 /* -------------------------------------------------------------------------- */
 
@@ -83,15 +83,15 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 // return current system time
 
+#if HW_TIMER_SIZE >= 32
+
 __STATIC_INLINE
 uint32_t port_sys_time( void )
 {
-#if OS_TICKLESS
 	return TIM2->CNT;
-#else
-	return 0;
-#endif
 }
+
+#endif
 
 /* -------------------------------------------------------------------------- */
 // force yield system control to the next process
@@ -108,7 +108,7 @@ void port_ctx_switch( void )
 __STATIC_INLINE
 void port_ctx_reset( void )
 {
-#if OS_TICKLESS
+#if HW_TIMER_SIZE
 	#if OS_ROBIN
 	SysTick->VAL = 0;
 	#endif
@@ -121,7 +121,7 @@ void port_ctx_reset( void )
 __STATIC_INLINE
 void port_tmr_stop( void )
 {
-#if OS_TICKLESS
+#if HW_TIMER_SIZE
 	TIM2->DIER = 0;
 #endif
 }
@@ -132,7 +132,7 @@ void port_tmr_stop( void )
 __STATIC_INLINE
 void port_tmr_start( uint32_t timeout )
 {
-#if OS_TICKLESS
+#if HW_TIMER_SIZE
 	TIM2->CCR1 = timeout;
 	TIM2->DIER = TIM_DIER_CC1IE;
 #else
@@ -146,7 +146,7 @@ void port_tmr_start( uint32_t timeout )
 __STATIC_INLINE
 void port_tmr_force( void )
 {
-#if OS_TICKLESS
+#if HW_TIMER_SIZE
 	NVIC_SetPendingIRQ(TIM2_IRQn);
 #endif
 }
