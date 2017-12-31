@@ -85,10 +85,10 @@ struct __sys
 
 /* -------------------------------------------------------------------------- */
 
-#if (OS_FREQUENCY)/1000000 < (UINT32_MAX) && (OS_FREQUENCY) >= 1000000
+#if (OS_FREQUENCY)/1000000 > 0 && (OS_FREQUENCY)/1000000 < (UINT32_MAX)
 #define USEC       (uint32_t)((OS_FREQUENCY)/1000000)
 #endif
-#if (OS_FREQUENCY)/1000 < (UINT32_MAX) && (OS_FREQUENCY) >= 1000
+#if (OS_FREQUENCY)/1000 > 0 && (OS_FREQUENCY)/1000 < (UINT32_MAX)
 #define MSEC       (uint32_t)((OS_FREQUENCY)/1000)
 #endif
 #if (OS_FREQUENCY) < (UINT32_MAX)
