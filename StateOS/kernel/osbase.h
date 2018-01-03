@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    31.12.2017
+    @date    03.01.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -92,16 +92,16 @@ struct __sys
 #define MSEC       (uint32_t)((OS_FREQUENCY)/1000)
 #endif
 #if (OS_FREQUENCY) < (UINT32_MAX)
-#define  SEC       (uint32_t)((OS_FREQUENCY))
+#define  SEC       ((uint32_t)(OS_FREQUENCY))
 #endif
 #if (OS_FREQUENCY) < (UINT32_MAX)/60
-#define  MIN       (uint32_t)((OS_FREQUENCY)*60)
+#define  MIN       ((uint32_t)(OS_FREQUENCY)*60)
 #endif
 #if (OS_FREQUENCY) < (UINT32_MAX)/3600
-#define HOUR       (uint32_t)((OS_FREQUENCY)*3600)
+#define HOUR       ((uint32_t)(OS_FREQUENCY)*3600)
 #endif
 #if (OS_FREQUENCY) < (UINT32_MAX)/86400
-#define  DAY       (uint32_t)((OS_FREQUENCY)*86400)
+#define  DAY       ((uint32_t)(OS_FREQUENCY)*86400)
 #endif
 
 /* -------------------------------------------------------------------------- */
