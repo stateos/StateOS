@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    13.12.2017
+    @date    01.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -274,7 +274,7 @@ void sem_delete( sem_t *sem );
  *
  ******************************************************************************/
 
-unsigned sem_waitUntil( sem_t *sem, uint32_t time );
+unsigned sem_waitUntil( sem_t *sem, cnt_t time );
 
 /******************************************************************************
  *
@@ -298,7 +298,7 @@ unsigned sem_waitUntil( sem_t *sem, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned sem_waitFor( sem_t *sem, uint32_t delay );
+unsigned sem_waitFor( sem_t *sem, cnt_t delay );
 
 /******************************************************************************
  *
@@ -366,7 +366,7 @@ unsigned sem_takeISR( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
  *
  ******************************************************************************/
 
-unsigned sem_sendUntil( sem_t *sem, uint32_t time );
+unsigned sem_sendUntil( sem_t *sem, cnt_t time );
 
 /******************************************************************************
  *
@@ -390,7 +390,7 @@ unsigned sem_sendUntil( sem_t *sem, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned sem_sendFor( sem_t *sem, uint32_t delay );
+unsigned sem_sendFor( sem_t *sem, cnt_t delay );
 
 /******************************************************************************
  *
@@ -467,17 +467,17 @@ struct Semaphore : public __sem
 	 Semaphore( const unsigned _init, const unsigned _limit = semCounting ): __sem _SEM_INIT(_init, _limit) {}
 	~Semaphore( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )            {        sem_kill     (this);         }
-	unsigned waitUntil( uint32_t _time )  { return sem_waitUntil(this, _time);  }
-	unsigned waitFor  ( uint32_t _delay ) { return sem_waitFor  (this, _delay); }
-	unsigned wait     ( void )            { return sem_wait     (this);         }
-	unsigned take     ( void )            { return sem_take     (this);         }
-	unsigned takeISR  ( void )            { return sem_takeISR  (this);         }
-	unsigned sendUntil( uint32_t _time )  { return sem_sendUntil(this, _time);  }
-	unsigned sendFor  ( uint32_t _delay ) { return sem_sendFor  (this, _delay); }
-	unsigned send     ( void )            { return sem_send     (this);         }
-	unsigned give     ( void )            { return sem_give     (this);         }
-	unsigned giveISR  ( void )            { return sem_giveISR  (this);         }
+	void     kill     ( void )         {        sem_kill     (this);         }
+	unsigned waitUntil( cnt_t _time )  { return sem_waitUntil(this, _time);  }
+	unsigned waitFor  ( cnt_t _delay ) { return sem_waitFor  (this, _delay); }
+	unsigned wait     ( void )         { return sem_wait     (this);         }
+	unsigned take     ( void )         { return sem_take     (this);         }
+	unsigned takeISR  ( void )         { return sem_takeISR  (this);         }
+	unsigned sendUntil( cnt_t _time )  { return sem_sendUntil(this, _time);  }
+	unsigned sendFor  ( cnt_t _delay ) { return sem_sendFor  (this, _delay); }
+	unsigned send     ( void )         { return sem_send     (this);         }
+	unsigned give     ( void )         { return sem_give     (this);         }
+	unsigned giveISR  ( void )         { return sem_giveISR  (this);         }
 };
 
 /******************************************************************************

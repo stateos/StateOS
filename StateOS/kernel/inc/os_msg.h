@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    01.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -266,7 +266,7 @@ void msg_delete( msg_t *msg );
  *
  ******************************************************************************/
 
-unsigned msg_waitUntil( msg_t *msg, unsigned *data, uint32_t time );
+unsigned msg_waitUntil( msg_t *msg, unsigned *data, cnt_t time );
 
 /******************************************************************************
  *
@@ -291,7 +291,7 @@ unsigned msg_waitUntil( msg_t *msg, unsigned *data, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned msg_waitFor( msg_t *msg, unsigned *data, uint32_t delay );
+unsigned msg_waitFor( msg_t *msg, unsigned *data, cnt_t delay );
 
 /******************************************************************************
  *
@@ -362,7 +362,7 @@ unsigned msg_takeISR( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, dat
  *
  ******************************************************************************/
 
-unsigned msg_sendUntil( msg_t *msg, unsigned data, uint32_t time );
+unsigned msg_sendUntil( msg_t *msg, unsigned data, cnt_t time );
 
 /******************************************************************************
  *
@@ -387,7 +387,7 @@ unsigned msg_sendUntil( msg_t *msg, unsigned data, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned msg_sendFor( msg_t *msg, unsigned data, uint32_t delay );
+unsigned msg_sendFor( msg_t *msg, unsigned data, cnt_t delay );
 
 /******************************************************************************
  *
@@ -465,17 +465,17 @@ struct baseMessageQueue : public __msg
 	 baseMessageQueue( const unsigned _limit, unsigned * const _data ): __msg _MSG_INIT(_limit, _data) {}
 	~baseMessageQueue( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                            {        msg_kill     (this);                }
-	unsigned waitUntil( unsigned*_data, uint32_t _time  ) { return msg_waitUntil(this, _data, _time);  }
-	unsigned waitFor  ( unsigned*_data, uint32_t _delay ) { return msg_waitFor  (this, _data, _delay); }
-	unsigned wait     ( unsigned*_data )                  { return msg_wait     (this, _data);         }
-	unsigned take     ( unsigned*_data )                  { return msg_take     (this, _data);         }
-	unsigned takeISR  ( unsigned*_data )                  { return msg_takeISR  (this, _data);         }
-	unsigned sendUntil( unsigned _data, uint32_t _time  ) { return msg_sendUntil(this, _data, _time);  }
-	unsigned sendFor  ( unsigned _data, uint32_t _delay ) { return msg_sendFor  (this, _data, _delay); }
-	unsigned send     ( unsigned _data )                  { return msg_send     (this, _data);         }
-	unsigned give     ( unsigned _data )                  { return msg_give     (this, _data);         }
-	unsigned giveISR  ( unsigned _data )                  { return msg_giveISR  (this, _data);         }
+	void     kill     ( void )                         {        msg_kill     (this);                }
+	unsigned waitUntil( unsigned*_data, cnt_t _time  ) { return msg_waitUntil(this, _data, _time);  }
+	unsigned waitFor  ( unsigned*_data, cnt_t _delay ) { return msg_waitFor  (this, _data, _delay); }
+	unsigned wait     ( unsigned*_data )               { return msg_wait     (this, _data);         }
+	unsigned take     ( unsigned*_data )               { return msg_take     (this, _data);         }
+	unsigned takeISR  ( unsigned*_data )               { return msg_takeISR  (this, _data);         }
+	unsigned sendUntil( unsigned _data, cnt_t _time  ) { return msg_sendUntil(this, _data, _time);  }
+	unsigned sendFor  ( unsigned _data, cnt_t _delay ) { return msg_sendFor  (this, _data, _delay); }
+	unsigned send     ( unsigned _data )               { return msg_send     (this, _data);         }
+	unsigned give     ( unsigned _data )               { return msg_give     (this, _data);         }
+	unsigned giveISR  ( unsigned _data )               { return msg_giveISR  (this, _data);         }
 };
 
 /******************************************************************************

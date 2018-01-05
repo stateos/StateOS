@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    08.12.2017
+    @date    01.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -131,7 +131,7 @@ void priv_box_put( box_t *box, void *data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_box_wait( box_t *box, void *data, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -163,7 +163,7 @@ unsigned priv_box_wait( box_t *box, void *data, uint32_t time, unsigned(*wait)(v
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_waitUntil( box_t *box, void *data, uint32_t time )
+unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -172,7 +172,7 @@ unsigned box_waitUntil( box_t *box, void *data, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_waitFor( box_t *box, void *data, uint32_t delay )
+unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);
@@ -182,7 +182,7 @@ unsigned box_waitFor( box_t *box, void *data, uint32_t delay )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_box_send( box_t *box, void *data, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_box_send( box_t *box, void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -214,7 +214,7 @@ unsigned priv_box_send( box_t *box, void *data, uint32_t time, unsigned(*wait)(v
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendUntil( box_t *box, const void *data, uint32_t time )
+unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -223,7 +223,7 @@ unsigned box_sendUntil( box_t *box, const void *data, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendFor( box_t *box, const void *data, uint32_t delay )
+unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);

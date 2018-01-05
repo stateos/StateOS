@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    01.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -230,7 +230,7 @@ void lst_delete( lst_t *lst );
  *
  ******************************************************************************/
 
-unsigned lst_waitUntil( lst_t *lst, void **data, uint32_t time );
+unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time );
 
 /******************************************************************************
  *
@@ -255,7 +255,7 @@ unsigned lst_waitUntil( lst_t *lst, void **data, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned lst_waitFor( lst_t *lst, void **data, uint32_t delay );
+unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay );
 
 /******************************************************************************
  *
@@ -352,14 +352,14 @@ struct List : public __lst
 	 List( void ): __lst _LST_INIT() {}
 	~List( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                          {        lst_kill     (this);                }
-	unsigned waitUntil( void **_data, uint32_t _time )  { return lst_waitUntil(this, _data, _time);  }
-	unsigned waitFor  ( void **_data, uint32_t _delay ) { return lst_waitFor  (this, _data, _delay); }
-	unsigned wait     ( void **_data )                  { return lst_wait     (this, _data);         }
-	unsigned take     ( void **_data )                  { return lst_take     (this, _data);         }
-	unsigned takeISR  ( void **_data )                  { return lst_takeISR  (this, _data);         }
-	void     give     ( void  *_data )                  {        lst_give     (this, _data);         }
-	void     giveISR  ( void  *_data )                  {        lst_giveISR  (this, _data);         }
+	void     kill     ( void )                       {        lst_kill     (this);                }
+	unsigned waitUntil( void **_data, cnt_t _time )  { return lst_waitUntil(this, _data, _time);  }
+	unsigned waitFor  ( void **_data, cnt_t _delay ) { return lst_waitFor  (this, _data, _delay); }
+	unsigned wait     ( void **_data )               { return lst_wait     (this, _data);         }
+	unsigned take     ( void **_data )               { return lst_take     (this, _data);         }
+	unsigned takeISR  ( void **_data )               { return lst_takeISR  (this, _data);         }
+	void     give     ( void  *_data )               {        lst_give     (this, _data);         }
+	void     giveISR  ( void  *_data )               {        lst_giveISR  (this, _data);         }
 };
 
 #endif

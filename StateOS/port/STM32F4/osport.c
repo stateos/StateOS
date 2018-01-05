@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    28.12.2017
+    @date    05.01.2018
     @brief   StateOS port file for STM32F4 uC.
 
  ******************************************************************************
@@ -86,9 +86,15 @@ void port_sys_init( void )
 	NVIC_SetPriority(TIM2_IRQn, 0xFF);
 	NVIC_EnableIRQ(TIM2_IRQn);
 
+	#if HW_TIMER_SIZE > OS_TIMER_SIZE
+	TIM2->ARR  = CNT_MAX;
+	#endif
 	TIM2->PSC  = (CPU_FREQUENCY)/(OS_FREQUENCY)/2-1;
 	TIM2->EGR  = TIM_EGR_UG;
 	TIM2->CR1  = TIM_CR1_CEN;
+	#if HW_TIMER_SIZE < OS_TIMER_SIZE
+	TIM2->DIER = TIM_DIER_UIE;
+	#endif
 
 /******************************************************************************
  End of configuration
@@ -163,7 +169,14 @@ void SysTick_Handler( void )
 
 void TIM2_IRQHandler( void )
 {
-//	if (TIM2->SR & TIM_SR_CC1IF)
+	#if HW_TIMER_SIZE < OS_TIMER_SIZE
+	if (TIM2->SR & TIM_SR_UIF)
+	{
+		TIM2->SR = ~TIM_SR_UIF;
+		core_sys_tick();
+	}
+	if (TIM2->SR & TIM_SR_CC1IF)
+	#endif
 	{
 		TIM2->SR = ~TIM_SR_CC1IF;
 		core_tmr_handler();
@@ -172,6 +185,35 @@ void TIM2_IRQHandler( void )
 
 /******************************************************************************
  End of the handler
+*******************************************************************************/
+
+/******************************************************************************
+ Tick-less mode: return current system time
+*******************************************************************************/
+
+#if HW_TIMER_SIZE < OS_TIMER_SIZE
+
+cnt_t port_sys_time( void )
+{
+	cnt_t    cnt;
+	uint32_t tck;
+
+	cnt = System.cnt;
+	tck = TIM2->CNT;
+
+	if (TIM2->SR & TIM_SR_UIF)
+	{
+		tck = TIM2->CNT;
+		cnt += (cnt_t)(1) << (HW_TIMER_SIZE);
+	}
+
+	return cnt + tck;
+}
+
+#endif
+
+/******************************************************************************
+ End of the function
 *******************************************************************************/
 
 	#if OS_ROBIN

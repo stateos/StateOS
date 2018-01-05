@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    01.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -96,7 +96,7 @@ void bar_delete( bar_t *bar )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_bar_wait( bar_t *bar, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -123,7 +123,7 @@ unsigned priv_bar_wait( bar_t *bar, uint32_t time, unsigned(*wait)(void*,uint32_
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned bar_waitUntil( bar_t *bar, uint32_t time )
+unsigned bar_waitUntil( bar_t *bar, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -132,7 +132,7 @@ unsigned bar_waitUntil( bar_t *bar, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned bar_waitFor( bar_t *bar, uint32_t delay )
+unsigned bar_waitFor( bar_t *bar, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    01.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -89,7 +89,7 @@ void cnd_delete( cnd_t *cnd )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -109,7 +109,7 @@ unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, uint32_t time, unsigned(*wait)(v
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, uint32_t time )
+unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -118,7 +118,7 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, uint32_t delay )
+unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());

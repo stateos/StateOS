@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    28.12.2017
+    @date    02.01.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -101,11 +101,6 @@ extern sys_t System; // system data
 __CONSTRUCTOR
 void port_sys_init( void );
 
-// return current system time in tick-less mode
-#if HW_TIMER_SIZE < 32 // because of CSMCC
-uint32_t port_sys_time( void );
-#endif
-
 /* -------------------------------------------------------------------------- */
 
 // initiate task 'tsk' for context switch
@@ -169,7 +164,7 @@ void core_tsk_unlink( tsk_t *tsk, unsigned event );
 // insert the current task into timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitUntil( void *obj, uint32_t time );
+unsigned core_tsk_waitUntil( void *obj, cnt_t time );
 
 // delay execution of current task for given duration of time 'delay'
 // append the current task to the delayed queue of object 'obj'
@@ -177,7 +172,7 @@ unsigned core_tsk_waitUntil( void *obj, uint32_t time );
 // insert the current task into timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitFor( void *obj, uint32_t delay );
+unsigned core_tsk_waitFor( void *obj, cnt_t delay );
 
 // delay indefinitely execution of given task
 // append given task to WAIT timer delayed queue
@@ -225,9 +220,14 @@ void *core_tsk_handler( void *sp );
 
 /* -------------------------------------------------------------------------- */
 
+// return current system time in tick-less mode
+#if HW_TIMER_SIZE < OS_TIMER_SIZE // because of CSMCC
+cnt_t port_sys_time( void );
+#endif
+
 // return current system time
 __STATIC_INLINE
-uint32_t core_sys_time( void )
+cnt_t core_sys_time( void )
 {
 #if HW_TIMER_SIZE == 0
 	return System.cnt;
@@ -243,8 +243,8 @@ void core_sys_tick( void );
 __STATIC_INLINE
 void core_sys_tick( void )
 {
-#if HW_TIMER_SIZE < 32
-	System.cnt += 1UL << (HW_TIMER_SIZE);
+#if HW_TIMER_SIZE < OS_TIMER_SIZE
+	System.cnt += (cnt_t)(1) << (HW_TIMER_SIZE);
 #endif
 }
 #endif

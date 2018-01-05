@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.h
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    01.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -231,7 +231,7 @@ void mut_delete( mut_t *mut );
  *
  ******************************************************************************/
 
-unsigned mut_waitUntil( mut_t *mut, uint32_t time );
+unsigned mut_waitUntil( mut_t *mut, cnt_t time );
 
 /******************************************************************************
  *
@@ -255,7 +255,7 @@ unsigned mut_waitUntil( mut_t *mut, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned mut_waitFor( mut_t *mut, uint32_t delay );
+unsigned mut_waitFor( mut_t *mut, cnt_t delay );
 
 /******************************************************************************
  *
@@ -344,12 +344,12 @@ struct FastMutex : public __mut
 	 FastMutex( void ): __mut _MUT_INIT() {}
 	~FastMutex( void ) { assert(owner == nullptr); }
 
-	void     kill     ( void )            {        mut_kill     (this);         }
-	unsigned waitUntil( uint32_t _time  ) { return mut_waitUntil(this, _time);  }
-	unsigned waitFor  ( uint32_t _delay ) { return mut_waitFor  (this, _delay); }
-	unsigned wait     ( void )            { return mut_wait     (this);         }
-	unsigned take     ( void )            { return mut_take     (this);         }
-	unsigned give     ( void )            { return mut_give     (this);         }
+	void     kill     ( void )         {        mut_kill     (this);         }
+	unsigned waitUntil( cnt_t _time  ) { return mut_waitUntil(this, _time);  }
+	unsigned waitFor  ( cnt_t _delay ) { return mut_waitFor  (this, _delay); }
+	unsigned wait     ( void )         { return mut_wait     (this);         }
+	unsigned take     ( void )         { return mut_take     (this);         }
+	unsigned give     ( void )         { return mut_give     (this);         }
 };
 
 #endif

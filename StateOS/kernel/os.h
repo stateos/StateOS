@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    01.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -162,10 +162,10 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
  *
  ******************************************************************************/
 
-uint32_t sys_time( void );
+cnt_t sys_time( void );
 
 __STATIC_INLINE
-uint32_t sys_timeISR( void ) { return sys_time(); }
+cnt_t sys_timeISR( void ) { return sys_time(); }
 
 /******************************************************************************
  *

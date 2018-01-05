@@ -2,7 +2,7 @@
 
     @file    StateOS: os.c
     @author  Rajmund Szymanski
-    @date    08.12.2017
+    @date    01.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,10 +29,10 @@
 #include "oskernel.h"
 
 /* -------------------------------------------------------------------------- */
-uint32_t sys_time( void )
+cnt_t sys_time( void )
 /* -------------------------------------------------------------------------- */
 {
-	uint32_t cnt;
+	cnt_t cnt;
 
 	port_sys_lock();
 

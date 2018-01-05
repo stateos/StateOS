@@ -2,7 +2,7 @@
 
     @file    StateOS: os_cnd.h
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    01.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -236,7 +236,7 @@ void cnd_delete( cnd_t *cnd );
  *
  ******************************************************************************/
 
-unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, uint32_t time );
+unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time );
 
 /******************************************************************************
  *
@@ -261,7 +261,7 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, uint32_t delay );
+unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay );
 
 /******************************************************************************
  *
@@ -334,12 +334,12 @@ struct ConditionVariable : public __cnd
 	 ConditionVariable( void ): __cnd _CND_INIT() {}
 	~ConditionVariable( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                         {        cnd_kill     (this);               }
-	unsigned waitUntil( mtx_t *_mtx, uint32_t _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
-	unsigned waitFor  ( mtx_t *_mtx, uint32_t _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
-	unsigned wait     ( mtx_t *_mtx )                  { return cnd_wait     (this, _mtx);         }
-	void     give     ( bool   _all = cndAll )         {        cnd_give     (this, _all);         }
-	void     giveISR  ( bool   _all = cndAll )         {        cnd_giveISR  (this, _all);         }
+	void     kill     ( void )                      {        cnd_kill     (this);               }
+	unsigned waitUntil( mtx_t *_mtx, cnt_t _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
+	unsigned waitFor  ( mtx_t *_mtx, cnt_t _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
+	unsigned wait     ( mtx_t *_mtx )               { return cnd_wait     (this, _mtx);         }
+	void     give     ( bool   _all = cndAll )      {        cnd_give     (this, _all);         }
+	void     giveISR  ( bool   _all = cndAll )      {        cnd_giveISR  (this, _all);         }
 };
 
 #endif

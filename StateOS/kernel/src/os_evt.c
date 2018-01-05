@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evt.c
     @author  Rajmund Szymanski
-    @date    22.10.2017
+    @date    01.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -89,7 +89,7 @@ void evt_delete( evt_t *evt )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_evt_wait( evt_t *evt, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_evt_wait( evt_t *evt, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -106,7 +106,7 @@ unsigned priv_evt_wait( evt_t *evt, uint32_t time, unsigned(*wait)(void*,uint32_
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitUntil( evt_t *evt, uint32_t time )
+unsigned evt_waitUntil( evt_t *evt, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -115,7 +115,7 @@ unsigned evt_waitUntil( evt_t *evt, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitFor( evt_t *evt, uint32_t delay )
+unsigned evt_waitFor( evt_t *evt, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());

@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    28.12.2017
+    @date    02.01.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -81,7 +81,7 @@ void priv_tmr_insert( tmr_t *tmr, unsigned id )
 
 	if (tmr->delay != INFINITE)
 		do nxt = nxt->obj.next;
-		while (nxt->delay < tmr->start + tmr->delay - nxt->start);
+		while (nxt->delay < (cnt_t)(tmr->start + tmr->delay - nxt->start));
 
 	priv_rdy_insert(&tmr->obj, &nxt->obj);
 }
@@ -122,12 +122,12 @@ bool priv_tmr_expired( tmr_t *tmr )
 	if (tmr->delay == INFINITE)
 	return false; // return if timer counting indefinitely
 
-	if (tmr->delay <= core_sys_time() - tmr->start)
+	if (tmr->delay <= (cnt_t)(core_sys_time() - tmr->start))
 	return true;  // return if timer finished counting
 
-	port_tmr_start(tmr->start + tmr->delay);
+	port_tmr_start((cnt_t)(tmr->start + tmr->delay));
 
-	if (tmr->delay >  core_sys_time() - tmr->start)
+	if (tmr->delay >  (cnt_t)(core_sys_time() - tmr->start))
 	return false; // return if timer still counts
 
 	port_tmr_stop();
@@ -142,7 +142,7 @@ bool priv_tmr_expired( tmr_t *tmr )
 static
 bool priv_tmr_expired( tmr_t *tmr )
 {
-	if (tmr->delay >= core_sys_time() - tmr->start + 1)
+	if (tmr->delay >= (cnt_t)(core_sys_time() - tmr->start + 1))
 	return false; // return if timer still counts or counting indefinitely
 
 	return true;  // timer finished counting
@@ -162,7 +162,7 @@ void priv_tmr_wakeup( tmr_t *tmr, unsigned event )
 		tmr->state();
 
 	core_tmr_remove(tmr);
-	if (tmr->delay >= core_sys_time() - tmr->start + 1)
+	if (tmr->delay >= (cnt_t)(core_sys_time() - tmr->start + 1))
 		priv_tmr_insert(tmr, ID_TIMER);
 
 	core_all_wakeup(tmr, event);
@@ -333,14 +333,14 @@ void priv_tsk_wait( tsk_t *tsk, void *obj )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitUntil( void *obj, uint32_t time )
+unsigned core_tsk_waitUntil( void *obj, cnt_t time )
 {
 	tsk_t *cur = System.cur;
 
 	cur->start = core_sys_time();
 	cur->delay = time - cur->start;
 
-	if ((int32_t)cur->delay <= 0)
+	if (cur->delay > ((CNT_MAX)>>1))
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
@@ -351,7 +351,7 @@ unsigned core_tsk_waitUntil( void *obj, uint32_t time )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitFor( void *obj, uint32_t delay )
+unsigned core_tsk_waitFor( void *obj, cnt_t delay )
 {
 	tsk_t *cur = System.cur;
 

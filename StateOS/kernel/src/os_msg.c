@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    08.12.2017
+    @date    01.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -122,7 +122,7 @@ void priv_msg_put( msg_t *msg, unsigned data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_wait( msg_t *msg, unsigned *data, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_msg_wait( msg_t *msg, unsigned *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -154,7 +154,7 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, uint32_t time, unsigned(*wai
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitUntil( msg_t *msg, unsigned *data, uint32_t time )
+unsigned msg_waitUntil( msg_t *msg, unsigned *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -163,7 +163,7 @@ unsigned msg_waitUntil( msg_t *msg, unsigned *data, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitFor( msg_t *msg, unsigned *data, uint32_t delay )
+unsigned msg_waitFor( msg_t *msg, unsigned *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);
@@ -173,7 +173,7 @@ unsigned msg_waitFor( msg_t *msg, unsigned *data, uint32_t delay )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_send( msg_t *msg, unsigned data, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_msg_send( msg_t *msg, unsigned data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -204,7 +204,7 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, uint32_t time, unsigned(*wait
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendUntil( msg_t *msg, unsigned data, uint32_t time )
+unsigned msg_sendUntil( msg_t *msg, unsigned data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -213,7 +213,7 @@ unsigned msg_sendUntil( msg_t *msg, unsigned data, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendFor( msg_t *msg, unsigned data, uint32_t delay )
+unsigned msg_sendFor( msg_t *msg, unsigned data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);

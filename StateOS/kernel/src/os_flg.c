@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    08.12.2017
+    @date    01.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -90,7 +90,7 @@ void flg_delete( flg_t *flg )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *cur = System.cur;
@@ -115,7 +115,7 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, uint32_t time
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, uint32_t time )
+unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -124,7 +124,7 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, uint32_t time
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, uint32_t delay )
+unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);

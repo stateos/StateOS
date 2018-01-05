@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    01.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -256,7 +256,7 @@ void sig_delete( sig_t *sig );
  *
  ******************************************************************************/
 
-unsigned sig_waitUntil( sig_t *sig, uint32_t time );
+unsigned sig_waitUntil( sig_t *sig, cnt_t time );
 
 /******************************************************************************
  *
@@ -279,7 +279,7 @@ unsigned sig_waitUntil( sig_t *sig, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned sig_waitFor( sig_t *sig, uint32_t delay );
+unsigned sig_waitFor( sig_t *sig, cnt_t delay );
 
 /******************************************************************************
  *
@@ -394,16 +394,16 @@ struct Signal : public __sig
 	 Signal( const unsigned _type = sigClear ): __sig _SIG_INIT(_type) {}
 	~Signal( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )            {        sig_kill     (this);         }
-	unsigned waitUntil( uint32_t _time  ) { return sig_waitUntil(this, _time);  }
-	unsigned waitFor  ( uint32_t _delay ) { return sig_waitFor  (this, _delay); }
-	unsigned wait     ( void )            { return sig_wait     (this);         }
-	unsigned take     ( void )            { return sig_take     (this);         }
-	unsigned takeISR  ( void )            { return sig_takeISR  (this);         }
-	void     give     ( void )            {        sig_give     (this);         }
-	void     giveISR  ( void )            {        sig_giveISR  (this);         }
-	void     clear    ( void )            {        sig_clear    (this);         }
-	void     clearISR ( void )            {        sig_clearISR (this);         }
+	void     kill     ( void )         {        sig_kill     (this);         }
+	unsigned waitUntil( cnt_t _time  ) { return sig_waitUntil(this, _time);  }
+	unsigned waitFor  ( cnt_t _delay ) { return sig_waitFor  (this, _delay); }
+	unsigned wait     ( void )         { return sig_wait     (this);         }
+	unsigned take     ( void )         { return sig_take     (this);         }
+	unsigned takeISR  ( void )         { return sig_takeISR  (this);         }
+	void     give     ( void )         {        sig_give     (this);         }
+	void     giveISR  ( void )         {        sig_giveISR  (this);         }
+	void     clear    ( void )         {        sig_clear    (this);         }
+	void     clearISR ( void )         {        sig_clearISR (this);         }
 };
 
 #endif

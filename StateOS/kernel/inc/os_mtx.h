@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.h
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    01.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -232,7 +232,7 @@ void mtx_delete( mtx_t *mtx );
  *
  ******************************************************************************/
 
-unsigned mtx_waitUntil( mtx_t *mtx, uint32_t time );
+unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
 
 /******************************************************************************
  *
@@ -256,7 +256,7 @@ unsigned mtx_waitUntil( mtx_t *mtx, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned mtx_waitFor( mtx_t *mtx, uint32_t delay );
+unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay );
 
 /******************************************************************************
  *
@@ -345,12 +345,12 @@ struct Mutex : public __mtx
 	 Mutex( void ): __mtx _MTX_INIT() {}
 	~Mutex( void ) { assert(owner == nullptr); }
 
-	void     kill     ( void )            {        mtx_kill     (this);         }
-	unsigned waitUntil( uint32_t _time  ) { return mtx_waitUntil(this, _time);  }
-	unsigned waitFor  ( uint32_t _delay ) { return mtx_waitFor  (this, _delay); }
-	unsigned wait     ( void )            { return mtx_wait     (this);         }
-	unsigned take     ( void )            { return mtx_take     (this);         }
-	unsigned give     ( void )            { return mtx_give     (this);         }
+	void     kill     ( void )         {        mtx_kill     (this);         }
+	unsigned waitUntil( cnt_t _time  ) { return mtx_waitUntil(this, _time);  }
+	unsigned waitFor  ( cnt_t _delay ) { return mtx_waitFor  (this, _delay); }
+	unsigned wait     ( void )         { return mtx_wait     (this);         }
+	unsigned take     ( void )         { return mtx_take     (this);         }
+	unsigned give     ( void )         { return mtx_give     (this);         }
 };
 
 #endif

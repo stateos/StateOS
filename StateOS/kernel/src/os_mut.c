@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mut.c
     @author  Rajmund Szymanski
-    @date    08.12.2017
+    @date    01.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -89,7 +89,7 @@ void mut_delete( mut_t *mut )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mut_wait( mut_t *mut, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_TIMEOUT;
@@ -115,7 +115,7 @@ unsigned priv_mut_wait( mut_t *mut, uint32_t time, unsigned(*wait)(void*,uint32_
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_waitUntil( mut_t *mut, uint32_t time )
+unsigned mut_waitUntil( mut_t *mut, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -124,7 +124,7 @@ unsigned mut_waitUntil( mut_t *mut, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_waitFor( mut_t *mut, uint32_t delay )
+unsigned mut_waitFor( mut_t *mut, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());

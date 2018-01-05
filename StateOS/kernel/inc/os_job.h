@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.h
     @author  Rajmund Szymanski
-    @date    10.12.2017
+    @date    01.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -265,7 +265,7 @@ void job_delete( job_t *job );
  *
  ******************************************************************************/
 
-unsigned job_waitUntil( job_t *job, uint32_t time );
+unsigned job_waitUntil( job_t *job, cnt_t time );
 
 /******************************************************************************
  *
@@ -289,7 +289,7 @@ unsigned job_waitUntil( job_t *job, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned job_waitFor( job_t *job, uint32_t delay );
+unsigned job_waitFor( job_t *job, cnt_t delay );
 
 /******************************************************************************
  *
@@ -354,7 +354,7 @@ unsigned job_take( job_t *job ) { return job_waitFor(job, IMMEDIATE); }
  *
  ******************************************************************************/
 
-unsigned job_sendUntil( job_t *job, fun_t *fun, uint32_t time );
+unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
 
 /******************************************************************************
  *
@@ -379,7 +379,7 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, uint32_t time );
  *
  ******************************************************************************/
 
-unsigned job_sendFor( job_t *job, fun_t *fun, uint32_t delay );
+unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay );
 
 /******************************************************************************
  *
@@ -459,16 +459,16 @@ struct baseJobQueue : public __box
 	 baseJobQueue( const unsigned _limit, FUN_t * const _data ): __box _BOX_INIT( _limit, sizeof(FUN_t), reinterpret_cast<char *>(_data) ) {}
 	~baseJobQueue( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                        {                              box_kill     (this);                                                              }
-	unsigned waitUntil( uint32_t _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
-	unsigned waitFor  ( uint32_t _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
-	unsigned wait     ( void )                        { FUN_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned take     ( void )                        { FUN_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned sendUntil( FUN_t _fun, uint32_t _time )  {             unsigned event = box_sendUntil(this, &_fun, _time);                                  return event; }
-	unsigned sendFor  ( FUN_t _fun, uint32_t _delay ) {             unsigned event = box_sendFor  (this, &_fun, _delay);                                 return event; }
-	unsigned send     ( FUN_t _fun )                  {             unsigned event = box_send     (this, &_fun);                                         return event; }
-	unsigned give     ( FUN_t _fun )                  {             unsigned event = box_give     (this, &_fun);                                         return event; }
-	unsigned giveISR  ( FUN_t _fun )                  {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
+	void     kill     ( void )                     {                              box_kill     (this);                                                              }
+	unsigned waitUntil( cnt_t _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
+	unsigned waitFor  ( cnt_t _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
+	unsigned wait     ( void )                     { FUN_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned take     ( void )                     { FUN_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned sendUntil( FUN_t _fun, cnt_t _time )  {             unsigned event = box_sendUntil(this, &_fun, _time);                                  return event; }
+	unsigned sendFor  ( FUN_t _fun, cnt_t _delay ) {             unsigned event = box_sendFor  (this, &_fun, _delay);                                 return event; }
+	unsigned send     ( FUN_t _fun )               {             unsigned event = box_send     (this, &_fun);                                         return event; }
+	unsigned give     ( FUN_t _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
+	unsigned giveISR  ( FUN_t _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
 };
 
 #else
@@ -479,16 +479,16 @@ struct baseJobQueue : public __job
 	 baseJobQueue( const unsigned _limit, FUN_t * const _data ): __job _JOB_INIT( _limit, _data ) {}
 	~baseJobQueue( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                        {        job_kill     (this);               }
-	unsigned waitUntil( uint32_t _time )              { return job_waitUntil(this, _time);        }
-	unsigned waitFor  ( uint32_t _delay )             { return job_waitFor  (this, _delay);       }
-	unsigned wait     ( void )                        { return job_wait     (this);               }
-	unsigned take     ( void )                        { return job_take     (this);               }
-	unsigned sendUntil( FUN_t _fun, uint32_t _time )  { return job_sendUntil(this, _fun, _time);  }
-	unsigned sendFor  ( FUN_t _fun, uint32_t _delay ) { return job_sendFor  (this, _fun, _delay); }
-	unsigned send     ( FUN_t _fun )                  { return job_send     (this, _fun);         }
-	unsigned give     ( FUN_t _fun )                  { return job_give     (this, _fun);         }
-	unsigned giveISR  ( FUN_t _fun )                  { return job_giveISR  (this, _fun);         }
+	void     kill     ( void )                     {        job_kill     (this);               }
+	unsigned waitUntil( cnt_t _time )              { return job_waitUntil(this, _time);        }
+	unsigned waitFor  ( cnt_t _delay )             { return job_waitFor  (this, _delay);       }
+	unsigned wait     ( void )                     { return job_wait     (this);               }
+	unsigned take     ( void )                     { return job_take     (this);               }
+	unsigned sendUntil( FUN_t _fun, cnt_t _time )  { return job_sendUntil(this, _fun, _time);  }
+	unsigned sendFor  ( FUN_t _fun, cnt_t _delay ) { return job_sendFor  (this, _fun, _delay); }
+	unsigned send     ( FUN_t _fun )               { return job_send     (this, _fun);         }
+	unsigned give     ( FUN_t _fun )               { return job_give     (this, _fun);         }
+	unsigned giveISR  ( FUN_t _fun )               { return job_giveISR  (this, _fun);         }
 };
 
 #endif

@@ -38,6 +38,27 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+#ifndef OS_TIMER_SIZE
+#define OS_TIMER_SIZE    32
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if     OS_TIMER_SIZE == 16
+typedef uint16_t     cnt_t;
+#define CNT_MAX  UINT16_MAX
+#elif   OS_TIMER_SIZE == 32
+typedef uint32_t     cnt_t;
+#define CNT_MAX  UINT32_MAX
+#elif   OS_TIMER_SIZE == 64
+typedef uint64_t     cnt_t;
+#define CNT_MAX  UINT64_MAX
+#else
+#error  Invalid OS_TIMER_SIZE value!
+#endif
+
+/* -------------------------------------------------------------------------- */
+
 typedef struct __tmr tmr_t, * const tmr_id; // timer
 typedef struct __tsk tsk_t, * const tsk_id; // task
 typedef         void fun_t(); // timer/task procedure
@@ -79,29 +100,31 @@ typedef struct __sys sys_t;
 struct __sys
 {
 	tsk_t  * cur;   // pointer to the current task control block
+#if HW_TIMER_SIZE < OS_TIMER_SIZE
 	volatile
-	uint32_t cnt;   // system timer counter
+	cnt_t    cnt;   // system timer counter
+#endif
 };
 
 /* -------------------------------------------------------------------------- */
 
-#if (OS_FREQUENCY)/1000000 > 0 && (OS_FREQUENCY)/1000000 < (UINT32_MAX)
-#define USEC       (uint32_t)((OS_FREQUENCY)/1000000)
+#if (OS_FREQUENCY)/1000000 > 0 && (OS_FREQUENCY)/1000000 < (CNT_MAX)
+#define USEC       (cnt_t)((OS_FREQUENCY)/1000000)
 #endif
-#if (OS_FREQUENCY)/1000 > 0 && (OS_FREQUENCY)/1000 < (UINT32_MAX)
-#define MSEC       (uint32_t)((OS_FREQUENCY)/1000)
+#if (OS_FREQUENCY)/1000 > 0 && (OS_FREQUENCY)/1000 < (CNT_MAX)
+#define MSEC       (cnt_t)((OS_FREQUENCY)/1000)
 #endif
-#if (OS_FREQUENCY) < (UINT32_MAX)
-#define  SEC       ((uint32_t)(OS_FREQUENCY))
+#if (OS_FREQUENCY) < (CNT_MAX)
+#define  SEC       ((cnt_t)(OS_FREQUENCY))
 #endif
-#if (OS_FREQUENCY) < (UINT32_MAX)/60
-#define  MIN       ((uint32_t)(OS_FREQUENCY)*60)
+#if (OS_FREQUENCY) < (CNT_MAX)/60
+#define  MIN       ((cnt_t)(OS_FREQUENCY)*60)
 #endif
-#if (OS_FREQUENCY) < (UINT32_MAX)/3600
-#define HOUR       ((uint32_t)(OS_FREQUENCY)*3600)
+#if (OS_FREQUENCY) < (CNT_MAX)/3600
+#define HOUR       ((cnt_t)(OS_FREQUENCY)*3600)
 #endif
-#if (OS_FREQUENCY) < (UINT32_MAX)/86400
-#define  DAY       ((uint32_t)(OS_FREQUENCY)*86400)
+#if (OS_FREQUENCY) < (CNT_MAX)/86400
+#define  DAY       ((cnt_t)(OS_FREQUENCY)*86400)
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -121,10 +144,10 @@ struct __sys
 /* -------------------------------------------------------------------------- */
 
 #ifndef IMMEDIATE
-#define IMMEDIATE    0UL        // no waiting
+#define IMMEDIATE    0       // no waiting
 #endif
 #ifndef INFINITE
-#define INFINITE     UINT32_MAX // infinite waiting
+#define INFINITE     CNT_MAX // infinite waiting
 #endif
 
 /* -------------------------------------------------------------------------- */

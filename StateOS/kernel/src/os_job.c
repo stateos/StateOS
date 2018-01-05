@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.c
     @author  Rajmund Szymanski
-    @date    08.12.2017
+    @date    01.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -121,7 +121,7 @@ void priv_job_put( job_t *job, fun_t *fun )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_job_wait( job_t *job, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -155,7 +155,7 @@ unsigned priv_job_wait( job_t *job, uint32_t time, unsigned(*wait)(void*,uint32_
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_waitUntil( job_t *job, uint32_t time )
+unsigned job_waitUntil( job_t *job, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -164,7 +164,7 @@ unsigned job_waitUntil( job_t *job, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_waitFor( job_t *job, uint32_t delay )
+unsigned job_waitFor( job_t *job, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);
@@ -174,7 +174,7 @@ unsigned job_waitFor( job_t *job, uint32_t delay )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_job_send( job_t *job, fun_t *fun, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -206,7 +206,7 @@ unsigned priv_job_send( job_t *job, fun_t *fun, uint32_t time, unsigned(*wait)(v
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_sendUntil( job_t *job, fun_t *fun, uint32_t time )
+unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -215,7 +215,7 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_sendFor( job_t *job, fun_t *fun, uint32_t delay )
+unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);

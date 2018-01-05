@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    12.12.2017
+    @date    01.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -127,7 +127,7 @@ void mem_delete( mem_t *mem )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mem_wait( mem_t *mem, void **data, uint32_t time, unsigned(*wait)(void*,uint32_t) )
+unsigned priv_mem_wait( mem_t *mem, void **data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
@@ -158,7 +158,7 @@ unsigned priv_mem_wait( mem_t *mem, void **data, uint32_t time, unsigned(*wait)(
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mem_waitUntil( mem_t *mem, void **data, uint32_t time )
+unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -167,7 +167,7 @@ unsigned mem_waitUntil( mem_t *mem, void **data, uint32_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mem_waitFor( mem_t *mem, void **data, uint32_t delay )
+unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside() || !delay);
