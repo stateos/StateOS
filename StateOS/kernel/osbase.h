@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    03.01.2018
+    @date    06.01.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -55,6 +55,12 @@ typedef uint64_t     cnt_t;
 #define CNT_MAX  UINT64_MAX
 #else
 #error  Invalid OS_TIMER_SIZE value!
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if     HW_TIMER_SIZE > OS_TIMER_SIZE
+#error  HW_TIMER_SIZE > OS_TIMER_SIZE causes unexpected problems!
 #endif
 
 /* -------------------------------------------------------------------------- */
