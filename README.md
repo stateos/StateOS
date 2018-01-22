@@ -1,7 +1,7 @@
 # StateOS
   [![Build Status](https://travis-ci.org/stateos/StateOS.svg)](https://travis-ci.org/stateos/StateOS)
-  [![release](https://img.shields.io/github/release/stateos/StateOS.svg)](https://github.com/stateos/StateOS/releases)
-  [![downloads](https://img.shields.io/github/downloads/stateos/StateOS/total.svg)](https://github.com/stateos/StateOS/releases)
+  [![Github release](https://img.shields.io/github/release/stateos/StateOS.svg)](https://github.com/stateos/StateOS/releases)
+  [![Github All Releases](https://img.shields.io/github/downloads/stateos/StateOS/total.svg)](https://github.com/stateos/StateOS/releases)
 
 Free, extremely simple, amazingly tiny and very fast real-time operating system (RTOS) designed for deeply embedded applications.
 Target: ARM Cortex-M, STM8 families.
