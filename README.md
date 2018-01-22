@@ -1,5 +1,6 @@
-StateOS [![Build Status](https://travis-ci.org/stateos/StateOS.svg)](https://travis-ci.org/stateos/StateOS)
-=======
+# StateOS
+  [![Build Status](https://travis-ci.org/stateos/StateOS.svg)](https://travis-ci.org/stateos/StateOS)
+  [![release](https://img.shields.io/github/release/stateos/StateOS.svg)](https://github.com/stateos/StateOS/releases)
 
 Free, extremely simple, amazingly tiny and very fast real-time operating system (RTOS) designed for deeply embedded applications.
 Target: ARM Cortex-M, STM8 families.
@@ -8,8 +9,7 @@ Procedure executed by the task (task state) doesn't have to be noreturn-type.
 It will be executed into an infinite loop.
 There's a dedicated function for immediate change the task state.
 
-Features
---------
+### Features
 
 - kernel works in preemptive or cooperative mode
 - kernel can operate with 16, 32 or 64-bit timer counter
@@ -35,12 +35,10 @@ Features
 - examples and templates are in separate repositories on [GitHub](https://github.com/stateos)
 - archival releases on [sourceforge](https://sourceforge.net/projects/stateos)
 
-Targets
--------
+### Targets
 
 ARM CM0(+), CM3, CM4(F), CM7
 
-License
--------
+### License
 
 This project is licensed under the terms of [GNU GENERAL PUBLIC LICENSE Version 3](http://www.gnu.org/philosophy/why-not-lgpl.html).
