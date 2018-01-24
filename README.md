@@ -1,6 +1,7 @@
 # StateOS
   [![Build Status](https://travis-ci.org/stateos/StateOS.svg)](https://travis-ci.org/stateos/StateOS)
   [![Github Release](https://img.shields.io/github/release/stateos/StateOS.svg)](https://github.com/stateos/StateOS/releases)
+  [![Software License](https://img.shields.io/github/license/stateos/StateOS.svg)](https://opensource.org/licenses/MIT)
 
 Free, extremely simple, amazingly tiny and very fast real-time operating system (RTOS) designed for deeply embedded applications.
 Target: ARM Cortex-M, STM8 families.
@@ -41,4 +42,4 @@ ARM CM0(+), CM3, CM4(F), CM7
 
 ### License
 
-This project is licensed under the terms of [GNU GENERAL PUBLIC LICENSE Version 3](http://www.gnu.org/philosophy/why-not-lgpl.html).
+This project is licensed under the terms of [MIT License (MIT)](https://opensource.org/licenses/MIT).
