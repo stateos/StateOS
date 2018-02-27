@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     15.11.2017
+#date     10.01.2018
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -15,17 +15,17 @@ QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board 
 
 PROJECT    ?= $(notdir $(CURDIR))
 DEFS       ?=
-LIBS       ?=
 DIRS       ?=
-KEYS       ?=
 INCS       ?=
+LIBS       ?=
+KEYS       ?= .cmsis_os .nasa_osal
 OPTF       ?=
 SCRIPT     ?=
 
 #----------------------------------------------------------#
 
 DEFS       += STM32F407xx __ARM__
-KEYS       += .csmcc *
+KEYS       += .csmcc .cortexm .stm32f4 *
 ifneq ($(MAKECMDGOALS),qemu)
 LIBS       += crtsi libfpulc libilc libm
 else

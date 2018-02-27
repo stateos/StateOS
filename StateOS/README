@@ -108,7 +108,7 @@ Features:
 4.9
 - changed tsk_suspend / tsk_resume functions
 - added tsk_suspend example
-- rebuilded port / core files
+- rebuilt port / core files
 - fixed bug in mutex object
 ---------
 4.8
@@ -140,8 +140,8 @@ Features:
 - added cmsis-os2 API
 - added cmsis-os2 example
 - added tsk_detach function
-- rebuilded cmsis-os1 api
-- rebuilded nasa-osal api
+- rebuilt cmsis-os1 api
+- rebuilt nasa-osal api
 - only delayed and suspended tasks can be resumed
 - tsk_wait functions return received flags or messages
 - mem_init function renamed to mem_reset
@@ -154,12 +154,12 @@ Features:
 - added sys_alloc and sys_free procedures
 - updated cmsis-rtos and nasa-osal
 - added changes in some definitions
-- rebuilded kernel
+- rebuilt kernel
 ---------
 4.3
-- rebuilded internal preprocessor definitions
-- rebuilded data structures
-- rebuilded c++ classes
+- rebuilt internal preprocessor definitions
+- rebuilt data structures
+- rebuilt c++ classes
 - updated examples
 ---------
 4.2

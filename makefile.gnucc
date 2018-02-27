@@ -1,30 +1,31 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     21.11.2017
+#date     10.01.2018
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
 GNUCC      := c:/sys/gcc/arm/bin/arm-none-eabi-
 OPENOCD    := c:/sys/tools/openocd/bin-x64/openocd
 STLINK     := c:/sys/tools/st-link/st-link_cli -Q -c SWD UR
+CUBE       := c:/sys/tools/cube/stm32_programmer_cli -q -c port=SWD mode=UR
 QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
 
 #----------------------------------------------------------#
 
 PROJECT    ?= $(notdir $(CURDIR))
 DEFS       ?= USE_NANO
-LIBS       ?=
 DIRS       ?=
-KEYS       ?=
 INCS       ?=
+LIBS       ?=
+KEYS       ?= .cmsis_os .nasa_osal
 OPTF       ?= 2 # s
 SCRIPT     ?=
 
 #----------------------------------------------------------#
 
 DEFS       += STM32F407xx
-KEYS       += .gnucc *
+KEYS       += .gnucc .cortexm .stm32f4 *
 
 #----------------------------------------------------------#
 
@@ -231,6 +232,7 @@ clean :
 flash : all $(HEX)
 	$(info Programing device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_EXEC) $(OOCD_EXIT)
+#	$(CUBE) -w $(ELF) -v -hardRst
 #	$(STLINK) -P $(HEX) -V -Rst
 
 server : all
@@ -252,6 +254,7 @@ qemu : all
 reset :
 	$(info Reseting device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_EXEC) $(OOCD_EXIT)
+#	$(CUBE) -hardRst
 #	$(STLINK) -HardRst
 
 .PHONY : all lib clean flash server debug monitor qemu reset
