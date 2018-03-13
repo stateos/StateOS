@@ -2,7 +2,7 @@
 #include <os.h>
 
 OS_MEM(mem, 1, sizeof(unsigned));
-OS_BOX(box, 1, sizeof(void*));
+OS_LST(lst);
 
 void slave()
 {
@@ -10,8 +10,8 @@ void slave()
 
 	for (;;)
 	{
-		box_wait(box, &p);
-		LEDs = *(unsigned*)p;
+		lst_wait(lst, &p);
+		LEDs = *(unsigned *)p;
 		mem_give(mem, p);
 	}
 }
@@ -25,8 +25,8 @@ void master()
 	{
 		tsk_delay(SEC);
 		mem_wait(mem, &p);
-		*(unsigned*)p = x++;
-		box_give(box, &p);
+		*(unsigned *)p = x++;
+		lst_give(lst, p);
 	}
 }
 

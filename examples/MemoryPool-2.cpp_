@@ -1,0 +1,44 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+auto led = Led();
+auto lst = ListT<unsigned>();
+auto mem = MemoryPoolTT<1, unsigned>();
+
+void slave()
+{
+	unsigned*p;
+
+	for (;;)
+	{
+		lst.wait(&p);
+		led = *p;
+		mem.give(p);
+	}
+}
+
+void master()
+{
+	unsigned*p;
+	unsigned x = 15;
+
+	for (;;)
+	{
+		ThisTask::delay(SEC);
+
+		mem.wait(&p);
+		*p=x++;
+		lst.give(p);
+	}
+}
+
+auto sla = Task(0, slave);
+auto mas = Task(0, master);
+
+int main()
+{
+	sla.start();
+	mas.start();
+
+	ThisTask::stop();
+}

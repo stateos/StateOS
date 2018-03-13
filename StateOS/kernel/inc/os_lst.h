@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    13.03.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -363,6 +363,30 @@ struct List : public __lst
 	unsigned takeISR  ( void **_data )               { return lst_takeISR  (this, _data);         }
 	void     give     ( void  *_data )               {        lst_give     (this, _data);         }
 	void     giveISR  ( void  *_data )               {        lst_giveISR  (this, _data);         }
+};
+
+/******************************************************************************
+ *
+ * Class             : List
+ *
+ * Description       : create and initialize a list object
+ *
+ * Constructor parameters
+ *   T               : class of a memory object
+ *
+ ******************************************************************************/
+
+template<class T>
+struct ListT : public List
+{
+	explicit
+	ListT( void ): List() {}
+
+	unsigned waitUntil( T **_data, cnt_t _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
+	unsigned waitFor  ( T **_data, cnt_t _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), _delay); }
+	unsigned wait     ( T **_data )               { return lst_wait     (this, reinterpret_cast<void **>(_data));         }
+	unsigned take     ( T **_data )               { return lst_take     (this, reinterpret_cast<void **>(_data));         }
+	unsigned takeISR  ( T **_data )               { return lst_takeISR  (this, reinterpret_cast<void **>(_data));         }
 };
 
 #endif
