@@ -372,7 +372,7 @@ struct List : public __lst
  * Description       : create and initialize a list object
  *
  * Constructor parameters
- *   T               : class of a memory object
+ *   T               : class of a list object
  *
  ******************************************************************************/
 
