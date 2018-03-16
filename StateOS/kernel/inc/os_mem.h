@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    16.03.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -52,7 +52,6 @@ struct __mem
 	void   * res;   // allocated memory pool object's resource
 	que_t  * next;  // inherited from list
 	unsigned limit; // size of a memory pool (max number of objects)
-
 	unsigned size;  // size of memory object (in words)
 	void   * data;  // pointer to memory pool buffer
 };

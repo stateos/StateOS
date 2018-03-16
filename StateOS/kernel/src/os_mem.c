@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    16.03.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -147,7 +147,6 @@ unsigned priv_mem_wait( mem_t *mem, void **data, cnt_t time, unsigned(*wait)(voi
 	}
 	else
 	{
-		*data = 0;
 		System.cur->tmp.data = data;
 		event = wait(mem, time);
 	}
@@ -198,9 +197,10 @@ void mem_give( mem_t *mem, void *data )
 	}
 	else
 	{
-		ptr = (que_t *)data - 1;
-		ptr->next = mem->next;
-		mem->next = ptr;
+		ptr = (que_t *)&(mem->next);
+		while (ptr->next) ptr = ptr->next;
+		ptr->next = (que_t *)data - 1;
+		ptr->next->next = 0;
 	}
 
 	port_sys_unlock();
