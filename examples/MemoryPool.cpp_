@@ -2,7 +2,7 @@
 #include <os.h>
 
 auto led = Led();
-auto box = MailBoxQueueTT<1, unsigned*>();
+auto lst = ListTT<unsigned>();
 auto mem = MemoryPoolTT<1, unsigned>();
 
 void slave()
@@ -11,7 +11,7 @@ void slave()
 
 	for (;;)
 	{
-		box.wait(&p);
+		lst.wait(&p);
 		led = *p;
 		mem.give(p);
 	}
@@ -28,7 +28,7 @@ void master()
 
 		mem.wait(&p);
 		*p=x++;
-		box.give(&p);
+		lst.give(p);
 	}
 }
 
