@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    13.03.2018
+    @date    16.03.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -377,10 +377,10 @@ struct List : public __lst
  ******************************************************************************/
 
 template<class T>
-struct ListT : public List
+struct ListTT : public List
 {
 	explicit
-	ListT( void ): List() {}
+	ListTT( void ): List() {}
 
 	unsigned waitUntil( T **_data, cnt_t _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
 	unsigned waitFor  ( T **_data, cnt_t _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), _delay); }
