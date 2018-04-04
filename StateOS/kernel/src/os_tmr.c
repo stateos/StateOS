@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    30.03.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -59,7 +59,7 @@ tmr_t *tmr_create( fun_t *state )
 
 	tmr = core_sys_alloc(sizeof(tmr_t));
 	tmr_init(tmr, state);
-	tmr->obj.res = tmr;
+	tmr->res = tmr;
 
 	port_sys_unlock();
 
@@ -75,7 +75,7 @@ void tmr_kill( tmr_t *tmr )
 
 	port_sys_lock();
 
-	if (tmr->obj.id != ID_STOPPED)
+	if (tmr->id != ID_STOPPED)
 	{
 		core_all_wakeup(tmr, E_STOPPED);
 		core_tmr_remove(tmr);
@@ -91,7 +91,7 @@ void tmr_delete( tmr_t *tmr )
 	port_sys_lock();
 
 	tmr_kill(tmr);
-	core_sys_free(tmr->obj.res);
+	core_sys_free(tmr->res);
 
 	port_sys_unlock();
 }
@@ -103,7 +103,7 @@ void priv_tmr_start( tmr_t *tmr )
 {
 	assert(!port_isr_inside());
 
-	if (tmr->obj.id != ID_STOPPED)
+	if (tmr->id != ID_STOPPED)
 		core_tmr_remove(tmr);
 	core_tmr_insert(tmr, ID_TIMER);
 }
@@ -173,7 +173,7 @@ unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 
 	port_sys_lock();
 
-	if (tmr->obj.id != ID_STOPPED)
+	if (tmr->id != ID_STOPPED)
 	{
 		event = wait(tmr, time);
 	}

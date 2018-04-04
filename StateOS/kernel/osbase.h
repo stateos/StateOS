@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    31.03.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -82,23 +82,6 @@ struct __que
 {
 	que_t  * next; // next object in the queue
 };
-
-/* -------------------------------------------------------------------------- */
-
-// object (timer, task) header
-
-typedef struct __obj obj_t;
-
-struct __obj
-{
-	tsk_t  * queue; // next process in the DELAYED queue
-	void   * res;   // allocated object's resource
-	unsigned id;    // object's id: ID_STOPPED, ID_READY, ID_DELAYED, ID_TIMER, ID_IDLE
-	void   * prev;  // previous object (timer, task) in the READY queue
-	void   * next;  // next object (timer, task) in the READY queue
-};
-
-#define               _OBJ_INIT() { 0, 0, 0, 0, 0 }
 
 /* -------------------------------------------------------------------------- */
 

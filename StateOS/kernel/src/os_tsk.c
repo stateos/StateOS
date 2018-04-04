@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    30.03.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -72,7 +72,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 	size = ABOVE(size);
 	tsk = core_sys_alloc(ABOVE(sizeof(tsk_t)) + size);
 	tsk_init(tsk, prio, state, (void *)((size_t)tsk + ABOVE(sizeof(tsk_t))), size);
-	tsk->obj.res = tsk;
+	tsk->res = tsk;
 
 	port_sys_unlock();
 
@@ -89,7 +89,7 @@ void tsk_start( tsk_t *tsk )
 
 	port_sys_lock();
 
-	if (tsk->obj.id == ID_STOPPED)
+	if (tsk->id == ID_STOPPED)
 	{
 		core_ctx_init(tsk);
 		core_tsk_insert(tsk);
@@ -108,7 +108,7 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 
 	port_sys_lock();
 
-	if (tsk->obj.id == ID_STOPPED)
+	if (tsk->id == ID_STOPPED)
 	{
 		tsk->state = state;
 
@@ -131,7 +131,7 @@ void tsk_stop( void )
 	if (System.cur->join != DETACHED)
 		core_tsk_wakeup(System.cur->join, E_SUCCESS);
 	else
-		core_sys_free(System.cur->obj.res);
+		core_sys_free(System.cur->res);
 
 	core_tsk_remove(System.cur);
 
@@ -147,7 +147,7 @@ void tsk_kill( tsk_t *tsk )
 
 	port_sys_lock();
 
-	if (tsk->obj.id != ID_STOPPED)
+	if (tsk->id != ID_STOPPED)
 	{
 		tsk->mtree = 0;
 		while (tsk->mlist)
@@ -156,12 +156,12 @@ void tsk_kill( tsk_t *tsk )
 		if (tsk->join != DETACHED)
 			core_tsk_wakeup(tsk->join, E_STOPPED);
 		else
-			core_sys_free(tsk->obj.res);
+			core_sys_free(tsk->res);
 
-		if (tsk->obj.id == ID_READY)
+		if (tsk->id == ID_READY)
 			core_tsk_remove(tsk);
 		else
-		if (tsk->obj.id == ID_DELAYED)
+		if (tsk->id == ID_DELAYED)
 		{
 			core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
 			core_tmr_remove((tmr_t *)tsk);
@@ -194,9 +194,9 @@ unsigned tsk_detach( tsk_t *tsk )
 
 	port_sys_lock();
 
-	if ((tsk->obj.id  != ID_STOPPED) &&
-		(tsk->join    != DETACHED) &&
-		(tsk->obj.res != 0))
+	if ((tsk->id   != ID_STOPPED) &&
+		(tsk->join != DETACHED) &&
+		(tsk->res  != 0))
 	{
 		core_tsk_wakeup(tsk->join, E_TIMEOUT);
 		tsk->join = DETACHED;
@@ -221,13 +221,13 @@ unsigned tsk_join( tsk_t *tsk )
 
 	if (tsk->join == JOINABLE)
 	{
-		if (tsk->obj.id != ID_STOPPED)
+		if (tsk->id != ID_STOPPED)
 			event = core_tsk_waitFor(&tsk->join, INFINITE);
 		else
 			event = E_SUCCESS;
 
 		if (event != E_TIMEOUT) // !detached
-			core_sys_free(tsk->obj.res);
+			core_sys_free(tsk->res);
 	}
 
 	port_sys_unlock();
@@ -321,7 +321,7 @@ void tsk_give( tsk_t *tsk, unsigned flags )
 
 	port_sys_lock();
 
-	if ((tsk->obj.id == ID_DELAYED) &&
+	if ((tsk->id == ID_DELAYED) &&
 	    (tsk->guard  == tsk))
 	{
 		tsk->evt.flags &= ~flags;
@@ -342,7 +342,7 @@ unsigned tsk_suspend( tsk_t *tsk )
 
 	port_sys_lock();
 
-	if (tsk->obj.id == ID_READY)
+	if (tsk->id == ID_READY)
 	{
 		core_tsk_suspend(tsk);
 		event = E_SUCCESS;
@@ -363,7 +363,7 @@ unsigned tsk_resume( tsk_t *tsk )
 
 	port_sys_lock();
 
-	if ((tsk->obj.id == ID_DELAYED) &&
+	if ((tsk->id == ID_DELAYED) &&
 	    (tsk->guard  == &WAIT))
 	{
 		core_tsk_wakeup(tsk, E_STOPPED);
