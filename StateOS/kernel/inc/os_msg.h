@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    09.04.2018
+    @date    24.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -440,29 +440,6 @@ unsigned msg_give( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, I
 __STATIC_INLINE
 unsigned msg_giveISR( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
 
-/******************************************************************************
- *
- * Name              : msg_pass
- * ISR alias         : msg_passISR
- *
- * Description       : transfer message data to the message queue object,
- *                     remove the oldest message data if the message queue object is full
- *
- * Parameters
- *   msg             : pointer to message queue object
- *   data            : message data
- *
- * Return            : none
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-void msg_pass( msg_t *msg, unsigned data );
-
-__STATIC_INLINE
-void msg_passISR( msg_t *msg, unsigned data ) { msg_pass(msg, data); }
-
 #ifdef __cplusplus
 }
 #endif
@@ -502,8 +479,6 @@ struct baseMessageQueue : public __msg
 	unsigned send     ( unsigned _data )               { return msg_send     (this, _data);         }
 	unsigned give     ( unsigned _data )               { return msg_give     (this, _data);         }
 	unsigned giveISR  ( unsigned _data )               { return msg_giveISR  (this, _data);         }
-	void     pass     ( unsigned _data )               {        msg_pass     (this, _data);         }
-	void     passISR  ( unsigned _data )               {        msg_passISR  (this, _data);         }
 };
 
 /******************************************************************************

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.h
     @author  Rajmund Szymanski
-    @date    09.04.2018
+    @date    24.01.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -432,29 +432,6 @@ unsigned job_give( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, IMMED
 __STATIC_INLINE
 unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, IMMEDIATE); }
 
-/******************************************************************************
- *
- * Name              : job_pass
- * ISR alias         : job_passISR
- *
- * Description       : transfer job data to the job queue object,
- *                     remove the oldest job data if the job queue object is full
- *
- * Parameters
- *   job             : pointer to job queue object
- *   fun             : pointer to job procedure
- *
- * Return            : none
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-void job_pass( job_t *job, fun_t *fun );
-
-__STATIC_INLINE
-void job_passISR( job_t *job, fun_t *fun ) { job_pass(job, fun); }
-
 #ifdef __cplusplus
 }
 #endif
@@ -495,8 +472,6 @@ struct baseJobQueue : public __box
 	unsigned send     ( FUN_t _fun )               {             unsigned event = box_send     (this, &_fun);                                         return event; }
 	unsigned give     ( FUN_t _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
 	unsigned giveISR  ( FUN_t _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
-	void     pass     ( FUN_t _fun )               {                              box_pass     (this, &_fun);                                                       }
-	void     passISR  ( FUN_t _fun )               {                              box_passISR  (this, &_fun);                                                       }
 };
 
 #else
@@ -517,8 +492,6 @@ struct baseJobQueue : public __job
 	unsigned send     ( FUN_t _fun )               { return job_send     (this, _fun);         }
 	unsigned give     ( FUN_t _fun )               { return job_give     (this, _fun);         }
 	unsigned giveISR  ( FUN_t _fun )               { return job_giveISR  (this, _fun);         }
-	void     pass     ( FUN_t _fun )               {        job_pass     (this, _fun);         }
-	void     passISR  ( FUN_t _fun )               {        job_passISR  (this, _fun);         }
 };
 
 #endif

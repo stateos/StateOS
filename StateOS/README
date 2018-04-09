@@ -36,7 +36,6 @@ Features:
 - updated list object
 - updated examples
 - updated kernel
-- added box_pass, msg_pass and job_pass functions
 ---------
 5.6
 - changed license to MIT

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    09.04.2018
+    @date    24.01.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -222,31 +222,6 @@ unsigned msg_sendFor( msg_t *msg, unsigned data, cnt_t delay )
 	assert(!port_isr_inside() || !delay);
 
 	return priv_msg_send(msg, data, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
-void msg_pass( msg_t *msg, unsigned data )
-/* -------------------------------------------------------------------------- */
-{
-	tsk_t *tsk;
-
-	assert(msg);
-
-	port_sys_lock();
-
-	while (msg->count >= msg->limit)
-	{
-		msg->first = (msg->first + 1) % msg->limit;
-		msg->count--;
-	}
-
-	priv_msg_put(msg, data);
-
-	tsk = core_one_wakeup(msg, E_SUCCESS);
-
-	if (tsk) priv_msg_get(msg, tsk->tmp.data);
-
-	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
