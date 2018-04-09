@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    09.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -224,6 +224,32 @@ unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 	assert(!port_isr_inside() || !delay);
 
 	return priv_job_send(job, fun, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+void job_pass( job_t *job, fun_t *fun )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	assert(job);
+	assert(fun);
+
+	port_sys_lock();
+
+	while (job->count >= job->limit)
+	{
+		job->first = (job->first + 1) % job->limit;
+		job->count--;
+	}
+
+	priv_job_put(job, fun);
+
+	tsk = core_one_wakeup(job, E_SUCCESS);
+
+	if (tsk) priv_job_get(job, &tsk->tmp.fun);
+
+	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

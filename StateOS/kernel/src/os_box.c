@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    09.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -110,7 +110,7 @@ void priv_box_get( box_t *box, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i;
-	char*buf = box->data + box->size * box->first;
+	char   * buf = box->data + box->size * box->first;
 
 	for (i = 0; i < box->size; i++) ((char*)data)[i] = buf[i];
 
@@ -120,11 +120,11 @@ void priv_box_get( box_t *box, void *data )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_box_put( box_t *box, void *data )
+void priv_box_put( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i;
-	char*buf = box->data + box->size * box->next;
+	char   * buf = box->data + box->size * box->next;
 
 	for (i = 0; i < box->size; i++) buf[i] = ((char*)data)[i];
 
@@ -185,7 +185,7 @@ unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_box_send( box_t *box, void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -198,7 +198,7 @@ unsigned priv_box_send( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 
 	if (box->count >= box->limit)
 	{
-		System.cur->tmp.data = data;
+		System.cur->tmp.data = (void*)data;
 
 		event = wait(box, time);
 	}
@@ -222,7 +222,7 @@ unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
 {
 	assert(!port_isr_inside());
 
-	return priv_box_send(box, (void*)data, time, core_tsk_waitUntil);
+	return priv_box_send(box, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -231,7 +231,33 @@ unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
 {
 	assert(!port_isr_inside() || !delay);
 
-	return priv_box_send(box, (void*)data, delay, core_tsk_waitFor);
+	return priv_box_send(box, data, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+void box_pass( box_t *box, const void *data )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	assert(box);
+	assert(data);
+
+	port_sys_lock();
+
+	while (box->count >= box->limit)
+	{
+		box->first = (box->first + 1) % box->limit;
+		box->count--;
+	}
+
+	priv_box_put(box, data);
+
+	tsk = core_one_wakeup(box, E_SUCCESS);
+
+	if (tsk) priv_box_get(box, tsk->tmp.data);
+
+	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
