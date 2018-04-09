@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    09.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -448,6 +448,29 @@ unsigned box_give( box_t *box, const void *data ) { return box_sendFor(box, data
 __STATIC_INLINE
 unsigned box_giveISR( box_t *box, const void *data ) { return box_sendFor(box, data, IMMEDIATE); }
 
+/******************************************************************************
+ *
+ * Name              : box_push
+ * ISR alias         : box_pushISR
+ *
+ * Description       : transfer mailbox data to the mailbox queue object,
+ *                     remove the oldest mailbox data if the mailbox queue object is full
+ *
+ * Parameters
+ *   box             : pointer to mailbox queue object
+ *   data            : pointer to mailbox data
+ *
+ * Return            : none
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+void box_push( box_t *box, const void *data );
+
+__STATIC_INLINE
+void box_pushISR( box_t *box, const void *data ) { box_push(box, data); }
+
 #ifdef __cplusplus
 }
 #endif
@@ -488,6 +511,8 @@ struct baseMailBoxQueue : public __box
 	unsigned send     ( const void *_data )               { return box_send     (this, _data);         }
 	unsigned give     ( const void *_data )               { return box_give     (this, _data);         }
 	unsigned giveISR  ( const void *_data )               { return box_giveISR  (this, _data);         }
+	void     push     ( const void *_data )               {        box_push     (this, _data);         }
+	void     pushISR  ( const void *_data )               {        box_pushISR  (this, _data);         }
 };
 
 /******************************************************************************

@@ -36,6 +36,7 @@ Features:
 - updated list object
 - updated examples
 - updated kernel
+- added box_push, msg_push and job_push functions
 ---------
 5.6
 - changed license to MIT
