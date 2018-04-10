@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    09.04.2018
+    @date    10.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -234,17 +234,18 @@ void msg_push( msg_t *msg, unsigned data )
 
 	port_sys_lock();
 
-	while (msg->count >= msg->limit)
-	{
-		msg->first = (msg->first + 1) % msg->limit;
-		msg->count--;
-	}
-
 	priv_msg_put(msg, data);
 
-	tsk = core_one_wakeup(msg, E_SUCCESS);
-
-	if (tsk) priv_msg_get(msg, tsk->tmp.data);
+	if (msg->count > msg->limit)
+	{
+		msg->count = msg->limit;
+		msg->first = msg->next;
+	}
+	else
+	{
+		tsk = core_one_wakeup(msg, E_SUCCESS);
+		if (tsk) priv_msg_get(msg, tsk->tmp.data);
+	}
 
 	port_sys_unlock();
 }

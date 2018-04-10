@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.c
     @author  Rajmund Szymanski
-    @date    09.04.2018
+    @date    10.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -237,17 +237,18 @@ void job_push( job_t *job, fun_t *fun )
 
 	port_sys_lock();
 
-	while (job->count >= job->limit)
-	{
-		job->first = (job->first + 1) % job->limit;
-		job->count--;
-	}
-
 	priv_job_put(job, fun);
 
-	tsk = core_one_wakeup(job, E_SUCCESS);
-
-	if (tsk) priv_job_get(job, &tsk->tmp.fun);
+	if (job->count > job->limit)
+	{
+		job->count = job->limit;
+		job->first = job->next;
+	}
+	else
+	{
+		tsk = core_one_wakeup(job, E_SUCCESS);
+		if (tsk) priv_job_get(job, &tsk->tmp.fun);
+	}
 
 	port_sys_unlock();
 }
