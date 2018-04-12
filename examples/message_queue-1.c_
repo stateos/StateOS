@@ -16,12 +16,12 @@ void slave()
 
 void master()
 {
-	unsigned x = 0;
+	unsigned x = 15;
 
 	for (;;)
 	{
 		tsk_delay(SEC);
-		msg_give(msg, ++x);
+		msg_give(msg, x++);
 	}
 }
 

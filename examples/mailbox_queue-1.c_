@@ -16,13 +16,13 @@ void slave()
 
 void master()
 {
-	unsigned x = 0;
+	unsigned x = 15;
 
 	for (;;)
 	{
 		tsk_delay(SEC);
-		x++;
 		box_give(box, &x);
+		x++;
 	}
 }
 

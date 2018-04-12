@@ -31,6 +31,10 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+5.8
+- added stream buffer object
+- updated examples
+---------
 5.7
 - updated memory pool object
 - updated list object

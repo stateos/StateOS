@@ -1,33 +1,30 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-box_id box = BOX_CREATE(1, sizeof(unsigned));
+OS_STM(stm, sizeof(unsigned));
 
-void slave()
+OS_TSK_DEF(sla, 0)
 {
 	unsigned x;
 
 	for (;;)
 	{
-		box_wait(box, &x);
+		stm_wait(stm, &x, sizeof(x));
 		LEDs = x;
 	}
 }
 
-void master()
+OS_TSK_DEF(mas, 0)
 {
 	unsigned x = 15;
 
 	for (;;)
 	{
 		tsk_delay(SEC);
-		box_give(box, &x);
+		stm_send(stm, &x, sizeof(x));
 		x++;
 	}
 }
-
-tsk_id sla = WRK_CREATE(0, slave,  256);
-tsk_id mas = WRK_CREATE(0, master, 256);
 
 int main()
 {
@@ -35,5 +32,5 @@ int main()
 
 	tsk_start(sla);
 	tsk_start(mas);
-	tsk_stop();
+	tsk_sleep();
 }

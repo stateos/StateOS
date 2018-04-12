@@ -2,7 +2,7 @@
 #include <os.h>
 
 auto led = Led();
-auto msg = MessageQueueT<1>();
+auto stm = StreamBufferTT<1, unsigned>();
 
 void slave()
 {
@@ -10,7 +10,7 @@ void slave()
 
 	for (;;)
 	{
-		msg.wait(&x);
+		stm.wait(&x, sizeof(x));
 		led = x;
 	}
 }
@@ -22,7 +22,8 @@ void master()
 	for (;;)
 	{
 		ThisTask::delay(SEC);
-		msg.give(x++);
+		stm.send(&x, sizeof(x));
+		x++;
 	}
 }
 

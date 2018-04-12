@@ -17,13 +17,13 @@ void slave()
 
 void master()
 {
-	unsigned x = 0;
+	unsigned x = 15;
 
 	for (;;)
 	{
 		ThisTask::delay(SEC);
-		x++;
 		box.give(&x);
+		x++;
 	}
 }
 
