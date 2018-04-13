@@ -223,7 +223,7 @@ unsigned priv_stm_wait( stm_t *stm, void *data, unsigned size, cnt_t time, unsig
 
 	if (size > 0)
 	{
-		if (stm->owner == 0)
+		if (stm->owner == 0 || stm->owner->guard != stm)
 			stm->owner = System.cur;
 		System.cur->tmp.idata = data;
 		System.cur->evt.size = size;
@@ -333,7 +333,7 @@ unsigned priv_stm_send( stm_t *stm, const void *data, unsigned size, cnt_t time,
 
 	if (size > 0)
 	{
-		if (stm->owner == 0)
+		if (stm->owner == 0 || stm->owner->guard != stm)
 			stm->owner = System.cur;
 		System.cur->tmp.odata = data;
 		System.cur->evt.size = size;
