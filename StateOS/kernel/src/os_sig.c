@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    13.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -95,13 +95,37 @@ void sig_delete( sig_t *sig )
 }
 
 /* -------------------------------------------------------------------------- */
+unsigned sig_take( sig_t *sig )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event = E_TIMEOUT;
+
+	assert(sig);
+	assert((sig->type & ~sigMASK) == 0U);
+
+	port_sys_lock();
+
+	if (sig->flag)
+	{
+		sig->flag = sig->type;
+		event = E_SUCCESS;
+	}
+
+	port_sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
 static
 unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(sig);
+	assert((sig->type & ~sigMASK) == 0U);
 
 	port_sys_lock();
 
@@ -123,8 +147,6 @@ unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 unsigned sig_waitUntil( sig_t *sig, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_sig_wait(sig, time, core_tsk_waitUntil);
 }
 
@@ -132,8 +154,6 @@ unsigned sig_waitUntil( sig_t *sig, cnt_t time )
 unsigned sig_waitFor( sig_t *sig, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_sig_wait(sig, delay, core_tsk_waitFor);
 }
 
@@ -142,6 +162,7 @@ void sig_give( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
 	assert(sig);
+	assert((sig->type & ~sigMASK) == 0U);
 
 	port_sys_lock();
 

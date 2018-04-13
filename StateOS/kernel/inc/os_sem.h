@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.h
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    13.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,11 +57,8 @@ struct __sem
 
 /* -------------------------------------------------------------------------- */
 
-#define semDirect    (  0U ) // sem_give/sem_send functions do not increase current value of the semaphore,
-                             // but they wake up one pending task if it exists
 #define semBinary    (  1U ) // binary semaphore
 #define semCounting  ( ~0U ) // counting semaphore
-#define semMASK      ( ~0U )
 
 /******************************************************************************
  *
@@ -343,11 +340,10 @@ unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned sem_take( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
+unsigned sem_take( sem_t *sem );
 
 __STATIC_INLINE
-unsigned sem_takeISR( sem_t *sem ) { return sem_waitFor(sem, IMMEDIATE); }
+unsigned sem_takeISR( sem_t *sem ) { return sem_take(sem); }
 
 /******************************************************************************
  *
@@ -435,11 +431,10 @@ unsigned sem_send( sem_t *sem ) { return sem_sendFor(sem, INFINITE); }
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned sem_give( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
+unsigned sem_give( sem_t *sem );
 
 __STATIC_INLINE
-unsigned sem_giveISR( sem_t *sem ) { return sem_sendFor(sem, IMMEDIATE); }
+unsigned sem_giveISR( sem_t *sem ) { return sem_give(sem); }
 
 #ifdef __cplusplus
 }

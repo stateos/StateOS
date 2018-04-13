@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    13.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -97,21 +97,50 @@ void sem_delete( sem_t *sem )
 }
 
 /* -------------------------------------------------------------------------- */
+unsigned sem_take( sem_t *sem )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event = E_TIMEOUT;
+
+	assert(sem);
+	assert(sem->limit);
+
+	port_sys_lock();
+
+	if (sem->count > 0)
+	{
+		if (core_one_wakeup(sem, E_SUCCESS) == 0)
+			sem->count--;
+		event = E_SUCCESS;
+	}
+
+	port_sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
 static
 unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(sem);
+	assert(sem->limit);
 
 	port_sys_lock();
 
-	if (sem->count == 0)
-		event = wait(sem, time);
+	if (sem->count > 0)
+	{
+		if (core_one_wakeup(sem, E_SUCCESS) == 0)
+			sem->count--;
+	}
 	else
-	if (core_one_wakeup(sem, E_SUCCESS) == 0)
-		sem->count--;
+	{
+		event = wait(sem, time);
+	}
 
 	port_sys_unlock();
 
@@ -122,8 +151,6 @@ unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 unsigned sem_waitUntil( sem_t *sem, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_sem_wait(sem, time, core_tsk_waitUntil);
 }
 
@@ -131,9 +158,30 @@ unsigned sem_waitUntil( sem_t *sem, cnt_t time )
 unsigned sem_waitFor( sem_t *sem, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_sem_wait(sem, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned sem_give( sem_t *sem )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event = E_TIMEOUT;
+
+	assert(sem);
+	assert(sem->limit);
+
+	port_sys_lock();
+
+	if (sem->count < sem->limit)
+	{
+		if (core_one_wakeup(sem, E_SUCCESS) == 0)
+			sem->count++;
+		event = E_SUCCESS;
+	}
+
+	port_sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -143,18 +191,21 @@ unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(sem);
+	assert(sem->limit);
 
 	port_sys_lock();
 
-	if (sem->limit == 0)
-		core_one_wakeup(sem, E_SUCCESS);
+	if (sem->count < sem->limit)
+	{
+		if (core_one_wakeup(sem, E_SUCCESS) == 0)
+			sem->count++;
+	}
 	else
-	if (sem->count >= sem->limit)
+	{
 		event = wait(sem, time);
-	else
-	if (core_one_wakeup(sem, E_SUCCESS) == 0)
-		sem->count++;
+	}
 
 	port_sys_unlock();
 
@@ -165,8 +216,6 @@ unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 unsigned sem_sendUntil( sem_t *sem, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_sem_send(sem, time, core_tsk_waitUntil);
 }
 
@@ -174,8 +223,6 @@ unsigned sem_sendUntil( sem_t *sem, cnt_t time )
 unsigned sem_sendFor( sem_t *sem, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_sem_send(sem, delay, core_tsk_waitFor);
 }
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.c
     @author  Rajmund Szymanski
-    @date    30.03.2018
+    @date    13.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -163,12 +163,33 @@ void tmr_startFrom( tmr_t *tmr, cnt_t delay, cnt_t period, fun_t *proc )
 }
 
 /* -------------------------------------------------------------------------- */
+unsigned tmr_take( tmr_t *tmr )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event = E_TIMEOUT;
+
+	assert(tmr);
+
+	port_sys_lock();
+
+	if (tmr->id == ID_STOPPED)
+	{
+		event = E_SUCCESS;
+	}
+
+	port_sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
 static
 unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(tmr);
 
 	port_sys_lock();
@@ -187,8 +208,6 @@ unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_tmr_wait(tmr, time, core_tsk_waitUntil);
 }
 
@@ -196,8 +215,6 @@ unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time )
 unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_tmr_wait(tmr, delay, core_tsk_waitFor);
 }
 

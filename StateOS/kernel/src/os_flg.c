@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    30.03.2018
+    @date    13.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -92,11 +92,10 @@ void flg_delete( flg_t *flg )
 }
 
 /* -------------------------------------------------------------------------- */
-static
-unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t *cur = System.cur;
+	unsigned value = flags;
 	unsigned event = E_SUCCESS;
 
 	assert(flg);
@@ -104,13 +103,42 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, u
 
 	port_sys_lock();
 
-	cur->tmp.mode  = mode;
-	cur->evt.flags = flags;
-	if ((mode & flgIgnore)  == 0) cur->evt.flags &= ~flg->flags;
+	if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
 	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
 
-	if (cur->evt.flags && ((mode & flgAll) || (cur->evt.flags == flags)))
+	if (value && ((mode & flgAll) || (value == flags)))
+	{
+		event = E_TIMEOUT;
+	}
+
+	port_sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned value = flags;
+	unsigned event = E_SUCCESS;
+
+	assert(!port_isr_inside());
+	assert(flg);
+	assert((mode & ~flgMASK) == 0U);
+
+	port_sys_lock();
+
+	if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
+	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
+
+	if (value && ((mode & flgAll) || (value == flags)))
+	{
+		System.cur->tmp.mode  = mode;
+		System.cur->evt.flags = value;
 		event = wait(flg, time);
+	}
 
 	port_sys_unlock();
 
@@ -121,8 +149,6 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, u
 unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_flg_wait(flg, flags, mode, time, core_tsk_waitUntil);
 }
 
@@ -130,8 +156,6 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time )
 unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_flg_wait(flg, flags, mode, delay, core_tsk_waitFor);
 }
 
@@ -152,9 +176,10 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 		if (tsk->evt.flags & flags)
 		{
 			if ((tsk->tmp.mode & flgProtect) == 0)
-			flg->flags &= ~tsk->evt.flags;
+				flg->flags &= ~tsk->evt.flags;
 			tsk->evt.flags &= ~flags;
-			if (tsk->evt.flags && (tsk->tmp.mode & flgAll)) continue;
+			if (tsk->evt.flags && (tsk->tmp.mode & flgAll))
+				continue;
 			core_one_wakeup(tsk = tsk->back, E_SUCCESS);
 		}
 	}

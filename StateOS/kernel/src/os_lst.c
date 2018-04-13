@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    13.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -92,12 +92,36 @@ void lst_delete( lst_t *lst )
 }
 
 /* -------------------------------------------------------------------------- */
+unsigned lst_take( lst_t *lst, void **data )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event = E_TIMEOUT;
+
+	assert(lst);
+	assert(data);
+
+	port_sys_lock();
+
+	if (lst->next)
+	{
+		*data = lst->next + 1;
+		lst->next = lst->next->next;
+		event = E_SUCCESS;
+	}
+	
+	port_sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
 static
 unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(lst);
 	assert(data);
 
@@ -123,8 +147,6 @@ unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(voi
 unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_lst_wait(lst, data, time, core_tsk_waitUntil);
 }
 
@@ -132,8 +154,6 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_lst_wait(lst, data, delay, core_tsk_waitFor);
 }
 

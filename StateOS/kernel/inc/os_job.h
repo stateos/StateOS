@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.h
     @author  Rajmund Szymanski
-    @date    09.04.2018
+    @date    12.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -318,6 +318,7 @@ unsigned job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
 /******************************************************************************
  *
  * Name              : job_take
+ * ISR alias         : job_takeISR
  *
  * Description       : try to transfer job data from the job queue object and execute the job procedure,
  *                     don't wait if the job queue object is empty
@@ -329,12 +330,14 @@ unsigned job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
  *   E_SUCCESS       : job data was successfully transfered from the job queue object
  *   E_TIMEOUT       : job queue object is empty
  *
- * Note              : use only in thread mode
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
+unsigned job_take( job_t *job );
+
 __STATIC_INLINE
-unsigned job_take( job_t *job ) { return job_waitFor(job, IMMEDIATE); }
+unsigned job_takeISR( job_t *job ) { return job_take(job); }
 
 /******************************************************************************
  *
@@ -426,11 +429,10 @@ unsigned job_send( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, INFIN
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned job_give( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, IMMEDIATE); }
+unsigned job_give( job_t *job, fun_t *fun );
 
 __STATIC_INLINE
-unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, IMMEDIATE); }
+unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_give(job, fun); }
 
 /******************************************************************************
  *

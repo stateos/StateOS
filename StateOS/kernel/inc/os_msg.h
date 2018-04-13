@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    09.04.2018
+    @date    12.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -338,11 +338,10 @@ unsigned msg_wait( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, 
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned msg_take( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+unsigned msg_take( msg_t *msg, unsigned *data );
 
 __STATIC_INLINE
-unsigned msg_takeISR( msg_t *msg, unsigned *data ) { return msg_waitFor(msg, data, IMMEDIATE); }
+unsigned msg_takeISR( msg_t *msg, unsigned *data ) { return msg_take(msg, data); }
 
 /******************************************************************************
  *
@@ -434,11 +433,10 @@ unsigned msg_send( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, I
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned msg_give( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
+unsigned msg_give( msg_t *msg, unsigned data );
 
 __STATIC_INLINE
-unsigned msg_giveISR( msg_t *msg, unsigned data ) { return msg_sendFor(msg, data, IMMEDIATE); }
+unsigned msg_giveISR( msg_t *msg, unsigned data ) { return msg_give(msg, data); }
 
 /******************************************************************************
  *

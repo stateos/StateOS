@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.h
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    13.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -335,11 +335,10 @@ unsigned flg_wait( flg_t *flg, unsigned flags, unsigned mode ) { return flg_wait
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
+unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode );
 
 __STATIC_INLINE
-unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, IMMEDIATE); }
+unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) { return flg_take(flg, flags, mode); }
 
 /******************************************************************************
  *

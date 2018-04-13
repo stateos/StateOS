@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    16.03.2018
+    @date    12.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -302,11 +302,10 @@ unsigned lst_wait( lst_t *lst, void **data ) { return lst_waitFor(lst, data, INF
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned lst_take( lst_t *lst, void **data ) { return lst_waitFor(lst, data, IMMEDIATE); }
+unsigned lst_take( lst_t *lst, void **data );
 
 __STATIC_INLINE
-unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_waitFor(lst, data, IMMEDIATE); }
+unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_take(lst, data); }
 
 /******************************************************************************
  *

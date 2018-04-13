@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    16.03.2018
+    @date    12.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -364,11 +364,10 @@ unsigned mem_wait( mem_t *mem, void **data ) { return mem_waitFor(mem, data, INF
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned mem_take( mem_t *mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
+unsigned mem_take( mem_t *mem, void **data );
 
 __STATIC_INLINE
-unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_waitFor(mem, data, IMMEDIATE); }
+unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_take(mem, data); }
 
 /******************************************************************************
  *

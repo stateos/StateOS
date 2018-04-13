@@ -56,6 +56,8 @@ struct __stm
 	unsigned first; // first element to read from buffer
 	unsigned next;  // next element to write into buffer
 	char   * data;  // buffer data
+
+	tsk_t  * owner; // stream buffer owner
 };
 
 /******************************************************************************
@@ -74,7 +76,7 @@ struct __stm
  *
  ******************************************************************************/
 
-#define               _STM_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data }
+#define               _STM_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data, 0 }
 
 /******************************************************************************
  *
@@ -331,11 +333,10 @@ unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned stm_take( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(stm, data, size, IMMEDIATE); }
+unsigned stm_take( stm_t *stm, void *data, unsigned size );
 
 __STATIC_INLINE
-unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(stm, data, size, IMMEDIATE); }
+unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(stm, data, size); }
 
 /******************************************************************************
  *
@@ -421,11 +422,10 @@ unsigned stm_send( stm_t *stm, void *data, unsigned size ) { return stm_sendFor(
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned stm_give( stm_t *stm, void *data, unsigned size ) { return stm_sendFor(stm, data, size, IMMEDIATE); }
+unsigned stm_give( stm_t *stm, void *data, unsigned size );
 
 __STATIC_INLINE
-unsigned stm_giveISR( stm_t *stm, void *data, unsigned size ) { return stm_sendFor(stm, data, size, IMMEDIATE); }
+unsigned stm_giveISR( stm_t *stm, void *data, unsigned size ) { return stm_give(stm, data, size); }
 
 #ifdef __cplusplus
 }

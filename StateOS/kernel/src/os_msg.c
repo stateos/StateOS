@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    10.04.2018
+    @date    13.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -124,6 +124,31 @@ void priv_msg_put( msg_t *msg, unsigned data )
 }
 
 /* -------------------------------------------------------------------------- */
+unsigned msg_take( msg_t *msg, unsigned *data )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t  * tsk;
+	unsigned event = E_TIMEOUT;
+
+	assert(msg);
+	assert(data);
+
+	port_sys_lock();
+
+	if (msg->count > 0)
+	{
+		priv_msg_get(msg, data);
+		tsk = core_one_wakeup(msg, E_SUCCESS);
+		if (tsk) priv_msg_put(msg, tsk->tmp.msg);
+		event = E_SUCCESS;
+	}
+
+	port_sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
 static
 unsigned priv_msg_wait( msg_t *msg, unsigned *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
@@ -131,24 +156,22 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, cnt_t time, unsigned(*wait)(
 	tsk_t  * tsk;
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(msg);
 	assert(data);
 
 	port_sys_lock();
 
-	if (msg->count == 0)
+	if (msg->count > 0)
 	{
-		System.cur->tmp.data = data;
-
-		event = wait(msg, time);
+		priv_msg_get(msg, data);
+		tsk = core_one_wakeup(msg, E_SUCCESS);
+		if (tsk) priv_msg_put(msg, tsk->tmp.msg);
 	}
 	else
 	{
-		priv_msg_get(msg, data);
-
-		tsk = core_one_wakeup(msg, E_SUCCESS);
-
-		if (tsk) priv_msg_put(msg, tsk->tmp.msg);
+		System.cur->tmp.data = data;
+		event = wait(msg, time);
 	}
 
 	port_sys_unlock();
@@ -160,8 +183,6 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, cnt_t time, unsigned(*wait)(
 unsigned msg_waitUntil( msg_t *msg, unsigned *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_msg_wait(msg, data, time, core_tsk_waitUntil);
 }
 
@@ -169,9 +190,31 @@ unsigned msg_waitUntil( msg_t *msg, unsigned *data, cnt_t time )
 unsigned msg_waitFor( msg_t *msg, unsigned *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_msg_wait(msg, data, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned msg_give( msg_t *msg, unsigned data )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t  * tsk;
+	unsigned event = E_TIMEOUT;
+
+	assert(msg);
+
+	port_sys_lock();
+
+	if (msg->count < msg->limit)
+	{
+		priv_msg_put(msg, data);
+		tsk = core_one_wakeup(msg, E_SUCCESS);
+		if (tsk) priv_msg_get(msg, tsk->tmp.data);
+		event = E_SUCCESS;
+	}
+
+	port_sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -182,23 +225,21 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, cnt_t time, unsigned(*wait)(v
 	tsk_t  * tsk;
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(msg);
 
 	port_sys_lock();
 
-	if (msg->count >= msg->limit)
+	if (msg->count < msg->limit)
 	{
-		System.cur->tmp.msg = data;
-
-		event = wait(msg, time);
+		priv_msg_put(msg, data);
+		tsk = core_one_wakeup(msg, E_SUCCESS);
+		if (tsk) priv_msg_get(msg, tsk->tmp.data);
 	}
 	else
 	{
-		priv_msg_put(msg, data);
-
-		tsk = core_one_wakeup(msg, E_SUCCESS);
-
-		if (tsk) priv_msg_get(msg, tsk->tmp.data);
+		System.cur->tmp.msg = data;
+		event = wait(msg, time);
 	}
 
 	port_sys_unlock();
@@ -210,8 +251,6 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, cnt_t time, unsigned(*wait)(v
 unsigned msg_sendUntil( msg_t *msg, unsigned data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_msg_send(msg, data, time, core_tsk_waitUntil);
 }
 
@@ -219,8 +258,6 @@ unsigned msg_sendUntil( msg_t *msg, unsigned data, cnt_t time )
 unsigned msg_sendFor( msg_t *msg, unsigned data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_msg_send(msg, data, delay, core_tsk_waitFor);
 }
 

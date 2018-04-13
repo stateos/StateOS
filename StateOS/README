@@ -15,7 +15,7 @@ Features:
 - events
 - flags (any, all, protect, ignore)
 - barriers
-- semaphores (direct, binary, limited, counting)
+- semaphores (binary, limited, counting)
 - mutexes (recursive, priority inheritance, robust)
 - fast mutexes (non-recursive, non-priority-inheritance, non-robust)
 - condition variables
@@ -34,6 +34,8 @@ Features:
 5.8
 - added stream buffer object
 - updated examples
+- fixed bugs in isr functions
+- removed direct semaphore (use signal instead)
 ---------
 5.7
 - updated memory pool object

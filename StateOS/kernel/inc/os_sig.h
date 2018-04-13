@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.h
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    13.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -322,11 +322,10 @@ unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned sig_take( sig_t *sig ) { return sig_waitFor(sig, IMMEDIATE); }
+unsigned sig_take( sig_t *sig );
 
 __STATIC_INLINE
-unsigned sig_takeISR( sig_t *sig ) { return sig_waitFor(sig, IMMEDIATE); }
+unsigned sig_takeISR( sig_t *sig ) { return sig_take(sig); }
 
 /******************************************************************************
  *

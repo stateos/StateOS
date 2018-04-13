@@ -2,7 +2,7 @@
 
     @file    StateOS: os_bar.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    13.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -104,6 +104,7 @@ unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(bar);
 	assert(bar->count);
 
@@ -129,8 +130,6 @@ unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 unsigned bar_waitUntil( bar_t *bar, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_bar_wait(bar, time, core_tsk_waitUntil);
 }
 
@@ -138,8 +137,6 @@ unsigned bar_waitUntil( bar_t *bar, cnt_t time )
 unsigned bar_waitFor( bar_t *bar, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_bar_wait(bar, delay, core_tsk_waitFor);
 }
 

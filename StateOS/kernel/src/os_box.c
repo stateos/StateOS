@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    11.04.2018
+    @date    13.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -133,6 +133,31 @@ void priv_box_put( box_t *box, char *data )
 }
 
 /* -------------------------------------------------------------------------- */
+unsigned box_take( box_t *box, void *data )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t  * tsk;
+	unsigned event = E_TIMEOUT;
+
+	assert(box);
+	assert(data);
+
+	port_sys_lock();
+
+	if (box->count > 0)
+	{
+		priv_box_get(box, data);
+		tsk = core_one_wakeup(box, E_SUCCESS);
+		if (tsk) priv_box_put(box, tsk->tmp.data);
+		event = E_SUCCESS;
+	}
+
+	port_sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
 static
 unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
@@ -140,24 +165,22 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 	tsk_t  * tsk;
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(box);
 	assert(data);
 
 	port_sys_lock();
 
-	if (box->count == 0)
+	if (box->count > 0)
 	{
-		System.cur->tmp.data = data;
-
-		event = wait(box, time);
+		priv_box_get(box, data);
+		tsk = core_one_wakeup(box, E_SUCCESS);
+		if (tsk) priv_box_put(box, tsk->tmp.data);
 	}
 	else
 	{
-		priv_box_get(box, data);
-
-		tsk = core_one_wakeup(box, E_SUCCESS);
-
-		if (tsk) priv_box_put(box, tsk->tmp.data);
+		System.cur->tmp.data = data;
+		event = wait(box, time);
 	}
 
 	port_sys_unlock();
@@ -169,8 +192,6 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_box_wait(box, data, time, core_tsk_waitUntil);
 }
 
@@ -178,9 +199,32 @@ unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
 unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_box_wait(box, data, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned box_give( box_t *box, void *data )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t  * tsk;
+	unsigned event = E_TIMEOUT;
+
+	assert(box);
+	assert(data);
+
+	port_sys_lock();
+
+	if (box->count < box->limit)
+	{
+		priv_box_put(box, data);
+		tsk = core_one_wakeup(box, E_SUCCESS);
+		if (tsk) priv_box_get(box, tsk->tmp.data);
+		event = E_SUCCESS;
+	}
+
+	port_sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -191,24 +235,22 @@ unsigned priv_box_send( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 	tsk_t  * tsk;
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(box);
 	assert(data);
 
 	port_sys_lock();
 
-	if (box->count >= box->limit)
+	if (box->count < box->limit)
 	{
-		System.cur->tmp.data = data;
-
-		event = wait(box, time);
+		priv_box_put(box, data);
+		tsk = core_one_wakeup(box, E_SUCCESS);
+		if (tsk) priv_box_get(box, tsk->tmp.data);
 	}
 	else
 	{
-		priv_box_put(box, data);
-
-		tsk = core_one_wakeup(box, E_SUCCESS);
-
-		if (tsk) priv_box_get(box, tsk->tmp.data);
+		System.cur->tmp.data = data;
+		event = wait(box, time);
 	}
 
 	port_sys_unlock();
@@ -220,8 +262,6 @@ unsigned priv_box_send( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 unsigned box_sendUntil( box_t *box, void *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_box_send(box, data, time, core_tsk_waitUntil);
 }
 
@@ -229,8 +269,6 @@ unsigned box_sendUntil( box_t *box, void *data, cnt_t time )
 unsigned box_sendFor( box_t *box, void *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_box_send(box, data, delay, core_tsk_waitFor);
 }
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    16.03.2018
+    @date    13.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -129,12 +129,39 @@ void mem_delete( mem_t *mem )
 }
 
 /* -------------------------------------------------------------------------- */
+unsigned mem_take( mem_t *mem, void **data )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event = E_TIMEOUT;
+
+	assert(mem);
+	assert(data);
+
+	port_sys_lock();
+
+	if (mem->next)
+	{
+		*data = mem->next + 1;
+		mem->next = mem->next->next;
+
+		memset(*data, 0, mem->size * sizeof(que_t));
+
+		event = E_SUCCESS;
+	}
+
+	port_sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
 static
 unsigned priv_mem_wait( mem_t *mem, void **data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_SUCCESS;
 
+	assert(!port_isr_inside());
 	assert(mem);
 	assert(data);
 
@@ -163,8 +190,6 @@ unsigned priv_mem_wait( mem_t *mem, void **data, cnt_t time, unsigned(*wait)(voi
 unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
-
 	return priv_mem_wait(mem, data, time, core_tsk_waitUntil);
 }
 
@@ -172,8 +197,6 @@ unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time )
 unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside() || !delay);
-
 	return priv_mem_wait(mem, data, delay, core_tsk_waitFor);
 }
 
