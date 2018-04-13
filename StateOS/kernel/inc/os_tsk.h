@@ -75,12 +75,9 @@ struct __tsk
 	cnt_t    slice;	// time slice
 	union  {
 	unsigned mode;  // used by flag object
-	char   * ibuff; // used by stream buffer (input buffer)
-	const
-	char   * obuff; // used by stream buffer (output buffer)
-	void   * idata; // used by queue objects (input data)
 	const
 	void   * odata; // used by queue objects (output data)
+	void   * idata; // used by queue objects (input data)
 	unsigned msg;   // used by message queue object
 	fun_t  * fun;   // used by job queue object
 	}        tmp;

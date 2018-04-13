@@ -165,8 +165,8 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
-			cnt = priv_stm_put(stm, tsk->tmp.obuff, tsk->evt.size);
-			tsk->tmp.obuff += cnt;
+			cnt = priv_stm_put(stm, tsk->tmp.odata, tsk->evt.size);
+			tsk->tmp.odata = (const char *)tsk->tmp.odata + cnt;
 			tsk->evt.size -= cnt;
 
 			if (tsk->evt.size == 0)
@@ -209,8 +209,8 @@ unsigned priv_stm_wait( stm_t *stm, void *data, unsigned size, cnt_t time, unsig
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
-			cnt = priv_stm_put(stm, tsk->tmp.obuff, tsk->evt.size);
-			tsk->tmp.obuff += cnt;
+			cnt = priv_stm_put(stm, tsk->tmp.odata, tsk->evt.size);
+			tsk->tmp.odata = (const char *)tsk->tmp.odata + cnt;
 			tsk->evt.size -= cnt;
 
 			if (tsk->evt.size == 0)
@@ -223,10 +223,10 @@ unsigned priv_stm_wait( stm_t *stm, void *data, unsigned size, cnt_t time, unsig
 
 	if (size > 0)
 	{
-		System.cur->tmp.ibuff = data;
+		System.cur->tmp.idata = data;
 		System.cur->evt.size = size;
 		wait(stm, time);
-		len += System.cur->tmp.ibuff - (char *)data;
+		len += (char *)System.cur->tmp.idata - (char *)data;
 	}
 
 	port_sys_unlock();
@@ -273,8 +273,8 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
-			cnt = priv_stm_get(stm, tsk->tmp.ibuff, tsk->evt.size);
-			tsk->tmp.ibuff += cnt;
+			cnt = priv_stm_get(stm, tsk->tmp.idata, tsk->evt.size);
+			tsk->tmp.idata = (char *)tsk->tmp.idata + cnt;
 			tsk->evt.size -= cnt;
 
 			if (tsk->evt.size == 0)
@@ -317,8 +317,8 @@ unsigned priv_stm_send( stm_t *stm, const void *data, unsigned size, cnt_t time,
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
-			cnt = priv_stm_get(stm, tsk->tmp.ibuff, tsk->evt.size);
-			tsk->tmp.ibuff += cnt;
+			cnt = priv_stm_get(stm, tsk->tmp.idata, tsk->evt.size);
+			tsk->tmp.idata = (char *)tsk->tmp.idata + cnt;
 			tsk->evt.size -= cnt;
 
 			if (tsk->evt.size == 0)
@@ -331,10 +331,10 @@ unsigned priv_stm_send( stm_t *stm, const void *data, unsigned size, cnt_t time,
 
 	if (size > 0)
 	{
-		System.cur->tmp.obuff = data;
+		System.cur->tmp.odata = data;
 		System.cur->evt.size = size;
 		wait(stm, time);
-		len += System.cur->tmp.obuff - (const char *)data;
+		len += (const char *)System.cur->tmp.odata - (const char *)data;
 	}
 
 	port_sys_unlock();
