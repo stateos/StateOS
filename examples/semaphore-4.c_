@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-OS_SEM(sem, 0, semDirect);
+OS_SEM(sem, 0, semBinary);
 
 OS_TSK_START(sla, 0)
 {
