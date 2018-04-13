@@ -170,7 +170,7 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, cnt_t time, unsigned(*wait)(
 	}
 	else
 	{
-		System.cur->tmp.data = data;
+		System.cur->tmp.idata = data;
 		event = wait(msg, time);
 	}
 
@@ -208,7 +208,7 @@ unsigned msg_give( msg_t *msg, unsigned data )
 	{
 		priv_msg_put(msg, data);
 		tsk = core_one_wakeup(msg, E_SUCCESS);
-		if (tsk) priv_msg_get(msg, tsk->tmp.data);
+		if (tsk) priv_msg_get(msg, tsk->tmp.idata);
 		event = E_SUCCESS;
 	}
 
@@ -234,7 +234,7 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, cnt_t time, unsigned(*wait)(v
 	{
 		priv_msg_put(msg, data);
 		tsk = core_one_wakeup(msg, E_SUCCESS);
-		if (tsk) priv_msg_get(msg, tsk->tmp.data);
+		if (tsk) priv_msg_get(msg, tsk->tmp.idata);
 	}
 	else
 	{
@@ -281,7 +281,7 @@ void msg_push( msg_t *msg, unsigned data )
 	else
 	{
 		tsk = core_one_wakeup(msg, E_SUCCESS);
-		if (tsk) priv_msg_get(msg, tsk->tmp.data);
+		if (tsk) priv_msg_get(msg, tsk->tmp.idata);
 	}
 
 	port_sys_unlock();

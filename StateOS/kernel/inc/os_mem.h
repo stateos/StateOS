@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.h
     @author  Rajmund Szymanski
-    @date    12.04.2018
+    @date    13.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -386,10 +386,10 @@ unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_take(mem, data); }
  *
  ******************************************************************************/
 
-void mem_give( mem_t *mem, void *data );
+void mem_give( mem_t *mem, const void *data );
 
 __STATIC_INLINE
-void mem_giveISR( mem_t *mem, void *data ) { mem_give(mem, data); }
+void mem_giveISR( mem_t *mem, const void *data ) { mem_give(mem, data); }
 
 #ifdef __cplusplus
 }
@@ -420,14 +420,14 @@ struct baseMemoryPool : public __mem
 	 baseMemoryPool( const unsigned _limit, const unsigned _size, void * const _data ): __mem _MEM_INIT(_limit, _size, _data) { mem_bind(this); }
 	~baseMemoryPool( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                       {        mem_kill     (this);                }
-	unsigned waitUntil( void **_data, cnt_t _time )  { return mem_waitUntil(this, _data, _time);  }
-	unsigned waitFor  ( void **_data, cnt_t _delay ) { return mem_waitFor  (this, _data, _delay); }
-	unsigned wait     ( void **_data )               { return mem_wait     (this, _data);         }
-	unsigned take     ( void **_data )               { return mem_take     (this, _data);         }
-	unsigned takeISR  ( void **_data )               { return mem_takeISR  (this, _data);         }
-	void     give     ( void  *_data )               {        mem_give     (this, _data);         }
-	void     giveISR  ( void  *_data )               {        mem_giveISR  (this, _data);         }
+	void     kill     ( void )                             {        mem_kill     (this);                }
+	unsigned waitUntil(       void **_data, cnt_t _time )  { return mem_waitUntil(this, _data, _time);  }
+	unsigned waitFor  (       void **_data, cnt_t _delay ) { return mem_waitFor  (this, _data, _delay); }
+	unsigned wait     (       void **_data )               { return mem_wait     (this, _data);         }
+	unsigned take     (       void **_data )               { return mem_take     (this, _data);         }
+	unsigned takeISR  (       void **_data )               { return mem_takeISR  (this, _data);         }
+	void     give     ( const void  *_data )               {        mem_give     (this, _data);         }
+	void     giveISR  ( const void  *_data )               {        mem_giveISR  (this, _data);         }
 };
 
 /******************************************************************************

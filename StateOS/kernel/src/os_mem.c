@@ -174,7 +174,7 @@ unsigned priv_mem_wait( mem_t *mem, void **data, cnt_t time, unsigned(*wait)(voi
 	}
 	else
 	{
-		System.cur->tmp.data = data;
+		System.cur->tmp.idata = data;
 		event = wait(mem, time);
 	}
 
@@ -201,7 +201,7 @@ unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-void mem_give( mem_t *mem, void *data )
+void mem_give( mem_t *mem, const void *data )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
@@ -216,7 +216,7 @@ void mem_give( mem_t *mem, void *data )
 
 	if (tsk)
 	{
-		*(void **)tsk->tmp.data = data;
+		*(const void **)tsk->tmp.odata = data;
 	}
 	else
 	{

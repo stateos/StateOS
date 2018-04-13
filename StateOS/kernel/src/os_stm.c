@@ -123,7 +123,7 @@ unsigned priv_stm_get( stm_t *stm, char *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_put( stm_t *stm, char *data, unsigned size )
+unsigned priv_stm_put( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i = 0;
@@ -165,8 +165,8 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
-			cnt = priv_stm_put(stm, tsk->tmp.buff, tsk->evt.size);
-			tsk->tmp.buff += cnt;
+			cnt = priv_stm_put(stm, tsk->tmp.obuff, tsk->evt.size);
+			tsk->tmp.obuff += cnt;
 			tsk->evt.size -= cnt;
 
 			if (tsk->evt.size == 0)
@@ -209,8 +209,8 @@ unsigned priv_stm_wait( stm_t *stm, void *data, unsigned size, cnt_t time, unsig
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
-			cnt = priv_stm_put(stm, tsk->tmp.buff, tsk->evt.size);
-			tsk->tmp.buff += cnt;
+			cnt = priv_stm_put(stm, tsk->tmp.obuff, tsk->evt.size);
+			tsk->tmp.obuff += cnt;
 			tsk->evt.size -= cnt;
 
 			if (tsk->evt.size == 0)
@@ -223,10 +223,10 @@ unsigned priv_stm_wait( stm_t *stm, void *data, unsigned size, cnt_t time, unsig
 
 	if (size > 0)
 	{
-		System.cur->tmp.buff = data;
+		System.cur->tmp.ibuff = data;
 		System.cur->evt.size = size;
 		wait(stm, time);
-		len += System.cur->tmp.buff - (char *)data;
+		len += System.cur->tmp.ibuff - (char *)data;
 	}
 
 	port_sys_unlock();
@@ -249,7 +249,7 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_give( stm_t *stm, void *data, unsigned size )
+unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -273,8 +273,8 @@ unsigned stm_give( stm_t *stm, void *data, unsigned size )
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
-			cnt = priv_stm_get(stm, tsk->tmp.buff, tsk->evt.size);
-			tsk->tmp.buff += cnt;
+			cnt = priv_stm_get(stm, tsk->tmp.ibuff, tsk->evt.size);
+			tsk->tmp.ibuff += cnt;
 			tsk->evt.size -= cnt;
 
 			if (tsk->evt.size == 0)
@@ -292,7 +292,7 @@ unsigned stm_give( stm_t *stm, void *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_send( stm_t *stm, void *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_stm_send( stm_t *stm, const void *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -317,8 +317,8 @@ unsigned priv_stm_send( stm_t *stm, void *data, unsigned size, cnt_t time, unsig
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
-			cnt = priv_stm_get(stm, tsk->tmp.buff, tsk->evt.size);
-			tsk->tmp.buff += cnt;
+			cnt = priv_stm_get(stm, tsk->tmp.ibuff, tsk->evt.size);
+			tsk->tmp.ibuff += cnt;
 			tsk->evt.size -= cnt;
 
 			if (tsk->evt.size == 0)
@@ -331,10 +331,10 @@ unsigned priv_stm_send( stm_t *stm, void *data, unsigned size, cnt_t time, unsig
 
 	if (size > 0)
 	{
-		System.cur->tmp.buff = data;
+		System.cur->tmp.obuff = data;
 		System.cur->evt.size = size;
 		wait(stm, time);
-		len += System.cur->tmp.buff - (char *)data;
+		len += System.cur->tmp.obuff - (const char *)data;
 	}
 
 	port_sys_unlock();
@@ -343,14 +343,14 @@ unsigned priv_stm_send( stm_t *stm, void *data, unsigned size, cnt_t time, unsig
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_sendUntil( stm_t *stm, void *data, unsigned size, cnt_t time )
+unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_stm_send(stm, data, size, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_sendFor( stm_t *stm, void *data, unsigned size, cnt_t delay )
+unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_stm_send(stm, data, size, delay, core_tsk_waitFor);

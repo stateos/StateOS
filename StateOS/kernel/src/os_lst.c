@@ -134,7 +134,7 @@ unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(voi
 	}
 	else
 	{
-		System.cur->tmp.data = data;
+		System.cur->tmp.idata = data;
 		event = wait(lst, time);
 	}
 	
@@ -158,7 +158,7 @@ unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-void lst_give( lst_t *lst, void *data )
+void lst_give( lst_t *lst, const void *data )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
@@ -173,7 +173,7 @@ void lst_give( lst_t *lst, void *data )
 
 	if (tsk)
 	{
-		*(void**)tsk->tmp.data = data;
+		*(const void**)tsk->tmp.odata = data;
 	}
 	else
 	{

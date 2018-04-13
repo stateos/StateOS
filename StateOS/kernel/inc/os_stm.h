@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.h
     @author  Rajmund Szymanski
-    @date    12.04.2018
+    @date    13.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -357,7 +357,7 @@ unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(
  *
  ******************************************************************************/
 
-unsigned stm_sendUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
+unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time );
 
 /******************************************************************************
  *
@@ -380,7 +380,7 @@ unsigned stm_sendUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
  *
  ******************************************************************************/
 
-unsigned stm_sendFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
+unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay );
 
 /******************************************************************************
  *
@@ -401,7 +401,7 @@ unsigned stm_sendFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned stm_send( stm_t *stm, void *data, unsigned size ) { return stm_sendFor(stm, data, size, INFINITE); }
+unsigned stm_send( stm_t *stm, const void *data, unsigned size ) { return stm_sendFor(stm, data, size, INFINITE); }
 
 /******************************************************************************
  *
@@ -422,10 +422,10 @@ unsigned stm_send( stm_t *stm, void *data, unsigned size ) { return stm_sendFor(
  *
  ******************************************************************************/
 
-unsigned stm_give( stm_t *stm, void *data, unsigned size );
+unsigned stm_give( stm_t *stm, const void *data, unsigned size );
 
 __STATIC_INLINE
-unsigned stm_giveISR( stm_t *stm, void *data, unsigned size ) { return stm_give(stm, data, size); }
+unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm_give(stm, data, size); }
 
 #ifdef __cplusplus
 }
@@ -455,17 +455,17 @@ struct baseStreamBuffer : public __stm
 	 baseStreamBuffer( const unsigned _limit, char * const _data ): __stm _STM_INIT(_limit, _data) {}
 	~baseStreamBuffer( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                                      {        stm_kill     (this);                }
-	unsigned waitUntil( void *_data, unsigned _size, cnt_t _time  ) { return stm_waitUntil(this, _data, _size, _time);  }
-	unsigned waitFor  ( void *_data, unsigned _size, cnt_t _delay ) { return stm_waitFor  (this, _data, _size, _delay); }
-	unsigned wait     ( void *_data, unsigned _size )               { return stm_wait     (this, _data, _size);         }
-	unsigned take     ( void *_data, unsigned _size )               { return stm_take     (this, _data, _size);         }
-	unsigned takeISR  ( void *_data, unsigned _size )               { return stm_takeISR  (this, _data, _size);         }
-	unsigned sendUntil( void *_data, unsigned _size, cnt_t _time  ) { return stm_sendUntil(this, _data, _size, _time);  }
-	unsigned sendFor  ( void *_data, unsigned _size, cnt_t _delay ) { return stm_sendFor  (this, _data, _size, _delay); }
-	unsigned send     ( void *_data, unsigned _size )               { return stm_send     (this, _data, _size);         }
-	unsigned give     ( void *_data, unsigned _size )               { return stm_give     (this, _data, _size);         }
-	unsigned giveISR  ( void *_data, unsigned _size )               { return stm_giveISR  (this, _data, _size);         }
+	void     kill     ( void )                                            {        stm_kill     (this);                       }
+	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time  ) { return stm_waitUntil(this, _data, _size, _time);  }
+	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return stm_waitFor  (this, _data, _size, _delay); }
+	unsigned wait     (       void *_data, unsigned _size )               { return stm_wait     (this, _data, _size);         }
+	unsigned take     (       void *_data, unsigned _size )               { return stm_take     (this, _data, _size);         }
+	unsigned takeISR  (       void *_data, unsigned _size )               { return stm_takeISR  (this, _data, _size);         }
+	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time  ) { return stm_sendUntil(this, _data, _size, _time);  }
+	unsigned sendFor  ( const void *_data, unsigned _size, cnt_t _delay ) { return stm_sendFor  (this, _data, _size, _delay); }
+	unsigned send     ( const void *_data, unsigned _size )               { return stm_send     (this, _data, _size);         }
+	unsigned give     ( const void *_data, unsigned _size )               { return stm_give     (this, _data, _size);         }
+	unsigned giveISR  ( const void *_data, unsigned _size )               { return stm_giveISR  (this, _data, _size);         }
 };
 
 /******************************************************************************

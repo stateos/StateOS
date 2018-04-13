@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    11.04.2018
+    @date    13.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -75,8 +75,12 @@ struct __tsk
 	cnt_t    slice;	// time slice
 	union  {
 	unsigned mode;  // used by flag object
-	char   * buff;  // used by stream buffer
-	void   * data;  // used by queue objects
+	char   * ibuff; // used by stream buffer (input buffer)
+	const
+	char   * obuff; // used by stream buffer (output buffer)
+	void   * idata; // used by queue objects (input data)
+	const
+	void   * odata; // used by queue objects (output data)
 	unsigned msg;   // used by message queue object
 	fun_t  * fun;   // used by job queue object
 	}        tmp;

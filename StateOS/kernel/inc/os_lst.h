@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.h
     @author  Rajmund Szymanski
-    @date    12.04.2018
+    @date    13.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -324,10 +324,10 @@ unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_take(lst, data); }
  *
  ******************************************************************************/
 
-void lst_give( lst_t *lst, void *data );
+void lst_give( lst_t *lst, const void *data );
 
 __STATIC_INLINE
-void lst_giveISR( lst_t *lst, void *data ) { lst_give(lst, data); }
+void lst_giveISR( lst_t *lst, const void *data ) { lst_give(lst, data); }
 
 #ifdef __cplusplus
 }
@@ -354,14 +354,14 @@ struct List : public __lst
 	 List( void ): __lst _LST_INIT() {}
 	~List( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                       {        lst_kill     (this);                }
-	unsigned waitUntil( void **_data, cnt_t _time )  { return lst_waitUntil(this, _data, _time);  }
-	unsigned waitFor  ( void **_data, cnt_t _delay ) { return lst_waitFor  (this, _data, _delay); }
-	unsigned wait     ( void **_data )               { return lst_wait     (this, _data);         }
-	unsigned take     ( void **_data )               { return lst_take     (this, _data);         }
-	unsigned takeISR  ( void **_data )               { return lst_takeISR  (this, _data);         }
-	void     give     ( void  *_data )               {        lst_give     (this, _data);         }
-	void     giveISR  ( void  *_data )               {        lst_giveISR  (this, _data);         }
+	void     kill     ( void )                             {        lst_kill     (this);                }
+	unsigned waitUntil(       void **_data, cnt_t _time )  { return lst_waitUntil(this, _data, _time);  }
+	unsigned waitFor  (       void **_data, cnt_t _delay ) { return lst_waitFor  (this, _data, _delay); }
+	unsigned wait     (       void **_data )               { return lst_wait     (this, _data);         }
+	unsigned take     (       void **_data )               { return lst_take     (this, _data);         }
+	unsigned takeISR  (       void **_data )               { return lst_takeISR  (this, _data);         }
+	void     give     ( const void  *_data )               {        lst_give     (this, _data);         }
+	void     giveISR  ( const void  *_data )               {        lst_giveISR  (this, _data);         }
 };
 
 /******************************************************************************

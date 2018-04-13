@@ -36,6 +36,7 @@ Features:
 - updated examples
 - fixed bugs in isr functions
 - removed direct semaphore (use signal instead)
+- updated const qualifiers
 ---------
 5.7
 - updated memory pool object

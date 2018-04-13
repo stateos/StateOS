@@ -120,7 +120,7 @@ void priv_box_get( box_t *box, char *data )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_box_put( box_t *box, char *data )
+void priv_box_put( box_t *box, const char *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i;
@@ -148,7 +148,7 @@ unsigned box_take( box_t *box, void *data )
 	{
 		priv_box_get(box, data);
 		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_put(box, tsk->tmp.data);
+		if (tsk) priv_box_put(box, tsk->tmp.odata);
 		event = E_SUCCESS;
 	}
 
@@ -175,11 +175,11 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 	{
 		priv_box_get(box, data);
 		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_put(box, tsk->tmp.data);
+		if (tsk) priv_box_put(box, tsk->tmp.odata);
 	}
 	else
 	{
-		System.cur->tmp.data = data;
+		System.cur->tmp.idata = data;
 		event = wait(box, time);
 	}
 
@@ -203,7 +203,7 @@ unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_give( box_t *box, void *data )
+unsigned box_give( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -218,7 +218,7 @@ unsigned box_give( box_t *box, void *data )
 	{
 		priv_box_put(box, data);
 		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_get(box, tsk->tmp.data);
+		if (tsk) priv_box_get(box, tsk->tmp.idata);
 		event = E_SUCCESS;
 	}
 
@@ -229,7 +229,7 @@ unsigned box_give( box_t *box, void *data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_box_send( box_t *box, void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
@@ -245,11 +245,11 @@ unsigned priv_box_send( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 	{
 		priv_box_put(box, data);
 		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_get(box, tsk->tmp.data);
+		if (tsk) priv_box_get(box, tsk->tmp.idata);
 	}
 	else
 	{
-		System.cur->tmp.data = data;
+		System.cur->tmp.odata = data;
 		event = wait(box, time);
 	}
 
@@ -259,21 +259,21 @@ unsigned priv_box_send( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendUntil( box_t *box, void *data, cnt_t time )
+unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_box_send(box, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendFor( box_t *box, void *data, cnt_t delay )
+unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_box_send(box, data, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-void box_push( box_t *box, void *data )
+void box_push( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
@@ -293,7 +293,7 @@ void box_push( box_t *box, void *data )
 	else
 	{
 		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_get(box, tsk->tmp.data);
+		if (tsk) priv_box_get(box, tsk->tmp.idata);
 	}
 
 	port_sys_unlock();
