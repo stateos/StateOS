@@ -161,7 +161,7 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 
 		while (stm->queue != 0 && stm->count < stm->limit)
 		{
-			if (stm->owner == 0)
+			if (stm->owner == 0 || stm->owner->guard != stm)
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
@@ -205,7 +205,7 @@ unsigned priv_stm_wait( stm_t *stm, void *data, unsigned size, cnt_t time, unsig
 
 		while (stm->queue != 0 && stm->count < stm->limit)
 		{
-			if (stm->owner == 0)
+			if (stm->owner == 0 || stm->owner->guard != stm)
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
@@ -271,7 +271,7 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 
 		while (stm->queue != 0 && stm->count > 0)
 		{
-			if (stm->owner == 0)
+			if (stm->owner == 0 || stm->owner->guard != stm)
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
@@ -315,7 +315,7 @@ unsigned priv_stm_send( stm_t *stm, const void *data, unsigned size, cnt_t time,
 
 		while (stm->queue != 0 && stm->count > 0)
 		{
-			if (stm->owner == 0)
+			if (stm->owner == 0 || stm->owner->guard != stm)
 				stm->owner = stm->queue;
 
 			tsk = stm->owner;
