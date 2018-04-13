@@ -19,7 +19,7 @@ There's a dedicated function for immediate change the task state.
 - events
 - flags (any, all, protect, ignore)
 - barriers
-- semaphores (direct, binary, limited, counting)
+- semaphores (binary, limited, counting)
 - mutexes (recursive, priority inheritance, robust)
 - fast mutexes (non-recursive, non-priority-inheritance, non-robust)
 - condition variables
