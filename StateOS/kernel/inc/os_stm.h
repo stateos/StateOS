@@ -496,8 +496,8 @@ struct baseStreamBuffer : public __stm
 	void     kill     ( void )                                            {        stm_kill     (this);                       }
 	unsigned count    ( void )                                            { return stm_count    (this);                       }
 	unsigned countISR ( void )                                            { return stm_countISR (this);                       }
-	unsigned space    ( void )                                            { return stm space    (this);                       }
-	unsigned spaceISR ( void )                                            { return stm spaceISR (this);                       }
+	unsigned space    ( void )                                            { return stm_space    (this);                       }
+	unsigned spaceISR ( void )                                            { return stm_spaceISR (this);                       }
 	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time  ) { return stm_waitUntil(this, _data, _size, _time);  }
 	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return stm_waitFor  (this, _data, _size, _delay); }
 	unsigned wait     (       void *_data, unsigned _size )               { return stm_wait     (this, _data, _size);         }
