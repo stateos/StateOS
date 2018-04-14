@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.c
     @author  Rajmund Szymanski
-    @date    13.04.2018
+    @date    14.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -138,6 +138,50 @@ unsigned priv_stm_put( stm_t *stm, const char *data, unsigned size )
 	}
 
 	return i;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned stm_count( stm_t *stm )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t  * tsk;
+	unsigned cnt;
+
+	assert(stm);
+
+	port_sys_lock();
+
+	cnt = stm->count;
+
+	if (cnt == stm->limit)
+		for (tsk = stm->queue; tsk; tsk = tsk->queue)
+			cnt += tsk->evt.size;
+
+	port_sys_unlock();
+
+	return cnt;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned stm_space( stm_t *stm )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t  * tsk;
+	unsigned cnt;
+
+	assert(stm);
+
+	port_sys_lock();
+
+	cnt = stm->limit - stm->count;
+
+	if (cnt == stm->limit)
+		for (tsk = stm->queue; tsk; tsk = tsk->queue)
+			cnt += tsk->evt.size;
+
+	port_sys_unlock();
+
+	return cnt;
 }
 
 /* -------------------------------------------------------------------------- */
