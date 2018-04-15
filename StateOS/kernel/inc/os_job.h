@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.h
     @author  Rajmund Szymanski
-    @date    12.04.2018
+    @date    15.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -484,7 +484,7 @@ void job_pushISR( job_t *job, fun_t *fun ) { job_push(job, fun); }
 struct baseJobQueue : public __box
 {
 	 explicit
-	 baseJobQueue( const unsigned _limit, FUN_t * const _data ): __box _BOX_INIT( _limit, sizeof(FUN_t), reinterpret_cast<char *>(_data) ) {}
+	 baseJobQueue( const unsigned _limit, FUN_t * const _data ): __box _BOX_INIT( _limit, reinterpret_cast<char *>(_data), sizeof(FUN_t) ) {}
 	~baseJobQueue( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                     {                              box_kill     (this);                                                              }

@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    30.03.2018
+    @date    15.04.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -1244,7 +1244,7 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 
 	sys_lock();
 
-	box_init(&mq->box, msg_count, msg_size, data);
+	box_init(&mq->box, msg_count, data, msg_size);
 	if (attr->cb_mem == NULL || attr->cb_size == 0U) mq->box.res = mq;
 	else
 	if (attr->mq_mem == NULL || attr->mq_size == 0U) mq->box.res = data;
