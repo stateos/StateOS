@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    15.04.2018
+    @date    16.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -39,16 +39,16 @@ void box_init( box_t *box, unsigned limit, void *data, unsigned size )
 	assert(!port_isr_inside());
 	assert(box);
 	assert(limit);
-	assert(size);
 	assert(data);
+	assert(size);
 
 	port_sys_lock();
 
 	memset(box, 0, sizeof(box_t));
 	
 	box->limit = limit;
-	box->size  = size;
 	box->data  = data;
+	box->size  = size;
 
 	port_sys_unlock();
 }
@@ -109,12 +109,12 @@ static
 void priv_box_get( box_t *box, char *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i;
 	char   * buf = box->data + box->size * box->first;
+	unsigned cnt = box->size - 1;
 
-	for (i = 0; i < box->size; i++) data[i] = buf[i];
+	do data[cnt] = buf[cnt]; while (cnt--);
 
-	box->first = (box->first + 1) % box->limit;
+	box->first = (box->first + 1 < box->limit) ? box->first + 1 : 0;
 	box->count--;
 }
 
@@ -123,12 +123,12 @@ static
 void priv_box_put( box_t *box, const char *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i;
 	char   * buf = box->data + box->size * box->next;
+	unsigned cnt = box->size - 1;
 
-	for (i = 0; i < box->size; i++) buf[i] = data[i];
+	do buf[cnt] = data[cnt]; while (cnt--);
 
-	box->next = (box->next + 1) % box->limit;
+	box->next = (box->next + 1 < box->limit) ? box->next + 1 : 0;
 	box->count++;
 }
 
