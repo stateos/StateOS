@@ -46,7 +46,7 @@ void box_init( box_t *box, unsigned limit, void *data, unsigned size )
 
 	memset(box, 0, sizeof(box_t));
 	
-	box->limit = limit;
+	box->limit = limit * size;
 	box->data  = data;
 	box->size  = size;
 
@@ -109,12 +109,11 @@ static
 void priv_box_get( box_t *box, char *data )
 /* -------------------------------------------------------------------------- */
 {
-	char   * buf = box->data + box->size * box->first;
-	unsigned cnt = box->size - 1;
+	unsigned i = 0;
 
-	do data[cnt] = buf[cnt]; while (cnt--);
+	do data[i++] = box->data[box->first++]; while (i < box->size);
 
-	box->first = (box->first + 1 < box->limit) ? box->first + 1 : 0;
+	if (box->first >= box->limit) box->first = 0;
 	box->count--;
 }
 
@@ -123,12 +122,11 @@ static
 void priv_box_put( box_t *box, const char *data )
 /* -------------------------------------------------------------------------- */
 {
-	char   * buf = box->data + box->size * box->next;
-	unsigned cnt = box->size - 1;
+	unsigned i = 0;
 
-	do buf[cnt] = data[cnt]; while (cnt--);
+	do box->data[box->next++] = data[i++]; while (i < box->size);
 
-	box->next = (box->next + 1 < box->limit) ? box->next + 1 : 0;
+	if (box->next >= box->limit) box->next = 0;
 	box->count++;
 }
 

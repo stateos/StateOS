@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.h
     @author  Rajmund Szymanski
-    @date    15.04.2018
+    @date    16.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -76,7 +76,7 @@ struct __box
  *
  ******************************************************************************/
 
-#define               _BOX_INIT( _limit, _data, _size ) { 0, 0, 0, _limit, 0, 0, _data, _size }
+#define               _BOX_INIT( _limit, _data, _size ) { 0, 0, 0, _limit * _size, 0, 0, _data, _size }
 
 /******************************************************************************
  *
