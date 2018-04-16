@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    13.04.2018
+    @date    16.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -106,9 +106,11 @@ static
 void priv_msg_get( msg_t *msg, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
-	*data = msg->data[msg->first];
+	unsigned i = msg->first;
+	
+	*data = msg->data[i++];
 
-	msg->first = (msg->first + 1) % msg->limit;
+	msg->first = (i < msg->limit) ? i : 0;
 	msg->count--;
 }
 
@@ -117,9 +119,11 @@ static
 void priv_msg_put( msg_t *msg, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
-	msg->data[msg->next] = data;
+	unsigned i = msg->next;
+	
+	msg->data[i++] = data;
 
-	msg->next = (msg->next + 1) % msg->limit;
+	msg->next = (i < msg->limit) ? i : 0;
 	msg->count++;
 }
 
