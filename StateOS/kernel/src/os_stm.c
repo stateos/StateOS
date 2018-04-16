@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.c
     @author  Rajmund Szymanski
-    @date    14.04.2018
+    @date    16.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -107,18 +107,24 @@ static
 unsigned priv_stm_get( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = 0;
-	
-	while (size > 0 && stm->count > 0)
+	char   * buf = stm->data;
+	unsigned i   = stm->first;
+	unsigned cnt = 0;
+
+	if (size > stm->count)
+		size = stm->count;
+
+	while (size-- > 0)
 	{
-		data[i++] = stm->data[stm->first++];
-		if (stm->first >= stm->limit)
-			stm->first = 0;
-		size--;
-		stm->count--;
+		data[cnt++] = buf[i++];
+		if (i >= stm->limit)
+			i = 0;
 	}
 
-	return i;
+	stm->first = i;
+	stm->count -= cnt;
+
+	return cnt;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -126,18 +132,24 @@ static
 unsigned priv_stm_put( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = 0;
+	char   * buf = stm->data;
+	unsigned i   = stm->next;
+	unsigned cnt = 0;
 
-	while (size > 0 && stm->count < stm->limit)
+	if (size > stm->limit - stm->count)
+		size = stm->limit - stm->count;
+
+	while (size-- > 0)
 	{
-		stm->data[stm->next++] = data[i++];
-		if (stm->next >= stm->limit)
-			stm->next = 0;
-		size--;
-		stm->count++;
+		buf[i++] = data[cnt++];
+		if (i >= stm->limit)
+			i = 0;
 	}
 
-	return i;
+	stm->next = i;
+	stm->count += cnt;
+
+	return cnt;
 }
 
 /* -------------------------------------------------------------------------- */
