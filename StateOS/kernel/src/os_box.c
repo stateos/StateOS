@@ -109,11 +109,12 @@ static
 void priv_box_get( box_t *box, char *data )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned f = box->first;
 	unsigned i = 0;
 
-	do data[i++] = box->data[box->first++]; while (i < box->size);
+	do data[i++] = box->data[f++]; while (i < box->size);
 
-	if (box->first >= box->limit) box->first = 0;
+	box->first = (f < box->limit) ? f : 0;
 	box->count--;
 }
 
@@ -122,11 +123,12 @@ static
 void priv_box_put( box_t *box, const char *data )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned n = box->next;
 	unsigned i = 0;
 
-	do box->data[box->next++] = data[i++]; while (i < box->size);
+	do box->data[n++] = data[i++]; while (i < box->size);
 
-	if (box->next >= box->limit) box->next = 0;
+	box->next = (n < box->limit) ? n : 0;
 	box->count++;
 }
 
