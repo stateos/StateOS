@@ -39,6 +39,7 @@ Features:
 - removed direct semaphore (use signal instead)
 - updated const qualifiers
 - changed syntax of box_init function
+- updated kernel
 ---------
 5.7
 - updated memory pool object

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    30.03.2018
+    @date    16.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -72,7 +72,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 	size = ABOVE(size);
 	tsk = core_sys_alloc(ABOVE(sizeof(tsk_t)) + size);
 	tsk_init(tsk, prio, state, (void *)((size_t)tsk + ABOVE(sizeof(tsk_t))), size);
-	tsk->res = tsk;
+	tsk->obj.res = tsk;
 
 	port_sys_unlock();
 
@@ -131,7 +131,7 @@ void tsk_stop( void )
 	if (System.cur->join != DETACHED)
 		core_tsk_wakeup(System.cur->join, E_SUCCESS);
 	else
-		core_sys_free(System.cur->res);
+		core_sys_free(System.cur->obj.res);
 
 	core_tsk_remove(System.cur);
 
@@ -156,7 +156,7 @@ void tsk_kill( tsk_t *tsk )
 		if (tsk->join != DETACHED)
 			core_tsk_wakeup(tsk->join, E_STOPPED);
 		else
-			core_sys_free(tsk->res);
+			core_sys_free(tsk->obj.res);
 
 		if (tsk->id == ID_READY)
 			core_tsk_remove(tsk);
@@ -194,9 +194,9 @@ unsigned tsk_detach( tsk_t *tsk )
 
 	port_sys_lock();
 
-	if ((tsk->id   != ID_STOPPED) &&
-		(tsk->join != DETACHED) &&
-		(tsk->res  != 0))
+	if ((tsk->id      != ID_STOPPED) &&
+		(tsk->join    != DETACHED) &&
+		(tsk->obj.res != 0))
 	{
 		core_tsk_wakeup(tsk->join, E_TIMEOUT);
 		tsk->join = DETACHED;
@@ -227,7 +227,7 @@ unsigned tsk_join( tsk_t *tsk )
 			event = E_SUCCESS;
 
 		if (event != E_TIMEOUT) // !detached
-			core_sys_free(tsk->res);
+			core_sys_free(tsk->obj.res);
 	}
 
 	port_sys_unlock();
@@ -321,8 +321,8 @@ void tsk_give( tsk_t *tsk, unsigned flags )
 
 	port_sys_lock();
 
-	if ((tsk->id == ID_DELAYED) &&
-	    (tsk->guard  == tsk))
+	if ((tsk->id    == ID_DELAYED) &&
+	    (tsk->guard == tsk))
 	{
 		tsk->evt.flags &= ~flags;
 		if (tsk->evt.flags == 0)
@@ -363,8 +363,8 @@ unsigned tsk_resume( tsk_t *tsk )
 
 	port_sys_lock();
 
-	if ((tsk->id == ID_DELAYED) &&
-	    (tsk->guard  == &WAIT))
+	if ((tsk->id    == ID_DELAYED) &&
+	    (tsk->guard == &WAIT))
 	{
 		core_tsk_wakeup(tsk, E_STOPPED);
 		event = E_SUCCESS;

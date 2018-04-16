@@ -164,7 +164,7 @@ unsigned stm_count( stm_t *stm )
 	cnt = stm->count;
 
 	if (cnt == stm->limit)
-		for (tsk = stm->queue; tsk; tsk = tsk->queue)
+		for (tsk = stm->queue; tsk; tsk = tsk->obj.queue)
 			cnt += tsk->evt.size;
 
 	port_sys_unlock();
@@ -186,7 +186,7 @@ unsigned stm_space( stm_t *stm )
 	cnt = stm->limit - stm->count;
 
 	if (cnt == stm->limit)
-		for (tsk = stm->queue; tsk; tsk = tsk->queue)
+		for (tsk = stm->queue; tsk; tsk = tsk->obj.queue)
 			cnt += tsk->evt.size;
 
 	port_sys_unlock();

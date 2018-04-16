@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    13.04.2018
+    @date    16.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,11 +48,8 @@ extern "C" {
 
 struct __tsk
 {
-	tsk_t  * queue; // next task in the DELAYED queue
-	void   * res;   // allocated object's resource
+	obj_t    obj;   // inherited from timer
 	unsigned id;    // task's id: ID_STOPPED, ID_READY, ID_DELAYED, ID_IDLE
-	tsk_t  * prev;  // previous task in the READY queue
-	tsk_t  * next;  // next task in the READY queue
 
 	fun_t  * state; // inherited from timer
 	cnt_t    start; // inherited from timer
@@ -112,10 +109,10 @@ struct __tsk
 
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { 0, 0, 0, 0, 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
+                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
 #else
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { 0, 0, 0, 0, 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 } }
+                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 } }
 #endif
 
 /******************************************************************************

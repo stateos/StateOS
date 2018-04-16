@@ -2,7 +2,7 @@
 
     @file    StateOS: os_flg.c
     @author  Rajmund Szymanski
-    @date    13.04.2018
+    @date    16.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -171,7 +171,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 
 	flags = flg->flags |= flags;
 
-	for (tsk = flg->queue; tsk; tsk = tsk->queue)
+	for (tsk = flg->queue; tsk; tsk = tsk->obj.queue)
 	{
 		if (tsk->evt.flags & flags)
 		{

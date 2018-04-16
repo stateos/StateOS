@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tmr.h
     @author  Rajmund Szymanski
-    @date    13.04.2018
+    @date    16.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -46,11 +46,8 @@ extern "C" {
 
 struct __tmr
 {
-	tsk_t  * queue; // next task in the DELAYED queue
-	void   * res;   // allocated object's resource
+	obj_t    obj;   // object header
 	unsigned id;    // timer's id: ID_STOPPED, ID_DELAYED, ID_TIMER
-	tmr_t  * prev;  // previous timer in the READY queue
-	tmr_t  * next;  // next timer in the READY queue
 
 	fun_t  * state; // callback procedure
 	cnt_t    start;
@@ -74,7 +71,7 @@ struct __tmr
  *
  ******************************************************************************/
 
-#define               _TMR_INIT( _state ) { 0, 0, 0, 0, 0, _state, 0, 0, 0 }
+#define               _TMR_INIT( _state ) { _OBJ_INIT(), 0, _state, 0, 0, 0 }
 
 /******************************************************************************
  *
@@ -305,7 +302,7 @@ struct __tmr
  ******************************************************************************/
 
 __STATIC_INLINE
-tmr_t *tmr_thisISR( void ) { return (tmr_t *) WAIT.next; }
+tmr_t *tmr_thisISR( void ) { return (tmr_t *) WAIT.obj.next; }
 
 /******************************************************************************
  *
@@ -693,7 +690,7 @@ struct Timer : public __tmr
 	bool     operator!( void )                                      { return __tmr::id == ID_STOPPED;                          }
 #if OS_FUNCTIONAL
 	static
-	void     run_( void ) { ((Timer *) WAIT.next)->fun_(); }
+	void     run_( void ) { ((Timer *) WAIT.obj.next)->fun_(); }
 	FUN_t    fun_;
 #endif
 };
@@ -804,7 +801,7 @@ struct startTimerPeriodic : public startTimer
 namespace ThisTimer
 {
 #if OS_FUNCTIONAL
-	static inline void flipISR ( FUN_t _state ) { ((Timer *) WAIT.next)->fun_ = _state;
+	static inline void flipISR ( FUN_t _state ) { ((Timer *) WAIT.obj.next)->fun_ = _state;
 	                                              tmr_flipISR (Timer::run_);                }
 #else
 	static inline void flipISR ( FUN_t _state ) { tmr_flipISR (_state);                     }

@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    15.04.2018
+    @date    16.04.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -256,9 +256,9 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	sys_lock();
 
 	tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, stack_mem, stack_size);
-	if (attr->cb_mem    == NULL || attr->cb_size    == 0U) thread->tsk.res = thread;
+	if (attr->cb_mem    == NULL || attr->cb_size    == 0U) thread->tsk.obj.res = thread;
 	else
-	if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.res = stack_mem;
+	if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.obj.res = stack_mem;
 	thread->tsk.join = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
 	flg_init(&thread->flg);
 	thread->flags = flags;
@@ -467,10 +467,10 @@ uint32_t osThreadGetCount (void)
 
 	count++;
 
-	for (tsk = IDLE.next; tsk != &IDLE; tsk = tsk->next)
+	for (tsk = IDLE.obj.next; tsk != &IDLE; tsk = tsk->obj.next)
 		count++;
 
-	for (tmr = WAIT.next; tmr != &WAIT; tmr = tmr->next)
+	for (tmr = WAIT.obj.next; tmr != &WAIT; tmr = tmr->obj.next)
 		if (tmr->id == ID_DELAYED)
 			count++;
 
@@ -492,10 +492,10 @@ uint32_t osThreadEnumerate (osThreadId_t *thread_array, uint32_t array_items)
 
 	thread_array[count++] = &IDLE;
 
-	for (tsk = IDLE.next; (tsk != &IDLE) && (count < array_items); tsk = tsk->next)
+	for (tsk = IDLE.obj.next; (tsk != &IDLE) && (count < array_items); tsk = tsk->obj.next)
 		thread_array[count++] = tsk;
 
-	for (tmr = WAIT.next; (tmr != &WAIT) && (count < array_items); tmr = tmr->next)
+	for (tmr = WAIT.obj.next; (tmr != &WAIT) && (count < array_items); tmr = tmr->obj.next)
 		if (tmr->id == ID_DELAYED)
 			thread_array[count++] = tmr;
 
@@ -622,7 +622,7 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 	sys_lock();
 
 	tmr_init(&timer->tmr, timer_handler);
-	if (attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.res = timer;
+	if (attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.obj.res = timer;
 	timer->flags = flags;
 	timer->name = (attr == NULL) ? NULL : attr->name;
 	timer->func = func;

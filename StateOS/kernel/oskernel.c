@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    04.04.2018
+    @date    16.04.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -46,11 +46,9 @@ void priv_tsk_idle( void )
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_rdy_insert( void *obj_, void *nxt_ )
+void priv_rdy_insert( obj_t *obj, obj_t *nxt )
 {
-	tmr_t *obj = obj_;
-	tmr_t *nxt = nxt_;
-	tmr_t *prv = nxt->prev;
+	obj_t *prv = nxt->prev;
 
 	obj->prev = prv;
 	obj->next = nxt;
@@ -61,11 +59,10 @@ void priv_rdy_insert( void *obj_, void *nxt_ )
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_rdy_remove( void *obj_ )
+void priv_rdy_remove( obj_t *obj )
 {
-	tmr_t *obj = obj_;
-	tmr_t *nxt = obj->next;
-	tmr_t *prv = obj->prev;
+	obj_t *nxt = obj->next;
+	obj_t *prv = obj->prev;
 
 	nxt->prev = prv;
 	prv->next = nxt;
@@ -75,7 +72,7 @@ void priv_rdy_remove( void *obj_ )
 // SYSTEM TIMER SERVICES
 /* -------------------------------------------------------------------------- */
 
-tmr_t WAIT = { .id=ID_TIMER, .prev=&WAIT, .next=&WAIT, .delay=INFINITE }; // timers queue
+tmr_t WAIT = { .obj={ .prev=&WAIT, .next=&WAIT }, .id=ID_TIMER, .delay=INFINITE }; // timers queue
 
 /* -------------------------------------------------------------------------- */
 
@@ -86,10 +83,10 @@ void priv_tmr_insert( tmr_t *tmr, unsigned id )
 	tmr->id = id;
 
 	if (tmr->delay != INFINITE)
-		do nxt = nxt->next;
+		do nxt = nxt->obj.next;
 		while (nxt->delay < (cnt_t)(tmr->start + tmr->delay - nxt->start));
 
-	priv_rdy_insert(tmr, nxt);
+	priv_rdy_insert(&tmr->obj, &nxt->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -97,7 +94,7 @@ void priv_tmr_insert( tmr_t *tmr, unsigned id )
 static
 void priv_tmr_remove( tmr_t *tmr )
 {
-	priv_rdy_remove(tmr);
+	priv_rdy_remove(&tmr->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -184,7 +181,7 @@ void core_tmr_handler( void )
 
 	port_isr_lock();
 
-	while (priv_tmr_expired(tmr = WAIT.next))
+	while (priv_tmr_expired(tmr = WAIT.obj.next))
 	{
 		if (tmr->id == ID_TIMER)
 			priv_tmr_wakeup((tmr_t *)tmr, E_SUCCESS);
@@ -213,8 +210,8 @@ static  union  { stk_t STK[SSIZE(OS_IDLE_STACK)];
 #define IDLE_TOP (stk_t*)(&IDLE_STACK)+SSIZE(OS_IDLE_STACK)
 #define IDLE_SP  (void *)(&IDLE_STACK.CTX.ctx)
 
-tsk_t MAIN = { .id=ID_READY, .prev=&IDLE, .next=&IDLE, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { .id=ID_IDLE,  .prev=&MAIN, .next=&MAIN, .state=priv_tsk_idle, .sp=IDLE_SP, .top=IDLE_TOP, .stack=IDLE_STK }; // idle task and tasks queue
+tsk_t MAIN = { .obj={ .prev=&IDLE, .next=&IDLE }, .id=ID_READY, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
+tsk_t IDLE = { .obj={ .prev=&MAIN, .next=&MAIN }, .id=ID_IDLE, .state=priv_tsk_idle, .sp=IDLE_SP, .top=IDLE_TOP, .stack=IDLE_STK }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
@@ -227,10 +224,10 @@ void priv_tsk_insert( tsk_t *tsk )
 	tsk->slice = 0;
 #endif
 	if (tsk->prio)
-		do nxt = nxt->next;
+		do nxt = nxt->obj.next;
 		while (tsk->prio <= nxt->prio);
 
-	priv_rdy_insert(tsk, nxt);
+	priv_rdy_insert(&tsk->obj, &nxt->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -238,7 +235,7 @@ void priv_tsk_insert( tsk_t *tsk )
 static
 void priv_tsk_remove( tsk_t *tsk )
 {
-	priv_rdy_remove(tsk);
+	priv_rdy_remove(&tsk->obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -247,7 +244,7 @@ void core_tsk_insert( tsk_t *tsk )
 {
 	tsk->id = ID_READY;
 	priv_tsk_insert(tsk);
-	if (tsk == IDLE.next)
+	if (tsk == IDLE.obj.next)
 		port_ctx_switch();
 }
 
@@ -276,8 +273,8 @@ void core_ctx_init( tsk_t *tsk )
 
 void core_ctx_switch( void )
 {
-	tsk_t *cur = IDLE.next;
-	tsk_t *nxt = cur->next;
+	tsk_t *cur = IDLE.obj.next;
+	tsk_t *nxt = cur->obj.next;
 	if (nxt->prio == cur->prio)
 		port_ctx_switch();
 }
@@ -303,14 +300,14 @@ void core_tsk_append( tsk_t *tsk, void *obj )
 	tsk_t *nxt = obj;
 	tsk->guard = obj;
 
-	do prv = nxt, nxt = nxt->queue;
+	do prv = nxt, nxt = nxt->obj.queue;
 	while (nxt && tsk->prio <= nxt->prio);
 
 	if (nxt)
 	nxt->back = tsk;
 	tsk->back = prv;
-	tsk->queue = nxt;
-	prv->queue = tsk;
+	tsk->obj.queue = nxt;
+	prv->obj.queue = tsk;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -318,13 +315,13 @@ void core_tsk_append( tsk_t *tsk, void *obj )
 void core_tsk_unlink( tsk_t *tsk, unsigned event )
 {
 	tsk_t *prv = tsk->back;
-	tsk_t *nxt = tsk->queue;
+	tsk_t *nxt = tsk->obj.queue;
 	tsk->evt.event = event;
 
 	if (nxt)
 	nxt->back = prv;
-	prv->queue = nxt;
-	tsk->queue = 0; // necessary because of tsk_wait[Until|For] functions
+	prv->obj.queue = nxt;
+	tsk->obj.queue = 0; // necessary because of tsk_wait[Until|For] functions
 }
 
 /* -------------------------------------------------------------------------- */
@@ -402,7 +399,7 @@ tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event )
 
 tsk_t *core_one_wakeup( void *obj, unsigned event )
 {
-	tsk_t *lst = obj;
+	obj_t *lst = obj;
 
 	return core_tsk_wakeup(lst->queue, event);
 }
@@ -411,7 +408,7 @@ tsk_t *core_one_wakeup( void *obj, unsigned event )
 
 void core_all_wakeup( void *obj, unsigned event )
 {
-	tsk_t *lst = obj;
+	obj_t *lst = obj;
 
 	while (core_tsk_wakeup(lst->queue, event));
 }
@@ -436,7 +433,7 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 
 		if (tsk == System.cur)
 		{
-			tsk = tsk->next;
+			tsk = tsk->obj.next;
 			if (tsk->prio > prio)
 				port_ctx_switch();
 		}
@@ -475,7 +472,7 @@ void core_cur_prio( unsigned prio )
 	if (tsk->prio != prio)
 	{
 		tsk->prio = prio;
-		tsk = tsk->next;
+		tsk = tsk->obj.next;
 		if (tsk->prio > prio)
 			port_ctx_switch();
 	}
@@ -495,7 +492,7 @@ void *core_tsk_handler( void *sp )
 	cur = System.cur;
 	cur->sp = sp;
 
-	nxt = IDLE.next;
+	nxt = IDLE.obj.next;
 
 #if OS_ROBIN && HW_TIMER_SIZE == 0
 	if (cur == nxt || (nxt->slice >= (OS_FREQUENCY)/(OS_ROBIN) && (nxt->slice = 0) == 0))
@@ -505,7 +502,7 @@ void *core_tsk_handler( void *sp )
 	{
 		priv_tsk_remove(nxt);
 		priv_tsk_insert(nxt);
-		nxt = IDLE.next;
+		nxt = IDLE.obj.next;
 	}
 
 	System.cur = nxt;
