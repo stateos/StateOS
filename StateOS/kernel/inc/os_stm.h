@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.h
     @author  Rajmund Szymanski
-    @date    15.04.2018
+    @date    16.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -547,7 +547,7 @@ template<unsigned _limit, class T>
 struct StreamBufferTT : public baseStreamBuffer
 {
 	explicit
-	StreamBufferTT( void ): baseStreamBuffer(_limit*sizeof(T), reinterpret_cast<char *>(data_) ) {}
+	StreamBufferTT( void ): baseStreamBuffer(_limit * sizeof(T), reinterpret_cast<char *>(data_) ) {}
 
 	private:
 	T data_[_limit];

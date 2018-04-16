@@ -107,24 +107,21 @@ static
 unsigned priv_stm_get( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	char   * buf = stm->data;
-	unsigned i   = stm->first;
-	unsigned cnt = 0;
+	unsigned i = 0;
 
 	if (size > stm->count)
 		size = stm->count;
 
-	while (size-- > 0)
+	stm->count -= size;
+
+	while (i < size)
 	{
-		data[cnt++] = buf[i++];
-		if (i >= stm->limit)
-			i = 0;
+		data[i++] = stm->data[stm->first++];
+		if (stm->first >= stm->limit)
+			stm->first = 0;
 	}
 
-	stm->first = i;
-	stm->count -= cnt;
-
-	return cnt;
+	return size;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -132,24 +129,21 @@ static
 unsigned priv_stm_put( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	char   * buf = stm->data;
-	unsigned i   = stm->next;
-	unsigned cnt = 0;
+	unsigned i = 0;
 
 	if (size > stm->limit - stm->count)
 		size = stm->limit - stm->count;
 
-	while (size-- > 0)
+	stm->count += size;
+
+	while (i < size)
 	{
-		buf[i++] = data[cnt++];
-		if (i >= stm->limit)
-			i = 0;
+		stm->data[stm->next++] = data[i++];
+		if (stm->next >= stm->limit)
+			stm->next = 0;
 	}
 
-	stm->next = i;
-	stm->count += cnt;
-
-	return cnt;
+	return size;
 }
 
 /* -------------------------------------------------------------------------- */
