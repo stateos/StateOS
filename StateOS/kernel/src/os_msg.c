@@ -106,11 +106,11 @@ static
 void priv_msg_get( msg_t *msg, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = msg->first;
+	unsigned f = msg->first;
 	
-	*data = msg->data[i++];
+	*data = msg->data[f++];
 
-	msg->first = (i < msg->limit) ? i : 0;
+	msg->first = (f < msg->limit) ? f : 0;
 	msg->count--;
 }
 
@@ -119,11 +119,11 @@ static
 void priv_msg_put( msg_t *msg, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = msg->next;
+	unsigned n = msg->next;
 	
-	msg->data[i++] = data;
+	msg->data[n++] = data;
 
-	msg->next = (i < msg->limit) ? i : 0;
+	msg->next = (n < msg->limit) ? n : 0;
 	msg->count++;
 }
 
