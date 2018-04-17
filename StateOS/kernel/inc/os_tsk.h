@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    16.04.2018
+    @date    17.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -51,10 +51,10 @@ struct __tsk
 	obj_t    obj;   // inherited from timer
 	unsigned id;    // task's id: ID_STOPPED, ID_READY, ID_DELAYED, ID_IDLE
 
-	fun_t  * state; // inherited from timer
+	fun_t  * state; // task state (initial task function, doesn't have to be noreturn-type)
 	cnt_t    start; // inherited from timer
 	cnt_t    delay; // inherited from timer
-	cnt_t    period;// inherited from timer
+	cnt_t    slice;	// time slice
 
 	tsk_t  * back;  // previous process in the DELAYED queue
 	void   * sp;    // current stack pointer
@@ -69,7 +69,6 @@ struct __tsk
 	tsk_t  * mtree; // tree of tasks waiting for mutexes
 	mtx_t  * mlist; // list of mutexes held
 
-	cnt_t    slice;	// time slice
 	union  {
 	unsigned mode;  // used by flag object
 	const
@@ -109,10 +108,10 @@ struct __tsk
 
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
+                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
 #else
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 } }
+                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 } }
 #endif
 
 /******************************************************************************
