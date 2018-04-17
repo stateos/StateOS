@@ -32,6 +32,10 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+5.9
+- updated os version
+- updated task object
+---------
 5.8
 - added stream buffer object
 - updated examples
