@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    18.04.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -160,6 +160,9 @@ void core_tsk_append( tsk_t *tsk, void *obj );
 
 // remove task 'tsk' from the delayed queue of object 'obj' with event value 'event'
 void core_tsk_unlink( tsk_t *tsk, unsigned event );
+
+// transfer task 'tsk' to the delayed queue of object 'obj'
+void core_tsk_transfer( tsk_t *tsk, void *obj );
 
 // delay execution of the current task until given time point 'time'
 // append the current task to the delayed queue of object 'obj'

@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    16.04.2018
+    @date    18.04.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -322,6 +322,15 @@ void core_tsk_unlink( tsk_t *tsk, unsigned event )
 	nxt->back = prv;
 	prv->obj.queue = nxt;
 	tsk->obj.queue = 0; // necessary because of tsk_wait[Until|For] functions
+	tsk->guard = 0;
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tsk_transfer( tsk_t *tsk, void *obj )
+{
+	core_tsk_unlink(tsk, tsk->evt.event);
+	core_tsk_append(tsk, obj);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -446,8 +455,7 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 		else
 		if (tsk->id == ID_DELAYED)
 		{
-			core_tsk_unlink(tsk, 0);
-			core_tsk_append(tsk, tsk->guard);
+			core_tsk_transfer(tsk, tsk->guard);
 			if (tsk->mtree)
 				core_tsk_prio(tsk->mtree, prio);
 		}
