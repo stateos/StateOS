@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    16.04.2018
+    @date    18.04.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -49,13 +49,13 @@ extern "C" {
 
 #if     OS_TIMER_SIZE == 16
 typedef uint16_t     cnt_t;
-#define CNT_MAX  UINT16_MAX
+#define CNT_MAX          0xFFFFU
 #elif   OS_TIMER_SIZE == 32
 typedef uint32_t     cnt_t;
-#define CNT_MAX  UINT32_MAX
+#define CNT_MAX          0xFFFFFFFFUL
 #elif   OS_TIMER_SIZE == 64
 typedef uint64_t     cnt_t;
-#define CNT_MAX  UINT64_MAX
+#define CNT_MAX          0xFFFFFFFFFFFFFFFFULL
 #else
 #error  Invalid OS_TIMER_SIZE value!
 #endif
