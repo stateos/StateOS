@@ -35,6 +35,7 @@ Features:
 5.9
 - updated os version
 - updated task object
+- updated mailbox queue object
 ---------
 5.8
 - added stream buffer object
