@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.c
     @author  Rajmund Szymanski
-    @date    16.04.2018
+    @date    23.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -104,26 +104,49 @@ void stm_delete( stm_t *stm )
 
 /* -------------------------------------------------------------------------- */
 static
+tsk_t *priv_stm_owner( stm_t *stm, tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	if (stm->owner == 0 || stm->owner->guard != stm)
+		stm->owner = tsk;
+
+	return stm->owner;
+}
+
+/* -------------------------------------------------------------------------- */
+static
 unsigned priv_stm_get( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned f = stm->first;
-	unsigned i = 0;
+	unsigned i;
+	unsigned len = 0;
+	tsk_t  * tsk;
 
-	if (size > stm->count)
-		size = stm->count;
-
-	while (size--)
+	while (size-- > 0 && stm->count > 0)
 	{
-		data[i++] = stm->data[f++];
-		if (f >= stm->limit)
-			f = 0;
+		i = stm->first;
+		data[len++] = stm->data[i++];
+		stm->first = (i < stm->limit) ? i : 0;
+		stm->count--;
+
+		tsk = priv_stm_owner(stm, stm->queue);
+		if (tsk)
+		{
+			i = stm->next;
+			stm->data[i++] = *(const char *)tsk->tmp.odata;
+			tsk->tmp.odata = (const char *)tsk->tmp.odata + 1;
+			stm->next = (i < stm->limit) ? i : 0;
+			stm->count++;
+			tsk->evt.size--;
+			if (tsk->evt.size == 0)
+			{
+				stm->owner = 0;
+				core_tsk_wakeup(tsk, E_SUCCESS);
+			}
+		}
 	}
 
-	stm->first = f;
-	stm->count -= i;
-
-	return i;
+	return len;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -131,23 +154,35 @@ static
 unsigned priv_stm_put( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned n = stm->next;
-	unsigned i = 0;
+	unsigned i;
+	unsigned len = 0;
+	tsk_t  * tsk;
 
-	if (size > stm->limit - stm->count)
-		size = stm->limit - stm->count;
-
-	while (size--)
+	while (size-- > 0 && stm->count < stm->limit)
 	{
-		stm->data[n++] = data[i++];
-		if (n >= stm->limit)
-			n = 0;
+		i = stm->next;
+		stm->data[i++] = data[len++];
+		stm->next = (i < stm->limit) ? i : 0;
+		stm->count++;
+
+		tsk = priv_stm_owner(stm, stm->queue);
+		if (tsk)
+		{
+			i = stm->first;
+			*(char *)tsk->tmp.idata = stm->data[i++];
+			tsk->tmp.idata = (char *)tsk->tmp.idata + 1;
+			stm->first = (i < stm->limit) ? i : 0;
+			stm->count--;
+			tsk->evt.size--;
+			if (tsk->evt.size == 0)
+			{
+				stm->owner = 0;
+				core_tsk_wakeup(tsk, E_SUCCESS);
+			}
+		}
 	}
 
-	stm->next = n;
-	stm->count += i;
-
-	return i;
+	return len;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -198,38 +233,14 @@ unsigned stm_space( stm_t *stm )
 unsigned stm_take( stm_t *stm, void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
-	unsigned cnt;
-	unsigned len = 0;
+	unsigned len;
 
 	assert(stm);
 	assert(data);
 
 	port_sys_lock();
 
-	while (size > 0 && stm->count > 0)
-	{
-		len += cnt = priv_stm_get(stm, data, size);
-		data = (char *)data + cnt;
-		size -= cnt;
-
-		while (stm->queue != 0 && stm->count < stm->limit)
-		{
-			if (stm->owner == 0 || stm->owner->guard != stm)
-				stm->owner = stm->queue;
-
-			tsk = stm->owner;
-			cnt = priv_stm_put(stm, tsk->tmp.odata, tsk->evt.size);
-			tsk->tmp.odata = (const char *)tsk->tmp.odata + cnt;
-			tsk->evt.size -= cnt;
-
-			if (tsk->evt.size == 0)
-			{
-				stm->owner = 0;
-				core_tsk_wakeup(tsk, E_SUCCESS);
-			}
-		}
-	}
+	len = priv_stm_get(stm, data, size);
 
 	port_sys_unlock();
 
@@ -238,12 +249,10 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_wait( stm_t *stm, void *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
-	unsigned cnt;
-	unsigned len = 0;
+	unsigned len;
 
 	assert(!port_isr_inside());
 	assert(stm);
@@ -251,38 +260,15 @@ unsigned priv_stm_wait( stm_t *stm, void *data, unsigned size, cnt_t time, unsig
 
 	port_sys_lock();
 
-	while (size > 0 && stm->count > 0)
+	len = priv_stm_get(stm, data, size);
+
+	if (len < size)
 	{
-		len += cnt = priv_stm_get(stm, data, size);
-		data = (char *)data + cnt;
-		size -= cnt;
-
-		while (stm->queue != 0 && stm->count < stm->limit)
-		{
-			if (stm->owner == 0 || stm->owner->guard != stm)
-				stm->owner = stm->queue;
-
-			tsk = stm->owner;
-			cnt = priv_stm_put(stm, tsk->tmp.odata, tsk->evt.size);
-			tsk->tmp.odata = (const char *)tsk->tmp.odata + cnt;
-			tsk->evt.size -= cnt;
-
-			if (tsk->evt.size == 0)
-			{
-				stm->owner = 0;
-				core_tsk_wakeup(tsk, E_SUCCESS);
-			}
-		}
-	}
-
-	if (size > 0)
-	{
-		if (stm->owner == 0 || stm->owner->guard != stm)
-			stm->owner = System.cur;
-		System.cur->tmp.idata = data;
-		System.cur->evt.size = size;
+		priv_stm_owner(stm, System.cur);
+		System.cur->tmp.idata = data + len;
+		System.cur->evt.size = size - len;
 		wait(stm, time);
-		len += (char *)System.cur->tmp.idata - (char *)data;
+		len = size - System.cur->evt.size;
 	}
 
 	port_sys_unlock();
@@ -308,38 +294,14 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay )
 unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
-	unsigned cnt;
-	unsigned len = 0;
+	unsigned len;
 
 	assert(stm);
 	assert(data);
 
 	port_sys_lock();
 
-	while (size > 0 && stm->count < stm->limit)
-	{
-		len += cnt = priv_stm_put(stm, data, size);
-		data = (char *)data + cnt;
-		size -= cnt;
-
-		while (stm->queue != 0 && stm->count > 0)
-		{
-			if (stm->owner == 0 || stm->owner->guard != stm)
-				stm->owner = stm->queue;
-
-			tsk = stm->owner;
-			cnt = priv_stm_get(stm, tsk->tmp.idata, tsk->evt.size);
-			tsk->tmp.idata = (char *)tsk->tmp.idata + cnt;
-			tsk->evt.size -= cnt;
-
-			if (tsk->evt.size == 0)
-			{
-				stm->owner = 0;
-				core_tsk_wakeup(tsk, E_SUCCESS);
-			}
-		}
-	}
+	len = priv_stm_put(stm, data, size);
 
 	port_sys_unlock();
 
@@ -348,12 +310,10 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_send( stm_t *stm, const void *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
-	unsigned cnt;
-	unsigned len = 0;
+	unsigned len;
 
 	assert(!port_isr_inside());
 	assert(stm);
@@ -361,38 +321,15 @@ unsigned priv_stm_send( stm_t *stm, const void *data, unsigned size, cnt_t time,
 
 	port_sys_lock();
 
-	while (size > 0 && stm->count < stm->limit)
+	len = priv_stm_put(stm, data, size);
+
+	if (len < size)
 	{
-		len += cnt = priv_stm_put(stm, data, size);
-		data = (char *)data + cnt;
-		size -= cnt;
-
-		while (stm->queue != 0 && stm->count > 0)
-		{
-			if (stm->owner == 0 || stm->owner->guard != stm)
-				stm->owner = stm->queue;
-
-			tsk = stm->owner;
-			cnt = priv_stm_get(stm, tsk->tmp.idata, tsk->evt.size);
-			tsk->tmp.idata = (char *)tsk->tmp.idata + cnt;
-			tsk->evt.size -= cnt;
-
-			if (tsk->evt.size == 0)
-			{
-				stm->owner = 0;
-				core_tsk_wakeup(tsk, E_SUCCESS);
-			}
-		}
-	}
-
-	if (size > 0)
-	{
-		if (stm->owner == 0 || stm->owner->guard != stm)
-			stm->owner = System.cur;
-		System.cur->tmp.odata = data;
-		System.cur->evt.size = size;
+		priv_stm_owner(stm, System.cur);
+		System.cur->tmp.odata = data + len;
+		System.cur->evt.size = size - len;
 		wait(stm, time);
-		len += (const char *)System.cur->tmp.odata - (const char *)data;
+		len = size - System.cur->evt.size;
 	}
 
 	port_sys_unlock();

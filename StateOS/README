@@ -37,6 +37,7 @@ Features:
 - updated task object
 - updated mailbox queue object
 - updated kernel
+- updated stream buffer object
 ---------
 5.8
 - added stream buffer object
