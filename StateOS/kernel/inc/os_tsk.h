@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    17.04.2018
+    @date    22.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -69,6 +69,7 @@ struct __tsk
 	tsk_t  * mtree; // tree of tasks waiting for mutexes
 	mtx_t  * mlist; // list of mutexes held
 
+	unsigned event; // wakeup event
 	union  {
 	unsigned mode;  // used by flag object
 	const
@@ -80,7 +81,6 @@ struct __tsk
 	union  {
 	unsigned flags; // used by flag object: all flags to wait
 	unsigned size;  // used by stream buffer
-	unsigned event; // wakeup event
 	}        evt;
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 	char     libspace[96];
@@ -108,10 +108,10 @@ struct __tsk
 
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
+                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
 #else
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, { 0 }, { 0 } }
+                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 } }
 #endif
 
 /******************************************************************************

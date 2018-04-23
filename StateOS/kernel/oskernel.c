@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    18.04.2018
+    @date    22.04.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -316,7 +316,7 @@ void core_tsk_unlink( tsk_t *tsk, unsigned event )
 {
 	tsk_t *prv = tsk->back;
 	tsk_t *nxt = tsk->obj.queue;
-	tsk->evt.event = event;
+	tsk->event = event;
 
 	if (nxt)
 	nxt->back = prv;
@@ -329,7 +329,7 @@ void core_tsk_unlink( tsk_t *tsk, unsigned event )
 
 void core_tsk_transfer( tsk_t *tsk, void *obj )
 {
-	core_tsk_unlink(tsk, tsk->evt.event);
+	core_tsk_unlink(tsk, tsk->event);
 	core_tsk_append(tsk, obj);
 }
 
@@ -358,7 +358,7 @@ unsigned core_tsk_waitUntil( void *obj, cnt_t time )
 	priv_tsk_wait(cur, obj);
 	port_ctx_switchLock();
 
-	return cur->evt.event;
+	return cur->event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -376,7 +376,7 @@ unsigned core_tsk_waitFor( void *obj, cnt_t delay )
 	priv_tsk_wait(cur, obj);
 	port_ctx_switchLock();
 
-	return cur->evt.event;
+	return cur->event;
 }
 
 /* -------------------------------------------------------------------------- */
