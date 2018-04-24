@@ -115,30 +115,65 @@ tsk_t *priv_stm_owner( stm_t *stm )
 
 /* -------------------------------------------------------------------------- */
 static
+char priv_stm_getc( stm_t *stm )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned i = stm->first;
+	char c = stm->data[i++];
+	stm->first = (i < stm->limit) ? i : 0;
+	stm->count--;
+	return c;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_stm_putc( stm_t *stm, char c )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned i = stm->next;
+	stm->data[i++] = c;
+	stm->next = (i < stm->limit) ? i : 0;
+	stm->count++;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+char priv_tsk_getc( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	const
+	char *buf = tsk->tmp.odata;
+	char c = *buf;
+	tsk->tmp.odata = ++buf;
+	return c;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_tsk_putc( tsk_t *tsk, char c )
+/* -------------------------------------------------------------------------- */
+{
+	char *buf = tsk->tmp.idata;
+	*buf = c;
+	tsk->tmp.idata = ++buf;
+}
+
+/* -------------------------------------------------------------------------- */
+static
 unsigned priv_stm_get( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i;
-	unsigned len = 0;
 	tsk_t  * tsk;
+	unsigned len = 0;
 
 	while (size-- > 0 && stm->count > 0)
 	{
-		i = stm->first;
-		data[len++] = stm->data[i++];
-		stm->first = (i < stm->limit) ? i : 0;
-		stm->count--;
-
+		data[len++] = priv_stm_getc(stm);
 		tsk = priv_stm_owner(stm);
 		if (tsk)
 		{
-			i = stm->next;
-			stm->data[i++] = *(const char *)tsk->tmp.odata;
-			tsk->tmp.odata = (const char *)tsk->tmp.odata + 1;
-			stm->next = (i < stm->limit) ? i : 0;
-			stm->count++;
-			tsk->evt.size--;
-			if (tsk->evt.size == 0)
+			priv_stm_putc(stm, priv_tsk_getc(tsk));
+			if (--tsk->evt.size == 0)
 			{
 				stm->owner = 0;
 				core_tsk_wakeup(tsk, E_SUCCESS);
@@ -154,27 +189,17 @@ static
 unsigned priv_stm_put( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i;
-	unsigned len = 0;
 	tsk_t  * tsk;
+	unsigned len = 0;
 
 	while (size-- > 0 && stm->count < stm->limit)
 	{
-		i = stm->next;
-		stm->data[i++] = data[len++];
-		stm->next = (i < stm->limit) ? i : 0;
-		stm->count++;
-
+		priv_stm_putc(stm, data[len++]);
 		tsk = priv_stm_owner(stm);
 		if (tsk)
 		{
-			i = stm->first;
-			*(char *)tsk->tmp.idata = stm->data[i++];
-			tsk->tmp.idata = (char *)tsk->tmp.idata + 1;
-			stm->first = (i < stm->limit) ? i : 0;
-			stm->count--;
-			tsk->evt.size--;
-			if (tsk->evt.size == 0)
+			priv_tsk_putc(tsk, priv_stm_getc(stm));
+			if (--tsk->evt.size == 0)
 			{
 				stm->owner = 0;
 				core_tsk_wakeup(tsk, E_SUCCESS);
