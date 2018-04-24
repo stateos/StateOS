@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.c
     @author  Rajmund Szymanski
-    @date    23.04.2018
+    @date    24.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -104,11 +104,11 @@ void stm_delete( stm_t *stm )
 
 /* -------------------------------------------------------------------------- */
 static
-tsk_t *priv_stm_owner( stm_t *stm, tsk_t *tsk )
+tsk_t *priv_stm_owner( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
 	if (stm->owner == 0 || stm->owner->guard != stm)
-		stm->owner = tsk;
+		stm->owner = stm->queue;
 
 	return stm->owner;
 }
@@ -129,7 +129,7 @@ unsigned priv_stm_get( stm_t *stm, char *data, unsigned size )
 		stm->first = (i < stm->limit) ? i : 0;
 		stm->count--;
 
-		tsk = priv_stm_owner(stm, stm->queue);
+		tsk = priv_stm_owner(stm);
 		if (tsk)
 		{
 			i = stm->next;
@@ -165,7 +165,7 @@ unsigned priv_stm_put( stm_t *stm, const char *data, unsigned size )
 		stm->next = (i < stm->limit) ? i : 0;
 		stm->count++;
 
-		tsk = priv_stm_owner(stm, stm->queue);
+		tsk = priv_stm_owner(stm);
 		if (tsk)
 		{
 			i = stm->first;
@@ -264,7 +264,8 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 
 	if (len < size)
 	{
-		priv_stm_owner(stm, System.cur);
+		if (len > 0)
+			stm->owner = System.cur;
 		System.cur->tmp.idata = data + len;
 		System.cur->evt.size = size - len;
 		wait(stm, time);
@@ -325,7 +326,8 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 
 	if (len < size)
 	{
-		priv_stm_owner(stm, System.cur);
+		if (len > 0)
+			stm->owner = System.cur;
 		System.cur->tmp.odata = data + len;
 		System.cur->evt.size = size - len;
 		wait(stm, time);
