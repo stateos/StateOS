@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.h
     @author  Rajmund Szymanski
-    @date    16.04.2018
+    @date    26.04.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -251,44 +251,6 @@ void stm_delete( stm_t *stm );
 
 /******************************************************************************
  *
- * Name              : stm_count
- * ISR alias         : stm_countISR
- *
- * Description       : return the amount of data contained in the stream buffer
- *
- * Parameters
- *   stm             : pointer to stream buffer object
- *
- * Return            : amount of data contained in the stream buffer
- *
- ******************************************************************************/
-
-unsigned stm_count( stm_t *stm );
-
-__STATIC_INLINE
-unsigned stm_countISR( stm_t *stm ) { return stm_count(stm); }
-
-/******************************************************************************
- *
- * Name              : stm_space
- * ISR alias         : stm_spaceISR
- *
- * Description       : return the amount of free space in the stream buffer
- *
- * Parameters
- *   stm             : pointer to stream buffer object
- *
- * Return            : amount of free space in the stream buffer
- *
- ******************************************************************************/
-
-unsigned stm_space( stm_t *stm );
-
-__STATIC_INLINE
-unsigned stm_spaceISR( stm_t *stm ) { return stm_space(stm); }
-
-/******************************************************************************
- *
  * Name              : stm_waitUntil
  *
  * Description       : try to transfer data from the stream buffer object,
@@ -465,6 +427,44 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size );
 __STATIC_INLINE
 unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm_give(stm, data, size); }
 
+/******************************************************************************
+ *
+ * Name              : stm_count
+ * ISR alias         : stm_countISR
+ *
+ * Description       : return the amount of data contained in the stream buffer
+ *
+ * Parameters
+ *   stm             : pointer to stream buffer object
+ *
+ * Return            : amount of data contained in the stream buffer
+ *
+ ******************************************************************************/
+
+unsigned stm_count( stm_t *stm );
+
+__STATIC_INLINE
+unsigned stm_countISR( stm_t *stm ) { return stm_count(stm); }
+
+/******************************************************************************
+ *
+ * Name              : stm_space
+ * ISR alias         : stm_spaceISR
+ *
+ * Description       : return the amount of free space in the stream buffer
+ *
+ * Parameters
+ *   stm             : pointer to stream buffer object
+ *
+ * Return            : amount of free space in the stream buffer
+ *
+ ******************************************************************************/
+
+unsigned stm_space( stm_t *stm );
+
+__STATIC_INLINE
+unsigned stm_spaceISR( stm_t *stm ) { return stm_space(stm); }
+
 #ifdef __cplusplus
 }
 #endif
@@ -494,10 +494,6 @@ struct baseStreamBuffer : public __stm
 	~baseStreamBuffer( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                                            {        stm_kill     (this);                       }
-	unsigned count    ( void )                                            { return stm_count    (this);                       }
-	unsigned countISR ( void )                                            { return stm_countISR (this);                       }
-	unsigned space    ( void )                                            { return stm_space    (this);                       }
-	unsigned spaceISR ( void )                                            { return stm_spaceISR (this);                       }
 	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time  ) { return stm_waitUntil(this, _data, _size, _time);  }
 	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return stm_waitFor  (this, _data, _size, _delay); }
 	unsigned wait     (       void *_data, unsigned _size )               { return stm_wait     (this, _data, _size);         }
@@ -508,6 +504,10 @@ struct baseStreamBuffer : public __stm
 	unsigned send     ( const void *_data, unsigned _size )               { return stm_send     (this, _data, _size);         }
 	unsigned give     ( const void *_data, unsigned _size )               { return stm_give     (this, _data, _size);         }
 	unsigned giveISR  ( const void *_data, unsigned _size )               { return stm_giveISR  (this, _data, _size);         }
+	unsigned count    ( void )                                            { return stm_count    (this);                       }
+	unsigned countISR ( void )                                            { return stm_countISR (this);                       }
+	unsigned space    ( void )                                            { return stm_space    (this);                       }
+	unsigned spaceISR ( void )                                            { return stm_spaceISR (this);                       }
 };
 
 /******************************************************************************

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.c
     @author  Rajmund Szymanski
-    @date    24.04.2018
+    @date    26.04.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -211,50 +211,6 @@ unsigned priv_stm_put( stm_t *stm, const char *data, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_count( stm_t *stm )
-/* -------------------------------------------------------------------------- */
-{
-	tsk_t  * tsk;
-	unsigned cnt;
-
-	assert(stm);
-
-	port_sys_lock();
-
-	cnt = stm->count;
-
-	if (cnt == stm->limit)
-		for (tsk = stm->queue; tsk; tsk = tsk->obj.queue)
-			cnt += tsk->evt.size;
-
-	port_sys_unlock();
-
-	return cnt;
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned stm_space( stm_t *stm )
-/* -------------------------------------------------------------------------- */
-{
-	tsk_t  * tsk;
-	unsigned cnt;
-
-	assert(stm);
-
-	port_sys_lock();
-
-	cnt = stm->limit - stm->count;
-
-	if (cnt == stm->limit)
-		for (tsk = stm->queue; tsk; tsk = tsk->obj.queue)
-			cnt += tsk->evt.size;
-
-	port_sys_unlock();
-
-	return cnt;
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned stm_take( stm_t *stm, void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
@@ -294,7 +250,7 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 		System.cur->tmp.idata = data + len;
 		System.cur->evt.size = size - len;
 		wait(stm, time);
-		len = size - System.cur->evt.size;
+		len = (char *)System.cur->tmp.idata - data;
 	}
 
 	port_sys_unlock();
@@ -356,7 +312,7 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 		System.cur->tmp.odata = data + len;
 		System.cur->evt.size = size - len;
 		wait(stm, time);
-		len = size - System.cur->evt.size;
+		len = (const char *)System.cur->tmp.odata - data;
 	}
 
 	port_sys_unlock();
@@ -376,6 +332,50 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_stm_send(stm, data, size, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned stm_count( stm_t *stm )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t  * tsk;
+	unsigned cnt;
+
+	assert(stm);
+
+	port_sys_lock();
+
+	cnt = stm->count;
+
+	if (cnt == stm->limit)
+		for (tsk = stm->queue; tsk; tsk = tsk->obj.queue)
+			cnt += tsk->evt.size;
+
+	port_sys_unlock();
+
+	return cnt;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned stm_space( stm_t *stm )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t  * tsk;
+	unsigned cnt;
+
+	assert(stm);
+
+	port_sys_lock();
+
+	cnt = stm->limit - stm->count;
+
+	if (cnt == stm->limit)
+		for (tsk = stm->queue; tsk; tsk = tsk->obj.queue)
+			cnt += tsk->evt.size;
+
+	port_sys_unlock();
+
+	return cnt;
 }
 
 /* -------------------------------------------------------------------------- */
