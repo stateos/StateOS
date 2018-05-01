@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    11.04.2018
+    @date    01.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -45,8 +45,8 @@
 #include "inc/os_mem.h" // memory pool
 #include "inc/os_stm.h" // stream buffer
 #include "inc/os_box.h" // mailbox queue
-#include "inc/os_msg.h" // message queue
 #include "inc/os_job.h" // job queue
+#include "inc/os_evq.h" // event queue
 #include "inc/os_tmr.h" // timer
 #include "inc/os_tsk.h" // task
 

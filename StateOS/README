@@ -21,9 +21,9 @@ Features:
 - condition variables
 - memory pools
 - stream buffers
-- message queues
 - mailbox queues
 - job queues
+- event queues
 - timers (one-shot, periodic)
 - cmsis-rtos api
 - cmsis-rtos2 api
@@ -38,6 +38,7 @@ Features:
 - updated mailbox queue object
 - updated kernel
 - updated stream buffer object
+- renamed message queue to event queue
 ---------
 5.8
 - added stream buffer object

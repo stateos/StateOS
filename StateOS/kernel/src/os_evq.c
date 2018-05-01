@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    @file    StateOS: os_msg.c
+    @file    StateOS: os_evq.c
     @author  Rajmund Szymanski
     @date    16.04.2018
     @brief   This file provides set of functions for StateOS.
@@ -29,121 +29,121 @@
 
  ******************************************************************************/
 
-#include "inc/os_msg.h"
+#include "inc/os_evq.h"
 #include "inc/os_tsk.h"
 
 /* -------------------------------------------------------------------------- */
-void msg_init( msg_t *msg, unsigned limit, unsigned *data )
+void evq_init( evq_t *evq, unsigned limit, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
-	assert(msg);
+	assert(evq);
 	assert(limit);
 	assert(data);
 
 	port_sys_lock();
 
-	memset(msg, 0, sizeof(msg_t));
+	memset(evq, 0, sizeof(evq_t));
 
-	msg->limit = limit;
-	msg->data  = data;
+	evq->limit = limit;
+	evq->data  = data;
 
 	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-msg_t *msg_create( unsigned limit )
+evq_t *evq_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	msg_t *msg;
+	evq_t *evq;
 
 	assert(!port_isr_inside());
 	assert(limit);
 
 	port_sys_lock();
 
-	msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + limit * sizeof(unsigned));
-	msg_init(msg, limit, (void *)((size_t)msg + ABOVE(sizeof(msg_t))));
-	msg->res = msg;
+	evq = core_sys_alloc(ABOVE(sizeof(evq_t)) + limit * sizeof(unsigned));
+	evq_init(evq, limit, (void *)((size_t)evq + ABOVE(sizeof(evq_t))));
+	evq->res = evq;
 
 	port_sys_unlock();
 
-	return msg;
+	return evq;
 }
 
 /* -------------------------------------------------------------------------- */
-void msg_kill( msg_t *msg )
+void evq_kill( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
-	assert(msg);
+	assert(evq);
 
 	port_sys_lock();
 
-	msg->count = 0;
-	msg->first = 0;
-	msg->next  = 0;
+	evq->count = 0;
+	evq->first = 0;
+	evq->next  = 0;
 
-	core_all_wakeup(msg, E_STOPPED);
+	core_all_wakeup(evq, E_STOPPED);
 
 	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-void msg_delete( msg_t *msg )
+void evq_delete( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
 	port_sys_lock();
 
-	msg_kill(msg);
-	core_sys_free(msg->res);
+	evq_kill(evq);
+	core_sys_free(evq->res);
 
 	port_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_get( msg_t *msg, unsigned *data )
+void priv_evq_get( evq_t *evq, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned f = msg->first;
+	unsigned f = evq->first;
 	
-	*data = msg->data[f++];
+	*data = evq->data[f++];
 
-	msg->first = (f < msg->limit) ? f : 0;
-	msg->count--;
+	evq->first = (f < evq->limit) ? f : 0;
+	evq->count--;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_put( msg_t *msg, unsigned data )
+void priv_evq_put( evq_t *evq, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned n = msg->next;
+	unsigned n = evq->next;
 	
-	msg->data[n++] = data;
+	evq->data[n++] = data;
 
-	msg->next = (n < msg->limit) ? n : 0;
-	msg->count++;
+	evq->next = (n < evq->limit) ? n : 0;
+	evq->count++;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_take( msg_t *msg, unsigned *data )
+unsigned evq_take( evq_t *evq, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
 	unsigned event = E_TIMEOUT;
 
-	assert(msg);
+	assert(evq);
 	assert(data);
 
 	port_sys_lock();
 
-	if (msg->count > 0)
+	if (evq->count > 0)
 	{
-		priv_msg_get(msg, data);
-		tsk = core_one_wakeup(msg, E_SUCCESS);
-		if (tsk) priv_msg_put(msg, tsk->tmp.msg);
+		priv_evq_get(evq, data);
+		tsk = core_one_wakeup(evq, E_SUCCESS);
+		if (tsk) priv_evq_put(evq, tsk->tmp.event);
 		event = E_SUCCESS;
 	}
 
@@ -154,28 +154,28 @@ unsigned msg_take( msg_t *msg, unsigned *data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_wait( msg_t *msg, unsigned *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_evq_wait( evq_t *evq, unsigned *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
 	unsigned event = E_SUCCESS;
 
 	assert(!port_isr_inside());
-	assert(msg);
+	assert(evq);
 	assert(data);
 
 	port_sys_lock();
 
-	if (msg->count > 0)
+	if (evq->count > 0)
 	{
-		priv_msg_get(msg, data);
-		tsk = core_one_wakeup(msg, E_SUCCESS);
-		if (tsk) priv_msg_put(msg, tsk->tmp.msg);
+		priv_evq_get(evq, data);
+		tsk = core_one_wakeup(evq, E_SUCCESS);
+		if (tsk) priv_evq_put(evq, tsk->tmp.event);
 	}
 	else
 	{
 		System.cur->tmp.idata = data;
-		event = wait(msg, time);
+		event = wait(evq, time);
 	}
 
 	port_sys_unlock();
@@ -184,35 +184,35 @@ unsigned priv_msg_wait( msg_t *msg, unsigned *data, cnt_t time, unsigned(*wait)(
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitUntil( msg_t *msg, unsigned *data, cnt_t time )
+unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_msg_wait(msg, data, time, core_tsk_waitUntil);
+	return priv_evq_wait(evq, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitFor( msg_t *msg, unsigned *data, cnt_t delay )
+unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_msg_wait(msg, data, delay, core_tsk_waitFor);
+	return priv_evq_wait(evq, data, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_give( msg_t *msg, unsigned data )
+unsigned evq_give( evq_t *evq, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
 	unsigned event = E_TIMEOUT;
 
-	assert(msg);
+	assert(evq);
 
 	port_sys_lock();
 
-	if (msg->count < msg->limit)
+	if (evq->count < evq->limit)
 	{
-		priv_msg_put(msg, data);
-		tsk = core_one_wakeup(msg, E_SUCCESS);
-		if (tsk) priv_msg_get(msg, tsk->tmp.idata);
+		priv_evq_put(evq, data);
+		tsk = core_one_wakeup(evq, E_SUCCESS);
+		if (tsk) priv_evq_get(evq, tsk->tmp.idata);
 		event = E_SUCCESS;
 	}
 
@@ -223,27 +223,27 @@ unsigned msg_give( msg_t *msg, unsigned data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_send( msg_t *msg, unsigned data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
 	unsigned event = E_SUCCESS;
 
 	assert(!port_isr_inside());
-	assert(msg);
+	assert(evq);
 
 	port_sys_lock();
 
-	if (msg->count < msg->limit)
+	if (evq->count < evq->limit)
 	{
-		priv_msg_put(msg, data);
-		tsk = core_one_wakeup(msg, E_SUCCESS);
-		if (tsk) priv_msg_get(msg, tsk->tmp.idata);
+		priv_evq_put(evq, data);
+		tsk = core_one_wakeup(evq, E_SUCCESS);
+		if (tsk) priv_evq_get(evq, tsk->tmp.idata);
 	}
 	else
 	{
-		System.cur->tmp.msg = data;
-		event = wait(msg, time);
+		System.cur->tmp.event = data;
+		event = wait(evq, time);
 	}
 
 	port_sys_unlock();
@@ -252,40 +252,40 @@ unsigned priv_msg_send( msg_t *msg, unsigned data, cnt_t time, unsigned(*wait)(v
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendUntil( msg_t *msg, unsigned data, cnt_t time )
+unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_msg_send(msg, data, time, core_tsk_waitUntil);
+	return priv_evq_send(evq, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendFor( msg_t *msg, unsigned data, cnt_t delay )
+unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_msg_send(msg, data, delay, core_tsk_waitFor);
+	return priv_evq_send(evq, data, delay, core_tsk_waitFor);
 }
 
 /* -------------------------------------------------------------------------- */
-void msg_push( msg_t *msg, unsigned data )
+void evq_push( evq_t *evq, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
 
-	assert(msg);
+	assert(evq);
 
 	port_sys_lock();
 
-	priv_msg_put(msg, data);
+	priv_evq_put(evq, data);
 
-	if (msg->count > msg->limit)
+	if (evq->count > evq->limit)
 	{
-		msg->count = msg->limit;
-		msg->first = msg->next;
+		evq->count = evq->limit;
+		evq->first = evq->next;
 	}
 	else
 	{
-		tsk = core_one_wakeup(msg, E_SUCCESS);
-		if (tsk) priv_msg_get(msg, tsk->tmp.idata);
+		tsk = core_one_wakeup(evq, E_SUCCESS);
+		if (tsk) priv_evq_get(evq, tsk->tmp.idata);
 	}
 
 	port_sys_unlock();
