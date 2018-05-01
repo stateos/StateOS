@@ -25,9 +25,10 @@ There's a dedicated function for immediate change the task state.
 - condition variables
 - memory pools
 - stream buffers
-- message queues
+- message buffers
 - mailbox queues
 - job queues
+- event queues
 - timers (one-shot, periodic)
 - cmsis-rtos api
 - cmsis-rtos2 api
