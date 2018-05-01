@@ -1,0 +1,36 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+OS_MSG(msg, sizeof(unsigned));
+
+OS_TSK_DEF(sla, 0)
+{
+	unsigned x;
+
+	for (;;)
+	{
+		msg_wait(msg, &x, sizeof(x));
+		LEDs = x;
+	}
+}
+
+OS_TSK_DEF(mas, 0)
+{
+	unsigned x = 15;
+
+	for (;;)
+	{
+		tsk_delay(SEC);
+		msg_give(msg, &x, sizeof(x));
+		x++;
+	}
+}
+
+int main()
+{
+	LED_Init();
+
+	tsk_start(sla);
+	tsk_start(mas);
+	tsk_sleep();
+}

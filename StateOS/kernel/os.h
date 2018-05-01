@@ -44,6 +44,7 @@
 #include "inc/os_lst.h" // list
 #include "inc/os_mem.h" // memory pool
 #include "inc/os_stm.h" // stream buffer
+#include "inc/os_msg.h" // message buffer
 #include "inc/os_box.h" // mailbox queue
 #include "inc/os_job.h" // job queue
 #include "inc/os_evq.h" // event queue

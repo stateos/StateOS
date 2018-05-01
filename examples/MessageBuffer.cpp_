@@ -1,0 +1,39 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+auto led = Led();
+auto msg = MessageBufferTT<1, unsigned>();
+
+void slave()
+{
+	unsigned x;
+
+	for (;;)
+	{
+		msg.wait(&x, sizeof(x));
+		led = x;
+	}
+}
+
+void master()
+{
+	unsigned x = 15;
+
+	for (;;)
+	{
+		ThisTask::delay(SEC);
+		msg.give(&x, sizeof(x));
+		x++;
+	}
+}
+
+auto sla = Task(0, slave);
+auto mas = Task(0, master);
+
+int main()
+{
+	sla.start();
+	mas.start();
+
+	ThisTask::stop();
+}
