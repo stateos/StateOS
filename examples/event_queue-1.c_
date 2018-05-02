@@ -16,12 +16,13 @@ void slave()
 
 void master()
 {
-	unsigned x = 15;
+	unsigned x = 1;
 
 	for (;;)
 	{
 		tsk_delay(SEC);
-		evq_give(evq, x++);
+		evq_give(evq, x);
+		x = (x << 1) | (x >> 3);
 	}
 }
 

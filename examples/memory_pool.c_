@@ -19,14 +19,15 @@ void slave()
 void master()
 {
 	void *p;
-	unsigned x = 15;
+	unsigned x = 1;
 
 	for (;;)
 	{
 		tsk_delay(SEC);
 		mem_wait(mem, &p);
-		*(unsigned *)p = x++;
+		*(unsigned *)p = x;
 		lst_give(lst, p);
+		x = (x << 1) | (x >> 3);
 	}
 }
 

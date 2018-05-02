@@ -16,13 +16,13 @@ OS_TSK_DEF(sla, 0)
 
 OS_TSK_DEF(mas, 0)
 {
-	unsigned x = 15;
+	unsigned x = 1;
 
 	for (;;)
 	{
 		tsk_delay(SEC);
 		stm_send(stm, &x, sizeof(x));
-		x++;
+		x = (x << 1) | (x >> 3);
 	}
 }
 

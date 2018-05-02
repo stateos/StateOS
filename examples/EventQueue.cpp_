@@ -17,12 +17,13 @@ void slave()
 
 void master()
 {
-	unsigned x = 15;
+	unsigned x = 1;
 
 	for (;;)
 	{
 		ThisTask::delay(SEC);
-		evq.give(x++);
+		evq.give(x);
+		x = (x << 1) | (x >> 3);
 	}
 }
 

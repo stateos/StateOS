@@ -17,13 +17,13 @@ void slave()
 
 void master()
 {
-	unsigned x = 15;
+	unsigned x = 1;
 
 	for (;;)
 	{
 		ThisTask::delay(SEC);
 		stm.send(&x, sizeof(x));
-		x++;
+		x = (x << 1) | (x >> 3);
 	}
 }
 

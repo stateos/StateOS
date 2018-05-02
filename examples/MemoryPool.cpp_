@@ -20,15 +20,16 @@ void slave()
 void master()
 {
 	unsigned*p;
-	unsigned x = 15;
+	unsigned x = 1;
 
 	for (;;)
 	{
 		ThisTask::delay(SEC);
 
 		mem.wait(&p);
-		*p=x++;
+		*p=x;
 		lst.give(p);
+		x = (x << 1) | (x >> 3);
 	}
 }
 
