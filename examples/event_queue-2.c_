@@ -9,7 +9,7 @@ void slave()
 
 	for (;;)
 	{
-		evq_wait(&evq, &x);
+		x = evq_wait(&evq);
 		LEDs = x;
 	}
 }

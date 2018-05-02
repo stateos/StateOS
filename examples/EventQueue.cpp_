@@ -10,7 +10,7 @@ void slave()
 
 	for (;;)
 	{
-		evq.wait(&x);
+		x = evq.wait();
 		led = x;
 	}
 }

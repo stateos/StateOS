@@ -42,6 +42,7 @@ Features:
 - renamed message queue to event queue
 - added message buffer object
 - added examples for new feature
+- updated event queue object
 ---------
 5.8
 - added stream buffer object

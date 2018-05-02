@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evq.h
     @author  Rajmund Szymanski
-    @date    01.05.2018
+    @date    02.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -256,19 +256,18 @@ void evq_delete( evq_t *evq );
  *
  * Parameters
  *   evq             : pointer to event queue object
- *   data            : pointer to store event data
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered from the event queue object
  *   E_STOPPED       : event queue object was killed before the specified timeout expired
  *   E_TIMEOUT       : event queue object is empty and was not received data before the specified timeout expired
+ *   'another'       : task was successfully released
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time );
+unsigned evq_waitUntil( evq_t *evq, cnt_t time );
 
 /******************************************************************************
  *
@@ -279,21 +278,20 @@ unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time );
  *
  * Parameters
  *   evq             : pointer to event queue object
- *   data            : pointer to store event data
  *   delay           : duration of time (maximum number of ticks to wait while the event queue object is empty)
  *                     IMMEDIATE: don't wait if the event queue object is empty
  *                     INFINITE:  wait indefinitely while the event queue object is empty
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered from the event queue object
  *   E_STOPPED       : event queue object was killed before the specified timeout expired
  *   E_TIMEOUT       : event queue object is empty and was not received data before the specified timeout expired
+ *   'another'       : task was successfully released
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay );
+unsigned evq_waitFor( evq_t *evq, cnt_t delay );
 
 /******************************************************************************
  *
@@ -304,18 +302,17 @@ unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay );
  *
  * Parameters
  *   evq             : pointer to event queue object
- *   data            : pointer to store event data
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered from the event queue object
  *   E_STOPPED       : event queue object was killed
+ *   'another'       : task was successfully released
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, INFINITE); }
+unsigned evq_wait( evq_t *evq ) { return evq_waitFor(evq, INFINITE); }
 
 /******************************************************************************
  *
@@ -327,20 +324,19 @@ unsigned evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, 
  *
  * Parameters
  *   evq             : pointer to event queue object
- *   data            : pointer to store event data
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered from the event queue object
  *   E_TIMEOUT       : event queue object is empty
+ *   'another'       : task was successfully released
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned evq_take( evq_t *evq, unsigned *data );
+unsigned evq_take( evq_t *evq );
 
 __STATIC_INLINE
-unsigned evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
+unsigned evq_takeISR( evq_t *evq ) { return evq_take(evq); }
 
 /******************************************************************************
  *
@@ -351,7 +347,7 @@ unsigned evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data);
  *
  * Parameters
  *   evq             : pointer to event queue object
- *   data            : event data
+ *   event           : event value
  *   time            : timepoint value
  *
  * Return
@@ -363,7 +359,7 @@ unsigned evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data);
  *
  ******************************************************************************/
 
-unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time );
+unsigned evq_sendUntil( evq_t *evq, unsigned event, cnt_t time );
 
 /******************************************************************************
  *
@@ -374,7 +370,7 @@ unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time );
  *
  * Parameters
  *   evq             : pointer to event queue object
- *   data            : event data
+ *   event           : event value
  *   delay           : duration of time (maximum number of ticks to wait while the event queue object is full)
  *                     IMMEDIATE: don't wait if the event queue object is full
  *                     INFINITE:  wait indefinitely while the event queue object is full
@@ -388,7 +384,7 @@ unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time );
  *
  ******************************************************************************/
 
-unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay );
+unsigned evq_sendFor( evq_t *evq, unsigned event, cnt_t delay );
 
 /******************************************************************************
  *
@@ -399,7 +395,7 @@ unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay );
  *
  * Parameters
  *   evq             : pointer to event queue object
- *   data            : event data
+ *   event           : event value
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered to the event queue object
@@ -410,7 +406,7 @@ unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned evq_send( evq_t *evq, unsigned data ) { return evq_sendFor(evq, data, INFINITE); }
+unsigned evq_send( evq_t *evq, unsigned event ) { return evq_sendFor(evq, event, INFINITE); }
 
 /******************************************************************************
  *
@@ -422,7 +418,7 @@ unsigned evq_send( evq_t *evq, unsigned data ) { return evq_sendFor(evq, data, I
  *
  * Parameters
  *   evq             : pointer to event queue object
- *   data            : event data
+ *   event           : event value
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered to the event queue object
@@ -432,10 +428,10 @@ unsigned evq_send( evq_t *evq, unsigned data ) { return evq_sendFor(evq, data, I
  *
  ******************************************************************************/
 
-unsigned evq_give( evq_t *evq, unsigned data );
+unsigned evq_give( evq_t *evq, unsigned event );
 
 __STATIC_INLINE
-unsigned evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); }
+unsigned evq_giveISR( evq_t *evq, unsigned event ) { return evq_give(evq, event); }
 
 /******************************************************************************
  *
@@ -447,7 +443,7 @@ unsigned evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); 
  *
  * Parameters
  *   evq             : pointer to event queue object
- *   data            : event data
+ *   event           : event value
  *
  * Return            : none
  *
@@ -455,10 +451,10 @@ unsigned evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); 
  *
  ******************************************************************************/
 
-void evq_push( evq_t *evq, unsigned data );
+void evq_push( evq_t *evq, unsigned event );
 
 __STATIC_INLINE
-void evq_pushISR( evq_t *evq, unsigned data ) { evq_push(evq, data); }
+void evq_pushISR( evq_t *evq, unsigned event ) { evq_push(evq, event); }
 
 #ifdef __cplusplus
 }
@@ -488,19 +484,19 @@ struct baseEventQueue : public __evq
 	 baseEventQueue( const unsigned _limit, unsigned * const _data ): __evq _EVQ_INIT(_limit, _data) {}
 	~baseEventQueue( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )                         {        evq_kill     (this);                }
-	unsigned waitUntil( unsigned*_data, cnt_t _time  ) { return evq_waitUntil(this, _data, _time);  }
-	unsigned waitFor  ( unsigned*_data, cnt_t _delay ) { return evq_waitFor  (this, _data, _delay); }
-	unsigned wait     ( unsigned*_data )               { return evq_wait     (this, _data);         }
-	unsigned take     ( unsigned*_data )               { return evq_take     (this, _data);         }
-	unsigned takeISR  ( unsigned*_data )               { return evq_takeISR  (this, _data);         }
-	unsigned sendUntil( unsigned _data, cnt_t _time  ) { return evq_sendUntil(this, _data, _time);  }
-	unsigned sendFor  ( unsigned _data, cnt_t _delay ) { return evq_sendFor  (this, _data, _delay); }
-	unsigned send     ( unsigned _data )               { return evq_send     (this, _data);         }
-	unsigned give     ( unsigned _data )               { return evq_give     (this, _data);         }
-	unsigned giveISR  ( unsigned _data )               { return evq_giveISR  (this, _data);         }
-	void     push     ( unsigned _data )               {        evq_push     (this, _data);         }
-	void     pushISR  ( unsigned _data )               {        evq_pushISR  (this, _data);         }
+	void     kill     ( void )                          {        evq_kill     (this);                 }
+	unsigned waitUntil(                  cnt_t _time  ) { return evq_waitUntil(this,         _time);  }
+	unsigned waitFor  (                  cnt_t _delay ) { return evq_waitFor  (this,         _delay); }
+	unsigned wait     ( void )                          { return evq_wait     (this);                 }
+	unsigned take     ( void )                          { return evq_take     (this);                 }
+	unsigned takeISR  ( void )                          { return evq_takeISR  (this);                 }
+	unsigned sendUntil( unsigned _event, cnt_t _time  ) { return evq_sendUntil(this, _event, _time);  }
+	unsigned sendFor  ( unsigned _event, cnt_t _delay ) { return evq_sendFor  (this, _event, _delay); }
+	unsigned send     ( unsigned _event )               { return evq_send     (this, _event);         }
+	unsigned give     ( unsigned _event )               { return evq_give     (this, _event);         }
+	unsigned giveISR  ( unsigned _event )               { return evq_giveISR  (this, _event);         }
+	void     push     ( unsigned _event )               {        evq_push     (this, _event);         }
+	void     pushISR  ( unsigned _event )               {        evq_pushISR  (this, _event);         }
 };
 
 /******************************************************************************
