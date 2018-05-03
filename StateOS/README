@@ -33,6 +33,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+6.0
+- updated os version
+---------
 5.9
 - updated os version
 - updated task object
