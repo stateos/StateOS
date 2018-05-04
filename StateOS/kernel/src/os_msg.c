@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    02.05.2018
+    @date    04.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -45,7 +45,7 @@ void msg_init( msg_t *msg, unsigned limit, void *data )
 
 	memset(msg, 0, sizeof(msg_t));
 
-	msg->limit = PSIZE(limit);
+	msg->limit = limit;
 	msg->data  = data;
 
 	port_sys_unlock();
@@ -62,7 +62,7 @@ msg_t *msg_create( unsigned limit )
 
 	port_sys_lock();
 
-	msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + PSIZE(limit));
+	msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + limit);
 	msg_init(msg, limit, (void *)((size_t)msg + ABOVE(sizeof(msg_t))));
 	msg->res = msg;
 
@@ -104,6 +104,28 @@ void msg_delete( msg_t *msg )
 
 /* -------------------------------------------------------------------------- */
 static
+unsigned priv_msg_count( msg_t *msg )
+/* -------------------------------------------------------------------------- */
+{
+	return msg->size;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_msg_space( msg_t *msg )
+/* -------------------------------------------------------------------------- */
+{
+	if (msg->count == 0)
+		return msg->limit;
+	else
+	if (msg->queue == 0 && msg->count + sizeof(unsigned) < msg->limit)
+		return msg->limit - msg->count - sizeof(unsigned);
+	else
+		return 0;
+}
+
+/* -------------------------------------------------------------------------- */
+static
 char priv_msg_getc( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
@@ -130,11 +152,8 @@ static
 void priv_msg_get( msg_t *msg, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	while (size-- > 0)
+	while (size--)
 		*data++ = priv_msg_getc(msg);
-
-	msg->first = ALIGNED(msg->first, unsigned);
-	msg->count = LIMITED(msg->count, unsigned);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -142,81 +161,61 @@ static
 void priv_msg_put( msg_t *msg, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	while (size-- > 0)
+	while (size--)
 		priv_msg_putc(msg, *data++);
-
-	msg->next  = ALIGNED(msg->next,  unsigned);
-	msg->count = ALIGNED(msg->count, unsigned);
 }
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_give( msg_t *msg, tsk_t *tsk, unsigned size )
+void priv_msg_getSize( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	tsk->evt.size -= size;
-	priv_msg_put(msg, tsk->tmp.idata, size);
-	core_tsk_wakeup(tsk, E_SUCCESS);
+	if (msg->count == 0)
+		msg->size = 0;
+	else
+		priv_msg_get(msg, (void *)&msg->size, sizeof(unsigned));
 }
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_tsk_get( tsk_t *tsk, char *data, unsigned size )
-/* -------------------------------------------------------------------------- */
-{
-	tsk->evt.size -= size;
-	memcpy(data, tsk->tmp.odata, size);
-	core_tsk_wakeup(tsk, E_SUCCESS);
-}
-
-/* -------------------------------------------------------------------------- */
-static
-void priv_tsk_put( tsk_t *tsk, const char *data, unsigned size )
-/* -------------------------------------------------------------------------- */
-{
-	tsk->evt.size -= size;
-	memcpy(tsk->tmp.idata, data, size);
-	core_tsk_wakeup(tsk, E_SUCCESS);
-}
-
-/* -------------------------------------------------------------------------- */
-static
-void priv_put_size( msg_t *msg, unsigned size )
+void priv_msg_putSize( msg_t *msg, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	if (msg->count == 0)
 		msg->size = size;
 	else
-		priv_msg_put(msg, (void *)&size, sizeof(unsigned));
+	if (size > 0)
+		priv_msg_put(msg, (const void *)&size, sizeof(unsigned));
 }
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_update( msg_t *msg, bool force )
+void priv_msg_getUpdate( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	if (msg->size > 0 && (msg->count == 0 || force))
+	while (msg->queue != 0 && (msg->count == 0 || msg->count + msg->queue->evt.size + sizeof(unsigned) <= msg->limit))
 	{
-		msg->size = 0;
-		if (force)
-			while (msg->size == 0 && msg->count > 0)
-				priv_msg_get(msg, (void *)&msg->size, sizeof(unsigned));
-		while (msg->queue != 0 && msg->size == 0)
-		{
-			msg->size = msg->queue->evt.size;
-			if (msg->size <= msg->limit)
-			{
-				priv_msg_give(msg, msg->queue, msg->queue->evt.size);
-				if (msg->size > 0)
-				{
-					while (msg->queue != 0 && msg->count + msg->queue->evt.size + sizeof(unsigned) <= msg->limit)
-					{
-						priv_put_size(msg, msg->queue->evt.size);
-						priv_msg_give(msg, msg->queue, msg->queue->evt.size);
-					}
-				}
-			}
-		}
+		priv_msg_putSize(msg, msg->queue->evt.size);
+		priv_msg_put(msg, msg->queue->tmp.odata, msg->queue->evt.size);
+		msg->queue->evt.size = 0;
+		core_tsk_wakeup(msg->queue, E_SUCCESS);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_msg_putUpdate( msg_t *msg )
+/* -------------------------------------------------------------------------- */
+{
+	while (msg->queue != 0 && msg->size > msg->queue->evt.size)
+		core_tsk_wakeup(msg->queue, E_TIMEOUT);
+
+	if (msg->queue != 0)
+	{
+		priv_msg_get(msg, msg->queue->tmp.idata, msg->size);
+		msg->queue->evt.size -= msg->size;
+		priv_msg_getSize(msg);
+		core_tsk_wakeup(msg->queue, E_SUCCESS);
 	}
 }
 
@@ -231,18 +230,16 @@ unsigned msg_take( msg_t *msg, void *data, unsigned size )
 
 	port_sys_lock();
 
-	priv_msg_update(msg, false);
-
-	if (msg->size > 0)
+	if (size > 0)
 	{
-		if (msg->size <= size)
+		if (msg->size > 0)
 		{
-			if (msg->count > 0)
-				priv_msg_get(msg, data, msg->size);
-			else
-				priv_tsk_get(msg->queue, data, msg->size);
-			len = msg->size;
-			priv_msg_update(msg, true);
+			if (size >= priv_msg_count(msg))
+			{
+				priv_msg_get(msg, data, len = msg->size);
+				priv_msg_getSize(msg);
+				priv_msg_getUpdate(msg);
+			}
 		}
 	}
 
@@ -264,26 +261,24 @@ unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsig
 
 	port_sys_lock();
 
-	priv_msg_update(msg, false);
-
-	if (msg->size > 0)
+	if (size > 0)
 	{
-		if (msg->size <= size)
+		if (msg->size > 0)
 		{
-			if (msg->count > 0)
-				priv_msg_get(msg, data, msg->size);
-			else
-				priv_tsk_get(msg->queue, data, msg->size);
-			len = msg->size;
-			priv_msg_update(msg, true);
+			if (size >= priv_msg_count(msg))
+			{
+				priv_msg_get(msg, data, len = msg->size);
+				priv_msg_getSize(msg);
+				priv_msg_getUpdate(msg);
+			}
 		}
-	}
-	else
-	{
-		System.cur->tmp.idata = data;
-		System.cur->evt.size = size;
-		wait(msg, time);
-		len = size - System.cur->evt.size;
+		else
+		{
+			System.cur->tmp.idata = data;
+			System.cur->evt.size = size;
+			wait(msg, time);
+			len = size - System.cur->evt.size;
+		}
 	}
 
 	port_sys_unlock();
@@ -316,22 +311,14 @@ unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 
 	port_sys_lock();
 
-	priv_msg_update(msg, false);
-
-	if (msg->queue != 0 && msg->size == 0)
+	if (size > 0 && size <= msg->limit)
 	{
-		if (msg->queue->evt.size >= size)
+		if (size <= priv_msg_space(msg))
 		{
-			priv_tsk_put(msg->queue, data, size);
-			len = size;
+			priv_msg_putSize(msg, len = size);
+			priv_msg_put(msg, data, len);
+			priv_msg_putUpdate(msg);
 		}
-	}
-	else
-	if (msg->queue == 0 && ((msg->size == 0 && msg->count + size <= msg->limit) || msg->count + sizeof(unsigned) + size <= msg->limit))
-	{
-		priv_put_size(msg, size);
-		priv_msg_put(msg, data, size);
-		len = size;
 	}
 
 	port_sys_unlock();
@@ -352,31 +339,21 @@ unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time,
 
 	port_sys_lock();
 
-	priv_msg_update(msg, false);
-
-	if (msg->queue != 0 && msg->size == 0)
+	if (size > 0 && size <= msg->limit)
 	{
-		if (msg->queue->evt.size >= size)
+		if (size <= priv_msg_space(msg))
 		{
-			priv_tsk_put(msg->queue, data, size);
-			len = size;
+			priv_msg_putSize(msg, len = size);
+			priv_msg_put(msg, data, len);
+			priv_msg_putUpdate(msg);
 		}
-	}
-	else
-	if (msg->queue == 0 && ((msg->size == 0 && msg->count + size <= msg->limit) || msg->count + sizeof(unsigned) + size <= msg->limit))
-	{
-		priv_put_size(msg, size);
-		priv_msg_put(msg, data, size);
-		len = size;
-	}
-	else
-	{
-		if (msg->size == 0)
-			msg->size = size;
-		System.cur->tmp.odata = data;
-		System.cur->evt.size = size;
-		wait(msg, time);
-		len = size - System.cur->evt.size;
+		else
+		{
+			System.cur->tmp.odata = data;
+			System.cur->evt.size = size;
+			wait(msg, time);
+			len = size - System.cur->evt.size;
+		}
 	}
 
 	port_sys_unlock();
@@ -408,9 +385,7 @@ unsigned msg_count( msg_t *msg )
 
 	port_sys_lock();
 
-	priv_msg_update(msg, false);
-
-	cnt = msg->size;
+	cnt = priv_msg_count(msg);
 
 	port_sys_unlock();
 
@@ -427,21 +402,7 @@ unsigned msg_space( msg_t *msg )
 
 	port_sys_lock();
 
-	priv_msg_update(msg, false);
-
-	if (msg->size > 0)
-	{
-		if (msg->queue == 0)
-			if (msg->count < msg->limit)
-				cnt = msg->limit - msg->count - sizeof(unsigned);
-	}
-	else
-	{
-		if (msg->queue == 0)
-			cnt = msg->limit;
-		else
-			cnt = msg->queue->evt.size;
-	}
+	cnt = priv_msg_space(msg);
 
 	port_sys_unlock();
 
