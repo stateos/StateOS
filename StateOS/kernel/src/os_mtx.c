@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    12.04.2018
+    @date    05.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -154,7 +154,6 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	if (mtx->owner == 0)
 	{
 		priv_mtx_link(mtx, System.cur);
-
 		event = E_SUCCESS;
 	}
 	else

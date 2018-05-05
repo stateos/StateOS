@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.c
     @author  Rajmund Szymanski
-    @date    13.04.2018
+    @date    05.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -154,7 +154,7 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
-	unsigned event = E_SUCCESS;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(job);
@@ -166,6 +166,7 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		priv_job_get(job, &System.cur->tmp.fun);
 		tsk = core_one_wakeup(job, E_SUCCESS);
 		if (tsk) priv_job_put(job, tsk->tmp.fun);
+		event = E_SUCCESS;
 	}
 	else
 	{
@@ -225,7 +226,7 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
-	unsigned event = E_SUCCESS;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(job);
@@ -238,6 +239,7 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void
 		priv_job_put(job, fun);
 		tsk = core_one_wakeup(job, E_SUCCESS);
 		if (tsk) priv_job_get(job, &tsk->tmp.fun);
+		event = E_SUCCESS;
 	}
 	else
 	{

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_lst.c
     @author  Rajmund Szymanski
-    @date    13.04.2018
+    @date    05.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -119,7 +119,7 @@ static
 unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_SUCCESS;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(lst);
@@ -131,6 +131,7 @@ unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(voi
 	{
 		*data = lst->next + 1;
 		lst->next = lst->next->next;
+		event = E_SUCCESS;
 	}
 	else
 	{

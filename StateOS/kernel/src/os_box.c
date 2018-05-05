@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    23.04.2018
+    @date    05.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -163,7 +163,7 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
-	unsigned event = E_SUCCESS;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(box);
@@ -176,6 +176,7 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 		priv_box_get(box, data);
 		tsk = core_one_wakeup(box, E_SUCCESS);
 		if (tsk) priv_box_put(box, tsk->tmp.odata);
+		event = E_SUCCESS;
 	}
 	else
 	{
@@ -233,7 +234,7 @@ unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t  * tsk;
-	unsigned event = E_SUCCESS;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(box);
@@ -246,6 +247,7 @@ unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait
 		priv_box_put(box, data);
 		tsk = core_one_wakeup(box, E_SUCCESS);
 		if (tsk) priv_box_get(box, tsk->tmp.idata);
+		event = E_SUCCESS;
 	}
 	else
 	{

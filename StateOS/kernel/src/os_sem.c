@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sem.c
     @author  Rajmund Szymanski
-    @date    13.04.2018
+    @date    05.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -124,7 +124,7 @@ static
 unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_SUCCESS;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(sem);
@@ -136,6 +136,7 @@ unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	{
 		if (core_one_wakeup(sem, E_SUCCESS) == 0)
 			sem->count--;
+		event = E_SUCCESS;
 	}
 	else
 	{
@@ -189,7 +190,7 @@ static
 unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_SUCCESS;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(sem);
@@ -201,6 +202,7 @@ unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	{
 		if (core_one_wakeup(sem, E_SUCCESS) == 0)
 			sem->count++;
+		event = E_SUCCESS;
 	}
 	else
 	{

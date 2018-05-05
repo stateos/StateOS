@@ -2,7 +2,7 @@
 
     @file    StateOS: os_sig.c
     @author  Rajmund Szymanski
-    @date    13.04.2018
+    @date    05.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -121,7 +121,7 @@ static
 unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_SUCCESS;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(sig);
@@ -132,6 +132,7 @@ unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	if (sig->flag)
 	{
 		sig->flag = sig->type;
+		event = E_SUCCESS;
 	}
 	else
 	{

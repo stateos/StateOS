@@ -224,7 +224,7 @@ static
 unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_SUCCESS;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(evq);
@@ -236,6 +236,7 @@ unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(v
 		priv_evq_put(evq, data);
 		if (evq->queue)
 			core_one_wakeup(evq, priv_evq_get(evq));
+		event = E_SUCCESS;
 	}
 	else
 	{
