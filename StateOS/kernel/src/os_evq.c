@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evq.c
     @author  Rajmund Szymanski
-    @date    02.05.2018
+    @date    05.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -138,7 +138,6 @@ unsigned evq_take( evq_t *evq )
 	unsigned event = E_TIMEOUT;
 
 	assert(evq);
-	assert(data);
 
 	port_sys_lock();
 
@@ -164,7 +163,6 @@ unsigned priv_evq_wait( evq_t *evq, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 
 	assert(!port_isr_inside());
 	assert(evq);
-	assert(data);
 
 	port_sys_lock();
 
