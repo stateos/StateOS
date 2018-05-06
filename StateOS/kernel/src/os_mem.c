@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mem.c
     @author  Rajmund Szymanski
-    @date    05.05.2018
+    @date    06.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -175,7 +175,7 @@ unsigned priv_mem_wait( mem_t *mem, void **data, cnt_t time, unsigned(*wait)(voi
 	}
 	else
 	{
-		System.cur->tmp.idata = data;
+		System.cur->tmp.mem.data.in = data;
 		event = wait(mem, time);
 	}
 
@@ -217,7 +217,7 @@ void mem_give( mem_t *mem, const void *data )
 
 	if (tsk)
 	{
-		*(const void **)tsk->tmp.odata = data;
+		*tsk->tmp.mem.data.out = data;
 	}
 	else
 	{

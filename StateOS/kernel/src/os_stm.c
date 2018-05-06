@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.c
     @author  Rajmund Szymanski
-    @date    26.04.2018
+    @date    06.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -138,28 +138,6 @@ void priv_stm_putc( stm_t *stm, char c )
 
 /* -------------------------------------------------------------------------- */
 static
-char priv_tsk_getc( tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
-	const
-	char *buf = tsk->tmp.odata;
-	char c = *buf;
-	tsk->tmp.odata = ++buf;
-	return c;
-}
-
-/* -------------------------------------------------------------------------- */
-static
-void priv_tsk_putc( tsk_t *tsk, char c )
-/* -------------------------------------------------------------------------- */
-{
-	char *buf = tsk->tmp.idata;
-	*buf = c;
-	tsk->tmp.idata = ++buf;
-}
-
-/* -------------------------------------------------------------------------- */
-static
 unsigned priv_stm_get( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
@@ -172,8 +150,8 @@ unsigned priv_stm_get( stm_t *stm, char *data, unsigned size )
 		tsk = priv_stm_owner(stm);
 		if (tsk)
 		{
-			priv_stm_putc(stm, priv_tsk_getc(tsk));
-			if (--tsk->evt.size == 0)
+			priv_stm_putc(stm, *tsk->tmp.stm.data.out++);
+			if (--tsk->tmp.stm.size == 0)
 			{
 				stm->owner = 0;
 				core_tsk_wakeup(tsk, E_SUCCESS);
@@ -198,8 +176,8 @@ unsigned priv_stm_put( stm_t *stm, const char *data, unsigned size )
 		tsk = priv_stm_owner(stm);
 		if (tsk)
 		{
-			priv_tsk_putc(tsk, priv_stm_getc(stm));
-			if (--tsk->evt.size == 0)
+			*tsk->tmp.stm.data.in++ = priv_stm_getc(stm);
+			if (--tsk->tmp.stm.size == 0)
 			{
 				stm->owner = 0;
 				core_tsk_wakeup(tsk, E_SUCCESS);
@@ -247,10 +225,10 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 	{
 		if (len > 0)
 			stm->owner = System.cur;
-		System.cur->tmp.idata = data + len;
-		System.cur->evt.size = size - len;
+		System.cur->tmp.stm.data.in = data + len;
+		System.cur->tmp.stm.size = size - len;
 		wait(stm, time);
-		len = (char *)System.cur->tmp.idata - data;
+		len = System.cur->tmp.stm.data.in - data;
 	}
 
 	port_sys_unlock();
@@ -309,10 +287,10 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 	{
 		if (len > 0)
 			stm->owner = System.cur;
-		System.cur->tmp.odata = data + len;
-		System.cur->evt.size = size - len;
+		System.cur->tmp.stm.data.out = data + len;
+		System.cur->tmp.stm.size = size - len;
 		wait(stm, time);
-		len = (const char *)System.cur->tmp.odata - data;
+		len = System.cur->tmp.stm.data.out - data;
 	}
 
 	port_sys_unlock();
@@ -349,7 +327,7 @@ unsigned stm_count( stm_t *stm )
 
 	if (cnt == stm->limit)
 		for (tsk = stm->queue; tsk; tsk = tsk->obj.queue)
-			cnt += tsk->evt.size;
+			cnt += tsk->tmp.stm.size;
 
 	port_sys_unlock();
 
@@ -371,7 +349,7 @@ unsigned stm_space( stm_t *stm )
 
 	if (cnt == stm->limit)
 		for (tsk = stm->queue; tsk; tsk = tsk->obj.queue)
-			cnt += tsk->evt.size;
+			cnt += tsk->tmp.stm.size;
 
 	port_sys_unlock();
 

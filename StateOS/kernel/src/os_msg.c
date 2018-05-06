@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    05.05.2018
+    @date    06.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -198,11 +198,11 @@ static
 void priv_msg_getUpdate( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	while (msg->queue != 0 && (msg->count == 0 || msg->count + msg->queue->evt.size + sizeof(unsigned) <= msg->limit))
+	while (msg->queue != 0 && (msg->count == 0 || msg->count + msg->queue->tmp.msg.size + sizeof(unsigned) <= msg->limit))
 	{
-		priv_msg_putSize(msg, msg->queue->evt.size);
-		priv_msg_put(msg, msg->queue->tmp.odata, msg->queue->evt.size);
-		msg->queue->evt.size = 0;
+		priv_msg_putSize(msg, msg->queue->tmp.msg.size);
+		priv_msg_put(msg, msg->queue->tmp.msg.data.out, msg->queue->tmp.msg.size);
+		msg->queue->tmp.msg.size = 0;
 		core_tsk_wakeup(msg->queue, E_SUCCESS);
 	}
 }
@@ -212,13 +212,13 @@ static
 void priv_msg_putUpdate( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	while (msg->queue != 0 && msg->size > msg->queue->evt.size)
+	while (msg->queue != 0 && msg->size > msg->queue->tmp.msg.size)
 		core_tsk_wakeup(msg->queue, E_TIMEOUT);
 
 	if (msg->queue != 0)
 	{
-		priv_msg_get(msg, msg->queue->tmp.idata, msg->size);
-		msg->queue->evt.size -= msg->size;
+		priv_msg_get(msg, msg->queue->tmp.msg.data.in, msg->size);
+		msg->queue->tmp.msg.size -= msg->size;
 		priv_msg_getSize(msg);
 		core_tsk_wakeup(msg->queue, E_SUCCESS);
 	}
@@ -279,10 +279,10 @@ unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsig
 		}
 		else
 		{
-			System.cur->tmp.idata = data;
-			System.cur->evt.size = size;
+			System.cur->tmp.msg.data.in = data;
+			System.cur->tmp.msg.size = size;
 			wait(msg, time);
-			len = size - System.cur->evt.size;
+			len = size - System.cur->tmp.msg.size;
 		}
 	}
 
@@ -354,10 +354,10 @@ unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time,
 		}
 		else
 		{
-			System.cur->tmp.odata = data;
-			System.cur->evt.size = size;
+			System.cur->tmp.msg.data.out = data;
+			System.cur->tmp.msg.size = size;
 			wait(msg, time);
-			len = size - System.cur->evt.size;
+			len = size - System.cur->tmp.msg.size;
 		}
 	}
 

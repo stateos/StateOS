@@ -2,7 +2,7 @@
 
     @file    StateOS: os_mtx.c
     @author  Rajmund Szymanski
-    @date    05.05.2018
+    @date    06.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -76,8 +76,8 @@ void priv_mtx_link( mtx_t *mtx, tsk_t *tsk )
 
 	if (tsk)
 	{
-		mtx->list = tsk->mlist;
-		tsk->mlist = mtx;
+		mtx->list = tsk->mtx.list;
+		tsk->mtx.list = mtx;
 	}
 }
 
@@ -95,10 +95,10 @@ void priv_mtx_unlink( mtx_t *mtx )
 	{
 		tsk = mtx->owner;
 
-		if (tsk->mlist == mtx)
-			tsk->mlist = mtx->list;
+		if (tsk->mtx.list == mtx)
+			tsk->mtx.list = mtx->list;
 
-		for (lst = tsk->mlist; lst; lst = lst->list)
+		for (lst = tsk->mtx.list; lst; lst = lst->list)
 			if (lst->list == mtx)
 				lst->list = mtx->list;
 
@@ -170,9 +170,9 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		if (mtx->owner->prio < System.cur->prio)
 			core_tsk_prio(mtx->owner, System.cur->prio);
 
-		System.cur->mtree = mtx->owner;
+		System.cur->mtx.tree = mtx->owner;
 		event = wait(mtx, time);
-		System.cur->mtree = 0;
+		System.cur->mtx.tree = 0;
 	}
 	
 	port_sys_unlock();

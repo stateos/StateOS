@@ -2,7 +2,7 @@
 
     @file    StateOS: os_job.c
     @author  Rajmund Szymanski
-    @date    05.05.2018
+    @date    06.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -138,7 +138,7 @@ unsigned job_take( job_t *job )
 	{
 		priv_job_get(job, &fun);
 		tsk = core_one_wakeup(job, E_SUCCESS);
-		if (tsk) priv_job_put(job, tsk->tmp.fun);
+		if (tsk) priv_job_put(job, tsk->tmp.job.fun);
 		fun();
 		event = E_SUCCESS;
 	}
@@ -163,9 +163,9 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 
 	if (job->count > 0)
 	{
-		priv_job_get(job, &System.cur->tmp.fun);
+		priv_job_get(job, &System.cur->tmp.job.fun);
 		tsk = core_one_wakeup(job, E_SUCCESS);
-		if (tsk) priv_job_put(job, tsk->tmp.fun);
+		if (tsk) priv_job_put(job, tsk->tmp.job.fun);
 		event = E_SUCCESS;
 	}
 	else
@@ -174,7 +174,7 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	}
 
 	if (event == E_SUCCESS)
-		System.cur->tmp.fun();
+		System.cur->tmp.job.fun();
 
 	port_sys_unlock();
 
@@ -211,7 +211,7 @@ unsigned job_give( job_t *job, fun_t *fun )
 	{
 		priv_job_put(job, fun);
 		tsk = core_one_wakeup(job, E_SUCCESS);
-		if (tsk) priv_job_get(job, &tsk->tmp.fun);
+		if (tsk) priv_job_get(job, &tsk->tmp.job.fun);
 		event = E_SUCCESS;
 	}
 
@@ -238,12 +238,12 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void
 	{
 		priv_job_put(job, fun);
 		tsk = core_one_wakeup(job, E_SUCCESS);
-		if (tsk) priv_job_get(job, &tsk->tmp.fun);
+		if (tsk) priv_job_get(job, &tsk->tmp.job.fun);
 		event = E_SUCCESS;
 	}
 	else
 	{
-		System.cur->tmp.fun = fun;
+		System.cur->tmp.job.fun = fun;
 		event = wait(job, time);
 	}
 
@@ -287,7 +287,7 @@ void job_push( job_t *job, fun_t *fun )
 	else
 	{
 		tsk = core_one_wakeup(job, E_SUCCESS);
-		if (tsk) priv_job_get(job, &tsk->tmp.fun);
+		if (tsk) priv_job_get(job, &tsk->tmp.job.fun);
 	}
 
 	port_sys_unlock();

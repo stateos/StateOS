@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    01.05.2018
+    @date    06.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -66,22 +66,72 @@ struct __tsk
 
 	tsk_t  * join;  // joinable state
 	void   * guard; // object that controls the pending process
-	tsk_t  * mtree; // tree of tasks waiting for mutexes
-	mtx_t  * mlist; // list of mutexes held
 
 	unsigned event; // wakeup event
+
+	struct {
+	mtx_t  * list;  // list of mutexes held
+	tsk_t  * tree;  // tree of tasks waiting for mutexes
+	}        mtx;
+
 	union  {
-	unsigned mode;  // used by flag object
+
+	struct {
+	unsigned flags;
+	unsigned mode;
+	}        flg;
+
+	struct {
+	union  {
 	const
-	void   * odata; // used by queue objects (output data)
-	void   * idata; // used by queue objects (input data)
-	fun_t  * fun;   // used by job queue object
-	unsigned event; // used by event queue object
-	}        tmp;
+	void  ** out;
+	void  ** in;
+	}        data;
+	}        lst;
+
+	struct {
 	union  {
-	unsigned flags; // used by flag object: all flags to wait
-	unsigned size;  // used by stream buffer
-	}        evt;
+	const
+	void  ** out;
+	void  ** in;
+	}        data;
+	}        mem;
+
+	struct {
+	union  {
+	const
+	char   * out;
+	char   * in;
+	}        data;
+	unsigned size;
+	}        stm;
+
+	struct {
+	union  {
+	const
+	char   * out;
+	char   * in;
+	}        data;
+	unsigned size;
+	}        msg;
+
+	struct {
+	union  {
+	const
+	void   * out;
+	void   * in;
+	}        data;
+	}        box;
+
+	struct {
+	fun_t  * fun;
+	}        job;
+
+	struct {
+	unsigned event;
+	}        evq;
+
+	}        tmp;
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 	char     libspace[96];
 #endif
@@ -108,10 +158,10 @@ struct __tsk
 
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } }
+                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, { 0 } }
 #else
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, 0, 0, { 0 }, { 0 } }
+                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } } }
 #endif
 
 /******************************************************************************

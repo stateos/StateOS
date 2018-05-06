@@ -36,6 +36,7 @@ Features:
 6.0
 - updated os version
 - updated message buffer object: size of the message limited to size of the buffer
+- reorganized task structure
 ---------
 5.9
 - updated os version

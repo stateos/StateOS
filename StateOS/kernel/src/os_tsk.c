@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.c
     @author  Rajmund Szymanski
-    @date    18.04.2018
+    @date    06.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -124,7 +124,7 @@ void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
-	assert(!System.cur->mlist);
+	assert(!System.cur->mtx.list);
 
 	port_set_lock();
 
@@ -149,9 +149,9 @@ void tsk_kill( tsk_t *tsk )
 
 	if (tsk->id != ID_STOPPED)
 	{
-		tsk->mtree = 0;
-		while (tsk->mlist)
-			mtx_kill(tsk->mlist);
+		tsk->mtx.tree = 0;
+		while (tsk->mtx.list)
+			mtx_kill(tsk->mtx.list);
 
 		if (tsk->join != DETACHED)
 			core_tsk_wakeup(tsk->join, E_STOPPED);
@@ -289,7 +289,7 @@ unsigned priv_tsk_wait( unsigned flags, cnt_t time, unsigned(*wait)(void*,cnt_t)
 
 	port_sys_lock();
 
-	System.cur->evt.flags = flags;
+	System.cur->tmp.flg.flags = flags;
 	event = wait(System.cur, time);
 
 	port_sys_unlock();
@@ -321,8 +321,8 @@ void tsk_give( tsk_t *tsk, unsigned flags )
 
 	if (tsk->guard == tsk)
 	{
-		tsk->evt.flags &= ~flags;
-		if (tsk->evt.flags == 0)
+		tsk->tmp.flg.flags &= ~flags;
+		if (tsk->tmp.flg.flags == 0)
 			core_tsk_wakeup(tsk, flags);
 	}
 

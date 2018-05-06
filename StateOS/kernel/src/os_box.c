@@ -2,7 +2,7 @@
 
     @file    StateOS: os_box.c
     @author  Rajmund Szymanski
-    @date    05.05.2018
+    @date    06.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -148,7 +148,7 @@ unsigned box_take( box_t *box, void *data )
 	{
 		priv_box_get(box, data);
 		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_put(box, tsk->tmp.odata);
+		if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
 		event = E_SUCCESS;
 	}
 
@@ -175,12 +175,12 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 	{
 		priv_box_get(box, data);
 		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_put(box, tsk->tmp.odata);
+		if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
 		event = E_SUCCESS;
 	}
 	else
 	{
-		System.cur->tmp.idata = data;
+		System.cur->tmp.box.data.in = data;
 		event = wait(box, time);
 	}
 
@@ -219,7 +219,7 @@ unsigned box_give( box_t *box, const void *data )
 	{
 		priv_box_put(box, data);
 		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_get(box, tsk->tmp.idata);
+		if (tsk) priv_box_get(box, tsk->tmp.box.data.in);
 		event = E_SUCCESS;
 	}
 
@@ -246,12 +246,12 @@ unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait
 	{
 		priv_box_put(box, data);
 		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_get(box, tsk->tmp.idata);
+		if (tsk) priv_box_get(box, tsk->tmp.box.data.in);
 		event = E_SUCCESS;
 	}
 	else
 	{
-		System.cur->tmp.odata = data;
+		System.cur->tmp.box.data.out = data;
 		event = wait(box, time);
 	}
 
@@ -295,7 +295,7 @@ void box_push( box_t *box, const void *data )
 	else
 	{
 		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_get(box, tsk->tmp.idata);
+		if (tsk) priv_box_get(box, tsk->tmp.box.data.in);
 	}
 
 	port_sys_unlock();

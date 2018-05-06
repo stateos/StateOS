@@ -2,7 +2,7 @@
 
     @file    StateOS: os_evq.c
     @author  Rajmund Szymanski
-    @date    05.05.2018
+    @date    06.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -145,7 +145,7 @@ unsigned evq_take( evq_t *evq )
 	{
 		event = priv_evq_get(evq);
 		tsk = core_one_wakeup(evq, E_SUCCESS);
-		if (tsk) priv_evq_put(evq, tsk->tmp.event);
+		if (tsk) priv_evq_put(evq, tsk->tmp.evq.event);
 	}
 
 	port_sys_unlock();
@@ -170,7 +170,7 @@ unsigned priv_evq_wait( evq_t *evq, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	{
 		event = priv_evq_get(evq);
 		tsk = core_one_wakeup(evq, E_SUCCESS);
-		if (tsk) priv_evq_put(evq, tsk->tmp.event);
+		if (tsk) priv_evq_put(evq, tsk->tmp.evq.event);
 	}
 	else
 	{
