@@ -2,7 +2,7 @@
 
     @file    StateOS: os_tsk.h
     @author  Rajmund Szymanski
-    @date    06.05.2018
+    @date    07.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -79,7 +79,7 @@ struct __tsk
 	struct {
 	unsigned flags;
 	unsigned mode;
-	}        flg;
+	}        flg;   // temporary data used by flag object
 
 	struct {
 	union  {
@@ -87,7 +87,7 @@ struct __tsk
 	void  ** out;
 	void  ** in;
 	}        data;
-	}        lst;
+	}        lst;  // temporary data used by list object
 
 	struct {
 	union  {
@@ -95,7 +95,7 @@ struct __tsk
 	void  ** out;
 	void  ** in;
 	}        data;
-	}        mem;
+	}        mem;   // temporary data used by memory pool object
 
 	struct {
 	union  {
@@ -104,7 +104,7 @@ struct __tsk
 	char   * in;
 	}        data;
 	unsigned size;
-	}        stm;
+	}        stm;   // temporary data used by stream buffer object
 
 	struct {
 	union  {
@@ -113,7 +113,7 @@ struct __tsk
 	char   * in;
 	}        data;
 	unsigned size;
-	}        msg;
+	}        msg;   // temporary data used by message buffer object
 
 	struct {
 	union  {
@@ -121,15 +121,15 @@ struct __tsk
 	void   * out;
 	void   * in;
 	}        data;
-	}        box;
+	}        box;   // temporary data used by mailbox queue object
 
 	struct {
 	fun_t  * fun;
-	}        job;
+	}        job;   // temporary data used by job queue object
 
 	struct {
 	unsigned event;
-	}        evq;
+	}        evq;   // temporary data used by event queue object
 
 	}        tmp;
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
