@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    07.05.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -55,8 +55,8 @@ struct __hdr
 /* -------------------------------------------------------------------------- */
 
 static
-hdr_t Heap[HSIZE(OS_HEAP_SIZE)] =
-  { { Heap+HSIZE(OS_HEAP_SIZE)-1, HSIZE(OS_HEAP_SIZE)-1 } };
+hdr_t Heap[HSIZE(OS_HEAP_SIZE)+1] =
+  { { Heap+HSIZE(OS_HEAP_SIZE), HSIZE(OS_HEAP_SIZE) } };
 
 /* -------------------------------------------------------------------------- */
 
