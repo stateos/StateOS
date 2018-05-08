@@ -1,0 +1,40 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+void alloc_free_test()
+{
+	size_t len = 1;
+	void * buf;
+
+	while ((buf = sys_alloc(len)) != 0)
+	{
+		sys_free(buf);
+		len *= 2;
+	}
+
+	while (len /= 2)
+	{
+		buf = sys_alloc(len);
+		sys_free(buf);
+	}
+}
+
+void slave()
+{
+	LED_Tick();
+	tsk_delete(tsk_this());
+}
+
+void master()
+{
+	alloc_free_test();
+	tsk_create(1, slave);
+}
+
+int main()
+{
+	LED_Init();
+
+	tsk_create(0, master);
+	tsk_stop();
+}
