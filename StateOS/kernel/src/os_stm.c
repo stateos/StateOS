@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.c
     @author  Rajmund Szymanski
-    @date    06.05.2018
+    @date    11.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -83,7 +83,6 @@ void stm_kill( stm_t *stm )
 	stm->count = 0;
 	stm->first = 0;
 	stm->next  = 0;
-	stm->owner = 0;
 
 	core_all_wakeup(stm, E_STOPPED);
 
@@ -104,13 +103,18 @@ void stm_delete( stm_t *stm )
 
 /* -------------------------------------------------------------------------- */
 static
-tsk_t *priv_stm_owner( stm_t *stm )
+unsigned priv_stm_count( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	if (stm->owner == 0 || stm->owner->guard != stm)
-		stm->owner = stm->queue;
+	return stm->count;
+}
 
-	return stm->owner;
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_stm_space( stm_t *stm )
+/* -------------------------------------------------------------------------- */
+{
+	return stm->limit - stm->count;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -138,68 +142,68 @@ void priv_stm_putc( stm_t *stm, char c )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_get( stm_t *stm, char *data, unsigned size )
+void priv_stm_get( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
-	unsigned len = 0;
+	assert(size <= stm->limit);
 
-	while (size-- > 0 && stm->count > 0)
-	{
-		data[len++] = priv_stm_getc(stm);
-		tsk = priv_stm_owner(stm);
-		if (tsk)
-		{
-			priv_stm_putc(stm, *tsk->tmp.stm.data.out++);
-			if (--tsk->tmp.stm.size == 0)
-			{
-				stm->owner = 0;
-				core_tsk_wakeup(tsk, E_SUCCESS);
-			}
-		}
-	}
-
-	return len;
+	while (size--)
+		*data++ = priv_stm_getc(stm);
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_put( stm_t *stm, const char *data, unsigned size )
+void priv_stm_put( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
-	unsigned len = 0;
+	assert(size <= stm->limit);
 
-	while (size-- > 0 && stm->count < stm->limit)
+	while (size--)
+		priv_stm_putc(stm, *data++);
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_stm_getUpdate( stm_t *stm )
+/* -------------------------------------------------------------------------- */
+{
+	while (stm->queue != 0 && stm->queue->tmp.stm.size <= priv_stm_space(stm))
 	{
-		priv_stm_putc(stm, data[len++]);
-		tsk = priv_stm_owner(stm);
-		if (tsk)
-		{
-			*tsk->tmp.stm.data.in++ = priv_stm_getc(stm);
-			if (--tsk->tmp.stm.size == 0)
-			{
-				stm->owner = 0;
-				core_tsk_wakeup(tsk, E_SUCCESS);
-			}
-		}
+		priv_stm_put(stm, stm->queue->tmp.stm.data.out, stm->queue->tmp.stm.size);
+		stm->queue->tmp.stm.size = 0;
+		core_tsk_wakeup(stm->queue, E_SUCCESS);
 	}
+}
 
-	return len;
+/* -------------------------------------------------------------------------- */
+static
+void priv_stm_putUpdate( stm_t *stm )
+/* -------------------------------------------------------------------------- */
+{
+	while (stm->queue != 0 && stm->queue->tmp.stm.size <= priv_stm_count(stm))
+	{
+		priv_stm_get(stm, stm->queue->tmp.stm.data.in, stm->queue->tmp.stm.size);
+		stm->queue->tmp.stm.size = 0;
+		core_tsk_wakeup(stm->queue, E_SUCCESS);
+	}
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned stm_take( stm_t *stm, void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned len = 0;
 
 	assert(stm);
 	assert(data);
 
 	port_sys_lock();
 
-	len = priv_stm_get(stm, data, size);
+	if (size <= priv_stm_count(stm))
+	{
+		priv_stm_get(stm, data, len = size);
+		priv_stm_getUpdate(stm);
+	}
 
 	port_sys_unlock();
 
@@ -211,7 +215,7 @@ static
 unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned len = 0;
 
 	assert(!port_isr_inside());
 	assert(stm);
@@ -219,16 +223,20 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 
 	port_sys_lock();
 
-	len = priv_stm_get(stm, data, size);
-
-	if (len < size)
+	if (size > 0)
 	{
-		if (len > 0)
-			stm->owner = System.cur;
-		System.cur->tmp.stm.data.in = data + len;
-		System.cur->tmp.stm.size = size - len;
-		wait(stm, time);
-		len = System.cur->tmp.stm.data.in - data;
+		if (size <= priv_stm_count(stm))
+		{
+			priv_stm_get(stm, data, len = size);
+			priv_stm_getUpdate(stm);
+		}
+		else
+		{
+			System.cur->tmp.stm.data.in = data;
+			System.cur->tmp.stm.size = size;
+			wait(stm, time);
+			len = size - System.cur->tmp.stm.size;
+		}
 	}
 
 	port_sys_unlock();
@@ -254,14 +262,18 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay )
 unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned len = 0;
 
 	assert(stm);
 	assert(data);
 
 	port_sys_lock();
 
-	len = priv_stm_put(stm, data, size);
+	if (size <= priv_stm_space(stm))
+	{
+		priv_stm_put(stm, data, len = size);
+		priv_stm_putUpdate(stm);
+	}
 
 	port_sys_unlock();
 
@@ -273,7 +285,7 @@ static
 unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned len = 0;
 
 	assert(!port_isr_inside());
 	assert(stm);
@@ -281,16 +293,20 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 
 	port_sys_lock();
 
-	len = priv_stm_put(stm, data, size);
-
-	if (len < size)
+	if (size > 0)
 	{
-		if (len > 0)
-			stm->owner = System.cur;
-		System.cur->tmp.stm.data.out = data + len;
-		System.cur->tmp.stm.size = size - len;
-		wait(stm, time);
-		len = System.cur->tmp.stm.data.out - data;
+		if (size <= priv_stm_space(stm))
+		{
+			priv_stm_put(stm, data, len = size);
+			priv_stm_putUpdate(stm);
+		}
+		else
+		{
+			System.cur->tmp.stm.data.out = data;
+			System.cur->tmp.stm.size = size;
+			wait(stm, time);
+			len = size - System.cur->tmp.stm.size;
+		}
 	}
 
 	port_sys_unlock();
@@ -316,18 +332,13 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
 unsigned stm_count( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
 	unsigned cnt;
 
 	assert(stm);
 
 	port_sys_lock();
 
-	cnt = stm->count;
-
-	if (cnt == stm->limit)
-		for (tsk = stm->queue; tsk; tsk = tsk->obj.queue)
-			cnt += tsk->tmp.stm.size;
+	cnt = priv_stm_count(stm);
 
 	port_sys_unlock();
 
@@ -338,18 +349,13 @@ unsigned stm_count( stm_t *stm )
 unsigned stm_space( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
 	unsigned cnt;
 
 	assert(stm);
 
 	port_sys_lock();
 
-	cnt = stm->limit - stm->count;
-
-	if (cnt == stm->limit)
-		for (tsk = stm->queue; tsk; tsk = tsk->obj.queue)
-			cnt += tsk->tmp.stm.size;
+	cnt = priv_stm_space(stm);
 
 	port_sys_unlock();
 

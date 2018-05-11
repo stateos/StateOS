@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.h
     @author  Rajmund Szymanski
-    @date    26.04.2018
+    @date    11.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -56,8 +56,6 @@ struct __stm
 	unsigned first; // first element to read from buffer
 	unsigned next;  // next element to write into buffer
 	char   * data;  // buffer data
-
-	tsk_t  * owner; // stream buffer owner
 };
 
 /******************************************************************************
@@ -76,7 +74,7 @@ struct __stm
  *
  ******************************************************************************/
 
-#define               _STM_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data, 0 }
+#define               _STM_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data }
 
 /******************************************************************************
  *
@@ -547,7 +545,7 @@ template<unsigned _limit, class T>
 struct StreamBufferTT : public baseStreamBuffer
 {
 	explicit
-	StreamBufferTT( void ): baseStreamBuffer(_limit * sizeof(T), reinterpret_cast<char *>(data_) ) {}
+	StreamBufferTT( void ): baseStreamBuffer(sizeof(data_), reinterpret_cast<char *>(data_) ) {}
 
 	private:
 	T data_[_limit];
