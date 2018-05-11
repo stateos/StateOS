@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    04.05.2018
+    @date    11.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -258,11 +258,11 @@ void msg_delete( msg_t *msg );
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to store message data
- *   size            : size of read buffer
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
  *   time            : timepoint value
  *
- * Return            : number of bytes read
+ * Return            : number of bytes read from the message buffer
  *
  * Note              : use only in thread mode
  *
@@ -279,13 +279,13 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time );
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to store message data
- *   size            : size of read buffer
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
  *   delay           : duration of time (maximum number of ticks to wait while the message buffer object is empty)
  *                     IMMEDIATE: don't wait if the message buffer object is empty
  *                     INFINITE:  wait indefinitely while the message buffer object is empty
  *
- * Return            : number of bytes read
+ * Return            : number of bytes read from the message buffer
  *
  * Note              : use only in thread mode
  *
@@ -302,10 +302,10 @@ unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay );
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
  *
- * Return            : number of bytes read
+ * Return            : number of bytes read from the message buffer
  *
  * Note              : use only in thread mode
  *
@@ -324,10 +324,10 @@ unsigned msg_wait( msg_t *msg, void *data, unsigned size ) { return msg_waitFor(
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
  *
- * Return            : number of bytes read
+ * Return            : number of bytes read from the message buffer
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -347,11 +347,11 @@ unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
  *   time            : timepoint value
  *
- * Return            : number of bytes written
+ * Return            : number of bytes written to the message buffer
  *
  * Note              : use only in thread mode
  *
@@ -368,13 +368,13 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
  *   delay           : duration of time (maximum number of ticks to wait while the message buffer object is full)
  *                     IMMEDIATE: don't wait if the message buffer object is full
  *                     INFINITE:  wait indefinitely while the message buffer object is full
  *
- * Return            : number of bytes written
+ * Return            : number of bytes written to the message buffer
  *
  * Note              : use only in thread mode
  *
@@ -391,10 +391,10 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
  *
- * Return            : number of bytes written
+ * Return            : number of bytes written to the message buffer
  *
  * Note              : use only in thread mode
  *
@@ -413,10 +413,10 @@ unsigned msg_send( msg_t *msg, const void *data, unsigned size ) { return msg_se
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
  *
- * Return            : number of bytes written
+ * Return            : number of bytes written to the message buffer
  *
  * Note              : may be used both in thread and handler mode
  *
