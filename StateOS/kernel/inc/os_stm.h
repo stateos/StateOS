@@ -256,11 +256,15 @@ void stm_delete( stm_t *stm );
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to store message data
- *   size            : size of read buffer
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
  *   time            : timepoint value
  *
- * Return            : number of bytes read
+ * Return
+ *   E_SUCCESS       : data was successfully transfered from the stream buffer object
+ *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : stream buffer object was not received enough data before the specified timeout expired
+ *                     or write buffer has an incorrect size
  *
  * Note              : use only in thread mode
  *
@@ -277,13 +281,17 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to store message data
- *   size            : size of read buffer
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
  *   delay           : duration of time (maximum number of ticks to wait while the stream buffer object is empty)
  *                     IMMEDIATE: don't wait if the stream buffer object is empty
  *                     INFINITE:  wait indefinitely while the stream buffer object is empty
  *
- * Return            : number of bytes read
+ * Return
+ *   E_SUCCESS       : data was successfully transfered from the stream buffer object
+ *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : stream buffer object was not received enough data before the specified timeout expired
+ *                     or write buffer has an incorrect size
  *
  * Note              : use only in thread mode
  *
@@ -300,10 +308,13 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
  *
- * Return            : number of bytes read
+ * Return
+ *   E_SUCCESS       : data was successfully transfered from the stream buffer object
+ *   E_STOPPED       : stream buffer queue object was killed
+ *   E_TIMEOUT       : write buffer has an incorrect size
  *
  * Note              : use only in thread mode
  *
@@ -322,10 +333,12 @@ unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
  *
- * Return            : number of bytes read
+ * Return
+ *   E_SUCCESS       : data was successfully transfered from the stream buffer object
+ *   E_TIMEOUT       : stream buffer object does not have enough data
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -345,11 +358,15 @@ unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
  *   time            : timepoint value
  *
- * Return            : number of bytes written
+ * Return
+ *   E_SUCCESS       : data was successfully transfered to the stream buffer object
+ *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : stream buffer object did not free enough space before the specified timeout expired
+ *                     or read buffer has an incorrect size
  *
  * Note              : use only in thread mode
  *
@@ -366,13 +383,17 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
  *   delay           : duration of time (maximum number of ticks to wait while the stream buffer object is full)
  *                     IMMEDIATE: don't wait if the stream buffer object is full
  *                     INFINITE:  wait indefinitely while the stream buffer object is full
  *
- * Return            : number of bytes written
+ * Return
+ *   E_SUCCESS       : data was successfully transfered to the stream buffer object
+ *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : stream buffer object did not free enough space before the specified timeout expired
+ *                     or read buffer has an incorrect size
  *
  * Note              : use only in thread mode
  *
@@ -389,10 +410,13 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
  *
- * Return            : number of bytes written
+ * Return
+ *   E_SUCCESS       : data was successfully transfered to the stream buffer object
+ *   E_STOPPED       : stream buffer queue object was killed
+ *   E_TIMEOUT       : read buffer has an incorrect size
  *
  * Note              : use only in thread mode
  *
@@ -411,10 +435,12 @@ unsigned stm_send( stm_t *stm, const void *data, unsigned size ) { return stm_se
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
  *
- * Return            : number of bytes written
+ * Return
+ *   E_SUCCESS       : data was successfully transfered to the stream buffer object
+ *   E_TIMEOUT       : stream buffer object does not have enough space
  *
  * Note              : may be used both in thread and handler mode
  *

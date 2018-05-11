@@ -170,7 +170,6 @@ void priv_stm_getUpdate( stm_t *stm )
 	while (stm->queue != 0 && stm->queue->tmp.stm.size <= priv_stm_space(stm))
 	{
 		priv_stm_put(stm, stm->queue->tmp.stm.data.out, stm->queue->tmp.stm.size);
-		stm->queue->tmp.stm.size = 0;
 		core_tsk_wakeup(stm->queue, E_SUCCESS);
 	}
 }
@@ -183,7 +182,6 @@ void priv_stm_putUpdate( stm_t *stm )
 	while (stm->queue != 0 && stm->queue->tmp.stm.size <= priv_stm_count(stm))
 	{
 		priv_stm_get(stm, stm->queue->tmp.stm.data.in, stm->queue->tmp.stm.size);
-		stm->queue->tmp.stm.size = 0;
 		core_tsk_wakeup(stm->queue, E_SUCCESS);
 	}
 }
@@ -192,7 +190,7 @@ void priv_stm_putUpdate( stm_t *stm )
 unsigned stm_take( stm_t *stm, void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len = 0;
+	unsigned event = E_TIMEOUT;
 
 	assert(stm);
 	assert(data);
@@ -201,13 +199,14 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 
 	if (size <= priv_stm_count(stm))
 	{
-		priv_stm_get(stm, data, len = size);
+		priv_stm_get(stm, data, size);
 		priv_stm_getUpdate(stm);
+		event = E_SUCCESS;
 	}
 
 	port_sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -215,7 +214,7 @@ static
 unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len = 0;
+	unsigned event = E_TIMEOUT;
 
 	assert(!port_isr_inside());
 	assert(stm);
@@ -227,21 +226,21 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 	{
 		if (size <= priv_stm_count(stm))
 		{
-			priv_stm_get(stm, data, len = size);
+			priv_stm_get(stm, data, size);
 			priv_stm_getUpdate(stm);
+			event = E_SUCCESS;
 		}
 		else
 		{
 			System.cur->tmp.stm.data.in = data;
 			System.cur->tmp.stm.size = size;
-			wait(stm, time);
-			len = size - System.cur->tmp.stm.size;
+			event = wait(stm, time);
 		}
 	}
 
 	port_sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -262,7 +261,7 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay )
 unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len = 0;
+	unsigned event = E_TIMEOUT;
 
 	assert(stm);
 	assert(data);
@@ -271,13 +270,14 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 
 	if (size <= priv_stm_space(stm))
 	{
-		priv_stm_put(stm, data, len = size);
+		priv_stm_put(stm, data, size);
 		priv_stm_putUpdate(stm);
+		event = E_SUCCESS;
 	}
 
 	port_sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -285,7 +285,7 @@ static
 unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len = 0;
+	unsigned event = E_TIMEOUT;
 
 	assert(!port_isr_inside());
 	assert(stm);
@@ -297,21 +297,21 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 	{
 		if (size <= priv_stm_space(stm))
 		{
-			priv_stm_put(stm, data, len = size);
+			priv_stm_put(stm, data, size);
 			priv_stm_putUpdate(stm);
+			event = E_SUCCESS;
 		}
 		else
 		{
 			System.cur->tmp.stm.data.out = data;
 			System.cur->tmp.stm.size = size;
-			wait(stm, time);
-			len = size - System.cur->tmp.stm.size;
+			event = wait(stm, time);
 		}
 	}
 
 	port_sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
