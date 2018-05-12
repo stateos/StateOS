@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.h
     @author  Rajmund Szymanski
-    @date    11.05.2018
+    @date    12.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -353,7 +353,7 @@ unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(
  *
  * Name              : stm_sendUntil
  *
- * Description       : try to transfer stream data to the stream buffer object,
+ * Description       : try to transfer data to the stream buffer object,
  *                     wait until given timepoint while the stream buffer object is full
  *
  * Parameters
@@ -378,7 +378,7 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
  *
  * Name              : stm_sendFor
  *
- * Description       : try to transfer stream data to the stream buffer object,
+ * Description       : try to transfer data to the stream buffer object,
  *                     wait for given duration of time while the stream buffer object is full
  *
  * Parameters
@@ -405,7 +405,7 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
  *
  * Name              : stm_send
  *
- * Description       : try to transfer stream data to the stream buffer object,
+ * Description       : try to transfer data to the stream buffer object,
  *                     wait indefinitely while the stream buffer object is full
  *
  * Parameters
@@ -430,7 +430,7 @@ unsigned stm_send( stm_t *stm, const void *data, unsigned size ) { return stm_se
  * Name              : stm_give
  * ISR alias         : stm_giveISR
  *
- * Description       : try to transfer stream data to the stream buffer object,
+ * Description       : try to transfer data to the stream buffer object,
  *                     don't wait if the stream buffer object is full
  *
  * Parameters

@@ -2,7 +2,7 @@
 
     @file    StateOS: os_stm.c
     @author  Rajmund Szymanski
-    @date    11.05.2018
+    @date    12.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -114,7 +114,13 @@ static
 unsigned priv_stm_space( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	return stm->limit - stm->count;
+	if (stm->count == 0)
+		return stm->limit;
+	else
+	if (stm->queue == 0)
+		return stm->limit - stm->count;
+	else
+		return 0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -167,7 +173,7 @@ static
 void priv_stm_getUpdate( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	while (stm->queue != 0 && stm->queue->tmp.stm.size <= priv_stm_space(stm))
+	while (stm->queue != 0 && stm->count + stm->queue->tmp.stm.size <= stm->limit)
 	{
 		priv_stm_put(stm, stm->queue->tmp.stm.data.out, stm->queue->tmp.stm.size);
 		core_tsk_wakeup(stm->queue, E_SUCCESS);
@@ -179,10 +185,17 @@ static
 void priv_stm_putUpdate( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	while (stm->queue != 0 && stm->queue->tmp.stm.size <= priv_stm_count(stm))
+	while (stm->queue != 0 && stm->count > 0)
 	{
-		priv_stm_get(stm, stm->queue->tmp.stm.data.in, stm->queue->tmp.stm.size);
-		core_tsk_wakeup(stm->queue, E_SUCCESS);
+		if (stm->queue->tmp.stm.size <= stm->count)
+		{
+			priv_stm_get(stm, stm->queue->tmp.stm.data.in, stm->queue->tmp.stm.size);
+			core_tsk_wakeup(stm->queue, E_SUCCESS);
+		}
+		else
+		{
+			core_tsk_wakeup(stm->queue, E_TIMEOUT);
+		}
 	}
 }
 
@@ -197,11 +210,17 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 
 	port_sys_lock();
 
-	if (size <= priv_stm_count(stm))
+	if (size > 0)
 	{
-		priv_stm_get(stm, data, size);
-		priv_stm_getUpdate(stm);
-		event = E_SUCCESS;
+		if (stm->count > 0)
+		{
+			if (size <= priv_stm_count(stm))
+			{
+				priv_stm_get(stm, data, size);
+				priv_stm_getUpdate(stm);
+				event = E_SUCCESS;
+			}
+		}
 	}
 
 	port_sys_unlock();
@@ -224,11 +243,14 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 
 	if (size > 0)
 	{
-		if (size <= priv_stm_count(stm))
+		if (stm->count > 0)
 		{
-			priv_stm_get(stm, data, size);
-			priv_stm_getUpdate(stm);
-			event = E_SUCCESS;
+			if (size <= priv_stm_count(stm))
+			{
+				priv_stm_get(stm, data, size);
+				priv_stm_getUpdate(stm);
+				event = E_SUCCESS;
+			}
 		}
 		else
 		{
@@ -268,11 +290,14 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 
 	port_sys_lock();
 
-	if (size <= priv_stm_space(stm))
+	if (size > 0 && size <= stm->limit)
 	{
-		priv_stm_put(stm, data, size);
-		priv_stm_putUpdate(stm);
-		event = E_SUCCESS;
+		if (size <= priv_stm_space(stm))
+		{
+			priv_stm_put(stm, data, size);
+			priv_stm_putUpdate(stm);
+			event = E_SUCCESS;
+		}
 	}
 
 	port_sys_unlock();
@@ -293,7 +318,7 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 
 	port_sys_lock();
 
-	if (size > 0)
+	if (size > 0 && size <= stm->limit)
 	{
 		if (size <= priv_stm_space(stm))
 		{
