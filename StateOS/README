@@ -35,8 +35,8 @@ Features:
 ---------
 6.0
 - updated os version
-- updated message buffer object: size of the message limited to size of the buffer
-- updated stream buffer object: size of the data limited to size of the buffer
+- updated message buffer object: size of the message data limited to size of the buffer
+- updated stream buffer object: size of the stream data limited to size of the buffer
 - reorganized task structure
 ---------
 5.9

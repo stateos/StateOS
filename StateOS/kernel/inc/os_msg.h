@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.h
     @author  Rajmund Szymanski
-    @date    11.05.2018
+    @date    12.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -342,7 +342,7 @@ unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(
  *
  * Name              : msg_sendUntil
  *
- * Description       : try to transfer stream data to the message buffer object,
+ * Description       : try to transfer data to the message buffer object,
  *                     wait until given timepoint while the message buffer object is full
  *
  * Parameters
@@ -363,7 +363,7 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
  *
  * Name              : msg_sendFor
  *
- * Description       : try to transfer stream data to the message buffer object,
+ * Description       : try to transfer data to the message buffer object,
  *                     wait for given duration of time while the message buffer object is full
  *
  * Parameters
@@ -386,7 +386,7 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
  *
  * Name              : msg_send
  *
- * Description       : try to transfer stream data to the message buffer object,
+ * Description       : try to transfer data to the message buffer object,
  *                     wait indefinitely while the message buffer object is full
  *
  * Parameters
@@ -408,7 +408,7 @@ unsigned msg_send( msg_t *msg, const void *data, unsigned size ) { return msg_se
  * Name              : msg_give
  * ISR alias         : msg_giveISR
  *
- * Description       : try to transfer stream data to the message buffer object,
+ * Description       : try to transfer data to the message buffer object,
  *                     don't wait if the message buffer object is full
  *
  * Parameters

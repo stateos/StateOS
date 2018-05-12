@@ -2,7 +2,7 @@
 
     @file    StateOS: os_msg.c
     @author  Rajmund Szymanski
-    @date    06.05.2018
+    @date    12.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
