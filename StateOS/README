@@ -38,6 +38,7 @@ Features:
 - updated message buffer object: size of the message data limited to size of the buffer
 - updated stream buffer object: size of the stream data limited to size of the buffer
 - reorganized task structure
+- changed kernel filenames
 ---------
 5.9
 - updated os version

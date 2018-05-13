@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    01.05.2018
+    @date    13.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,23 +33,23 @@
 #define __STATEOS_H
 
 #include "oskernel.h"
-#include "inc/os_sig.h" // signal
-#include "inc/os_evt.h" // event
-#include "inc/os_flg.h" // flag
-#include "inc/os_bar.h" // barrier
-#include "inc/os_sem.h" // semaphore
-#include "inc/os_mtx.h" // mutex
-#include "inc/os_mut.h" // fast mutex
-#include "inc/os_cnd.h" // condition variable
-#include "inc/os_lst.h" // list
-#include "inc/os_mem.h" // memory pool
-#include "inc/os_stm.h" // stream buffer
-#include "inc/os_msg.h" // message buffer
-#include "inc/os_box.h" // mailbox queue
-#include "inc/os_job.h" // job queue
-#include "inc/os_evq.h" // event queue
-#include "inc/os_tmr.h" // timer
-#include "inc/os_tsk.h" // task
+#include "inc/ossignal.h"
+#include "inc/osevent.h"
+#include "inc/osflag.h"
+#include "inc/osbarrier.h"
+#include "inc/ossemaphore.h"
+#include "inc/osmutex.h"
+#include "inc/osfastmutex.h"
+#include "inc/osconditionvariable.h"
+#include "inc/oslist.h"
+#include "inc/osmemorypool.h"
+#include "inc/osstreambuffer.h"
+#include "inc/osmessagebuffer.h"
+#include "inc/osmailboxqueue.h"
+#include "inc/osjobqueue.h"
+#include "inc/oseventqueue.h"
+#include "inc/ostimer.h"
+#include "inc/ostask.h"
 
 #ifdef __cplusplus
 extern "C" {
