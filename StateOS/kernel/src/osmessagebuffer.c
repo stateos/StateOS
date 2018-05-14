@@ -131,7 +131,7 @@ void priv_msg_get( msg_t *msg, char *data, unsigned size )
 {
 	unsigned i;
 
-	assert(size <= priv_msg_count());
+	assert(size >= priv_msg_count(msg));
 
 	while (size--)
 	{
@@ -149,7 +149,7 @@ void priv_msg_put( msg_t *msg, const char *data, unsigned size )
 {
 	unsigned i;
 
-	assert(size <= priv_msg_space());
+	assert(size <= priv_msg_space(msg));
 
 	while (size--)
 	{

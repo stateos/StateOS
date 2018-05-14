@@ -130,7 +130,7 @@ void priv_stm_get( stm_t *stm, char *data, unsigned size )
 {
 	unsigned i;
 
-	assert(size <= priv_stm_count());
+	assert(size <= priv_stm_count(stm));
 
 	while (size--)
 	{
@@ -148,7 +148,7 @@ void priv_stm_put( stm_t *stm, const char *data, unsigned size )
 {
 	unsigned i;
 
-	assert(size <= priv_stm_space());
+	assert(size <= priv_stm_space(stm));
 
 	while (size--)
 	{
