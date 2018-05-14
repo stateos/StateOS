@@ -164,7 +164,7 @@ static
 void priv_stm_getUpdate( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	while (stm->queue != 0 && stm->count + stm->queue->tmp.stm.size <= stm->limit)
+	while (stm->queue != 0 && stm->queue->tmp.stm.size <= stm->limit - stm->count)
 	{
 		priv_stm_put(stm, stm->queue->tmp.stm.data.out, stm->queue->tmp.stm.size);
 		core_tsk_wakeup(stm->queue, E_SUCCESS);
@@ -201,17 +201,11 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 
 	port_sys_lock();
 
-	if (size > 0)
+	if (size > 0 && size <= priv_stm_count(stm))
 	{
-		if (stm->count > 0)
-		{
-			if (size <= priv_stm_count(stm))
-			{
-				priv_stm_get(stm, data, size);
-				priv_stm_getUpdate(stm);
-				event = E_SUCCESS;
-			}
-		}
+		priv_stm_get(stm, data, size);
+		priv_stm_getUpdate(stm);
+		event = E_SUCCESS;
 	}
 
 	port_sys_unlock();
@@ -282,14 +276,11 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 
 	port_sys_lock();
 
-	if (size > 0)
+	if (size > 0 && size <= priv_stm_space(stm))
 	{
-		if (size <= priv_stm_space(stm))
-		{
-			priv_stm_put(stm, data, size);
-			priv_stm_putUpdate(stm);
-			event = E_SUCCESS;
-		}
+		priv_stm_put(stm, data, size);
+		priv_stm_putUpdate(stm);
+		event = E_SUCCESS;
 	}
 
 	port_sys_unlock();
