@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    14.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -125,36 +125,20 @@ unsigned priv_stm_space( stm_t *stm )
 
 /* -------------------------------------------------------------------------- */
 static
-char priv_stm_getc( stm_t *stm )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned i = stm->first;
-	char c = stm->data[i++];
-	stm->first = (i < stm->limit) ? i : 0;
-	stm->count--;
-	return c;
-}
-
-/* -------------------------------------------------------------------------- */
-static
-void priv_stm_putc( stm_t *stm, char c )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned i = stm->next;
-	stm->data[i++] = c;
-	stm->next = (i < stm->limit) ? i : 0;
-	stm->count++;
-}
-
-/* -------------------------------------------------------------------------- */
-static
 void priv_stm_get( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	assert(size <= stm->limit);
+	unsigned i;
+
+	assert(size <= priv_stm_count());
 
 	while (size--)
-		*data++ = priv_stm_getc(stm);
+	{
+		i = stm->first;
+		*data++ = stm->data[i++];
+		stm->first = (i < stm->limit) ? i : 0;
+		stm->count--;
+	}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -162,10 +146,17 @@ static
 void priv_stm_put( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	assert(size <= stm->limit);
+	unsigned i;
+
+	assert(size <= priv_stm_space());
 
 	while (size--)
-		priv_stm_putc(stm, *data++);
+	{
+		i = stm->next;
+		stm->data[i++] = *data++;
+		stm->next = (i < stm->limit) ? i : 0;
+		stm->count++;
+	}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -253,6 +244,7 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 			}
 		}
 		else
+		if (size <= stm->limit)
 		{
 			System.cur->tmp.stm.data.in = data;
 			System.cur->tmp.stm.size = size;
@@ -290,7 +282,7 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 
 	port_sys_lock();
 
-	if (size > 0 && size <= stm->limit)
+	if (size > 0)
 	{
 		if (size <= priv_stm_space(stm))
 		{
@@ -318,7 +310,7 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 
 	port_sys_lock();
 
-	if (size > 0 && size <= stm->limit)
+	if (size > 0)
 	{
 		if (size <= priv_stm_space(stm))
 		{
@@ -327,6 +319,7 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 			event = E_SUCCESS;
 		}
 		else
+		if (size <= stm->limit)
 		{
 			System.cur->tmp.stm.data.out = data;
 			System.cur->tmp.stm.size = size;
