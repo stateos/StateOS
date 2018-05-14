@@ -118,7 +118,7 @@ unsigned priv_msg_space( msg_t *msg )
 	if (msg->count == 0)
 		return msg->limit;
 	else
-	if (msg->queue == 0 && msg->count + sizeof(unsigned) < msg->limit)
+	if (msg->queue == 0 && msg->limit - msg->count > sizeof(unsigned))
 		return msg->limit - msg->count - sizeof(unsigned);
 	else
 		return 0;
@@ -208,8 +208,8 @@ void priv_msg_putUpdate( msg_t *msg )
 
 	if (msg->queue != 0)
 	{
-		priv_msg_get(msg, msg->queue->tmp.msg.data.in, msg->size);
 		msg->queue->tmp.msg.size -= msg->size;
+		priv_msg_get(msg, msg->queue->tmp.msg.data.in, msg->size);
 		priv_msg_getSize(msg);
 		core_tsk_wakeup(msg->queue, E_SUCCESS);
 	}
@@ -226,17 +226,11 @@ unsigned msg_take( msg_t *msg, void *data, unsigned size )
 
 	port_sys_lock();
 
-	if (size > 0)
+	if (msg->count > 0 && size >= priv_msg_count(msg))
 	{
-		if (msg->count > 0)
-		{
-			if (size >= priv_msg_count(msg))
-			{
-				priv_msg_get(msg, data, len = msg->size);
-				priv_msg_getSize(msg);
-				priv_msg_getUpdate(msg);
-			}
-		}
+		priv_msg_get(msg, data, len = msg->size);
+		priv_msg_getSize(msg);
+		priv_msg_getUpdate(msg);
 	}
 
 	port_sys_unlock();
@@ -307,14 +301,11 @@ unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 
 	port_sys_lock();
 
-	if (size > 0)
+	if (size > 0 && size <= priv_msg_space(msg))
 	{
-		if (size <= priv_msg_space(msg))
-		{
-			priv_msg_putSize(msg, len = size);
-			priv_msg_put(msg, data, len);
-			priv_msg_putUpdate(msg);
-		}
+		priv_msg_putSize(msg, size);
+		priv_msg_put(msg, data, len = size);
+		priv_msg_putUpdate(msg);
 	}
 
 	port_sys_unlock();
@@ -339,8 +330,8 @@ unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time,
 	{
 		if (size <= priv_msg_space(msg))
 		{
-			priv_msg_putSize(msg, len = size);
-			priv_msg_put(msg, data, len);
+			priv_msg_putSize(msg, size);
+			priv_msg_put(msg, data, len = size);
 			priv_msg_putUpdate(msg);
 		}
 		else

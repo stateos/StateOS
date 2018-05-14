@@ -550,7 +550,7 @@ struct MessageBufferTT : public baseMessageBuffer
 	MessageBufferTT( void ): baseMessageBuffer(sizeof(data_), data_) {}
 
 	private:
-	char data_[_limit*(sizeof(T)+sizeof(unsigned))-sizeof(unsigned)];
+	char data_[_limit*(sizeof(unsigned)+sizeof(T))-sizeof(unsigned)];
 };
 
 #endif
