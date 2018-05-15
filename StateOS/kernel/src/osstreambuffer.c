@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    14.05.2018
+    @date    15.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -114,13 +114,9 @@ static
 unsigned priv_stm_space( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	if (stm->count == 0)
-		return stm->limit;
-	else
-	if (stm->queue == 0)
-		return stm->limit - stm->count;
-	else
-		return 0;
+	return (stm->count == 0) ? stm->limit :
+	       (stm->queue == 0) ? stm->limit - stm->count :
+	                           0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -132,13 +128,14 @@ void priv_stm_get( stm_t *stm, char *data, unsigned size )
 
 	assert(size <= priv_stm_count(stm));
 
+	stm->count -= size;;
+	i = stm->first;
 	while (size--)
 	{
-		i = stm->first;
 		*data++ = stm->data[i++];
-		stm->first = (i < stm->limit) ? i : 0;
-		stm->count--;
+		if (i >= stm->limit) i = 0;
 	}
+	stm->first = i;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -150,20 +147,23 @@ void priv_stm_put( stm_t *stm, const char *data, unsigned size )
 
 	assert(size <= priv_stm_space(stm));
 
+	stm->count += size;
+	i = stm->next;
 	while (size--)
 	{
-		i = stm->next;
 		stm->data[i++] = *data++;
-		stm->next = (i < stm->limit) ? i : 0;
-		stm->count++;
+		if (i >= stm->limit) i = 0;
 	}
+	stm->next = i;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_stm_getUpdate( stm_t *stm )
+void priv_stm_getUpdate( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
+	priv_stm_get(stm, data, size);
+
 	while (stm->queue != 0 && stm->queue->tmp.stm.size <= stm->limit - stm->count)
 	{
 		priv_stm_put(stm, stm->queue->tmp.stm.data.out, stm->queue->tmp.stm.size);
@@ -173,9 +173,11 @@ void priv_stm_getUpdate( stm_t *stm )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_stm_putUpdate( stm_t *stm )
+void priv_stm_putUpdate( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
+	priv_stm_put(stm, data, size);
+
 	while (stm->queue != 0 && stm->count > 0)
 	{
 		if (stm->queue->tmp.stm.size <= stm->count)
@@ -203,8 +205,7 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 
 	if (size > 0 && size <= priv_stm_count(stm))
 	{
-		priv_stm_get(stm, data, size);
-		priv_stm_getUpdate(stm);
+		priv_stm_getUpdate(stm, data, size);
 		event = E_SUCCESS;
 	}
 
@@ -232,8 +233,7 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 		{
 			if (size <= priv_stm_count(stm))
 			{
-				priv_stm_get(stm, data, size);
-				priv_stm_getUpdate(stm);
+				priv_stm_getUpdate(stm, data, size);
 				event = E_SUCCESS;
 			}
 		}
@@ -278,8 +278,7 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 
 	if (size > 0 && size <= priv_stm_space(stm))
 	{
-		priv_stm_put(stm, data, size);
-		priv_stm_putUpdate(stm);
+		priv_stm_putUpdate(stm, data, size);
 		event = E_SUCCESS;
 	}
 
@@ -305,8 +304,7 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 	{
 		if (size <= priv_stm_space(stm))
 		{
-			priv_stm_put(stm, data, size);
-			priv_stm_putUpdate(stm);
+			priv_stm_putUpdate(stm, data, size);
 			event = E_SUCCESS;
 		}
 		else
