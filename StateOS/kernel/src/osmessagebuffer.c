@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    14.05.2018
+    @date    15.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -115,13 +115,9 @@ static
 unsigned priv_msg_space( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	if (msg->count == 0)
-		return msg->limit;
-	else
-	if (msg->queue == 0 && msg->limit - msg->count > sizeof(unsigned))
-		return msg->limit - msg->count - sizeof(unsigned);
-	else
-		return 0;
+	return (msg->count == 0) ?                                               msg->limit :
+	       (msg->queue == 0 && msg->limit - msg->count > sizeof(unsigned)) ? msg->limit - msg->count - sizeof(unsigned) :
+	                                                                         0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -133,13 +129,14 @@ void priv_msg_get( msg_t *msg, char *data, unsigned size )
 
 	assert(size >= priv_msg_count(msg));
 
+	msg->count -= size;;
+	i = msg->first;
 	while (size--)
 	{
-		i = msg->first;
 		*data++ = msg->data[i++];
-		msg->first = (i < msg->limit) ? i : 0;
-		msg->count--;
+		if (i >= msg->limit) i = 0;
 	}
+	msg->first = i;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -151,13 +148,14 @@ void priv_msg_put( msg_t *msg, const char *data, unsigned size )
 
 	assert(size <= priv_msg_space(msg));
 
+	msg->count += size;
+	i = msg->next;
 	while (size--)
 	{
-		i = msg->next;
 		msg->data[i++] = *data++;
-		msg->next = (i < msg->limit) ? i : 0;
-		msg->count++;
+		if (i >= msg->limit) i = 0;
 	}
+	msg->next = i;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -186,9 +184,12 @@ void priv_msg_putSize( msg_t *msg, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_getUpdate( msg_t *msg )
+void priv_msg_getUpdate( msg_t *msg, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
+	priv_msg_get(msg, data, size);
+	priv_msg_getSize(msg);
+
 	while (msg->queue != 0 && (msg->count == 0 || msg->count + msg->queue->tmp.msg.size + sizeof(unsigned) <= msg->limit))
 	{
 		priv_msg_putSize(msg, msg->queue->tmp.msg.size);
@@ -200,9 +201,12 @@ void priv_msg_getUpdate( msg_t *msg )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_putUpdate( msg_t *msg )
+void priv_msg_putUpdate( msg_t *msg, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
+	priv_msg_putSize(msg, size);
+	priv_msg_put(msg, data, size);
+
 	while (msg->queue != 0 && msg->size > msg->queue->tmp.msg.size)
 		core_tsk_wakeup(msg->queue, E_TIMEOUT);
 
@@ -227,11 +231,7 @@ unsigned msg_take( msg_t *msg, void *data, unsigned size )
 	port_sys_lock();
 
 	if (msg->count > 0 && size >= priv_msg_count(msg))
-	{
-		priv_msg_get(msg, data, len = msg->size);
-		priv_msg_getSize(msg);
-		priv_msg_getUpdate(msg);
-	}
+		priv_msg_getUpdate(msg, data, len = msg->size);
 
 	port_sys_unlock();
 
@@ -257,9 +257,7 @@ unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsig
 		{
 			if (size >= priv_msg_count(msg))
 			{
-				priv_msg_get(msg, data, len = msg->size);
-				priv_msg_getSize(msg);
-				priv_msg_getUpdate(msg);
+				priv_msg_getUpdate(msg, data, len = msg->size);
 			}
 		}
 		else
@@ -302,11 +300,7 @@ unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 	port_sys_lock();
 
 	if (size > 0 && size <= priv_msg_space(msg))
-	{
-		priv_msg_putSize(msg, size);
-		priv_msg_put(msg, data, len = size);
-		priv_msg_putUpdate(msg);
-	}
+		priv_msg_putUpdate(msg, data, len = size);
 
 	port_sys_unlock();
 
@@ -330,9 +324,7 @@ unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time,
 	{
 		if (size <= priv_msg_space(msg))
 		{
-			priv_msg_putSize(msg, size);
-			priv_msg_put(msg, data, len = size);
-			priv_msg_putUpdate(msg);
+			priv_msg_putUpdate(msg, data, len = size);
 		}
 		else
 		if (size <= msg->limit)
