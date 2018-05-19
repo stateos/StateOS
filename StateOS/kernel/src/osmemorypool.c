@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    19.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -50,7 +50,7 @@ void mem_bind( mem_t *mem )
 	ptr = mem->data;
 	cnt = mem->limit;
 
-	mem->next = 0;
+	mem->head.next = 0;
 	while (cnt--) { mem_give(mem, ++ptr); ptr += mem->size; }
 
 	port_sys_unlock();
@@ -124,108 +124,6 @@ void mem_delete( mem_t *mem )
 
 	mem_kill(mem);
 	core_sys_free(mem->res);
-
-	port_sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned mem_take( mem_t *mem, void **data )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event = E_TIMEOUT;
-
-	assert(mem);
-	assert(data);
-
-	port_sys_lock();
-
-	if (mem->next)
-	{
-		*data = mem->next + 1;
-		mem->next = mem->next->next;
-
-		memset(*data, 0, mem->size * sizeof(que_t));
-
-		event = E_SUCCESS;
-	}
-
-	port_sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
-static
-unsigned priv_mem_wait( mem_t *mem, void **data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert(!port_isr_inside());
-	assert(mem);
-	assert(data);
-
-	port_sys_lock();
-
-	if (mem->next)
-	{
-		*data = mem->next + 1;
-		mem->next = mem->next->next;
-		event = E_SUCCESS;
-	}
-	else
-	{
-		System.cur->tmp.mem.data.in = data;
-		event = wait(mem, time);
-	}
-
-	if (event == E_SUCCESS)
-		memset(*data, 0, mem->size * sizeof(que_t));
-
-	port_sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_mem_wait(mem, data, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_mem_wait(mem, data, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
-void mem_give( mem_t *mem, const void *data )
-/* -------------------------------------------------------------------------- */
-{
-	tsk_t *tsk;
-	que_t *ptr;
-
-	assert(mem);
-	assert(data);
-
-	port_sys_lock();
-
-	tsk = core_one_wakeup(mem, E_SUCCESS);
-
-	if (tsk)
-	{
-		*tsk->tmp.mem.data.out = data;
-	}
-	else
-	{
-		ptr = (que_t *)&(mem->next);
-		while (ptr->next) ptr = ptr->next;
-		ptr->next = (que_t *)data - 1;
-		ptr->next->next = 0;
-	}
 
 	port_sys_unlock();
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    19.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,6 +40,35 @@ extern "C" {
 
 /******************************************************************************
  *
+ * Name              : queue
+ *
+ ******************************************************************************/
+
+typedef struct __que que_t;
+
+struct __que
+{
+	que_t  * next; // next object in the queue
+};
+
+/******************************************************************************
+ *
+ * Name              : _QUE_INIT
+ *
+ * Description       : create and initialize a queue object
+ *
+ * Parameters        : none
+ *
+ * Return            : queue object
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+#define               _QUE_INIT() { 0 }
+
+/******************************************************************************
+ *
  * Name              : list
  *
  ******************************************************************************/
@@ -50,7 +79,7 @@ struct __lst
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 	void   * res;   // allocated list object's resource
-	que_t  * next;  // next memory object in the queue, previously created in the memory pool
+	que_t    head;  // next memory object in the queue, previously created in the memory pool
 };
 
 /******************************************************************************
@@ -67,7 +96,7 @@ struct __lst
  *
  ******************************************************************************/
 
-#define               _LST_INIT() { 0, 0, 0 }
+#define               _LST_INIT() { 0, 0, _QUE_INIT() }
 
 /******************************************************************************
  *

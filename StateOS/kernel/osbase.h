@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    18.04.2018
+    @date    19.05.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -71,17 +71,6 @@ typedef uint64_t     cnt_t;
 typedef struct __tmr tmr_t, * const tmr_id; // timer
 typedef struct __tsk tsk_t, * const tsk_id; // task
 typedef         void fun_t(); // timer/task procedure
-
-/* -------------------------------------------------------------------------- */
-
-// queue
-
-typedef struct __que que_t;
-
-struct __que
-{
-	que_t  * next; // next object in the queue
-};
 
 /* -------------------------------------------------------------------------- */
 

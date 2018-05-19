@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    19.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #define __STATEOS_MEM_H
 
 #include "oskernel.h"
+#include "oslist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +51,7 @@ struct __mem
 {
 	tsk_t  * queue; // inherited from list
 	void   * res;   // allocated memory pool object's resource
-	que_t  * next;  // inherited from list
+	que_t    head;  // inherited from list
 	unsigned limit; // size of a memory pool (max number of objects)
 	unsigned size;  // size of memory object (in words)
 	void   * data;  // pointer to memory pool buffer
@@ -77,7 +78,7 @@ struct __mem
  *
  ******************************************************************************/
 
-#define               _MEM_INIT( _limit, _size, _data ) { 0, 0, 0, _limit, MSIZE(_size), _data }
+#define               _MEM_INIT( _limit, _size, _data ) { 0, 0, _QUE_INIT(), _limit, MSIZE(_size), _data }
 
 /******************************************************************************
  *
@@ -295,7 +296,8 @@ void mem_delete( mem_t *mem );
  *
  ******************************************************************************/
 
-unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time );
+__STATIC_INLINE
+unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time ) { return lst_waitUntil((lst_t *)mem, data, time); }
 
 /******************************************************************************
  *
@@ -320,7 +322,8 @@ unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time );
  *
  ******************************************************************************/
 
-unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay );
+__STATIC_INLINE
+unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay ) { return lst_waitFor((lst_t *)mem, data, delay); }
 
 /******************************************************************************
  *
@@ -342,7 +345,7 @@ unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned mem_wait( mem_t *mem, void **data ) { return mem_waitFor(mem, data, INFINITE); }
+unsigned mem_wait( mem_t *mem, void **data ) { return lst_wait((lst_t *)mem, data); }
 
 /******************************************************************************
  *
@@ -364,10 +367,11 @@ unsigned mem_wait( mem_t *mem, void **data ) { return mem_waitFor(mem, data, INF
  *
  ******************************************************************************/
 
-unsigned mem_take( mem_t *mem, void **data );
+__STATIC_INLINE
+unsigned mem_take( mem_t *mem, void **data ) { return lst_take((lst_t*)mem, data); }
 
 __STATIC_INLINE
-unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_take(mem, data); }
+unsigned mem_takeISR( mem_t *mem, void **data ) { return lst_takeISR((lst_t *)mem, data); }
 
 /******************************************************************************
  *
@@ -386,10 +390,11 @@ unsigned mem_takeISR( mem_t *mem, void **data ) { return mem_take(mem, data); }
  *
  ******************************************************************************/
 
-void mem_give( mem_t *mem, const void *data );
+__STATIC_INLINE
+void mem_give( mem_t *mem, const void *data ) { lst_give((lst_t *)mem, data); }
 
 __STATIC_INLINE
-void mem_giveISR( mem_t *mem, const void *data ) { mem_give(mem, data); }
+void mem_giveISR( mem_t *mem, const void *data ) { lst_giveISR((lst_t *)mem, data); }
 
 #ifdef __cplusplus
 }
