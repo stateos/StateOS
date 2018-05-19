@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    14.05.2018
+    @date    19.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,8 +53,8 @@ struct __msg
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
-	unsigned first; // first element to read from buffer
-	unsigned next;  // next element to write into buffer
+	unsigned head;  // first element to read from queue
+	unsigned tail;  // first element to write into queue
 	char   * data;  // buffer data
 
 	unsigned size;  // size of the first message in the buffer
