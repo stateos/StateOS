@@ -52,6 +52,7 @@ struct __mem
 	tsk_t  * queue; // inherited from list
 	void   * res;   // allocated memory pool object's resource
 	que_t    head;  // inherited from list
+
 	unsigned limit; // size of a memory pool (max number of objects)
 	unsigned size;  // size of memory object (in words)
 	void   * data;  // pointer to memory pool buffer
