@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    15.05.2018
+    @date    19.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -81,8 +81,8 @@ void stm_kill( stm_t *stm )
 	port_sys_lock();
 
 	stm->count = 0;
-	stm->first = 0;
-	stm->next  = 0;
+	stm->head  = 0;
+	stm->tail  = 0;
 
 	core_all_wakeup(stm, E_STOPPED);
 
@@ -129,13 +129,13 @@ void priv_stm_get( stm_t *stm, char *data, unsigned size )
 	assert(size <= priv_stm_count(stm));
 
 	stm->count -= size;;
-	i = stm->first;
+	i = stm->head;
 	while (size--)
 	{
 		*data++ = stm->data[i++];
 		if (i >= stm->limit) i = 0;
 	}
-	stm->first = i;
+	stm->head = i;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -148,13 +148,13 @@ void priv_stm_put( stm_t *stm, const char *data, unsigned size )
 	assert(size <= priv_stm_space(stm));
 
 	stm->count += size;
-	i = stm->next;
+	i = stm->tail;
 	while (size--)
 	{
 		stm->data[i++] = *data++;
 		if (i >= stm->limit) i = 0;
 	}
-	stm->next = i;
+	stm->tail = i;
 }
 
 /* -------------------------------------------------------------------------- */
