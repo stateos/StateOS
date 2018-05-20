@@ -126,8 +126,6 @@ void priv_stm_get( stm_t *stm, char *data, unsigned size )
 {
 	unsigned i;
 
-	assert(size <= priv_stm_count(stm));
-
 	stm->count -= size;;
 	i = stm->head;
 	while (size--)
@@ -144,8 +142,6 @@ void priv_stm_put( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i;
-
-	assert(size <= priv_stm_space(stm));
 
 	stm->count += size;
 	i = stm->tail;
