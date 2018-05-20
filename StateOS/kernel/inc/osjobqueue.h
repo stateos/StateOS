@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    19.05.2018
+    @date    20.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -54,9 +54,9 @@ struct __job
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
-	unsigned head;  // first element to read from queue
-	unsigned tail;  // first element to write into queue
-	fun_t ** data;  // queue data
+	unsigned head;  // first element to read from data buffer
+	unsigned tail;  // first element to write into data buffer
+	fun_t ** data;  // data buffer
 };
 
 /******************************************************************************

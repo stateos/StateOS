@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    19.05.2018
+    @date    20.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,9 +53,10 @@ struct __box
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
-	unsigned head;  // first element to read from queue
-	unsigned tail;  // first element to write into queue
-	char   * data;  // queue data
+	unsigned head;  // first element to read from data buffer
+	unsigned tail;  // first element to write into data buffer
+	char   * data;  // data buffer
+
 	unsigned size;  // size of a single mail (in bytes)
 };
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    20.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -87,15 +87,7 @@ struct __tsk
 	void  ** out;
 	void  ** in;
 	}        data;
-	}        lst;  // temporary data used by list object
-
-	struct {
-	union  {
-	const
-	void  ** out;
-	void  ** in;
-	}        data;
-	}        mem;   // temporary data used by memory pool object
+	}        lst;  // temporary data used by list / memory pool object
 
 	struct {
 	union  {
