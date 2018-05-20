@@ -87,7 +87,7 @@ struct __tsk
 	void  ** out;
 	void  ** in;
 	}        data;
-	}        lst;  // temporary data used by list / memory pool object
+	}        lst;   // temporary data used by list / memory pool object
 
 	struct {
 	union  {
