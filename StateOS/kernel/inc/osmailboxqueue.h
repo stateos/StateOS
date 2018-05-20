@@ -452,23 +452,25 @@ unsigned box_giveISR( box_t *box, const void *data ) { return box_give(box, data
  * Name              : box_push
  * ISR alias         : box_pushISR
  *
- * Description       : transfer mailbox data to the mailbox queue object,
+ * Description       : try to transfer mailbox data to the mailbox queue object,
  *                     remove the oldest mailbox data if the mailbox queue object is full
  *
  * Parameters
  *   box             : pointer to mailbox queue object
  *   data            : pointer to mailbox data
  *
- * Return            : none
+ * Return
+ *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
+ *   E_TIMEOUT       : there are tasks waiting for writing to the mailbox queue object
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-void box_push( box_t *box, const void *data );
+unsigned box_push( box_t *box, const void *data );
 
 __STATIC_INLINE
-void box_pushISR( box_t *box, const void *data ) { box_push(box, data); }
+unsigned box_pushISR( box_t *box, const void *data ) { return box_push(box, data); }
 
 #ifdef __cplusplus
 }
@@ -510,8 +512,8 @@ struct baseMailBoxQueue : public __box
 	unsigned send     ( const void *_data )               { return box_send     (this, _data);         }
 	unsigned give     ( const void *_data )               { return box_give     (this, _data);         }
 	unsigned giveISR  ( const void *_data )               { return box_giveISR  (this, _data);         }
-	void     push     ( const void *_data )               {        box_push     (this, _data);         }
-	void     pushISR  ( const void *_data )               {        box_pushISR  (this, _data);         }
+	unsigned push     ( const void *_data )               { return box_push     (this, _data);         }
+	unsigned pushISR  ( const void *_data )               { return box_pushISR  (this, _data);         }
 };
 
 /******************************************************************************
