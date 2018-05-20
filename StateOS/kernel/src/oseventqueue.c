@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    19.05.2018
+    @date    20.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -263,27 +263,31 @@ unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-void evq_push( evq_t *evq, unsigned data )
+unsigned evq_push( evq_t *evq, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned event = E_TIMEOUT;
+
 	assert(evq);
 
 	port_sys_lock();
 
-	priv_evq_put(evq, data);
-
-	if (evq->count > evq->limit)
+	if (evq->count < evq->limit || evq->queue == 0)
 	{
-		evq->count = evq->limit;
-		evq->head = evq->tail;
-	}
-	else
-	{
+		priv_evq_put(evq, data);
+		if (evq->count > evq->limit)
+		{
+			evq->count = evq->limit;
+			evq->head = evq->tail;
+		}
 		if (evq->queue)
 			core_one_wakeup(evq, priv_evq_get(evq));
+		event = E_SUCCESS;
 	}
 
 	port_sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
