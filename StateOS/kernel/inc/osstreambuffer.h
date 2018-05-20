@@ -453,6 +453,33 @@ unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm
 
 /******************************************************************************
  *
+ * Name              : stm_push
+ * ISR alias         : stm_pushISR
+ *
+ * Description       : try to transfer data to the stream buffer object,
+ *                     remove the oldest data if the stream buffer object is full
+ *
+ * Parameters
+ *   stm             : pointer to stream buffer object
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
+ *
+ * Return
+ *   E_SUCCESS       : data was successfully transfered to the stream buffer object
+ *   E_TIMEOUT       : read buffer has an incorrect size or
+ *                     there are tasks waiting for writing to the stream buffer object
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned stm_push( stm_t *stm, const void *data, unsigned size );
+
+__STATIC_INLINE
+unsigned stm_pushISR( stm_t *stm, const void *data, unsigned size ) { return stm_push(stm, data, size); }
+
+/******************************************************************************
+ *
  * Name              : stm_count
  * ISR alias         : stm_countISR
  *
@@ -528,6 +555,8 @@ struct baseStreamBuffer : public __stm
 	unsigned send     ( const void *_data, unsigned _size )               { return stm_send     (this, _data, _size);         }
 	unsigned give     ( const void *_data, unsigned _size )               { return stm_give     (this, _data, _size);         }
 	unsigned giveISR  ( const void *_data, unsigned _size )               { return stm_giveISR  (this, _data, _size);         }
+	unsigned push     ( const void *_data, unsigned _size )               { return stm_push     (this, _data, _size);         }
+	unsigned pushISR  ( const void *_data, unsigned _size )               { return stm_pushISR  (this, _data, _size);         }
 	unsigned count    ( void )                                            { return stm_count    (this);                       }
 	unsigned countISR ( void )                                            { return stm_countISR (this);                       }
 	unsigned space    ( void )                                            { return stm_space    (this);                       }
