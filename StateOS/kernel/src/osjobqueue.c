@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    19.05.2018
+    @date    20.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -274,30 +274,33 @@ unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-void job_push( job_t *job, fun_t *fun )
+unsigned job_push( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t *tsk;
+	tsk_t  * tsk;
+	unsigned event = E_TIMEOUT;
 
 	assert(job);
 	assert(fun);
 
 	port_sys_lock();
 
-	priv_job_put(job, fun);
-
-	if (job->count > job->limit)
+	if (job->count < job->limit || job->queue == 0)
 	{
-		job->count = job->limit;
-		job->head = job->tail;
-	}
-	else
-	{
+		priv_job_put(job, fun);
+		if (job->count > job->limit)
+		{
+			job->count = job->limit;
+			job->head = job->tail;
+		}
 		tsk = core_one_wakeup(job, E_SUCCESS);
 		if (tsk) tsk->tmp.job.fun = priv_job_get(job);
+		event = E_SUCCESS;
 	}
 
 	port_sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

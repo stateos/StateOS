@@ -439,23 +439,25 @@ unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_give(job, fun); }
  * Name              : job_push
  * ISR alias         : job_pushISR
  *
- * Description       : transfer job data to the job queue object,
+ * Description       : try to transfer job data to the job queue object,
  *                     remove the oldest job data if the job queue object is full
  *
  * Parameters
  *   job             : pointer to job queue object
  *   fun             : pointer to job procedure
  *
- * Return            : none
+ * Return
+ *   E_SUCCESS       : job data was successfully transfered to the job queue object
+ *   E_TIMEOUT       : there are tasks waiting for writing to the job queue object
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-void job_push( job_t *job, fun_t *fun );
+unsigned job_push( job_t *job, fun_t *fun );
 
 __STATIC_INLINE
-void job_pushISR( job_t *job, fun_t *fun ) { job_push(job, fun); }
+unsigned job_pushISR( job_t *job, fun_t *fun ) { return job_push(job, fun); }
 
 #ifdef __cplusplus
 }
@@ -497,8 +499,8 @@ struct baseJobQueue : public __box
 	unsigned send     ( FUN_t _fun )               {             unsigned event = box_send     (this, &_fun);                                         return event; }
 	unsigned give     ( FUN_t _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
 	unsigned giveISR  ( FUN_t _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
-	void     push     ( FUN_t _fun )               {                              box_push     (this, &_fun);                                                       }
-	void     pushISR  ( FUN_t _fun )               {                              box_pushISR  (this, &_fun);                                                       }
+	unsigned push     ( FUN_t _fun )               {             unsigned event = box_push     (this, &_fun);                                         return event; }
+	unsigned pushISR  ( FUN_t _fun )               {             unsigned event = box_pushISR  (this, &_fun);                                         return event; }
 };
 
 #else
@@ -519,8 +521,8 @@ struct baseJobQueue : public __job
 	unsigned send     ( FUN_t _fun )               { return job_send     (this, _fun);         }
 	unsigned give     ( FUN_t _fun )               { return job_give     (this, _fun);         }
 	unsigned giveISR  ( FUN_t _fun )               { return job_giveISR  (this, _fun);         }
-	void     push     ( FUN_t _fun )               {        job_push     (this, _fun);         }
-	void     pushISR  ( FUN_t _fun )               {        job_pushISR  (this, _fun);         }
+	unsigned push     ( FUN_t _fun )               { return job_push     (this, _fun);         }
+	unsigned pushISR  ( FUN_t _fun )               { return job_pushISR  (this, _fun);         }
 };
 
 #endif
