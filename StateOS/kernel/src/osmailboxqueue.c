@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    20.05.2018
+    @date    21.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -286,7 +286,7 @@ unsigned box_push( box_t *box, const void *data )
 
 	port_sys_lock();
 
-	if (box->count < box->limit || box->queue == 0)
+	if (box->count == 0 || box->queue == 0)
 	{
 		priv_box_put(box, data);
 		if (box->count > box->limit)

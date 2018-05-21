@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    20.05.2018
+    @date    21.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -285,7 +285,7 @@ unsigned job_push( job_t *job, fun_t *fun )
 
 	port_sys_lock();
 
-	if (job->count < job->limit || job->queue == 0)
+	if (job->count == 0 || job->queue == 0)
 	{
 		priv_job_put(job, fun);
 		if (job->count > job->limit)

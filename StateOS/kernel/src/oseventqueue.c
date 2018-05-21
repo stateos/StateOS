@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    20.05.2018
+    @date    21.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -272,7 +272,7 @@ unsigned evq_push( evq_t *evq, unsigned data )
 
 	port_sys_lock();
 
-	if (evq->count < evq->limit || evq->queue == 0)
+	if (evq->count == 0 || evq->queue == 0)
 	{
 		priv_evq_put(evq, data);
 		if (evq->count > evq->limit)
