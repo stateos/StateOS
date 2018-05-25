@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    20.05.2018
+    @date    25.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -605,6 +605,7 @@ tsk_t *wrk_new( unsigned prio, fun_t *state, unsigned size ) { return wrk_create
 
 __STATIC_INLINE
 tsk_t *tsk_create( unsigned prio, fun_t *state ) { return wrk_create(prio, state, OS_STACK_SIZE); }
+
 __STATIC_INLINE
 tsk_t *tsk_new   ( unsigned prio, fun_t *state ) { return wrk_create(prio, state, OS_STACK_SIZE); }
 
@@ -752,6 +753,7 @@ unsigned tsk_join( tsk_t *tsk );
  ******************************************************************************/
 
 void tsk_yield( void );
+
 __STATIC_INLINE
 void tsk_pass ( void ) { tsk_yield(); }
 
@@ -790,6 +792,7 @@ void tsk_flip( fun_t *state );
  ******************************************************************************/
 
 void tsk_prio   ( unsigned prio );
+
 __STATIC_INLINE
 void tsk_setPrio( unsigned prio ) { tsk_prio(prio); }
 
@@ -919,6 +922,7 @@ unsigned tsk_sleepUntil( cnt_t time ) { return tmr_waitUntil(&WAIT, time); }
 /******************************************************************************
  *
  * Name              : tsk_sleepFor
+ * Alias             : tsk_delay
  *
  * Description       : delay execution of current task for given duration of time
  *
@@ -938,6 +942,9 @@ unsigned tsk_sleepUntil( cnt_t time ) { return tmr_waitUntil(&WAIT, time); }
 __STATIC_INLINE
 unsigned tsk_sleepFor( cnt_t delay ) { return tmr_waitFor(&WAIT, delay); }
 
+__STATIC_INLINE
+unsigned tsk_delay( cnt_t delay ) { return tsk_sleepFor(delay); }
+
 /******************************************************************************
  *
  * Name              : tsk_sleep
@@ -955,28 +962,6 @@ unsigned tsk_sleepFor( cnt_t delay ) { return tmr_waitFor(&WAIT, delay); }
 
 __STATIC_INLINE
 unsigned tsk_sleep( void ) { return tmr_wait(&WAIT); }
-
-/******************************************************************************
- *
- * Name              : tsk_delay
- *
- * Description       : the same as tsk_sleepFor, delay execution of current task for given duration of time
- *
- * Parameters
- *   delay           : duration of time (maximum number of ticks to delay execution of current task)
- *                     IMMEDIATE: don't delay execution of current task
- *                     INFINITE:  delay indefinitely execution of current task
- *
- * Return
- *   E_TIMEOUT       : task object successfully finished countdown
- *   E_STOPPED       : task object was resumed (tsk_resume)
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-__STATIC_INLINE
-unsigned tsk_delay( cnt_t delay ) { return tsk_sleepFor(delay); }
 
 /******************************************************************************
  *
