@@ -43,8 +43,8 @@ extern "C" {
 
 /// Kernel Information
 #define osVersionAPI         20010002   ///< API version (2.1.2)
-#define osVersionKernel      60000000   ///< Kernel version (6.0.0)
-#define osKernelId      "StateOS v6.0"  ///< Kernel identification string
+#define osVersionKernel      60010000   ///< Kernel version (6.1.0)
+#define osKernelId      "StateOS v6.1"  ///< Kernel identification string
 
 /*---------------------------------------------------------------------------*/
 

@@ -164,9 +164,9 @@
  
 #define osCMSIS             0x20001U    ///< API version (main[31:16].sub[15:0])
  
-#define osCMSIS_StateOS     0x60000U    ///< RTOS identification and version (main[31:16].sub[15:0])
+#define osCMSIS_StateOS     0x60001U    ///< RTOS identification and version (main[31:16].sub[15:0])
  
-#define osKernelSystemId "StateOS v6.0" ///< RTOS identification string
+#define osKernelSystemId "StateOS v6.1" ///< RTOS identification string
  
 #define osFeature_MainThread  1         ///< main thread      1=main can be thread, 0=not available
 #define osFeature_Signals     31U       ///< maximum number of Signal Flags available per thread
