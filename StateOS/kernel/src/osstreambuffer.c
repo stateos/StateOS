@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    20.05.2018
+    @date    28.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -121,13 +121,22 @@ unsigned priv_stm_space( stm_t *stm )
 
 /* -------------------------------------------------------------------------- */
 static
+void priv_stm_skip( stm_t *stm, unsigned size )
+/* -------------------------------------------------------------------------- */
+{
+	stm->count -= size;
+	stm->head  += size;
+	if (stm->head >= stm->limit) stm->head -= stm->limit;
+}
+
+/* -------------------------------------------------------------------------- */
+static
 void priv_stm_get( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i;
+	unsigned i = stm->head;
 
 	stm->count -= size;;
-	i = stm->head;
 	while (size--)
 	{
 		*data++ = stm->data[i++];
@@ -141,10 +150,9 @@ static
 void priv_stm_put( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i;
+	unsigned i = stm->tail;
 
 	stm->count += size;
-	i = stm->tail;
 	while (size--)
 	{
 		stm->data[i++] = *data++;
@@ -173,12 +181,6 @@ void priv_stm_putUpdate( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	priv_stm_put(stm, data, size);
-
-	if (stm->count > stm->limit)
-	{
-		stm->count = stm->limit;
-		stm->head = stm->tail;
-	}
 
 	while (stm->queue != 0 && stm->count > 0)
 	{
@@ -352,6 +354,8 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 	{
 		if (stm->count == 0 || stm->queue == 0)
 		{
+			if (stm->count + size > stm->limit)
+				priv_stm_skip(stm, stm->count + size - stm->limit);
 			priv_stm_putUpdate(stm, data, size);
 			event = E_SUCCESS;
 		}
