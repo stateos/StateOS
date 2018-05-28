@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    21.05.2018
+    @date    28.05.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -106,6 +106,32 @@ void box_delete( box_t *box )
 
 /* -------------------------------------------------------------------------- */
 static
+unsigned priv_box_count( box_t *box )
+/* -------------------------------------------------------------------------- */
+{
+	return box->count / box->size;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_box_space( box_t *box )
+/* -------------------------------------------------------------------------- */
+{
+	return (box->limit - box->count) / box->size;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_box_skip( box_t *box )
+/* -------------------------------------------------------------------------- */
+{
+	box->count -= box->size;
+	box->head  += box->size;
+	if (box->head == box->limit) box->head = 0;
+}
+
+/* -------------------------------------------------------------------------- */
+static
 void priv_box_get( box_t *box, char *data )
 /* -------------------------------------------------------------------------- */
 {
@@ -133,10 +159,33 @@ void priv_box_put( box_t *box, const char *data )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_box_getUpdate( box_t *box, char *data )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	priv_box_get(box, data);
+	tsk = core_one_wakeup(box, E_SUCCESS);
+	if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_box_putUpdate( box_t *box, const char *data )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	priv_box_put(box, data);
+	tsk = core_one_wakeup(box, E_SUCCESS);
+	if (tsk) priv_box_get(box, tsk->tmp.box.data.in);
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned box_take( box_t *box, void *data )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
 	unsigned event = E_TIMEOUT;
 
 	assert(box);
@@ -146,9 +195,7 @@ unsigned box_take( box_t *box, void *data )
 
 	if (box->count > 0)
 	{
-		priv_box_get(box, data);
-		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
+		priv_box_getUpdate(box, data);
 		event = E_SUCCESS;
 	}
 
@@ -162,7 +209,6 @@ static
 unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
 	unsigned event;
 
 	assert(!port_isr_inside());
@@ -173,9 +219,7 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 
 	if (box->count > 0)
 	{
-		priv_box_get(box, data);
-		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
+		priv_box_getUpdate(box, data);
 		event = E_SUCCESS;
 	}
 	else
@@ -207,7 +251,6 @@ unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
 unsigned box_give( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
 	unsigned event = E_TIMEOUT;
 
 	assert(box);
@@ -217,9 +260,7 @@ unsigned box_give( box_t *box, const void *data )
 
 	if (box->count < box->limit)
 	{
-		priv_box_put(box, data);
-		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_get(box, tsk->tmp.box.data.in);
+		priv_box_putUpdate(box, data);
 		event = E_SUCCESS;
 	}
 
@@ -233,7 +274,6 @@ static
 unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
 	unsigned event;
 
 	assert(!port_isr_inside());
@@ -244,9 +284,7 @@ unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait
 
 	if (box->count < box->limit)
 	{
-		priv_box_put(box, data);
-		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_get(box, tsk->tmp.box.data.in);
+		priv_box_putUpdate(box, data);
 		event = E_SUCCESS;
 	}
 	else
@@ -278,7 +316,6 @@ unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
 unsigned box_push( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
 	unsigned event = E_TIMEOUT;
 
 	assert(box);
@@ -288,20 +325,49 @@ unsigned box_push( box_t *box, const void *data )
 
 	if (box->count == 0 || box->queue == 0)
 	{
-		priv_box_put(box, data);
-		if (box->count > box->limit)
-		{
-			box->count = box->limit;
-			box->head = box->tail;
-		}
-		tsk = core_one_wakeup(box, E_SUCCESS);
-		if (tsk) priv_box_get(box, tsk->tmp.box.data.in);
+		if (box->count == box->limit)
+			priv_box_skip(box);
+		priv_box_putUpdate(box, data);
 		event = E_SUCCESS;
 	}
 
 	port_sys_unlock();
 
 	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned box_count( box_t *box )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned cnt;
+
+	assert(box);
+
+	port_sys_lock();
+
+	cnt = priv_box_count(box);
+
+	port_sys_unlock();
+
+	return cnt;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned box_space( box_t *box )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned cnt;
+
+	assert(box);
+
+	port_sys_lock();
+
+	cnt = priv_box_space(box);
+
+	port_sys_unlock();
+
+	return cnt;
 }
 
 /* -------------------------------------------------------------------------- */

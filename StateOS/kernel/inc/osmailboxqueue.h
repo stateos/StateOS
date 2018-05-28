@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    20.05.2018
+    @date    27.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,14 +48,14 @@ typedef struct __box box_t, * const box_id;
 
 struct __box
 {
-	tsk_t  * queue; // inherited from semaphore
+	tsk_t  * queue; // inherited from stream buffer
 	void   * res;   // allocated mailbox queue object's resource
-	unsigned count; // inherited from semaphore
-	unsigned limit; // inherited from semaphore
+	unsigned count; // inherited from stream buffer
+	unsigned limit; // inherited from stream buffer
 
-	unsigned head;  // first element to read from data buffer
-	unsigned tail;  // first element to write into data buffer
-	char   * data;  // data buffer
+	unsigned head;  // inherited from stream buffer
+	unsigned tail;  // inherited from stream buffer
+	char   * data;  // inherited from stream buffer
 
 	unsigned size;  // size of a single mail (in bytes)
 };
@@ -472,6 +472,44 @@ unsigned box_push( box_t *box, const void *data );
 __STATIC_INLINE
 unsigned box_pushISR( box_t *box, const void *data ) { return box_push(box, data); }
 
+/******************************************************************************
+ *
+ * Name              : box_count
+ * ISR alias         : box_countISR
+ *
+ * Description       : return the amount of data contained in the mailbox queue
+ *
+ * Parameters
+ *   box             : pointer to mailbox queue object
+ *
+ * Return            : amount of data contained in the mailbox queue
+ *
+ ******************************************************************************/
+
+unsigned box_count( box_t *box );
+
+__STATIC_INLINE
+unsigned box_countISR( box_t *box ) { return box_count(box); }
+
+/******************************************************************************
+ *
+ * Name              : box_space
+ * ISR alias         : box_spaceISR
+ *
+ * Description       : return the amount of free space in the mailbox queue
+ *
+ * Parameters
+ *   box             : pointer to mailbox queue object
+ *
+ * Return            : amount of free space in the mailbox queue
+ *
+ ******************************************************************************/
+
+unsigned box_space( box_t *box );
+
+__STATIC_INLINE
+unsigned box_spaceISR( box_t *box ) { return box_space(box); }
+
 #ifdef __cplusplus
 }
 #endif
@@ -514,6 +552,10 @@ struct baseMailBoxQueue : public __box
 	unsigned giveISR  ( const void *_data )               { return box_giveISR  (this, _data);         }
 	unsigned push     ( const void *_data )               { return box_push     (this, _data);         }
 	unsigned pushISR  ( const void *_data )               { return box_pushISR  (this, _data);         }
+	unsigned count    ( void )                            { return box_count    (this);                }
+	unsigned countISR ( void )                            { return box_countISR (this);                }
+	unsigned space    ( void )                            { return box_space    (this);                }
+	unsigned spaceISR ( void )                            { return box_spaceISR (this);                }
 };
 
 /******************************************************************************
