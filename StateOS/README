@@ -36,6 +36,7 @@ Features:
 6.1
 - updated os version
 - updated mailbox queue object
+- updated message buffer object
 ---------
 6.0
 - updated os version

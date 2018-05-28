@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    20.05.2018
+    @date    28.05.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,14 +48,14 @@ typedef struct __msg msg_t, * const msg_id;
 
 struct __msg
 {
-	tsk_t  * queue; // inherited from semaphore
-	void   * res;   // allocated stream buffer object's resource
-	unsigned count; // inherited from semaphore
-	unsigned limit; // inherited from semaphore
+	tsk_t  * queue; // inherited from stream buffer
+	void   * res;   // allocated message buffer object's resource
+	unsigned count; // inherited from stream buffer
+	unsigned limit; // inherited from stream buffer
 
-	unsigned head;  // first element to read from data buffer
-	unsigned tail;  // first element to write into data buffer
-	char   * data;  // data buffer
+	unsigned head;  // inherited from stream buffer
+	unsigned tail;  // inherited from stream buffer
+	char   * data;  // inherited from stream buffer
 
 	unsigned size;  // size of the first message in the buffer
 };
@@ -429,6 +429,31 @@ unsigned msg_giveISR( msg_t *msg, const void *data, unsigned size ) { return msg
 
 /******************************************************************************
  *
+ * Name              : msg_push
+ * ISR alias         : msg_pushISR
+ *
+ * Description       : try to transfer data to the message buffer object,
+ *                     remove the oldest data if the message buffer object is full
+ *
+ * Parameters
+ *   msg             : pointer to message buffer object
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
+ *
+ * Return
+ * Return            : number of bytes written to the message buffer
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned msg_push( msg_t *msg, const void *data, unsigned size );
+
+__STATIC_INLINE
+unsigned msg_pushISR( msg_t *msg, const void *data, unsigned size ) { return msg_push(msg, data, size); }
+
+/******************************************************************************
+ *
  * Name              : msg_count
  * ISR alias         : msg_countISR
  *
@@ -504,6 +529,8 @@ struct baseMessageBuffer : public __msg
 	unsigned send     ( const void *_data, unsigned _size )               { return msg_send     (this, _data, _size);         }
 	unsigned give     ( const void *_data, unsigned _size )               { return msg_give     (this, _data, _size);         }
 	unsigned giveISR  ( const void *_data, unsigned _size )               { return msg_giveISR  (this, _data, _size);         }
+	unsigned push     ( const void *_data, unsigned _size )               { return msg_push     (this, _data, _size);         }
+	unsigned pushISR  ( const void *_data, unsigned _size )               { return msg_pushISR  (this, _data, _size);         }
 	unsigned count    ( void )                                            { return msg_count    (this);                       }
 	unsigned countISR ( void )                                            { return msg_countISR (this);                       }
 	unsigned space    ( void )                                            { return msg_space    (this);                       }
