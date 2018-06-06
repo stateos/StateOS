@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    05.06.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -309,14 +309,14 @@ unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
  * Name              : sig_take
  * ISR alias         : sig_takeISR
  *
- * Description       : don't wait until the signal object has been released
+ * Description       : check if the signal object has been released
  *
  * Parameters
  *   sig             : pointer to signal object
  *
  * Return
  *   E_SUCCESS       : signal object was successfully released
- *   E_TIMEOUT       : signal object is not set
+ *   E_TIMEOUT       : signal object was not released
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -332,7 +332,8 @@ unsigned sig_takeISR( sig_t *sig ) { return sig_take(sig); }
  * Name              : sig_give
  * ISR alias         : sig_giveISR
  *
- * Description       : resume one (sigClear) or all (sigProtect) tasks that are waiting on the signal object
+ * Description       : release the signal object
+ *                     resume one (sigClear) or all (sigProtect) tasks that are waiting on the signal object
  *
  * Parameters
  *   sig             : pointer to signal object
