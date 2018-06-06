@@ -16,6 +16,7 @@ There's a dedicated function for immediate change the task state.
 - kernel works in preemptive or cooperative mode
 - kernel can operate with 16, 32 or 64-bit timer counter
 - kernel can operate in tick-less mode
+- spin locks
 - signals (clear, protect)
 - events
 - flags (any, all, protect, ignore)
