@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    05.06.2018
+    @date    26.06.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -44,13 +44,10 @@ extern "C" {
  *
  ******************************************************************************/
 
-typedef struct __spn spn_t, * const spn_id;
-
 struct __spn
 {
-	tsk_t  * queue; // next process in the DELAYED queue
-	void   * res;   // allocated spin lock object's resource
-	unsigned flag;  // spin lock's current value
+	volatile
+	unsigned lock;
 };
 
 /******************************************************************************
@@ -67,7 +64,7 @@ struct __spn
  *
  ******************************************************************************/
 
-#define               _SPN_INIT() { 0, 0, 0 }
+#define               _SPN_INIT() { 0 }
 
 /******************************************************************************
  *
@@ -155,28 +152,8 @@ struct __spn
  *
  ******************************************************************************/
 
-void spn_init( spn_t *spn );
-
-/******************************************************************************
- *
- * Name              : spn_create
- * Alias             : spn_new
- *
- * Description       : create and initialize a new spin lock object
- *
- * Parameters        : none
- *
- * Return            : pointer to spin lock object (spin lock successfully created)
- *   0               : spin lock not created (not enough free memory)
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-spn_t *spn_create( void );
-
 __STATIC_INLINE
-spn_t *spn_new( void ) { return spn_create(); }
+void spn_init( spn_t *spn ) { spn->lock = 0; }
 
 /******************************************************************************
  *
@@ -193,120 +170,53 @@ spn_t *spn_new( void ) { return spn_create(); }
  *
  ******************************************************************************/
 
-void spn_kill( spn_t *spn );
+__STATIC_INLINE
+void spn_kill( spn_t *spn ) { spn->lock = 0; }
 
 /******************************************************************************
  *
- * Name              : spn_delete
+ * Name              : spn_lock
+ * Alias             : spn_wait
  *
- * Description       : reset the spin lock object and free allocated resource
+ * Description       : lock the spin lock object,
+ *                     wait indefinitely if the spin lock object can't be locked immediately
  *
  * Parameters
  *   spn             : pointer to spin lock object
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : use only in thread mode, do not use on single-core systems
+ *                     be careful using this function, it can block the system
+ *                     do not use blocking functions inside spn_lock / spn_unlock
  *
  ******************************************************************************/
 
-void spn_delete( spn_t *spn );
-
-/******************************************************************************
- *
- * Name              : spn_waitUntil
- *
- * Description       : try to lock the spin lock object,
- *                     wait until given timepoint if the spin lock object can't be locked immediately
- *
- * Parameters
- *   spn             : pointer to spin lock object
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : spin lock object was successfully locked
- *   E_STOPPED       : spin lock object was killed before the specified timeout expired
- *   E_TIMEOUT       : spin lock object was not locked before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned spn_waitUntil( spn_t *spn, cnt_t time );
-
-/******************************************************************************
- *
- * Name              : spn_waitFor
- *
- * Description       : try to lock the spin lock object,
- *                     wait for given duration of time if the spin lock object can't be locked immediately
- *
- * Parameters
- *   spn             : pointer to spin lock object
- *   delay           : duration of time (maximum number of ticks to wait for lock the spin lock object)
- *                     IMMEDIATE: don't wait if the spin lock object can't be locked immediately
- *                     INFINITE:  wait indefinitely until the spin lock object has been locked
- *
- * Return
- *   E_SUCCESS       : spin lock object was successfully locked
- *   E_STOPPED       : spin lock object was killed before the specified timeout expired
- *   E_TIMEOUT       : spin lock object was not locked before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned spn_waitFor( spn_t *spn, cnt_t delay );
-
-/******************************************************************************
- *
- * Name              : spn_wait
- *
- * Description       : try to lock the spin lock object,
- *                     wait indefinitely if the spin lock object can't be locked immediately
- *
- * Parameters
- *   spn             : pointer to spin lock object
- *
- * Return
- *   E_SUCCESS       : spin lock object was successfully locked
- *   E_STOPPED       : spin lock object was killed
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
+#ifndef OS_SPN_ARCH
 
 __STATIC_INLINE
-unsigned spn_wait( spn_t *spn ) { return spn_waitFor(spn, INFINITE); }
+void spn_lock( spn_t *spn )
+{
+	unsigned lock;
+	do
+	{
+		port_sys_lock();
+		lock = spn->lock;
+		spn->lock = 1;
+		port_sys_unlock();
+	}
+	while (lock);
+}
 
-/******************************************************************************
- *
- * Name              : spn_take
- * ISR alias         : spn_takeISR
- *
- * Description       : try to lock the spin lock object,
- *                     don't wait if the spin lock object can't be locked immediately
- *
- * Parameters
- *   spn             : pointer to spin lock object
- *
- * Return
- *   E_SUCCESS       : spin lock object was successfully locked
- *   E_TIMEOUT       : spin lock object can't be locked immediately
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-unsigned spn_take( spn_t *spn );
+#endif
 
 __STATIC_INLINE
-unsigned spn_takeISR( spn_t *spn ) { return spn_take(spn); }
+void spn_wait( spn_t *spn ) { spn_lock(spn); }
 
 /******************************************************************************
  *
- * Name              : spn_give
- * ISR alias         : spn_giveISR
+ * Name              : spn_unlock
+ * Alias             : spn_give
  *
  * Description       : unlock the spin lock object
  *
@@ -319,10 +229,11 @@ unsigned spn_takeISR( spn_t *spn ) { return spn_take(spn); }
  *
  ******************************************************************************/
 
-void spn_give( spn_t *spn );
+__STATIC_INLINE
+void spn_unlock( spn_t *spn ) { spn->lock = 0; }
 
 __STATIC_INLINE
-void spn_giveISR( spn_t *spn ) { spn_give(spn); }
+void spn_give( spn_t *spn ) { spn_unlock(spn); }
 
 #ifdef __cplusplus
 }
@@ -347,16 +258,12 @@ struct SpinLock : public __spn
 {
 	 explicit
 	 SpinLock( void ): __spn _SPN_INIT() {}
-	~SpinLock( void ) { assert(queue == nullptr); }
 
-	void     kill     ( void )         {        spn_kill     (this);         }
-	unsigned waitUntil( cnt_t _time  ) { return spn_waitUntil(this, _time);  }
-	unsigned waitFor  ( cnt_t _delay ) { return spn_waitFor  (this, _delay); }
-	unsigned wait     ( void )         { return spn_wait     (this);         }
-	unsigned take     ( void )         { return spn_take     (this);         }
-	unsigned takeISR  ( void )         { return spn_takeISR  (this);         }
-	void     give     ( void )         {        spn_give     (this);         }
-	void     giveISR  ( void )         {        spn_giveISR  (this);         }
+	void kill  ( void ) { spn_kill  (this); }
+	void lock  ( void ) { spn_lock  (this); }
+	void wait  ( void ) { spn_wait  (this); }
+	void unlock( void ) { spn_unlock(this); }
+	void give  ( void ) { spn_give  (this); }
 };
 
 #endif

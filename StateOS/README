@@ -40,7 +40,6 @@ Features:
 - updated message buffer object
 - updated stream buffer object
 - added spin lock object
-- added example for new feature
 ---------
 6.0
 - updated os version

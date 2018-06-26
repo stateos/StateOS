@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    26.06.2018
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -228,6 +228,22 @@ void port_ctx_switchLock( void )
 	port_ctx_switchNow();
 	port_set_lock();
 }
+
+/* -------------------------------------------------------------------------- */
+
+#if   ((defined(__ARM_ARCH_7M__     ) && (__ARM_ARCH_7M__      == 1)) || \
+       (defined(__ARM_ARCH_7EM__    ) && (__ARM_ARCH_7EM__     == 1)) || \
+       (defined(__ARM_ARCH_8M_MAIN__) && (__ARM_ARCH_8M_MAIN__ == 1)) || \
+       (defined(__ARM_ARCH_8M_BASE__) && (__ARM_ARCH_8M_BASE__ == 1)))
+
+__STATIC_INLINE
+void spn_lock( spn_t *spn )
+{
+	while (__LDREXW((volatile uint32_t *)spn) || __STREXW(1, (volatile uint32_t *)spn));
+}
+
+#define OS_SPN_ARCH
+#endif
 
 /* -------------------------------------------------------------------------- */
 
