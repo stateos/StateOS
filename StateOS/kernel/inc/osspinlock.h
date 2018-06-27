@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    26.06.2018
+    @date    27.06.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -157,26 +157,7 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
 
 /******************************************************************************
  *
- * Name              : spn_kill
- *
- * Description       : reset the spin lock object and wake up all waiting tasks with 'E_STOPPED' event value
- *
- * Parameters
- *   spn             : pointer to spin lock object
- *
- * Return            : none
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-__STATIC_INLINE
-void spn_kill( spn_t *spn ) { spn->lock = 0; }
-
-/******************************************************************************
- *
  * Name              : spn_lock
- * Alias             : spn_wait
  *
  * Description       : lock the spin lock object,
  *                     wait indefinitely if the spin lock object can't be locked immediately
@@ -186,9 +167,10 @@ void spn_kill( spn_t *spn ) { spn->lock = 0; }
  *
  * Return            : none
  *
- * Note              : use only in thread mode, do not use on single-core systems
+ * Note              : do not use on single-core systems
  *                     be careful using this function, it can block the system
- *                     do not use blocking functions inside spn_lock / spn_unlock
+ *                     do not use waiting functions inside spn_lock / spn_unlock
+ *                     use only in thread mode
  *
  ******************************************************************************/
 
@@ -210,13 +192,9 @@ void spn_lock( spn_t *spn )
 
 #endif
 
-__STATIC_INLINE
-void spn_wait( spn_t *spn ) { spn_lock(spn); }
-
 /******************************************************************************
  *
  * Name              : spn_unlock
- * Alias             : spn_give
  *
  * Description       : unlock the spin lock object
  *
@@ -225,15 +203,12 @@ void spn_wait( spn_t *spn ) { spn_lock(spn); }
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : use only in thread mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 void spn_unlock( spn_t *spn ) { spn->lock = 0; }
-
-__STATIC_INLINE
-void spn_give( spn_t *spn ) { spn_unlock(spn); }
 
 #ifdef __cplusplus
 }
@@ -256,14 +231,11 @@ void spn_give( spn_t *spn ) { spn_unlock(spn); }
 
 struct SpinLock : public __spn
 {
-	 explicit
-	 SpinLock( void ): __spn _SPN_INIT() {}
+	explicit
+	SpinLock( void ): __spn _SPN_INIT() {}
 
-	void kill  ( void ) { spn_kill  (this); }
 	void lock  ( void ) { spn_lock  (this); }
-	void wait  ( void ) { spn_wait  (this); }
 	void unlock( void ) { spn_unlock(this); }
-	void give  ( void ) { spn_give  (this); }
 };
 
 #endif
