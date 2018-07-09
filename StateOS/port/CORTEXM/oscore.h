@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    26.06.2018
+    @date    09.07.2018
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -233,10 +233,23 @@ void port_ctx_switchLock( void )
 
 #if __CORTEX_M > 0
 
-#define port_spn_lock(lck)    while (__LDREXW((volatile uint32_t *)(lck)) || \
-                                  __STREXW(1, (volatile uint32_t *)(lck)))
+#ifdef  OS_MULTICORE
 
-#endif
+#error  OS_MULTICORE is an internal port definition!
+
+#else
+
+#define OS_MULTICORE
+
+__STATIC_INLINE
+void port_spn_lock( volatile unsigned *lock )
+{
+    while (__LDREXW((volatile uint32_t *)lock) || __STREXW(1, (volatile uint32_t *)lock));
+}
+
+#endif//OS_MULTICORE
+
+#endif//__CORTEX_M
 
 /* -------------------------------------------------------------------------- */
 

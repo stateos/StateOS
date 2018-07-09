@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    28.06.2018
+    @date    09.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -169,30 +169,20 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
  *
  * Return            : none
  *
- * Note              : do not use on single-core systems
- *                     be careful using this function, it can block the system
- *                     do not use waiting functions inside spn_lock / spn_unlock
+ * Note              : do not use waiting functions inside spn_lock / spn_unlock
  *                     use only in thread mode
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-void spn_lock( spn_t *spn )
-{
-#ifdef port_spn_lock
-	port_spn_lock(&spn->lock);
+#ifdef  OS_MULTICORE
+
+#define spn_lock(spn)  port_sys_lock(); \
+                       port_spn_lock(&(spn)->lock)
 #else
-	unsigned lock;
-	do
-	{
-		port_sys_lock();
-		lock = spn->lock;
-		spn->lock = 1;
-		port_sys_unlock();
-	}
-	while (lock);
+
+#define spn_lock(spn)  port_sys_lock(); \
+                       (void)(spn)
 #endif
-}
 
 /******************************************************************************
  *
@@ -209,8 +199,15 @@ void spn_lock( spn_t *spn )
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-void spn_unlock( spn_t *spn ) { spn->lock = 0; }
+#ifdef  OS_MULTICORE
+
+#define spn_unlock(spn)  (spn)->lock = 0; \
+                       port_sys_unlock()
+#else
+
+#define spn_unlock(spn)  (void)(spn); \
+                       port_sys_unlock()
+#endif
 
 #ifdef __cplusplus
 }
@@ -236,8 +233,24 @@ struct SpinLock : public __spn
 	explicit
 	SpinLock( void ): __spn _SPN_INIT() {}
 
-	void lock  ( void ) { spn_lock  (this); }
-	void unlock( void ) { spn_unlock(this); }
+	void lock( void )
+	{
+		state = port_get_lock(); port_set_lock();
+#ifdef  OS_MULTICORE
+		port_spn_lock(&(__spn::lock));
+#endif
+	}
+
+	void unlock( void )
+	{
+#ifdef  OS_MULTICORE
+		__spn::lock = 0;
+#endif
+		port_put_lock(state);
+	}
+
+	private:
+	lck_t state;
 };
 
 #endif
