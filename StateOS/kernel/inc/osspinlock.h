@@ -232,7 +232,7 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
 struct SpinLock : private CriticalSection
 {
 	explicit
-	SpinLock( spn_t *_spn ): spin(_spn) {}
+	SpinLock( spn_id _spn ): spin(_spn) {}
 #ifdef  OS_MULTICORE
 	void lock  ( void ) { port_spn_lock(&spin->lock); }
 	void unlock( void ) { spin->lock = 0;             }
