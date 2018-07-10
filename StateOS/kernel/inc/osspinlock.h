@@ -176,13 +176,11 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
  ******************************************************************************/
 
 #ifdef  OS_MULTICORE
-
-#define spn_lock(spn)  port_sys_lock(); \
-                       port_spn_lock(&(spn)->lock)
+#define                spn_lock(spn) \
+                       port_sys_lock(); port_spn_lock(&(spn)->lock)
 #else
-
-#define spn_lock(spn)  port_sys_lock(); \
-                       (void)(spn)
+#define                spn_lock(spn) \
+                       port_sys_lock(); assert((spn)->lock == 0); (spn)->lock = 1
 #endif
 
 /******************************************************************************
@@ -200,15 +198,8 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
  *
  ******************************************************************************/
 
-#ifdef  OS_MULTICORE
-
-#define spn_unlock(spn)  (spn)->lock = 0; \
-                       port_sys_unlock()
-#else
-
-#define spn_unlock(spn)  (void)(spn); \
-                       port_sys_unlock()
-#endif
+#define                spn_unlock(spn) \
+                       assert((spn)->lock == 1); (spn)->lock = 0; port_sys_unlock()
 
 #ifdef __cplusplus
 }
@@ -234,12 +225,12 @@ struct SpinLock : private CriticalSection
 	explicit
 	SpinLock( spn_id _spn ): spin(_spn) {}
 #ifdef  OS_MULTICORE
-	void lock  ( void ) { port_spn_lock(&spin->lock); }
-	void unlock( void ) { spin->lock = 0;             }
+	void lock  ( void ) { port_spn_lock(&spin->lock);              }
 #else
-	void lock  ( void ) {}
-	void unlock( void ) {}
+	void lock  ( void ) { assert(spin->lock == 0); spin->lock = 1; }
 #endif
+	void unlock( void ) { assert(spin->lock == 1); spin->lock = 0; }
+
 	private:
 	spn_id spin;
 };
