@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    05.06.2018
+    @date    10.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #define __STATEOS_H
 
 #include "oskernel.h"
+#include "inc/oscriticalsection.h"
 #include "inc/osspinlock.h"
 #include "inc/ossignal.h"
 #include "inc/osevent.h"
@@ -113,48 +114,6 @@ void sys_free( void *ptr ) { core_sys_free(ptr); }
 
 /******************************************************************************
  *
- * Name              : sys_lock
- * ISR alias         : sys_lockISR
- *
- * Description       : disable interrupts / enter into critical section
- *
- * Parameters        : none
- *
- * Return            : none
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-#define                sys_lock() \
-                       port_sys_lock()
-
-#define                sys_lockISR() \
-                       port_sys_lock()
-
-/******************************************************************************
- *
- * Name              : sys_unlock
- * ISR alias         : sys_unlockISR
- *
- * Description       : enable interrupts / exit from critical section
- *
- * Parameters        : none
- *
- * Return            : none
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-#define                sys_unlock() \
-                       port_sys_unlock()
-
-#define                sys_unlockISR() \
-                       port_sys_unlock()
-
-/******************************************************************************
- *
  * Name              : sys_time
  * ISR alias         : sys_timeISR
  *
@@ -193,33 +152,5 @@ cnt_t sys_timeISR( void ) { return sys_time(); }
 #ifdef __cplusplus
 }
 #endif
-
-/* -------------------------------------------------------------------------- */
-
-#ifdef __cplusplus
-
-/******************************************************************************
- *
- * Class             : CriticalSection
- *
- * Description       : create and initialize a critical section guard object
- *
- * Constructor parameters
- *                   : none
- *
- ******************************************************************************/
-
-struct CriticalSection
-{
-	 CriticalSection( void ) { state = port_get_lock(); port_set_lock(); }
-	~CriticalSection( void ) { port_put_lock(state); }
-
-	private:
-	lck_t state;
-};
-
-#endif
-
-/* -------------------------------------------------------------------------- */
 
 #endif//__STATEOS_H

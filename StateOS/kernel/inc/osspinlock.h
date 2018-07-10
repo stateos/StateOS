@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    09.07.2018
+    @date    10.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #define __STATEOS_SPN_H
 
 #include "oskernel.h"
+#include "oscriticalsection.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -221,36 +222,26 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
  *
  * Class             : SpinLock
  *
- * Description       : create and initialize a spin lock object
+ * Description       : use a spin lock object
  *
  * Constructor parameters
- *                   : none
+ *   spn             : pointer to spin lock object
  *
  ******************************************************************************/
 
-struct SpinLock : public __spn
+struct SpinLock : private CriticalSection
 {
 	explicit
-	SpinLock( void ): __spn _SPN_INIT() {}
-
-	void lock( void )
-	{
-		state = port_get_lock(); port_set_lock();
+	SpinLock( spn_t *_spn ): spin(_spn) {}
 #ifdef  OS_MULTICORE
-		port_spn_lock(&(__spn::lock));
+	void lock  ( void ) { port_spn_lock(&spin->lock); }
+	void unlock( void ) { spin->lock = 0;             }
+#else
+	void lock  ( void ) {}
+	void unlock( void ) {}
 #endif
-	}
-
-	void unlock( void )
-	{
-#ifdef  OS_MULTICORE
-		__spn::lock = 0;
-#endif
-		port_put_lock(state);
-	}
-
 	private:
-	lck_t state;
+	spn_id spin;
 };
 
 #endif
