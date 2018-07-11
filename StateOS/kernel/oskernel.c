@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    11.07.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -41,6 +41,25 @@ static
 void priv_tsk_idle( void )
 {
 	__WFI();
+}
+
+/* -------------------------------------------------------------------------- */
+
+static
+void core_ctx_switchNow( void )
+{
+	port_ctx_switch();
+	port_clr_lock();
+	port_set_barrier();
+}
+
+/* -------------------------------------------------------------------------- */
+
+static
+void core_ctx_switchLock( void )
+{
+	core_ctx_switchNow();
+	port_set_lock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -255,7 +274,7 @@ void core_tsk_remove( tsk_t *tsk )
 	tsk->id = ID_STOPPED;
 	priv_tsk_remove(tsk);
 	if (tsk == System.cur)
-		port_ctx_switchNow();
+		core_ctx_switchNow();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -358,7 +377,7 @@ unsigned core_tsk_waitUntil( void *obj, cnt_t time )
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
-	port_ctx_switchLock();
+	core_ctx_switchLock();
 
 	return cur->event;
 }
@@ -376,7 +395,7 @@ unsigned core_tsk_waitFor( void *obj, cnt_t delay )
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
-	port_ctx_switchLock();
+	core_ctx_switchLock();
 
 	return cur->event;
 }
@@ -389,7 +408,7 @@ void core_tsk_suspend( tsk_t *tsk )
 
 	priv_tsk_wait(tsk, &WAIT);
 	if (tsk == System.cur)
-		port_ctx_switchLock();
+		core_ctx_switchLock();
 }
 
 /* -------------------------------------------------------------------------- */
