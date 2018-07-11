@@ -46,7 +46,7 @@ void priv_tsk_idle( void )
 /* -------------------------------------------------------------------------- */
 
 static
-void core_ctx_switchNow( void )
+void priv_ctx_switchNow( void )
 {
 	port_ctx_switch();
 	port_clr_lock();
@@ -56,9 +56,9 @@ void core_ctx_switchNow( void )
 /* -------------------------------------------------------------------------- */
 
 static
-void core_ctx_switchLock( void )
+void priv_ctx_switchLock( void )
 {
-	core_ctx_switchNow();
+	priv_ctx_switchNow();
 	port_set_lock();
 }
 
@@ -274,7 +274,7 @@ void core_tsk_remove( tsk_t *tsk )
 	tsk->id = ID_STOPPED;
 	priv_tsk_remove(tsk);
 	if (tsk == System.cur)
-		core_ctx_switchNow();
+		priv_ctx_switchNow();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -377,7 +377,7 @@ unsigned core_tsk_waitUntil( void *obj, cnt_t time )
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
-	core_ctx_switchLock();
+	priv_ctx_switchLock();
 
 	return cur->event;
 }
@@ -395,7 +395,7 @@ unsigned core_tsk_waitFor( void *obj, cnt_t delay )
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
-	core_ctx_switchLock();
+	priv_ctx_switchLock();
 
 	return cur->event;
 }
@@ -408,7 +408,7 @@ void core_tsk_suspend( tsk_t *tsk )
 
 	priv_tsk_wait(tsk, &WAIT);
 	if (tsk == System.cur)
-		core_ctx_switchLock();
+		priv_ctx_switchLock();
 }
 
 /* -------------------------------------------------------------------------- */
