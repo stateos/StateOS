@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -38,11 +38,11 @@ void mut_init( mut_t *mut )
 	assert(!port_isr_inside());
 	assert(mut);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(mut, 0, sizeof(mut_t));
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -53,13 +53,13 @@ mut_t *mut_create( void )
 
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	mut = core_sys_alloc(sizeof(mut_t));
 	mut_init(mut);
 	mut->res = mut;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return mut;
 }
@@ -71,23 +71,23 @@ void mut_kill( mut_t *mut )
 	assert(!port_isr_inside());
 	assert(mut);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	core_all_wakeup(mut, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void mut_delete( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	mut_kill(mut);
 	core_sys_free(mut->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -100,7 +100,7 @@ unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(!port_isr_inside());
 	assert(mut);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (mut->owner == 0)
 	{
@@ -113,7 +113,7 @@ unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		event = wait(mut, time);
 	}
 	
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -141,7 +141,7 @@ unsigned mut_give( mut_t *mut )
 	assert(!port_isr_inside());
 	assert(mut);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (mut->owner == System.cur)
 	{
@@ -149,7 +149,7 @@ unsigned mut_give( mut_t *mut )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }

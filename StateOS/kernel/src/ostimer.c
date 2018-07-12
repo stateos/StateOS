@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -38,13 +38,13 @@ void tmr_init( tmr_t *tmr, fun_t *state )
 	assert(!port_isr_inside());
 	assert(tmr);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(tmr, 0, sizeof(tmr_t));
 
 	tmr->state = state;
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -55,13 +55,13 @@ tmr_t *tmr_create( fun_t *state )
 
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	tmr = core_sys_alloc(sizeof(tmr_t));
 	tmr_init(tmr, state);
 	tmr->obj.res = tmr;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return tmr;
 }
@@ -73,7 +73,7 @@ void tmr_kill( tmr_t *tmr )
 	assert(!port_isr_inside());
 	assert(tmr);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (tmr->id != ID_STOPPED)
 	{
@@ -81,19 +81,19 @@ void tmr_kill( tmr_t *tmr )
 		core_tmr_remove(tmr);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void tmr_delete( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	tmr_kill(tmr);
 	core_sys_free(tmr->obj.res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -114,7 +114,7 @@ void tmr_startUntil( tmr_t *tmr, cnt_t time )
 {
 	assert(tmr);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	tmr->start  = core_sys_time();
 	tmr->delay  = time - tmr->start;
@@ -124,7 +124,7 @@ void tmr_startUntil( tmr_t *tmr, cnt_t time )
 
 	priv_tmr_start(tmr);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -133,7 +133,7 @@ void tmr_start( tmr_t *tmr, cnt_t delay, cnt_t period )
 {
 	assert(tmr);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	tmr->start  = core_sys_time();
 	tmr->delay  = delay;
@@ -141,7 +141,7 @@ void tmr_start( tmr_t *tmr, cnt_t delay, cnt_t period )
 
 	priv_tmr_start(tmr);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -150,7 +150,7 @@ void tmr_startFrom( tmr_t *tmr, cnt_t delay, cnt_t period, fun_t *proc )
 {
 	assert(tmr);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	tmr->state  = proc;
 	tmr->start  = core_sys_time();
@@ -159,7 +159,7 @@ void tmr_startFrom( tmr_t *tmr, cnt_t delay, cnt_t period, fun_t *proc )
 
 	priv_tmr_start(tmr);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -170,14 +170,14 @@ unsigned tmr_take( tmr_t *tmr )
 
 	assert(tmr);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (tmr->id == ID_STOPPED)
 	{
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -192,14 +192,14 @@ unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(!port_isr_inside());
 	assert(tmr);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (tmr->id != ID_STOPPED)
 	{
 		event = wait(tmr, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }

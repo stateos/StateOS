@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -38,13 +38,13 @@ void sig_init( sig_t *sig, unsigned type )
 	assert(!port_isr_inside());
 	assert(sig);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(sig, 0, sizeof(sig_t));
 
 	sig->type = type & sigMASK;
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -55,13 +55,13 @@ sig_t *sig_create( unsigned type )
 
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	sig = core_sys_alloc(sizeof(sig_t));
 	sig_init(sig, type);
 	sig->res = sig;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return sig;
 }
@@ -73,25 +73,25 @@ void sig_kill( sig_t *sig )
 	assert(!port_isr_inside());
 	assert(sig);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	sig->flag = 0;
 	
 	core_all_wakeup(sig, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void sig_delete( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	sig_kill(sig);
 	core_sys_free(sig->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -103,7 +103,7 @@ unsigned sig_take( sig_t *sig )
 	assert(sig);
 	assert((sig->type & ~sigMASK) == 0U);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (sig->flag)
 	{
@@ -111,7 +111,7 @@ unsigned sig_take( sig_t *sig )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -127,7 +127,7 @@ unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(sig);
 	assert((sig->type & ~sigMASK) == 0U);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (sig->flag)
 	{
@@ -139,7 +139,7 @@ unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		event = wait(sig, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -165,7 +165,7 @@ void sig_give( sig_t *sig )
 	assert(sig);
 	assert((sig->type & ~sigMASK) == 0U);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	sig->flag = 1;
 
@@ -179,7 +179,7 @@ void sig_give( sig_t *sig )
 		core_all_wakeup(sig, E_SUCCESS);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

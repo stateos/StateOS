@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    11.07.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,7 @@ void *sbreak( int size )
 	static char *_brk = _memory;
 	       char * brk = NULL;
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (_brk + size < _stack - 4096)
 	{
@@ -50,7 +50,7 @@ void *sbreak( int size )
 		_brk += size;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return brk;
 }

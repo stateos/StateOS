@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -39,14 +39,14 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit )
 	assert(sem);
 	assert(init<=limit);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(sem, 0, sizeof(sem_t));
 
 	sem->count = init;
 	sem->limit = limit;
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -57,13 +57,13 @@ sem_t *sem_create( unsigned init, unsigned limit )
 
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	sem = core_sys_alloc(sizeof(sem_t));
 	sem_init(sem, init, limit);
 	sem->res = sem;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return sem;
 }
@@ -75,25 +75,25 @@ void sem_kill( sem_t *sem )
 	assert(!port_isr_inside());
 	assert(sem);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	sem->count = 0;
 
 	core_all_wakeup(sem, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void sem_delete( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	sem_kill(sem);
 	core_sys_free(sem->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -105,7 +105,7 @@ unsigned sem_take( sem_t *sem )
 	assert(sem);
 	assert(sem->limit);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (sem->count > 0)
 	{
@@ -114,7 +114,7 @@ unsigned sem_take( sem_t *sem )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -130,7 +130,7 @@ unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(sem);
 	assert(sem->limit);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (sem->count > 0)
 	{
@@ -143,7 +143,7 @@ unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		event = wait(sem, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -171,7 +171,7 @@ unsigned sem_give( sem_t *sem )
 	assert(sem);
 	assert(sem->limit);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (sem->count < sem->limit)
 	{
@@ -180,7 +180,7 @@ unsigned sem_give( sem_t *sem )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -196,7 +196,7 @@ unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(sem);
 	assert(sem->limit);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (sem->count < sem->limit)
 	{
@@ -209,7 +209,7 @@ unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		event = wait(sem, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }

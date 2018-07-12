@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    19.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -39,11 +39,11 @@ void lst_init( lst_t *lst )
 	assert(!port_isr_inside());
 	assert(lst);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(lst, 0, sizeof(lst_t));
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -54,13 +54,13 @@ lst_t *lst_create( void )
 
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	lst = core_sys_alloc(sizeof(lst_t));
 	lst_init(lst);
 	lst->res = lst;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return lst;
 }
@@ -72,23 +72,23 @@ void lst_kill( lst_t *lst )
 	assert(!port_isr_inside());
 	assert(lst);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	core_all_wakeup(lst, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void lst_delete( lst_t *lst )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	lst_kill(lst);
 	core_sys_free(lst->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -100,7 +100,7 @@ unsigned lst_take( lst_t *lst, void **data )
 	assert(lst);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (lst->head.next)
 	{
@@ -109,7 +109,7 @@ unsigned lst_take( lst_t *lst, void **data )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -125,7 +125,7 @@ unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(voi
 	assert(lst);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (lst->head.next)
 	{
@@ -139,7 +139,7 @@ unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(voi
 		event = wait(lst, time);
 	}
 	
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -168,7 +168,7 @@ void lst_give( lst_t *lst, const void *data )
 	assert(lst);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	tsk = core_one_wakeup(lst, E_SUCCESS);
 
@@ -183,7 +183,7 @@ void lst_give( lst_t *lst, const void *data )
 		ptr->next->next = 0;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

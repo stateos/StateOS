@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    10.07.2018
+    @date    11.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -177,10 +177,10 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
 
 #ifdef  OS_MULTICORE
 #define                spn_lock(spn) \
-                       port_sys_lock(); port_spn_lock(&(spn)->lock)
+                       core_sys_lock(); port_spn_lock(&(spn)->lock)
 #else
 #define                spn_lock(spn) \
-                       port_sys_lock(); assert((spn)->lock == 0); (spn)->lock = 1
+                       core_sys_lock(); assert((spn)->lock == 0); (spn)->lock = 1
 #endif
 
 /******************************************************************************
@@ -199,7 +199,7 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
  ******************************************************************************/
 
 #define                spn_unlock(spn) \
-                       assert((spn)->lock == 1); (spn)->lock = 0; port_sys_unlock()
+                       assert((spn)->lock == 1); (spn)->lock = 0; core_sys_unlock()
 
 #ifdef __cplusplus
 }

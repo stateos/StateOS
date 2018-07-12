@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    21.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -41,14 +41,14 @@ void evq_init( evq_t *evq, unsigned limit, unsigned *data )
 	assert(limit);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(evq, 0, sizeof(evq_t));
 
 	evq->limit = limit;
 	evq->data  = data;
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -60,13 +60,13 @@ evq_t *evq_create( unsigned limit )
 	assert(!port_isr_inside());
 	assert(limit);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	evq = core_sys_alloc(ABOVE(sizeof(evq_t)) + limit * sizeof(unsigned));
 	evq_init(evq, limit, (void *)((size_t)evq + ABOVE(sizeof(evq_t))));
 	evq->res = evq;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return evq;
 }
@@ -78,7 +78,7 @@ void evq_kill( evq_t *evq )
 	assert(!port_isr_inside());
 	assert(evq);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	evq->count = 0;
 	evq->head  = 0;
@@ -86,19 +86,19 @@ void evq_kill( evq_t *evq )
 
 	core_all_wakeup(evq, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void evq_delete( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	evq_kill(evq);
 	core_sys_free(evq->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -139,7 +139,7 @@ unsigned evq_take( evq_t *evq )
 
 	assert(evq);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (evq->count > 0)
 	{
@@ -148,7 +148,7 @@ unsigned evq_take( evq_t *evq )
 		if (tsk) priv_evq_put(evq, tsk->tmp.evq.event);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -164,7 +164,7 @@ unsigned priv_evq_wait( evq_t *evq, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(!port_isr_inside());
 	assert(evq);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (evq->count > 0)
 	{
@@ -177,7 +177,7 @@ unsigned priv_evq_wait( evq_t *evq, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		event = wait(evq, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -204,7 +204,7 @@ unsigned evq_give( evq_t *evq, unsigned data )
 
 	assert(evq);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (evq->count < evq->limit)
 	{
@@ -214,7 +214,7 @@ unsigned evq_give( evq_t *evq, unsigned data )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -229,7 +229,7 @@ unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(v
 	assert(!port_isr_inside());
 	assert(evq);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (evq->count < evq->limit)
 	{
@@ -243,7 +243,7 @@ unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(v
 		event = wait(evq, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -270,7 +270,7 @@ unsigned evq_push( evq_t *evq, unsigned data )
 
 	assert(evq);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (evq->count == 0 || evq->queue == 0)
 	{
@@ -285,7 +285,7 @@ unsigned evq_push( evq_t *evq, unsigned data )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }

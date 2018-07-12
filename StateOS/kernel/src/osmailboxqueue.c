@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    28.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,7 @@ void box_init( box_t *box, unsigned limit, void *data, unsigned size )
 	assert(data);
 	assert(size);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(box, 0, sizeof(box_t));
 	
@@ -50,7 +50,7 @@ void box_init( box_t *box, unsigned limit, void *data, unsigned size )
 	box->data  = data;
 	box->size  = size;
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -63,13 +63,13 @@ box_t *box_create( unsigned limit, unsigned size )
 	assert(limit);
 	assert(size);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	box = core_sys_alloc(ABOVE(sizeof(box_t)) + limit * size);
 	box_init(box, limit, (void *)((size_t)box + ABOVE(sizeof(box_t))), size);
 	box->res = box;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return box;
 }
@@ -81,7 +81,7 @@ void box_kill( box_t *box )
 	assert(!port_isr_inside());
 	assert(box);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	box->count = 0;
 	box->head  = 0;
@@ -89,19 +89,19 @@ void box_kill( box_t *box )
 
 	core_all_wakeup(box, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void box_delete( box_t *box )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	box_kill(box);
 	core_sys_free(box->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -191,7 +191,7 @@ unsigned box_take( box_t *box, void *data )
 	assert(box);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (box->count > 0)
 	{
@@ -199,7 +199,7 @@ unsigned box_take( box_t *box, void *data )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -215,7 +215,7 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 	assert(box);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (box->count > 0)
 	{
@@ -228,7 +228,7 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 		event = wait(box, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -256,7 +256,7 @@ unsigned box_give( box_t *box, const void *data )
 	assert(box);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (box->count < box->limit)
 	{
@@ -264,7 +264,7 @@ unsigned box_give( box_t *box, const void *data )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -280,7 +280,7 @@ unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait
 	assert(box);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (box->count < box->limit)
 	{
@@ -293,7 +293,7 @@ unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait
 		event = wait(box, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -321,7 +321,7 @@ unsigned box_push( box_t *box, const void *data )
 	assert(box);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (box->count == 0 || box->queue == 0)
 	{
@@ -331,7 +331,7 @@ unsigned box_push( box_t *box, const void *data )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -344,11 +344,11 @@ unsigned box_count( box_t *box )
 
 	assert(box);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	cnt = priv_box_count(box);
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return cnt;
 }
@@ -361,11 +361,11 @@ unsigned box_space( box_t *box )
 
 	assert(box);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	cnt = priv_box_space(box);
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return cnt;
 }

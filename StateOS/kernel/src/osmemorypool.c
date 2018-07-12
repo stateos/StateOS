@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    19.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -45,7 +45,7 @@ void mem_bind( mem_t *mem )
 	assert(mem->size);
 	assert(mem->data);
 
-	port_sys_lock();
+	core_sys_lock();
 	
 	ptr = mem->data;
 	cnt = mem->limit;
@@ -53,7 +53,7 @@ void mem_bind( mem_t *mem )
 	mem->head.next = 0;
 	while (cnt--) { mem_give(mem, ++ptr); ptr += mem->size; }
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -66,7 +66,7 @@ void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data )
 	assert(size);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(mem, 0, sizeof(mem_t));
 
@@ -76,7 +76,7 @@ void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data )
 
 	mem_bind(mem);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -91,13 +91,13 @@ mem_t *mem_create( unsigned limit, unsigned size )
 
 	size = MSIZE(size);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + limit * (1 + size) * sizeof(que_t));
 	mem_init(mem, limit, size, (void *)((size_t)mem + ABOVE(sizeof(mem_t))));
 	mem->res = mem;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return mem;
 }
@@ -109,23 +109,23 @@ void mem_kill( mem_t *mem )
 	assert(!port_isr_inside());
 	assert(mem);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	core_all_wakeup(mem, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void mem_delete( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	mem_kill(mem);
 	core_sys_free(mem->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

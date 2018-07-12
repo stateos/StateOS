@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    28.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -41,14 +41,14 @@ void stm_init( stm_t *stm, unsigned limit, void *data )
 	assert(limit);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(stm, 0, sizeof(stm_t));
 
 	stm->limit = limit;
 	stm->data  = data;
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -60,13 +60,13 @@ stm_t *stm_create( unsigned limit )
 	assert(!port_isr_inside());
 	assert(limit);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	stm = core_sys_alloc(ABOVE(sizeof(stm_t)) + limit);
 	stm_init(stm, limit, (void *)((size_t)stm + ABOVE(sizeof(stm_t))));
 	stm->res = stm;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return stm;
 }
@@ -78,7 +78,7 @@ void stm_kill( stm_t *stm )
 	assert(!port_isr_inside());
 	assert(stm);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	stm->count = 0;
 	stm->head  = 0;
@@ -86,19 +86,19 @@ void stm_kill( stm_t *stm )
 
 	core_all_wakeup(stm, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void stm_delete( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	stm_kill(stm);
 	core_sys_free(stm->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -205,7 +205,7 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 	assert(stm);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (size > 0 && size <= priv_stm_count(stm))
 	{
@@ -213,7 +213,7 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -229,7 +229,7 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 	assert(stm);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (size > 0)
 	{
@@ -250,7 +250,7 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 		}
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -278,7 +278,7 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 	assert(stm);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (size > 0 && size <= priv_stm_space(stm))
 	{
@@ -286,7 +286,7 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -302,7 +302,7 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 	assert(stm);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (size > 0)
 	{
@@ -320,7 +320,7 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 		}
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -348,7 +348,7 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 	assert(stm);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (size > 0 && size <= stm->limit)
 	{
@@ -361,7 +361,7 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 		}
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -374,11 +374,11 @@ unsigned stm_count( stm_t *stm )
 
 	assert(stm);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	cnt = priv_stm_count(stm);
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return cnt;
 }
@@ -391,11 +391,11 @@ unsigned stm_space( stm_t *stm )
 
 	assert(stm);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	cnt = priv_stm_space(stm);
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return cnt;
 }

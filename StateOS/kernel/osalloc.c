@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    07.05.2018
+    @date    11.07.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -69,7 +69,7 @@ void *core_sys_alloc( size_t size )
 
 	size = HSIZE(size) + 1;
 
-	port_sys_lock();
+	core_sys_lock();
 
 	for (heap = Heap; heap; heap = heap->next)
 	{
@@ -98,7 +98,7 @@ void *core_sys_alloc( size_t size )
 		break;								// memory segment was successfully allocated
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	assert(heap);
 
@@ -113,7 +113,7 @@ void core_sys_free( void *base )
 
 	base = (hdr_t *) base - 1;
 
-	port_sys_lock();
+	core_sys_lock();
 
 	for (heap = Heap; heap; heap = heap->next)
 	{
@@ -124,7 +124,7 @@ void core_sys_free( void *base )
 		break;								// memory segment was successfully released
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

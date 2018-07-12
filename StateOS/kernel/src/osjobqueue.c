@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    21.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -41,14 +41,14 @@ void job_init( job_t *job, unsigned limit, fun_t **data )
 	assert(limit);
 	assert(data);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(job, 0, sizeof(job_t));
 
 	job->limit = limit;
 	job->data  = data;
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -60,13 +60,13 @@ job_t *job_create( unsigned limit )
 	assert(!port_isr_inside());
 	assert(limit);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	job = core_sys_alloc(ABOVE(sizeof(job_t)) + limit * sizeof(fun_t *));
 	job_init(job, limit, (void *)((size_t)job + ABOVE(sizeof(job_t))));
 	job->res = job;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return job;
 }
@@ -78,7 +78,7 @@ void job_kill( job_t *job )
 	assert(!port_isr_inside());
 	assert(job);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	job->count = 0;
 	job->head  = 0;
@@ -86,19 +86,19 @@ void job_kill( job_t *job )
 
 	core_all_wakeup(job, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void job_delete( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	job_kill(job);
 	core_sys_free(job->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -139,7 +139,7 @@ unsigned job_take( job_t *job )
 
 	assert(job);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (job->count > 0)
 	{
@@ -150,7 +150,7 @@ unsigned job_take( job_t *job )
 		event = E_SUCCESS;
 	}
 	
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -166,7 +166,7 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(!port_isr_inside());
 	assert(job);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (job->count > 0)
 	{
@@ -183,7 +183,7 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	if (event == E_SUCCESS)
 		System.cur->tmp.job.fun();
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -212,7 +212,7 @@ unsigned job_give( job_t *job, fun_t *fun )
 	assert(job);
 	assert(fun);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (job->count < job->limit)
 	{
@@ -222,7 +222,7 @@ unsigned job_give( job_t *job, fun_t *fun )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -239,7 +239,7 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void
 	assert(job);
 	assert(fun);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (job->count < job->limit)
 	{
@@ -254,7 +254,7 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void
 		event = wait(job, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -283,7 +283,7 @@ unsigned job_push( job_t *job, fun_t *fun )
 	assert(job);
 	assert(fun);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (job->count == 0 || job->queue == 0)
 	{
@@ -298,7 +298,7 @@ unsigned job_push( job_t *job, fun_t *fun )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }

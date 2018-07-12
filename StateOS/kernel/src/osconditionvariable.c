@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -38,11 +38,11 @@ void cnd_init( cnd_t *cnd )
 	assert(!port_isr_inside());
 	assert(cnd);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(cnd, 0, sizeof(cnd_t));
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -53,13 +53,13 @@ cnd_t *cnd_create( void )
 
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	cnd = core_sys_alloc(sizeof(cnd_t));
 	cnd_init(cnd);
 	cnd->res = cnd;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return cnd;
 }
@@ -71,23 +71,23 @@ void cnd_kill( cnd_t *cnd )
 	assert(!port_isr_inside());
 	assert(cnd);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	core_all_wakeup(cnd, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void cnd_delete( cnd_t *cnd )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	cnd_kill(cnd);
 	core_sys_free(cnd->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -101,13 +101,13 @@ unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(void
 	assert(cnd);
 	assert(mtx);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if ((event = mtx_give(mtx))   == E_SUCCESS)
 	if ((event = wait(cnd, time)) == E_SUCCESS)
 	     event = mtx_wait(mtx);
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -132,12 +132,12 @@ void cnd_give( cnd_t *cnd, bool all )
 {
 	assert(cnd);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (all) core_all_wakeup(cnd, E_SUCCESS);
 	else     core_one_wakeup(cnd, E_SUCCESS);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

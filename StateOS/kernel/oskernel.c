@@ -198,7 +198,7 @@ void core_tmr_handler( void )
 
 	core_stk_assert();
 
-	port_isr_lock();
+	core_isr_lock();
 
 	while (priv_tmr_expired(tmr = WAIT.obj.next))
 	{
@@ -209,7 +209,7 @@ void core_tmr_handler( void )
 			core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
 	}
 
-	port_isr_unlock();
+	core_isr_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -515,7 +515,7 @@ void *core_tsk_handler( void *sp )
 
 	core_stk_assert();
 
-	port_isr_lock();
+	core_isr_lock();
 	core_ctx_reset();
 
 	cur = System.cur;
@@ -537,7 +537,7 @@ void *core_tsk_handler( void *sp )
 	System.cur = nxt;
 	sp = nxt->sp;
 
-	port_isr_unlock();
+	core_isr_unlock();
 
 	return sp;
 }

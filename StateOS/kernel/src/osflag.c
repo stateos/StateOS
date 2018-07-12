@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -39,11 +39,11 @@ void flg_init( flg_t *flg )
 	assert(!port_isr_inside());
 	assert(flg);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(flg, 0, sizeof(flg_t));
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -54,13 +54,13 @@ flg_t *flg_create( void )
 
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	flg = core_sys_alloc(sizeof(flg_t));
 	flg_init(flg);
 	flg->res = flg;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return flg;
 }
@@ -72,23 +72,23 @@ void flg_kill( flg_t *flg )
 	assert(!port_isr_inside());
 	assert(flg);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	core_all_wakeup(flg, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void flg_delete( flg_t *flg )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	flg_kill(flg);
 	core_sys_free(flg->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -101,7 +101,7 @@ unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
 	assert(flg);
 	assert((mode & ~flgMASK) == 0U);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
 	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
@@ -111,7 +111,7 @@ unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
 		event = E_TIMEOUT;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -128,7 +128,7 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, u
 	assert(flg);
 	assert((mode & ~flgMASK) == 0U);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
 	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
@@ -140,7 +140,7 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, u
 		event = wait(flg, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -167,7 +167,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 	
 	assert(flg);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	flags = flg->flags |= flags;
 
@@ -186,7 +186,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 
 	flags = flg->flags;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return flags;
 }
@@ -199,12 +199,12 @@ unsigned flg_clear( flg_t *flg, unsigned flags )
 
 	assert(flg);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	state = flg->flags;
 	flg->flags &= ~flags;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return state;
 }

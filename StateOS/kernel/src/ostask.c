@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    15.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -41,7 +41,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
 	assert(stack);
 	assert(size);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(tsk, 0, sizeof(tsk_t));
 	
@@ -54,7 +54,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
 	core_ctx_init(tsk);
 	core_tsk_insert(tsk);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -67,14 +67,14 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 	assert(state);
 	assert(size);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	size = ABOVE(size);
 	tsk = core_sys_alloc(ABOVE(sizeof(tsk_t)) + size);
 	tsk_init(tsk, prio, state, (void *)((size_t)tsk + ABOVE(sizeof(tsk_t))), size);
 	tsk->obj.res = tsk;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return tsk;
 }
@@ -87,7 +87,7 @@ void tsk_start( tsk_t *tsk )
 	assert(tsk);
 	assert(tsk->state);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (tsk->id == ID_STOPPED)
 	{
@@ -95,7 +95,7 @@ void tsk_start( tsk_t *tsk )
 		core_tsk_insert(tsk);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -106,7 +106,7 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 	assert(tsk);
 	assert(state);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (tsk->id == ID_STOPPED)
 	{
@@ -116,7 +116,7 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 		core_tsk_insert(tsk);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -145,7 +145,7 @@ void tsk_kill( tsk_t *tsk )
 	assert(!port_isr_inside());
 	assert(tsk);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (tsk->id != ID_STOPPED)
 	{
@@ -168,19 +168,19 @@ void tsk_kill( tsk_t *tsk )
 		}
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void tsk_delete( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	tsk_detach(tsk);
 	tsk_kill(tsk);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -192,7 +192,7 @@ unsigned tsk_detach( tsk_t *tsk )
 	assert(!port_isr_inside());
 	assert(tsk);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if ((tsk->id      != ID_STOPPED) &&
 	    (tsk->join    != DETACHED) &&
@@ -203,7 +203,7 @@ unsigned tsk_detach( tsk_t *tsk )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -217,7 +217,7 @@ unsigned tsk_join( tsk_t *tsk )
 	assert(!port_isr_inside());
 	assert(tsk);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (tsk->join == JOINABLE)
 	{
@@ -230,7 +230,7 @@ unsigned tsk_join( tsk_t *tsk )
 			core_sys_free(tsk->obj.res);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -241,12 +241,12 @@ void tsk_yield( void )
 {
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	core_ctx_switch();
 
 	port_clr_lock();
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -270,12 +270,12 @@ void tsk_prio( unsigned prio )
 {
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	System.cur->basic = prio;
 	core_cur_prio(prio);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -287,12 +287,12 @@ unsigned priv_tsk_wait( unsigned flags, cnt_t time, unsigned(*wait)(void*,cnt_t)
 
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	System.cur->tmp.flg.flags = flags;
 	event = wait(System.cur, time);
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -317,7 +317,7 @@ void tsk_give( tsk_t *tsk, unsigned flags )
 {
 	assert(tsk);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (tsk->guard == tsk)
 	{
@@ -326,7 +326,7 @@ void tsk_give( tsk_t *tsk, unsigned flags )
 			core_tsk_wakeup(tsk, flags);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -337,7 +337,7 @@ unsigned tsk_suspend( tsk_t *tsk )
 	
 	assert(tsk);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (tsk->id == ID_READY)
 	{
@@ -345,7 +345,7 @@ unsigned tsk_suspend( tsk_t *tsk )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -358,7 +358,7 @@ unsigned tsk_resume( tsk_t *tsk )
 
 	assert(tsk);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (tsk->guard == &WAIT)
 	{
@@ -366,7 +366,7 @@ unsigned tsk_resume( tsk_t *tsk )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }

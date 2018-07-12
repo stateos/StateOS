@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -39,14 +39,14 @@ void bar_init( bar_t *bar, unsigned limit )
 	assert(bar);
 	assert(limit);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(bar, 0, sizeof(bar_t));
 
 	bar->count = limit;
 	bar->limit = limit;
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -58,13 +58,13 @@ bar_t *bar_create( unsigned limit )
 	assert(!port_isr_inside());
 	assert(limit);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	bar = core_sys_alloc(sizeof(bar_t));
 	bar_init(bar, limit);
 	bar->res = bar;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return bar;
 }
@@ -76,25 +76,25 @@ void bar_kill( bar_t *bar )
 	assert(!port_isr_inside());
 	assert(bar);
 	
-	port_sys_lock();
+	core_sys_lock();
 
 	bar->count = bar->limit;
 
 	core_all_wakeup(bar, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void bar_delete( bar_t *bar )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	bar_kill(bar);
 	core_sys_free(bar->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -108,7 +108,7 @@ unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(bar);
 	assert(bar->count);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (--bar->count == 0)
 	{
@@ -121,7 +121,7 @@ unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		event = wait(bar, time);
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }

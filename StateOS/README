@@ -40,6 +40,7 @@ Features:
 - updated message buffer object
 - updated stream buffer object
 - added spin lock object
+- some lock definitions moved to kernel
 ---------
 6.0
 - updated os version

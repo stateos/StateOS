@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    11.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -39,11 +39,11 @@ void mtx_init( mtx_t *mtx )
 	assert(!port_isr_inside());
 	assert(mtx);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	memset(mtx, 0, sizeof(mtx_t));
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -54,13 +54,13 @@ mtx_t *mtx_create( void )
 
 	assert(!port_isr_inside());
 
-	port_sys_lock();
+	core_sys_lock();
 
 	mtx = core_sys_alloc(sizeof(mtx_t));
 	mtx_init(mtx);
 	mtx->res = mtx;
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return mtx;
 }
@@ -116,7 +116,7 @@ void mtx_kill( mtx_t *mtx )
 	assert(!port_isr_inside());
 	assert(mtx);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	priv_mtx_unlink(mtx);
 
@@ -124,19 +124,19 @@ void mtx_kill( mtx_t *mtx )
 
 	core_all_wakeup(mtx, E_STOPPED);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void mtx_delete( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	port_sys_lock();
+	core_sys_lock();
 
 	mtx_kill(mtx);
 	core_sys_free(mtx->res);
 
-	port_sys_unlock();
+	core_sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -149,7 +149,7 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(!port_isr_inside());
 	assert(mtx);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (mtx->owner == 0)
 	{
@@ -175,7 +175,7 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		System.cur->mtx.tree = 0;
 	}
 	
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
@@ -203,7 +203,7 @@ unsigned mtx_give( mtx_t *mtx )
 	assert(!port_isr_inside());
 	assert(mtx);
 
-	port_sys_lock();
+	core_sys_lock();
 
 	if (mtx->owner == System.cur)
 	{
@@ -220,7 +220,7 @@ unsigned mtx_give( mtx_t *mtx )
 		event = E_SUCCESS;
 	}
 
-	port_sys_unlock();
+	core_sys_unlock();
 
 	return event;
 }
