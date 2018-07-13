@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    13.07.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -104,12 +104,6 @@ extern sys_t System; // system data
 
 #define core_sys_unlock() \
         port_put_lock(__LOCK); } while(0)
-
-#define core_isr_lock() \
-        do { port_set_lock()
-
-#define core_isr_unlock() \
-        port_clr_lock(); } while(0)
 
 /* -------------------------------------------------------------------------- */
 

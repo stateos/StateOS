@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    13.07.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -198,18 +198,18 @@ void core_tmr_handler( void )
 
 	core_stk_assert();
 
-	core_isr_lock();
-
-	while (priv_tmr_expired(tmr = WAIT.obj.next))
+	port_set_lock();
 	{
-		if (tmr->id == ID_TIMER)
-			priv_tmr_wakeup((tmr_t *)tmr, E_SUCCESS);
+		while (priv_tmr_expired(tmr = WAIT.obj.next))
+		{
+			if (tmr->id == ID_TIMER)
+				priv_tmr_wakeup((tmr_t *)tmr, E_SUCCESS);
 
-		else      /* id == ID_DELAYED */
-			core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
+			else      /* id == ID_DELAYED */
+				core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
+		}
 	}
-
-	core_isr_unlock();
+	port_clr_lock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -515,29 +515,30 @@ void *core_tsk_handler( void *sp )
 
 	core_stk_assert();
 
-	core_isr_lock();
-	core_ctx_reset();
+	port_set_lock();
+	{
+		core_ctx_reset();
 
-	cur = System.cur;
-	cur->sp = sp;
+		cur = System.cur;
+		cur->sp = sp;
 
-	nxt = IDLE.obj.next;
+		nxt = IDLE.obj.next;
 
 #if OS_ROBIN && HW_TIMER_SIZE == 0
-	if (cur == nxt || (nxt->slice >= (OS_FREQUENCY)/(OS_ROBIN) && (nxt->slice = 0) == 0))
+		if (cur == nxt || (nxt->slice >= (OS_FREQUENCY)/(OS_ROBIN) && (nxt->slice = 0) == 0))
 #else
-	if (cur == nxt)
+		if (cur == nxt)
 #endif
-	{
-		priv_tsk_remove(nxt);
-		priv_tsk_insert(nxt);
-		nxt = IDLE.obj.next;
+		{
+			priv_tsk_remove(nxt);
+			priv_tsk_insert(nxt);
+			nxt = IDLE.obj.next;
+		}
+
+		System.cur = nxt;
+		sp = nxt->sp;
 	}
-
-	System.cur = nxt;
-	sp = nxt->sp;
-
-	core_isr_unlock();
+	port_clr_lock();
 
 	return sp;
 }
