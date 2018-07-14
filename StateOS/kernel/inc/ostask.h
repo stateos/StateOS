@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    25.05.2018
+    @date    14.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -126,6 +126,9 @@ struct __tsk
 	}        tmp;
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 	char     libspace[96];
+	#define _TSK_EXTRA { 0 }
+#else
+	#define _TSK_EXTRA
 #endif
 };
 
@@ -148,13 +151,8 @@ struct __tsk
  *
  ******************************************************************************/
 
-#if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, { 0 } }
-#else
-#define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } } }
-#endif
+                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
 
 /******************************************************************************
  *
