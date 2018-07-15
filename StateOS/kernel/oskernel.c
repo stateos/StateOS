@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    13.07.2018
+    @date    15.07.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -51,14 +51,6 @@ void priv_ctx_switchNow( void )
 	port_ctx_switch();
 	port_clr_lock();
 	port_set_barrier();
-}
-
-/* -------------------------------------------------------------------------- */
-
-static
-void priv_ctx_switchLock( void )
-{
-	priv_ctx_switchNow();
 	port_set_lock();
 }
 
@@ -377,7 +369,7 @@ unsigned core_tsk_waitUntil( void *obj, cnt_t time )
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
-	priv_ctx_switchLock();
+	priv_ctx_switchNow();
 
 	return cur->event;
 }
@@ -395,7 +387,7 @@ unsigned core_tsk_waitFor( void *obj, cnt_t delay )
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
-	priv_ctx_switchLock();
+	priv_ctx_switchNow();
 
 	return cur->event;
 }
@@ -408,7 +400,7 @@ void core_tsk_suspend( tsk_t *tsk )
 
 	priv_tsk_wait(tsk, &WAIT);
 	if (tsk == System.cur)
-		priv_ctx_switchLock();
+		priv_ctx_switchNow();
 }
 
 /* -------------------------------------------------------------------------- */
