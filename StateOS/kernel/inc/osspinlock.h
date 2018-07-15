@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -45,13 +45,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-typedef struct __spn spn_t, * const spn_id;
-
-struct __spn
-{
-	volatile
-	unsigned lock;
-};
+typedef volatile unsigned spn_t, * const spn_id;
 
 /******************************************************************************
  *
@@ -67,7 +61,7 @@ struct __spn
  *
  ******************************************************************************/
 
-#define               _SPN_INIT() { 0 }
+#define               _SPN_INIT()   0
 
 /******************************************************************************
  *
@@ -135,7 +129,7 @@ struct __spn
 
 #ifndef __cplusplus
 #define                SPN_CREATE() \
-             & (spn_t) SPN_INIT  ()
+           (spn_t[]) { SPN_INIT  () }
 #define                SPN_NEW \
                        SPN_CREATE
 #endif
@@ -156,7 +150,7 @@ struct __spn
  ******************************************************************************/
 
 __STATIC_INLINE
-void spn_init( spn_t *spn ) { spn->lock = 0; }
+void spn_init( spn_t *spn ) { *spn = 0; }
 
 /******************************************************************************
  *
@@ -177,10 +171,10 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
 
 #ifdef  OS_MULTICORE
 #define                spn_lock(spn) \
-                       core_sys_lock(); port_spn_lock(&(spn)->lock)
+                       core_sys_lock(); port_spn_lock(spn)
 #else
 #define                spn_lock(spn) \
-                       core_sys_lock(); assert((spn)->lock == 0); (spn)->lock = 1
+                       core_sys_lock()
 #endif
 
 /******************************************************************************
@@ -198,8 +192,13 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
  *
  ******************************************************************************/
 
+#ifdef  OS_MULTICORE
 #define                spn_unlock(spn) \
-                       assert((spn)->lock == 1); (spn)->lock = 0; core_sys_unlock()
+                       *(spn) = 0; core_sys_unlock()
+#else
+#define                spn_unlock(spn) \
+                                   core_sys_unlock()
+#endif
 
 #ifdef __cplusplus
 }
@@ -222,17 +221,22 @@ void spn_init( spn_t *spn ) { spn->lock = 0; }
 
 struct SpinLock : private CriticalSection
 {
+#ifdef  OS_MULTICORE
 	explicit
 	SpinLock( spn_id _spn ): spin(_spn) {}
-#ifdef  OS_MULTICORE
-	void lock  ( void ) { port_spn_lock(&spin->lock);              }
-#else
-	void lock  ( void ) { assert(spin->lock == 0); spin->lock = 1; }
-#endif
-	void unlock( void ) { assert(spin->lock == 1); spin->lock = 0; }
+
+	void lock  ( void ) { port_spn_lock(spin); }
+	void unlock( void ) { *spin = 0;           }
 
 	private:
 	spn_id spin;
+#else
+	explicit
+	SpinLock( spn_id _spn ) { (void)_spn; }
+
+	void lock  ( void ) {}
+	void unlock( void ) {}
+#endif
 };
 
 #endif
