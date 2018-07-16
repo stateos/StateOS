@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -282,7 +282,7 @@ struct __tmr
 
 #ifndef __cplusplus
 #define                TMR_CREATE( state ) \
-             & (tmr_t) TMR_INIT  ( state )
+           (tmr_t[]) { TMR_INIT  ( state ) }
 #define                TMR_NEW \
                        TMR_CREATE
 #endif

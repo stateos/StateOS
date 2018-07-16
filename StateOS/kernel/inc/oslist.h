@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    19.05.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -164,7 +164,7 @@ struct __lst
 
 #ifndef __cplusplus
 #define                LST_CREATE() \
-             & (lst_t) LST_INIT  ()
+           (lst_t[]) { LST_INIT  () }
 #define                LST_NEW \
                        LST_CREATE
 #endif

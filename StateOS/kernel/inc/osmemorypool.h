@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    19.05.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -177,7 +177,7 @@ struct __mem
 
 #ifndef __cplusplus
 #define                MEM_CREATE( limit, size ) \
-             & (mem_t) MEM_INIT  ( limit, size )
+           (mem_t[]) { MEM_INIT  ( limit, size ) }
 #define                MEM_NEW \
                        MEM_CREATE
 #endif

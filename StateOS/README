@@ -41,6 +41,7 @@ Features:
 - updated stream buffer object
 - added spin lock object
 - some lock definitions moved to kernel
+- updated XXX_CREATE definitions
 ---------
 6.0
 - updated os version

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    20.05.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -167,7 +167,7 @@ struct __evq
 
 #ifndef __cplusplus
 #define                EVQ_CREATE( limit ) \
-             & (evq_t) EVQ_INIT  ( limit )
+           (evq_t[]) { EVQ_INIT  ( limit ) }
 #define                EVQ_NEW \
                        EVQ_CREATE
 #endif

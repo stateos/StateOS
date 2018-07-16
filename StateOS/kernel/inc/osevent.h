@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -134,7 +134,7 @@ struct __evt
 
 #ifndef __cplusplus
 #define                EVT_CREATE() \
-             & (evt_t) EVT_INIT  ()
+           (evt_t[]) { EVT_INIT  () }
 #define                EVT_NEW \
                        EVT_CREATE
 #endif

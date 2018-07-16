@@ -2,7 +2,7 @@
 
     @file    StateOS: oscriticalsection.h
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,7 +57,7 @@ extern "C" {
                        core_sys_lock()
 
 #define                sys_lockISR() \
-                       core_sys_lock()
+                       sys_lock()
 
 /******************************************************************************
  *
@@ -78,7 +78,7 @@ extern "C" {
                        core_sys_unlock()
 
 #define                sys_unlockISR() \
-                       core_sys_unlock()
+                       sys_unlock()
 
 #ifdef __cplusplus
 }

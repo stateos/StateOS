@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    20.05.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -167,7 +167,7 @@ struct __stm
 
 #ifndef __cplusplus
 #define                STM_CREATE( limit ) \
-             & (stm_t) STM_INIT  ( limit )
+           (stm_t[]) { STM_INIT  ( limit ) }
 #define                STM_NEW \
                        STM_CREATE
 #endif

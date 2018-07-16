@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -142,7 +142,7 @@ struct __bar
 
 #ifndef __cplusplus
 #define                BAR_CREATE( limit ) \
-             & (bar_t) BAR_INIT  ( limit )
+           (bar_t[]) { BAR_INIT  ( limit ) }
 #define                BAR_NEW \
                        BAR_CREATE
 #endif

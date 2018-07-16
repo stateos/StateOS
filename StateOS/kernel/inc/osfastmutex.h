@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -137,7 +137,7 @@ struct __mut
 
 #ifndef __cplusplus
 #define                MUT_CREATE() \
-             & (mut_t) MUT_INIT  ()
+           (mut_t[]) { MUT_INIT  () }
 #define                MUT_NEW \
                        MUT_CREATE
 #endif

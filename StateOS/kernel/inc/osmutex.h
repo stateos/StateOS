@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    13.05.2018
+    @date    15.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -138,7 +138,7 @@ struct __mtx
 
 #ifndef __cplusplus
 #define                MTX_CREATE() \
-             & (mtx_t) MTX_INIT  ()
+           (mtx_t[]) { MTX_INIT  () }
 #define                MTX_NEW \
                        MTX_CREATE
 #endif
