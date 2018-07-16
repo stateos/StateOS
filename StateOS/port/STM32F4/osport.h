@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    16.07.2018
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -34,9 +34,9 @@
 
 #include <stm32f4xx.h>
 #ifndef   NOCONFIG
-#include <osconfig.h>
+#include "osconfig.h"
 #endif
-#include <osdefs.h>
+#include "osdefs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,7 +66,7 @@ extern "C" {
 
 #ifdef  HW_TIMER_SIZE
 #error  HW_TIMER_SIZE is an internal os definition!
-#elif   OS_FREQUENCY > 1000 
+#elif   OS_FREQUENCY > 1000
 #define HW_TIMER_SIZE        32 /* bit size of hardware timer                 */
 #else
 #define HW_TIMER_SIZE         0 /* os does not work in tick-less mode         */
@@ -140,7 +140,7 @@ void port_tmr_stop( void )
 	#endif
 #endif
 }
-	
+
 /* -------------------------------------------------------------------------- */
 // set time breakpoint
 

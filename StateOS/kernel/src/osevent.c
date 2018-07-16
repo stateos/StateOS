@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -30,6 +30,7 @@
  ******************************************************************************/
 
 #include "inc/osevent.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void evt_init( evt_t *evt )
@@ -38,11 +39,11 @@ void evt_init( evt_t *evt )
 	assert(!port_isr_inside());
 	assert(evt);
 
-	core_sys_lock();
-
-	memset(evt, 0, sizeof(evt_t));
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		memset(evt, 0, sizeof(evt_t));
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -53,13 +54,13 @@ evt_t *evt_create( void )
 
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	evt = core_sys_alloc(sizeof(evt_t));
-	evt_init(evt);
-	evt->res = evt;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		evt = core_sys_alloc(sizeof(evt_t));
+		evt_init(evt);
+		evt->res = evt;
+	}
+	sys_unlock();
 
 	return evt;
 }
@@ -71,23 +72,23 @@ void evt_kill( evt_t *evt )
 	assert(!port_isr_inside());
 	assert(evt);
 
-	core_sys_lock();
-
-	core_all_wakeup(evt, E_STOPPED);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		core_all_wakeup(evt, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void evt_delete( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	evt_kill(evt);
-	core_sys_free(evt->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		evt_kill(evt);
+		core_sys_free(evt->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -100,11 +101,11 @@ unsigned priv_evt_wait( evt_t *evt, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(!port_isr_inside());
 	assert(evt);
 
-	core_sys_lock();
-
-	event = wait(evt, time);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		event = wait(evt, time);
+	}
+	sys_unlock();
 
 	return event;
 }
@@ -129,11 +130,11 @@ void evt_give( evt_t *evt, unsigned event )
 {
 	assert(evt);
 
-	core_sys_lock();
-
-	core_all_wakeup(evt, event);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		core_all_wakeup(evt, event);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

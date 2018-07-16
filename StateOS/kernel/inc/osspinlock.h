@@ -223,7 +223,7 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  ******************************************************************************/
 
 #define                spn_lock(spn) \
-                       core_sys_lock(); port_spn_lock(spn)
+                       sys_lock(); core_spn_lock(spn)
 
 /******************************************************************************
  *
@@ -241,7 +241,7 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  ******************************************************************************/
 
 #define                spn_unlock(spn) \
-                       core_spn_unlock(spn); core_sys_unlock()
+                       core_spn_unlock(spn); sys_unlock()
 
 #ifdef __cplusplus
 }

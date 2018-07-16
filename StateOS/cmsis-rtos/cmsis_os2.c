@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    27.06.2018
+    @date    16.07.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -155,18 +155,18 @@ uint32_t osKernelGetSysTimerCount (void)
 	uint32_t tck;
 
 	sys_lock();
-
-	cnt = sys_time();
-	tck = SysTick->VAL;
-
-	if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)
 	{
+		cnt = sys_time();
 		tck = SysTick->VAL;
-		cnt++;
+
+		if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)
+		{
+			tck = SysTick->VAL;
+			cnt++;
+		}
+
+		cnt = (cnt + 1U) * (SysTick->LOAD + 1U) - tck;
 	}
-
-	cnt = (cnt + 1U) * (SysTick->LOAD + 1U) - tck;
-
 	sys_unlock();
 
 	return cnt;
@@ -221,7 +221,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 			if (attr->cb_size != osThreadCbSize)
 				return NULL;
 		}
-		
+
 		if (attr->stack_size != 0U)
 		{
 			stack_size = attr->stack_size;
@@ -251,21 +251,21 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 		stack_mem = sys_alloc(stack_size);
 		if (stack_mem == NULL)
 			return NULL;
-	}	
+	}
 
 	sys_lock();
-
-	tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, stack_mem, stack_size);
-	if (attr->cb_mem    == NULL || attr->cb_size    == 0U) thread->tsk.obj.res = thread;
-	else
-	if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.obj.res = stack_mem;
-	thread->tsk.join = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
-	flg_init(&thread->flg);
-	thread->flags = flags;
-	thread->name = (attr == NULL) ? NULL : attr->name;
-	thread->func = func;
-	thread->arg = argument;
-
+	{
+		tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, stack_mem, stack_size);
+		if (attr->cb_mem    == NULL || attr->cb_size    == 0U) thread->tsk.obj.res = thread;
+		else
+		if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.obj.res = stack_mem;
+		thread->tsk.join = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
+		flg_init(&thread->flg);
+		thread->flags = flags;
+		thread->name = (attr == NULL) ? NULL : attr->name;
+		thread->func = func;
+		thread->arg = argument;
+	}
 	sys_unlock();
 
 	return thread;
@@ -312,9 +312,9 @@ osStatus_t osThreadSetPriority (osThreadId_t thread_id, osPriority_t priority)
 		return osErrorParameter;
 
 	sys_lock();
-
-	core_tsk_prio(&thread->tsk, thread->tsk.basic = priority);
-
+	{
+		core_tsk_prio(&thread->tsk, thread->tsk.basic = priority);
+	}
 	sys_unlock();
 
 	return osOK;
@@ -461,16 +461,16 @@ uint32_t osThreadGetCount (void)
 		return 0U;
 
 	sys_lock();
-
-	count++;
-
-	for (tsk = IDLE.obj.next; tsk != &IDLE; tsk = tsk->obj.next)
+	{
 		count++;
 
-	for (tmr = WAIT.obj.next; tmr != &WAIT; tmr = tmr->obj.next)
-		if (tmr->id == ID_DELAYED)
+		for (tsk = IDLE.obj.next; tsk != &IDLE; tsk = tsk->obj.next)
 			count++;
 
+		for (tmr = WAIT.obj.next; tmr != &WAIT; tmr = tmr->obj.next)
+			if (tmr->id == ID_DELAYED)
+				count++;
+	}
 	sys_unlock();
 
 	return count;
@@ -486,16 +486,16 @@ uint32_t osThreadEnumerate (osThreadId_t *thread_array, uint32_t array_items)
 		return 0U;
 
 	sys_lock();
+	{
+		thread_array[count++] = &IDLE;
 
-	thread_array[count++] = &IDLE;
+		for (tsk = IDLE.obj.next; (tsk != &IDLE) && (count < array_items); tsk = tsk->obj.next)
+			thread_array[count++] = tsk;
 
-	for (tsk = IDLE.obj.next; (tsk != &IDLE) && (count < array_items); tsk = tsk->obj.next)
-		thread_array[count++] = tsk;
-
-	for (tmr = WAIT.obj.next; (tmr != &WAIT) && (count < array_items); tmr = tmr->obj.next)
-		if (tmr->id == ID_DELAYED)
-			thread_array[count++] = tmr;
-
+		for (tmr = WAIT.obj.next; (tmr != &WAIT) && (count < array_items); tmr = tmr->obj.next)
+			if (tmr->id == ID_DELAYED)
+				thread_array[count++] = tmr;
+	}
 	sys_unlock();
 
 	return count;
@@ -617,14 +617,14 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 	}
 
 	sys_lock();
-
-	tmr_init(&timer->tmr, timer_handler);
-	if (attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.obj.res = timer;
-	timer->flags = flags;
-	timer->name = (attr == NULL) ? NULL : attr->name;
-	timer->func = func;
-	timer->arg = argument;
-
+	{
+		tmr_init(&timer->tmr, timer_handler);
+		if (attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.obj.res = timer;
+		timer->flags = flags;
+		timer->name = (attr == NULL) ? NULL : attr->name;
+		timer->func = func;
+		timer->arg = argument;
+	}
 	sys_unlock();
 
 	return timer;
@@ -657,7 +657,7 @@ osStatus_t osTimerStart (osTimerId_t timer_id, uint32_t ticks)
 osStatus_t osTimerStop (osTimerId_t timer_id)
 {
 	osTimer_t *timer = timer_id;
-	
+
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 	if (timer_id == NULL)
@@ -720,12 +720,12 @@ osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 	}
 
 	sys_lock();
-
-	flg_init(&ef->flg);
-	if (attr->cb_mem == NULL || attr->cb_size == 0U) ef->flg.res = ef;
-	ef->flags = flags;
-	ef->name = (attr == NULL) ? NULL : attr->name;
-
+	{
+		flg_init(&ef->flg);
+		if (attr->cb_mem == NULL || attr->cb_size == 0U) ef->flg.res = ef;
+		ef->flags = flags;
+		ef->name = (attr == NULL) ? NULL : attr->name;
+	}
 	sys_unlock();
 
 	return ef;
@@ -832,12 +832,12 @@ osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 	}
 
 	sys_lock();
-
-	mtx_init(&mutex->mtx);
-	if (attr->cb_mem == NULL || attr->cb_size == 0U) mutex->mtx.res = mutex;
-	mutex->flags = flags;
-	mutex->name = (attr == NULL) ? NULL : attr->name;
-
+	{
+		mtx_init(&mutex->mtx);
+		if (attr->cb_mem == NULL || attr->cb_size == 0U) mutex->mtx.res = mutex;
+		mutex->flags = flags;
+		mutex->name = (attr == NULL) ? NULL : attr->name;
+	}
 	sys_unlock();
 
 	return mutex;
@@ -938,12 +938,12 @@ osSemaphoreId_t osSemaphoreNew (uint32_t max_count, uint32_t initial_count, cons
 	}
 
 	sys_lock();
-
-	sem_init(&semaphore->sem, initial_count, max_count);
-	if (attr->cb_mem == NULL || attr->cb_size == 0U) semaphore->sem.res = semaphore;
-	semaphore->flags = flags;
-	semaphore->name = (attr == NULL) ? NULL : attr->name;
-
+	{
+		sem_init(&semaphore->sem, initial_count, max_count);
+		if (attr->cb_mem == NULL || attr->cb_size == 0U) semaphore->sem.res = semaphore;
+		semaphore->flags = flags;
+		semaphore->name = (attr == NULL) ? NULL : attr->name;
+	}
 	sys_unlock();
 
 	return semaphore;
@@ -1066,14 +1066,14 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 	}
 
 	sys_lock();
-
-	mem_init(&mp->mem, block_count, block_size, data);
-	if (attr->cb_mem == NULL || attr->cb_size == 0U) mp->mem.res = mp;
-	else
-	if (attr->mp_mem == NULL || attr->mp_size == 0U) mp->mem.res = data;
-	mp->flags = flags;
-	mp->name = (attr == NULL) ? NULL : attr->name;
-
+	{
+		mem_init(&mp->mem, block_count, block_size, data);
+		if (attr->cb_mem == NULL || attr->cb_size == 0U) mp->mem.res = mp;
+		else
+		if (attr->mp_mem == NULL || attr->mp_size == 0U) mp->mem.res = data;
+		mp->flags = flags;
+		mp->name = (attr == NULL) ? NULL : attr->name;
+	}
 	sys_unlock();
 
 	return mp;
@@ -1148,9 +1148,9 @@ uint32_t osMemoryPoolGetCount (osMemoryPoolId_t mp_id)
 		return 0U;
 
 	sys_lock();
-
-	for (que = mp->mem.head.next; que != NULL; que = que->next) count--;
-
+	{
+		for (que = mp->mem.head.next; que != NULL; que = que->next) count--;
+	}
 	sys_unlock();
 
 	return count;
@@ -1166,9 +1166,9 @@ uint32_t osMemoryPoolGetSpace (osMemoryPoolId_t mp_id)
 		return 0U;
 
 	sys_lock();
-
-	for (que = mp->mem.head.next; que != NULL; que = que->next) count++;
-
+	{
+		for (que = mp->mem.head.next; que != NULL; que = que->next) count++;
+	}
 	sys_unlock();
 
 	return count;
@@ -1240,14 +1240,14 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 	}
 
 	sys_lock();
-
-	box_init(&mq->box, msg_count, data, msg_size);
-	if (attr->cb_mem == NULL || attr->cb_size == 0U) mq->box.res = mq;
-	else
-	if (attr->mq_mem == NULL || attr->mq_size == 0U) mq->box.res = data;
-	mq->flags = flags;
-	mq->name = (attr == NULL) ? NULL : attr->name;
-
+	{
+		box_init(&mq->box, msg_count, data, msg_size);
+		if (attr->cb_mem == NULL || attr->cb_size == 0U) mq->box.res = mq;
+		else
+		if (attr->mq_mem == NULL || attr->mq_size == 0U) mq->box.res = data;
+		mq->flags = flags;
+		mq->name = (attr == NULL) ? NULL : attr->name;
+	}
 	sys_unlock();
 
 	return mq;
@@ -1342,9 +1342,9 @@ uint32_t osMessageQueueGetSpace (osMessageQueueId_t mq_id)
 		return 0U;
 
 	sys_lock();
-
-	count = mq->box.limit - mq->box.count;
-
+	{
+		count = mq->box.limit - mq->box.count;
+	}
 	sys_unlock();
 
 	return count;

@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -30,6 +30,7 @@
  ******************************************************************************/
 
 #include "inc/osbarrier.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void bar_init( bar_t *bar, unsigned limit )
@@ -39,14 +40,14 @@ void bar_init( bar_t *bar, unsigned limit )
 	assert(bar);
 	assert(limit);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		memset(bar, 0, sizeof(bar_t));
 
-	memset(bar, 0, sizeof(bar_t));
-
-	bar->count = limit;
-	bar->limit = limit;
-
-	core_sys_unlock();
+		bar->count = limit;
+		bar->limit = limit;
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -58,13 +59,13 @@ bar_t *bar_create( unsigned limit )
 	assert(!port_isr_inside());
 	assert(limit);
 
-	core_sys_lock();
-
-	bar = core_sys_alloc(sizeof(bar_t));
-	bar_init(bar, limit);
-	bar->res = bar;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		bar = core_sys_alloc(sizeof(bar_t));
+		bar_init(bar, limit);
+		bar->res = bar;
+	}
+	sys_unlock();
 
 	return bar;
 }
@@ -75,26 +76,26 @@ void bar_kill( bar_t *bar )
 {
 	assert(!port_isr_inside());
 	assert(bar);
-	
-	core_sys_lock();
 
-	bar->count = bar->limit;
+	sys_lock();
+	{
+		bar->count = bar->limit;
 
-	core_all_wakeup(bar, E_STOPPED);
-
-	core_sys_unlock();
+		core_all_wakeup(bar, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void bar_delete( bar_t *bar )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	bar_kill(bar);
-	core_sys_free(bar->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		bar_kill(bar);
+		core_sys_free(bar->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -108,20 +109,20 @@ unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(bar);
 	assert(bar->count);
 
-	core_sys_lock();
-
-	if (--bar->count == 0)
+	sys_lock();
 	{
-		bar->count = bar->limit;
-		core_all_wakeup(bar, E_SUCCESS);
-		event = E_SUCCESS;
+		if (--bar->count == 0)
+		{
+			bar->count = bar->limit;
+			core_all_wakeup(bar, E_SUCCESS);
+			event = E_SUCCESS;
+		}
+		else
+		{
+			event = wait(bar, time);
+		}
 	}
-	else
-	{
-		event = wait(bar, time);
-	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }

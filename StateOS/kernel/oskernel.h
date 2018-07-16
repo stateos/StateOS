@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    13.07.2018
+    @date    16.07.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -34,7 +34,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <oscore.h>
+#include "oscore.h"
 
 /* -------------------------------------------------------------------------- */
 
@@ -96,14 +96,6 @@ extern sys_t System; // system data
 
 #define core_stk_assert() \
         assert((System.cur == &MAIN) || (System.cur->stack <= port_get_sp()))
-
-/* -------------------------------------------------------------------------- */
-
-#define core_sys_lock() \
-        do { lck_t __LOCK = port_get_lock(); port_set_lock()
-
-#define core_sys_unlock() \
-        port_put_lock(__LOCK); } while(0)
 
 /* -------------------------------------------------------------------------- */
 

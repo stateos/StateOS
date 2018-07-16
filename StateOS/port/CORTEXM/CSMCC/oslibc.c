@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -31,7 +31,8 @@
 
 #if defined(__CSMC__)
 
-#include <oskernel.h>
+#include "oskernel.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 
@@ -42,15 +43,15 @@ void *sbreak( int size )
 	static char *_brk = _memory;
 	       char * brk = NULL;
 
-	core_sys_lock();
-
-	if (_brk + size < _stack - 4096)
+	sys_lock();
 	{
-		 brk  = _brk;
-		_brk += size;
+		if (_brk + size < _stack - 4096)
+		{
+			 brk  = _brk;
+			_brk += size;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return brk;
 }

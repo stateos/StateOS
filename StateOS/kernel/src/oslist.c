@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/oslist.h"
 #include "inc/ostask.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void lst_init( lst_t *lst )
@@ -39,11 +40,11 @@ void lst_init( lst_t *lst )
 	assert(!port_isr_inside());
 	assert(lst);
 
-	core_sys_lock();
-
-	memset(lst, 0, sizeof(lst_t));
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		memset(lst, 0, sizeof(lst_t));
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -54,13 +55,13 @@ lst_t *lst_create( void )
 
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	lst = core_sys_alloc(sizeof(lst_t));
-	lst_init(lst);
-	lst->res = lst;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		lst = core_sys_alloc(sizeof(lst_t));
+		lst_init(lst);
+		lst->res = lst;
+	}
+	sys_unlock();
 
 	return lst;
 }
@@ -72,23 +73,23 @@ void lst_kill( lst_t *lst )
 	assert(!port_isr_inside());
 	assert(lst);
 
-	core_sys_lock();
-
-	core_all_wakeup(lst, E_STOPPED);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		core_all_wakeup(lst, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void lst_delete( lst_t *lst )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	lst_kill(lst);
-	core_sys_free(lst->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		lst_kill(lst);
+		core_sys_free(lst->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -100,16 +101,16 @@ unsigned lst_take( lst_t *lst, void **data )
 	assert(lst);
 	assert(data);
 
-	core_sys_lock();
-
-	if (lst->head.next)
+	sys_lock();
 	{
-		*data = lst->head.next + 1;
-		lst->head.next = lst->head.next->next;
-		event = E_SUCCESS;
+		if (lst->head.next)
+		{
+			*data = lst->head.next + 1;
+			lst->head.next = lst->head.next->next;
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -125,21 +126,21 @@ unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(voi
 	assert(lst);
 	assert(data);
 
-	core_sys_lock();
-
-	if (lst->head.next)
+	sys_lock();
 	{
-		*data = lst->head.next + 1;
-		lst->head.next = lst->head.next->next;
-		event = E_SUCCESS;
+		if (lst->head.next)
+		{
+			*data = lst->head.next + 1;
+			lst->head.next = lst->head.next->next;
+			event = E_SUCCESS;
+		}
+		else
+		{
+			System.cur->tmp.lst.data.in = data;
+			event = wait(lst, time);
+		}
 	}
-	else
-	{
-		System.cur->tmp.lst.data.in = data;
-		event = wait(lst, time);
-	}
-	
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -168,22 +169,22 @@ void lst_give( lst_t *lst, const void *data )
 	assert(lst);
 	assert(data);
 
-	core_sys_lock();
-
-	tsk = core_one_wakeup(lst, E_SUCCESS);
-
-	if (tsk)
+	sys_lock();
 	{
-		*tsk->tmp.lst.data.out = data;
-	}
-	else
-	{
-		for (ptr = &lst->head; ptr->next; ptr = ptr->next);
-		ptr->next = (que_t *)data - 1;
-		ptr->next->next = 0;
-	}
+		tsk = core_one_wakeup(lst, E_SUCCESS);
 
-	core_sys_unlock();
+		if (tsk)
+		{
+			*tsk->tmp.lst.data.out = data;
+		}
+		else
+		{
+			for (ptr = &lst->head; ptr->next; ptr = ptr->next);
+			ptr->next = (que_t *)data - 1;
+			ptr->next->next = 0;
+		}
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

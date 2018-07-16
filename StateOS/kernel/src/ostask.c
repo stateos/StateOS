@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -30,6 +30,7 @@
  ******************************************************************************/
 
 #include "inc/ostask.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned size )
@@ -41,20 +42,20 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
 	assert(stack);
 	assert(size);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		memset(tsk, 0, sizeof(tsk_t));
 
-	memset(tsk, 0, sizeof(tsk_t));
-	
-	tsk->prio  = prio;
-	tsk->basic = prio;
-	tsk->state = state;
-	tsk->stack = stack;
-	tsk->top   = (stk_t *) LIMITED((char *)stack + size, stk_t);
+		tsk->prio  = prio;
+		tsk->basic = prio;
+		tsk->state = state;
+		tsk->stack = stack;
+		tsk->top   = (stk_t *) LIMITED((char *)stack + size, stk_t);
 
-	core_ctx_init(tsk);
-	core_tsk_insert(tsk);
-
-	core_sys_unlock();
+		core_ctx_init(tsk);
+		core_tsk_insert(tsk);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -67,14 +68,14 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 	assert(state);
 	assert(size);
 
-	core_sys_lock();
-
-	size = ABOVE(size);
-	tsk = core_sys_alloc(ABOVE(sizeof(tsk_t)) + size);
-	tsk_init(tsk, prio, state, (void *)((size_t)tsk + ABOVE(sizeof(tsk_t))), size);
-	tsk->obj.res = tsk;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		size = ABOVE(size);
+		tsk = core_sys_alloc(ABOVE(sizeof(tsk_t)) + size);
+		tsk_init(tsk, prio, state, (void *)((size_t)tsk + ABOVE(sizeof(tsk_t))), size);
+		tsk->obj.res = tsk;
+	}
+	sys_unlock();
 
 	return tsk;
 }
@@ -87,15 +88,15 @@ void tsk_start( tsk_t *tsk )
 	assert(tsk);
 	assert(tsk->state);
 
-	core_sys_lock();
-
-	if (tsk->id == ID_STOPPED)
+	sys_lock();
 	{
-		core_ctx_init(tsk);
-		core_tsk_insert(tsk);
+		if (tsk->id == ID_STOPPED)
+		{
+			core_ctx_init(tsk);
+			core_tsk_insert(tsk);
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -106,17 +107,17 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 	assert(tsk);
 	assert(state);
 
-	core_sys_lock();
-
-	if (tsk->id == ID_STOPPED)
+	sys_lock();
 	{
-		tsk->state = state;
+		if (tsk->id == ID_STOPPED)
+		{
+			tsk->state = state;
 
-		core_ctx_init(tsk);
-		core_tsk_insert(tsk);
+			core_ctx_init(tsk);
+			core_tsk_insert(tsk);
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -145,42 +146,42 @@ void tsk_kill( tsk_t *tsk )
 	assert(!port_isr_inside());
 	assert(tsk);
 
-	core_sys_lock();
-
-	if (tsk->id != ID_STOPPED)
+	sys_lock();
 	{
-		tsk->mtx.tree = 0;
-		while (tsk->mtx.list)
-			mtx_kill(tsk->mtx.list);
-
-		if (tsk->join != DETACHED)
-			core_tsk_wakeup(tsk->join, E_STOPPED);
-		else
-			core_sys_free(tsk->obj.res);
-
-		if (tsk->id == ID_READY)
-			core_tsk_remove(tsk);
-		else
-		if (tsk->id == ID_DELAYED)
+		if (tsk->id != ID_STOPPED)
 		{
-			core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
-			core_tmr_remove((tmr_t *)tsk);
+			tsk->mtx.tree = 0;
+			while (tsk->mtx.list)
+				mtx_kill(tsk->mtx.list);
+
+			if (tsk->join != DETACHED)
+				core_tsk_wakeup(tsk->join, E_STOPPED);
+			else
+				core_sys_free(tsk->obj.res);
+
+			if (tsk->id == ID_READY)
+				core_tsk_remove(tsk);
+			else
+			if (tsk->id == ID_DELAYED)
+			{
+				core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
+				core_tmr_remove((tmr_t *)tsk);
+			}
 		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void tsk_delete( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	tsk_detach(tsk);
-	tsk_kill(tsk);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		tsk_detach(tsk);
+		tsk_kill(tsk);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -192,18 +193,18 @@ unsigned tsk_detach( tsk_t *tsk )
 	assert(!port_isr_inside());
 	assert(tsk);
 
-	core_sys_lock();
-
-	if ((tsk->id      != ID_STOPPED) &&
-	    (tsk->join    != DETACHED) &&
-	    (tsk->obj.res != 0))
+	sys_lock();
 	{
-		core_tsk_wakeup(tsk->join, E_TIMEOUT);
-		tsk->join = DETACHED;
-		event = E_SUCCESS;
+		if ((tsk->id      != ID_STOPPED) &&
+		    (tsk->join    != DETACHED) &&
+		    (tsk->obj.res != 0))
+		{
+			core_tsk_wakeup(tsk->join, E_TIMEOUT);
+			tsk->join = DETACHED;
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -217,20 +218,20 @@ unsigned tsk_join( tsk_t *tsk )
 	assert(!port_isr_inside());
 	assert(tsk);
 
-	core_sys_lock();
-
-	if (tsk->join == JOINABLE)
+	sys_lock();
 	{
-		if (tsk->id != ID_STOPPED)
-			event = core_tsk_waitFor(&tsk->join, INFINITE);
-		else
-			event = E_SUCCESS;
+		if (tsk->join == JOINABLE)
+		{
+			if (tsk->id != ID_STOPPED)
+				event = core_tsk_waitFor(&tsk->join, INFINITE);
+			else
+				event = E_SUCCESS;
 
-		if (event != E_TIMEOUT) // !detached
-			core_sys_free(tsk->obj.res);
+			if (event != E_TIMEOUT) // !detached
+				core_sys_free(tsk->obj.res);
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -241,12 +242,12 @@ void tsk_yield( void )
 {
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	core_ctx_switch();
-
-	port_clr_lock();
-	core_sys_unlock();
+	sys_lock();
+	{
+		core_ctx_switch();
+		port_clr_lock(); port_set_barrier();
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -270,12 +271,12 @@ void tsk_prio( unsigned prio )
 {
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	System.cur->basic = prio;
-	core_cur_prio(prio);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		System.cur->basic = prio;
+		core_cur_prio(prio);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -287,12 +288,12 @@ unsigned priv_tsk_wait( unsigned flags, cnt_t time, unsigned(*wait)(void*,cnt_t)
 
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	System.cur->tmp.flg.flags = flags;
-	event = wait(System.cur, time);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		System.cur->tmp.flg.flags = flags;
+		event = wait(System.cur, time);
+	}
+	sys_unlock();
 
 	return event;
 }
@@ -317,16 +318,16 @@ void tsk_give( tsk_t *tsk, unsigned flags )
 {
 	assert(tsk);
 
-	core_sys_lock();
-
-	if (tsk->guard == tsk)
+	sys_lock();
 	{
-		tsk->tmp.flg.flags &= ~flags;
-		if (tsk->tmp.flg.flags == 0)
-			core_tsk_wakeup(tsk, flags);
+		if (tsk->guard == tsk)
+		{
+			tsk->tmp.flg.flags &= ~flags;
+			if (tsk->tmp.flg.flags == 0)
+				core_tsk_wakeup(tsk, flags);
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -334,18 +335,18 @@ unsigned tsk_suspend( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_STOPPED;
-	
+
 	assert(tsk);
 
-	core_sys_lock();
-
-	if (tsk->id == ID_READY)
+	sys_lock();
 	{
-		core_tsk_suspend(tsk);
-		event = E_SUCCESS;
+		if (tsk->id == ID_READY)
+		{
+			core_tsk_suspend(tsk);
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -358,15 +359,15 @@ unsigned tsk_resume( tsk_t *tsk )
 
 	assert(tsk);
 
-	core_sys_lock();
-
-	if (tsk->guard == &WAIT)
+	sys_lock();
 	{
-		core_tsk_wakeup(tsk, E_STOPPED);
-		event = E_SUCCESS;
+		if (tsk->guard == &WAIT)
+		{
+			core_tsk_wakeup(tsk, E_STOPPED);
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }

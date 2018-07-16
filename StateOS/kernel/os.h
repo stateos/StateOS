@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    10.07.2018
+    @date    16.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************

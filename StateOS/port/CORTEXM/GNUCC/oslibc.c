@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    24.01.2018
+    @date    16.07.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -31,9 +31,9 @@
 
 #if defined(__GNUC__) && !defined(__ARMCC_VERSION)
 
-#include <oskernel.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include "oskernel.h"
 
 /* -------------------------------------------------------------------------- */
 

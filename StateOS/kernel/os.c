@@ -2,7 +2,7 @@
 
     @file    StateOS: os.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -30,6 +30,7 @@
  ******************************************************************************/
 
 #include "oskernel.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 cnt_t sys_time( void )
@@ -37,11 +38,11 @@ cnt_t sys_time( void )
 {
 	cnt_t cnt;
 
-	core_sys_lock();
-
-	cnt = core_sys_time();
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		cnt = core_sys_time();
+	}
+	sys_unlock();
 
 	return cnt;
 }

@@ -42,6 +42,7 @@ Features:
 - added spin lock object
 - some lock definitions moved to kernel
 - updated XXX_CREATE definitions
+- updated lock definitions and usage
 ---------
 6.0
 - updated os version

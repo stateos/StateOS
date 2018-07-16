@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/osjobqueue.h"
 #include "inc/ostask.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void job_init( job_t *job, unsigned limit, fun_t **data )
@@ -41,14 +42,14 @@ void job_init( job_t *job, unsigned limit, fun_t **data )
 	assert(limit);
 	assert(data);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		memset(job, 0, sizeof(job_t));
 
-	memset(job, 0, sizeof(job_t));
-
-	job->limit = limit;
-	job->data  = data;
-
-	core_sys_unlock();
+		job->limit = limit;
+		job->data  = data;
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -60,13 +61,13 @@ job_t *job_create( unsigned limit )
 	assert(!port_isr_inside());
 	assert(limit);
 
-	core_sys_lock();
-
-	job = core_sys_alloc(ABOVE(sizeof(job_t)) + limit * sizeof(fun_t *));
-	job_init(job, limit, (void *)((size_t)job + ABOVE(sizeof(job_t))));
-	job->res = job;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		job = core_sys_alloc(ABOVE(sizeof(job_t)) + limit * sizeof(fun_t *));
+		job_init(job, limit, (void *)((size_t)job + ABOVE(sizeof(job_t))));
+		job->res = job;
+	}
+	sys_unlock();
 
 	return job;
 }
@@ -78,27 +79,27 @@ void job_kill( job_t *job )
 	assert(!port_isr_inside());
 	assert(job);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		job->count = 0;
+		job->head  = 0;
+		job->tail  = 0;
 
-	job->count = 0;
-	job->head  = 0;
-	job->tail  = 0;
-
-	core_all_wakeup(job, E_STOPPED);
-
-	core_sys_unlock();
+		core_all_wakeup(job, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void job_delete( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	job_kill(job);
-	core_sys_free(job->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		job_kill(job);
+		core_sys_free(job->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -139,18 +140,18 @@ unsigned job_take( job_t *job )
 
 	assert(job);
 
-	core_sys_lock();
-
-	if (job->count > 0)
+	sys_lock();
 	{
-		fun = priv_job_get(job);
-		tsk = core_one_wakeup(job, E_SUCCESS);
-		if (tsk) priv_job_put(job, tsk->tmp.job.fun);
-		fun();
-		event = E_SUCCESS;
+		if (job->count > 0)
+		{
+			fun = priv_job_get(job);
+			tsk = core_one_wakeup(job, E_SUCCESS);
+			if (tsk) priv_job_put(job, tsk->tmp.job.fun);
+			fun();
+			event = E_SUCCESS;
+		}
 	}
-	
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -166,24 +167,24 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(!port_isr_inside());
 	assert(job);
 
-	core_sys_lock();
-
-	if (job->count > 0)
+	sys_lock();
 	{
-		System.cur->tmp.job.fun = priv_job_get(job);
-		tsk = core_one_wakeup(job, E_SUCCESS);
-		if (tsk) priv_job_put(job, tsk->tmp.job.fun);
-		event = E_SUCCESS;
-	}
-	else
-	{
-		event = wait(job, time);
-	}
+		if (job->count > 0)
+		{
+			System.cur->tmp.job.fun = priv_job_get(job);
+			tsk = core_one_wakeup(job, E_SUCCESS);
+			if (tsk) priv_job_put(job, tsk->tmp.job.fun);
+			event = E_SUCCESS;
+		}
+		else
+		{
+			event = wait(job, time);
+		}
 
-	if (event == E_SUCCESS)
-		System.cur->tmp.job.fun();
-
-	core_sys_unlock();
+		if (event == E_SUCCESS)
+			System.cur->tmp.job.fun();
+	}
+	sys_unlock();
 
 	return event;
 }
@@ -212,17 +213,17 @@ unsigned job_give( job_t *job, fun_t *fun )
 	assert(job);
 	assert(fun);
 
-	core_sys_lock();
-
-	if (job->count < job->limit)
+	sys_lock();
 	{
-		priv_job_put(job, fun);
-		tsk = core_one_wakeup(job, E_SUCCESS);
-		if (tsk) tsk->tmp.job.fun = priv_job_get(job);
-		event = E_SUCCESS;
+		if (job->count < job->limit)
+		{
+			priv_job_put(job, fun);
+			tsk = core_one_wakeup(job, E_SUCCESS);
+			if (tsk) tsk->tmp.job.fun = priv_job_get(job);
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -239,22 +240,22 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void
 	assert(job);
 	assert(fun);
 
-	core_sys_lock();
-
-	if (job->count < job->limit)
+	sys_lock();
 	{
-		priv_job_put(job, fun);
-		tsk = core_one_wakeup(job, E_SUCCESS);
-		if (tsk) tsk->tmp.job.fun = priv_job_get(job);
-		event = E_SUCCESS;
+		if (job->count < job->limit)
+		{
+			priv_job_put(job, fun);
+			tsk = core_one_wakeup(job, E_SUCCESS);
+			if (tsk) tsk->tmp.job.fun = priv_job_get(job);
+			event = E_SUCCESS;
+		}
+		else
+		{
+			System.cur->tmp.job.fun = fun;
+			event = wait(job, time);
+		}
 	}
-	else
-	{
-		System.cur->tmp.job.fun = fun;
-		event = wait(job, time);
-	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -283,22 +284,22 @@ unsigned job_push( job_t *job, fun_t *fun )
 	assert(job);
 	assert(fun);
 
-	core_sys_lock();
-
-	if (job->count == 0 || job->queue == 0)
+	sys_lock();
 	{
-		priv_job_put(job, fun);
-		if (job->count > job->limit)
+		if (job->count == 0 || job->queue == 0)
 		{
-			job->count = job->limit;
-			job->head = job->tail;
+			priv_job_put(job, fun);
+			if (job->count > job->limit)
+			{
+				job->count = job->limit;
+				job->head = job->tail;
+			}
+			tsk = core_one_wakeup(job, E_SUCCESS);
+			if (tsk) tsk->tmp.job.fun = priv_job_get(job);
+			event = E_SUCCESS;
 		}
-		tsk = core_one_wakeup(job, E_SUCCESS);
-		if (tsk) tsk->tmp.job.fun = priv_job_get(job);
-		event = E_SUCCESS;
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }

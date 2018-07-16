@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/osmutex.h"
 #include "inc/ostask.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void mtx_init( mtx_t *mtx )
@@ -39,11 +40,11 @@ void mtx_init( mtx_t *mtx )
 	assert(!port_isr_inside());
 	assert(mtx);
 
-	core_sys_lock();
-
-	memset(mtx, 0, sizeof(mtx_t));
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		memset(mtx, 0, sizeof(mtx_t));
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -54,13 +55,13 @@ mtx_t *mtx_create( void )
 
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	mtx = core_sys_alloc(sizeof(mtx_t));
-	mtx_init(mtx);
-	mtx->res = mtx;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		mtx = core_sys_alloc(sizeof(mtx_t));
+		mtx_init(mtx);
+		mtx->res = mtx;
+	}
+	sys_unlock();
 
 	return mtx;
 }
@@ -116,27 +117,27 @@ void mtx_kill( mtx_t *mtx )
 	assert(!port_isr_inside());
 	assert(mtx);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		priv_mtx_unlink(mtx);
 
-	priv_mtx_unlink(mtx);
+		mtx->count = 0;
 
-	mtx->count = 0;
-
-	core_all_wakeup(mtx, E_STOPPED);
-
-	core_sys_unlock();
+		core_all_wakeup(mtx, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void mtx_delete( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	mtx_kill(mtx);
-	core_sys_free(mtx->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		mtx_kill(mtx);
+		core_sys_free(mtx->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -149,33 +150,33 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(!port_isr_inside());
 	assert(mtx);
 
-	core_sys_lock();
-
-	if (mtx->owner == 0)
+	sys_lock();
 	{
-		priv_mtx_link(mtx, System.cur);
-		event = E_SUCCESS;
-	}
-	else
-	if (mtx->owner == System.cur)
-	{
-		if (mtx->count < ~0U)
+		if (mtx->owner == 0)
 		{
-			mtx->count++;
+			priv_mtx_link(mtx, System.cur);
 			event = E_SUCCESS;
 		}
-	}
-	else
-	{
-		if (mtx->owner->prio < System.cur->prio)
-			core_tsk_prio(mtx->owner, System.cur->prio);
+		else
+		if (mtx->owner == System.cur)
+		{
+			if (mtx->count < ~0U)
+			{
+				mtx->count++;
+				event = E_SUCCESS;
+			}
+		}
+		else
+		{
+			if (mtx->owner->prio < System.cur->prio)
+				core_tsk_prio(mtx->owner, System.cur->prio);
 
-		System.cur->mtx.tree = mtx->owner;
-		event = wait(mtx, time);
-		System.cur->mtx.tree = 0;
+			System.cur->mtx.tree = mtx->owner;
+			event = wait(mtx, time);
+			System.cur->mtx.tree = 0;
+		}
 	}
-	
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -199,28 +200,28 @@ unsigned mtx_give( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_TIMEOUT;
-	
+
 	assert(!port_isr_inside());
 	assert(mtx);
 
-	core_sys_lock();
-
-	if (mtx->owner == System.cur)
+	sys_lock();
 	{
-		if (mtx->count)
+		if (mtx->owner == System.cur)
 		{
-			mtx->count--;
-		}
-		else
-		{
-			priv_mtx_unlink(mtx);
-			priv_mtx_link(mtx, core_one_wakeup(mtx, E_SUCCESS));
-		}
+			if (mtx->count)
+			{
+				mtx->count--;
+			}
+			else
+			{
+				priv_mtx_unlink(mtx);
+				priv_mtx_link(mtx, core_one_wakeup(mtx, E_SUCCESS));
+			}
 
-		event = E_SUCCESS;
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }

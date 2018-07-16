@@ -2,7 +2,7 @@
 
     @file    StateOS: oscriticalsection.h
     @author  Rajmund Szymanski
-    @date    15.07.2018
+    @date    16.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,6 +40,49 @@ extern "C" {
 
 /******************************************************************************
  *
+ * Name              : core_sys_lock
+ *
+ * Description       : disable interrupts
+ *
+ * Parameters        : none
+ *
+ * Return            : previous interrupts state
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+lck_t core_sys_lock( void )
+{
+	lck_t state = port_get_lock();
+	port_set_lock();
+	return state;
+}
+
+/******************************************************************************
+ *
+ * Name              : core_sys_unlock
+ *
+ * Description       : restore previous interrupts state
+ *
+ * Parameters
+ *   state           : previous interrupts state
+ *
+ * Return            : none
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+void core_sys_unlock( lck_t state )
+{
+	port_put_lock(state);
+}
+
+/******************************************************************************
+ *
  * Name              : sys_lock
  * ISR alias         : sys_lockISR
  *
@@ -54,7 +97,7 @@ extern "C" {
  ******************************************************************************/
 
 #define                sys_lock() \
-                       core_sys_lock()
+                       do { lck_t __LOCK = core_sys_lock()
 
 #define                sys_lockISR() \
                        sys_lock()
@@ -75,7 +118,7 @@ extern "C" {
  ******************************************************************************/
 
 #define                sys_unlock() \
-                       core_sys_unlock()
+                       core_sys_unlock(__LOCK); } while (0)
 
 #define                sys_unlockISR() \
                        sys_unlock()
@@ -101,8 +144,8 @@ extern "C" {
 
 struct CriticalSection
 {
-	 CriticalSection( void ) { state = port_get_lock(); port_set_lock(); }
-	~CriticalSection( void ) { port_put_lock(state); }
+	 CriticalSection( void ) { state = core_sys_lock(); }
+	~CriticalSection( void ) { core_sys_unlock(state);  }
 
 	private:
 	lck_t state;

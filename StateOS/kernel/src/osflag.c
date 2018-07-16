@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/osflag.h"
 #include "inc/ostask.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void flg_init( flg_t *flg )
@@ -39,11 +40,11 @@ void flg_init( flg_t *flg )
 	assert(!port_isr_inside());
 	assert(flg);
 
-	core_sys_lock();
-
-	memset(flg, 0, sizeof(flg_t));
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		memset(flg, 0, sizeof(flg_t));
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -54,13 +55,13 @@ flg_t *flg_create( void )
 
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	flg = core_sys_alloc(sizeof(flg_t));
-	flg_init(flg);
-	flg->res = flg;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		flg = core_sys_alloc(sizeof(flg_t));
+		flg_init(flg);
+		flg->res = flg;
+	}
+	sys_unlock();
 
 	return flg;
 }
@@ -72,23 +73,23 @@ void flg_kill( flg_t *flg )
 	assert(!port_isr_inside());
 	assert(flg);
 
-	core_sys_lock();
-
-	core_all_wakeup(flg, E_STOPPED);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		core_all_wakeup(flg, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void flg_delete( flg_t *flg )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	flg_kill(flg);
-	core_sys_free(flg->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		flg_kill(flg);
+		core_sys_free(flg->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -101,17 +102,17 @@ unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
 	assert(flg);
 	assert((mode & ~flgMASK) == 0U);
 
-	core_sys_lock();
-
-	if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
-	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
-
-	if (value && ((mode & flgAll) || (value == flags)))
+	sys_lock();
 	{
-		event = E_TIMEOUT;
-	}
+		if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
+		if ((mode & flgProtect) == 0) flg->flags &= ~flags;
 
-	core_sys_unlock();
+		if (value && ((mode & flgAll) || (value == flags)))
+		{
+			event = E_TIMEOUT;
+		}
+	}
+	sys_unlock();
 
 	return event;
 }
@@ -128,19 +129,19 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, u
 	assert(flg);
 	assert((mode & ~flgMASK) == 0U);
 
-	core_sys_lock();
-
-	if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
-	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
-
-	if (value && ((mode & flgAll) || (value == flags)))
+	sys_lock();
 	{
-		System.cur->tmp.flg.mode  = mode;
-		System.cur->tmp.flg.flags = value;
-		event = wait(flg, time);
-	}
+		if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
+		if ((mode & flgProtect) == 0) flg->flags &= ~flags;
 
-	core_sys_unlock();
+		if (value && ((mode & flgAll) || (value == flags)))
+		{
+			System.cur->tmp.flg.mode  = mode;
+			System.cur->tmp.flg.flags = value;
+			event = wait(flg, time);
+		}
+	}
+	sys_unlock();
 
 	return event;
 }
@@ -164,29 +165,29 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
-	
+
 	assert(flg);
 
-	core_sys_lock();
-
-	flags = flg->flags |= flags;
-
-	for (tsk = flg->queue; tsk; tsk = tsk->obj.queue)
+	sys_lock();
 	{
-		if (tsk->tmp.flg.flags & flags)
+		flags = flg->flags |= flags;
+
+		for (tsk = flg->queue; tsk; tsk = tsk->obj.queue)
 		{
-			if ((tsk->tmp.flg.mode & flgProtect) == 0)
-				flg->flags &= ~tsk->tmp.flg.flags;
-			tsk->tmp.flg.flags &= ~flags;
-			if (tsk->tmp.flg.flags && (tsk->tmp.flg.mode & flgAll))
-				continue;
-			core_one_wakeup(tsk = tsk->back, E_SUCCESS);
+			if (tsk->tmp.flg.flags & flags)
+			{
+				if ((tsk->tmp.flg.mode & flgProtect) == 0)
+					flg->flags &= ~tsk->tmp.flg.flags;
+				tsk->tmp.flg.flags &= ~flags;
+				if (tsk->tmp.flg.flags && (tsk->tmp.flg.mode & flgAll))
+					continue;
+				core_one_wakeup(tsk = tsk->back, E_SUCCESS);
+			}
 		}
+
+		flags = flg->flags;
 	}
-
-	flags = flg->flags;
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return flags;
 }
@@ -199,12 +200,12 @@ unsigned flg_clear( flg_t *flg, unsigned flags )
 
 	assert(flg);
 
-	core_sys_lock();
-
-	state = flg->flags;
-	flg->flags &= ~flags;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		state = flg->flags;
+		flg->flags &= ~flags;
+	}
+	sys_unlock();
 
 	return state;
 }

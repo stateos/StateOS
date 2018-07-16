@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -30,6 +30,7 @@
  ******************************************************************************/
 
 #include "inc/osconditionvariable.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void cnd_init( cnd_t *cnd )
@@ -38,11 +39,11 @@ void cnd_init( cnd_t *cnd )
 	assert(!port_isr_inside());
 	assert(cnd);
 
-	core_sys_lock();
-
-	memset(cnd, 0, sizeof(cnd_t));
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		memset(cnd, 0, sizeof(cnd_t));
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -53,13 +54,13 @@ cnd_t *cnd_create( void )
 
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	cnd = core_sys_alloc(sizeof(cnd_t));
-	cnd_init(cnd);
-	cnd->res = cnd;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		cnd = core_sys_alloc(sizeof(cnd_t));
+		cnd_init(cnd);
+		cnd->res = cnd;
+	}
+	sys_unlock();
 
 	return cnd;
 }
@@ -71,23 +72,23 @@ void cnd_kill( cnd_t *cnd )
 	assert(!port_isr_inside());
 	assert(cnd);
 
-	core_sys_lock();
-
-	core_all_wakeup(cnd, E_STOPPED);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		core_all_wakeup(cnd, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void cnd_delete( cnd_t *cnd )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	cnd_kill(cnd);
-	core_sys_free(cnd->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		cnd_kill(cnd);
+		core_sys_free(cnd->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -101,13 +102,13 @@ unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(void
 	assert(cnd);
 	assert(mtx);
 
-	core_sys_lock();
-
-	if ((event = mtx_give(mtx))   == E_SUCCESS)
-	if ((event = wait(cnd, time)) == E_SUCCESS)
-	     event = mtx_wait(mtx);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		if ((event = mtx_give(mtx))   == E_SUCCESS)
+		if ((event = wait(cnd, time)) == E_SUCCESS)
+		     event = mtx_wait(mtx);
+	}
+	sys_unlock();
 
 	return event;
 }
@@ -132,12 +133,12 @@ void cnd_give( cnd_t *cnd, bool all )
 {
 	assert(cnd);
 
-	core_sys_lock();
-
-	if (all) core_all_wakeup(cnd, E_SUCCESS);
-	else     core_one_wakeup(cnd, E_SUCCESS);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		if (all) core_all_wakeup(cnd, E_SUCCESS);
+		else     core_one_wakeup(cnd, E_SUCCESS);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

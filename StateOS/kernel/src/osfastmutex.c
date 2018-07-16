@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -30,6 +30,7 @@
  ******************************************************************************/
 
 #include "inc/osfastmutex.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void mut_init( mut_t *mut )
@@ -38,11 +39,11 @@ void mut_init( mut_t *mut )
 	assert(!port_isr_inside());
 	assert(mut);
 
-	core_sys_lock();
-
-	memset(mut, 0, sizeof(mut_t));
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		memset(mut, 0, sizeof(mut_t));
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -53,13 +54,13 @@ mut_t *mut_create( void )
 
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	mut = core_sys_alloc(sizeof(mut_t));
-	mut_init(mut);
-	mut->res = mut;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		mut = core_sys_alloc(sizeof(mut_t));
+		mut_init(mut);
+		mut->res = mut;
+	}
+	sys_unlock();
 
 	return mut;
 }
@@ -71,23 +72,23 @@ void mut_kill( mut_t *mut )
 	assert(!port_isr_inside());
 	assert(mut);
 
-	core_sys_lock();
-
-	core_all_wakeup(mut, E_STOPPED);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		core_all_wakeup(mut, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void mut_delete( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	mut_kill(mut);
-	core_sys_free(mut->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		mut_kill(mut);
+		core_sys_free(mut->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -100,20 +101,20 @@ unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(!port_isr_inside());
 	assert(mut);
 
-	core_sys_lock();
-
-	if (mut->owner == 0)
+	sys_lock();
 	{
-		mut->owner = System.cur;
-		event = E_SUCCESS;
+		if (mut->owner == 0)
+		{
+			mut->owner = System.cur;
+			event = E_SUCCESS;
+		}
+		else
+		if (mut->owner != System.cur)
+		{
+			event = wait(mut, time);
+		}
 	}
-	else
-	if (mut->owner != System.cur)
-	{
-		event = wait(mut, time);
-	}
-	
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -137,19 +138,19 @@ unsigned mut_give( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event = E_TIMEOUT;
-	
+
 	assert(!port_isr_inside());
 	assert(mut);
 
-	core_sys_lock();
-
-	if (mut->owner == System.cur)
+	sys_lock();
 	{
-		mut->owner = core_one_wakeup(mut, E_SUCCESS);
-		event = E_SUCCESS;
+		if (mut->owner == System.cur)
+		{
+			mut->owner = core_one_wakeup(mut, E_SUCCESS);
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }

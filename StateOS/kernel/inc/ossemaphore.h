@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    15.07.2018
+    @date    16.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************

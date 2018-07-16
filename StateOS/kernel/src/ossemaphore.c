@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -30,6 +30,7 @@
  ******************************************************************************/
 
 #include "inc/ossemaphore.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void sem_init( sem_t *sem, unsigned init, unsigned limit )
@@ -39,14 +40,14 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit )
 	assert(sem);
 	assert(init<=limit);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		memset(sem, 0, sizeof(sem_t));
 
-	memset(sem, 0, sizeof(sem_t));
-
-	sem->count = init;
-	sem->limit = limit;
-
-	core_sys_unlock();
+		sem->count = init;
+		sem->limit = limit;
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -57,13 +58,13 @@ sem_t *sem_create( unsigned init, unsigned limit )
 
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	sem = core_sys_alloc(sizeof(sem_t));
-	sem_init(sem, init, limit);
-	sem->res = sem;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		sem = core_sys_alloc(sizeof(sem_t));
+		sem_init(sem, init, limit);
+		sem->res = sem;
+	}
+	sys_unlock();
 
 	return sem;
 }
@@ -75,25 +76,25 @@ void sem_kill( sem_t *sem )
 	assert(!port_isr_inside());
 	assert(sem);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		sem->count = 0;
 
-	sem->count = 0;
-
-	core_all_wakeup(sem, E_STOPPED);
-
-	core_sys_unlock();
+		core_all_wakeup(sem, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void sem_delete( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	sem_kill(sem);
-	core_sys_free(sem->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		sem_kill(sem);
+		core_sys_free(sem->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -105,16 +106,16 @@ unsigned sem_take( sem_t *sem )
 	assert(sem);
 	assert(sem->limit);
 
-	core_sys_lock();
-
-	if (sem->count > 0)
+	sys_lock();
 	{
-		if (core_one_wakeup(sem, E_SUCCESS) == 0)
-			sem->count--;
-		event = E_SUCCESS;
+		if (sem->count > 0)
+		{
+			if (core_one_wakeup(sem, E_SUCCESS) == 0)
+				sem->count--;
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -130,20 +131,20 @@ unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(sem);
 	assert(sem->limit);
 
-	core_sys_lock();
-
-	if (sem->count > 0)
+	sys_lock();
 	{
-		if (core_one_wakeup(sem, E_SUCCESS) == 0)
-			sem->count--;
-		event = E_SUCCESS;
+		if (sem->count > 0)
+		{
+			if (core_one_wakeup(sem, E_SUCCESS) == 0)
+				sem->count--;
+			event = E_SUCCESS;
+		}
+		else
+		{
+			event = wait(sem, time);
+		}
 	}
-	else
-	{
-		event = wait(sem, time);
-	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -171,16 +172,16 @@ unsigned sem_give( sem_t *sem )
 	assert(sem);
 	assert(sem->limit);
 
-	core_sys_lock();
-
-	if (sem->count < sem->limit)
+	sys_lock();
 	{
-		if (core_one_wakeup(sem, E_SUCCESS) == 0)
-			sem->count++;
-		event = E_SUCCESS;
+		if (sem->count < sem->limit)
+		{
+			if (core_one_wakeup(sem, E_SUCCESS) == 0)
+				sem->count++;
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -196,20 +197,20 @@ unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(sem);
 	assert(sem->limit);
 
-	core_sys_lock();
-
-	if (sem->count < sem->limit)
+	sys_lock();
 	{
-		if (core_one_wakeup(sem, E_SUCCESS) == 0)
-			sem->count++;
-		event = E_SUCCESS;
+		if (sem->count < sem->limit)
+		{
+			if (core_one_wakeup(sem, E_SUCCESS) == 0)
+				sem->count++;
+			event = E_SUCCESS;
+		}
+		else
+		{
+			event = wait(sem, time);
+		}
 	}
-	else
-	{
-		event = wait(sem, time);
-	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }

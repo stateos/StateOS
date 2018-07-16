@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/osmemorypool.h"
 #include "inc/ostask.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void mem_bind( mem_t *mem )
@@ -45,15 +46,15 @@ void mem_bind( mem_t *mem )
 	assert(mem->size);
 	assert(mem->data);
 
-	core_sys_lock();
-	
-	ptr = mem->data;
-	cnt = mem->limit;
+	sys_lock();
+	{
+		ptr = mem->data;
+		cnt = mem->limit;
 
-	mem->head.next = 0;
-	while (cnt--) { mem_give(mem, ++ptr); ptr += mem->size; }
-
-	core_sys_unlock();
+		mem->head.next = 0;
+		while (cnt--) { mem_give(mem, ++ptr); ptr += mem->size; }
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -66,17 +67,17 @@ void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data )
 	assert(size);
 	assert(data);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		memset(mem, 0, sizeof(mem_t));
 
-	memset(mem, 0, sizeof(mem_t));
+		mem->limit = limit;
+		mem->size  = size;
+		mem->data  = data;
 
-	mem->limit = limit;
-	mem->size  = size;
-	mem->data  = data;
-
-	mem_bind(mem);
-
-	core_sys_unlock();
+		mem_bind(mem);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -91,13 +92,13 @@ mem_t *mem_create( unsigned limit, unsigned size )
 
 	size = MSIZE(size);
 
-	core_sys_lock();
-
-	mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + limit * (1 + size) * sizeof(que_t));
-	mem_init(mem, limit, size, (void *)((size_t)mem + ABOVE(sizeof(mem_t))));
-	mem->res = mem;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + limit * (1 + size) * sizeof(que_t));
+		mem_init(mem, limit, size, (void *)((size_t)mem + ABOVE(sizeof(mem_t))));
+		mem->res = mem;
+	}
+	sys_unlock();
 
 	return mem;
 }
@@ -109,23 +110,23 @@ void mem_kill( mem_t *mem )
 	assert(!port_isr_inside());
 	assert(mem);
 
-	core_sys_lock();
-
-	core_all_wakeup(mem, E_STOPPED);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		core_all_wakeup(mem, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void mem_delete( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	mem_kill(mem);
-	core_sys_free(mem->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		mem_kill(mem);
+		core_sys_free(mem->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

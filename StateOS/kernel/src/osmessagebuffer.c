@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/osmessagebuffer.h"
 #include "inc/ostask.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void msg_init( msg_t *msg, unsigned limit, void *data )
@@ -41,14 +42,14 @@ void msg_init( msg_t *msg, unsigned limit, void *data )
 	assert(limit);
 	assert(data);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		memset(msg, 0, sizeof(msg_t));
 
-	memset(msg, 0, sizeof(msg_t));
-
-	msg->limit = limit;
-	msg->data  = data;
-
-	core_sys_unlock();
+		msg->limit = limit;
+		msg->data  = data;
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -60,13 +61,13 @@ msg_t *msg_create( unsigned limit )
 	assert(!port_isr_inside());
 	assert(limit);
 
-	core_sys_lock();
-
-	msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + limit);
-	msg_init(msg, limit, (void *)((size_t)msg + ABOVE(sizeof(msg_t))));
-	msg->res = msg;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + limit);
+		msg_init(msg, limit, (void *)((size_t)msg + ABOVE(sizeof(msg_t))));
+		msg->res = msg;
+	}
+	sys_unlock();
 
 	return msg;
 }
@@ -78,28 +79,28 @@ void msg_kill( msg_t *msg )
 	assert(!port_isr_inside());
 	assert(msg);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		msg->count = 0;
+		msg->head  = 0;
+		msg->tail  = 0;
+		msg->size  = 0;
 
-	msg->count = 0;
-	msg->head  = 0;
-	msg->tail  = 0;
-	msg->size  = 0;
-
-	core_all_wakeup(msg, E_STOPPED);
-
-	core_sys_unlock();
+		core_all_wakeup(msg, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void msg_delete( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	msg_kill(msg);
-	core_sys_free(msg->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		msg_kill(msg);
+		core_sys_free(msg->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -247,12 +248,12 @@ unsigned msg_take( msg_t *msg, void *data, unsigned size )
 	assert(msg);
 	assert(data);
 
-	core_sys_lock();
-
-	if (msg->count > 0 && size >= priv_msg_count(msg))
-		priv_msg_getUpdate(msg, data, len = msg->size);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		if (msg->count > 0 && size >= priv_msg_count(msg))
+			priv_msg_getUpdate(msg, data, len = msg->size);
+	}
+	sys_unlock();
 
 	return len;
 }
@@ -268,27 +269,27 @@ unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsig
 	assert(msg);
 	assert(data);
 
-	core_sys_lock();
-
-	if (size > 0)
+	sys_lock();
 	{
-		if (msg->count > 0)
+		if (size > 0)
 		{
-			if (size >= priv_msg_count(msg))
+			if (msg->count > 0)
 			{
-				priv_msg_getUpdate(msg, data, len = msg->size);
+				if (size >= priv_msg_count(msg))
+				{
+					priv_msg_getUpdate(msg, data, len = msg->size);
+				}
+			}
+			else
+			{
+				System.cur->tmp.msg.data.in = data;
+				System.cur->tmp.msg.size = size;
+				wait(msg, time);
+				len = size - System.cur->tmp.msg.size;
 			}
 		}
-		else
-		{
-			System.cur->tmp.msg.data.in = data;
-			System.cur->tmp.msg.size = size;
-			wait(msg, time);
-			len = size - System.cur->tmp.msg.size;
-		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return len;
 }
@@ -316,12 +317,12 @@ unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 	assert(msg);
 	assert(data);
 
-	core_sys_lock();
-
-	if (size > 0 && size <= priv_msg_space(msg))
-		priv_msg_putUpdate(msg, data, len = size);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		if (size > 0 && size <= priv_msg_space(msg))
+			priv_msg_putUpdate(msg, data, len = size);
+	}
+	sys_unlock();
 
 	return len;
 }
@@ -337,25 +338,25 @@ unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time,
 	assert(msg);
 	assert(data);
 
-	core_sys_lock();
-
-	if (size > 0)
+	sys_lock();
 	{
-		if (size <= priv_msg_space(msg))
+		if (size > 0)
 		{
-			priv_msg_putUpdate(msg, data, len = size);
-		}
-		else
-		if (size <= msg->limit)
-		{
-			System.cur->tmp.msg.data.out = data;
-			System.cur->tmp.msg.size = size;
-			wait(msg, time);
-			len = size - System.cur->tmp.msg.size;
+			if (size <= priv_msg_space(msg))
+			{
+				priv_msg_putUpdate(msg, data, len = size);
+			}
+			else
+			if (size <= msg->limit)
+			{
+				System.cur->tmp.msg.data.out = data;
+				System.cur->tmp.msg.size = size;
+				wait(msg, time);
+				len = size - System.cur->tmp.msg.size;
+			}
 		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return len;
 }
@@ -383,19 +384,19 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 	assert(msg);
 	assert(data);
 
-	core_sys_lock();
-
-	if (size > 0 && size <= msg->limit)
+	sys_lock();
 	{
-		if (msg->count == 0 || msg->queue == 0)
+		if (size > 0 && size <= msg->limit)
 		{
-			while (size > priv_msg_space(msg))
-				priv_msg_skipUpdate(msg);
-			priv_msg_putUpdate(msg, data, len = size);
+			if (msg->count == 0 || msg->queue == 0)
+			{
+				while (size > priv_msg_space(msg))
+					priv_msg_skipUpdate(msg);
+				priv_msg_putUpdate(msg, data, len = size);
+			}
 		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return len;
 }
@@ -408,11 +409,11 @@ unsigned msg_count( msg_t *msg )
 
 	assert(msg);
 
-	core_sys_lock();
-
-	cnt = priv_msg_count(msg);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		cnt = priv_msg_count(msg);
+	}
+	sys_unlock();
 
 	return cnt;
 }
@@ -425,11 +426,11 @@ unsigned msg_space( msg_t *msg )
 
 	assert(msg);
 
-	core_sys_lock();
-
-	cnt = priv_msg_space(msg);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		cnt = priv_msg_space(msg);
+	}
+	sys_unlock();
 
 	return cnt;
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    14.07.2018
+    @date    16.07.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -32,8 +32,8 @@
 #if  defined(__CC_ARM)
 #if !defined(__MICROLIB)
 
-#include <oskernel.h>
-#include <ostask.h>
+#include "oskernel.h"
+#include "inc/ostask.h"
 
 /* -------------------------------------------------------------------------- */
 

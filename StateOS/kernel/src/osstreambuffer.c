@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/osstreambuffer.h"
 #include "inc/ostask.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void stm_init( stm_t *stm, unsigned limit, void *data )
@@ -41,14 +42,14 @@ void stm_init( stm_t *stm, unsigned limit, void *data )
 	assert(limit);
 	assert(data);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		memset(stm, 0, sizeof(stm_t));
 
-	memset(stm, 0, sizeof(stm_t));
-
-	stm->limit = limit;
-	stm->data  = data;
-
-	core_sys_unlock();
+		stm->limit = limit;
+		stm->data  = data;
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -60,13 +61,13 @@ stm_t *stm_create( unsigned limit )
 	assert(!port_isr_inside());
 	assert(limit);
 
-	core_sys_lock();
-
-	stm = core_sys_alloc(ABOVE(sizeof(stm_t)) + limit);
-	stm_init(stm, limit, (void *)((size_t)stm + ABOVE(sizeof(stm_t))));
-	stm->res = stm;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		stm = core_sys_alloc(ABOVE(sizeof(stm_t)) + limit);
+		stm_init(stm, limit, (void *)((size_t)stm + ABOVE(sizeof(stm_t))));
+		stm->res = stm;
+	}
+	sys_unlock();
 
 	return stm;
 }
@@ -78,27 +79,27 @@ void stm_kill( stm_t *stm )
 	assert(!port_isr_inside());
 	assert(stm);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		stm->count = 0;
+		stm->head  = 0;
+		stm->tail  = 0;
 
-	stm->count = 0;
-	stm->head  = 0;
-	stm->tail  = 0;
-
-	core_all_wakeup(stm, E_STOPPED);
-
-	core_sys_unlock();
+		core_all_wakeup(stm, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void stm_delete( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	stm_kill(stm);
-	core_sys_free(stm->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		stm_kill(stm);
+		core_sys_free(stm->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -205,15 +206,15 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 	assert(stm);
 	assert(data);
 
-	core_sys_lock();
-
-	if (size > 0 && size <= priv_stm_count(stm))
+	sys_lock();
 	{
-		priv_stm_getUpdate(stm, data, size);
-		event = E_SUCCESS;
+		if (size > 0 && size <= priv_stm_count(stm))
+		{
+			priv_stm_getUpdate(stm, data, size);
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -229,28 +230,28 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 	assert(stm);
 	assert(data);
 
-	core_sys_lock();
-
-	if (size > 0)
+	sys_lock();
 	{
-		if (stm->count > 0)
+		if (size > 0)
 		{
-			if (size <= priv_stm_count(stm))
+			if (stm->count > 0)
 			{
-				priv_stm_getUpdate(stm, data, size);
-				event = E_SUCCESS;
+				if (size <= priv_stm_count(stm))
+				{
+					priv_stm_getUpdate(stm, data, size);
+					event = E_SUCCESS;
+				}
+			}
+			else
+			if (size <= stm->limit)
+			{
+				System.cur->tmp.stm.data.in = data;
+				System.cur->tmp.stm.size = size;
+				event = wait(stm, time);
 			}
 		}
-		else
-		if (size <= stm->limit)
-		{
-			System.cur->tmp.stm.data.in = data;
-			System.cur->tmp.stm.size = size;
-			event = wait(stm, time);
-		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -278,15 +279,15 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 	assert(stm);
 	assert(data);
 
-	core_sys_lock();
-
-	if (size > 0 && size <= priv_stm_space(stm))
+	sys_lock();
 	{
-		priv_stm_putUpdate(stm, data, size);
-		event = E_SUCCESS;
+		if (size > 0 && size <= priv_stm_space(stm))
+		{
+			priv_stm_putUpdate(stm, data, size);
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -302,25 +303,25 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 	assert(stm);
 	assert(data);
 
-	core_sys_lock();
-
-	if (size > 0)
+	sys_lock();
 	{
-		if (size <= priv_stm_space(stm))
+		if (size > 0)
 		{
-			priv_stm_putUpdate(stm, data, size);
-			event = E_SUCCESS;
-		}
-		else
-		if (size <= stm->limit)
-		{
-			System.cur->tmp.stm.data.out = data;
-			System.cur->tmp.stm.size = size;
-			event = wait(stm, time);
+			if (size <= priv_stm_space(stm))
+			{
+				priv_stm_putUpdate(stm, data, size);
+				event = E_SUCCESS;
+			}
+			else
+			if (size <= stm->limit)
+			{
+				System.cur->tmp.stm.data.out = data;
+				System.cur->tmp.stm.size = size;
+				event = wait(stm, time);
+			}
 		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -348,20 +349,20 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 	assert(stm);
 	assert(data);
 
-	core_sys_lock();
-
-	if (size > 0 && size <= stm->limit)
+	sys_lock();
 	{
-		if (stm->count == 0 || stm->queue == 0)
+		if (size > 0 && size <= stm->limit)
 		{
-			if (stm->count + size > stm->limit)
-				priv_stm_skip(stm, stm->count + size - stm->limit);
-			priv_stm_putUpdate(stm, data, size);
-			event = E_SUCCESS;
+			if (stm->count == 0 || stm->queue == 0)
+			{
+				if (stm->count + size > stm->limit)
+					priv_stm_skip(stm, stm->count + size - stm->limit);
+				priv_stm_putUpdate(stm, data, size);
+				event = E_SUCCESS;
+			}
 		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -374,11 +375,11 @@ unsigned stm_count( stm_t *stm )
 
 	assert(stm);
 
-	core_sys_lock();
-
-	cnt = priv_stm_count(stm);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		cnt = priv_stm_count(stm);
+	}
+	sys_unlock();
 
 	return cnt;
 }
@@ -391,11 +392,11 @@ unsigned stm_space( stm_t *stm )
 
 	assert(stm);
 
-	core_sys_lock();
-
-	cnt = priv_stm_space(stm);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		cnt = priv_stm_space(stm);
+	}
+	sys_unlock();
 
 	return cnt;
 }

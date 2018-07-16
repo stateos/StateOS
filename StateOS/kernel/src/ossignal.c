@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    11.07.2018
+    @date    16.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -30,6 +30,7 @@
  ******************************************************************************/
 
 #include "inc/ossignal.h"
+#include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
 void sig_init( sig_t *sig, unsigned type )
@@ -38,13 +39,13 @@ void sig_init( sig_t *sig, unsigned type )
 	assert(!port_isr_inside());
 	assert(sig);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		memset(sig, 0, sizeof(sig_t));
 
-	memset(sig, 0, sizeof(sig_t));
-
-	sig->type = type & sigMASK;
-
-	core_sys_unlock();
+		sig->type = type & sigMASK;
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -55,13 +56,13 @@ sig_t *sig_create( unsigned type )
 
 	assert(!port_isr_inside());
 
-	core_sys_lock();
-
-	sig = core_sys_alloc(sizeof(sig_t));
-	sig_init(sig, type);
-	sig->res = sig;
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		sig = core_sys_alloc(sizeof(sig_t));
+		sig_init(sig, type);
+		sig->res = sig;
+	}
+	sys_unlock();
 
 	return sig;
 }
@@ -73,25 +74,25 @@ void sig_kill( sig_t *sig )
 	assert(!port_isr_inside());
 	assert(sig);
 
-	core_sys_lock();
+	sys_lock();
+	{
+		sig->flag = 0;
 
-	sig->flag = 0;
-	
-	core_all_wakeup(sig, E_STOPPED);
-
-	core_sys_unlock();
+		core_all_wakeup(sig, E_STOPPED);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 void sig_delete( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
-	core_sys_lock();
-
-	sig_kill(sig);
-	core_sys_free(sig->res);
-
-	core_sys_unlock();
+	sys_lock();
+	{
+		sig_kill(sig);
+		core_sys_free(sig->res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -103,15 +104,15 @@ unsigned sig_take( sig_t *sig )
 	assert(sig);
 	assert((sig->type & ~sigMASK) == 0U);
 
-	core_sys_lock();
-
-	if (sig->flag)
+	sys_lock();
 	{
-		sig->flag = sig->type;
-		event = E_SUCCESS;
+		if (sig->flag)
+		{
+			sig->flag = sig->type;
+			event = E_SUCCESS;
+		}
 	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -127,19 +128,19 @@ unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(sig);
 	assert((sig->type & ~sigMASK) == 0U);
 
-	core_sys_lock();
-
-	if (sig->flag)
+	sys_lock();
 	{
-		sig->flag = sig->type;
-		event = E_SUCCESS;
+		if (sig->flag)
+		{
+			sig->flag = sig->type;
+			event = E_SUCCESS;
+		}
+		else
+		{
+			event = wait(sig, time);
+		}
 	}
-	else
-	{
-		event = wait(sig, time);
-	}
-
-	core_sys_unlock();
+	sys_unlock();
 
 	return event;
 }
@@ -165,21 +166,21 @@ void sig_give( sig_t *sig )
 	assert(sig);
 	assert((sig->type & ~sigMASK) == 0U);
 
-	core_sys_lock();
-
-	sig->flag = 1;
-
-	if (sig->type == sigClear)
+	sys_lock();
 	{
-		if (core_one_wakeup(sig, E_SUCCESS))
-		sig->flag = 0;
-	}
-	else
-	{
-		core_all_wakeup(sig, E_SUCCESS);
-	}
+		sig->flag = 1;
 
-	core_sys_unlock();
+		if (sig->type == sigClear)
+		{
+			if (core_one_wakeup(sig, E_SUCCESS))
+			sig->flag = 0;
+		}
+		else
+		{
+			core_all_wakeup(sig, E_SUCCESS);
+		}
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

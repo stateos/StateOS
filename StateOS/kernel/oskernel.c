@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    15.07.2018
+    @date    16.07.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -49,8 +49,7 @@ static
 void priv_ctx_switchNow( void )
 {
 	port_ctx_switch();
-	port_clr_lock();
-	port_set_barrier();
+	port_clr_lock(); port_set_barrier();
 	port_set_lock();
 }
 
@@ -440,7 +439,7 @@ void core_all_wakeup( void *obj, unsigned event )
 void core_tsk_prio( tsk_t *tsk, unsigned prio )
 {
 	mtx_t *mtx;
-	
+
 	if (prio < tsk->basic)
 		prio = tsk->basic;
 
@@ -481,7 +480,7 @@ void core_cur_prio( unsigned prio )
 {
 	mtx_t *mtx;
 	tsk_t *tsk = System.cur;
-	
+
 	if (prio < tsk->basic)
 		prio = tsk->basic;
 

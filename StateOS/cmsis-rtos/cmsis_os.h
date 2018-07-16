@@ -132,7 +132,7 @@
 
     @file    StateOS: cmsis_os.h
     @author  Rajmund Szymanski
-    @date    03.05.2018
+    @date    16.07.2018
     @brief   CMSIS-RTOS API implementation for StateOS.
 
  ******************************************************************************
