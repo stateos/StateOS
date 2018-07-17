@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    17.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -244,8 +244,7 @@ void tsk_yield( void )
 
 	sys_lock();
 	{
-		core_ctx_switch();
-		port_clr_lock(); port_set_barrier();
+		core_ctx_switchNow();
 	}
 	sys_unlock();
 }

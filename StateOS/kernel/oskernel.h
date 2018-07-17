@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    17.07.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -111,6 +111,14 @@ void core_ctx_init( tsk_t *tsk );
 
 // save status of the current process and force yield system control to the next
 void core_ctx_switch( void );
+
+// save status of the current process and immediately yield system control to the next
+__STATIC_INLINE
+void core_ctx_switchNow( void )
+{
+	core_ctx_switch();
+	port_clr_lock(); port_set_barrier();
+}
 
 // system infinite loop procedure for the current process
 __NO_RETURN
