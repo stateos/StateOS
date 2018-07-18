@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    17.07.2018
+    @date    18.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -138,9 +138,9 @@ typedef volatile unsigned spn_t, * const spn_id;
  *
  * Name              : core_spn_lock
  *
- * Description       : lock the spin lock object,
- *                     wait indefinitely if the spin lock object can't be locked immediately
- *                     do nothing if OS_MULTICORE is not defined
+ * Description       : lock the spin lock object
+ *                     (wait indefinitely if the spin lock object can't be locked immediately)
+ *                     or do nothing if OS_MULTICORE is not defined
  *
  * Parameters
  *   spn             : pointer to spin lock object
@@ -166,7 +166,7 @@ void core_spn_lock( spn_t *spn )
  * Name              : core_spn_unlock
  *
  * Description       : unlock the spin lock object
- *                     do nothing if OS_MULTICORE is not defined
+ *                     or do nothing if OS_MULTICORE is not defined
  *
  * Parameters
  *   spn             : pointer to spin lock object
@@ -209,8 +209,10 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  *
  * Name              : spn_lock
  *
- * Description       : lock the spin lock object,
- *                     wait indefinitely if the spin lock object can't be locked immediately
+ * Description       : save interrupts state, disable interrupts then lock the spin lock object
+ *                     (wait indefinitely if the spin lock object can't be locked immediately)
+ *                     or do nothing if OS_MULTICORE is not defined
+ *                   / enter into critical section
  *
  * Parameters
  *   spn             : pointer to spin lock object
@@ -230,13 +232,17 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  * Name              : spn_unlock
  *
  * Description       : unlock the spin lock object
+ *                     or do nothing if OS_MULTICORE is not defined
+ *                     then restore saved interrupts state
+ *                   / exit from critical section
  *
  * Parameters
  *   spn             : pointer to spin lock object
  *
  * Return            : none
  *
- * Note              : use only in thread mode
+ * Note              : do not use waiting functions inside spn_lock / spn_unlock
+ *                     use only in thread mode
  *
  ******************************************************************************/
 
