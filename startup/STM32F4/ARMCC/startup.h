@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     21.11.2017
+@date     19.07.2018
 @brief    Startup file header for armcc compiler.
 *******************************************************************************/
 
@@ -26,19 +26,19 @@ __attribute__ ((section(".heap")))
 __asm void __user_stacks_and_heap_config( void )
 {
 __heap_base     EQU     .
-__heap_limit    EQU     __ram_end - __proc_stack_size
+__heap_limit    EQU     RAM_end - __proc_stack_size
                 #if     main_stack_size > 0
-__initial_msp   EQU     __ram_start + __main_stack_size
+__initial_msp   EQU     RAM_start + __main_stack_size
                 #else
 __initial_msp   EQU     __heap_limit
                 #endif
                 #if     proc_stack_size > 0
-__initial_sp    EQU     __ram_end
+__initial_sp    EQU     RAM_end
                 #else
 __initial_sp    EQU     __initial_msp
                 #endif
 
-				#if     proc_stack_size > 0
+                #if     proc_stack_size > 0
                 #ifndef __MICROLIB
                 IMPORT  __use_two_region_memory
                 #endif

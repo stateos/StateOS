@@ -104,7 +104,7 @@ COMMON_F   += # --debug
 
 AS_FLAGS    =
 C_FLAGS     = -std=gnu11
-CXX_FLAGS   = -std=gnu++11 -fno-rtti -fno-exceptions # -fno-use-cxa-atexit
+CXX_FLAGS   = -std=gnu++14 -fno-rtti -fno-exceptions # -fno-use-cxa-atexit
 LD_FLAGS    = --strict --scatter=$(SCRIPT) --symbols --list_mapping_symbols
 LD_FLAGS   += --map --info common,sizes,summarysizes,totals,veneers,unused --list=$(MAP) # --callgraph
 ifneq ($(filter USE_LTO,$(DEFS)),)

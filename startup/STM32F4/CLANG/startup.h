@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     21.11.2017
+@date     19.07.2018
 @brief    Startup file header for armclang compiler.
 *******************************************************************************/
 
@@ -24,7 +24,7 @@ void __user_stacks_and_heap_config( void )
 	(
 "               .pushsection .heap, \"w\",\"nobits\"\n"
 "__heap_base    =       .               \n"
-"__heap_limit   =      "STR(__ram_end - __proc_stack_size)
+"__heap_limit   =      "STR(RAM_end - __proc_stack_size)
 "               .popsection             \n"
                 #if     __main_stack_size > 0
 "               .pushsection .stack,\"w\",\"nobits\"\n"
@@ -40,12 +40,12 @@ void __user_stacks_and_heap_config( void )
 "               .align  3               \n"
 "               .space "STR(__proc_stack_size)
 "               .popsection             \n"
-"__initial_sp   =      "STR(__ram_end)
+"__initial_sp   =      "STR(RAM_end)
                 #else
 "__initial_sp   =       __initial_msp   \n"
                 #endif
 
-				#if     __proc_stack_size > 0
+                #if     __proc_stack_size > 0
                 #ifndef __MICROLIB
 "               .global __use_two_region_memory\n"
                 #endif

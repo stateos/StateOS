@@ -1,21 +1,25 @@
 #***********************************************************
 # file     stm32f4xx.lkf
 # author   Rajmund Szymanski
-# date     23.11.2017
-# brief    Link command file for STM32F407VG
+# date     19.07.2018
+# brief    Link command file for STM32F407VG device with 1024KB FLASH and 192KB RAM
 #***********************************************************
 
 +def __ROM_start=0x08000000
 +def __ROM_size=0x00100000
++def __ROM_end=0x08100000
 
 +def __CCM_start=0x10000000
 +def __CCM_size=0x00010000
++def __CCM_end=0x10010000
 
 +def __RAM_start=0x20000000
 +def __RAM_size=0x00020000
++def __RAM_end=0x20020000
 
 +def __BKP_start=0x40024000
 +def __BKP_size=0x00001000
++def __BKP_end=0x40025000
 
 # segment vectors:
 +seg .vectors -b __ROM_start -m __ROM_size -n .vectors -k
