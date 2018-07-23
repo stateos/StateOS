@@ -43,6 +43,7 @@ Features:
 - some lock definitions moved to kernel
 - updated XXX_CREATE definitions
 - updated lock definitions and usage
+- updated version identification
 ---------
 6.0
 - updated os version

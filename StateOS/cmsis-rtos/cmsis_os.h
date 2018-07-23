@@ -132,7 +132,7 @@
 
     @file    StateOS: cmsis_os.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    23.07.2018
     @brief   CMSIS-RTOS API implementation for StateOS.
 
  ******************************************************************************
@@ -164,9 +164,9 @@
  
 #define osCMSIS             0x20001U    ///< API version (main[31:16].sub[15:0])
  
-#define osCMSIS_StateOS     0x60001U    ///< RTOS identification and version (main[31:16].sub[15:0])
+#define osCMSIS_StateOS ((((__STATEOS_MAJOR)&0xFFFFUL)<<16)|((__STATEOS_MINOR)&0xFFFFUL))
  
-#define osKernelSystemId "StateOS v6.1" ///< RTOS identification string
+#define osKernelSystemId    __STATEOS__ ///< RTOS identification string
  
 #define osFeature_MainThread  1         ///< main thread      1=main can be thread, 0=not available
 #define osFeature_Signals     31U       ///< maximum number of Signal Flags available per thread

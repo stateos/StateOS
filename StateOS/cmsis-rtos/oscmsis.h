@@ -2,7 +2,7 @@
 
     @file    StateOS: oscmsis.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    23.07.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -43,8 +43,8 @@ extern "C" {
 
 /// Kernel Information
 #define osVersionAPI         20010002   ///< API version (2.1.2)
-#define osVersionKernel      60010000   ///< Kernel version (6.1.0)
-#define osKernelId      "StateOS v6.1"  ///< Kernel identification string
+#define osVersionKernel  ((((__STATEOS_MAJOR)&0xFUL)<<28)|(((__STATEOS_MINOR)&0xFFFUL)<<16)|((__STATEOS_BUILD)&0xFFFFUL))
+#define osKernelId           __STATEOS__  ///< Kernel identification string
 
 /*---------------------------------------------------------------------------*/
 
