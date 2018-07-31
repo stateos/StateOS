@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -168,9 +168,6 @@ bool priv_tmr_expired( tmr_t *tmr )
 static
 void priv_tmr_wakeup( tmr_t *tmr, unsigned event )
 {
-	tmr->start += tmr->delay;
-	tmr->delay  = tmr->period;
-
 	if (tmr->state)
 		tmr->state();
 
@@ -193,10 +190,15 @@ void core_tmr_handler( void )
 	{
 		while (priv_tmr_expired(tmr = WAIT.obj.next))
 		{
-			if (tmr->id == ID_TIMER)
-				priv_tmr_wakeup((tmr_t *)tmr, E_SUCCESS);
+			tmr->start += tmr->delay;
 
-			else      /* id == ID_DELAYED */
+			if (tmr->id == ID_TIMER)
+			{
+				tmr->delay = tmr->period;
+
+				priv_tmr_wakeup((tmr_t *)tmr, E_SUCCESS);
+			}
+			else  /* id == ID_DELAYED */
 				core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
 		}
 	}
@@ -365,6 +367,23 @@ unsigned core_tsk_waitUntil( void *obj, cnt_t time )
 	cur->delay = time - cur->start;
 
 	if (cur->delay > ((CNT_MAX)>>1))
+		return E_TIMEOUT;
+
+	priv_tsk_wait(cur, obj);
+	priv_ctx_switchNow();
+
+	return cur->event;
+}
+
+/* -------------------------------------------------------------------------- */
+
+unsigned core_tsk_waitNext( void *obj, cnt_t delay )
+{
+	tsk_t *cur = System.cur;
+
+	cur->delay = delay;
+
+	if (cur->delay == IMMEDIATE)
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
