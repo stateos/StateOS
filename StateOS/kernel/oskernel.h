@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    17.07.2018
+    @date    31.07.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -179,6 +179,14 @@ void core_tsk_transfer( tsk_t *tsk, void *obj );
 // force context switch
 // return event value
 unsigned core_tsk_waitUntil( void *obj, cnt_t time );
+
+// delay execution of current task for given duration of time 'delay' from the end of the previous countdown
+// append the current task to the delayed queue of object 'obj'
+// remove the current task from tasks READY queue
+// insert the current task into timers READY queue
+// force context switch
+// return event value
+unsigned core_tsk_waitNext( void *obj, cnt_t delay );
 
 // delay execution of current task for given duration of time 'delay'
 // append the current task to the delayed queue of object 'obj'
