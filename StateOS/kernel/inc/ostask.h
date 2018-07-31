@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -945,6 +945,29 @@ unsigned tsk_delay( cnt_t delay ) { return tsk_sleepFor(delay); }
 
 /******************************************************************************
  *
+ * Name              : tsk_sleepNext
+ *
+ * Description       : delay execution of current task for given duration of time
+ *                     from the end of the previous countdown
+ *
+ * Parameters
+ *   delay           : duration of time (maximum number of ticks to delay execution of current task)
+ *                     IMMEDIATE: don't delay execution of current task
+ *                     INFINITE:  delay indefinitely execution of current task
+ *
+ * Return
+ *   E_TIMEOUT       : task object successfully finished countdown
+ *   E_STOPPED       : task object was resumed (tsk_resume)
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+unsigned tsk_sleepNext( cnt_t delay ) { return tmr_waitNext(&WAIT, delay); }
+
+/******************************************************************************
+ *
  * Name              : tsk_sleep
  *
  * Description       : delay indefinitely execution of current task
@@ -1184,6 +1207,7 @@ namespace ThisTask
 	static inline unsigned wait      ( unsigned _flags )               { return tsk_wait      (_flags);                   }
 	static inline unsigned sleepUntil( cnt_t    _time )                { return tsk_sleepUntil(_time);                    }
 	static inline unsigned sleepFor  ( cnt_t    _delay )               { return tsk_sleepFor  (_delay);                   }
+	static inline unsigned sleepNext ( cnt_t    _delay )               { return tsk_sleepNext (_delay);                   }
 	static inline unsigned sleep     ( void )                          { return tsk_sleep     ();                         }
 	static inline unsigned delay     ( cnt_t    _delay )               { return tsk_delay     (_delay);                   }
 }

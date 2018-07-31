@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -384,7 +384,8 @@ void tmr_delete( tmr_t *tmr );
  *
  * Name              : tmr_startUntil
  *
- * Description       : start/restart one-shot timer until given timepoint and then launch the callback procedure
+ * Description       : start/restart one-shot timer until given timepoint
+ *                     when the timer has finished the countdown, the callback procedure is launched
  *
  * Parameters
  *   tmr             : pointer to timer object
@@ -402,7 +403,8 @@ void tmr_startUntil( tmr_t *tmr, cnt_t time );
  *
  * Name              : tmr_start
  *
- * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure
+ * Description       : start/restart periodic timer for given duration of time
+ *                     when the timer has finished the countdown, the callback procedure is launched
  *                     do this periodically if period > 0
  *
  * Parameters
@@ -426,7 +428,8 @@ void tmr_start( tmr_t *tmr, cnt_t delay, cnt_t period );
  *
  * Name              : tmr_startFor
  *
- * Description       : start/restart one-shot timer for given duration of time and then launch the callback procedure
+ * Description       : start/restart one-shot timer for given duration of time
+ *                     when the timer has finished the countdown, the callback procedure is launched
  *
  * Parameters
  *   tmr             : pointer to timer object
@@ -447,7 +450,8 @@ void tmr_startFor( tmr_t *tmr, cnt_t delay ) { tmr_start(tmr, delay, 0); }
  *
  * Name              : tmr_startPeriodic
  *
- * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure
+ * Description       : start/restart periodic timer for given duration of time
+ *                     when the timer has finished the countdown, the callback procedure is launched
  *                     do this periodically
  *
  * Parameters
@@ -469,7 +473,8 @@ void tmr_startPeriodic( tmr_t *tmr, cnt_t period ) { tmr_start(tmr, period, peri
  *
  * Name              : tmr_startFrom
  *
- * Description       : start/restart periodic timer for given duration of time and then launch the callback procedure
+ * Description       : start/restart periodic timer for given duration of time
+ *                     when the timer has finished the countdown, the callback procedure is launched
  *                     do this periodically if period > 0
  *
  * Parameters
@@ -490,6 +495,27 @@ void tmr_startPeriodic( tmr_t *tmr, cnt_t period ) { tmr_start(tmr, period, peri
  ******************************************************************************/
 
 void tmr_startFrom( tmr_t *tmr, cnt_t delay, cnt_t period, fun_t *proc );
+
+/******************************************************************************
+ *
+ * Name              : tmr_startNext
+ *
+ * Description       : restart the timer for given duration of time from the end of the previous countdown
+ *                     when the timer has finished the countdown, the callback procedure is launched
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   delay           : duration of time (maximum number of ticks to countdown)
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+void tmr_startNext( tmr_t *tmr, cnt_t delay );
 
 /******************************************************************************
  *
@@ -552,6 +578,30 @@ unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time );
  ******************************************************************************/
 
 unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : tmr_waitNext
+ *
+ * Description       : wait for given duration of time from the end of the previous countdown
+ *                     until the timer finishes countdown
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   delay           : duration of time (maximum number of ticks to wait for the timer finishes countdown)
+ *                     IMMEDIATE: don't wait for the timer finishes countdown
+ *                     INFINITE:  wait indefinitely until the timer finishes countdown
+ *
+ * Return
+ *   E_SUCCESS       : timer object successfully finished countdown
+ *   E_STOPPED       : timer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay );
 
 /******************************************************************************
  *
@@ -679,10 +729,12 @@ struct Timer : public __tmr
 #else
 	void startFrom    ( cnt_t _delay, cnt_t _period, FUN_t _state ) {        tmr_startFrom    (this, _delay, _period, _state); }
 #endif
+	void startNext    ( cnt_t _delay )                              {        tmr_startNext    (this, _delay);                  }
 	void stop         ( void )                                      {        tmr_stop         (this);                          }
 
 	unsigned waitUntil( cnt_t _time )                               { return tmr_waitUntil    (this, _time);                   }
 	unsigned waitFor  ( cnt_t _delay )                              { return tmr_waitFor      (this, _delay);                  }
+	unsigned waitNext ( cnt_t _delay )                              { return tmr_waitNext     (this, _delay);                  }
 	unsigned wait     ( void )                                      { return tmr_wait         (this);                          }
 	unsigned take     ( void )                                      { return tmr_take         (this);                          }
 	unsigned takeISR  ( void )                                      { return tmr_takeISR      (this);                          }
@@ -700,7 +752,8 @@ struct Timer : public __tmr
  * Class             : startTimerUntil
  *
  * Description       : create and initialize a timer object
- *                     and start one-shot timer until given timepoint and then launch the callback procedure
+ *                     and start one-shot timer until given timepoint
+ *                     when the timer has finished the countdown, the callback procedure is launched
  *
  * Constructor parameters
  *   time            : timepoint value
@@ -721,7 +774,8 @@ struct startTimerUntil : public Timer
  * Class             : startTimer
  *
  * Description       : create and initialize a timer object
- *                     and start periodic timer for given duration of time and then launch the callback procedure
+ *                     and start periodic timer for given duration of time
+ *                     when the timer has finished the countdown, the callback procedure is launched
  *                     do this periodically
  *
  * Constructor parameters
@@ -748,7 +802,8 @@ struct startTimer : public Timer
  * Class             : startTimerFor
  *
  * Description       : create and initialize a timer object
- *                     and start one-shot timer for given duration of time and then launch the callback procedure
+ *                     and start one-shot timer for given duration of time
+ *                     when the timer has finished the countdown, the callback procedure is launched
  *
  * Constructor parameters
  *   delay           : duration of time (maximum number of ticks to countdown)
@@ -771,7 +826,8 @@ struct startTimerFor : public startTimer
  * Class             : startTimerPeriodic
  *
  * Description       : create and initialize a timer object
- *                     and start periodic timer for given duration of time and then launch the callback procedure
+ *                     and start periodic timer for given duration of time
+ *                     when the timer has finished the countdown, the callback procedure is launched
  *                     do this periodically
  *
  * Constructor parameters

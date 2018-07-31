@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -164,6 +164,21 @@ void tmr_startFrom( tmr_t *tmr, cnt_t delay, cnt_t period, fun_t *proc )
 }
 
 /* -------------------------------------------------------------------------- */
+void tmr_startNext( tmr_t *tmr, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	assert(tmr);
+
+	sys_lock();
+	{
+		tmr->delay  = delay;
+
+		priv_tmr_start(tmr);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned tmr_take( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
@@ -217,6 +232,13 @@ unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_tmr_wait(tmr, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_tmr_wait(tmr, delay, core_tsk_waitNext);
 }
 
 /* -------------------------------------------------------------------------- */
