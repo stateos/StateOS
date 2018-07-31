@@ -152,7 +152,7 @@ struct __tsk
  ******************************************************************************/
 
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), 0, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
+                       { _OBJ_INIT(), ID_STOPPED, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
 
 /******************************************************************************
  *
