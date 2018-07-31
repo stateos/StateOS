@@ -49,7 +49,7 @@ extern "C" {
 struct __tsk
 {
 	obj_t    obj;   // inherited from timer
-	unsigned id;    // task's id: ID_STOPPED, ID_READY, ID_DELAYED, ID_IDLE
+	tid_t    id;    // task's id: ID_STOPPED, ID_READY, ID_DELAYED, ID_IDLE
 
 	fun_t  * state; // task state (initial task function, doesn't have to be noreturn-type)
 	cnt_t    start; // inherited from timer

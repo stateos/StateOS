@@ -46,6 +46,7 @@ Features:
 - updated version identification
 - added tmr_startNext, tmr_waitNext and tsk_sleepNext functions
 - reorganized the order of functions
+- the task/timer identifier is an enumeration constant
 ---------
 6.0
 - updated os version

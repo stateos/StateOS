@@ -47,7 +47,7 @@ extern "C" {
 struct __tmr
 {
 	obj_t    obj;   // object header
-	unsigned id;    // timer's id: ID_STOPPED, ID_DELAYED, ID_TIMER
+	tid_t    id;    // timer's id: ID_STOPPED, ID_DELAYED, ID_TIMER
 
 	fun_t  * state; // callback procedure
 	cnt_t    start;
