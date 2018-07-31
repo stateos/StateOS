@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -242,27 +242,6 @@ void sig_delete( sig_t *sig );
 
 /******************************************************************************
  *
- * Name              : sig_waitUntil
- *
- * Description       : wait for release the signal object until given timepoint
- *
- * Parameters
- *   sig             : pointer to signal object
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : signal object was successfully released
- *   E_STOPPED       : signal object was killed before the specified timeout expired
- *   E_TIMEOUT       : signal object was not released before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned sig_waitUntil( sig_t *sig, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : sig_waitFor
  *
  * Description       : wait for release the signal object for given duration of time
@@ -283,6 +262,27 @@ unsigned sig_waitUntil( sig_t *sig, cnt_t time );
  ******************************************************************************/
 
 unsigned sig_waitFor( sig_t *sig, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : sig_waitUntil
+ *
+ * Description       : wait for release the signal object until given timepoint
+ *
+ * Parameters
+ *   sig             : pointer to signal object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : signal object was successfully released
+ *   E_STOPPED       : signal object was killed before the specified timeout expired
+ *   E_TIMEOUT       : signal object was not released before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned sig_waitUntil( sig_t *sig, cnt_t time );
 
 /******************************************************************************
  *
@@ -398,8 +398,8 @@ struct Signal : public __sig
 	~Signal( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )         {        sig_kill     (this);         }
-	unsigned waitUntil( cnt_t _time  ) { return sig_waitUntil(this, _time);  }
 	unsigned waitFor  ( cnt_t _delay ) { return sig_waitFor  (this, _delay); }
+	unsigned waitUntil( cnt_t _time  ) { return sig_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return sig_wait     (this);         }
 	unsigned take     ( void )         { return sig_take     (this);         }
 	unsigned takeISR  ( void )         { return sig_takeISR  (this);         }

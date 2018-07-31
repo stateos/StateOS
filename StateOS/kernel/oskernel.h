@@ -172,13 +172,13 @@ void core_tsk_unlink( tsk_t *tsk, unsigned event );
 // transfer task 'tsk' to the delayed queue of object 'obj'
 void core_tsk_transfer( tsk_t *tsk, void *obj );
 
-// delay execution of the current task until given time point 'time'
+// delay execution of current task for given duration of time 'delay'
 // append the current task to the delayed queue of object 'obj'
 // remove the current task from tasks READY queue
 // insert the current task into timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitUntil( void *obj, cnt_t time );
+unsigned core_tsk_waitFor( void *obj, cnt_t delay );
 
 // delay execution of current task for given duration of time 'delay' from the end of the previous countdown
 // append the current task to the delayed queue of object 'obj'
@@ -188,13 +188,13 @@ unsigned core_tsk_waitUntil( void *obj, cnt_t time );
 // return event value
 unsigned core_tsk_waitNext( void *obj, cnt_t delay );
 
-// delay execution of current task for given duration of time 'delay'
+// delay execution of the current task until given time point 'time'
 // append the current task to the delayed queue of object 'obj'
 // remove the current task from tasks READY queue
 // insert the current task into timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitFor( void *obj, cnt_t delay );
+unsigned core_tsk_waitUntil( void *obj, cnt_t time );
 
 // delay indefinitely execution of given task
 // append given task to WAIT timer delayed queue

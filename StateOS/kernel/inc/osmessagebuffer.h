@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -251,27 +251,6 @@ void msg_delete( msg_t *msg );
 
 /******************************************************************************
  *
- * Name              : msg_waitUntil
- *
- * Description       : try to transfer data from the message buffer object,
- *                     wait until given timepoint while the message buffer object is empty
- *
- * Parameters
- *   msg             : pointer to message buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
- *   time            : timepoint value
- *
- * Return            : number of bytes read from the message buffer
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : msg_waitFor
  *
  * Description       : try to transfer data from the message buffer object,
@@ -292,6 +271,27 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time );
  ******************************************************************************/
 
 unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : msg_waitUntil
+ *
+ * Description       : try to transfer data from the message buffer object,
+ *                     wait until given timepoint while the message buffer object is empty
+ *
+ * Parameters
+ *   msg             : pointer to message buffer object
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
+ *   time            : timepoint value
+ *
+ * Return            : number of bytes read from the message buffer
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time );
 
 /******************************************************************************
  *
@@ -340,27 +340,6 @@ unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(
 
 /******************************************************************************
  *
- * Name              : msg_sendUntil
- *
- * Description       : try to transfer data to the message buffer object,
- *                     wait until given timepoint while the message buffer object is full
- *
- * Parameters
- *   msg             : pointer to message buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
- *   time            : timepoint value
- *
- * Return            : number of bytes written to the message buffer
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : msg_sendFor
  *
  * Description       : try to transfer data to the message buffer object,
@@ -381,6 +360,27 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
  ******************************************************************************/
 
 unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : msg_sendUntil
+ *
+ * Description       : try to transfer data to the message buffer object,
+ *                     wait until given timepoint while the message buffer object is full
+ *
+ * Parameters
+ *   msg             : pointer to message buffer object
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
+ *   time            : timepoint value
+ *
+ * Return            : number of bytes written to the message buffer
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time );
 
 /******************************************************************************
  *
@@ -519,13 +519,13 @@ struct baseMessageBuffer : public __msg
 	~baseMessageBuffer( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                                            {        msg_kill     (this);                       }
-	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time  ) { return msg_waitUntil(this, _data, _size, _time);  }
 	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return msg_waitFor  (this, _data, _size, _delay); }
+	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time  ) { return msg_waitUntil(this, _data, _size, _time);  }
 	unsigned wait     (       void *_data, unsigned _size )               { return msg_wait     (this, _data, _size);         }
 	unsigned take     (       void *_data, unsigned _size )               { return msg_take     (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return msg_takeISR  (this, _data, _size);         }
-	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time  ) { return msg_sendUntil(this, _data, _size, _time);  }
 	unsigned sendFor  ( const void *_data, unsigned _size, cnt_t _delay ) { return msg_sendFor  (this, _data, _size, _delay); }
+	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time  ) { return msg_sendUntil(this, _data, _size, _time);  }
 	unsigned send     ( const void *_data, unsigned _size )               { return msg_send     (this, _data, _size);         }
 	unsigned give     ( const void *_data, unsigned _size )               { return msg_give     (this, _data, _size);         }
 	unsigned giveISR  ( const void *_data, unsigned _size )               { return msg_giveISR  (this, _data, _size);         }

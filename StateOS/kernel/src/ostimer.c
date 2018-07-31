@@ -110,25 +110,6 @@ void priv_tmr_start( tmr_t *tmr )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_startUntil( tmr_t *tmr, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	assert(tmr);
-
-	sys_lock();
-	{
-		tmr->start  = core_sys_time();
-		tmr->delay  = time - tmr->start;
-		if (tmr->delay > ((CNT_MAX)>>1))
-			tmr->delay = 0;
-		tmr->period = 0;
-
-		priv_tmr_start(tmr);
-	}
-	sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
 void tmr_start( tmr_t *tmr, cnt_t delay, cnt_t period )
 /* -------------------------------------------------------------------------- */
 {
@@ -179,6 +160,25 @@ void tmr_startNext( tmr_t *tmr, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
+void tmr_startUntil( tmr_t *tmr, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	assert(tmr);
+
+	sys_lock();
+	{
+		tmr->start  = core_sys_time();
+		tmr->delay  = time - tmr->start;
+		if (tmr->delay > ((CNT_MAX)>>1))
+			tmr->delay = 0;
+		tmr->period = 0;
+
+		priv_tmr_start(tmr);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned tmr_take( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
@@ -221,13 +221,6 @@ unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_tmr_wait(tmr, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
@@ -239,6 +232,13 @@ unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_tmr_wait(tmr, delay, core_tsk_waitNext);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_tmr_wait(tmr, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

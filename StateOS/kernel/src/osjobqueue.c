@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -190,17 +190,17 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_waitUntil( job_t *job, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_job_wait(job, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned job_waitFor( job_t *job, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_job_wait(job, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned job_waitUntil( job_t *job, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_job_wait(job, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -261,17 +261,17 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_job_send(job, fun, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_job_send(job, fun, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_job_send(job, fun, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

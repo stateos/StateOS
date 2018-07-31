@@ -813,27 +813,6 @@ unsigned tsk_getPrio( void ) { return System.cur->basic; }
 
 /******************************************************************************
  *
- * Name              : tsk_waitUntil
- *
- * Description       : delay execution of current task until given timepoint and wait for flags or message
- *
- * Parameters
- *   flags           : all flags to wait
- *                     0: wait for any flags or message
- *   time            : timepoint value
- *
- * Return
- *   E_TIMEOUT       : task object was not released before the specified timeout expired
- *   'another'       : task object resumed by the direct transfer of 'another' flags or message (tsk_give)
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned tsk_waitUntil( unsigned flags, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : tsk_waitFor
  *
  * Description       : delay execution of current task for given duration of time and wait for flags or message
@@ -854,6 +833,27 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time );
  ******************************************************************************/
 
 unsigned tsk_waitFor( unsigned flags, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : tsk_waitUntil
+ *
+ * Description       : delay execution of current task until given timepoint and wait for flags or message
+ *
+ * Parameters
+ *   flags           : all flags to wait
+ *                     0: wait for any flags or message
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_TIMEOUT       : task object was not released before the specified timeout expired
+ *   'another'       : task object resumed by the direct transfer of 'another' flags or message (tsk_give)
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned tsk_waitUntil( unsigned flags, cnt_t time );
 
 /******************************************************************************
  *
@@ -896,26 +896,6 @@ void tsk_give( tsk_t *tsk, unsigned flags );
 
 __STATIC_INLINE
 void tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
-
-/******************************************************************************
- *
- * Name              : tsk_sleepUntil
- *
- * Description       : delay execution of current task until given timepoint
- *
- * Parameters
- *   time            : timepoint value
- *
- * Return
- *   E_TIMEOUT       : task object successfully finished countdown
- *   E_STOPPED       : task object was resumed (tsk_resume)
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-__STATIC_INLINE
-unsigned tsk_sleepUntil( cnt_t time ) { return tmr_waitUntil(&WAIT, time); }
 
 /******************************************************************************
  *
@@ -965,6 +945,26 @@ unsigned tsk_delay( cnt_t delay ) { return tsk_sleepFor(delay); }
 
 __STATIC_INLINE
 unsigned tsk_sleepNext( cnt_t delay ) { return tmr_waitNext(&WAIT, delay); }
+
+/******************************************************************************
+ *
+ * Name              : tsk_sleepUntil
+ *
+ * Description       : delay execution of current task until given timepoint
+ *
+ * Parameters
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_TIMEOUT       : task object successfully finished countdown
+ *   E_STOPPED       : task object was resumed (tsk_resume)
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+unsigned tsk_sleepUntil( cnt_t time ) { return tmr_waitUntil(&WAIT, time); }
 
 /******************************************************************************
  *
@@ -1202,12 +1202,12 @@ namespace ThisTask
 	static inline unsigned detach    ( void )                          { return tsk_detach    (System.cur);               }
 	static inline void     suspend   ( void )                          {        tsk_suspend   (System.cur);               }
 
-	static inline unsigned waitUntil ( unsigned _flags, cnt_t _time )  { return tsk_waitUntil (_flags, _time);            }
 	static inline unsigned waitFor   ( unsigned _flags, cnt_t _delay ) { return tsk_waitFor   (_flags, _delay);           }
+	static inline unsigned waitUntil ( unsigned _flags, cnt_t _time )  { return tsk_waitUntil (_flags, _time);            }
 	static inline unsigned wait      ( unsigned _flags )               { return tsk_wait      (_flags);                   }
-	static inline unsigned sleepUntil( cnt_t    _time )                { return tsk_sleepUntil(_time);                    }
 	static inline unsigned sleepFor  ( cnt_t    _delay )               { return tsk_sleepFor  (_delay);                   }
 	static inline unsigned sleepNext ( cnt_t    _delay )               { return tsk_sleepNext (_delay);                   }
+	static inline unsigned sleepUntil( cnt_t    _time )                { return tsk_sleepUntil(_time);                    }
 	static inline unsigned sleep     ( void )                          { return tsk_sleep     ();                         }
 	static inline unsigned delay     ( cnt_t    _delay )               { return tsk_delay     (_delay);                   }
 }

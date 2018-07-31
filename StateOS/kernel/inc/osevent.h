@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -213,27 +213,6 @@ void evt_delete( evt_t *evt );
 
 /******************************************************************************
  *
- * Name              : evt_waitUntil
- *
- * Description       : wait for release the event object until given timepoint
- *
- * Parameters
- *   evt             : pointer to event object
- *   time            : timepoint value
- *
- * Return
- *   E_STOPPED       : event object was killed before the specified timeout expired
- *   E_TIMEOUT       : event object was not released before the specified timeout expired
- *   'another'       : event object was successfully released
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned evt_waitUntil( evt_t *evt, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : evt_waitFor
  *
  * Description       : wait for release the event object for given duration of time
@@ -254,6 +233,27 @@ unsigned evt_waitUntil( evt_t *evt, cnt_t time );
  ******************************************************************************/
 
 unsigned evt_waitFor( evt_t *evt, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : evt_waitUntil
+ *
+ * Description       : wait for release the event object until given timepoint
+ *
+ * Parameters
+ *   evt             : pointer to event object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_STOPPED       : event object was killed before the specified timeout expired
+ *   E_TIMEOUT       : event object was not released before the specified timeout expired
+ *   'another'       : event object was successfully released
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned evt_waitUntil( evt_t *evt, cnt_t time );
 
 /******************************************************************************
  *
@@ -323,8 +323,8 @@ struct Event : public __evt
 	~Event( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )            {        evt_kill     (this);         }
-	unsigned waitUntil( cnt_t _time  )    { return evt_waitUntil(this, _time);  }
 	unsigned waitFor  ( cnt_t _delay )    { return evt_waitFor  (this, _delay); }
+	unsigned waitUntil( cnt_t _time  )    { return evt_waitUntil(this, _time);  }
 	unsigned wait     ( void )            { return evt_wait     (this);         }
 	void     give     ( unsigned _event ) {        evt_give     (this, _event); }
 	void     giveISR  ( unsigned _event ) {        evt_giveISR  (this, _event); }

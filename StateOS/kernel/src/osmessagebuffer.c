@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -295,17 +295,17 @@ unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsig
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_msg_wait(msg, data, size, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_msg_wait(msg, data, size, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_msg_wait(msg, data, size, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -362,17 +362,17 @@ unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time,
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_msg_send(msg, data, size, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_msg_send(msg, data, size, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_msg_send(msg, data, size, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

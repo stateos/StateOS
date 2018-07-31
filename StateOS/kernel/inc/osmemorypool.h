@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -278,30 +278,6 @@ void mem_delete( mem_t *mem );
 
 /******************************************************************************
  *
- * Name              : mem_waitUntil
- *
- * Description       : try to get memory object from the memory pool object,
- *                     wait until given timepoint while the memory pool object is empty
- *
- * Parameters
- *   mem             : pointer to memory pool object
- *   data            : pointer to store the pointer to the memory object
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_STOPPED       : memory pool object was killed before the specified timeout expired
- *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-__STATIC_INLINE
-unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time ) { return lst_waitUntil((lst_t *)mem, data, time); }
-
-/******************************************************************************
- *
  * Name              : mem_waitFor
  *
  * Description       : try to get memory object from the memory pool object,
@@ -325,6 +301,30 @@ unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time ) { return lst_waitU
 
 __STATIC_INLINE
 unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay ) { return lst_waitFor((lst_t *)mem, data, delay); }
+
+/******************************************************************************
+ *
+ * Name              : mem_waitUntil
+ *
+ * Description       : try to get memory object from the memory pool object,
+ *                     wait until given timepoint while the memory pool object is empty
+ *
+ * Parameters
+ *   mem             : pointer to memory pool object
+ *   data            : pointer to store the pointer to the memory object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
+ *   E_STOPPED       : memory pool object was killed before the specified timeout expired
+ *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time ) { return lst_waitUntil((lst_t *)mem, data, time); }
 
 /******************************************************************************
  *
@@ -427,8 +427,8 @@ struct baseMemoryPool : public __mem
 	~baseMemoryPool( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                             {        mem_kill     (this);                }
-	unsigned waitUntil(       void **_data, cnt_t _time )  { return mem_waitUntil(this, _data, _time);  }
 	unsigned waitFor  (       void **_data, cnt_t _delay ) { return mem_waitFor  (this, _data, _delay); }
+	unsigned waitUntil(       void **_data, cnt_t _time )  { return mem_waitUntil(this, _data, _time);  }
 	unsigned wait     (       void **_data )               { return mem_wait     (this, _data);         }
 	unsigned take     (       void **_data )               { return mem_take     (this, _data);         }
 	unsigned takeISR  (       void **_data )               { return mem_takeISR  (this, _data);         }
@@ -476,8 +476,8 @@ struct MemoryPoolTT : public MemoryPoolT<_limit, sizeof(T)>
 	explicit
 	MemoryPoolTT( void ): MemoryPoolT<_limit, sizeof(T)>() {}
 
-	unsigned waitUntil( T **_data, cnt_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
 	unsigned waitFor  ( T **_data, cnt_t _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), _delay); }
+	unsigned waitUntil( T **_data, cnt_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
 	unsigned wait     ( T **_data )               { return mem_wait     (this, reinterpret_cast<void **>(_data));         }
 	unsigned take     ( T **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data));         }
 	unsigned takeISR  ( T **_data )               { return mem_takeISR  (this, reinterpret_cast<void **>(_data));         }

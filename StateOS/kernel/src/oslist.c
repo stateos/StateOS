@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -146,17 +146,17 @@ unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(voi
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_lst_wait(lst, data, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_lst_wait(lst, data, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_lst_wait(lst, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

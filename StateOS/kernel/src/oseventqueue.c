@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -184,17 +184,17 @@ unsigned priv_evq_wait( evq_t *evq, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evq_waitUntil( evq_t *evq, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_evq_wait(evq, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned evq_waitFor( evq_t *evq, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_evq_wait(evq, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evq_waitUntil( evq_t *evq, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_evq_wait(evq, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -250,17 +250,17 @@ unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(v
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_evq_send(evq, data, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_evq_send(evq, data, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_evq_send(evq, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

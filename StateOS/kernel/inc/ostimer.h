@@ -110,28 +110,6 @@ struct __tmr
 
 /******************************************************************************
  *
- * Name              : OS_TMR_UNTIL
- *
- * Description       : define, initialize and start complete timer object
- *                     timer callback procedure (function body) must be defined immediately below
- *
- * Parameters
- *   tmr             : name of a pointer to timer object
- *   time            : timepoint value
- *
- * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent
- *
- ******************************************************************************/
-
-#define             OS_TMR_UNTIL( tmr, time )                                                \
-                       void tmr##__fun( void );                                               \
-                       tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                             \
-                       tmr_id tmr = & tmr##__tmr;                                               \
-         __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
-                       void tmr##__fun( void )
-
-/******************************************************************************
- *
  * Name              : OS_TMR_START
  *
  * Description       : define, initialize and start complete timer object
@@ -155,6 +133,28 @@ struct __tmr
                        tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                                 \
                        tmr_id tmr = & tmr##__tmr;                                                   \
          __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_start(tmr, delay, period); } \
+                       void tmr##__fun( void )
+
+/******************************************************************************
+ *
+ * Name              : OS_TMR_UNTIL
+ *
+ * Description       : define, initialize and start complete timer object
+ *                     timer callback procedure (function body) must be defined immediately below
+ *
+ * Parameters
+ *   tmr             : name of a pointer to timer object
+ *   time            : timepoint value
+ *
+ * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent
+ *
+ ******************************************************************************/
+
+#define             OS_TMR_UNTIL( tmr, time )                                                \
+                       void tmr##__fun( void );                                               \
+                       tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                             \
+                       tmr_id tmr = & tmr##__tmr;                                               \
+         __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
                        void tmr##__fun( void )
 
 /******************************************************************************
@@ -195,28 +195,6 @@ struct __tmr
 
 /******************************************************************************
  *
- * Name              : static_TMR_UNTIL
- *
- * Description       : define, initialize and start static timer object
- *                     timer callback procedure (function body) must be defined immediately below
- *
- * Parameters
- *   tmr             : name of a pointer to timer object
- *   time            : timepoint value
- *
- * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent
- *
- ******************************************************************************/
-
-#define         static_TMR_UNTIL( tmr, time )                                                \
-                static void tmr##__fun( void );                                               \
-                static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                             \
-                static tmr_id tmr = & tmr##__tmr;                                               \
-  __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
-                static  void tmr##__fun( void )
-
-/******************************************************************************
- *
  * Name              : static_TMR_START
  *
  * Description       : define, initialize and start static timer object
@@ -241,6 +219,28 @@ struct __tmr
                 static tmr_id tmr = & tmr##__tmr;                                                   \
   __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_start(tmr, delay, period); } \
                 static void tmr##__fun( void )
+
+/******************************************************************************
+ *
+ * Name              : static_TMR_UNTIL
+ *
+ * Description       : define, initialize and start static timer object
+ *                     timer callback procedure (function body) must be defined immediately below
+ *
+ * Parameters
+ *   tmr             : name of a pointer to timer object
+ *   time            : timepoint value
+ *
+ * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent
+ *
+ ******************************************************************************/
+
+#define         static_TMR_UNTIL( tmr, time )                                                \
+                static void tmr##__fun( void );                                               \
+                static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                             \
+                static tmr_id tmr = & tmr##__tmr;                                               \
+  __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
+                static  void tmr##__fun( void )
 
 /******************************************************************************
  *
@@ -382,25 +382,6 @@ void tmr_delete( tmr_t *tmr );
 
 /******************************************************************************
  *
- * Name              : tmr_startUntil
- *
- * Description       : start/restart one-shot timer until given timepoint
- *                     when the timer has finished the countdown, the callback procedure is launched
- *
- * Parameters
- *   tmr             : pointer to timer object
- *   time            : timepoint value
- *
- * Return            : none
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-void tmr_startUntil( tmr_t *tmr, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : tmr_start
  *
  * Description       : start/restart periodic timer for given duration of time
@@ -519,6 +500,25 @@ void tmr_startNext( tmr_t *tmr, cnt_t delay );
 
 /******************************************************************************
  *
+ * Name              : tmr_startUntil
+ *
+ * Description       : start/restart one-shot timer until given timepoint
+ *                     when the timer has finished the countdown, the callback procedure is launched
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   time            : timepoint value
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+void tmr_startUntil( tmr_t *tmr, cnt_t time );
+
+/******************************************************************************
+ *
  * Name              : tmr_stop
  *
  * Description       : stop timer
@@ -534,27 +534,6 @@ void tmr_startNext( tmr_t *tmr, cnt_t delay );
 
 __STATIC_INLINE
 void tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0); }
-
-/******************************************************************************
- *
- * Name              : tmr_waitUntil
- *
- * Description       : wait until given timepoint until the timer finishes countdown
- *
- * Parameters
- *   tmr             : pointer to timer object
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : timer object successfully finished countdown
- *   E_STOPPED       : timer object was killed before the specified timeout expired
- *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time );
 
 /******************************************************************************
  *
@@ -602,6 +581,27 @@ unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay );
  ******************************************************************************/
 
 unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : tmr_waitUntil
+ *
+ * Description       : wait until given timepoint until the timer finishes countdown
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : timer object successfully finished countdown
+ *   E_STOPPED       : timer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time );
 
 /******************************************************************************
  *
@@ -719,7 +719,6 @@ struct Timer : public __tmr
 #endif
 
 	void kill         ( void )                                      {        tmr_kill         (this);                          }
-	void startUntil   ( cnt_t _time )                               {        tmr_startUntil   (this, _time);                   }
 	void start        ( cnt_t _delay, cnt_t _period )               {        tmr_start        (this, _delay, _period);         }
 	void startFor     ( cnt_t _delay )                              {        tmr_startFor     (this, _delay);                  }
 	void startPeriodic( cnt_t _period )                             {        tmr_startPeriodic(this,         _period);         }
@@ -730,11 +729,12 @@ struct Timer : public __tmr
 	void startFrom    ( cnt_t _delay, cnt_t _period, FUN_t _state ) {        tmr_startFrom    (this, _delay, _period, _state); }
 #endif
 	void startNext    ( cnt_t _delay )                              {        tmr_startNext    (this, _delay);                  }
+	void startUntil   ( cnt_t _time )                               {        tmr_startUntil   (this, _time);                   }
 	void stop         ( void )                                      {        tmr_stop         (this);                          }
 
-	unsigned waitUntil( cnt_t _time )                               { return tmr_waitUntil    (this, _time);                   }
 	unsigned waitFor  ( cnt_t _delay )                              { return tmr_waitFor      (this, _delay);                  }
 	unsigned waitNext ( cnt_t _delay )                              { return tmr_waitNext     (this, _delay);                  }
+	unsigned waitUntil( cnt_t _time )                               { return tmr_waitUntil    (this, _time);                   }
 	unsigned wait     ( void )                                      { return tmr_wait         (this);                          }
 	unsigned take     ( void )                                      { return tmr_take         (this);                          }
 	unsigned takeISR  ( void )                                      { return tmr_takeISR      (this);                          }
@@ -745,28 +745,6 @@ struct Timer : public __tmr
 	void     run_( void ) { ((Timer *) WAIT.obj.next)->fun_(); }
 	FUN_t    fun_;
 #endif
-};
-
-/******************************************************************************
- *
- * Class             : startTimerUntil
- *
- * Description       : create and initialize a timer object
- *                     and start one-shot timer until given timepoint
- *                     when the timer has finished the countdown, the callback procedure is launched
- *
- * Constructor parameters
- *   time            : timepoint value
- *   state           : callback procedure
- *
- ******************************************************************************/
-
-struct startTimerUntil : public Timer
-{
-	explicit
-	startTimerUntil( const cnt_t _time ):               Timer()       { port_sys_init(); tmr_startUntil(this, _time); }
-	explicit
-	startTimerUntil( const cnt_t _time, FUN_t _state ): Timer(_state) { port_sys_init(); tmr_startUntil(this, _time); }
 };
 
 /******************************************************************************
@@ -844,6 +822,28 @@ struct startTimerPeriodic : public startTimer
 	startTimerPeriodic( const cnt_t _period ):               startTimer(_period, _period)         {}
 	explicit
 	startTimerPeriodic( const cnt_t _period, FUN_t _state ): startTimer(_period, _period, _state) {}
+};
+
+/******************************************************************************
+ *
+ * Class             : startTimerUntil
+ *
+ * Description       : create and initialize a timer object
+ *                     and start one-shot timer until given timepoint
+ *                     when the timer has finished the countdown, the callback procedure is launched
+ *
+ * Constructor parameters
+ *   time            : timepoint value
+ *   state           : callback procedure
+ *
+ ******************************************************************************/
+
+struct startTimerUntil : public Timer
+{
+	explicit
+	startTimerUntil( const cnt_t _time ):               Timer()       { port_sys_init(); tmr_startUntil(this, _time); }
+	explicit
+	startTimerUntil( const cnt_t _time, FUN_t _state ): Timer(_state) { port_sys_init(); tmr_startUntil(this, _time); }
 };
 
 /******************************************************************************

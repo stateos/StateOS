@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -249,31 +249,6 @@ void stm_delete( stm_t *stm );
 
 /******************************************************************************
  *
- * Name              : stm_waitUntil
- *
- * Description       : try to transfer data from the stream buffer object,
- *                     wait until given timepoint while the stream buffer object is empty
- *
- * Parameters
- *   stm             : pointer to stream buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : data was successfully transfered from the stream buffer object
- *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : stream buffer object was not received enough data before the specified timeout expired
- *                     or write buffer has an incorrect size
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : stm_waitFor
  *
  * Description       : try to transfer data from the stream buffer object,
@@ -298,6 +273,31 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
  ******************************************************************************/
 
 unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : stm_waitUntil
+ *
+ * Description       : try to transfer data from the stream buffer object,
+ *                     wait until given timepoint while the stream buffer object is empty
+ *
+ * Parameters
+ *   stm             : pointer to stream buffer object
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : data was successfully transfered from the stream buffer object
+ *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : stream buffer object was not received enough data before the specified timeout expired
+ *                     or write buffer has an incorrect size
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
 
 /******************************************************************************
  *
@@ -351,31 +351,6 @@ unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(
 
 /******************************************************************************
  *
- * Name              : stm_sendUntil
- *
- * Description       : try to transfer data to the stream buffer object,
- *                     wait until given timepoint while the stream buffer object is full
- *
- * Parameters
- *   stm             : pointer to stream buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : data was successfully transfered to the stream buffer object
- *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : stream buffer object did not free enough space before the specified timeout expired
- *                     or read buffer has an incorrect size
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : stm_sendFor
  *
  * Description       : try to transfer data to the stream buffer object,
@@ -400,6 +375,31 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
  ******************************************************************************/
 
 unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : stm_sendUntil
+ *
+ * Description       : try to transfer data to the stream buffer object,
+ *                     wait until given timepoint while the stream buffer object is full
+ *
+ * Parameters
+ *   stm             : pointer to stream buffer object
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : data was successfully transfered to the stream buffer object
+ *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : stream buffer object did not free enough space before the specified timeout expired
+ *                     or read buffer has an incorrect size
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time );
 
 /******************************************************************************
  *
@@ -545,13 +545,13 @@ struct baseStreamBuffer : public __stm
 	~baseStreamBuffer( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                                            {        stm_kill     (this);                       }
-	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time  ) { return stm_waitUntil(this, _data, _size, _time);  }
 	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return stm_waitFor  (this, _data, _size, _delay); }
+	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time  ) { return stm_waitUntil(this, _data, _size, _time);  }
 	unsigned wait     (       void *_data, unsigned _size )               { return stm_wait     (this, _data, _size);         }
 	unsigned take     (       void *_data, unsigned _size )               { return stm_take     (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return stm_takeISR  (this, _data, _size);         }
-	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time  ) { return stm_sendUntil(this, _data, _size, _time);  }
 	unsigned sendFor  ( const void *_data, unsigned _size, cnt_t _delay ) { return stm_sendFor  (this, _data, _size, _delay); }
+	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time  ) { return stm_sendUntil(this, _data, _size, _time);  }
 	unsigned send     ( const void *_data, unsigned _size )               { return stm_send     (this, _data, _size);         }
 	unsigned give     ( const void *_data, unsigned _size )               { return stm_give     (this, _data, _size);         }
 	unsigned giveISR  ( const void *_data, unsigned _size )               { return stm_giveISR  (this, _data, _size);         }

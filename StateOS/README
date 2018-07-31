@@ -45,6 +45,7 @@ Features:
 - updated lock definitions and usage
 - updated version identification
 - added tmr_startNext, tmr_waitNext and tsk_sleepNext functions
+- reorganized the order of functions
 ---------
 6.0
 - updated os version

@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -120,17 +120,17 @@ unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_waitUntil( mut_t *mut, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_mut_wait(mut, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned mut_waitFor( mut_t *mut, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_mut_wait(mut, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned mut_waitUntil( mut_t *mut, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_mut_wait(mut, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

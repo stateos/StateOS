@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -223,27 +223,6 @@ void bar_delete( bar_t *bar );
 
 /******************************************************************************
  *
- * Name              : bar_waitUntil
- *
- * Description       : wait for release the barrier object until given timepoint
- *
- * Parameters
- *   bar             : pointer to barrier object
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : barrier object was successfully released
- *   E_STOPPED       : barrier object was killed before the specified timeout expired
- *   E_TIMEOUT       : barrier object was not released before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned bar_waitUntil( bar_t *bar, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : bar_waitFor
  *
  * Description       : wait for release the barrier object for given duration of time
@@ -264,6 +243,27 @@ unsigned bar_waitUntil( bar_t *bar, cnt_t time );
  ******************************************************************************/
 
 unsigned bar_waitFor( bar_t *bar, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : bar_waitUntil
+ *
+ * Description       : wait for release the barrier object until given timepoint
+ *
+ * Parameters
+ *   bar             : pointer to barrier object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : barrier object was successfully released
+ *   E_STOPPED       : barrier object was killed before the specified timeout expired
+ *   E_TIMEOUT       : barrier object was not released before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned bar_waitUntil( bar_t *bar, cnt_t time );
 
 /******************************************************************************
  *
@@ -311,8 +311,8 @@ struct Barrier : public __bar
 	~Barrier( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )         {        bar_kill     (this);         }
-	unsigned waitUntil( cnt_t _time  ) { return bar_waitUntil(this, _time);  }
 	unsigned waitFor  ( cnt_t _delay ) { return bar_waitFor  (this, _delay); }
+	unsigned waitUntil( cnt_t _time  ) { return bar_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return bar_wait     (this);         }
 };
 

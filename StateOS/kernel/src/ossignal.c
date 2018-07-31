@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -146,17 +146,17 @@ unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitUntil( sig_t *sig, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_sig_wait(sig, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned sig_waitFor( sig_t *sig, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_sig_wait(sig, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned sig_waitUntil( sig_t *sig, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_sig_wait(sig, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

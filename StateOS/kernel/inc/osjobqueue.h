@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -250,28 +250,6 @@ void job_delete( job_t *job );
 
 /******************************************************************************
  *
- * Name              : job_waitUntil
- *
- * Description       : try to transfer job data from the job queue object and execute the job procedure,
- *                     wait until given timepoint while the job queue object is empty
- *
- * Parameters
- *   job             : pointer to job queue object
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : job data was successfully transfered from the job queue object
- *   E_STOPPED       : job queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : job queue object is empty and was not received data before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned job_waitUntil( job_t *job, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : job_waitFor
  *
  * Description       : try to transfer job data from the job queue object and execute the job procedure,
@@ -293,6 +271,28 @@ unsigned job_waitUntil( job_t *job, cnt_t time );
  ******************************************************************************/
 
 unsigned job_waitFor( job_t *job, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : job_waitUntil
+ *
+ * Description       : try to transfer job data from the job queue object and execute the job procedure,
+ *                     wait until given timepoint while the job queue object is empty
+ *
+ * Parameters
+ *   job             : pointer to job queue object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : job data was successfully transfered from the job queue object
+ *   E_STOPPED       : job queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : job queue object is empty and was not received data before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned job_waitUntil( job_t *job, cnt_t time );
 
 /******************************************************************************
  *
@@ -341,29 +341,6 @@ unsigned job_takeISR( job_t *job ) { return job_take(job); }
 
 /******************************************************************************
  *
- * Name              : job_sendUntil
- *
- * Description       : try to transfer job data to the job queue object,
- *                     wait until given timepoint while the job queue object is full
- *
- * Parameters
- *   job             : pointer to job queue object
- *   fun             : pointer to job procedure
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : job data was successfully transfered to the job queue object
- *   E_STOPPED       : job queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : job queue object is full and was not issued data before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : job_sendFor
  *
  * Description       : try to transfer job data to the job queue object,
@@ -386,6 +363,29 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
  ******************************************************************************/
 
 unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : job_sendUntil
+ *
+ * Description       : try to transfer job data to the job queue object,
+ *                     wait until given timepoint while the job queue object is full
+ *
+ * Parameters
+ *   job             : pointer to job queue object
+ *   fun             : pointer to job procedure
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : job data was successfully transfered to the job queue object
+ *   E_STOPPED       : job queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : job queue object is full and was not issued data before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
 
 /******************************************************************************
  *
@@ -490,12 +490,12 @@ struct baseJobQueue : public __box
 	~baseJobQueue( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                     {                              box_kill     (this);                                                              }
-	unsigned waitUntil( cnt_t _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
 	unsigned waitFor  ( cnt_t _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
+	unsigned waitUntil( cnt_t _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
 	unsigned wait     ( void )                     { FUN_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
 	unsigned take     ( void )                     { FUN_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned sendUntil( FUN_t _fun, cnt_t _time )  {             unsigned event = box_sendUntil(this, &_fun, _time);                                  return event; }
 	unsigned sendFor  ( FUN_t _fun, cnt_t _delay ) {             unsigned event = box_sendFor  (this, &_fun, _delay);                                 return event; }
+	unsigned sendUntil( FUN_t _fun, cnt_t _time )  {             unsigned event = box_sendUntil(this, &_fun, _time);                                  return event; }
 	unsigned send     ( FUN_t _fun )               {             unsigned event = box_send     (this, &_fun);                                         return event; }
 	unsigned give     ( FUN_t _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
 	unsigned giveISR  ( FUN_t _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
@@ -512,12 +512,12 @@ struct baseJobQueue : public __job
 	~baseJobQueue( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                     {        job_kill     (this);               }
-	unsigned waitUntil( cnt_t _time )              { return job_waitUntil(this, _time);        }
 	unsigned waitFor  ( cnt_t _delay )             { return job_waitFor  (this, _delay);       }
+	unsigned waitUntil( cnt_t _time )              { return job_waitUntil(this, _time);        }
 	unsigned wait     ( void )                     { return job_wait     (this);               }
 	unsigned take     ( void )                     { return job_take     (this);               }
-	unsigned sendUntil( FUN_t _fun, cnt_t _time )  { return job_sendUntil(this, _fun, _time);  }
 	unsigned sendFor  ( FUN_t _fun, cnt_t _delay ) { return job_sendFor  (this, _fun, _delay); }
+	unsigned sendUntil( FUN_t _fun, cnt_t _time )  { return job_sendUntil(this, _fun, _time);  }
 	unsigned send     ( FUN_t _fun )               { return job_send     (this, _fun);         }
 	unsigned give     ( FUN_t _fun )               { return job_give     (this, _fun);         }
 	unsigned giveISR  ( FUN_t _fun )               { return job_giveISR  (this, _fun);         }

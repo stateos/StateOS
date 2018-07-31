@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -259,29 +259,6 @@ void box_delete( box_t *box );
 
 /******************************************************************************
  *
- * Name              : box_waitUntil
- *
- * Description       : try to transfer mailbox data from the mailbox queue object,
- *                     wait until given timepoint while the mailbox queue object is empty
- *
- * Parameters
- *   box             : pointer to mailbox queue object
- *   data            : pointer to store mailbox data
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
- *   E_STOPPED       : mailbox queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : mailbox queue object is empty and was not received data before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned box_waitUntil( box_t *box, void *data, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : box_waitFor
  *
  * Description       : try to transfer mailbox data from the mailbox queue object,
@@ -304,6 +281,29 @@ unsigned box_waitUntil( box_t *box, void *data, cnt_t time );
  ******************************************************************************/
 
 unsigned box_waitFor( box_t *box, void *data, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : box_waitUntil
+ *
+ * Description       : try to transfer mailbox data from the mailbox queue object,
+ *                     wait until given timepoint while the mailbox queue object is empty
+ *
+ * Parameters
+ *   box             : pointer to mailbox queue object
+ *   data            : pointer to store mailbox data
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
+ *   E_STOPPED       : mailbox queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : mailbox queue object is empty and was not received data before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned box_waitUntil( box_t *box, void *data, cnt_t time );
 
 /******************************************************************************
  *
@@ -354,29 +354,6 @@ unsigned box_takeISR( box_t *box, void *data ) { return box_take(box, data); }
 
 /******************************************************************************
  *
- * Name              : box_sendUntil
- *
- * Description       : try to transfer mailbox data to the mailbox queue object,
- *                     wait until given timepoint while the mailbox queue object is full
- *
- * Parameters
- *   box             : pointer to mailbox queue object
- *   data            : pointer to mailbox data
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
- *   E_STOPPED       : mailbox queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : mailbox queue object is full and was not issued data before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned box_sendUntil( box_t *box, const void *data, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : box_sendFor
  *
  * Description       : try to transfer mailbox data to the mailbox queue object,
@@ -399,6 +376,29 @@ unsigned box_sendUntil( box_t *box, const void *data, cnt_t time );
  ******************************************************************************/
 
 unsigned box_sendFor( box_t *box, const void *data, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : box_sendUntil
+ *
+ * Description       : try to transfer mailbox data to the mailbox queue object,
+ *                     wait until given timepoint while the mailbox queue object is full
+ *
+ * Parameters
+ *   box             : pointer to mailbox queue object
+ *   data            : pointer to mailbox data
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
+ *   E_STOPPED       : mailbox queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : mailbox queue object is full and was not issued data before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned box_sendUntil( box_t *box, const void *data, cnt_t time );
 
 /******************************************************************************
  *
@@ -540,13 +540,13 @@ struct baseMailBoxQueue : public __box
 	~baseMailBoxQueue( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                            {        box_kill     (this);                }
-	unsigned waitUntil(       void *_data, cnt_t _time  ) { return box_waitUntil(this, _data, _time);  }
 	unsigned waitFor  (       void *_data, cnt_t _delay ) { return box_waitFor  (this, _data, _delay); }
+	unsigned waitUntil(       void *_data, cnt_t _time  ) { return box_waitUntil(this, _data, _time);  }
 	unsigned wait     (       void *_data )               { return box_wait     (this, _data);         }
 	unsigned take     (       void *_data )               { return box_take     (this, _data);         }
 	unsigned takeISR  (       void *_data )               { return box_takeISR  (this, _data);         }
-	unsigned sendUntil( const void *_data, cnt_t _time  ) { return box_sendUntil(this, _data, _time);  }
 	unsigned sendFor  ( const void *_data, cnt_t _delay ) { return box_sendFor  (this, _data, _delay); }
+	unsigned sendUntil( const void *_data, cnt_t _time  ) { return box_sendUntil(this, _data, _time);  }
 	unsigned send     ( const void *_data )               { return box_send     (this, _data);         }
 	unsigned give     ( const void *_data )               { return box_give     (this, _data);         }
 	unsigned giveISR  ( const void *_data )               { return box_giveISR  (this, _data);         }

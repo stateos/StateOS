@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -220,29 +220,6 @@ void cnd_delete( cnd_t *cnd );
 
 /******************************************************************************
  *
- * Name              : cnd_waitUntil
- *
- * Description       : wait until given timepoint on the condition variable releasing the currently owned mutex,
- *                     and finally lock the mutex again
- *
- * Parameters
- *   cnd             : pointer to condition variable object
- *   mtx             : currently owned mutex
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again
- *   E_STOPPED       : condition variable object was killed before the specified timeout expired
- *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : cnd_waitFor
  *
  * Description       : wait for given duration of time on the condition variable releasing the currently owned mutex,
@@ -265,6 +242,29 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time );
  ******************************************************************************/
 
 unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : cnd_waitUntil
+ *
+ * Description       : wait until given timepoint on the condition variable releasing the currently owned mutex,
+ *                     and finally lock the mutex again
+ *
+ * Parameters
+ *   cnd             : pointer to condition variable object
+ *   mtx             : currently owned mutex
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again
+ *   E_STOPPED       : condition variable object was killed before the specified timeout expired
+ *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time );
 
 /******************************************************************************
  *
@@ -338,8 +338,8 @@ struct ConditionVariable : public __cnd
 	~ConditionVariable( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                      {        cnd_kill     (this);               }
-	unsigned waitUntil( mtx_t *_mtx, cnt_t _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
 	unsigned waitFor  ( mtx_t *_mtx, cnt_t _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
+	unsigned waitUntil( mtx_t *_mtx, cnt_t _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
 	unsigned wait     ( mtx_t *_mtx )               { return cnd_wait     (this, _mtx);         }
 	void     give     ( bool   _all = cndAll )      {        cnd_give     (this, _all);         }
 	void     giveISR  ( bool   _all = cndAll )      {        cnd_giveISR  (this, _all);         }

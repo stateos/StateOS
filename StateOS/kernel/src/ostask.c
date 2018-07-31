@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    17.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -298,17 +298,17 @@ unsigned priv_tsk_wait( unsigned flags, cnt_t time, unsigned(*wait)(void*,cnt_t)
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitUntil( unsigned flags, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_tsk_wait(flags, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned tsk_waitFor( unsigned flags, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_tsk_wait(flags, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_waitUntil( unsigned flags, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_tsk_wait(flags, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

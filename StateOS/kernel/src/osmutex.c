@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -182,17 +182,17 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_mtx_wait(mtx, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_mtx_wait(mtx, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_mtx_wait(mtx, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

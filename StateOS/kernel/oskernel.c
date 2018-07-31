@@ -359,14 +359,14 @@ void priv_tsk_wait( tsk_t *tsk, void *obj )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitUntil( void *obj, cnt_t time )
+unsigned core_tsk_waitFor( void *obj, cnt_t delay )
 {
 	tsk_t *cur = System.cur;
 
 	cur->start = core_sys_time();
-	cur->delay = time - cur->start;
+	cur->delay = delay;
 
-	if (cur->delay > ((CNT_MAX)>>1))
+	if (cur->delay == IMMEDIATE)
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);
@@ -394,14 +394,14 @@ unsigned core_tsk_waitNext( void *obj, cnt_t delay )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitFor( void *obj, cnt_t delay )
+unsigned core_tsk_waitUntil( void *obj, cnt_t time )
 {
 	tsk_t *cur = System.cur;
 
 	cur->start = core_sys_time();
-	cur->delay = delay;
+	cur->delay = time - cur->start;
 
-	if (cur->delay == IMMEDIATE)
+	if (cur->delay > ((CNT_MAX)>>1))
 		return E_TIMEOUT;
 
 	priv_tsk_wait(cur, obj);

@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -147,17 +147,17 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, u
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_flg_wait(flg, flags, mode, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_flg_wait(flg, flags, mode, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_flg_wait(flg, flags, mode, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

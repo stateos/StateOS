@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -235,17 +235,17 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_box_wait(box, data, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_box_wait(box, data, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_box_wait(box, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -300,17 +300,17 @@ unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_box_send(box, data, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_box_send(box, data, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_box_send(box, data, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -249,28 +249,6 @@ void evq_delete( evq_t *evq );
 
 /******************************************************************************
  *
- * Name              : evq_waitUntil
- *
- * Description       : try to transfer event data from the event queue object,
- *                     wait until given timepoint while the event queue object is empty
- *
- * Parameters
- *   evq             : pointer to event queue object
- *   time            : timepoint value
- *
- * Return
- *   E_STOPPED       : event queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : event queue object is empty and was not received data before the specified timeout expired
- *   'another'       : task was successfully released
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned evq_waitUntil( evq_t *evq, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : evq_waitFor
  *
  * Description       : try to transfer event data from the event queue object,
@@ -292,6 +270,28 @@ unsigned evq_waitUntil( evq_t *evq, cnt_t time );
  ******************************************************************************/
 
 unsigned evq_waitFor( evq_t *evq, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : evq_waitUntil
+ *
+ * Description       : try to transfer event data from the event queue object,
+ *                     wait until given timepoint while the event queue object is empty
+ *
+ * Parameters
+ *   evq             : pointer to event queue object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_STOPPED       : event queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : event queue object is empty and was not received data before the specified timeout expired
+ *   'another'       : task was successfully released
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned evq_waitUntil( evq_t *evq, cnt_t time );
 
 /******************************************************************************
  *
@@ -340,29 +340,6 @@ unsigned evq_takeISR( evq_t *evq ) { return evq_take(evq); }
 
 /******************************************************************************
  *
- * Name              : evq_sendUntil
- *
- * Description       : try to transfer event data to the event queue object,
- *                     wait until given timepoint while the event queue object is full
- *
- * Parameters
- *   evq             : pointer to event queue object
- *   event           : event value
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : event data was successfully transfered to the event queue object
- *   E_STOPPED       : event queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : event queue object is full and was not issued data before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned evq_sendUntil( evq_t *evq, unsigned event, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : evq_sendFor
  *
  * Description       : try to transfer event data to the event queue object,
@@ -385,6 +362,29 @@ unsigned evq_sendUntil( evq_t *evq, unsigned event, cnt_t time );
  ******************************************************************************/
 
 unsigned evq_sendFor( evq_t *evq, unsigned event, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : evq_sendUntil
+ *
+ * Description       : try to transfer event data to the event queue object,
+ *                     wait until given timepoint while the event queue object is full
+ *
+ * Parameters
+ *   evq             : pointer to event queue object
+ *   event           : event value
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : event data was successfully transfered to the event queue object
+ *   E_STOPPED       : event queue object was killed before the specified timeout expired
+ *   E_TIMEOUT       : event queue object is full and was not issued data before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned evq_sendUntil( evq_t *evq, unsigned event, cnt_t time );
 
 /******************************************************************************
  *
@@ -487,13 +487,13 @@ struct baseEventQueue : public __evq
 	~baseEventQueue( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                          {        evq_kill     (this);                 }
-	unsigned waitUntil(                  cnt_t _time  ) { return evq_waitUntil(this,         _time);  }
 	unsigned waitFor  (                  cnt_t _delay ) { return evq_waitFor  (this,         _delay); }
+	unsigned waitUntil(                  cnt_t _time  ) { return evq_waitUntil(this,         _time);  }
 	unsigned wait     ( void )                          { return evq_wait     (this);                 }
 	unsigned take     ( void )                          { return evq_take     (this);                 }
 	unsigned takeISR  ( void )                          { return evq_takeISR  (this);                 }
-	unsigned sendUntil( unsigned _event, cnt_t _time  ) { return evq_sendUntil(this, _event, _time);  }
 	unsigned sendFor  ( unsigned _event, cnt_t _delay ) { return evq_sendFor  (this, _event, _delay); }
+	unsigned sendUntil( unsigned _event, cnt_t _time  ) { return evq_sendUntil(this, _event, _time);  }
 	unsigned send     ( unsigned _event )               { return evq_send     (this, _event);         }
 	unsigned give     ( unsigned _event )               { return evq_give     (this, _event);         }
 	unsigned giveISR  ( unsigned _event )               { return evq_giveISR  (this, _event);         }

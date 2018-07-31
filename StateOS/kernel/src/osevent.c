@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -111,17 +111,17 @@ unsigned priv_evt_wait( evt_t *evt, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitUntil( evt_t *evt, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_evt_wait(evt, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned evt_waitFor( evt_t *evt, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_evt_wait(evt, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evt_waitUntil( evt_t *evt, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_evt_wait(evt, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

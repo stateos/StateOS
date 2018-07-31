@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -217,28 +217,6 @@ void mtx_delete( mtx_t *mtx );
 
 /******************************************************************************
  *
- * Name              : mtx_waitUntil
- *
- * Description       : try to lock the mutex object,
- *                     wait until given timepoint if the mutex object can't be locked immediately
- *
- * Parameters
- *   mtx             : pointer to mutex object
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : mutex object was successfully locked
- *   E_STOPPED       : mutex object was killed before the specified timeout expired
- *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : mtx_waitFor
  *
  * Description       : try to lock the mutex object,
@@ -260,6 +238,28 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
  ******************************************************************************/
 
 unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : mtx_waitUntil
+ *
+ * Description       : try to lock the mutex object,
+ *                     wait until given timepoint if the mutex object can't be locked immediately
+ *
+ * Parameters
+ *   mtx             : pointer to mutex object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : mutex object was successfully locked
+ *   E_STOPPED       : mutex object was killed before the specified timeout expired
+ *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
 
 /******************************************************************************
  *
@@ -349,8 +349,8 @@ struct Mutex : public __mtx
 	~Mutex( void ) { assert(owner == nullptr); }
 
 	void     kill     ( void )         {        mtx_kill     (this);         }
-	unsigned waitUntil( cnt_t _time  ) { return mtx_waitUntil(this, _time);  }
 	unsigned waitFor  ( cnt_t _delay ) { return mtx_waitFor  (this, _delay); }
+	unsigned waitUntil( cnt_t _time  ) { return mtx_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return mtx_wait     (this);         }
 	unsigned take     ( void )         { return mtx_take     (this);         }
 	unsigned give     ( void )         { return mtx_give     (this);         }

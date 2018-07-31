@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -114,17 +114,17 @@ unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(void
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_cnd_wait(cnd, mtx, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_cnd_wait(cnd, mtx, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_cnd_wait(cnd, mtx, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

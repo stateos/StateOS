@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -257,17 +257,17 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_stm_wait(stm, data, size, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_stm_wait(stm, data, size, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_stm_wait(stm, data, size, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -327,17 +327,17 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_stm_send(stm, data, size, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_stm_send(stm, data, size, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_stm_send(stm, data, size, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

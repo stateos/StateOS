@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -128,17 +128,17 @@ unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned bar_waitUntil( bar_t *bar, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_bar_wait(bar, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned bar_waitFor( bar_t *bar, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_bar_wait(bar, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned bar_waitUntil( bar_t *bar, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_bar_wait(bar, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

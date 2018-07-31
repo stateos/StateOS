@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -150,17 +150,17 @@ unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sem_waitUntil( sem_t *sem, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_sem_wait(sem, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned sem_waitFor( sem_t *sem, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_sem_wait(sem, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned sem_waitUntil( sem_t *sem, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_sem_wait(sem, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -216,17 +216,17 @@ unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sem_sendUntil( sem_t *sem, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_sem_send(sem, time, core_tsk_waitUntil);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned sem_sendFor( sem_t *sem, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	return priv_sem_send(sem, delay, core_tsk_waitFor);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned sem_sendUntil( sem_t *sem, cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	return priv_sem_send(sem, time, core_tsk_waitUntil);
 }
 
 /* -------------------------------------------------------------------------- */

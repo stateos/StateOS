@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -243,29 +243,6 @@ void lst_delete( lst_t *lst );
 
 /******************************************************************************
  *
- * Name              : lst_waitUntil
- *
- * Description       : try to get memory object from the list object,
- *                     wait until given timepoint while the list object is empty
- *
- * Parameters
- *   lst             : pointer to list object
- *   data            : pointer to store the pointer to the memory object
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_STOPPED       : list object was killed before the specified timeout expired
- *   E_TIMEOUT       : list object is empty and was not received data before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : lst_waitFor
  *
  * Description       : try to get memory object from the list object,
@@ -288,6 +265,29 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time );
  ******************************************************************************/
 
 unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : lst_waitUntil
+ *
+ * Description       : try to get memory object from the list object,
+ *                     wait until given timepoint while the list object is empty
+ *
+ * Parameters
+ *   lst             : pointer to list object
+ *   data            : pointer to store the pointer to the memory object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
+ *   E_STOPPED       : list object was killed before the specified timeout expired
+ *   E_TIMEOUT       : list object is empty and was not received data before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time );
 
 /******************************************************************************
  *
@@ -384,8 +384,8 @@ struct List : public __lst
 	~List( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                             {        lst_kill     (this);                }
-	unsigned waitUntil(       void **_data, cnt_t _time )  { return lst_waitUntil(this, _data, _time);  }
 	unsigned waitFor  (       void **_data, cnt_t _delay ) { return lst_waitFor  (this, _data, _delay); }
+	unsigned waitUntil(       void **_data, cnt_t _time )  { return lst_waitUntil(this, _data, _time);  }
 	unsigned wait     (       void **_data )               { return lst_wait     (this, _data);         }
 	unsigned take     (       void **_data )               { return lst_take     (this, _data);         }
 	unsigned takeISR  (       void **_data )               { return lst_takeISR  (this, _data);         }
@@ -410,8 +410,8 @@ struct ListTT : public List
 	explicit
 	ListTT( void ): List() {}
 
-	unsigned waitUntil( T **_data, cnt_t _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
 	unsigned waitFor  ( T **_data, cnt_t _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), _delay); }
+	unsigned waitUntil( T **_data, cnt_t _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
 	unsigned wait     ( T **_data )               { return lst_wait     (this, reinterpret_cast<void **>(_data));         }
 	unsigned take     ( T **_data )               { return lst_take     (this, reinterpret_cast<void **>(_data));         }
 	unsigned takeISR  ( T **_data )               { return lst_takeISR  (this, reinterpret_cast<void **>(_data));         }

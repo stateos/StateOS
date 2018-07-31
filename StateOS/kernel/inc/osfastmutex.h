@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.07.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -216,28 +216,6 @@ void mut_delete( mut_t *mut );
 
 /******************************************************************************
  *
- * Name              : mut_waitUntil
- *
- * Description       : try to lock the fast mutex object,
- *                     wait until given timepoint if the fast mutex object can't be locked immediately
- *
- * Parameters
- *   mut             : pointer to fast mutex object
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : fast mutex object was successfully locked
- *   E_STOPPED       : fast mutex object was killed before the specified timeout expired
- *   E_TIMEOUT       : fast mutex object was not locked before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned mut_waitUntil( mut_t *mut, cnt_t time );
-
-/******************************************************************************
- *
  * Name              : mut_waitFor
  *
  * Description       : try to lock the fast mutex object,
@@ -259,6 +237,28 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time );
  ******************************************************************************/
 
 unsigned mut_waitFor( mut_t *mut, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : mut_waitUntil
+ *
+ * Description       : try to lock the fast mutex object,
+ *                     wait until given timepoint if the fast mutex object can't be locked immediately
+ *
+ * Parameters
+ *   mut             : pointer to fast mutex object
+ *   time            : timepoint value
+ *
+ * Return
+ *   E_SUCCESS       : fast mutex object was successfully locked
+ *   E_STOPPED       : fast mutex object was killed before the specified timeout expired
+ *   E_TIMEOUT       : fast mutex object was not locked before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned mut_waitUntil( mut_t *mut, cnt_t time );
 
 /******************************************************************************
  *
@@ -348,8 +348,8 @@ struct FastMutex : public __mut
 	~FastMutex( void ) { assert(owner == nullptr); }
 
 	void     kill     ( void )         {        mut_kill     (this);         }
-	unsigned waitUntil( cnt_t _time  ) { return mut_waitUntil(this, _time);  }
 	unsigned waitFor  ( cnt_t _delay ) { return mut_waitFor  (this, _delay); }
+	unsigned waitUntil( cnt_t _time  ) { return mut_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return mut_wait     (this);         }
 	unsigned take     ( void )         { return mut_take     (this);         }
 	unsigned give     ( void )         { return mut_give     (this);         }
