@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    03.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,7 +34,7 @@
 #include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
-void flg_init( flg_t *flg )
+void flg_init( flg_t *flg, unsigned init )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -43,12 +43,14 @@ void flg_init( flg_t *flg )
 	sys_lock();
 	{
 		memset(flg, 0, sizeof(flg_t));
+
+		flg->flags = init;
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-flg_t *flg_create( void )
+flg_t *flg_create( unsigned init )
 /* -------------------------------------------------------------------------- */
 {
 	flg_t *flg;
@@ -58,7 +60,7 @@ flg_t *flg_create( void )
 	sys_lock();
 	{
 		flg = core_sys_alloc(sizeof(flg_t));
-		flg_init(flg);
+		flg_init(flg, init);
 		flg->res = flg;
 	}
 	sys_unlock();

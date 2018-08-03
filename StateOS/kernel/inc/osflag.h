@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    03.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -72,7 +72,8 @@ struct __flg
  *
  * Description       : create and initialize a flag object
  *
- * Parameters        : none
+ * Parameters
+ *   init            : initial value of flag
  *
  * Return            : flag object
  *
@@ -80,7 +81,7 @@ struct __flg
  *
  ******************************************************************************/
 
-#define               _FLG_INIT() { 0, 0, 0 }
+#define               _FLG_INIT( init ) { 0, 0, init }
 
 /******************************************************************************
  *
@@ -90,11 +91,12 @@ struct __flg
  *
  * Parameters
  *   flg             : name of a pointer to flag object
+ *   init            : initial value of flag
  *
  ******************************************************************************/
 
-#define             OS_FLG( flg )                     \
-                       flg_t flg##__flg = _FLG_INIT(); \
+#define             OS_FLG( flg, init )                   \
+                       flg_t flg##__flg = _FLG_INIT(init); \
                        flg_id flg = & flg##__flg
 
 /******************************************************************************
@@ -105,11 +107,12 @@ struct __flg
  *
  * Parameters
  *   flg             : name of a pointer to flag object
+ *   init            : initial value of flag
  *
  ******************************************************************************/
 
-#define         static_FLG( flg )                     \
-                static flg_t flg##__flg = _FLG_INIT(); \
+#define         static_FLG( flg, init )                   \
+                static flg_t flg##__flg = _FLG_INIT(init); \
                 static flg_id flg = & flg##__flg
 
 /******************************************************************************
@@ -118,7 +121,8 @@ struct __flg
  *
  * Description       : create and initialize a flag object
  *
- * Parameters        : none
+ * Parameters
+ *   init            : initial value of flag
  *
  * Return            : flag object
  *
@@ -127,8 +131,8 @@ struct __flg
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                FLG_INIT() \
-                      _FLG_INIT()
+#define                FLG_INIT( init ) \
+                      _FLG_INIT( init )
 #endif
 
 /******************************************************************************
@@ -138,7 +142,8 @@ struct __flg
  *
  * Description       : create and initialize a flag object
  *
- * Parameters        : none
+ * Parameters
+ *   init            : initial value of flag
  *
  * Return            : pointer to flag object
  *
@@ -147,8 +152,8 @@ struct __flg
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                FLG_CREATE() \
-           (flg_t[]) { FLG_INIT  () }
+#define                FLG_CREATE( init ) \
+           (flg_t[]) { FLG_INIT  ( init ) }
 #define                FLG_NEW \
                        FLG_CREATE
 #endif
@@ -161,6 +166,7 @@ struct __flg
  *
  * Parameters
  *   flg             : pointer to flag object
+ *   init            : initial value of flag
  *
  * Return            : none
  *
@@ -168,7 +174,7 @@ struct __flg
  *
  ******************************************************************************/
 
-void flg_init( flg_t *flg );
+void flg_init( flg_t *flg, unsigned init );
 
 /******************************************************************************
  *
@@ -177,7 +183,8 @@ void flg_init( flg_t *flg );
  *
  * Description       : create and initialize a new flag object
  *
- * Parameters        : none
+ * Parameters
+ *   init            : initial value of flag
  *
  * Return            : pointer to flag object (flag successfully created)
  *   0               : flag not created (not enough free memory)
@@ -186,10 +193,10 @@ void flg_init( flg_t *flg );
  *
  ******************************************************************************/
 
-flg_t *flg_create( void );
+flg_t *flg_create( unsigned init );
 
 __STATIC_INLINE
-flg_t *flg_new( void ) { return flg_create(); }
+flg_t *flg_new( unsigned init ) { return flg_create(init); }
 
 /******************************************************************************
  *
@@ -399,14 +406,14 @@ unsigned flg_clearISR( flg_t *flg, unsigned flags ) { return flg_clear(flg, flag
  * Description       : create and initialize a flag object
  *
  * Constructor parameters
- *                   : none
+ *   init            : initial value of flag
  *
  ******************************************************************************/
 
 struct Flag : public __flg
 {
 	 explicit
-	 Flag( void ): __flg _FLG_INIT() {}
+	 Flag( const unsigned _init = 0 ): __flg _FLG_INIT(_init) {}
 	~Flag( void ) { assert(queue == nullptr); }
 
 	void     kill     ( void )                                          {        flg_kill     (this);                        }

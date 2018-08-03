@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-OS_FLG(flg);
+OS_FLG(flg, 0);
 
 void slave()
 {

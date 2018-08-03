@@ -36,6 +36,7 @@ Features:
 ---------
 6.2
 - updated kernel
+- added initial value for flag object
 ---------
 6.1
 - updated os version
