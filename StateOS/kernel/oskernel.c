@@ -87,7 +87,7 @@ tmr_t WAIT = { .obj={ .prev=&WAIT.obj, .next=&WAIT.obj }, .id=ID_TIMER, .delay=I
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_tmr_insert( tmr_t *tmr, unsigned id )
+void priv_tmr_insert( tmr_t *tmr, tid_t id )
 {
 	tmr_t *nxt = &WAIT;
 	tmr->id = id;
@@ -109,7 +109,7 @@ void priv_tmr_remove( tmr_t *tmr )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tmr_insert( tmr_t *tmr, unsigned id )
+void core_tmr_insert( tmr_t *tmr, tid_t id )
 {
 	priv_tmr_insert(tmr, id);
 	port_tmr_force();

@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    03.08.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -142,7 +142,7 @@ void core_sys_free( void *ptr );
 /* -------------------------------------------------------------------------- */
 
 // insert timer 'tmr' into timers READY queue with id 'id' and start it
-void core_tmr_insert( tmr_t *tmr, unsigned id );
+void core_tmr_insert( tmr_t *tmr, tid_t id );
 
 // remove timer 'tmr' from timers READY queue
 void core_tmr_remove( tmr_t *tmr );
