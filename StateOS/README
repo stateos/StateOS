@@ -34,6 +34,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+6.2
+- updated kernel
+---------
 6.1
 - updated os version
 - updated mailbox queue object
