@@ -23,7 +23,7 @@ There's a dedicated function for immediate change the task state.
 - barriers
 - semaphores (binary, limited, counting)
 - mutexes (recursive, priority inheritance, robust)
-- fast mutexes (non-recursive, non-priority-inheritance, non-robust)
+- fast mutexes (error checking)
 - condition variables
 - memory pools
 - stream buffers
