@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    07.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,9 +57,9 @@ struct __tsk
 	cnt_t    slice;	// time slice
 
 	tsk_t  * back;  // previous process in the DELAYED queue
-	void   * sp;    // current stack pointer
-	stk_t  * top;   // top of stack
 	void   * stack; // base of stack
+	stk_t  * top;   // top of stack
+	void   * sp;    // current stack pointer
 
 	unsigned basic; // basic priority
 	unsigned prio;  // current priority
@@ -152,7 +152,7 @@ struct __tsk
  ******************************************************************************/
 
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), ID_STOPPED, _state, 0, 0, 0, 0, 0, _stack+SSIZE(_size), _stack, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
+                       { _OBJ_INIT(), ID_STOPPED, _state, 0, 0, 0, 0, _stack, _stack+SSIZE(_size), 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
 
 /******************************************************************************
  *
