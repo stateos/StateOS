@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    08.08.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 #ifndef __STATEOSBASE_H
 #define __STATEOSBASE_H
 
+#include <stdint.h>
 #include <stdbool.h>
 #include "osport.h"
 
