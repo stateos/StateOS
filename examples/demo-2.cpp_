@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-void proc( unsigned &led, uint32_t timePoint )
+void proc( unsigned &led, cnt_t timePoint )
 {
 	ThisTask::sleepUntil(timePoint);
 	for (;;)
