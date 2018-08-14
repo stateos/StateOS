@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -46,6 +46,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
 	{
 		memset(tsk, 0, sizeof(tsk_t));
 
+		tsk->id    = ID_STOPPED;
 		tsk->prio  = prio;
 		tsk->basic = prio;
 		tsk->state = state;

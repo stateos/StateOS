@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -469,9 +469,9 @@ unsigned job_pushISR( job_t *job, fun_t *fun ) { return job_push(job, fun); }
 
 /******************************************************************************
  *
- * Class             : baseJobQueue
+ * Class             : staticJobQueueT<>
  *
- * Description       : create and initialize a job queue object
+ * Description       : create and initialize a static job queue object
  *
  * Constructor parameters
  *   limit           : size of a queue (max number of stored job procedures)
@@ -481,13 +481,47 @@ unsigned job_pushISR( job_t *job, fun_t *fun ) { return job_push(job, fun); }
  *
  ******************************************************************************/
 
+template<unsigned limit_>
+struct staticJobQueueT : public __job
+{
+	 staticJobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
+	~staticJobQueueT( void ) { assert(__job::queue == nullptr); }
+
+	void     kill     ( void )                      {        job_kill     (this);               }
+	unsigned waitFor  ( cnt_t  _delay )             { return job_waitFor  (this, _delay);       }
+	unsigned waitUntil( cnt_t  _time )              { return job_waitUntil(this, _time);        }
+	unsigned wait     ( void )                      { return job_wait     (this);               }
+	unsigned take     ( void )                      { return job_take     (this);               }
+	unsigned sendFor  ( fun_t *_fun, cnt_t _delay ) { return job_sendFor  (this, _fun, _delay); }
+	unsigned sendUntil( fun_t *_fun, cnt_t _time )  { return job_sendUntil(this, _fun, _time);  }
+	unsigned send     ( fun_t *_fun )               { return job_send     (this, _fun);         }
+	unsigned give     ( fun_t *_fun )               { return job_give     (this, _fun);         }
+	unsigned giveISR  ( fun_t *_fun )               { return job_giveISR  (this, _fun);         }
+	unsigned push     ( fun_t *_fun )               { return job_push     (this, _fun);         }
+	unsigned pushISR  ( fun_t *_fun )               { return job_pushISR  (this, _fun);         }
+
+	private:
+	fun_t *data_[limit_];
+};
+
+/******************************************************************************
+ *
+ * Class             : JobQueueT<>
+ *
+ * Description       : create and initialize a job queue object
+ *
+ * Constructor parameters
+ *   limit           : size of a queue (max number of stored job procedures)
+ *
+ ******************************************************************************/
+
 #if OS_FUNCTIONAL
 
-struct baseJobQueue : public __box
+template<unsigned limit_>
+struct JobQueueT : public __box
 {
-	 explicit
-	 baseJobQueue( const unsigned _limit, FUN_t * const _data ): __box _BOX_INIT( _limit, reinterpret_cast<char *>(_data), sizeof(FUN_t) ) {}
-	~baseJobQueue( void ) { assert(queue == nullptr); }
+	 JobQueueT( void ): __box _BOX_INIT(limit_, reinterpret_cast<char *>(data_), sizeof(FUN_t)) {}
+	~JobQueueT( void ) { assert(__box::queue == nullptr); }
 
 	void     kill     ( void )                     {                              box_kill     (this);                                                              }
 	unsigned waitFor  ( cnt_t _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
@@ -501,54 +535,22 @@ struct baseJobQueue : public __box
 	unsigned giveISR  ( FUN_t _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
 	unsigned push     ( FUN_t _fun )               {             unsigned event = box_push     (this, &_fun);                                         return event; }
 	unsigned pushISR  ( FUN_t _fun )               {             unsigned event = box_pushISR  (this, &_fun);                                         return event; }
+
+	private:
+	FUN_t data_[limit_];
 };
 
 #else
 
-struct baseJobQueue : public __job
+template<unsigned limit_>
+struct JobQueueT : public staticJobQueueT<limit_>
 {
-	 explicit
-	 baseJobQueue( const unsigned _limit, FUN_t * const _data ): __job _JOB_INIT( _limit, _data ) {}
-	~baseJobQueue( void ) { assert(queue == nullptr); }
-
-	void     kill     ( void )                     {        job_kill     (this);               }
-	unsigned waitFor  ( cnt_t _delay )             { return job_waitFor  (this, _delay);       }
-	unsigned waitUntil( cnt_t _time )              { return job_waitUntil(this, _time);        }
-	unsigned wait     ( void )                     { return job_wait     (this);               }
-	unsigned take     ( void )                     { return job_take     (this);               }
-	unsigned sendFor  ( FUN_t _fun, cnt_t _delay ) { return job_sendFor  (this, _fun, _delay); }
-	unsigned sendUntil( FUN_t _fun, cnt_t _time )  { return job_sendUntil(this, _fun, _time);  }
-	unsigned send     ( FUN_t _fun )               { return job_send     (this, _fun);         }
-	unsigned give     ( FUN_t _fun )               { return job_give     (this, _fun);         }
-	unsigned giveISR  ( FUN_t _fun )               { return job_giveISR  (this, _fun);         }
-	unsigned push     ( FUN_t _fun )               { return job_push     (this, _fun);         }
-	unsigned pushISR  ( FUN_t _fun )               { return job_pushISR  (this, _fun);         }
+	JobQueueT( void ): staticJobQueueT<limit_>() {}
 };
 
 #endif
 
-/******************************************************************************
- *
- * Class             : JobQueue
- *
- * Description       : create and initialize a job queue object
- *
- * Constructor parameters
- *   limit           : size of a queue (max number of stored job procedures)
- *
- ******************************************************************************/
-
-template<unsigned _limit>
-struct JobQueueT : public baseJobQueue
-{
-	explicit
-	JobQueueT( void ): baseJobQueue(_limit, data_) {}
-
-	private:
-	FUN_t data_[_limit];
-};
-
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 

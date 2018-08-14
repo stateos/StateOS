@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -38,6 +38,12 @@
 extern "C" {
 #endif
 
+/* -------------------------------------------------------------------------- */
+
+#define sigClear     ( 0U << 0 ) // auto clearing signal
+#define sigProtect   ( 1U << 0 ) // protected signal
+#define sigMASK      ( 1U )
+
 /******************************************************************************
  *
  * Name              : signal
@@ -53,12 +59,6 @@ struct __sig
 	unsigned flag;  // signal's current value
 	unsigned type;  // signal type: sigClear, sigProtect
 };
-
-/* -------------------------------------------------------------------------- */
-
-#define sigClear     ( 0U << 0 ) // auto clearing signal
-#define sigProtect   ( 1U << 0 ) // protected signal
-#define sigMASK      ( 1U )
 
 /******************************************************************************
  *
@@ -393,9 +393,8 @@ void sig_clearISR( sig_t *sig ) { sig_clear(sig); }
 
 struct Signal : public __sig
 {
-	 explicit
 	 Signal( const unsigned _type = sigClear ): __sig _SIG_INIT(_type) {}
-	~Signal( void ) { assert(queue == nullptr); }
+	~Signal( void ) { assert(__sig::queue == nullptr); }
 
 	void     kill     ( void )         {        sig_kill     (this);         }
 	unsigned waitFor  ( cnt_t _delay ) { return sig_waitFor  (this, _delay); }
@@ -409,7 +408,7 @@ struct Signal : public __sig
 	void     clearISR ( void )         {        sig_clearISR (this);         }
 };
 
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 

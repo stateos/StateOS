@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -344,9 +344,8 @@ unsigned mtx_give( mtx_t *mtx );
 
 struct Mutex : public __mtx
 {
-	 explicit
 	 Mutex( void ): __mtx _MTX_INIT() {}
-	~Mutex( void ) { assert(owner == nullptr); }
+	~Mutex( void ) { assert(__mtx::owner == nullptr); }
 
 	void     kill     ( void )         {        mtx_kill     (this);         }
 	unsigned waitFor  ( cnt_t _delay ) { return mtx_waitFor  (this, _delay); }
@@ -356,7 +355,7 @@ struct Mutex : public __mtx
 	unsigned give     ( void )         { return mtx_give     (this);         }
 };
 
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 

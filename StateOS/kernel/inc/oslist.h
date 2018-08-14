@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -368,34 +368,7 @@ void lst_giveISR( lst_t *lst, const void *data ) { lst_give(lst, data); }
 
 /******************************************************************************
  *
- * Class             : List
- *
- * Description       : create and initialize a list object
- *
- * Constructor parameters
- *                   : none
- *
- ******************************************************************************/
-
-struct List : public __lst
-{
-	 explicit
-	 List( void ): __lst _LST_INIT() {}
-	~List( void ) { assert(queue == nullptr); }
-
-	void     kill     ( void )                             {        lst_kill     (this);                }
-	unsigned waitFor  (       void **_data, cnt_t _delay ) { return lst_waitFor  (this, _data, _delay); }
-	unsigned waitUntil(       void **_data, cnt_t _time )  { return lst_waitUntil(this, _data, _time);  }
-	unsigned wait     (       void **_data )               { return lst_wait     (this, _data);         }
-	unsigned take     (       void **_data )               { return lst_take     (this, _data);         }
-	unsigned takeISR  (       void **_data )               { return lst_takeISR  (this, _data);         }
-	void     give     ( const void  *_data )               {        lst_give     (this, _data);         }
-	void     giveISR  ( const void  *_data )               {        lst_giveISR  (this, _data);         }
-};
-
-/******************************************************************************
- *
- * Class             : List
+ * Class             : ListTT<>
  *
  * Description       : create and initialize a list object
  *
@@ -405,19 +378,26 @@ struct List : public __lst
  ******************************************************************************/
 
 template<class T>
-struct ListTT : public List
+struct ListTT : public __lst
 {
-	explicit
-	ListTT( void ): List() {}
+	 ListTT( void ): __lst _LST_INIT() {}
+	~ListTT( void ) { assert(__lst::queue == nullptr); }
 
-	unsigned waitFor  ( T **_data, cnt_t _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), _delay); }
-	unsigned waitUntil( T **_data, cnt_t _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
-	unsigned wait     ( T **_data )               { return lst_wait     (this, reinterpret_cast<void **>(_data));         }
-	unsigned take     ( T **_data )               { return lst_take     (this, reinterpret_cast<void **>(_data));         }
-	unsigned takeISR  ( T **_data )               { return lst_takeISR  (this, reinterpret_cast<void **>(_data));         }
+	void     kill     ( void )                            {        lst_kill     (this);                                           }
+	unsigned waitFor  (       T   **_data, cnt_t _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), _delay); }
+	unsigned waitUntil(       T   **_data, cnt_t _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
+	unsigned wait     (       T   **_data )               { return lst_wait     (this, reinterpret_cast<void **>(_data));         }
+	unsigned take     (       T   **_data )               { return lst_take     (this, reinterpret_cast<void **>(_data));         }
+	unsigned takeISR  (       T   **_data )               { return lst_takeISR  (this, reinterpret_cast<void **>(_data));         }
+	void     give     ( const void *_data )               {        lst_give     (this,                           _data);          }
+	void     giveISR  ( const void *_data )               {        lst_giveISR  (this,                           _data);          }
 };
 
-#endif
+/* -------------------------------------------------------------------------- */
+
+typedef ListTT<void> List;
+
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -468,61 +468,40 @@ unsigned evq_pushISR( evq_t *evq, unsigned event ) { return evq_push(evq, event)
 
 /******************************************************************************
  *
- * Class             : baseEventQueue
+ * Class             : EventQueueT<>
  *
  * Description       : create and initialize an event queue object
  *
  * Constructor parameters
  *   limit           : size of a queue (max number of stored events)
- *   data            : event queue data buffer
- *
- * Note              : for internal use
  *
  ******************************************************************************/
 
-struct baseEventQueue : public __evq
+template<unsigned limit_>
+struct EventQueueT : public __evq
 {
-	 explicit
-	 baseEventQueue( const unsigned _limit, unsigned * const _data ): __evq _EVQ_INIT(_limit, _data) {}
-	~baseEventQueue( void ) { assert(queue == nullptr); }
+	 EventQueueT( void ): __evq _EVQ_INIT(limit_, data_) {}
+	~EventQueueT( void ) { assert(__evq::queue == nullptr); }
 
 	void     kill     ( void )                          {        evq_kill     (this);                 }
 	unsigned waitFor  (                  cnt_t _delay ) { return evq_waitFor  (this,         _delay); }
-	unsigned waitUntil(                  cnt_t _time  ) { return evq_waitUntil(this,         _time);  }
+	unsigned waitUntil(                  cnt_t _time )  { return evq_waitUntil(this,         _time);  }
 	unsigned wait     ( void )                          { return evq_wait     (this);                 }
 	unsigned take     ( void )                          { return evq_take     (this);                 }
 	unsigned takeISR  ( void )                          { return evq_takeISR  (this);                 }
 	unsigned sendFor  ( unsigned _event, cnt_t _delay ) { return evq_sendFor  (this, _event, _delay); }
-	unsigned sendUntil( unsigned _event, cnt_t _time  ) { return evq_sendUntil(this, _event, _time);  }
+	unsigned sendUntil( unsigned _event, cnt_t _time )  { return evq_sendUntil(this, _event, _time);  }
 	unsigned send     ( unsigned _event )               { return evq_send     (this, _event);         }
 	unsigned give     ( unsigned _event )               { return evq_give     (this, _event);         }
 	unsigned giveISR  ( unsigned _event )               { return evq_giveISR  (this, _event);         }
 	unsigned push     ( unsigned _event )               { return evq_push     (this, _event);         }
 	unsigned pushISR  ( unsigned _event )               { return evq_pushISR  (this, _event);         }
-};
-
-/******************************************************************************
- *
- * Class             : EventQueue
- *
- * Description       : create and initialize an event queue object
- *
- * Constructor parameters
- *   limit           : size of a queue (max number of stored events)
- *
- ******************************************************************************/
-
-template<unsigned _limit>
-struct EventQueueT : public baseEventQueue
-{
-	explicit
-	EventQueueT( void ): baseEventQueue(_limit, data_) {}
 
 	private:
-	unsigned data_[_limit];
+	unsigned data_[limit_];
 };
 
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 

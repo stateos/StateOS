@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    03.08.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -38,6 +38,19 @@
 extern "C" {
 #endif
 
+/* -------------------------------------------------------------------------- */
+
+#define flgAny        ( 0U << 0 )
+#define flgAll        ( 1U << 0 )
+#define flgProtect    ( 1U << 1 )
+#define flgIgnore     ( 1U << 2 )
+#define flgMASK       ( 7U )
+
+#define flgAnyProtect ( flgAny | flgProtect )
+#define flgAllProtect ( flgAll | flgProtect )
+#define flgAnyIgnore  ( flgAny | flgIgnore  )
+#define flgAllIgnore  ( flgAll | flgIgnore  )
+
 /******************************************************************************
  *
  * Name              : flag
@@ -52,19 +65,6 @@ struct __flg
 	void   * res;   // allocated flag object's resource
 	unsigned flags; // flag's current value
 };
-
-/* -------------------------------------------------------------------------- */
-
-#define flgAny        ( 0U << 0 )
-#define flgAll        ( 1U << 0 )
-#define flgProtect    ( 1U << 1 )
-#define flgIgnore     ( 1U << 2 )
-#define flgMASK       ( 7U )
-
-#define flgAnyProtect ( flgAny | flgProtect )
-#define flgAllProtect ( flgAll | flgProtect )
-#define flgAnyIgnore  ( flgAny | flgIgnore  )
-#define flgAllIgnore  ( flgAll | flgIgnore  )
 
 /******************************************************************************
  *
@@ -412,9 +412,8 @@ unsigned flg_clearISR( flg_t *flg, unsigned flags ) { return flg_clear(flg, flag
 
 struct Flag : public __flg
 {
-	 explicit
 	 Flag( const unsigned _init = 0 ): __flg _FLG_INIT(_init) {}
-	~Flag( void ) { assert(queue == nullptr); }
+	~Flag( void ) { assert(__flg::queue == nullptr); }
 
 	void     kill     ( void )                                          {        flg_kill     (this);                        }
 	unsigned waitFor  ( unsigned _flags, unsigned _mode, cnt_t _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
@@ -428,7 +427,7 @@ struct Flag : public __flg
 	unsigned clearISR ( unsigned _flags )                               { return flg_clearISR (this, _flags);                }
 };
 
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 

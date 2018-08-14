@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -526,32 +526,29 @@ unsigned stm_spaceISR( stm_t *stm ) { return stm_space(stm); }
 
 /******************************************************************************
  *
- * Class             : baseStreamBuffer
+ * Class             : StreamBufferT<>
  *
  * Description       : create and initialize a stream buffer object
  *
  * Constructor parameters
  *   limit           : size of a buffer (max number of stored bytes)
- *   data            : stream buffer data
- *
- * Note              : for internal use
  *
  ******************************************************************************/
 
-struct baseStreamBuffer : public __stm
+template<unsigned limit_>
+struct StreamBufferT : public __stm
 {
-	 explicit
-	 baseStreamBuffer( const unsigned _limit, char * const _data ): __stm _STM_INIT(_limit, _data) {}
-	~baseStreamBuffer( void ) { assert(queue == nullptr); }
+	 StreamBufferT( void ): __stm _STM_INIT(limit_, data_) {}
+	~StreamBufferT( void ) { assert(__stm::queue == nullptr); }
 
 	void     kill     ( void )                                            {        stm_kill     (this);                       }
 	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return stm_waitFor  (this, _data, _size, _delay); }
-	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time  ) { return stm_waitUntil(this, _data, _size, _time);  }
+	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time )  { return stm_waitUntil(this, _data, _size, _time);  }
 	unsigned wait     (       void *_data, unsigned _size )               { return stm_wait     (this, _data, _size);         }
 	unsigned take     (       void *_data, unsigned _size )               { return stm_take     (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return stm_takeISR  (this, _data, _size);         }
 	unsigned sendFor  ( const void *_data, unsigned _size, cnt_t _delay ) { return stm_sendFor  (this, _data, _size, _delay); }
-	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time  ) { return stm_sendUntil(this, _data, _size, _time);  }
+	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time )  { return stm_sendUntil(this, _data, _size, _time);  }
 	unsigned send     ( const void *_data, unsigned _size )               { return stm_send     (this, _data, _size);         }
 	unsigned give     ( const void *_data, unsigned _size )               { return stm_give     (this, _data, _size);         }
 	unsigned giveISR  ( const void *_data, unsigned _size )               { return stm_giveISR  (this, _data, _size);         }
@@ -561,32 +558,14 @@ struct baseStreamBuffer : public __stm
 	unsigned countISR ( void )                                            { return stm_countISR (this);                       }
 	unsigned space    ( void )                                            { return stm_space    (this);                       }
 	unsigned spaceISR ( void )                                            { return stm_spaceISR (this);                       }
-};
-
-/******************************************************************************
- *
- * Class             : StreamBuffer
- *
- * Description       : create and initialize a stream buffer object
- *
- * Constructor parameters
- *   limit           : size of a buffer (max number of stored bytes)
- *
- ******************************************************************************/
-
-template<unsigned _limit>
-struct StreamBufferT : public baseStreamBuffer
-{
-	explicit
-	StreamBufferT( void ): baseStreamBuffer(_limit, data_) {}
 
 	private:
-	char data_[_limit];
+	char data_[limit_];
 };
 
 /******************************************************************************
  *
- * Class             : StreamBuffer
+ * Class             : StreamBufferTT<>
  *
  * Description       : create and initialize a stream buffer object
  *
@@ -596,17 +575,26 @@ struct StreamBufferT : public baseStreamBuffer
  *
  ******************************************************************************/
 
-template<unsigned _limit, class T>
-struct StreamBufferTT : public baseStreamBuffer
+template<unsigned limit_, class T>
+struct StreamBufferTT : public StreamBufferT<limit_*sizeof(T)>
 {
-	explicit
-	StreamBufferTT( void ): baseStreamBuffer(sizeof(data_), reinterpret_cast<char *>(data_) ) {}
+	StreamBufferTT( void ): StreamBufferT<limit_*sizeof(T)>() {}
 
-	private:
-	T data_[_limit];
+	unsigned waitFor  (       T *_data, cnt_t _delay ) { return stm_waitFor  (this, _data, sizeof(T), _delay); }
+	unsigned waitUntil(       T *_data, cnt_t _time )  { return stm_waitUntil(this, _data, sizeof(T), _time);  }
+	unsigned wait     (       T *_data )               { return stm_wait     (this, _data, sizeof(T));         }
+	unsigned take     (       T *_data )               { return stm_take     (this, _data, sizeof(T));         }
+	unsigned takeISR  (       T *_data )               { return stm_takeISR  (this, _data, sizeof(T));         }
+	unsigned sendFor  ( const T *_data, cnt_t _delay ) { return stm_sendFor  (this, _data, sizeof(T), _delay); }
+	unsigned sendUntil( const T *_data, cnt_t _time )  { return stm_sendUntil(this, _data, sizeof(T), _time);  }
+	unsigned send     ( const T *_data )               { return stm_send     (this, _data, sizeof(T));         }
+	unsigned give     ( const T *_data )               { return stm_give     (this, _data, sizeof(T));         }
+	unsigned giveISR  ( const T *_data )               { return stm_giveISR  (this, _data, sizeof(T));         }
+	unsigned push     ( const T *_data )               { return stm_push     (this, _data, sizeof(T));         }
+	unsigned pushISR  ( const T *_data )               { return stm_pushISR  (this, _data, sizeof(T));         }
 };
 
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 

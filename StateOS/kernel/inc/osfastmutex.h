@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -343,19 +343,18 @@ unsigned mut_give( mut_t *mut );
 
 struct FastMutex : public __mut
 {
-	 explicit
 	 FastMutex( void ): __mut _MUT_INIT() {}
-	~FastMutex( void ) { assert(owner == nullptr); }
+	~FastMutex( void ) { assert(__mut::owner == nullptr); }
 
 	void     kill     ( void )         {        mut_kill     (this);         }
 	unsigned waitFor  ( cnt_t _delay ) { return mut_waitFor  (this, _delay); }
-	unsigned waitUntil( cnt_t _time  ) { return mut_waitUntil(this, _time);  }
+	unsigned waitUntil( cnt_t _time )  { return mut_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return mut_wait     (this);         }
 	unsigned take     ( void )         { return mut_take     (this);         }
 	unsigned give     ( void )         { return mut_give     (this);         }
 };
 
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 

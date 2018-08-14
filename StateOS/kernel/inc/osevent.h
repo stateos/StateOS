@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -318,19 +318,18 @@ void evt_giveISR( evt_t *evt, unsigned event ) { evt_give(evt, event); }
 
 struct Event : public __evt
 {
-	 explicit
 	 Event( void ): __evt _EVT_INIT() {}
-	~Event( void ) { assert(queue == nullptr); }
+	~Event( void ) { assert(__evt::queue == nullptr); }
 
 	void     kill     ( void )            {        evt_kill     (this);         }
 	unsigned waitFor  ( cnt_t _delay )    { return evt_waitFor  (this, _delay); }
-	unsigned waitUntil( cnt_t _time  )    { return evt_waitUntil(this, _time);  }
+	unsigned waitUntil( cnt_t _time )     { return evt_waitUntil(this, _time);  }
 	unsigned wait     ( void )            { return evt_wait     (this);         }
 	void     give     ( unsigned _event ) {        evt_give     (this, _event); }
 	void     giveISR  ( unsigned _event ) {        evt_giveISR  (this, _event); }
 };
 
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 

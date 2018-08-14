@@ -37,6 +37,8 @@ Features:
 6.2
 - updated kernel
 - added initial value for flag object
+- updated tsk/tmr init functions
+- added static c++ classes
 ---------
 6.1
 - updated os version

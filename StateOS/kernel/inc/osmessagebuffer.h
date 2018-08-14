@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -500,23 +500,20 @@ unsigned msg_spaceISR( msg_t *msg ) { return msg_space(msg); }
 
 /******************************************************************************
  *
- * Class             : baseMessageBuffer
+ * Class             : MessageBufferT<>
  *
  * Description       : create and initialize a message buffer object
  *
  * Constructor parameters
  *   limit           : size of a buffer (max number of stored bytes)
- *   data            : message buffer data
- *
- * Note              : for internal use
  *
  ******************************************************************************/
 
-struct baseMessageBuffer : public __msg
+template<unsigned limit_>
+struct MessageBufferT : public __msg
 {
-	 explicit
-	 baseMessageBuffer( const unsigned _limit, char * const _data ): __msg _MSG_INIT(_limit, _data) {}
-	~baseMessageBuffer( void ) { assert(queue == nullptr); }
+	 MessageBufferT( void ): __msg _MSG_INIT(limit_, data_) {}
+	~MessageBufferT( void ) { assert(__msg::queue == nullptr); }
 
 	void     kill     ( void )                                            {        msg_kill     (this);                       }
 	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return msg_waitFor  (this, _data, _size, _delay); }
@@ -535,32 +532,14 @@ struct baseMessageBuffer : public __msg
 	unsigned countISR ( void )                                            { return msg_countISR (this);                       }
 	unsigned space    ( void )                                            { return msg_space    (this);                       }
 	unsigned spaceISR ( void )                                            { return msg_spaceISR (this);                       }
-};
-
-/******************************************************************************
- *
- * Class             : MessageBuffer
- *
- * Description       : create and initialize a message buffer object
- *
- * Constructor parameters
- *   limit           : size of a buffer (max number of stored bytes)
- *
- ******************************************************************************/
-
-template<unsigned _limit>
-struct MessageBufferT : public baseMessageBuffer
-{
-	explicit
-	MessageBufferT( void ): baseMessageBuffer(sizeof(data_), data_) {}
 
 	private:
-	char data_[_limit];
+	char data_[limit_];
 };
 
 /******************************************************************************
  *
- * Class             : MessageBuffer
+ * Class             : MessageBufferTT<>
  *
  * Description       : create and initialize a message buffer object
  *
@@ -570,17 +549,26 @@ struct MessageBufferT : public baseMessageBuffer
  *
  ******************************************************************************/
 
-template<unsigned _limit, class T>
-struct MessageBufferTT : public baseMessageBuffer
+template<unsigned limit_, class T>
+struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T))>
 {
-	explicit
-	MessageBufferTT( void ): baseMessageBuffer(sizeof(data_), data_) {}
+	MessageBufferTT( void ): MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T))>() {}
 
-	private:
-	char data_[_limit*(sizeof(unsigned)+sizeof(T))-sizeof(unsigned)];
+	unsigned waitFor  (       T *_data, cnt_t _delay ) { return msg_waitFor  (this, _data, sizeof(T), _delay); }
+	unsigned waitUntil(       T *_data, cnt_t _time )  { return msg_waitUntil(this, _data, sizeof(T), _time);  }
+	unsigned wait     (       T *_data )               { return msg_wait     (this, _data, sizeof(T));         }
+	unsigned take     (       T *_data )               { return msg_take     (this, _data, sizeof(T));         }
+	unsigned takeISR  (       T *_data )               { return msg_takeISR  (this, _data, sizeof(T));         }
+	unsigned sendFor  ( const T *_data, cnt_t _delay ) { return msg_sendFor  (this, _data, sizeof(T), _delay); }
+	unsigned sendUntil( const T *_data, cnt_t _time )  { return msg_sendUntil(this, _data, sizeof(T), _time);  }
+	unsigned send     ( const T *_data )               { return msg_send     (this, _data, sizeof(T));         }
+	unsigned give     ( const T *_data )               { return msg_give     (this, _data, sizeof(T));         }
+	unsigned giveISR  ( const T *_data )               { return msg_giveISR  (this, _data, sizeof(T));         }
+	unsigned push     ( const T *_data )               { return msg_push     (this, _data, sizeof(T));         }
+	unsigned pushISR  ( const T *_data )               { return msg_pushISR  (this, _data, sizeof(T));         }
 };
 
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 

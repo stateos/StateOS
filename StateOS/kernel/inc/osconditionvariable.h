@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    14.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -39,6 +39,11 @@
 extern "C" {
 #endif
 
+/* -------------------------------------------------------------------------- */
+
+#define cndOne       ( false ) // notify one task
+#define cndAll       ( true  ) // notify all tasks (broadcast)
+
 /******************************************************************************
  *
  * Name              : condition variable
@@ -53,11 +58,6 @@ struct __cnd
 	tsk_t  * queue; // next process in the DELAYED queue
 	void   * res;   // allocated condition variable object's resource
 };
-
-/* -------------------------------------------------------------------------- */
-
-#define cndOne       ( false ) // notify one task
-#define cndAll       ( true  ) // notify all tasks
 
 /******************************************************************************
  *
@@ -333,19 +333,18 @@ void cnd_giveISR( cnd_t *cnd, bool all ) { cnd_give(cnd, all); }
 
 struct ConditionVariable : public __cnd
 {
-	 explicit
 	 ConditionVariable( void ): __cnd _CND_INIT() {}
-	~ConditionVariable( void ) { assert(queue == nullptr); }
+	~ConditionVariable( void ) { assert(__cnd::queue == nullptr); }
 
 	void     kill     ( void )                      {        cnd_kill     (this);               }
 	unsigned waitFor  ( mtx_t *_mtx, cnt_t _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
-	unsigned waitUntil( mtx_t *_mtx, cnt_t _time  ) { return cnd_waitUntil(this, _mtx, _time);  }
+	unsigned waitUntil( mtx_t *_mtx, cnt_t _time )  { return cnd_waitUntil(this, _mtx, _time);  }
 	unsigned wait     ( mtx_t *_mtx )               { return cnd_wait     (this, _mtx);         }
 	void     give     ( bool   _all = cndAll )      {        cnd_give     (this, _all);         }
 	void     giveISR  ( bool   _all = cndAll )      {        cnd_giveISR  (this, _all);         }
 };
 
-#endif
+#endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 
