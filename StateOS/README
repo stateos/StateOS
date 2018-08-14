@@ -41,6 +41,7 @@ Features:
 - added static c++ classes
 - added optional stack size parameter for task create definitions
 - added optional type size parameter for message buffer create definitions
+- added optional limit parameter for semaphore create definitions
 ---------
 6.1
 - updated os version
