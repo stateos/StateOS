@@ -200,6 +200,19 @@ struct __tsk
 
 /******************************************************************************
  *
+ * Name              : _VA_STK
+ *
+ * Description       : calculate stack size from optional parameter
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+#define               _VA_STK( _size ) \
+                       ( (_size + 0) ? (_size + 0) : (OS_STACK_SIZE) )
+
+/******************************************************************************
+ *
  * Name              : OS_WRK
  *
  * Description       : define and initialize complete work area for task object
@@ -229,11 +242,12 @@ struct __tsk
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
+ *   size            : (optional) size of task private stack (in bytes); default: OS_STACK_SIZE
  *
  ******************************************************************************/
 
-#define             OS_TSK( tsk, prio, state ) \
-                    OS_WRK( tsk, prio, state, OS_STACK_SIZE )
+#define             OS_TSK( tsk, prio, state, ... ) \
+                    OS_WRK( tsk, prio, state, _VA_STK(__VA_ARGS__) )
 
 /******************************************************************************
  *
@@ -264,11 +278,12 @@ struct __tsk
  * Parameters
  *   tsk             : name of a pointer to task object
  *   prio            : initial task priority (any unsigned int value)
+ *   size            : (optional) size of task private stack (in bytes); default: OS_STACK_SIZE
  *
  ******************************************************************************/
 
-#define             OS_TSK_DEF( tsk, prio ) \
-                    OS_WRK_DEF( tsk, prio, OS_STACK_SIZE )
+#define             OS_TSK_DEF( tsk, prio, ... ) \
+                    OS_WRK_DEF( tsk, prio, _VA_STK(__VA_ARGS__) )
 
 /******************************************************************************
  *
@@ -302,13 +317,14 @@ struct __tsk
  * Parameters
  *   tsk             : name of a pointer to task object
  *   prio            : initial task priority (any unsigned int value)
+ *   size            : (optional) size of task private stack (in bytes); default: OS_STACK_SIZE
  *
  * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent
  *
  ******************************************************************************/
 
-#define             OS_TSK_START( tsk, prio ) \
-                    OS_WRK_START( tsk, prio, OS_STACK_SIZE )
+#define             OS_TSK_START( tsk, prio, ... ) \
+                    OS_WRK_START( tsk, prio, _VA_STK(__VA_ARGS__) )
 
 /******************************************************************************
  *
@@ -341,11 +357,12 @@ struct __tsk
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
+ *   size            : (optional) size of task private stack (in bytes); default: OS_STACK_SIZE
  *
  ******************************************************************************/
 
-#define         static_TSK( tsk, prio, state ) \
-                static_WRK( tsk, prio, state, OS_STACK_SIZE )
+#define         static_TSK( tsk, prio, state, ... ) \
+                static_WRK( tsk, prio, state, _VA_STK(__VA_ARGS__) )
 
 /******************************************************************************
  *
@@ -376,11 +393,12 @@ struct __tsk
  * Parameters
  *   tsk             : name of a pointer to task object
  *   prio            : initial task priority (any unsigned int value)
+ *   size            : (optional) size of task private stack (in bytes); default: OS_STACK_SIZE
  *
  ******************************************************************************/
 
-#define         static_TSK_DEF( tsk, prio ) \
-                static_WRK_DEF( tsk, prio, OS_STACK_SIZE )
+#define         static_TSK_DEF( tsk, prio, ... ) \
+                static_WRK_DEF( tsk, prio, _VA_STK(__VA_ARGS__) )
 
 /******************************************************************************
  *
@@ -414,13 +432,14 @@ struct __tsk
  * Parameters
  *   tsk             : name of a pointer to task object
  *   prio            : initial task priority (any unsigned int value)
+ *   size            : (optional) size of task private stack (in bytes); default: OS_STACK_SIZE
  *
  * Note              : only available for compilers supporting the "constructor" function attribute or its equivalent
  *
  ******************************************************************************/
 
-#define         static_TSK_START( tsk, prio ) \
-                static_WRK_START( tsk, prio, OS_STACK_SIZE )
+#define         static_TSK_START( tsk, prio, ... ) \
+                static_WRK_START( tsk, prio, _VA_STK(__VA_ARGS__) )
 
 /******************************************************************************
  *
@@ -481,6 +500,7 @@ struct __tsk
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
+ *   size            : (optional) size of task private stack (in bytes); default: OS_STACK_SIZE
  *
  * Return            : task object
  *
@@ -489,8 +509,8 @@ struct __tsk
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                TSK_INIT( prio, state ) \
-                       WRK_INIT( prio, state, OS_STACK_SIZE )
+#define                TSK_INIT( prio, state, ... ) \
+                       WRK_INIT( prio, state, _VA_STK(__VA_ARGS__) )
 #endif
 
 /******************************************************************************
@@ -504,6 +524,7 @@ struct __tsk
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
+ *   size            : (optional) size of task private stack (in bytes); default: OS_STACK_SIZE
  *
  * Return            : pointer to task object
  *
@@ -512,8 +533,8 @@ struct __tsk
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                TSK_CREATE( prio, state ) \
-                       WRK_CREATE( prio, state, OS_STACK_SIZE )
+#define                TSK_CREATE( prio, state, ... ) \
+                       WRK_CREATE( prio, state, _VA_STK(__VA_ARGS__) )
 #define                TSK_NEW \
                        TSK_CREATE
 #endif

@@ -39,6 +39,8 @@ Features:
 - added initial value for flag object
 - updated tsk/tmr init functions
 - added static c++ classes
+- added optional stack size parameter for task create definitions
+- added optional type size parameter for message buffer create definitions
 ---------
 6.1
 - updated os version

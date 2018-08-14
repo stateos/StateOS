@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-OS_MSG(msg, 10);
+OS_MSG(msg, 1, sizeof(unsigned));
 
 OS_TSK_DEF(sla, 0)
 {
