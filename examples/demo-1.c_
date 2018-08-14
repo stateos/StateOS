@@ -5,7 +5,7 @@ void proc()
 {
 	static 	 unsigned i = 0;
 	volatile unsigned*led;
-	         uint32_t timePoint;
+	cnt_t    timePoint;
 
 	switch (i++)
 	{
@@ -16,9 +16,10 @@ void proc()
 		default: led = &GRN;    timePoint = SEC/8*4; break;
 	}
 
+	tsk_sleepUntil(timePoint);
 	for (;;)
 	{
-		tsk_sleepUntil(timePoint += SEC/2);
+		tsk_sleepNext(SEC/2);
 		(*led)++;
 	}
 }

@@ -10,7 +10,7 @@ void slave()
 
 	for (;;)
 	{
-		stm.wait(&x, sizeof(x));
+		stm.wait(&x);
 		led = x;
 	}
 }
@@ -22,7 +22,7 @@ void master()
 	for (;;)
 	{
 		ThisTask::delay(SEC);
-		stm.send(&x, sizeof(x));
+		stm.send(&x);
 		x = (x << 1) | (x >> 3);
 	}
 }

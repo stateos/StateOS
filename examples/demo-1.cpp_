@@ -3,9 +3,10 @@
 
 void proc( unsigned &led, uint32_t timePoint )
 {
+	ThisTask::sleepUntil(timePoint);
 	for (;;)
 	{
-		ThisTask::sleepUntil(timePoint += SEC/2);
+		ThisTask::sleepNext(SEC/2);
 		led++;
 	}
 }
