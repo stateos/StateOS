@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    15.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -97,19 +97,33 @@ struct __stm
 
 /******************************************************************************
  *
+ * Name              : _VA_STM
+ *
+ * Description       : calculate buffer size from optional parameter
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+#define               _VA_STM( _limit, _size ) \
+                       ( (_size + 0) ? ((_limit) * (_size + 0)) : (_limit) )
+
+/******************************************************************************
+ *
  * Name              : OS_STM
  *
  * Description       : define and initialize a stream buffer object
  *
  * Parameters
  *   stm             : name of a pointer to stream buffer object
- *   limit           : size of a buffer (max number of stored bytes)
+ *   limit           : size of a buffer (max number of stored bytes / objects)
+ *   type            : (optional) size of the object (in bytes); default: 1
  *
  ******************************************************************************/
 
-#define             OS_STM( stm, limit )                                \
-                       char stm##__buf[limit];                           \
-                       stm_t stm##__stm = _STM_INIT( limit, stm##__buf ); \
+#define             OS_STM( stm, limit, ... )                                                 \
+                       char stm##__buf[_VA_STM(limit, __VA_ARGS__)];                           \
+                       stm_t stm##__stm = _STM_INIT( _VA_STM(limit, __VA_ARGS__), stm##__buf ); \
                        stm_id stm = & stm##__stm
 
 /******************************************************************************
@@ -120,13 +134,14 @@ struct __stm
  *
  * Parameters
  *   stm             : name of a pointer to stream buffer object
- *   limit           : size of a buffer (max number of stored bytes)
+ *   limit           : size of a buffer (max number of stored bytes / objects)
+ *   type            : (optional) size of the object (in bytes); default: 1
  *
  ******************************************************************************/
 
-#define         static_STM( stm, limit )                                \
-                static char stm##__buf[limit];                           \
-                static stm_t stm##__stm = _STM_INIT( limit, stm##__buf ); \
+#define         static_STM( stm, limit, ... )                                                 \
+                static char stm##__buf[_VA_STM(limit, __VA_ARGS__)];                           \
+                static stm_t stm##__stm = _STM_INIT( _VA_STM(limit, __VA_ARGS__), stm##__buf ); \
                 static stm_id stm = & stm##__stm
 
 /******************************************************************************
@@ -136,7 +151,8 @@ struct __stm
  * Description       : create and initialize a stream buffer object
  *
  * Parameters
- *   limit           : size of a buffer (max number of stored bytes)
+ *   limit           : size of a buffer (max number of stored bytes / objects)
+ *   type            : (optional) size of the object (in bytes); default: 1
  *
  * Return            : stream buffer object
  *
@@ -145,8 +161,8 @@ struct __stm
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                STM_INIT( limit ) \
-                      _STM_INIT( limit, _STM_DATA( limit ) )
+#define                STM_INIT( limit, ... ) \
+                      _STM_INIT( _VA_STM(limit, __VA_ARGS__), _STM_DATA( _VA_STM(limit, __VA_ARGS__) ) )
 #endif
 
 /******************************************************************************
@@ -157,7 +173,8 @@ struct __stm
  * Description       : create and initialize a stream buffer object
  *
  * Parameters
- *   limit           : size of a buffer (max number of stored bytes)
+ *   limit           : size of a buffer (max number of stored bytes / objects)
+ *   type            : (optional) size of the object (in bytes); default: 1
  *
  * Return            : pointer to stream buffer object
  *
@@ -166,8 +183,8 @@ struct __stm
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                STM_CREATE( limit ) \
-           (stm_t[]) { STM_INIT  ( limit ) }
+#define                STM_CREATE( limit, ... ) \
+           (stm_t[]) { STM_INIT  ( _VA_STM(limit, __VA_ARGS__) ) }
 #define                STM_NEW \
                        STM_CREATE
 #endif
