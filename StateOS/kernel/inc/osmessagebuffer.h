@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    15.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -118,8 +118,8 @@ struct __msg
  *
  * Parameters
  *   msg             : name of a pointer to message buffer object
- *   limit           : size of a buffer (max number of stored bytes)
- *   type            : (optional) size of the object (in bytes); default: 0
+ *   limit           : size of a buffer (max number of stored bytes / objects)
+ *   type            : (optional) size of the object (in bytes)
  *
  ******************************************************************************/
 
@@ -136,8 +136,8 @@ struct __msg
  *
  * Parameters
  *   msg             : name of a pointer to message buffer object
- *   limit           : size of a buffer (max number of stored bytes)
- *   type            : (optional) size of the object (in bytes); default: 0
+ *   limit           : size of a buffer (max number of stored bytes / objects)
+ *   type            : (optional) size of the object (in bytes)
  *
  ******************************************************************************/
 
@@ -153,8 +153,8 @@ struct __msg
  * Description       : create and initialize a message buffer object
  *
  * Parameters
- *   limit           : size of a buffer (max number of stored bytes)
- *   type            : (optional) size of the object (in bytes); default: 0
+ *   limit           : size of a buffer (max number of stored bytes / objects)
+ *   type            : (optional) size of the object (in bytes)
  *
  * Return            : message buffer object
  *
@@ -175,8 +175,8 @@ struct __msg
  * Description       : create and initialize a message buffer object
  *
  * Parameters
- *   limit           : size of a buffer (max number of stored bytes)
- *   type            : (optional) size of the object (in bytes); default: 0
+ *   limit           : size of a buffer (max number of stored bytes / objects)
+ *   type            : (optional) size of the object (in bytes)
  *
  * Return            : pointer to message buffer object
  *
@@ -534,12 +534,12 @@ struct MessageBufferT : public __msg
 
 	void     kill     ( void )                                            {        msg_kill     (this);                       }
 	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return msg_waitFor  (this, _data, _size, _delay); }
-	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time  ) { return msg_waitUntil(this, _data, _size, _time);  }
+	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time )  { return msg_waitUntil(this, _data, _size, _time);  }
 	unsigned wait     (       void *_data, unsigned _size )               { return msg_wait     (this, _data, _size);         }
 	unsigned take     (       void *_data, unsigned _size )               { return msg_take     (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return msg_takeISR  (this, _data, _size);         }
 	unsigned sendFor  ( const void *_data, unsigned _size, cnt_t _delay ) { return msg_sendFor  (this, _data, _size, _delay); }
-	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time  ) { return msg_sendUntil(this, _data, _size, _time);  }
+	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time )  { return msg_sendUntil(this, _data, _size, _time);  }
 	unsigned send     ( const void *_data, unsigned _size )               { return msg_send     (this, _data, _size);         }
 	unsigned give     ( const void *_data, unsigned _size )               { return msg_give     (this, _data, _size);         }
 	unsigned giveISR  ( const void *_data, unsigned _size )               { return msg_giveISR  (this, _data, _size);         }
