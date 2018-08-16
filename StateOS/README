@@ -45,6 +45,7 @@ Features:
 - added optional type size parameter for stream buffer create definitions
 - updated stream buffer object
 - updated message buffer object
+- added optional init parameter for flag create definitions
 ---------
 6.1
 - updated os version
