@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    16.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -81,20 +81,33 @@ struct __sig
 
 /******************************************************************************
  *
+ * Name              : _VA_SIG
+ *
+ * Description       : calculate signal type from optional parameter
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+#define               _VA_SIG( _type ) \
+                       ( ( _type + 0 ) & sigMASK )
+
+/******************************************************************************
+ *
  * Name              : OS_SIG
  *
  * Description       : define and initialize a signal object
  *
  * Parameters
  *   sig             : name of a pointer to signal object
- *   type            : signal type
- *                     sigClear:   auto clearing signal
+ *   type            : (optional) signal type
+ *                     sigClear:   auto clearing signal (default)
  *                     sigProtect: protected signal
  *
  ******************************************************************************/
 
-#define             OS_SIG( sig, type )                     \
-                       sig_t sig##__sig = _SIG_INIT( type ); \
+#define             OS_SIG( sig, ... )                                      \
+                       sig_t sig##__sig = _SIG_INIT( _VA_SIG(__VA_ARGS__) ); \
                        sig_id sig = & sig##__sig
 
 /******************************************************************************
@@ -105,14 +118,14 @@ struct __sig
  *
  * Parameters
  *   sig             : name of a pointer to signal object
- *   type            : signal type
- *                     sigClear:   auto clearing signal
+ *   type            : (optional) signal type
+ *                     sigClear:   auto clearing signal (default)
  *                     sigProtect: protected signal
  *
  ******************************************************************************/
 
-#define         static_SIG( sig, type )                     \
-                static sig_t sig##__sig = _SIG_INIT( type ); \
+#define         static_SIG( sig, ... )                                      \
+                static sig_t sig##__sig = _SIG_INIT( _VA_SIG(__VA_ARGS__) ); \
                 static sig_id sig = & sig##__sig
 
 /******************************************************************************
@@ -122,8 +135,8 @@ struct __sig
  * Description       : create and initialize a signal object
  *
  * Parameters
- *   type            : signal type
- *                     sigClear:   auto clearing signal
+ *   type            : (optional) signal type
+ *                     sigClear:   auto clearing signal (default)
  *                     sigProtect: protected signal
  *
  * Return            : signal object
@@ -133,8 +146,8 @@ struct __sig
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                SIG_INIT( type ) \
-                      _SIG_INIT( type )
+#define                SIG_INIT( ... ) \
+                      _SIG_INIT( _VA_SIG(__VA_ARGS__) )
 #endif
 
 /******************************************************************************
@@ -145,8 +158,8 @@ struct __sig
  * Description       : create and initialize a signal object
  *
  * Parameters
- *   type            : signal type
- *                     sigClear:   auto clearing signal
+ *   type            : (optional) signal type
+ *                     sigClear:   auto clearing signal (default)
  *                     sigProtect: protected signal
  *
  * Return            : pointer to signal object
@@ -156,8 +169,8 @@ struct __sig
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                SIG_CREATE( type ) \
-           (sig_t[]) { SIG_INIT  ( type ) }
+#define                SIG_CREATE( ... ) \
+           (sig_t[]) { SIG_INIT  ( _VA_SIG(__VA_ARGS__) ) }
 #define                SIG_NEW \
                        SIG_CREATE
 #endif

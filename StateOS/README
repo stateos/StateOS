@@ -46,6 +46,7 @@ Features:
 - updated stream buffer object
 - updated message buffer object
 - added optional init parameter for flag create definitions
+- added optional signal type parameter for signal create definitions
 ---------
 6.1
 - updated os version
