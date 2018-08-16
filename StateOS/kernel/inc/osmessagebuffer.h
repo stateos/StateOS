@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    15.08.2018
+    @date    16.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -56,8 +56,6 @@ struct __msg
 	unsigned head;  // inherited from stream buffer
 	unsigned tail;  // inherited from stream buffer
 	char   * data;  // inherited from stream buffer
-
-	unsigned size;  // size of the first message in the buffer
 };
 
 /******************************************************************************
@@ -76,7 +74,7 @@ struct __msg
  *
  ******************************************************************************/
 
-#define               _MSG_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data, 0 }
+#define               _MSG_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data }
 
 /******************************************************************************
  *
@@ -457,7 +455,6 @@ unsigned msg_giveISR( msg_t *msg, const void *data, unsigned size ) { return msg
  *   data            : pointer to read buffer
  *   size            : size of read buffer
  *
- * Return
  * Return            : number of bytes written to the message buffer
  *
  * Note              : may be used both in thread and handler mode
@@ -479,7 +476,9 @@ unsigned msg_pushISR( msg_t *msg, const void *data, unsigned size ) { return msg
  * Parameters
  *   msg             : pointer to message buffer object
  *
- * Return            : amount of data contained in the message buffer
+ * Return            : amount of data contained in the first message
+ *
+ * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
@@ -500,12 +499,35 @@ unsigned msg_countISR( msg_t *msg ) { return msg_count(msg); }
  *
  * Return            : amount of free space in the message buffer
  *
+ * Note              : may be used both in thread and handler mode
+ *
  ******************************************************************************/
 
 unsigned msg_space( msg_t *msg );
 
 __STATIC_INLINE
 unsigned msg_spaceISR( msg_t *msg ) { return msg_space(msg); }
+
+/******************************************************************************
+ *
+ * Name              : msg_limit
+ * ISR alias         : msg_limitISR
+ *
+ * Description       : return the size of the message buffer
+ *
+ * Parameters
+ *   msg             : pointer to message buffer object
+ *
+ * Return            : size of the message buffer
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned msg_limit( msg_t *msg );
+
+__STATIC_INLINE
+unsigned msg_limitISR( msg_t *msg ) { return msg_limit(msg); }
 
 #ifdef __cplusplus
 }
@@ -549,6 +571,8 @@ struct MessageBufferT : public __msg
 	unsigned countISR ( void )                                            { return msg_countISR (this);                       }
 	unsigned space    ( void )                                            { return msg_space    (this);                       }
 	unsigned spaceISR ( void )                                            { return msg_spaceISR (this);                       }
+	unsigned limit    ( void )                                            { return msg_limit    (this);                       }
+	unsigned limitISR ( void )                                            { return msg_limitISR (this);                       }
 
 	private:
 	char data_[limit_];
