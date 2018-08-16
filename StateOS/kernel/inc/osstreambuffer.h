@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    15.08.2018
+    @date    16.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -279,11 +279,7 @@ void stm_delete( stm_t *stm );
  *                     IMMEDIATE: don't wait if the stream buffer object is empty
  *                     INFINITE:  wait indefinitely while the stream buffer object is empty
  *
- * Return
- *   E_SUCCESS       : data was successfully transfered from the stream buffer object
- *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : stream buffer object was not received enough data before the specified timeout expired
- *                     or write buffer has an incorrect size
+ * Return            : number of bytes read from the stream buffer
  *
  * Note              : use only in thread mode
  *
@@ -304,11 +300,7 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
  *   size            : size of write buffer
  *   time            : timepoint value
  *
- * Return
- *   E_SUCCESS       : data was successfully transfered from the stream buffer object
- *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : stream buffer object was not received enough data before the specified timeout expired
- *                     or write buffer has an incorrect size
+ * Return            : number of bytes read from the stream buffer
  *
  * Note              : use only in thread mode
  *
@@ -328,10 +320,7 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
  *   data            : pointer to write buffer
  *   size            : size of write buffer
  *
- * Return
- *   E_SUCCESS       : data was successfully transfered from the stream buffer object
- *   E_STOPPED       : stream buffer queue object was killed
- *   E_TIMEOUT       : write buffer has an incorrect size
+ * Return            : number of bytes read from the stream buffer
  *
  * Note              : use only in thread mode
  *
@@ -353,9 +342,7 @@ unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(
  *   data            : pointer to write buffer
  *   size            : size of write buffer
  *
- * Return
- *   E_SUCCESS       : data was successfully transfered from the stream buffer object
- *   E_TIMEOUT       : stream buffer object does not have enough data
+ * Return            : number of bytes read from the stream buffer
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -381,11 +368,7 @@ unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(
  *                     IMMEDIATE: don't wait if the stream buffer object is full
  *                     INFINITE:  wait indefinitely while the stream buffer object is full
  *
- * Return
- *   E_SUCCESS       : data was successfully transfered to the stream buffer object
- *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : stream buffer object did not free enough space before the specified timeout expired
- *                     or read buffer has an incorrect size
+ * Return            : number of bytes written to the stream buffer
  *
  * Note              : use only in thread mode
  *
@@ -406,11 +389,7 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
  *   size            : size of read buffer
  *   time            : timepoint value
  *
- * Return
- *   E_SUCCESS       : data was successfully transfered to the stream buffer object
- *   E_STOPPED       : stream buffer queue object was killed before the specified timeout expired
- *   E_TIMEOUT       : stream buffer object did not free enough space before the specified timeout expired
- *                     or read buffer has an incorrect size
+ * Return            : number of bytes written to the stream buffer
  *
  * Note              : use only in thread mode
  *
@@ -430,10 +409,7 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
  *   data            : pointer to read buffer
  *   size            : size of read buffer
  *
- * Return
- *   E_SUCCESS       : data was successfully transfered to the stream buffer object
- *   E_STOPPED       : stream buffer queue object was killed
- *   E_TIMEOUT       : read buffer has an incorrect size
+ * Return            : number of bytes written to the stream buffer
  *
  * Note              : use only in thread mode
  *
@@ -455,9 +431,7 @@ unsigned stm_send( stm_t *stm, const void *data, unsigned size ) { return stm_se
  *   data            : pointer to read buffer
  *   size            : size of read buffer
  *
- * Return
- *   E_SUCCESS       : data was successfully transfered to the stream buffer object
- *   E_TIMEOUT       : stream buffer object does not have enough space
+ * Return            : number of bytes written to the stream buffer
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -481,10 +455,7 @@ unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm
  *   data            : pointer to read buffer
  *   size            : size of read buffer
  *
- * Return
- *   E_SUCCESS       : data was successfully transfered to the stream buffer object
- *   E_TIMEOUT       : read buffer has an incorrect size or
- *                     there are tasks waiting for writing to the stream buffer object
+ * Return            : number of bytes written to the stream buffer
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -507,6 +478,8 @@ unsigned stm_pushISR( stm_t *stm, const void *data, unsigned size ) { return stm
  *
  * Return            : amount of data contained in the stream buffer
  *
+ * Note              : may be used both in thread and handler mode
+ *
  ******************************************************************************/
 
 unsigned stm_count( stm_t *stm );
@@ -526,12 +499,35 @@ unsigned stm_countISR( stm_t *stm ) { return stm_count(stm); }
  *
  * Return            : amount of free space in the stream buffer
  *
+ * Note              : may be used both in thread and handler mode
+ *
  ******************************************************************************/
 
 unsigned stm_space( stm_t *stm );
 
 __STATIC_INLINE
 unsigned stm_spaceISR( stm_t *stm ) { return stm_space(stm); }
+
+/******************************************************************************
+ *
+ * Name              : stm_limit
+ * ISR alias         : stm_limitISR
+ *
+ * Description       : return the size of the stream buffer
+ *
+ * Parameters
+ *   stm             : pointer to stream buffer object
+ *
+ * Return            : size of the stream buffer
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned stm_limit( stm_t *stm );
+
+__STATIC_INLINE
+unsigned stm_limitISR( stm_t *stm ) { return stm_limit(stm); }
 
 #ifdef __cplusplus
 }
@@ -575,6 +571,8 @@ struct StreamBufferT : public __stm
 	unsigned countISR ( void )                                            { return stm_countISR (this);                       }
 	unsigned space    ( void )                                            { return stm_space    (this);                       }
 	unsigned spaceISR ( void )                                            { return stm_spaceISR (this);                       }
+	unsigned limit    ( void )                                            { return stm_limit    (this);                       }
+	unsigned limitISR ( void )                                            { return stm_limitISR (this);                       }
 
 	private:
 	char data_[limit_];
