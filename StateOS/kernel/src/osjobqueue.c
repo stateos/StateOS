@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    20.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -131,11 +131,47 @@ void priv_job_put( job_t *job, fun_t *fun )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_job_skip( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	job->count--;
+	job->head++;
+	if (job->head == job->limit) job->head = 0;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+fun_t *priv_job_getUpdate( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	fun_t *fun;
+	tsk_t *tsk;
+
+	fun = priv_job_get(job);
+	tsk = core_one_wakeup(job, E_SUCCESS);
+	if (tsk) priv_job_put(job, tsk->tmp.job.fun);
+
+	return fun;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_job_putUpdate( job_t *job, fun_t *fun )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	priv_job_put(job, fun);
+	tsk = core_one_wakeup(job, E_SUCCESS);
+	if (tsk) tsk->tmp.job.fun = priv_job_get(job);
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned job_take( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
 	fun_t  * fun;
-	tsk_t  * tsk;
 	unsigned event = E_TIMEOUT;
 
 	assert(job);
@@ -144,11 +180,14 @@ unsigned job_take( job_t *job )
 	{
 		if (job->count > 0)
 		{
-			fun = priv_job_get(job);
-			tsk = core_one_wakeup(job, E_SUCCESS);
-			if (tsk) priv_job_put(job, tsk->tmp.job.fun);
-			fun();
+			fun = priv_job_getUpdate(job);
 			event = E_SUCCESS;
+		}
+
+		if (event == E_SUCCESS)
+		{
+			port_clr_lock();
+			fun();
 		}
 	}
 	sys_unlock();
@@ -161,7 +200,7 @@ static
 unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
+	fun_t  * fun;
 	unsigned event;
 
 	assert(!port_isr_inside());
@@ -171,18 +210,20 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	{
 		if (job->count > 0)
 		{
-			System.cur->tmp.job.fun = priv_job_get(job);
-			tsk = core_one_wakeup(job, E_SUCCESS);
-			if (tsk) priv_job_put(job, tsk->tmp.job.fun);
+			fun = priv_job_getUpdate(job);
 			event = E_SUCCESS;
 		}
 		else
 		{
 			event = wait(job, time);
+			fun = System.cur->tmp.job.fun;
 		}
 
 		if (event == E_SUCCESS)
-			System.cur->tmp.job.fun();
+		{
+			port_clr_lock();
+			fun();
+		}
 	}
 	sys_unlock();
 
@@ -207,7 +248,6 @@ unsigned job_waitUntil( job_t *job, cnt_t time )
 unsigned job_give( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
 	unsigned event = E_TIMEOUT;
 
 	assert(job);
@@ -217,9 +257,7 @@ unsigned job_give( job_t *job, fun_t *fun )
 	{
 		if (job->count < job->limit)
 		{
-			priv_job_put(job, fun);
-			tsk = core_one_wakeup(job, E_SUCCESS);
-			if (tsk) tsk->tmp.job.fun = priv_job_get(job);
+			priv_job_putUpdate(job, fun);
 			event = E_SUCCESS;
 		}
 	}
@@ -233,7 +271,6 @@ static
 unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
 	unsigned event;
 
 	assert(!port_isr_inside());
@@ -244,9 +281,7 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void
 	{
 		if (job->count < job->limit)
 		{
-			priv_job_put(job, fun);
-			tsk = core_one_wakeup(job, E_SUCCESS);
-			if (tsk) tsk->tmp.job.fun = priv_job_get(job);
+			priv_job_putUpdate(job, fun);
 			event = E_SUCCESS;
 		}
 		else
@@ -278,7 +313,6 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 unsigned job_push( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t  * tsk;
 	unsigned event = E_TIMEOUT;
 
 	assert(job);
@@ -288,14 +322,9 @@ unsigned job_push( job_t *job, fun_t *fun )
 	{
 		if (job->count == 0 || job->queue == 0)
 		{
-			priv_job_put(job, fun);
-			if (job->count > job->limit)
-			{
-				job->count = job->limit;
-				job->head = job->tail;
-			}
-			tsk = core_one_wakeup(job, E_SUCCESS);
-			if (tsk) tsk->tmp.job.fun = priv_job_get(job);
+			if (job->count == job->limit)
+				priv_job_skip(job);
+			priv_job_putUpdate(job, fun);
 			event = E_SUCCESS;
 		}
 	}
