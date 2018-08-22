@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    22.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,7 +40,7 @@ extern "C" {
 
 /******************************************************************************
  *
- * Name              : fast mutex (non-recursive and non-priority-inheritance)
+ * Name              : fast mutex (error checking)
  *
  * Note              : use only to synchronize tasks with the same priority
  *

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    22.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,7 +40,7 @@ extern "C" {
 
 /******************************************************************************
  *
- * Name              : mutex
+ * Name              : mutex (recursive, priority inheritance, robust)
  *                     like a POSIX pthread_mutex_t
  *
  ******************************************************************************/
