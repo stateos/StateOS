@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    07.08.2018
+    @date    23.08.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -348,13 +348,18 @@ void core_tsk_transfer( tsk_t *tsk, void *obj )
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_tsk_wait( tsk_t *tsk, void *obj )
+unsigned priv_tsk_wait( tsk_t *tsk, void *obj, bool yield )
 {
 	assert(!port_isr_inside());
 
 	core_tsk_append((tsk_t *)tsk, obj);
 	priv_tsk_remove((tsk_t *)tsk);
 	core_tmr_insert((tmr_t *)tsk, ID_DELAYED);
+
+	if (yield)
+		priv_ctx_switchNow();
+
+	return tsk->event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -369,10 +374,7 @@ unsigned core_tsk_waitFor( void *obj, cnt_t delay )
 	if (cur->delay == IMMEDIATE)
 		return E_TIMEOUT;
 
-	priv_tsk_wait(cur, obj);
-	priv_ctx_switchNow();
-
-	return cur->event;
+	return priv_tsk_wait(cur, obj, true);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -386,10 +388,7 @@ unsigned core_tsk_waitNext( void *obj, cnt_t delay )
 	if (cur->delay == IMMEDIATE)
 		return E_TIMEOUT;
 
-	priv_tsk_wait(cur, obj);
-	priv_ctx_switchNow();
-
-	return cur->event;
+	return priv_tsk_wait(cur, obj, true);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -404,10 +403,7 @@ unsigned core_tsk_waitUntil( void *obj, cnt_t time )
 	if (cur->delay > ((CNT_MAX)>>1))
 		return E_TIMEOUT;
 
-	priv_tsk_wait(cur, obj);
-	priv_ctx_switchNow();
-
-	return cur->event;
+	return priv_tsk_wait(cur, obj, true);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -416,9 +412,7 @@ void core_tsk_suspend( tsk_t *tsk )
 {
 	tsk->delay = INFINITE;
 
-	priv_tsk_wait(tsk, &WAIT);
-	if (tsk == System.cur)
-		priv_ctx_switchNow();
+	priv_tsk_wait(tsk, &WAIT, tsk == System.cur);
 }
 
 /* -------------------------------------------------------------------------- */
