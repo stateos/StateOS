@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -96,23 +96,30 @@ static
 unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
-
 	assert(!port_isr_inside());
 	assert(mut);
 
+	if (mut->owner == 0)
+	{
+		mut->owner = System.cur;
+		return E_SUCCESS;
+	}
+
+	if (mut->owner == System.cur)
+		return E_TIMEOUT;
+
+	return wait(mut, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned mut_waitFor( mut_t *mut, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if (mut->owner == 0)
-		{
-			mut->owner = System.cur;
-			event = E_SUCCESS;
-		}
-		else
-		if (mut->owner != System.cur)
-		{
-			event = wait(mut, time);
-		}
+		event = priv_mut_wait(mut, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -120,17 +127,18 @@ unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_waitFor( mut_t *mut, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_mut_wait(mut, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned mut_waitUntil( mut_t *mut, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_mut_wait(mut, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_mut_wait(mut, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

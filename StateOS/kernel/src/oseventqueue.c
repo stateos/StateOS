@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    20.08.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -191,21 +191,24 @@ static
 unsigned priv_evq_wait( evq_t *evq, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_inside());
 	assert(evq);
 
+	if (evq->count > 0)
+		return priv_evq_getUpdate(evq);
+
+	return wait(evq, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evq_waitFor( evq_t *evq, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if (evq->count > 0)
-		{
-			event = priv_evq_getUpdate(evq);
-		}
-		else
-		{
-			event = wait(evq, time);
-		}
+		event = priv_evq_wait(evq, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -213,17 +216,18 @@ unsigned priv_evq_wait( evq_t *evq, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evq_waitFor( evq_t *evq, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_evq_wait(evq, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned evq_waitUntil( evq_t *evq, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_evq_wait(evq, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_evq_wait(evq, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -252,23 +256,28 @@ static
 unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_inside());
 	assert(evq);
 
+	if (evq->count < evq->limit)
+	{
+		priv_evq_putUpdate(evq, data);
+		return E_SUCCESS;
+	}
+
+	System.cur->tmp.evq.event = data;
+	return wait(evq, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if (evq->count < evq->limit)
-		{
-			priv_evq_putUpdate(evq, data);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			System.cur->tmp.evq.event = data;
-			event = wait(evq, time);
-		}
+		event = priv_evq_send(evq, data, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -276,17 +285,18 @@ unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(v
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_evq_send(evq, data, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_evq_send(evq, data, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_evq_send(evq, data, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

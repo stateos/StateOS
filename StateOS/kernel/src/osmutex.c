@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -145,38 +145,34 @@ static
 unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(mtx);
 
-	sys_lock();
+	if (mtx->owner == 0)
 	{
-		if (mtx->owner == 0)
-		{
-			priv_mtx_link(mtx, System.cur);
-			event = E_SUCCESS;
-		}
-		else
-		if (mtx->owner == System.cur)
-		{
-			if (mtx->count < ~0U)
-			{
-				mtx->count++;
-				event = E_SUCCESS;
-			}
-		}
-		else
-		{
-			if (mtx->owner->prio < System.cur->prio)
-				core_tsk_prio(mtx->owner, System.cur->prio);
-
-			System.cur->mtx.tree = mtx->owner;
-			event = wait(mtx, time);
-			System.cur->mtx.tree = 0;
-		}
+		priv_mtx_link(mtx, System.cur);
+		return E_SUCCESS;
 	}
-	sys_unlock();
+
+	if (mtx->owner == System.cur)
+	{
+		if (mtx->count + 1 != 0)
+		{
+			mtx->count++;
+			return E_SUCCESS;
+		}
+
+		return E_TIMEOUT;
+	}
+
+	if (mtx->owner->prio < System.cur->prio)
+		core_tsk_prio(mtx->owner, System.cur->prio);
+
+	System.cur->mtx.tree = mtx->owner;
+	event = wait(mtx, time);
+	System.cur->mtx.tree = 0;
 
 	return event;
 }
@@ -185,14 +181,30 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_mtx_wait(mtx, delay, core_tsk_waitFor);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_mtx_wait(mtx, delay, core_tsk_waitFor);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_mtx_wait(mtx, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_mtx_wait(mtx, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

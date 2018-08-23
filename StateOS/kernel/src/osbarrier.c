@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -103,24 +103,29 @@ static
 unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_inside());
 	assert(bar);
 	assert(bar->count);
 
+	if (--bar->count == 0)
+	{
+		bar->count = bar->limit;
+		core_all_wakeup(bar, E_SUCCESS);
+		return E_SUCCESS;
+	}
+
+	return wait(bar, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned bar_waitFor( bar_t *bar, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if (--bar->count == 0)
-		{
-			bar->count = bar->limit;
-			core_all_wakeup(bar, E_SUCCESS);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = wait(bar, time);
-		}
+		event = priv_bar_wait(bar, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -128,17 +133,18 @@ unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned bar_waitFor( bar_t *bar, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_bar_wait(bar, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned bar_waitUntil( bar_t *bar, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_bar_wait(bar, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_bar_wait(bar, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

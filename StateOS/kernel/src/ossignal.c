@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -122,23 +122,28 @@ static
 unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_inside());
 	assert(sig);
 	assert((sig->type & ~sigMASK) == 0U);
 
+	if (sig->flag)
+	{
+		sig->flag = sig->type;
+		return E_SUCCESS;
+	}
+
+	return wait(sig, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned sig_waitFor( sig_t *sig, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if (sig->flag)
-		{
-			sig->flag = sig->type;
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = wait(sig, time);
-		}
+		event = priv_sig_wait(sig, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -146,17 +151,18 @@ unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitFor( sig_t *sig, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_sig_wait(sig, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned sig_waitUntil( sig_t *sig, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_sig_wait(sig, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_sig_wait(sig, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

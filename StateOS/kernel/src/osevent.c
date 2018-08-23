@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -96,14 +96,21 @@ static
 unsigned priv_evt_wait( evt_t *evt, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_inside());
 	assert(evt);
 
+	return wait(evt, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evt_waitFor( evt_t *evt, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		event = wait(evt, time);
+		event = priv_evt_wait(evt, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -111,17 +118,18 @@ unsigned priv_evt_wait( evt_t *evt, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitFor( evt_t *evt, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_evt_wait(evt, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned evt_waitUntil( evt_t *evt, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_evt_wait(evt, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_evt_wait(evt, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

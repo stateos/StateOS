@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -284,14 +284,21 @@ static
 unsigned priv_tsk_wait( unsigned flags, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_inside());
+
+	System.cur->tmp.flg.flags = flags;
+	return wait(System.cur, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_waitFor( unsigned flags, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
 
 	sys_lock();
 	{
-		System.cur->tmp.flg.flags = flags;
-		event = wait(System.cur, time);
+		event = priv_tsk_wait(flags, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -299,17 +306,18 @@ unsigned priv_tsk_wait( unsigned flags, cnt_t time, unsigned(*wait)(void*,cnt_t)
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitFor( unsigned flags, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_tsk_wait(flags, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned tsk_waitUntil( unsigned flags, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_tsk_wait(flags, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_tsk_wait(flags, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    16.08.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -283,27 +283,35 @@ static
 unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len = 0;
-
 	assert(!port_isr_inside());
 	assert(msg);
 	assert(data);
 
+	if (msg->count > 0)
+	{
+		if (size >= priv_msg_count(msg))
+			return priv_msg_getUpdate(msg, data, size);
+		return 0;
+	}
+
+	System.cur->tmp.msg.data.in = data;
+	System.cur->tmp.msg.size = size;
+
+	if (size > 0)
+		wait(msg, time);
+
+	return size - System.cur->tmp.msg.size;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned len;
+
 	sys_lock();
 	{
-		if (msg->count > 0)
-		{
-			if (size >= priv_msg_count(msg))
-				len = priv_msg_getUpdate(msg, data, size);
-		}
-		else
-		if (size > 0)
-		{
-			System.cur->tmp.msg.data.in = data;
-			System.cur->tmp.msg.size = size;
-			wait(msg, time);
-			len = size - System.cur->tmp.msg.size;
-		}
+		len = priv_msg_wait(msg, data, size, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -311,17 +319,18 @@ unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsig
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_msg_wait(msg, data, size, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_msg_wait(msg, data, size, time, core_tsk_waitUntil);
+	unsigned len;
+
+	sys_lock();
+	{
+		len = priv_msg_wait(msg, data, size, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return len;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -335,10 +344,11 @@ unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 
 	sys_lock();
 	{
-		if (size > 0)
+		if (size <= priv_msg_space(msg))
 		{
-			if (size <= priv_msg_space(msg))
-				priv_msg_putUpdate(msg, data, len = size);
+			if (size > 0)
+				priv_msg_putUpdate(msg, data, size);
+			len = size;
 		}
 	}
 	sys_unlock();
@@ -351,27 +361,35 @@ static
 unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len = 0;
-
 	assert(!port_isr_inside());
 	assert(msg);
 	assert(data);
 
-	sys_lock();
+	if (size <= priv_msg_space(msg))
 	{
 		if (size > 0)
-		{
-			if (size <= priv_msg_space(msg))
-				priv_msg_putUpdate(msg, data, len = size);
-			else
-			if (size <= priv_msg_limit(msg))
-			{
-				System.cur->tmp.msg.data.out = data;
-				System.cur->tmp.msg.size = size;
-				wait(msg, time);
-				len = size - System.cur->tmp.msg.size;
-			}
-		}
+			priv_msg_putUpdate(msg, data, size);
+		return size;
+	}
+
+	System.cur->tmp.msg.data.out = data;
+	System.cur->tmp.msg.size = size;
+
+	if (size <= priv_msg_limit(msg))
+		wait(msg, time);
+
+	return size - System.cur->tmp.msg.size;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned len;
+
+	sys_lock();
+	{
+		len = priv_msg_send(msg, data, size, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -379,17 +397,18 @@ unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time,
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_msg_send(msg, data, size, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_msg_send(msg, data, size, time, core_tsk_waitUntil);
+	unsigned len;
+
+	sys_lock();
+	{
+		len = priv_msg_send(msg, data, size, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return len;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -403,11 +422,13 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 
 	sys_lock();
 	{
-		if ((msg->count == 0 || msg->queue == 0) && size > 0 && size <= priv_msg_limit(msg))
+		if ((msg->count == 0 || msg->queue == 0) && size <= priv_msg_limit(msg))
 		{
 			while (size > priv_msg_space(msg))
 				priv_msg_skip(msg, priv_msg_getSize(msg));
-			priv_msg_putUpdate(msg, data, len = size);
+			if (size > 0)
+				priv_msg_putUpdate(msg, data, size);
+			len = size;
 		}
 	}
 	sys_unlock();

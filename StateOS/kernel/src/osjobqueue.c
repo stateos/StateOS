@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    20.08.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -206,26 +206,22 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(!port_isr_inside());
 	assert(job);
 
-	sys_lock();
+	if (job->count > 0)
 	{
-		if (job->count > 0)
-		{
-			fun = priv_job_getUpdate(job);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = wait(job, time);
-			fun = System.cur->tmp.job.fun;
-		}
-
-		if (event == E_SUCCESS)
-		{
-			port_clr_lock();
-			fun();
-		}
+		fun = priv_job_getUpdate(job);
+		event = E_SUCCESS;
 	}
-	sys_unlock();
+	else
+	{
+		event = wait(job, time);
+		fun = System.cur->tmp.job.fun;
+	}
+
+	if (event == E_SUCCESS)
+	{
+		port_clr_lock();
+		fun();
+	}
 
 	return event;
 }
@@ -234,14 +230,30 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 unsigned job_waitFor( job_t *job, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_job_wait(job, delay, core_tsk_waitFor);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_job_wait(job, delay, core_tsk_waitFor);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned job_waitUntil( job_t *job, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_job_wait(job, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_job_wait(job, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -271,24 +283,29 @@ static
 unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_inside());
 	assert(job);
 	assert(fun);
 
+	if (job->count < job->limit)
+	{
+		priv_job_putUpdate(job, fun);
+		return E_SUCCESS;
+	}
+
+	System.cur->tmp.job.fun = fun;
+	return wait(job, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if (job->count < job->limit)
-		{
-			priv_job_putUpdate(job, fun);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			System.cur->tmp.job.fun = fun;
-			event = wait(job, time);
-		}
+		event = priv_job_send(job, fun, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -296,17 +313,18 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_job_send(job, fun, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_job_send(job, fun, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_job_send(job, fun, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

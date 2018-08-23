@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -102,14 +102,15 @@ unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(void
 	assert(cnd);
 	assert(mtx);
 
-	sys_lock();
-	{
-		if ((event = mtx_give(mtx))   == E_SUCCESS)
-		if ((event = wait(cnd, time)) == E_SUCCESS)
-		     event = mtx_wait(mtx);
-	}
-	sys_unlock();
+	event = mtx_give(mtx);
+	if (event != E_SUCCESS)
+		return event;
 
+	event = wait(cnd, time);
+	if (event != E_SUCCESS)
+		return event;
+
+	event = mtx_wait(mtx);
 	return event;
 }
 
@@ -117,14 +118,30 @@ unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(void
 unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_cnd_wait(cnd, mtx, delay, core_tsk_waitFor);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_cnd_wait(cnd, mtx, delay, core_tsk_waitFor);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_cnd_wait(cnd, mtx, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_cnd_wait(cnd, mtx, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

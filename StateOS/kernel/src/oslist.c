@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    31.07.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -120,25 +120,30 @@ static
 unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_inside());
 	assert(lst);
 	assert(data);
 
+	if (lst->head.next)
+	{
+		*data = lst->head.next + 1;
+		lst->head.next = lst->head.next->next;
+		return E_SUCCESS;
+	}
+
+	System.cur->tmp.lst.data.in = data;
+	return wait(lst, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if (lst->head.next)
-		{
-			*data = lst->head.next + 1;
-			lst->head.next = lst->head.next->next;
-			event = E_SUCCESS;
-		}
-		else
-		{
-			System.cur->tmp.lst.data.in = data;
-			event = wait(lst, time);
-		}
+		event = priv_lst_wait(lst, data, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -146,17 +151,18 @@ unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(voi
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_lst_wait(lst, data, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_lst_wait(lst, data, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_lst_wait(lst, data, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

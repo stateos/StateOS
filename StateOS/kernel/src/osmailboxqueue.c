@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    20.08.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -210,24 +210,29 @@ static
 unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_inside());
 	assert(box);
 	assert(data);
 
+	if (box->count > 0)
+	{
+		priv_box_getUpdate(box, data);
+		return E_SUCCESS;
+	}
+
+	System.cur->tmp.box.data.in = data;
+	return wait(box, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if (box->count > 0)
-		{
-			priv_box_getUpdate(box, data);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			System.cur->tmp.box.data.in = data;
-			event = wait(box, time);
-		}
+		event = priv_box_wait(box, data, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -235,17 +240,18 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_box_wait(box, data, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_box_wait(box, data, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_box_wait(box, data, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -275,24 +281,29 @@ static
 unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_inside());
 	assert(box);
 	assert(data);
 
+	if (box->count < box->limit)
+	{
+		priv_box_putUpdate(box, data);
+		return E_SUCCESS;
+	}
+
+	System.cur->tmp.box.data.out = data;
+	return wait(box, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if (box->count < box->limit)
-		{
-			priv_box_putUpdate(box, data);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			System.cur->tmp.box.data.out = data;
-			event = wait(box, time);
-		}
+		event = priv_box_send(box, data, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -300,17 +311,18 @@ unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_box_send(box, data, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_box_send(box, data, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_box_send(box, data, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

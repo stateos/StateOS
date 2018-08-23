@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    03.08.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -99,7 +99,7 @@ unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned value = flags;
-	unsigned event = E_SUCCESS;
+	unsigned event = E_TIMEOUT;
 
 	assert(flg);
 	assert((mode & ~flgMASK) == 0U);
@@ -109,10 +109,8 @@ unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
 		if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
 		if ((mode & flgProtect) == 0) flg->flags &= ~flags;
 
-		if (value && ((mode & flgAll) || (value == flags)))
-		{
-			event = E_TIMEOUT;
-		}
+		if (value == 0 || ((value != flags) && !(mode & flgAll)))
+			event = E_SUCCESS;
 	}
 	sys_unlock();
 
@@ -125,23 +123,31 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, u
 /* -------------------------------------------------------------------------- */
 {
 	unsigned value = flags;
-	unsigned event = E_SUCCESS;
 
 	assert(!port_isr_inside());
 	assert(flg);
 	assert((mode & ~flgMASK) == 0U);
 
+	if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
+	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
+
+	if (value == 0 || ((value != flags) && !(mode & flgAll)))
+		return E_SUCCESS;
+	
+	System.cur->tmp.flg.mode  = mode;
+	System.cur->tmp.flg.flags = value;
+	return wait(flg, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
-		if ((mode & flgProtect) == 0) flg->flags &= ~flags;
-
-		if (value && ((mode & flgAll) || (value == flags)))
-		{
-			System.cur->tmp.flg.mode  = mode;
-			System.cur->tmp.flg.flags = value;
-			event = wait(flg, time);
-		}
+		event = priv_flg_wait(flg, flags, mode, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -149,17 +155,18 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, u
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_flg_wait(flg, flags, mode, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_flg_wait(flg, flags, mode, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_flg_wait(flg, flags, mode, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */

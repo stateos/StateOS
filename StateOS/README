@@ -47,6 +47,7 @@ Features:
 - updated message buffer object
 - added optional init parameter for flag create definitions
 - added optional signal type parameter for signal create definitions
+- static private functions work inside critical sections
 ---------
 6.1
 - updated os version

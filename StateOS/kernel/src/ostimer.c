@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    23.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -190,9 +190,7 @@ unsigned tmr_take( tmr_t *tmr )
 	sys_lock();
 	{
 		if (tmr->id == ID_STOPPED)
-		{
 			event = E_SUCCESS;
-		}
 	}
 	sys_unlock();
 
@@ -204,17 +202,24 @@ static
 unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_SUCCESS;
-
 	assert(!port_isr_inside());
 	assert(tmr);
 
+	if (tmr->id == ID_STOPPED)
+		return E_SUCCESS;
+
+	return wait(tmr, time);
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
 	sys_lock();
 	{
-		if (tmr->id != ID_STOPPED)
-		{
-			event = wait(tmr, time);
-		}
+		event = priv_tmr_wait(tmr, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -222,24 +227,33 @@ unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	return priv_tmr_wait(tmr, delay, core_tsk_waitFor);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_tmr_wait(tmr, delay, core_tsk_waitNext);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_tmr_wait(tmr, delay, core_tsk_waitNext);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	return priv_tmr_wait(tmr, time, core_tsk_waitUntil);
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_tmr_wait(tmr, time, core_tsk_waitUntil);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
