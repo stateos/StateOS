@@ -151,9 +151,21 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	assert(mtx);
 
 	if (mtx->owner == 0)
+	{
 		priv_mtx_link(mtx, System.cur);
+
+		return E_SUCCESS;
+	}
 	else
-	if (mtx->owner != System.cur)
+	if (mtx->owner == System.cur)
+	{
+		mtx->count++;
+
+		assert(mtx->count);
+
+		return E_SUCCESS;
+	}
+	else
 	{
 		if (mtx->owner->prio < System.cur->prio)
 			core_tsk_prio(mtx->owner, System.cur->prio);
@@ -162,15 +174,8 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		event = wait(mtx, time);
 		System.cur->mtx.tree = 0;
 
-		if (event != E_SUCCESS)
-			return event;
+		return event;
 	}
-
-	mtx->count++;
-
-	assert(mtx->count);
-
-	return E_SUCCESS;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -211,13 +216,16 @@ unsigned mtx_give( mtx_t *mtx )
 
 	assert(!port_isr_inside());
 	assert(mtx);
-	assert(mtx->count);
 
 	sys_lock();
 	{
 		if (mtx->owner == System.cur)
 		{
-			if (--mtx->count == 0)
+			if (mtx->count)
+			{
+				mtx->count--;
+			}
+			else
 			{
 				priv_mtx_unlink(mtx);
 				priv_mtx_link(mtx, core_one_wakeup(mtx, E_SUCCESS));
