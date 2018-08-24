@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-evq_t evq = EVQ_INIT(1);
+evt_t evt = EVT_INIT(1);
 
 void slave()
 {
@@ -9,7 +9,7 @@ void slave()
 
 	for (;;)
 	{
-		x = evq_wait(&evq);
+		evt_wait(&evt, &x);
 		LEDs = x;
 	}
 }
@@ -21,7 +21,7 @@ void master()
 	for (;;)
 	{
 		tsk_delay(SEC);
-		evq_give(&evq, x);
+		evt_give(&evt, x);
 		x = (x << 1) | (x >> 3);
 	}
 }

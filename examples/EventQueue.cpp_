@@ -2,7 +2,7 @@
 #include <os.h>
 
 auto led = Led();
-auto evq = EventQueueT<1>();
+auto evt = EventQueueT<1>();
 
 void slave()
 {
@@ -10,7 +10,7 @@ void slave()
 
 	for (;;)
 	{
-		x = evq.wait();
+		evt.wait(&x);
 		led = x;
 	}
 }
@@ -22,7 +22,7 @@ void master()
 	for (;;)
 	{
 		ThisTask::delay(SEC);
-		evq.give(x);
+		evt.give(x);
 		x = (x << 1) | (x >> 3);
 	}
 }

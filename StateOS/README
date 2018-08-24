@@ -48,6 +48,7 @@ Features:
 - added optional init parameter for flag create definitions
 - added optional signal type parameter for signal create definitions
 - static private functions work inside critical sections
+- removed event object; event queue object renamed to 'evt'
 ---------
 6.1
 - updated os version

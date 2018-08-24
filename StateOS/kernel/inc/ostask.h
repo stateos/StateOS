@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    24.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -116,12 +116,15 @@ struct __tsk
 	}        box;   // temporary data used by mailbox queue object
 
 	struct {
-	fun_t  * fun;
-	}        job;   // temporary data used by job queue object
+	union  {
+	unsigned out;
+	unsigned*in;
+	}        data;
+	}        evt;   // temporary data used by event queue object
 
 	struct {
-	unsigned event;
-	}        evq;   // temporary data used by event queue object
+	fun_t  * fun;
+	}        job;   // temporary data used by job queue object
 
 	}        tmp;
 #if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
