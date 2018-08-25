@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    24.08.2018
+    @date    25.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -839,18 +839,18 @@ unsigned tsk_getPrio( void ) { return System.cur->basic; }
  *
  * Name              : tsk_waitFor
  *
- * Description       : delay execution of current task for given duration of time and wait for flags or message
+ * Description       : delay execution of current task for given duration of time and wait for flags or event
  *
  * Parameters
  *   flags           : all flags to wait
- *                     0: wait for any flag or message
+ *                     0: wait for any flag or event
  *   delay           : duration of time (maximum number of ticks to delay execution of current task)
  *                     IMMEDIATE: don't delay execution of current task
  *                     INFINITE:  delay indefinitely execution of current task
  *
  * Return
  *   E_TIMEOUT       : task object was not released before the specified timeout expired
- *   'another'       : task object resumed by the direct transfer of 'another' flags or message (tsk_give)
+ *   'another'       : task object resumed by the direct transfer of 'another' flags or event (tsk_give)
  *
  * Note              : use only in thread mode
  *
@@ -862,16 +862,16 @@ unsigned tsk_waitFor( unsigned flags, cnt_t delay );
  *
  * Name              : tsk_waitUntil
  *
- * Description       : delay execution of current task until given timepoint and wait for flags or message
+ * Description       : delay execution of current task until given timepoint and wait for flags or event
  *
  * Parameters
  *   flags           : all flags to wait
- *                     0: wait for any flags or message
+ *                     0: wait for an event
  *   time            : timepoint value
  *
  * Return
  *   E_TIMEOUT       : task object was not released before the specified timeout expired
- *   'another'       : task object resumed by the direct transfer of 'another' flags or message (tsk_give)
+ *   'another'       : task object resumed by the direct transfer of 'another' flags or event (tsk_give)
  *
  * Note              : use only in thread mode
  *
@@ -883,14 +883,14 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time );
  *
  * Name              : tsk_wait
  *
- * Description       : delay indefinitely execution of current task and wait for flags or message
+ * Description       : delay indefinitely execution of current task and wait for flags or event
  *
  * Parameters
  *   flags           : all flags to wait
- *                     0: wait for any flag or message
+ *                     0: wait for any flag or event
  *
  * Return
- *   'another'       : task object resumed by the direct transfer of 'another' flags or message (tsk_give)
+ *   'another'       : task object resumed by the direct transfer of 'another' flags or event (tsk_give)
  *
  * Note              : use only in thread mode
  *
@@ -908,18 +908,20 @@ unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, INFINITE); }
  *
  * Parameters
  *   tsk             : pointer to delayed task object
- *   flags           : flags or message transfered to the task
+ *   flags           : flags or event transfered to the task
  *
- * Return            : none
+ * Return
+ *   E_SUCCESS       : given flags have been successfully transferred to the task
+ *   E_TIMEOUT       : given flags have not been transferred to the task
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-void tsk_give( tsk_t *tsk, unsigned flags );
+unsigned tsk_give( tsk_t *tsk, unsigned flags );
 
 __STATIC_INLINE
-void tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
+unsigned tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
 
 /******************************************************************************
  *
@@ -1085,8 +1087,8 @@ struct staticTaskT : public __tsk
 	unsigned join     ( void )            { return tsk_join      (this);         }
 	void     start    ( void )            {        tsk_start     (this);         }
 	void     startFrom( fun_t  * _state ) {        tsk_startFrom (this, _state); }
-	void     give     ( unsigned _flags ) {        tsk_give      (this, _flags); }
-	void     giveISR  ( unsigned _flags ) {        tsk_giveISR   (this, _flags); }
+	unsigned give     ( unsigned _flags ) { return tsk_give      (this, _flags); }
+	unsigned giveISR  ( unsigned _flags ) { return tsk_giveISR   (this, _flags); }
 	unsigned suspend  ( void )            { return tsk_suspend   (this);         }
 	unsigned resume   ( void )            { return tsk_resume    (this);         }
 	unsigned resumeISR( void )            { return tsk_resumeISR (this);         }
