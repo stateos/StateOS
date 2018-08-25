@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    25.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -188,9 +188,8 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 				if ((tsk->tmp.flg.mode & flgProtect) == 0)
 					flg->flags &= ~tsk->tmp.flg.flags;
 				tsk->tmp.flg.flags &= ~flags;
-				if (tsk->tmp.flg.flags && (tsk->tmp.flg.mode & flgAll))
-					continue;
-				core_one_wakeup(tsk = tsk->back, E_SUCCESS);
+				if (tsk->tmp.flg.flags == 0 || (tsk->tmp.flg.mode & flgAll) == 0)
+					core_one_wakeup(tsk = tsk->back, E_SUCCESS);
 			}
 		}
 
