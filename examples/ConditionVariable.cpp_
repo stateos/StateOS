@@ -8,7 +8,7 @@ auto cnd = ConditionVariable();
 void slave()
 {
 	mtx.wait();
-	cnd.wait(&mtx);
+	cnd.wait(mtx);
 	mtx.give();
 	led.tick();
 }

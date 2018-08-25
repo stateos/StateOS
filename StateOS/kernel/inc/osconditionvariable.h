@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    25.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -338,8 +338,11 @@ struct ConditionVariable : public __cnd
 
 	void     kill     ( void )                      {        cnd_kill     (this);               }
 	unsigned waitFor  ( mtx_t *_mtx, cnt_t _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
+	unsigned waitFor  ( mtx_t &_mtx, cnt_t _delay ) { return cnd_waitFor  (this,&_mtx, _delay); }
 	unsigned waitUntil( mtx_t *_mtx, cnt_t _time )  { return cnd_waitUntil(this, _mtx, _time);  }
+	unsigned waitUntil( mtx_t &_mtx, cnt_t _time )  { return cnd_waitUntil(this,&_mtx, _time);  }
 	unsigned wait     ( mtx_t *_mtx )               { return cnd_wait     (this, _mtx);         }
+	unsigned wait     ( mtx_t &_mtx )               { return cnd_wait     (this,&_mtx);         }
 	void     give     ( bool   _all = cndAll )      {        cnd_give     (this, _all);         }
 	void     giveISR  ( bool   _all = cndAll )      {        cnd_giveISR  (this, _all);         }
 };
