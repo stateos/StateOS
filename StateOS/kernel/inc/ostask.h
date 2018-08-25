@@ -921,7 +921,7 @@ unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, INFINITE); }
 unsigned tsk_give( tsk_t *tsk, unsigned flags );
 
 __STATIC_INLINE
-unsigned tsk_giveISR( tsk_t *tsk, unsigned flags ) { tsk_give(tsk, flags); }
+unsigned tsk_giveISR( tsk_t *tsk, unsigned flags ) { return tsk_give(tsk, flags); }
 
 /******************************************************************************
  *
