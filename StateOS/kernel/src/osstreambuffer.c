@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    27.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,19 +34,19 @@
 #include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
-void stm_init( stm_t *stm, unsigned limit, void *data )
+void stm_init( stm_t *stm, void *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
 	assert(stm);
-	assert(limit);
 	assert(data);
+	assert(bufsize);
 
 	sys_lock();
 	{
 		memset(stm, 0, sizeof(stm_t));
 
-		stm->limit = limit;
+		stm->limit = bufsize;
 		stm->data  = data;
 	}
 	sys_unlock();
@@ -56,15 +56,17 @@ void stm_init( stm_t *stm, unsigned limit, void *data )
 stm_t *stm_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	stm_t *stm;
+	stm_t  * stm;
+	unsigned bufsize;
 
 	assert(!port_isr_inside());
 	assert(limit);
 
 	sys_lock();
 	{
-		stm = core_sys_alloc(ABOVE(sizeof(stm_t)) + limit);
-		stm_init(stm, limit, (void *)((size_t)stm + ABOVE(sizeof(stm_t))));
+		bufsize = limit;
+		stm = core_sys_alloc(ABOVE(sizeof(stm_t)) + bufsize);
+		stm_init(stm, (void *)((size_t)stm + ABOVE(sizeof(stm_t))), bufsize);
 		stm->res = stm;
 	}
 	sys_unlock();

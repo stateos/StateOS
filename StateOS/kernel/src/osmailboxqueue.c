@@ -39,9 +39,9 @@ void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
 {
 	assert(!port_isr_inside());
 	assert(box);
-	assert(limit);
-	assert(data);
 	assert(size);
+	assert(data);
+	assert(bufsize);
 
 	sys_lock();
 	{

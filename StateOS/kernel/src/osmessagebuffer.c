@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    27.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,19 +34,19 @@
 #include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
-void msg_init( msg_t *msg, unsigned limit, void *data )
+void msg_init( msg_t *msg, void *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
 	assert(msg);
-	assert(limit);
 	assert(data);
+	assert(bufsize);
 
 	sys_lock();
 	{
 		memset(msg, 0, sizeof(msg_t));
 
-		msg->limit = limit;
+		msg->limit = bufsize;
 		msg->data  = data;
 	}
 	sys_unlock();
@@ -56,15 +56,17 @@ void msg_init( msg_t *msg, unsigned limit, void *data )
 msg_t *msg_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	msg_t *msg;
+	msg_t  * msg;
+	unsigned bufsize;
 
 	assert(!port_isr_inside());
 	assert(limit);
 
 	sys_lock();
 	{
-		msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + limit);
-		msg_init(msg, limit, (void *)((size_t)msg + ABOVE(sizeof(msg_t))));
+		bufsize = limit;
+		msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + bufsize);
+		msg_init(msg, (void *)((size_t)msg + ABOVE(sizeof(msg_t))), bufsize);
 		msg->res = msg;
 	}
 	sys_unlock();

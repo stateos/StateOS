@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    16.08.2018
+    @date    27.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -197,8 +197,8 @@ struct __stm
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   limit           : size of a buffer (max number of stored bytes)
  *   data            : stream buffer data
+ *   bufsize         : size of the data buffer (in bytes)
  *
  * Return            : none
  *
@@ -206,7 +206,7 @@ struct __stm
  *
  ******************************************************************************/
 
-void stm_init( stm_t *stm, unsigned limit, void *data );
+void stm_init( stm_t *stm, void *data, unsigned bufsize );
 
 /******************************************************************************
  *

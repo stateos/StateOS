@@ -39,8 +39,8 @@ void job_init( job_t *job, fun_t **data, unsigned bufsize )
 {
 	assert(!port_isr_inside());
 	assert(job);
-	assert(limit);
 	assert(data);
+	assert(bufsize);
 
 	sys_lock();
 	{

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    16.08.2018
+    @date    27.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -197,8 +197,8 @@ struct __msg
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   limit           : size of a buffer (max number of stored bytes)
  *   data            : message buffer data
+ *   bufsize         : size of the data buffer (in bytes)
  *
  * Return            : none
  *
@@ -206,7 +206,7 @@ struct __msg
  *
  ******************************************************************************/
 
-void msg_init( msg_t *msg, unsigned limit, void *data );
+void msg_init( msg_t *msg, void *data, unsigned bufsize );
 
 /******************************************************************************
  *
