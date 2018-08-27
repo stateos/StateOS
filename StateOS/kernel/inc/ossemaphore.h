@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    27.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -91,8 +91,7 @@ struct __sem
  *
  ******************************************************************************/
 
-#define               _VA_SEM( _limit ) \
-                       ( (_limit + 0) ? (_limit + 0) : (semCounting) )
+#define               _VA_SEM( _limit ) ( (_limit + 0) ? (_limit + 0) : (semCounting) )
 
 /******************************************************************************
  *

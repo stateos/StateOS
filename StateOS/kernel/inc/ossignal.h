@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    26.08.2018
+    @date    27.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -88,8 +88,7 @@ struct __sig
  *
  ******************************************************************************/
 
-#define               _VA_SIG( _type ) \
-                       ( ( _type + 0 ) ? sigProtect : sigClear )
+#define               _VA_SIG( _type ) ( ( _type + 0 ) ? sigProtect : sigClear )
 
 /******************************************************************************
  *
