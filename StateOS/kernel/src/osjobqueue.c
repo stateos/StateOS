@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    24.08.2018
+    @date    27.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,7 +34,7 @@
 #include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
-void job_init( job_t *job, unsigned limit, fun_t **data )
+void job_init( job_t *job, fun_t **data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -46,7 +46,7 @@ void job_init( job_t *job, unsigned limit, fun_t **data )
 	{
 		memset(job, 0, sizeof(job_t));
 
-		job->limit = limit;
+		job->limit = bufsize / sizeof(fun_t *);
 		job->data  = data;
 	}
 	sys_unlock();
@@ -56,15 +56,17 @@ void job_init( job_t *job, unsigned limit, fun_t **data )
 job_t *job_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	job_t *job;
+	job_t  * job;
+	unsigned bufsize;
 
 	assert(!port_isr_inside());
 	assert(limit);
 
 	sys_lock();
 	{
-		job = core_sys_alloc(ABOVE(sizeof(job_t)) + limit * sizeof(fun_t *));
-		job_init(job, limit, (void *)((size_t)job + ABOVE(sizeof(job_t))));
+		bufsize = limit * sizeof(fun_t *);
+		job = core_sys_alloc(ABOVE(sizeof(job_t)) + bufsize);
+		job_init(job, (void *)((size_t)job + ABOVE(sizeof(job_t))), bufsize);
 		job->res = job;
 	}
 	sys_unlock();

@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    27.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -181,8 +181,8 @@ struct __job
  *
  * Parameters
  *   job             : pointer to job queue object
- *   limit           : size of a queue (max number of stored job procedures)
  *   data            : job queue data buffer
+ *   bufsize         : size of the data buffer (in bytes)
  *
  * Return            : none
  *
@@ -190,7 +190,7 @@ struct __job
  *
  ******************************************************************************/
 
-void job_init( job_t *job, unsigned limit, fun_t **data );
+void job_init( job_t *job, fun_t **data, unsigned bufsize );
 
 /******************************************************************************
  *
