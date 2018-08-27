@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    27.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,7 +34,7 @@
 #include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
-void box_init( box_t *box, unsigned limit, void *data, unsigned size )
+void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -47,7 +47,7 @@ void box_init( box_t *box, unsigned limit, void *data, unsigned size )
 	{
 		memset(box, 0, sizeof(box_t));
 
-		box->limit = limit * size;
+		box->limit = (bufsize / size) * size;
 		box->data  = data;
 		box->size  = size;
 	}
@@ -58,7 +58,8 @@ void box_init( box_t *box, unsigned limit, void *data, unsigned size )
 box_t *box_create( unsigned limit, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	box_t *box;
+	box_t  * box;
+	unsigned bufsize;
 
 	assert(!port_isr_inside());
 	assert(limit);
@@ -66,8 +67,9 @@ box_t *box_create( unsigned limit, unsigned size )
 
 	sys_lock();
 	{
-		box = core_sys_alloc(ABOVE(sizeof(box_t)) + limit * size);
-		box_init(box, limit, (void *)((size_t)box + ABOVE(sizeof(box_t))), size);
+		bufsize = limit * size;
+		box = core_sys_alloc(ABOVE(sizeof(box_t)) + bufsize);
+		box_init(box, size, (void *)((size_t)box + ABOVE(sizeof(box_t))), bufsize);
 		box->res = box;
 	}
 	sys_unlock();

@@ -52,6 +52,7 @@ Features:
 - changed mem_init function
 - changed evt_init function
 - changed job_init function
+- changed box_init function
 ---------
 6.1
 - updated os version
