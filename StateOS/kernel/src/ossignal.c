@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    26.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,7 @@
 #include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
-void sig_init( sig_t *sig, unsigned type )
+void sig_init( sig_t *sig, bool type )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -43,13 +43,13 @@ void sig_init( sig_t *sig, unsigned type )
 	{
 		memset(sig, 0, sizeof(sig_t));
 
-		sig->type = type & sigMASK;
+		sig->type = type;
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-sig_t *sig_create( unsigned type )
+sig_t *sig_create( bool type )
 /* -------------------------------------------------------------------------- */
 {
 	sig_t *sig;
@@ -76,7 +76,7 @@ void sig_kill( sig_t *sig )
 
 	sys_lock();
 	{
-		sig->flag = 0;
+		sig->flag = false;
 
 		core_all_wakeup(sig, E_STOPPED);
 	}
@@ -102,7 +102,6 @@ unsigned sig_take( sig_t *sig )
 	unsigned event = E_TIMEOUT;
 
 	assert(sig);
-	assert((sig->type & ~sigMASK) == 0U);
 
 	sys_lock();
 	{
@@ -124,7 +123,6 @@ unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 {
 	assert(!port_isr_inside());
 	assert(sig);
-	assert((sig->type & ~sigMASK) == 0U);
 
 	if (sig->flag)
 	{
@@ -170,19 +168,16 @@ void sig_give( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
 	assert(sig);
-	assert((sig->type & ~sigMASK) == 0U);
 
 	sys_lock();
 	{
-		sig->flag = 1;
-
 		if (sig->type == sigClear)
 		{
-			if (core_one_wakeup(sig, E_SUCCESS))
-			sig->flag = 0;
+			sig->flag = !core_one_wakeup(sig, E_SUCCESS);
 		}
 		else
 		{
+			sig->flag = true;
 			core_all_wakeup(sig, E_SUCCESS);
 		}
 	}
@@ -195,7 +190,7 @@ void sig_clear( sig_t *sig )
 {
 	assert(sig);
 
-	sig->flag = 0;
+	sig->flag = false;
 }
 
 /* -------------------------------------------------------------------------- */

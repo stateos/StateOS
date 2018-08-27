@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    16.08.2018
+    @date    26.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,9 +40,8 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#define sigClear     ( 0U << 0 ) // auto clearing signal
-#define sigProtect   ( 1U << 0 ) // protected signal
-#define sigMASK      ( 1U )
+#define sigClear     ( false ) // auto clearing signal
+#define sigProtect   ( true  ) // protected signal
 
 /******************************************************************************
  *
@@ -56,8 +55,8 @@ struct __sig
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 	void   * res;   // allocated signal object's resource
-	unsigned flag;  // signal's current value
-	unsigned type;  // signal type: sigClear, sigProtect
+	bool     flag;  // signal's current value
+	bool     type;  // signal type: sigClear, sigProtect
 };
 
 /******************************************************************************
@@ -77,7 +76,7 @@ struct __sig
  *
  ******************************************************************************/
 
-#define               _SIG_INIT( _type ) { 0, 0, 0, (_type)&sigMASK }
+#define               _SIG_INIT( _type ) { 0, 0, 0, _type }
 
 /******************************************************************************
  *
@@ -90,7 +89,7 @@ struct __sig
  ******************************************************************************/
 
 #define               _VA_SIG( _type ) \
-                       ( ( _type + 0 ) & sigMASK )
+                       ( ( _type + 0 ) ? sigProtect : sigClear )
 
 /******************************************************************************
  *
@@ -193,7 +192,7 @@ struct __sig
  *
  ******************************************************************************/
 
-void sig_init( sig_t *sig, unsigned type );
+void sig_init( sig_t *sig, bool type );
 
 /******************************************************************************
  *
@@ -214,10 +213,10 @@ void sig_init( sig_t *sig, unsigned type );
  *
  ******************************************************************************/
 
-sig_t *sig_create( unsigned type );
+sig_t *sig_create( bool type );
 
 __STATIC_INLINE
-sig_t *sig_new( unsigned type ) { return sig_create(type); }
+sig_t *sig_new( bool type ) { return sig_create(type); }
 
 /******************************************************************************
  *
@@ -406,7 +405,7 @@ void sig_clearISR( sig_t *sig ) { sig_clear(sig); }
 
 struct Signal : public __sig
 {
-	 Signal( const unsigned _type = sigClear ): __sig _SIG_INIT(_type) {}
+	 Signal( const bool _type = sigClear ): __sig _SIG_INIT(_type) {}
 	~Signal( void ) { assert(__sig::queue == nullptr); }
 
 	void     kill     ( void )         {        sig_kill     (this);         }
