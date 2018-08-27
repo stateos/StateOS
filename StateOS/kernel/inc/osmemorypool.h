@@ -210,7 +210,7 @@ void mem_bind( mem_t *mem );
  *   mem             : pointer to memory pool object
  *   size            : size of memory object (in bytes)
  *   data            : memory pool data buffer
- *   bufsize         : size of a buffer (in bytes)
+ *   bufsize         : size of the data buffer (in bytes)
  *
  * Return            : none
  *
