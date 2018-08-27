@@ -50,6 +50,7 @@ Features:
 - removed event object; event queue object renamed to 'evt'
 - fixed stack initialization
 - changed mem_init function
+- changed evt_init function
 ---------
 6.1
 - updated os version

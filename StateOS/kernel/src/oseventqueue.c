@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    24.08.2018
+    @date    27.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -34,19 +34,19 @@
 #include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
-void evt_init( evt_t *evt, unsigned limit, unsigned *data )
+void evt_init( evt_t *evt, unsigned *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
 	assert(evt);
-	assert(limit);
 	assert(data);
+	assert(bufsize);
 
 	sys_lock();
 	{
 		memset(evt, 0, sizeof(evt_t));
 
-		evt->limit = limit;
+		evt->limit = bufsize / sizeof(unsigned);
 		evt->data  = data;
 	}
 	sys_unlock();
@@ -56,15 +56,17 @@ void evt_init( evt_t *evt, unsigned limit, unsigned *data )
 evt_t *evt_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	evt_t *evt;
+	evt_t  * evt;
+	unsigned bufsize;
 
 	assert(!port_isr_inside());
 	assert(limit);
 
 	sys_lock();
 	{
-		evt = core_sys_alloc(ABOVE(sizeof(evt_t)) + limit * sizeof(unsigned));
-		evt_init(evt, limit, (void *)((size_t)evt + ABOVE(sizeof(evt_t))));
+		bufsize = limit * sizeof(unsigned);
+		evt = core_sys_alloc(ABOVE(sizeof(evt_t)) + bufsize);
+		evt_init(evt, (void *)((size_t)evt + ABOVE(sizeof(evt_t))), bufsize);
 		evt->res = evt;
 	}
 	sys_unlock();
