@@ -1067,7 +1067,7 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 
 	sys_lock();
 	{
-		mem_init(&mp->mem, block_count, block_size, data);
+		mem_init(&mp->mem, block_size, data, size);
 		if (attr->cb_mem == NULL || attr->cb_size == 0U) mp->mem.res = mp;
 		else
 		if (attr->mp_mem == NULL || attr->mp_size == 0U) mp->mem.res = data;
