@@ -49,6 +49,7 @@ Features:
 - static private functions work inside critical sections
 - removed event object; event queue object renamed to 'evt'
 - fixed stack initialization
+- changed mem_init function
 ---------
 6.1
 - updated os version

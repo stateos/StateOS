@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    27.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -59,8 +59,8 @@ struct __mem
 	que_t    head;  // inherited from list
 
 	unsigned limit; // size of a memory pool (max number of objects)
-	unsigned size;  // size of memory object (in words)
-	void   * data;  // pointer to memory pool buffer
+	unsigned size;  // size of memory object (in sizeof(que_t) units)
+	que_t  * data;  // pointer to memory pool buffer
 };
 
 /******************************************************************************
@@ -70,7 +70,8 @@ struct __mem
  * Description       : create and initialize a memory pool object
  *
  * Parameters
- *   size            : size of memory object (in bytes)
+ *   limit           : size of a buffer (max number of objects)
+ *   size            : size of memory object (in sizeof(que_t) units)
  *   data            : memory pool data buffer
  *
  * Return            : memory pool object
@@ -79,7 +80,7 @@ struct __mem
  *
  ******************************************************************************/
 
-#define               _MEM_INIT( _limit, _size, _data ) { 0, 0, _QUE_INIT(), _limit, MSIZE(_size), _data }
+#define               _MEM_INIT( _limit, _size, _data ) { 0, 0, _QUE_INIT(), _limit, _size, _data }
 
 /******************************************************************************
  *
@@ -89,7 +90,7 @@ struct __mem
  *
  * Parameters
  *   limit           : size of a buffer (max number of objects)
- *   size            : size of memory object (in bytes)
+ *   size            : size of memory object (in sizeof(que_t) units)
  *
  * Return            : memory pool data buffer
  *
@@ -98,7 +99,7 @@ struct __mem
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define               _MEM_DATA( _limit, _size ) (void *[_limit * (1 + MSIZE(_size))]){ 0 }
+#define               _MEM_DATA( _limit, _size ) (que_t[_limit * (1 + _size)]){ { 0 } }
 #endif
 
 /******************************************************************************
@@ -114,9 +115,9 @@ struct __mem
  *
  ******************************************************************************/
 
-#define             OS_MEM( mem, limit, size )                                \
-                       void*mem##__buf[limit*(1+MSIZE(size))];                 \
-                       mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
+#define             OS_MEM( mem, limit, size )                                       \
+                       que_t mem##__buf[limit * (1 + MSIZE(size))];                   \
+                       mem_t mem##__mem = _MEM_INIT( limit, MSIZE(size), mem##__buf ); \
                        mem_id mem = & mem##__mem
 
 /******************************************************************************
@@ -132,9 +133,9 @@ struct __mem
  *
  ******************************************************************************/
 
-#define         static_MEM( mem, limit, size )                                \
-                static void*mem##__buf[limit*(1+MSIZE(size))];                 \
-                static mem_t mem##__mem = _MEM_INIT( limit, size, mem##__buf ); \
+#define         static_MEM( mem, limit, size )                                       \
+                static que_t mem##__buf[limit * (1 + MSIZE(size))];                   \
+                static mem_t mem##__mem = _MEM_INIT( limit, MSIZE(size), mem##__buf ); \
                 static mem_id mem = & mem##__mem
 
 /******************************************************************************
@@ -155,7 +156,7 @@ struct __mem
 
 #ifndef __cplusplus
 #define                MEM_INIT( limit, size ) \
-                      _MEM_INIT( limit, size, _MEM_DATA( limit, size ) )
+                      _MEM_INIT( limit, MSIZE(size), _MEM_DATA(limit, MSIZE(size)) )
 #endif
 
 /******************************************************************************
@@ -207,9 +208,9 @@ void mem_bind( mem_t *mem );
  *
  * Parameters
  *   mem             : pointer to memory pool object
- *   limit           : size of a buffer (max number of objects)
  *   size            : size of memory object (in bytes)
  *   data            : memory pool data buffer
+ *   bufsize         : size of a buffer (in bytes)
  *
  * Return            : none
  *
@@ -217,7 +218,7 @@ void mem_bind( mem_t *mem );
  *
  ******************************************************************************/
 
-void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data );
+void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize );
 
 /******************************************************************************
  *
@@ -420,7 +421,7 @@ void mem_giveISR( mem_t *mem, const void *data ) { lst_giveISR((lst_t *)mem, dat
 template<unsigned limit_, unsigned size_>
 struct MemoryPoolT : public __mem
 {
-	 MemoryPoolT( void ): __mem _MEM_INIT(limit_, size_, data_) { mem_bind(this); }
+	 MemoryPoolT( void ): __mem _MEM_INIT(limit_, MSIZE(size_), data_) { mem_bind(this); }
 	~MemoryPoolT( void ) { assert(__mem::queue == nullptr); }
 
 	void     kill     ( void )                             {        mem_kill     (this);                }
@@ -433,7 +434,7 @@ struct MemoryPoolT : public __mem
 	void     giveISR  ( const void  *_data )               {        mem_giveISR  (this, _data);         }
 
 	private:
-	void *data_[limit_ * (1 + MSIZE(size_))];
+	que_t data_[limit_ * (1 + MSIZE(size_))];
 };
 
 /******************************************************************************

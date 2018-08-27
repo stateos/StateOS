@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    27.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -58,21 +58,21 @@ void mem_bind( mem_t *mem )
 }
 
 /* -------------------------------------------------------------------------- */
-void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data )
+void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
 	assert(mem);
-	assert(limit);
 	assert(size);
 	assert(data);
+	assert(bufsize);
 
 	sys_lock();
 	{
 		memset(mem, 0, sizeof(mem_t));
 
-		mem->limit = limit;
-		mem->size  = size;
+		mem->limit = bufsize / (1 + MSIZE(size)) / sizeof(que_t);
+		mem->size  = MSIZE(size);
 		mem->data  = data;
 
 		mem_bind(mem);
@@ -84,18 +84,18 @@ void mem_init( mem_t *mem, unsigned limit, unsigned size, void *data )
 mem_t *mem_create( unsigned limit, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	mem_t *mem;
+	mem_t  * mem;
+	unsigned bufsize;
 
 	assert(!port_isr_inside());
 	assert(limit);
 	assert(size);
 
-	size = MSIZE(size);
-
 	sys_lock();
 	{
-		mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + limit * (1 + size) * sizeof(que_t));
-		mem_init(mem, limit, size, (void *)((size_t)mem + ABOVE(sizeof(mem_t))));
+		bufsize = limit * (1 + MSIZE(size)) * sizeof(que_t);
+		mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + bufsize);
+		mem_init(mem, size, (void *)((size_t)mem + ABOVE(sizeof(mem_t))), bufsize);
 		mem->res = mem;
 	}
 	sys_unlock();
