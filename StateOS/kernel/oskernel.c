@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    27.08.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -218,12 +218,10 @@ static  union  { stk_t STK[SSIZE(OS_IDLE_STACK)];
         struct { char  stk[ABOVE(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
         IDLE_STACK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
 #define IDLE_STK (void *)(&IDLE_STACK)
-//      IDLE_TOP (stk_t*)(&IDLE_STACK+1) // because of the SDCC
-#define IDLE_TOP (stk_t*)(&IDLE_STACK)+SSIZE(OS_IDLE_STACK)
 #define IDLE_SP  (void *)(&IDLE_STACK.CTX.ctx)
 
-tsk_t MAIN = { .obj={ .prev=&IDLE.obj, .next=&IDLE.obj }, .id=ID_READY, .top=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { .obj={ .prev=&MAIN.obj, .next=&MAIN.obj }, .id=ID_IDLE, .state=priv_tsk_idle, .stack=IDLE_STK, .top=IDLE_TOP, .sp=IDLE_SP }; // idle task and tasks queue
+tsk_t MAIN = { .obj={ .prev=&IDLE.obj, .next=&IDLE.obj }, .id=ID_READY, .stack=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
+tsk_t IDLE = { .obj={ .prev=&MAIN.obj, .next=&MAIN.obj }, .id=ID_IDLE, .state=priv_tsk_idle, .stack=IDLE_STK, .size=OS_IDLE_STACK, .sp=IDLE_SP }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
@@ -275,9 +273,9 @@ void core_tsk_remove( tsk_t *tsk )
 void core_ctx_init( tsk_t *tsk )
 {
 #ifdef DEBUG
-	memset(tsk->stack, 0xFF, (size_t)tsk->top - (size_t)tsk->stack);
+	memset(tsk->stack, 0xFF, tsk->size);
 #endif
-	tsk->sp = (ctx_t *)tsk->top - 1;
+	tsk->sp = (ctx_t *)LIMITED((size_t)tsk->stack + tsk->size, stk_t) - 1;
 	port_ctx_init(tsk->sp, core_tsk_loop);
 }
 

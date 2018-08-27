@@ -13,7 +13,6 @@ Features:
 - kernel can operate in tick-less mode
 - spin locks
 - signals (clear, protect)
-- events
 - flags (any, all, protect, ignore)
 - barriers
 - semaphores (binary, limited, counting)
@@ -24,8 +23,8 @@ Features:
 - stream buffers
 - message buffers
 - mailbox queues
-- job queues
 - event queues
+- job queues
 - timers (one-shot, periodic)
 - cmsis-rtos api
 - cmsis-rtos2 api
@@ -49,6 +48,7 @@ Features:
 - added optional signal type parameter for signal create definitions
 - static private functions work inside critical sections
 - removed event object; event queue object renamed to 'evt'
+- fixed stack initialization
 ---------
 6.1
 - updated os version

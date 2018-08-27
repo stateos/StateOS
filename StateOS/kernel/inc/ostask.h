@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    25.08.2018
+    @date    27.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,8 +57,8 @@ struct __tsk
 	cnt_t    slice;	// time slice
 
 	tsk_t  * back;  // previous process in the DELAYED queue
-	void   * stack; // base of stack
-	stk_t  * top;   // top of stack
+	stk_t  * stack; // base of stack
+	unsigned size;  // size of stack (in bytes)
 	void   * sp;    // current stack pointer
 
 	unsigned basic; // basic priority
@@ -155,7 +155,7 @@ struct __tsk
  ******************************************************************************/
 
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), ID_STOPPED, _state, 0, 0, 0, 0, _stack, _stack+SSIZE(_size), 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
+                       { _OBJ_INIT(), ID_STOPPED, _state, 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
 
 /******************************************************************************
  *
@@ -197,8 +197,7 @@ struct __tsk
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define               _TSK_STACK( _size ) \
-                       ( stk_t[SSIZE( _size )] ){ 0 }
+#define               _TSK_STACK( _size ) (stk_t[SSIZE(_size)]){ 0 }
 #endif
 
 /******************************************************************************
@@ -211,8 +210,7 @@ struct __tsk
  *
  ******************************************************************************/
 
-#define               _VA_STK( _size ) \
-                       ( (_size + 0) ? (_size + 0) : (OS_STACK_SIZE) )
+#define               _VA_STK( _size ) ((_size + 0) ? (_size + 0) : (OS_STACK_SIZE))
 
 /******************************************************************************
  *
@@ -579,7 +577,7 @@ tsk_t *tsk_this( void ) { return System.cur; }
  *
  ******************************************************************************/
 
-void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned size );
+void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size );
 
 /******************************************************************************
  *

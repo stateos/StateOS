@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    03.08.2018
+    @date    27.08.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -432,7 +432,7 @@ uint32_t osThreadGetStackSize (osThreadId_t thread_id)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_id == NULL))
 		return 0U;
 
-	return (uint32_t) thread->tsk.top - (uint32_t) thread->tsk.stack;
+	return (uint32_t) thread->tsk.size;
 }
 
 uint32_t osThreadGetStackSpace (osThreadId_t thread_id)

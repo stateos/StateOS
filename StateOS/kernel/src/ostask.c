@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    25.08.2018
+    @date    27.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,7 @@
 #include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
-void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned size )
+void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_inside());
@@ -51,7 +51,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, void *stack, unsigned si
 		tsk->basic = prio;
 		tsk->state = state;
 		tsk->stack = stack;
-		tsk->top   = (stk_t *) LIMITED((char *)stack + size, stk_t);
+		tsk->size  = size;
 
 		core_ctx_init(tsk);
 		core_tsk_insert(tsk);
@@ -71,7 +71,6 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 
 	sys_lock();
 	{
-		size = ABOVE(size);
 		tsk = core_sys_alloc(ABOVE(sizeof(tsk_t)) + size);
 		tsk_init(tsk, prio, state, (void *)((size_t)tsk + ABOVE(sizeof(tsk_t))), size);
 		tsk->obj.res = tsk;
@@ -262,7 +261,7 @@ void tsk_flip( fun_t *state )
 	System.cur->state = state;
 
 	core_ctx_switch();
-	core_tsk_flip(System.cur->top);
+	core_tsk_flip(System.cur->stack + LIMITED_SIZE(System.cur->size, stk_t));
 }
 
 /* -------------------------------------------------------------------------- */

@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    27.08.2018
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -1185,7 +1185,7 @@ int32 OS_TaskGetInfo(uint32 task_id, OS_task_prop_t *task_prop)
 		{
 			strcpy(task_prop->name, rec->name);
 			task_prop->creator = rec->creator;
-			task_prop->stack_size = (uint32_t) rec->tsk.top - (uint32_t) rec->tsk.stack;
+			task_prop->stack_size = (uint32_t) rec->tsk.size;
 			task_prop->priority = ~rec->tsk.basic;
 			task_prop->OStask_id = (uint32) &rec->tsk;
 			status = OS_SUCCESS;
