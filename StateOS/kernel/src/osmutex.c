@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    28.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -153,19 +153,10 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	if (mtx->owner == 0)
 	{
 		priv_mtx_link(mtx, System.cur);
-
-		return E_SUCCESS;
+		event = E_SUCCESS;
 	}
 	else
-	if (mtx->owner == System.cur)
-	{
-		mtx->count++;
-
-		assert(mtx->count);
-
-		return E_SUCCESS;
-	}
-	else
+	if (mtx->owner != System.cur)
 	{
 		if (mtx->owner->prio < System.cur->prio)
 			core_tsk_prio(mtx->owner, System.cur->prio);
@@ -173,9 +164,14 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		System.cur->mtx.tree = mtx->owner;
 		event = wait(mtx, time);
 		System.cur->mtx.tree = 0;
-
-		return event;
 	}
+	else
+	{
+		mtx->count++; assert(mtx->count);
+		event = E_SUCCESS;
+	}
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -212,25 +208,27 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
 unsigned mtx_give( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(!port_isr_inside());
 	assert(mtx);
 
 	sys_lock();
 	{
-		if (mtx->owner == System.cur)
+		if (mtx->owner != System.cur)
 		{
-			if (mtx->count)
-			{
-				mtx->count--;
-			}
-			else
-			{
-				priv_mtx_unlink(mtx);
-				priv_mtx_link(mtx, core_one_wakeup(mtx, E_SUCCESS));
-			}
-
+			event = E_TIMEOUT;
+		}
+		else
+		if (mtx->count)
+		{
+			mtx->count--;
+			event = E_SUCCESS;
+		}
+		else
+		{
+			priv_mtx_unlink(mtx);
+			priv_mtx_link(mtx, core_one_wakeup(mtx, E_SUCCESS));
 			event = E_SUCCESS;
 		}
 	}
