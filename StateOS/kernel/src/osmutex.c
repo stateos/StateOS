@@ -166,9 +166,14 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		System.cur->mtx.tree = 0;
 	}
 	else
+	if (mtx->count + 1)
 	{
-		mtx->count++; assert(mtx->count);
+		mtx->count++;
 		event = E_SUCCESS;
+	}
+	else
+	{
+		event = E_TIMEOUT;
 	}
 
 	return event;
