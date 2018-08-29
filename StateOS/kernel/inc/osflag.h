@@ -427,16 +427,16 @@ struct Flag : public __flg
 	 Flag( const unsigned _init = 0 ): __flg _FLG_INIT(_init) {}
 	~Flag( void ) { assert(__flg::queue == nullptr); }
 
-	void     kill     ( void )                                          {        flg_kill     (this);                        }
-	unsigned waitFor  ( unsigned _flags, unsigned _mode, cnt_t _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
-	unsigned waitUntil( unsigned _flags, unsigned _mode, cnt_t _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
-	unsigned wait     ( unsigned _flags, unsigned _mode = flgAll )      { return flg_wait     (this, _flags, _mode);         }
-	unsigned take     ( unsigned _flags, unsigned _mode = flgAll )      { return flg_take     (this, _flags, _mode);         }
-	unsigned takeISR  ( unsigned _flags, unsigned _mode = flgAll )      { return flg_takeISR  (this, _flags, _mode);         }
-	unsigned give     ( unsigned _flags )                               { return flg_give     (this, _flags);                }
-	unsigned giveISR  ( unsigned _flags )                               { return flg_giveISR  (this, _flags);                }
-	unsigned clear    ( unsigned _flags )                               { return flg_clear    (this, _flags);                }
-	unsigned clearISR ( unsigned _flags )                               { return flg_clearISR (this, _flags);                }
+	void     kill     ( void )                                      {        flg_kill     (this);                        }
+	unsigned waitFor  ( unsigned _flags, char _mode, cnt_t _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
+	unsigned waitUntil( unsigned _flags, char _mode, cnt_t _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
+	unsigned wait     ( unsigned _flags, char _mode = flgAll )      { return flg_wait     (this, _flags, _mode);         }
+	unsigned take     ( unsigned _flags, char _mode = flgAll )      { return flg_take     (this, _flags, _mode);         }
+	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )      { return flg_takeISR  (this, _flags, _mode);         }
+	unsigned give     ( unsigned _flags )                           { return flg_give     (this, _flags);                }
+	unsigned giveISR  ( unsigned _flags )                           { return flg_giveISR  (this, _flags);                }
+	unsigned clear    ( unsigned _flags )                           { return flg_clear    (this, _flags);                }
+	unsigned clearISR ( unsigned _flags )                           { return flg_clearISR (this, _flags);                }
 };
 
 #endif//__cplusplus
