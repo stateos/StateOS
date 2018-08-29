@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 void cnd_init( cnd_t *cnd )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(cnd);
 
 	sys_lock();
@@ -52,7 +52,7 @@ cnd_t *cnd_create( void )
 {
 	cnd_t *cnd;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 
 	sys_lock();
 	{
@@ -69,7 +69,7 @@ cnd_t *cnd_create( void )
 void cnd_kill( cnd_t *cnd )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(cnd);
 
 	sys_lock();
@@ -98,7 +98,7 @@ unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(void
 {
 	unsigned event;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(cnd);
 	assert(mtx);
 

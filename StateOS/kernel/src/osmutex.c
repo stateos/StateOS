@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    28.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -37,7 +37,7 @@
 void mtx_init( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(mtx);
 
 	sys_lock();
@@ -53,7 +53,7 @@ mtx_t *mtx_create( void )
 {
 	mtx_t *mtx;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 
 	sys_lock();
 	{
@@ -114,7 +114,7 @@ void priv_mtx_unlink( mtx_t *mtx )
 void mtx_kill( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(mtx);
 
 	sys_lock();
@@ -147,7 +147,7 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 {
 	unsigned event;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(mtx);
 
 	if (mtx->owner == 0)
@@ -215,7 +215,7 @@ unsigned mtx_give( mtx_t *mtx )
 {
 	unsigned event;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(mtx);
 
 	sys_lock();

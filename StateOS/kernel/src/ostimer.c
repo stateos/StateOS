@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 void tmr_init( tmr_t *tmr, fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(tmr);
 
 	sys_lock();
@@ -55,7 +55,7 @@ tmr_t *tmr_create( fun_t *state )
 {
 	tmr_t *tmr;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 
 	sys_lock();
 	{
@@ -72,7 +72,7 @@ tmr_t *tmr_create( fun_t *state )
 void tmr_kill( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(tmr);
 
 	sys_lock();
@@ -103,7 +103,7 @@ static
 void priv_tmr_start( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 
 	if (tmr->id != ID_STOPPED)
 		core_tmr_remove(tmr);
@@ -202,7 +202,7 @@ static
 unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(tmr);
 
 	if (tmr->id == ID_STOPPED)

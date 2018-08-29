@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -37,7 +37,7 @@
 void evt_init( evt_t *evt, unsigned *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(evt);
 	assert(data);
 	assert(bufsize);
@@ -59,7 +59,7 @@ evt_t *evt_create( unsigned limit )
 	evt_t  * evt;
 	unsigned bufsize;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(limit);
 
 	sys_lock();
@@ -78,7 +78,7 @@ evt_t *evt_create( unsigned limit )
 void evt_kill( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(evt);
 
 	sys_lock();
@@ -190,7 +190,7 @@ static
 unsigned priv_evt_wait( evt_t *evt, unsigned *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(evt);
 
 	if (evt->count > 0)
@@ -259,7 +259,7 @@ static
 unsigned priv_evt_send( evt_t *evt, unsigned data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(evt);
 
 	if (evt->count < evt->limit)

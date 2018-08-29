@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -37,7 +37,7 @@
 void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(box);
 	assert(size);
 	assert(data);
@@ -61,7 +61,7 @@ box_t *box_create( unsigned limit, unsigned size )
 	box_t  * box;
 	unsigned bufsize;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(limit);
 	assert(size);
 
@@ -81,7 +81,7 @@ box_t *box_create( unsigned limit, unsigned size )
 void box_kill( box_t *box )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(box);
 
 	sys_lock();
@@ -212,7 +212,7 @@ static
 unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(box);
 	assert(data);
 
@@ -283,7 +283,7 @@ static
 unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(box);
 	assert(data);
 

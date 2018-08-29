@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 void bar_init( bar_t *bar, unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(bar);
 	assert(limit);
 
@@ -56,7 +56,7 @@ bar_t *bar_create( unsigned limit )
 {
 	bar_t *bar;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(limit);
 
 	sys_lock();
@@ -74,7 +74,7 @@ bar_t *bar_create( unsigned limit )
 void bar_kill( bar_t *bar )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(bar);
 
 	sys_lock();
@@ -103,7 +103,7 @@ static
 unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(bar);
 	assert(bar->count);
 

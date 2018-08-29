@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    26.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 void sig_init( sig_t *sig, bool type )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(sig);
 
 	sys_lock();
@@ -54,7 +54,7 @@ sig_t *sig_create( bool type )
 {
 	sig_t *sig;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 
 	sys_lock();
 	{
@@ -71,7 +71,7 @@ sig_t *sig_create( bool type )
 void sig_kill( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(sig);
 
 	sys_lock();
@@ -121,7 +121,7 @@ static
 unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(sig);
 
 	if (sig->flag)

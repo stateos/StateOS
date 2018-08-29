@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -37,7 +37,7 @@
 void job_init( job_t *job, fun_t **data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(job);
 	assert(data);
 	assert(bufsize);
@@ -59,7 +59,7 @@ job_t *job_create( unsigned limit )
 	job_t  * job;
 	unsigned bufsize;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(limit);
 
 	sys_lock();
@@ -78,7 +78,7 @@ job_t *job_create( unsigned limit )
 void job_kill( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(job);
 
 	sys_lock();
@@ -203,7 +203,7 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	fun_t  * fun;
 	unsigned event;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(job);
 
 	if (job->count > 0)
@@ -283,7 +283,7 @@ static
 unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(job);
 	assert(fun);
 

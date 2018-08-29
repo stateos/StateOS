@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    29.08.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -348,7 +348,7 @@ void core_tsk_transfer( tsk_t *tsk, void *obj )
 static
 unsigned priv_tsk_wait( tsk_t *tsk, void *obj, bool yield )
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 
 	core_tsk_append((tsk_t *)tsk, obj);
 	priv_tsk_remove((tsk_t *)tsk);

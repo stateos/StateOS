@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    29.08.2018
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -146,7 +146,7 @@ void port_ctx_init( ctx_t *ctx, fun_t *pc )
 // is procedure inside ISR?
 
 __STATIC_INLINE
-bool port_isr_inside( void )
+bool port_isr_context( void )
 {
 	return (__get_IPSR() != 0U);
 }

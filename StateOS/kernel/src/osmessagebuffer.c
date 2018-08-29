@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -37,7 +37,7 @@
 void msg_init( msg_t *msg, void *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(msg);
 	assert(data);
 	assert(bufsize);
@@ -59,7 +59,7 @@ msg_t *msg_create( unsigned limit )
 	msg_t  * msg;
 	unsigned bufsize;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(limit);
 
 	sys_lock();
@@ -78,7 +78,7 @@ msg_t *msg_create( unsigned limit )
 void msg_kill( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(msg);
 
 	sys_lock();
@@ -285,7 +285,7 @@ static
 unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(msg);
 	assert(data);
 
@@ -363,7 +363,7 @@ static
 unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(msg);
 	assert(data);
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -37,7 +37,7 @@
 void stm_init( stm_t *stm, void *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(stm);
 	assert(data);
 	assert(bufsize);
@@ -59,7 +59,7 @@ stm_t *stm_create( unsigned limit )
 	stm_t  * stm;
 	unsigned bufsize;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(limit);
 
 	sys_lock();
@@ -78,7 +78,7 @@ stm_t *stm_create( unsigned limit )
 void stm_kill( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(stm);
 
 	sys_lock();
@@ -237,7 +237,7 @@ static
 unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(stm);
 	assert(data);
 
@@ -315,7 +315,7 @@ static
 unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(stm);
 	assert(data);
 

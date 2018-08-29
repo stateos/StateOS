@@ -2,7 +2,7 @@
 
     @file    StateOS: oscmsis.h
     @author  Rajmund Szymanski
-    @date    23.07.2018
+    @date    29.08.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -48,7 +48,7 @@ extern "C" {
 
 /*---------------------------------------------------------------------------*/
 
-#define IS_IRQ_MODE()    port_isr_inside()
+#define IS_IRQ_MODE()    port_isr_context()
 #define IS_IRQ_MASKED()  port_isr_masked()
 
 /*---------------------------------------------------------------------------*/

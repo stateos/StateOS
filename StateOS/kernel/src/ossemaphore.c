@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 void sem_init( sem_t *sem, unsigned init, unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(sem);
 	assert(init<=limit);
 
@@ -56,7 +56,7 @@ sem_t *sem_create( unsigned init, unsigned limit )
 {
 	sem_t *sem;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 
 	sys_lock();
 	{
@@ -73,7 +73,7 @@ sem_t *sem_create( unsigned init, unsigned limit )
 void sem_kill( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(sem);
 
 	sys_lock();
@@ -125,7 +125,7 @@ static
 unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(sem);
 	assert(sem->limit);
 
@@ -197,7 +197,7 @@ static
 unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(sem);
 	assert(sem->limit);
 

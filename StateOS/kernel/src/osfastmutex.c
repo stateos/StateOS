@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    23.08.2018
+    @date    29.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 void mut_init( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(mut);
 
 	sys_lock();
@@ -52,7 +52,7 @@ mut_t *mut_create( void )
 {
 	mut_t *mut;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 
 	sys_lock();
 	{
@@ -69,7 +69,7 @@ mut_t *mut_create( void )
 void mut_kill( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(mut);
 
 	sys_lock();
@@ -96,7 +96,7 @@ static
 unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(mut);
 
 	if (mut->owner == 0)
@@ -147,7 +147,7 @@ unsigned mut_give( mut_t *mut )
 {
 	unsigned event = E_TIMEOUT;
 
-	assert(!port_isr_inside());
+	assert(!port_isr_context());
 	assert(mut);
 
 	sys_lock();
