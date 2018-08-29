@@ -95,14 +95,14 @@ void flg_delete( flg_t *flg )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
+unsigned flg_take( flg_t *flg, unsigned flags, char mode )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 	unsigned value = flags;
 
 	assert(flg);
-	assert((mode & ~flgMASK) == 0U);
+	assert((mode & ~flgMASK) == 0);
 
 	sys_lock();
 	{
@@ -121,14 +121,14 @@ unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_flg_wait( flg_t *flg, unsigned flags, char mode, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned value = flags;
 
 	assert(!port_isr_context());
 	assert(flg);
-	assert((mode & ~flgMASK) == 0U);
+	assert((mode & ~flgMASK) == 0);
 
 	if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
 	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
@@ -142,7 +142,7 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, unsigned mode, cnt_t time, u
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay )
+unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -157,7 +157,7 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time )
+unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;

@@ -55,6 +55,7 @@ Features:
 - changed box_init function
 - changed msg_init function
 - changed stm_init function
+- reorganized kernel functions
 ---------
 6.1
 - updated os version

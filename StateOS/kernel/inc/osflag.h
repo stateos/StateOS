@@ -40,11 +40,11 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#define flgAny        ( 0U << 0 )
-#define flgAll        ( 1U << 0 )
-#define flgProtect    ( 1U << 1 )
-#define flgIgnore     ( 1U << 2 )
-#define flgMASK       ( 7U )
+#define flgAny          0
+#define flgAll          1
+#define flgProtect      2
+#define flgIgnore       4
+#define flgMASK         7
 
 #define flgAnyProtect ( flgAny | flgProtect )
 #define flgAllProtect ( flgAll | flgProtect )
@@ -272,7 +272,7 @@ void flg_delete( flg_t *flg );
  *
  ******************************************************************************/
 
-unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay );
+unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay );
 
 /******************************************************************************
  *
@@ -300,7 +300,7 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time );
+unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
 
 /******************************************************************************
  *
@@ -327,7 +327,7 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned flg_wait( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
+unsigned flg_wait( flg_t *flg, unsigned flags, char mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
 
 /******************************************************************************
  *
@@ -354,10 +354,10 @@ unsigned flg_wait( flg_t *flg, unsigned flags, unsigned mode ) { return flg_wait
  *
  ******************************************************************************/
 
-unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode );
+unsigned flg_take( flg_t *flg, unsigned flags, char mode );
 
 __STATIC_INLINE
-unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) { return flg_take(flg, flags, mode); }
+unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(flg, flags, mode); }
 
 /******************************************************************************
  *
