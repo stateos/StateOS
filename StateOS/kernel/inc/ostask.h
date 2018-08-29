@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    29.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -837,18 +837,19 @@ unsigned tsk_getPrio( void ) { return System.cur->basic; }
  *
  * Name              : tsk_waitFor
  *
- * Description       : delay execution of current task for given duration of time and wait for flags or event
+ * Description       : delay execution of current task for given duration of time and wait for all flags or any event
  *
  * Parameters
  *   flags           : all flags to wait
- *                     0: wait for any flag or event
+ *                     0: wait for any event
  *   delay           : duration of time (maximum number of ticks to delay execution of current task)
  *                     IMMEDIATE: don't delay execution of current task
  *                     INFINITE:  delay indefinitely execution of current task
  *
  * Return
  *   E_TIMEOUT       : task object was not released before the specified timeout expired
- *   'another'       : task object resumed by the direct transfer of 'another' flags or event (tsk_give)
+ *   0               : task object resumed by direct transfer of all flags (tsk_give)
+ *   'another'       : task object resumed by direct transfer of any event (tsk_give)
  *
  * Note              : use only in thread mode
  *
@@ -860,16 +861,17 @@ unsigned tsk_waitFor( unsigned flags, cnt_t delay );
  *
  * Name              : tsk_waitUntil
  *
- * Description       : delay execution of current task until given timepoint and wait for flags or event
+ * Description       : delay execution of current task until given timepoint and wait for all flags or any event
  *
  * Parameters
  *   flags           : all flags to wait
- *                     0: wait for an event
+ *                     0: wait for any event
  *   time            : timepoint value
  *
  * Return
  *   E_TIMEOUT       : task object was not released before the specified timeout expired
- *   'another'       : task object resumed by the direct transfer of 'another' flags or event (tsk_give)
+ *   0               : task object resumed by direct transfer of all flags (tsk_give)
+ *   'another'       : task object resumed by direct transfer of any event (tsk_give)
  *
  * Note              : use only in thread mode
  *
@@ -881,14 +883,15 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time );
  *
  * Name              : tsk_wait
  *
- * Description       : delay indefinitely execution of current task and wait for flags or event
+ * Description       : delay indefinitely execution of current task and wait for all flags or any event
  *
  * Parameters
  *   flags           : all flags to wait
- *                     0: wait for any flag or event
+ *                     0: wait for any event
  *
  * Return
- *   'another'       : task object resumed by the direct transfer of 'another' flags or event (tsk_give)
+ *   0               : task object resumed by direct transfer of all flags (tsk_give)
+ *   'another'       : task object resumed by direct transfer of any event (tsk_give)
  *
  * Note              : use only in thread mode
  *
@@ -902,11 +905,11 @@ unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, INFINITE); }
  * Name              : tsk_give
  * ISR alias         : tsk_giveISR
  *
- * Description       : set given flags in waiting task (tsk_wait)
+ * Description       : set given flags or event of waiting task (tsk_wait)
  *
  * Parameters
  *   tsk             : pointer to delayed task object
- *   flags           : flags or event transfered to the task
+ *   flags           : flags or event to be transferred to the task
  *
  * Return
  *   E_SUCCESS       : given flags have been successfully transferred to the task
