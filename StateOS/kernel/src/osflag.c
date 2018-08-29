@@ -109,7 +109,7 @@ unsigned flg_take( flg_t *flg, unsigned flags, char mode )
 		if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
 		if ((mode & flgProtect) == 0) flg->flags &= ~flags;
 
-		if (value == 0 || ((value != flags) && !(mode & flgAll)))
+		if (value == 0 || (value != flags && (mode & flgAll) == 0))
 			event = E_SUCCESS;
 		else
 			event = E_TIMEOUT;
@@ -133,7 +133,7 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, char mode, cnt_t time, unsig
 	if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
 	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
 
-	if (value == 0 || ((value != flags) && !(mode & flgAll)))
+	if (value == 0 || (value != flags && (mode & flgAll) == 0))
 		return E_SUCCESS;
 	
 	System.cur->tmp.flg.mode  = mode;
