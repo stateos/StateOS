@@ -110,8 +110,7 @@ unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(void
 	if (event != E_SUCCESS)
 		return event;
 
-	event = mtx_wait(mtx);
-	return event;
+	return mtx_wait(mtx);
 }
 
 /* -------------------------------------------------------------------------- */

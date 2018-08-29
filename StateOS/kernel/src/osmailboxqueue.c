@@ -189,7 +189,7 @@ void priv_box_putUpdate( box_t *box, const char *data )
 unsigned box_take( box_t *box, void *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(box);
 	assert(data);
@@ -200,6 +200,10 @@ unsigned box_take( box_t *box, void *data )
 		{
 			priv_box_getUpdate(box, data);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();
@@ -260,7 +264,7 @@ unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
 unsigned box_give( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(box);
 	assert(data);
@@ -271,6 +275,10 @@ unsigned box_give( box_t *box, const void *data )
 		{
 			priv_box_putUpdate(box, data);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();
@@ -331,7 +339,7 @@ unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
 unsigned box_push( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(box);
 	assert(data);
@@ -344,6 +352,10 @@ unsigned box_push( box_t *box, const void *data )
 				priv_box_skip(box);
 			priv_box_putUpdate(box, data);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();

@@ -98,8 +98,8 @@ void flg_delete( flg_t *flg )
 unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned event;
 	unsigned value = flags;
-	unsigned event = E_TIMEOUT;
 
 	assert(flg);
 	assert((mode & ~flgMASK) == 0U);
@@ -111,6 +111,8 @@ unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
 
 		if (value == 0 || ((value != flags) && !(mode & flgAll)))
 			event = E_SUCCESS;
+		else
+			event = E_TIMEOUT;
 	}
 	sys_unlock();
 
@@ -173,12 +175,14 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time )
 unsigned flg_give( flg_t *flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t *tsk;
+	unsigned state;
+	tsk_t  * tsk;
 
 	assert(flg);
 
 	sys_lock();
 	{
+		state = flg->flags;
 		flags = flg->flags |= flags;
 
 		for (tsk = flg->queue; tsk; tsk = tsk->obj.queue)
@@ -197,7 +201,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 	}
 	sys_unlock();
 
-	return flags;
+	return state;
 }
 
 /* -------------------------------------------------------------------------- */

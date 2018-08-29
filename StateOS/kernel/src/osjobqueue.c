@@ -174,7 +174,7 @@ unsigned job_take( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
 	fun_t  * fun;
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(job);
 
@@ -188,6 +188,10 @@ unsigned job_take( job_t *job )
 			fun();
 
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();
@@ -260,7 +264,7 @@ unsigned job_waitUntil( job_t *job, cnt_t time )
 unsigned job_give( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(job);
 	assert(fun);
@@ -271,6 +275,10 @@ unsigned job_give( job_t *job, fun_t *fun )
 		{
 			priv_job_putUpdate(job, fun);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();
@@ -331,7 +339,7 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 unsigned job_push( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(job);
 	assert(fun);
@@ -344,6 +352,10 @@ unsigned job_push( job_t *job, fun_t *fun )
 				priv_job_skip(job);
 			priv_job_putUpdate(job, fun);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();

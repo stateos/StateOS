@@ -101,7 +101,7 @@ void sem_delete( sem_t *sem )
 unsigned sem_take( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(sem);
 	assert(sem->limit);
@@ -113,6 +113,10 @@ unsigned sem_take( sem_t *sem )
 			if (core_one_wakeup(sem, E_SUCCESS) == 0)
 				sem->count--;
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();
@@ -173,7 +177,7 @@ unsigned sem_waitUntil( sem_t *sem, cnt_t time )
 unsigned sem_give( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(sem);
 	assert(sem->limit);
@@ -185,6 +189,10 @@ unsigned sem_give( sem_t *sem )
 			if (core_one_wakeup(sem, E_SUCCESS) == 0)
 				sem->count++;
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();

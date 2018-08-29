@@ -168,7 +168,7 @@ void priv_evt_putUpdate( evt_t *evt, const unsigned data )
 unsigned evt_take( evt_t *evt, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(evt);
 
@@ -178,6 +178,10 @@ unsigned evt_take( evt_t *evt, unsigned *data )
 		{
 			priv_evt_getUpdate(evt, data);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();
@@ -237,7 +241,7 @@ unsigned evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time )
 unsigned evt_give( evt_t *evt, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(evt);
 
@@ -247,6 +251,10 @@ unsigned evt_give( evt_t *evt, unsigned data )
 		{
 			priv_evt_putUpdate(evt, data);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();
@@ -306,7 +314,7 @@ unsigned evt_sendUntil( evt_t *evt, unsigned data, cnt_t time )
 unsigned evt_push( evt_t *evt, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(evt);
 
@@ -318,6 +326,10 @@ unsigned evt_push( evt_t *evt, unsigned data )
 				priv_evt_skip(evt);
 			priv_evt_putUpdate(evt, data);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();

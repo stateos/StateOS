@@ -99,7 +99,7 @@ void sig_delete( sig_t *sig )
 unsigned sig_take( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(sig);
 
@@ -109,6 +109,10 @@ unsigned sig_take( sig_t *sig )
 		{
 			sig->flag = sig->type;
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();

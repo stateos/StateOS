@@ -145,7 +145,7 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time )
 unsigned mut_give( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(!port_isr_context());
 	assert(mut);
@@ -156,6 +156,10 @@ unsigned mut_give( mut_t *mut )
 		{
 			mut->owner = core_one_wakeup(mut, E_SUCCESS);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();

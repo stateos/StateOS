@@ -188,7 +188,7 @@ void tsk_delete( tsk_t *tsk )
 unsigned tsk_detach( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(!port_isr_context());
 	assert(tsk);
@@ -203,6 +203,10 @@ unsigned tsk_detach( tsk_t *tsk )
 			tsk->join = DETACHED;
 			event = E_SUCCESS;
 		}
+		else
+		{
+			event = E_TIMEOUT;
+		}
 	}
 	sys_unlock();
 
@@ -213,23 +217,23 @@ unsigned tsk_detach( tsk_t *tsk )
 unsigned tsk_join( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(!port_isr_context());
 	assert(tsk);
 
 	sys_lock();
 	{
-		if (tsk->join == JOINABLE)
-		{
-			if (tsk->id != ID_STOPPED)
-				event = core_tsk_waitFor(&tsk->join, INFINITE);
-			else
-				event = E_SUCCESS;
+		if (tsk->join != JOINABLE)
+			event = E_TIMEOUT;
+		else
+		if (tsk->id != ID_STOPPED)
+			event = core_tsk_waitFor(&tsk->join, INFINITE);
+		else
+			event = E_SUCCESS;
 
-			if (event != E_TIMEOUT) // !detached
-				core_sys_free(tsk->obj.res);
-		}
+		if (event != E_TIMEOUT) // !detached
+			core_sys_free(tsk->obj.res);
 	}
 	sys_unlock();
 
@@ -323,7 +327,7 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time )
 unsigned tsk_give( tsk_t *tsk, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(tsk);
 
@@ -337,6 +341,10 @@ unsigned tsk_give( tsk_t *tsk, unsigned flags )
 				core_tsk_wakeup(tsk, flags);
 			event = E_SUCCESS;
 		}
+		else
+		{
+			event = E_TIMEOUT;
+		}
 	}
 	sys_unlock();
 
@@ -347,7 +355,7 @@ unsigned tsk_give( tsk_t *tsk, unsigned flags )
 unsigned tsk_suspend( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_STOPPED;
+	unsigned event;
 
 	assert(tsk);
 
@@ -357,6 +365,10 @@ unsigned tsk_suspend( tsk_t *tsk )
 		{
 			core_tsk_suspend(tsk);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_STOPPED;
 		}
 	}
 	sys_unlock();
@@ -368,7 +380,7 @@ unsigned tsk_suspend( tsk_t *tsk )
 unsigned tsk_resume( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_STOPPED;
+	unsigned event;
 
 	assert(tsk);
 
@@ -378,6 +390,10 @@ unsigned tsk_resume( tsk_t *tsk )
 		{
 			core_tsk_wakeup(tsk, E_STOPPED);
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_STOPPED;
 		}
 	}
 	sys_unlock();

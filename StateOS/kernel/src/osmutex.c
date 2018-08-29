@@ -145,38 +145,36 @@ static
 unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(!port_isr_context());
 	assert(mtx);
 
 	if (mtx->owner == 0)
 	{
 		priv_mtx_link(mtx, System.cur);
-		event = E_SUCCESS;
+		return E_SUCCESS;
 	}
-	else
+
 	if (mtx->owner != System.cur)
 	{
+		unsigned event;
+
 		if (mtx->owner->prio < System.cur->prio)
 			core_tsk_prio(mtx->owner, System.cur->prio);
 
 		System.cur->mtx.tree = mtx->owner;
 		event = wait(mtx, time);
 		System.cur->mtx.tree = 0;
-	}
-	else
-	if (mtx->count + 1)
-	{
-		mtx->count++;
-		event = E_SUCCESS;
-	}
-	else
-	{
-		event = E_TIMEOUT;
+
+		return event;
 	}
 
-	return event;
+	if (mtx->count + 1 != 0)
+	{
+		mtx->count++;
+		return E_SUCCESS;
+	}
+
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -225,7 +223,7 @@ unsigned mtx_give( mtx_t *mtx )
 			event = E_TIMEOUT;
 		}
 		else
-		if (mtx->count)
+		if (mtx->count > 0)
 		{
 			mtx->count--;
 			event = E_SUCCESS;

@@ -96,7 +96,7 @@ void lst_delete( lst_t *lst )
 unsigned lst_take( lst_t *lst, void **data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned event;
 
 	assert(lst);
 	assert(data);
@@ -108,6 +108,10 @@ unsigned lst_take( lst_t *lst, void **data )
 			*data = lst->head.next + 1;
 			lst->head.next = lst->head.next->next;
 			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();

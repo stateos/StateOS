@@ -183,18 +183,12 @@ void tmr_startUntil( tmr_t *tmr, cnt_t time )
 unsigned tmr_take( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
-
 	assert(tmr);
 
-	sys_lock();
-	{
-		if (tmr->id == ID_STOPPED)
-			event = E_SUCCESS;
-	}
-	sys_unlock();
+	if (tmr->id == ID_STOPPED)
+		return E_SUCCESS;
 
-	return event;
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */

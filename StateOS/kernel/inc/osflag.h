@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    29.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -370,7 +370,7 @@ unsigned flg_takeISR( flg_t *flg, unsigned flags, unsigned mode ) { return flg_t
  *   flg             : pointer to flag object
  *   flags           : all flags to set
  *
- * Return            : flags in flag object after setting
+ * Return            : flags in flag object before setting
  *
  * Note              : may be used both in thread and handler mode
  *
