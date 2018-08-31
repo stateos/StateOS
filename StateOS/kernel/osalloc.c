@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    31.08.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -40,31 +40,33 @@
 
 /* -------------------------------------------------------------------------- */
 
-typedef struct __hdr hdr_t;
+// memory segment header
 
-struct __hdr
+typedef struct __seg seg_t;
+
+struct __seg
 {
-	hdr_t  * next;
+	seg_t  * next;
 	size_t   size;
 };
 
 /* -------------------------------------------------------------------------- */
 
 #define HSIZE( size ) \
- ALIGNED_SIZE( size, hdr_t )
+ ALIGNED_SIZE( size, seg_t )
 
 /* -------------------------------------------------------------------------- */
 
 static
-hdr_t Heap[HSIZE(OS_HEAP_SIZE)+1] =
+seg_t Heap[HSIZE(OS_HEAP_SIZE)+1] =
   { { Heap+HSIZE(OS_HEAP_SIZE), HSIZE(OS_HEAP_SIZE) } };
 
 /* -------------------------------------------------------------------------- */
 
 void *core_sys_alloc( size_t size )
 {
-	hdr_t *heap;
-	hdr_t *next;
+	seg_t *mem;
+	seg_t *nxt;
 
 	assert(HSIZE(size));
 
@@ -72,56 +74,55 @@ void *core_sys_alloc( size_t size )
 
 	sys_lock();
 	{
-		for (heap = Heap; heap; heap = heap->next)
+		for (mem = Heap; mem; mem = mem->next)
 		{
-			if (heap->size == 0)				// memory segment has already been allocated
+			if (mem->size == 0)					// memory segment has already been allocated
 				continue;
 
-			while ((next = heap->next)->size)	// it is possible to merge adjacent free memory segments
+			while ((nxt = mem->next)->size)		// it is possible to merge adjacent free memory segments
 			{
-				heap->next = next->next;
-				heap->size += next->size;
+				mem->next = nxt->next;
+				mem->size += nxt->size;
 			}
 
-			if (heap->size < size)				// memory segment is too small
+			if (mem->size < size)				// memory segment is too small
 				continue;
 
-			if (heap->size > size)				// memory segment is larger than required
+			if (mem->size > size)				// memory segment is larger than required
 			{
-				next = heap + size;
-				next->next = heap->next;
-				next->size = heap->size - size;
+				nxt = mem + size;
+				nxt->next = mem->next;
+				nxt->size = mem->size - size;
 			}
 
-			heap = memset(heap, 0, size * sizeof(hdr_t));
-			heap->next = next;
-			heap = heap + 1;
+			mem = memset(mem, 0, size * sizeof(seg_t));
+			mem->next = nxt;
+			mem = mem + 1;
 			break;								// memory segment was successfully allocated
 		}
 	}
 	sys_unlock();
 
-	assert(heap);
+	assert(mem);
 
-	return heap;
+	return mem;
 }
 
 /* -------------------------------------------------------------------------- */
 
 void core_sys_free( void *base )
 {
-	hdr_t *heap;
-
-	base = (hdr_t *) base - 1;
+	seg_t *mem;
+	seg_t *seg = (seg_t *)base - 1;
 
 	sys_lock();
 	{
-		for (heap = Heap; heap; heap = heap->next)
+		for (mem = Heap; mem; mem = mem->next)
 		{
-			if (heap != base)					// this is not the memory segment we are looking for
+			if (mem != seg)						// this is not the memory segment we are looking for
 				continue;
 
-			heap->size = heap->next - heap;
+			mem->size = mem->next - mem;
 			break;								// memory segment was successfully released
 		}
 	}
@@ -134,18 +135,18 @@ void core_sys_free( void *base )
 
 void *core_sys_alloc( size_t size )
 {
-	void *base;
+	void *mem;
 
 	assert(size);
 
-	base = malloc(size);
+	mem = malloc(size);
 
-	if (base)
-		base = memset(base, 0, size);
+	if (mem)
+		mem = memset(mem, 0, size);
 
-	assert(base);
+	assert(mem);
 
-	return base;
+	return mem;
 }
 
 /* -------------------------------------------------------------------------- */
