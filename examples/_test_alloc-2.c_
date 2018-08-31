@@ -1,0 +1,39 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+sem_t *sem;
+tsk_t *sla;
+tsk_t *tck;
+
+void tick()
+{
+	tsk_kill(sla);
+	LED_Tick();
+	tsk_detach(tsk_this());
+	tsk_stop();
+}
+
+void slave()
+{
+	sem_wait(sem);
+	sem_delete(sem);
+	tck = tsk_create(2, tick);
+	tsk_join(tck);
+	tsk_stop();
+}
+
+void master()
+{
+	sem = sem_create(0, semBinary);
+	sla = tsk_create(1, slave);
+	sem_give(sem);
+	tsk_join(sla);
+}
+
+int main()
+{
+	LED_Init();
+
+	tsk_create(0, master);
+	tsk_stop();
+}
