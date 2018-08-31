@@ -54,9 +54,7 @@ typedef struct __mem mem_t, * const mem_id;
 
 struct __mem
 {
-	obj_t    obj;   // object header
-
-	que_t    head;  // inherited from list
+	lst_t    lst;   // memory pool list
 
 	unsigned limit; // size of a memory pool (max number of objects)
 	unsigned size;  // size of memory object (in sizeof(que_t) units)
@@ -80,7 +78,7 @@ struct __mem
  *
  ******************************************************************************/
 
-#define               _MEM_INIT( _limit, _size, _data ) { _OBJ_INIT(), _QUE_INIT(), _limit, _size, _data }
+#define               _MEM_INIT( _limit, _size, _data ) { _LST_INIT(), _limit, _size, _data }
 
 /******************************************************************************
  *
@@ -301,7 +299,7 @@ void mem_delete( mem_t *mem );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay ) { return lst_waitFor((lst_t *)mem, data, delay); }
+unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay ) { return lst_waitFor(&mem->lst, data, delay); }
 
 /******************************************************************************
  *
@@ -325,7 +323,7 @@ unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay ) { return lst_waitFo
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time ) { return lst_waitUntil((lst_t *)mem, data, time); }
+unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time ) { return lst_waitUntil(&mem->lst, data, time); }
 
 /******************************************************************************
  *
@@ -347,7 +345,7 @@ unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time ) { return lst_waitU
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned mem_wait( mem_t *mem, void **data ) { return lst_wait((lst_t *)mem, data); }
+unsigned mem_wait( mem_t *mem, void **data ) { return lst_wait(&mem->lst, data); }
 
 /******************************************************************************
  *
@@ -370,10 +368,10 @@ unsigned mem_wait( mem_t *mem, void **data ) { return lst_wait((lst_t *)mem, dat
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned mem_take( mem_t *mem, void **data ) { return lst_take((lst_t*)mem, data); }
+unsigned mem_take( mem_t *mem, void **data ) { return lst_take(&mem->lst, data); }
 
 __STATIC_INLINE
-unsigned mem_takeISR( mem_t *mem, void **data ) { return lst_takeISR((lst_t *)mem, data); }
+unsigned mem_takeISR( mem_t *mem, void **data ) { return lst_takeISR(&mem->lst, data); }
 
 /******************************************************************************
  *
@@ -393,10 +391,10 @@ unsigned mem_takeISR( mem_t *mem, void **data ) { return lst_takeISR((lst_t *)me
  ******************************************************************************/
 
 __STATIC_INLINE
-void mem_give( mem_t *mem, const void *data ) { lst_give((lst_t *)mem, data); }
+void mem_give( mem_t *mem, const void *data ) { lst_give(&mem->lst, data); }
 
 __STATIC_INLINE
-void mem_giveISR( mem_t *mem, const void *data ) { lst_giveISR((lst_t *)mem, data); }
+void mem_giveISR( mem_t *mem, const void *data ) { lst_giveISR(&mem->lst, data); }
 
 #ifdef __cplusplus
 }

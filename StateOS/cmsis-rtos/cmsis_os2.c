@@ -1068,9 +1068,9 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 	sys_lock();
 	{
 		mem_init(&mp->mem, block_size, data, size);
-		if (attr->cb_mem == NULL || attr->cb_size == 0U) mp->mem.obj.res = mp;
+		if (attr->cb_mem == NULL || attr->cb_size == 0U) mp->mem.lst.obj.res = mp;
 		else
-		if (attr->mp_mem == NULL || attr->mp_size == 0U) mp->mem.obj.res = data;
+		if (attr->mp_mem == NULL || attr->mp_size == 0U) mp->mem.lst.obj.res = data;
 		mp->flags = flags;
 		mp->name = (attr == NULL) ? NULL : attr->name;
 	}
@@ -1149,7 +1149,7 @@ uint32_t osMemoryPoolGetCount (osMemoryPoolId_t mp_id)
 
 	sys_lock();
 	{
-		for (que = mp->mem.head.next; que != NULL; que = que->next) count--;
+		for (que = mp->mem.lst.head.next; que != NULL; que = que->next) count--;
 	}
 	sys_unlock();
 
@@ -1167,7 +1167,7 @@ uint32_t osMemoryPoolGetSpace (osMemoryPoolId_t mp_id)
 
 	sys_lock();
 	{
-		for (que = mp->mem.head.next; que != NULL; que = que->next) count++;
+		for (que = mp->mem.lst.head.next; que != NULL; que = que->next) count++;
 	}
 	sys_unlock();
 

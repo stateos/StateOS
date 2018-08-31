@@ -51,7 +51,7 @@ void mem_bind( mem_t *mem )
 		ptr = mem->data;
 		cnt = mem->limit;
 
-		mem->head.next = 0;
+		mem->lst.head.next = 0;
 		while (cnt--) { mem_give(mem, ++ptr); ptr += mem->size; }
 	}
 	sys_unlock();
@@ -71,7 +71,7 @@ void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize )
 	{
 		memset(mem, 0, sizeof(mem_t));
 
-		core_obj_init(&mem->obj);
+		core_obj_init(&mem->lst.obj);
 
 		mem->limit = bufsize / (1 + MSIZE(size)) / sizeof(que_t);
 		mem->size  = MSIZE(size);
@@ -98,7 +98,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 		bufsize = limit * (1 + MSIZE(size)) * sizeof(que_t);
 		mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + bufsize);
 		mem_init(mem, size, (void *)((size_t)mem + ABOVE(sizeof(mem_t))), bufsize);
-		mem->obj.res = mem;
+		mem->lst.obj.res = mem;
 	}
 	sys_unlock();
 
@@ -114,7 +114,7 @@ void mem_kill( mem_t *mem )
 
 	sys_lock();
 	{
-		core_all_wakeup(&mem->obj.queue, E_STOPPED);
+		core_all_wakeup(&mem->lst.obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -126,7 +126,7 @@ void mem_delete( mem_t *mem )
 	sys_lock();
 	{
 		mem_kill(mem);
-		core_sys_free(mem->obj.res);
+		core_sys_free(mem->lst.obj.res);
 	}
 	sys_unlock();
 }

@@ -79,7 +79,7 @@ struct __lst
 {
 	obj_t    obj;   // object header
 
-	que_t    head;  // next memory object in the queue, previously created in the memory pool
+	que_t    head;  // list head
 };
 
 /******************************************************************************
