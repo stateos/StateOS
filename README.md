@@ -18,7 +18,6 @@ There's a dedicated function for immediate change the task state.
 - kernel can operate in tick-less mode
 - spin locks
 - signals (clear, protect)
-- events
 - flags (any, all, protect, ignore)
 - barriers
 - semaphores (binary, limited, counting)
@@ -29,8 +28,8 @@ There's a dedicated function for immediate change the task state.
 - stream buffers
 - message buffers
 - mailbox queues
-- job queues
 - event queues
+- job queues
 - timers (one-shot, periodic)
 - cmsis-rtos api
 - cmsis-rtos2 api
