@@ -57,6 +57,7 @@ Features:
 - changed stm_init function
 - reorganized kernel functions
 - added object header
+- added header init functions
 ---------
 6.1
 - updated os version

@@ -46,7 +46,8 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 	{
 		memset(tsk, 0, sizeof(tsk_t));
 
-		tsk->sub.id = ID_STOPPED;
+		core_sub_init(&tsk->sub);
+
 		tsk->prio   = prio;
 		tsk->basic  = prio;
 		tsk->state  = state;

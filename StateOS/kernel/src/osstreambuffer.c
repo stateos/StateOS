@@ -46,6 +46,8 @@ void stm_init( stm_t *stm, void *data, unsigned bufsize )
 	{
 		memset(stm, 0, sizeof(stm_t));
 
+		core_obj_init(&stm->obj);
+
 		stm->limit = bufsize;
 		stm->data  = data;
 	}

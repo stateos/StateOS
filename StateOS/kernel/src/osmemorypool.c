@@ -71,6 +71,8 @@ void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize )
 	{
 		memset(mem, 0, sizeof(mem_t));
 
+		core_obj_init(&mem->obj);
+
 		mem->limit = bufsize / (1 + MSIZE(size)) / sizeof(que_t);
 		mem->size  = MSIZE(size);
 		mem->data  = data;

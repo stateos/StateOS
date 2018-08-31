@@ -42,6 +42,8 @@ void cnd_init( cnd_t *cnd )
 	sys_lock();
 	{
 		memset(cnd, 0, sizeof(cnd_t));
+
+		core_obj_init(&cnd->obj);
 	}
 	sys_unlock();
 }

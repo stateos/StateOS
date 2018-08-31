@@ -46,6 +46,8 @@ void msg_init( msg_t *msg, void *data, unsigned bufsize )
 	{
 		memset(msg, 0, sizeof(msg_t));
 
+		core_obj_init(&msg->obj);
+
 		msg->limit = bufsize;
 		msg->data  = data;
 	}

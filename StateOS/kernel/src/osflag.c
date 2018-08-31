@@ -44,6 +44,8 @@ void flg_init( flg_t *flg, unsigned init )
 	{
 		memset(flg, 0, sizeof(flg_t));
 
+		core_obj_init(&flg->obj);
+
 		flg->flags = init;
 	}
 	sys_unlock();

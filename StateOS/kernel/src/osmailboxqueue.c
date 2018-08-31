@@ -47,6 +47,8 @@ void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
 	{
 		memset(box, 0, sizeof(box_t));
 
+		core_obj_init(&box->obj);
+
 		box->limit = (bufsize / size) * size;
 		box->data  = data;
 		box->size  = size;

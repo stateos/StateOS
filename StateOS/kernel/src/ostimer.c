@@ -43,7 +43,8 @@ void tmr_init( tmr_t *tmr, fun_t *state )
 	{
 		memset(tmr, 0, sizeof(tmr_t));
 
-		tmr->sub.id = ID_STOPPED;
+		core_sub_init(&tmr->sub);
+
 		tmr->state  = state;
 	}
 	sys_unlock();

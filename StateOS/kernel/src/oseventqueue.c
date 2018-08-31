@@ -46,6 +46,8 @@ void evt_init( evt_t *evt, unsigned *data, unsigned bufsize )
 	{
 		memset(evt, 0, sizeof(evt_t));
 
+		core_obj_init(&evt->obj);
+
 		evt->limit = bufsize / sizeof(unsigned);
 		evt->data  = data;
 	}

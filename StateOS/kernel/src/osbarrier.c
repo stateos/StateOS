@@ -44,6 +44,8 @@ void bar_init( bar_t *bar, unsigned limit )
 	{
 		memset(bar, 0, sizeof(bar_t));
 
+		core_obj_init(&bar->obj);
+
 		bar->count = limit;
 		bar->limit = limit;
 	}

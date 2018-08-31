@@ -43,6 +43,8 @@ void sig_init( sig_t *sig, bool type )
 	{
 		memset(sig, 0, sizeof(sig_t));
 
+		core_obj_init(&sig->obj);
+
 		sig->type = type;
 	}
 	sys_unlock();

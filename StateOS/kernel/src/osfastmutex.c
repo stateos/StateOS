@@ -42,6 +42,8 @@ void mut_init( mut_t *mut )
 	sys_lock();
 	{
 		memset(mut, 0, sizeof(mut_t));
+
+		core_obj_init(&mut->obj);
 	}
 	sys_unlock();
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -108,6 +108,14 @@ typedef struct __obj
 
 /* -------------------------------------------------------------------------- */
 
+__STATIC_INLINE
+void core_obj_init( obj_t *obj )
+{
+	(void) obj;
+}
+
+/* -------------------------------------------------------------------------- */
+
 // timer / task header
 
 typedef struct __sub
@@ -120,6 +128,16 @@ typedef struct __sub
 }	sub_t;
 
 #define               _SUB_INIT() { _OBJ_INIT(), 0, 0, ID_STOPPED }
+
+/* -------------------------------------------------------------------------- */
+
+__STATIC_INLINE
+void core_sub_init( sub_t *sub )
+{
+	core_obj_init(&sub->obj);
+
+	sub->id = ID_STOPPED;
+}
 
 /* -------------------------------------------------------------------------- */
 

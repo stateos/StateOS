@@ -43,6 +43,8 @@ void mtx_init( mtx_t *mtx )
 	sys_lock();
 	{
 		memset(mtx, 0, sizeof(mtx_t));
+
+		core_obj_init(&mtx->obj);
 	}
 	sys_unlock();
 }

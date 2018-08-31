@@ -44,6 +44,8 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit )
 	{
 		memset(sem, 0, sizeof(sem_t));
 
+		core_obj_init(&sem->obj);
+
 		sem->count = init;
 		sem->limit = limit;
 	}

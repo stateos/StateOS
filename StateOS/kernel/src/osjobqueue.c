@@ -46,6 +46,8 @@ void job_init( job_t *job, fun_t **data, unsigned bufsize )
 	{
 		memset(job, 0, sizeof(job_t));
 
+		core_obj_init(&job->obj);
+
 		job->limit = bufsize / sizeof(fun_t *);
 		job->data  = data;
 	}

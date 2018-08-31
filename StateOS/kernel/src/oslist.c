@@ -43,6 +43,8 @@ void lst_init( lst_t *lst )
 	sys_lock();
 	{
 		memset(lst, 0, sizeof(lst_t));
+
+		core_obj_init(&lst->obj);
 	}
 	sys_unlock();
 }
