@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -551,7 +551,7 @@ template<unsigned limit_>
 struct MessageBufferT : public __msg
 {
 	 MessageBufferT( void ): __msg _MSG_INIT(limit_, data_) {}
-	~MessageBufferT( void ) { assert(__msg::queue == nullptr); }
+	~MessageBufferT( void ) { assert(__msg::obj.queue == nullptr); }
 
 	void     kill     ( void )                                            {        msg_kill     (this);                       }
 	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return msg_waitFor  (this, _data, _size, _delay); }

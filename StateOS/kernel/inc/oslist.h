@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -381,7 +381,7 @@ template<class T>
 struct ListTT : public __lst
 {
 	 ListTT( void ): __lst _LST_INIT() {}
-	~ListTT( void ) { assert(__lst::queue == nullptr); }
+	~ListTT( void ) { assert(__lst::obj.queue == nullptr); }
 
 	void     kill     ( void )                            {        lst_kill     (this);                                           }
 	unsigned waitFor  (       T   **_data, cnt_t _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), _delay); }

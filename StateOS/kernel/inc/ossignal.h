@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -405,7 +405,7 @@ void sig_clearISR( sig_t *sig ) { sig_clear(sig); }
 struct Signal : public __sig
 {
 	 Signal( const bool _type = sigClear ): __sig _SIG_INIT(_type) {}
-	~Signal( void ) { assert(__sig::queue == nullptr); }
+	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
 	void     kill     ( void )         {        sig_kill     (this);         }
 	unsigned waitFor  ( cnt_t _delay ) { return sig_waitFor  (this, _delay); }

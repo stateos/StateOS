@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -485,7 +485,7 @@ template<unsigned limit_>
 struct staticJobQueueT : public __job
 {
 	 staticJobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
-	~staticJobQueueT( void ) { assert(__job::queue == nullptr); }
+	~staticJobQueueT( void ) { assert(__job::obj.queue == nullptr); }
 
 	void     kill     ( void )                      {        job_kill     (this);               }
 	unsigned waitFor  ( cnt_t  _delay )             { return job_waitFor  (this, _delay);       }
@@ -521,7 +521,7 @@ template<unsigned limit_>
 struct JobQueueT : public __box
 {
 	 JobQueueT( void ): __box _BOX_INIT(limit_, reinterpret_cast<char *>(data_), sizeof(FUN_t)) {}
-	~JobQueueT( void ) { assert(__box::queue == nullptr); }
+	~JobQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	void     kill     ( void )                     {                              box_kill     (this);                                                              }
 	unsigned waitFor  ( cnt_t _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }

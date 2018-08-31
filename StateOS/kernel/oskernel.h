@@ -95,7 +95,7 @@ extern sys_t System; // system data
 /* -------------------------------------------------------------------------- */
 
 #define core_stk_assert() \
-        assert((System.cur == &MAIN) || (System.cur->stack <= port_get_sp()))
+        assert((System.cur == &MAIN) || ((uintptr_t)System.cur->stack <= (uintptr_t)port_get_sp()))
 
 /* -------------------------------------------------------------------------- */
 

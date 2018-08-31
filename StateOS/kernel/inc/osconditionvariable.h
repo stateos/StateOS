@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -333,7 +333,7 @@ void cnd_giveISR( cnd_t *cnd, bool all ) { cnd_give(cnd, all); }
 struct ConditionVariable : public __cnd
 {
 	 ConditionVariable( void ): __cnd _CND_INIT() {}
-	~ConditionVariable( void ) { assert(__cnd::queue == nullptr); }
+	~ConditionVariable( void ) { assert(__cnd::obj.queue == nullptr); }
 
 	void     kill     ( void )                      {        cnd_kill     (this);               }
 	unsigned waitFor  ( mtx_t *_mtx, cnt_t _delay ) { return cnd_waitFor  (this, _mtx, _delay); }

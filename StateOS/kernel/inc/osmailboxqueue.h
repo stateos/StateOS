@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -534,7 +534,7 @@ template<unsigned limit_, unsigned size_>
 struct MailBoxQueueT : public __box
 {
 	 MailBoxQueueT( void ): __box _BOX_INIT(limit_, data_, size_) {}
-	~MailBoxQueueT( void ) { assert(__box::queue == nullptr); }
+	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	void     kill     ( void )                            {        box_kill     (this);                }
 	unsigned waitFor  (       void *_data, cnt_t _delay ) { return box_waitFor  (this, _data, _delay); }

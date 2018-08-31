@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -422,7 +422,7 @@ template<unsigned limit_, unsigned size_>
 struct MemoryPoolT : public __mem
 {
 	 MemoryPoolT( void ): __mem _MEM_INIT(limit_, MSIZE(size_), data_) { mem_bind(this); }
-	~MemoryPoolT( void ) { assert(__mem::queue == nullptr); }
+	~MemoryPoolT( void ) { assert(__mem::lst.obj.queue == nullptr); }
 
 	void     kill     ( void )                             {        mem_kill     (this);                }
 	unsigned waitFor  (       void **_data, cnt_t _delay ) { return mem_waitFor  (this, _data, _delay); }

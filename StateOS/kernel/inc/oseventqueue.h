@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -485,7 +485,7 @@ template<unsigned limit_>
 struct EventQueueT : public __evt
 {
 	 EventQueueT( void ): __evt _EVT_INIT(limit_, data_) {}
-	~EventQueueT( void ) { assert(__evt::queue == nullptr); }
+	~EventQueueT( void ) { assert(__evt::obj.queue == nullptr); }
 
 	void     kill     ( void )                          {        evt_kill     (this);                }
 	unsigned waitFor  ( unsigned *_data, cnt_t _delay ) { return evt_waitFor  (this, _data, _delay); }

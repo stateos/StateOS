@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -425,7 +425,7 @@ unsigned flg_clearISR( flg_t *flg, unsigned flags ) { return flg_clear(flg, flag
 struct Flag : public __flg
 {
 	 Flag( const unsigned _init = 0 ): __flg _FLG_INIT(_init) {}
-	~Flag( void ) { assert(__flg::queue == nullptr); }
+	~Flag( void ) { assert(__flg::obj.queue == nullptr); }
 
 	void     kill     ( void )                                      {        flg_kill     (this);                        }
 	unsigned waitFor  ( unsigned _flags, char _mode, cnt_t _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }

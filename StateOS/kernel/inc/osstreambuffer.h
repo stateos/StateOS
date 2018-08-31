@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -551,7 +551,7 @@ template<unsigned limit_>
 struct StreamBufferT : public __stm
 {
 	 StreamBufferT( void ): __stm _STM_INIT(limit_, data_) {}
-	~StreamBufferT( void ) { assert(__stm::queue == nullptr); }
+	~StreamBufferT( void ) { assert(__stm::obj.queue == nullptr); }
 
 	void     kill     ( void )                                            {        stm_kill     (this);                       }
 	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return stm_waitFor  (this, _data, _size, _delay); }

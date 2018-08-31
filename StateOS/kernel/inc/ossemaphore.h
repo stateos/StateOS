@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -474,7 +474,7 @@ unsigned sem_giveISR( sem_t *sem ) { return sem_give(sem); }
 struct Semaphore : public __sem
 {
 	 Semaphore( const unsigned _init, const unsigned _limit = semCounting ): __sem _SEM_INIT(_init, _limit) {}
-	~Semaphore( void ) { assert(__sem::queue == nullptr); }
+	~Semaphore( void ) { assert(__sem::obj.queue == nullptr); }
 
 	void     kill     ( void )         {        sem_kill     (this);         }
 	unsigned waitFor  ( cnt_t _delay ) { return sem_waitFor  (this, _delay); }
