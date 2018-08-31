@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,8 +48,8 @@ typedef struct __stm stm_t, * const stm_id;
 
 struct __stm
 {
-	tsk_t  * queue; // inherited from semaphore
-	void   * res;   // allocated stream buffer object's resource
+	obj_t    obj;   // object header
+
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
@@ -74,7 +74,7 @@ struct __stm
  *
  ******************************************************************************/
 
-#define               _STM_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data }
+#define               _STM_INIT( _limit, _data ) { _OBJ_INIT(), 0, _limit, 0, 0, _data }
 
 /******************************************************************************
  *

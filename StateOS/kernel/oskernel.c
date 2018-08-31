@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -56,23 +56,23 @@ void priv_ctx_switchNow( void )
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_rdy_insert( obj_t *obj, obj_t *nxt )
+void priv_rdy_insert( sub_t *sub, sub_t *nxt )
 {
-	obj_t *prv = nxt->prev;
+	sub_t *prv = nxt->prev;
 
-	obj->prev = prv;
-	obj->next = nxt;
-	nxt->prev = obj;
-	prv->next = obj;
+	sub->prev = prv;
+	sub->next = nxt;
+	nxt->prev = sub;
+	prv->next = sub;
 }
 
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_rdy_remove( obj_t *obj )
+void priv_rdy_remove( sub_t *sub )
 {
-	obj_t *nxt = obj->next;
-	obj_t *prv = obj->prev;
+	sub_t *nxt = sub->next;
+	sub_t *prv = sub->prev;
 
 	nxt->prev = prv;
 	prv->next = nxt;
@@ -82,7 +82,7 @@ void priv_rdy_remove( obj_t *obj )
 // SYSTEM TIMER SERVICES
 /* -------------------------------------------------------------------------- */
 
-tmr_t WAIT = { .obj={ .prev=&WAIT.obj, .next=&WAIT.obj }, .id=ID_TIMER, .delay=INFINITE }; // timers queue
+tmr_t WAIT = { .sub={ .prev=&WAIT, .next=&WAIT, .id=ID_TIMER }, .delay=INFINITE }; // timers queue
 
 /* -------------------------------------------------------------------------- */
 
@@ -90,13 +90,13 @@ static
 void priv_tmr_insert( tmr_t *tmr, tid_t id )
 {
 	tmr_t *nxt = &WAIT;
-	tmr->id = id;
+	tmr->sub.id = id;
 
 	if (tmr->delay != INFINITE)
-		do nxt = nxt->obj.next;
+		do nxt = nxt->sub.next;
 		while (nxt->delay < (cnt_t)(tmr->start + tmr->delay - nxt->start));
 
-	priv_rdy_insert(&tmr->obj, &nxt->obj);
+	priv_rdy_insert(&tmr->sub, &nxt->sub);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -104,7 +104,7 @@ void priv_tmr_insert( tmr_t *tmr, tid_t id )
 static
 void priv_tmr_remove( tmr_t *tmr )
 {
-	priv_rdy_remove(&tmr->obj);
+	priv_rdy_remove(&tmr->sub);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -119,7 +119,7 @@ void core_tmr_insert( tmr_t *tmr, tid_t id )
 
 void core_tmr_remove( tmr_t *tmr )
 {
-	tmr->id = ID_STOPPED;
+	tmr->sub.id = ID_STOPPED;
 	priv_tmr_remove(tmr);
 }
 
@@ -175,7 +175,7 @@ void priv_tmr_wakeup( tmr_t *tmr, unsigned event )
 	if (tmr->delay >= (cnt_t)(core_sys_time() - tmr->start + 1))
 		priv_tmr_insert(tmr, ID_TIMER);
 
-	core_all_wakeup(tmr, event);
+	core_all_wakeup(&tmr->sub.obj.queue, event);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -188,11 +188,11 @@ void core_tmr_handler( void )
 
 	port_set_lock();
 	{
-		while (priv_tmr_expired(tmr = WAIT.obj.next))
+		while (priv_tmr_expired(tmr = WAIT.sub.next))
 		{
 			tmr->start += tmr->delay;
 
-			if (tmr->id == ID_TIMER)
+			if (tmr->sub.id == ID_TIMER)
 			{
 				tmr->delay = tmr->period;
 
@@ -220,8 +220,8 @@ static  union  { stk_t STK[SSIZE(OS_IDLE_STACK)];
 #define IDLE_STK (void *)(&IDLE_STACK)
 #define IDLE_SP  (void *)(&IDLE_STACK.CTX.ctx)
 
-tsk_t MAIN = { .obj={ .prev=&IDLE.obj, .next=&IDLE.obj }, .id=ID_READY, .stack=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { .obj={ .prev=&MAIN.obj, .next=&MAIN.obj }, .id=ID_IDLE, .state=priv_tsk_idle, .stack=IDLE_STK, .size=OS_IDLE_STACK, .sp=IDLE_SP }; // idle task and tasks queue
+tsk_t MAIN = { .sub={ .prev=&IDLE, .next=&IDLE, .id=ID_READY }, .stack=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
+tsk_t IDLE = { .sub={ .prev=&MAIN, .next=&MAIN, .id=ID_IDLE  }, .state=priv_tsk_idle, .stack=IDLE_STK, .size=OS_IDLE_STACK, .sp=IDLE_SP }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
@@ -234,10 +234,10 @@ void priv_tsk_insert( tsk_t *tsk )
 	tsk->slice = 0;
 #endif
 	if (tsk->prio)
-		do nxt = nxt->obj.next;
+		do nxt = nxt->sub.next;
 		while (tsk->prio <= nxt->prio);
 
-	priv_rdy_insert(&tsk->obj, &nxt->obj);
+	priv_rdy_insert(&tsk->sub, &nxt->sub);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -245,16 +245,16 @@ void priv_tsk_insert( tsk_t *tsk )
 static
 void priv_tsk_remove( tsk_t *tsk )
 {
-	priv_rdy_remove(&tsk->obj);
+	priv_rdy_remove(&tsk->sub);
 }
 
 /* -------------------------------------------------------------------------- */
 
 void core_tsk_insert( tsk_t *tsk )
 {
-	tsk->id = ID_READY;
+	tsk->sub.id = ID_READY;
 	priv_tsk_insert(tsk);
-	if (tsk == IDLE.obj.next)
+	if (tsk == IDLE.sub.next)
 		port_ctx_switch();
 }
 
@@ -262,7 +262,7 @@ void core_tsk_insert( tsk_t *tsk )
 
 void core_tsk_remove( tsk_t *tsk )
 {
-	tsk->id = ID_STOPPED;
+	tsk->sub.id = ID_STOPPED;
 	priv_tsk_remove(tsk);
 	if (tsk == System.cur)
 		priv_ctx_switchNow();
@@ -283,8 +283,8 @@ void core_ctx_init( tsk_t *tsk )
 
 void core_ctx_switch( void )
 {
-	tsk_t *cur = IDLE.obj.next;
-	tsk_t *nxt = cur->obj.next;
+	tsk_t *cur = IDLE.sub.next;
+	tsk_t *nxt = cur->sub.next;
 	if (nxt->prio == cur->prio)
 		port_ctx_switch();
 }
@@ -304,53 +304,55 @@ void core_tsk_loop( void )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_append( tsk_t *tsk, void *obj )
+void core_tsk_append( tsk_t *tsk, tsk_t **que )
 {
-	tsk_t *prv;
-	tsk_t *nxt = obj;
-	tsk->guard = obj;
+	tsk_t *nxt = *que;
+	tsk->guard = que;
 
-	do prv = nxt, nxt = nxt->obj.queue;
-	while (nxt && tsk->prio <= nxt->prio);
+	while (nxt && tsk->prio <= nxt->prio)
+	{
+		que = &nxt->sub.obj.queue;
+		nxt = *que;
+	}
 
 	if (nxt)
-	nxt->back = tsk;
-	tsk->back = prv;
-	tsk->obj.queue = nxt;
-	prv->obj.queue = tsk;
+		nxt->back = &tsk->sub.obj.queue;
+	tsk->back = que;
+	tsk->sub.obj.queue = nxt;
+	*que = tsk;
 }
 
 /* -------------------------------------------------------------------------- */
 
 void core_tsk_unlink( tsk_t *tsk, unsigned event )
 {
-	tsk_t *prv = tsk->back;
-	tsk_t *nxt = tsk->obj.queue;
+	tsk_t**que = tsk->back;
+	tsk_t *nxt = tsk->sub.obj.queue;
 	tsk->event = event;
 
 	if (nxt)
-	nxt->back = prv;
-	prv->obj.queue = nxt;
-	tsk->obj.queue = 0; // necessary because of tsk_wait[Until|For] functions
+		nxt->back = que;
+	*que = nxt;
+	tsk->sub.obj.queue = 0; // necessary because of tsk_wait[Until|For] functions
 	tsk->guard = 0;
 }
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_transfer( tsk_t *tsk, void *obj )
+void core_tsk_transfer( tsk_t *tsk, tsk_t **que )
 {
 	core_tsk_unlink(tsk, tsk->event);
-	core_tsk_append(tsk, obj);
+	core_tsk_append(tsk, que);
 }
 
 /* -------------------------------------------------------------------------- */
 
 static
-unsigned priv_tsk_wait( tsk_t *tsk, void *obj, bool yield )
+unsigned priv_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield )
 {
 	assert(!port_isr_context());
 
-	core_tsk_append((tsk_t *)tsk, obj);
+	core_tsk_append((tsk_t *)tsk, que);
 	priv_tsk_remove((tsk_t *)tsk);
 	core_tmr_insert((tmr_t *)tsk, ID_DELAYED);
 
@@ -362,7 +364,7 @@ unsigned priv_tsk_wait( tsk_t *tsk, void *obj, bool yield )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitFor( void *obj, cnt_t delay )
+unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay )
 {
 	tsk_t *cur = System.cur;
 
@@ -372,12 +374,12 @@ unsigned core_tsk_waitFor( void *obj, cnt_t delay )
 	if (cur->delay == IMMEDIATE)
 		return E_TIMEOUT;
 
-	return priv_tsk_wait(cur, obj, true);
+	return priv_tsk_wait(cur, que, true);
 }
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitNext( void *obj, cnt_t delay )
+unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay )
 {
 	tsk_t *cur = System.cur;
 
@@ -386,12 +388,12 @@ unsigned core_tsk_waitNext( void *obj, cnt_t delay )
 	if (cur->delay == IMMEDIATE)
 		return E_TIMEOUT;
 
-	return priv_tsk_wait(cur, obj, true);
+	return priv_tsk_wait(cur, que, true);
 }
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitUntil( void *obj, cnt_t time )
+unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time )
 {
 	tsk_t *cur = System.cur;
 
@@ -401,7 +403,7 @@ unsigned core_tsk_waitUntil( void *obj, cnt_t time )
 	if (cur->delay > ((CNT_MAX)>>1))
 		return E_TIMEOUT;
 
-	return priv_tsk_wait(cur, obj, true);
+	return priv_tsk_wait(cur, que, true);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -410,7 +412,7 @@ void core_tsk_suspend( tsk_t *tsk )
 {
 	tsk->delay = INFINITE;
 
-	priv_tsk_wait(tsk, &WAIT, tsk == System.cur);
+	priv_tsk_wait(tsk, &WAIT.sub.obj.queue, tsk == System.cur);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -429,20 +431,9 @@ tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event )
 
 /* -------------------------------------------------------------------------- */
 
-tsk_t *core_one_wakeup( void *obj, unsigned event )
+void core_all_wakeup( tsk_t **que, unsigned event )
 {
-	obj_t *lst = obj;
-
-	return core_tsk_wakeup(lst->queue, event);
-}
-
-/* -------------------------------------------------------------------------- */
-
-void core_all_wakeup( void *obj, unsigned event )
-{
-	obj_t *lst = obj;
-
-	while (core_tsk_wakeup(lst->queue, event));
+	while (core_tsk_wakeup(*que, event));
 }
 
 /* -------------------------------------------------------------------------- */
@@ -455,9 +446,9 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 		prio = tsk->basic;
 
 	for (mtx = tsk->mtx.list; mtx; mtx = mtx->list)
-		if (mtx->queue)
-			if (prio < mtx->queue->prio)
-				prio = mtx->queue->prio;
+		if (mtx->obj.queue)
+			if (prio < mtx->obj.queue->prio)
+				prio = mtx->obj.queue->prio;
 
 	if (tsk->prio != prio)
 	{
@@ -465,18 +456,18 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 
 		if (tsk == System.cur)
 		{
-			tsk = tsk->obj.next;
+			tsk = tsk->sub.next;
 			if (tsk->prio > prio)
 				port_ctx_switch();
 		}
 		else
-		if (tsk->id == ID_READY)
+		if (tsk->sub.id == ID_READY)
 		{
 			priv_tsk_remove(tsk);
 			core_tsk_insert(tsk);
 		}
 		else
-		if (tsk->id == ID_DELAYED)
+		if (tsk->sub.id == ID_DELAYED)
 		{
 			core_tsk_transfer(tsk, tsk->guard);
 			if (tsk->mtx.tree)
@@ -496,14 +487,14 @@ void core_cur_prio( unsigned prio )
 		prio = tsk->basic;
 
 	for (mtx = tsk->mtx.list; mtx; mtx = mtx->list)
-		if (mtx->queue)
-			if (prio < mtx->queue->prio)
-				prio = mtx->queue->prio;
+		if (mtx->obj.queue)
+			if (prio < mtx->obj.queue->prio)
+				prio = mtx->obj.queue->prio;
 
 	if (tsk->prio != prio)
 	{
 		tsk->prio = prio;
-		tsk = tsk->obj.next;
+		tsk = tsk->sub.next;
 		if (tsk->prio > prio)
 			port_ctx_switch();
 	}
@@ -524,7 +515,7 @@ void *core_tsk_handler( void *sp )
 		cur = System.cur;
 		cur->sp = sp;
 
-		nxt = IDLE.obj.next;
+		nxt = IDLE.sub.next;
 
 #if OS_ROBIN && HW_TIMER_SIZE == 0
 		if (cur == nxt || (nxt->slice >= (OS_FREQUENCY)/(OS_ROBIN) && (nxt->slice = 0) == 0))
@@ -534,7 +525,7 @@ void *core_tsk_handler( void *sp )
 		{
 			priv_tsk_remove(nxt);
 			priv_tsk_insert(nxt);
-			nxt = IDLE.obj.next;
+			nxt = IDLE.sub.next;
 		}
 
 		System.cur = nxt;

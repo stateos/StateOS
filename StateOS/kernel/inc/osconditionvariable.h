@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    25.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -55,8 +55,7 @@ typedef struct __cnd cnd_t, * const cnd_id;
 
 struct __cnd
 {
-	tsk_t  * queue; // next process in the DELAYED queue
-	void   * res;   // allocated condition variable object's resource
+	obj_t    obj;   // object header
 };
 
 /******************************************************************************
@@ -73,7 +72,7 @@ struct __cnd
  *
  ******************************************************************************/
 
-#define               _CND_INIT() { 0, 0 }
+#define               _CND_INIT() { _OBJ_INIT() }
 
 /******************************************************************************
  *

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,15 +48,14 @@ extern "C" {
 
 struct __tsk
 {
-	obj_t    obj;   // inherited from timer
-	tid_t    id;    // task's id: ID_STOPPED, ID_READY, ID_DELAYED, ID_IDLE
+	sub_t    sub;   // timer / task header
 
 	fun_t  * state; // task state (initial task function, doesn't have to be noreturn-type)
 	cnt_t    start; // inherited from timer
 	cnt_t    delay; // inherited from timer
 	cnt_t    slice;	// time slice
 
-	tsk_t  * back;  // previous process in the DELAYED queue
+	tsk_t ** back;  // previous object in the DELAYED queue
 	stk_t  * stack; // base of stack
 	unsigned size;  // size of stack (in bytes)
 	void   * sp;    // current stack pointer
@@ -65,7 +64,7 @@ struct __tsk
 	unsigned prio;  // current priority
 
 	tsk_t  * join;  // joinable state
-	void   * guard; // object that controls the pending process
+	tsk_t ** guard; // DELAYED queue for the pending process
 
 	unsigned event; // wakeup event
 
@@ -155,7 +154,7 @@ struct __tsk
  ******************************************************************************/
 
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _OBJ_INIT(), ID_STOPPED, _state, 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
+                       { _SUB_INIT(), _state, 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
 
 /******************************************************************************
  *
@@ -1023,7 +1022,7 @@ unsigned tsk_sleep( void ) { return tmr_wait(&WAIT); }
  *
  * Return
  *   E_SUCCESS       : task was successfully suspended
- *   E_STOPPED       : task can not be suspended
+ *   E_TIMEOUT       : task can not be suspended
  *
  * Note              : use only in thread mode
  *
@@ -1044,7 +1043,7 @@ unsigned tsk_suspend( tsk_t *tsk );
  *
  * Return
  *   E_SUCCESS       : task was successfully resumed
- *   E_STOPPED       : task can not be resumed
+ *   E_TIMEOUT       : task can not be resumed
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -1081,7 +1080,7 @@ template<unsigned size_ = OS_STACK_SIZE>
 struct staticTaskT : public __tsk
 {
 	 staticTaskT( const unsigned _prio, fun_t *_state ): __tsk _TSK_INIT(_prio, _state, stack_, size_) {}
-	~staticTaskT( void ) { assert(__tsk::id == ID_STOPPED); }
+	~staticTaskT( void ) { assert(__tsk::sub.id == ID_STOPPED); }
 
 	void     kill     ( void )            {        tsk_kill      (this);         }
 	unsigned detach   ( void )            { return tsk_detach    (this);         }
@@ -1096,7 +1095,7 @@ struct staticTaskT : public __tsk
 
 	unsigned prio     ( void )            { return __tsk::basic;                 }
 	unsigned getPrio  ( void )            { return __tsk::basic;                 }
-	bool     operator!( void )            { return __tsk::id == ID_STOPPED;      }
+	bool     operator!( void )            { return __tsk::sub.id == ID_STOPPED;  }
 
 	private:
 	stk_t stack_[SSIZE(size_)];

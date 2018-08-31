@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -60,7 +60,7 @@ sig_t *sig_create( bool type )
 	{
 		sig = core_sys_alloc(sizeof(sig_t));
 		sig_init(sig, type);
-		sig->res = sig;
+		sig->obj.res = sig;
 	}
 	sys_unlock();
 
@@ -78,7 +78,7 @@ void sig_kill( sig_t *sig )
 	{
 		sig->flag = false;
 
-		core_all_wakeup(sig, E_STOPPED);
+		core_all_wakeup(&sig->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -90,7 +90,7 @@ void sig_delete( sig_t *sig )
 	sys_lock();
 	{
 		sig_kill(sig);
-		core_sys_free(sig->res);
+		core_sys_free(sig->obj.res);
 	}
 	sys_unlock();
 }
@@ -122,7 +122,7 @@ unsigned sig_take( sig_t *sig )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -134,7 +134,7 @@ unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 		return E_SUCCESS;
 	}
 
-	return wait(sig, time);
+	return wait(&sig->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -177,12 +177,12 @@ void sig_give( sig_t *sig )
 	{
 		if (sig->type == sigClear)
 		{
-			sig->flag = !core_one_wakeup(sig, E_SUCCESS);
+			sig->flag = !core_one_wakeup(&sig->obj.queue, E_SUCCESS);
 		}
 		else
 		{
 			sig->flag = true;
-			core_all_wakeup(sig, E_SUCCESS);
+			core_all_wakeup(&sig->obj.queue, E_SUCCESS);
 		}
 	}
 	sys_unlock();

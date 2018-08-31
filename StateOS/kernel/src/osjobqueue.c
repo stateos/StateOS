@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -67,7 +67,7 @@ job_t *job_create( unsigned limit )
 		bufsize = limit * sizeof(fun_t *);
 		job = core_sys_alloc(ABOVE(sizeof(job_t)) + bufsize);
 		job_init(job, (void *)((size_t)job + ABOVE(sizeof(job_t))), bufsize);
-		job->res = job;
+		job->obj.res = job;
 	}
 	sys_unlock();
 
@@ -87,7 +87,7 @@ void job_kill( job_t *job )
 		job->head  = 0;
 		job->tail  = 0;
 
-		core_all_wakeup(job, E_STOPPED);
+		core_all_wakeup(&job->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -99,7 +99,7 @@ void job_delete( job_t *job )
 	sys_lock();
 	{
 		job_kill(job);
-		core_sys_free(job->res);
+		core_sys_free(job->obj.res);
 	}
 	sys_unlock();
 }
@@ -151,7 +151,7 @@ fun_t *priv_job_getUpdate( job_t *job )
 	tsk_t *tsk;
 
 	fun = priv_job_get(job);
-	tsk = core_one_wakeup(job, E_SUCCESS);
+	tsk = core_one_wakeup(&job->obj.queue, E_SUCCESS);
 	if (tsk) priv_job_put(job, tsk->tmp.job.fun);
 
 	return fun;
@@ -165,7 +165,7 @@ void priv_job_putUpdate( job_t *job, fun_t *fun )
 	tsk_t *tsk;
 
 	priv_job_put(job, fun);
-	tsk = core_one_wakeup(job, E_SUCCESS);
+	tsk = core_one_wakeup(&job->obj.queue, E_SUCCESS);
 	if (tsk) tsk->tmp.job.fun = priv_job_get(job);
 }
 
@@ -201,7 +201,7 @@ unsigned job_take( job_t *job )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	fun_t  * fun;
@@ -217,7 +217,7 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	}
 	else
 	{
-		event = wait(job, time);
+		event = wait(&job->obj.queue, time);
 		fun = System.cur->tmp.job.fun;
 	}
 
@@ -288,7 +288,7 @@ unsigned job_give( job_t *job, fun_t *fun )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -302,7 +302,7 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(void
 	}
 
 	System.cur->tmp.job.fun = fun;
-	return wait(job, time);
+	return wait(&job->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -346,7 +346,7 @@ unsigned job_push( job_t *job, fun_t *fun )
 
 	sys_lock();
 	{
-		if (job->count == 0 || job->queue == 0)
+		if (job->count == 0 || job->obj.queue == 0)
 		{
 			if (job->count == job->limit)
 				priv_job_skip(job);

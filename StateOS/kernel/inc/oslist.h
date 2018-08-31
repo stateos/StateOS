@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -77,8 +77,8 @@ typedef struct __lst lst_t, * const lst_id;
 
 struct __lst
 {
-	tsk_t  * queue; // next process in the DELAYED queue
-	void   * res;   // allocated list object's resource
+	obj_t    obj;   // object header
+
 	que_t    head;  // next memory object in the queue, previously created in the memory pool
 };
 
@@ -96,7 +96,7 @@ struct __lst
  *
  ******************************************************************************/
 
-#define               _LST_INIT() { 0, 0, _QUE_INIT() }
+#define               _LST_INIT() { _OBJ_INIT(), _QUE_INIT() }
 
 /******************************************************************************
  *

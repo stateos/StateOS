@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -58,7 +58,7 @@ mut_t *mut_create( void )
 	{
 		mut = core_sys_alloc(sizeof(mut_t));
 		mut_init(mut);
-		mut->res = mut;
+		mut->obj.res = mut;
 	}
 	sys_unlock();
 
@@ -74,7 +74,7 @@ void mut_kill( mut_t *mut )
 
 	sys_lock();
 	{
-		core_all_wakeup(mut, E_STOPPED);
+		core_all_wakeup(&mut->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -86,14 +86,14 @@ void mut_delete( mut_t *mut )
 	sys_lock();
 	{
 		mut_kill(mut);
-		core_sys_free(mut->res);
+		core_sys_free(mut->obj.res);
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -108,7 +108,7 @@ unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	if (mut->owner == System.cur)
 		return E_TIMEOUT;
 
-	return wait(mut, time);
+	return wait(&mut->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -154,7 +154,7 @@ unsigned mut_give( mut_t *mut )
 	{
 		if (mut->owner == System.cur)
 		{
-			mut->owner = core_one_wakeup(mut, E_SUCCESS);
+			mut->owner = core_one_wakeup(&mut->obj.queue, E_SUCCESS);
 			event = E_SUCCESS;
 		}
 		else

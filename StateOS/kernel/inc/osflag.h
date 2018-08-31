@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -61,8 +61,8 @@ typedef struct __flg flg_t, * const flg_id;
 
 struct __flg
 {
-	tsk_t  * queue; // next process in the DELAYED queue
-	void   * res;   // allocated flag object's resource
+	obj_t    obj;   // object header
+
 	unsigned flags; // flag's current value
 };
 
@@ -81,7 +81,7 @@ struct __flg
  *
  ******************************************************************************/
 
-#define               _FLG_INIT( init ) { 0, 0, init }
+#define               _FLG_INIT( init ) { _OBJ_INIT(), init }
 
 /******************************************************************************
  *

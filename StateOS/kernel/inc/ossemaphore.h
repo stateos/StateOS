@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -54,8 +54,8 @@ typedef struct __sem sem_t, * const sem_id;
 
 struct __sem
 {
-	tsk_t  * queue; // next process in the DELAYED queue
-	void   * res;   // allocated semaphore object's resource
+	obj_t    obj;   // object header
+
 	unsigned count; // semaphore's current value
 	unsigned limit; // semaphore's value limit
 };
@@ -79,7 +79,7 @@ struct __sem
  *
  ******************************************************************************/
 
-#define               _SEM_INIT( _init, _limit ) { 0, 0, _init, _limit }
+#define               _SEM_INIT( _init, _limit ) { _OBJ_INIT(), _init, _limit }
 
 /******************************************************************************
  *

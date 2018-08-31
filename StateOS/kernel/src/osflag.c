@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -61,7 +61,7 @@ flg_t *flg_create( unsigned init )
 	{
 		flg = core_sys_alloc(sizeof(flg_t));
 		flg_init(flg, init);
-		flg->res = flg;
+		flg->obj.res = flg;
 	}
 	sys_unlock();
 
@@ -77,7 +77,7 @@ void flg_kill( flg_t *flg )
 
 	sys_lock();
 	{
-		core_all_wakeup(flg, E_STOPPED);
+		core_all_wakeup(&flg->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -89,7 +89,7 @@ void flg_delete( flg_t *flg )
 	sys_lock();
 	{
 		flg_kill(flg);
-		core_sys_free(flg->res);
+		core_sys_free(flg->obj.res);
 	}
 	sys_unlock();
 }
@@ -121,7 +121,7 @@ unsigned flg_take( flg_t *flg, unsigned flags, char mode )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_flg_wait( flg_t *flg, unsigned flags, char mode, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_flg_wait( flg_t *flg, unsigned flags, char mode, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned value = flags;
@@ -138,7 +138,7 @@ unsigned priv_flg_wait( flg_t *flg, unsigned flags, char mode, cnt_t time, unsig
 	
 	System.cur->tmp.flg.mode  = mode;
 	System.cur->tmp.flg.flags = value;
-	return wait(flg, time);
+	return wait(&flg->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -176,6 +176,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned state;
+	obj_t  * obj;
 	tsk_t  * tsk;
 
 	assert(flg);
@@ -185,15 +186,16 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 		state = flg->flags;
 		flags = flg->flags |= flags;
 
-		for (tsk = flg->queue; tsk; tsk = tsk->obj.queue)
+		for (obj = &flg->obj; obj->queue; obj = &obj->queue->sub.obj)
 		{
+			tsk = obj->queue;
 			if (tsk->tmp.flg.flags & flags)
 			{
 				if ((tsk->tmp.flg.mode & flgProtect) == 0)
 					flg->flags &= ~tsk->tmp.flg.flags;
 				tsk->tmp.flg.flags &= ~flags;
 				if (tsk->tmp.flg.flags == 0 || (tsk->tmp.flg.mode & flgAll) == 0)
-					core_one_wakeup(tsk = tsk->back, E_SUCCESS);
+					core_tsk_wakeup(tsk, E_SUCCESS);
 			}
 		}
 

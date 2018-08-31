@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -54,8 +54,8 @@ typedef struct __mem mem_t, * const mem_id;
 
 struct __mem
 {
-	tsk_t  * queue; // inherited from list
-	void   * res;   // allocated memory pool object's resource
+	obj_t    obj;   // object header
+
 	que_t    head;  // inherited from list
 
 	unsigned limit; // size of a memory pool (max number of objects)
@@ -80,7 +80,7 @@ struct __mem
  *
  ******************************************************************************/
 
-#define               _MEM_INIT( _limit, _size, _data ) { 0, 0, _QUE_INIT(), _limit, _size, _data }
+#define               _MEM_INIT( _limit, _size, _data ) { _OBJ_INIT(), _QUE_INIT(), _limit, _size, _data }
 
 /******************************************************************************
  *

@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,8 +49,8 @@ typedef struct __job job_t, * const job_id;
 
 struct __job
 {
-	tsk_t  * queue; // inherited from semaphore
-	void   * res;   // allocated job queue object's resource
+	obj_t    obj;   // object header
+
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
@@ -75,7 +75,7 @@ struct __job
  *
  ******************************************************************************/
 
-#define               _JOB_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data }
+#define               _JOB_INIT( _limit, _data ) { _OBJ_INIT(), 0, _limit, 0, 0, _data }
 
 /******************************************************************************
  *

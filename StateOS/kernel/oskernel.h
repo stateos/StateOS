@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    03.08.2018
+    @date    31.08.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -163,38 +163,38 @@ void core_tsk_insert( tsk_t *tsk );
 // remove task 'tsk' from tasks READY queue
 void core_tsk_remove( tsk_t *tsk );
 
-// append task 'tsk' to the delayed queue of object 'obj'
-void core_tsk_append( tsk_t *tsk, void *obj );
+// append task 'tsk' to the delayed queue 'que'
+void core_tsk_append( tsk_t *tsk, tsk_t **obj );
 
-// remove task 'tsk' from the delayed queue of object 'obj' with event value 'event'
+// remove task 'tsk' from the delayed queue with event value 'event'
 void core_tsk_unlink( tsk_t *tsk, unsigned event );
 
-// transfer task 'tsk' to the delayed queue of object 'obj'
-void core_tsk_transfer( tsk_t *tsk, void *obj );
+// transfer task 'tsk' to the delayed queue 'que'
+void core_tsk_transfer( tsk_t *tsk, tsk_t **que );
 
 // delay execution of current task for given duration of time 'delay'
-// append the current task to the delayed queue of object 'obj'
+// append the current task to the delayed queue 'que'
 // remove the current task from tasks READY queue
 // insert the current task into timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitFor( void *obj, cnt_t delay );
+unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay );
 
 // delay execution of current task for given duration of time 'delay' from the end of the previous countdown
-// append the current task to the delayed queue of object 'obj'
+// append the current task to the delayed queue 'que'
 // remove the current task from tasks READY queue
 // insert the current task into timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitNext( void *obj, cnt_t delay );
+unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay );
 
 // delay execution of the current task until given time point 'time'
-// append the current task to the delayed queue of object 'obj'
+// append the current task to the delayed queue 'que'
 // remove the current task from tasks READY queue
 // insert the current task into timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitUntil( void *obj, cnt_t time );
+unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time );
 
 // delay indefinitely execution of given task
 // append given task to WAIT timer delayed queue
@@ -211,20 +211,24 @@ void core_tsk_suspend( tsk_t *tsk );
 // return 'tsk'
 tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event );
 
-// resume execution of first task from object 'obj' delayed queue with event value 'event'
-// remove first task from object 'obj' delayed queue
+// resume execution of first task from delayed queue 'que' with event value 'event'
+// remove first task from delayed queue 'que'
 // remove resumed task from timers READY queue
 // insert resumed task into tasks READY queue
 // force context switch if priority of resumed task is greater then priority of the current task and kernel works in preemptive mode
 // return pointer to resumed task
-tsk_t *core_one_wakeup( void *obj, unsigned event );
+__STATIC_INLINE
+tsk_t *core_one_wakeup( tsk_t **que, unsigned event )
+{
+	return core_tsk_wakeup(*que, event);
+}
 
-// resume execution of all tasks from object 'obj' delayed queue with event value 'event'
-// remove all tasks from object 'obj' delayed queue
+// resume execution of all tasks from delayed queue 'que' with event value 'event'
+// remove all tasks from delayed queue 'que'
 // remove all resumed tasks from timers READY queue
 // insert all resumed tasks into tasks READY queue
 // force context switch if priority of any resumed task is greater then priority of the current task and kernel works in preemptive mode
-void core_all_wakeup( void *obj, unsigned event );
+void core_all_wakeup( tsk_t **que, unsigned event );
 
 // set task 'tsk' priority
 // force context switch if new priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode

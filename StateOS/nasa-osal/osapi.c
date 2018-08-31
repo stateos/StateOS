@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    30.08.2018
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -213,7 +213,7 @@ int32 OS_QueueCreate(uint32 *queue_id, const char *queue_name, uint32 queue_dept
 					{
 						*queue_id = rec - OS_queue_table;
 						box_init(&rec->box, queue_depth, data, data_size);
-						rec->box.res = data;
+						rec->box.obj.res = data;
 						strcpy(rec->name, queue_name);
 						rec->creator = OS_TaskGetId();
 						rec->used = 1;
@@ -1018,7 +1018,7 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 					{
 						*task_id = rec - OS_task_table;
 						tsk_init(&rec->tsk, ~priority, task_handler, stack, stack_size);
-						if (stack_pointer == 0) rec->tsk.obj.res = stack;
+						if (stack_pointer == 0) rec->tsk.sub.obj.res = stack;
 						strcpy(rec->name, task_name);
 						rec->creator = OS_TaskGetId();
 						rec->used = 1;

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,8 +48,8 @@ typedef struct __evt evt_t, * const evt_id;
 
 struct __evt
 {
-	tsk_t  * queue; // inherited from semaphore
-	void   * res;   // allocated event queue object's resource
+	obj_t    obj;   // object header
+
 	unsigned count; // inherited from semaphore
 	unsigned limit; // inherited from semaphore
 
@@ -74,7 +74,7 @@ struct __evt
  *
  ******************************************************************************/
 
-#define               _EVT_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data }
+#define               _EVT_INIT( _limit, _data ) { _OBJ_INIT(), 0, _limit, 0, 0, _data }
 
 /******************************************************************************
  *

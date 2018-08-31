@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,8 +49,8 @@ typedef struct __bar bar_t, * const bar_id;
 
 struct __bar
 {
-	tsk_t  * queue; // next process in the DELAYED queue
-	void   * res;   // allocated barrier object's resource
+	obj_t    obj;   // object header
+
 	unsigned count; // barrier's current value
 	unsigned limit; // barrier's value limit
 };
@@ -70,7 +70,7 @@ struct __bar
  *
  ******************************************************************************/
 
-#define               _BAR_INIT( _limit ) { 0, 0, _limit, _limit }
+#define               _BAR_INIT( _limit ) { _OBJ_INIT(), _limit, _limit }
 
 /******************************************************************************
  *

@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -63,7 +63,7 @@ bar_t *bar_create( unsigned limit )
 	{
 		bar = core_sys_alloc(sizeof(bar_t));
 		bar_init(bar, limit);
-		bar->res = bar;
+		bar->obj.res = bar;
 	}
 	sys_unlock();
 
@@ -81,7 +81,7 @@ void bar_kill( bar_t *bar )
 	{
 		bar->count = bar->limit;
 
-		core_all_wakeup(bar, E_STOPPED);
+		core_all_wakeup(&bar->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -93,14 +93,14 @@ void bar_delete( bar_t *bar )
 	sys_lock();
 	{
 		bar_kill(bar);
-		core_sys_free(bar->res);
+		core_sys_free(bar->obj.res);
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -110,11 +110,11 @@ unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 	if (--bar->count == 0)
 	{
 		bar->count = bar->limit;
-		core_all_wakeup(bar, E_SUCCESS);
+		core_all_wakeup(&bar->obj.queue, E_SUCCESS);
 		return E_SUCCESS;
 	}
 
-	return wait(bar, time);
+	return wait(&bar->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */

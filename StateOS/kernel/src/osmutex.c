@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -59,7 +59,7 @@ mtx_t *mtx_create( void )
 	{
 		mtx = core_sys_alloc(sizeof(mtx_t));
 		mtx_init(mtx);
-		mtx->res = mtx;
+		mtx->obj.res = mtx;
 	}
 	sys_unlock();
 
@@ -123,7 +123,7 @@ void mtx_kill( mtx_t *mtx )
 
 		mtx->count = 0;
 
-		core_all_wakeup(mtx, E_STOPPED);
+		core_all_wakeup(&mtx->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -135,14 +135,14 @@ void mtx_delete( mtx_t *mtx )
 	sys_lock();
 	{
 		mtx_kill(mtx);
-		core_sys_free(mtx->res);
+		core_sys_free(mtx->obj.res);
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -162,7 +162,7 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 			core_tsk_prio(mtx->owner, System.cur->prio);
 
 		System.cur->mtx.tree = mtx->owner;
-		event = wait(mtx, time);
+		event = wait(&mtx->obj.queue, time);
 		System.cur->mtx.tree = 0;
 
 		return event;
@@ -231,7 +231,7 @@ unsigned mtx_give( mtx_t *mtx )
 		else
 		{
 			priv_mtx_unlink(mtx);
-			priv_mtx_link(mtx, core_one_wakeup(mtx, E_SUCCESS));
+			priv_mtx_link(mtx, core_one_wakeup(&mtx->obj.queue, E_SUCCESS));
 			event = E_SUCCESS;
 		}
 	}

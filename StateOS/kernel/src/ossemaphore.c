@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -62,7 +62,7 @@ sem_t *sem_create( unsigned init, unsigned limit )
 	{
 		sem = core_sys_alloc(sizeof(sem_t));
 		sem_init(sem, init, limit);
-		sem->res = sem;
+		sem->obj.res = sem;
 	}
 	sys_unlock();
 
@@ -80,7 +80,7 @@ void sem_kill( sem_t *sem )
 	{
 		sem->count = 0;
 
-		core_all_wakeup(sem, E_STOPPED);
+		core_all_wakeup(&sem->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -92,7 +92,7 @@ void sem_delete( sem_t *sem )
 	sys_lock();
 	{
 		sem_kill(sem);
-		core_sys_free(sem->res);
+		core_sys_free(sem->obj.res);
 	}
 	sys_unlock();
 }
@@ -110,7 +110,7 @@ unsigned sem_take( sem_t *sem )
 	{
 		if (sem->count > 0)
 		{
-			if (core_one_wakeup(sem, E_SUCCESS) == 0)
+			if (core_one_wakeup(&sem->obj.queue, E_SUCCESS) == 0)
 				sem->count--;
 			event = E_SUCCESS;
 		}
@@ -126,7 +126,7 @@ unsigned sem_take( sem_t *sem )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -135,12 +135,12 @@ unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 
 	if (sem->count > 0)
 	{
-		if (core_one_wakeup(sem, E_SUCCESS) == 0)
+		if (core_one_wakeup(&sem->obj.queue, E_SUCCESS) == 0)
 			sem->count--;
 		return E_SUCCESS;
 	}
 
-	return wait(sem, time);
+	return wait(&sem->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -186,7 +186,7 @@ unsigned sem_give( sem_t *sem )
 	{
 		if (sem->count < sem->limit)
 		{
-			if (core_one_wakeup(sem, E_SUCCESS) == 0)
+			if (core_one_wakeup(&sem->obj.queue, E_SUCCESS) == 0)
 				sem->count++;
 			event = E_SUCCESS;
 		}
@@ -202,7 +202,7 @@ unsigned sem_give( sem_t *sem )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -211,12 +211,12 @@ unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(void*,cnt_t) )
 
 	if (sem->count < sem->limit)
 	{
-		if (core_one_wakeup(sem, E_SUCCESS) == 0)
+		if (core_one_wakeup(&sem->obj.queue, E_SUCCESS) == 0)
 			sem->count++;
 		return E_SUCCESS;
 	}
 
-	return wait(sem, time);
+	return wait(&sem->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */

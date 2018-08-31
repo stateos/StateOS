@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    22.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -50,8 +50,8 @@ typedef struct __mut mut_t, * const mut_id;
 
 struct __mut
 {
-	tsk_t  * queue; // next process in the DELAYED queue
-	void   * res;   // allocated fast mutex object's resource
+	obj_t    obj;   // object header
+
 	tsk_t  * owner; // owner task
 };
 
@@ -69,7 +69,7 @@ struct __mut
  *
  ******************************************************************************/
 
-#define               _MUT_INIT() { 0, 0, 0 }
+#define               _MUT_INIT() { _OBJ_INIT(), 0 }
 
 /******************************************************************************
  *

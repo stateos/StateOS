@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,8 +48,8 @@ typedef struct __msg msg_t, * const msg_id;
 
 struct __msg
 {
-	tsk_t  * queue; // inherited from stream buffer
-	void   * res;   // allocated message buffer object's resource
+	obj_t    obj;   // object header
+
 	unsigned count; // inherited from stream buffer
 	unsigned limit; // inherited from stream buffer
 
@@ -74,7 +74,7 @@ struct __msg
  *
  ******************************************************************************/
 
-#define               _MSG_INIT( _limit, _data ) { 0, 0, 0, _limit, 0, 0, _data }
+#define               _MSG_INIT( _limit, _data ) { _OBJ_INIT(), 0, _limit, 0, 0, _data }
 
 /******************************************************************************
  *

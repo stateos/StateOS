@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,8 +53,8 @@ typedef struct __sig sig_t, * const sig_id;
 
 struct __sig
 {
-	tsk_t  * queue; // next process in the DELAYED queue
-	void   * res;   // allocated signal object's resource
+	obj_t    obj;   // object header
+
 	bool     flag;  // signal's current value
 	bool     type;  // signal type: sigClear, sigProtect
 };
@@ -76,7 +76,7 @@ struct __sig
  *
  ******************************************************************************/
 
-#define               _SIG_INIT( _type ) { 0, 0, 0, _type }
+#define               _SIG_INIT( _type ) { _OBJ_INIT(), false, _type }
 
 /******************************************************************************
  *

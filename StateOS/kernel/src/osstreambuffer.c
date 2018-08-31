@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -67,7 +67,7 @@ stm_t *stm_create( unsigned limit )
 		bufsize = limit;
 		stm = core_sys_alloc(ABOVE(sizeof(stm_t)) + bufsize);
 		stm_init(stm, (void *)((size_t)stm + ABOVE(sizeof(stm_t))), bufsize);
-		stm->res = stm;
+		stm->obj.res = stm;
 	}
 	sys_unlock();
 
@@ -87,7 +87,7 @@ void stm_kill( stm_t *stm )
 		stm->head  = 0;
 		stm->tail  = 0;
 
-		core_all_wakeup(stm, E_STOPPED);
+		core_all_wakeup(&stm->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -99,7 +99,7 @@ void stm_delete( stm_t *stm )
 	sys_lock();
 	{
 		stm_kill(stm);
-		core_sys_free(stm->res);
+		core_sys_free(stm->obj.res);
 	}
 	sys_unlock();
 }
@@ -117,7 +117,7 @@ static
 unsigned priv_stm_space( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	return (stm->count == 0 || stm->queue == 0) ? stm->limit - stm->count : 0;
+	return (stm->count == 0 || stm->obj.queue == 0) ? stm->limit - stm->count : 0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -179,11 +179,11 @@ unsigned priv_stm_getUpdate( stm_t *stm, char *data, unsigned size )
 		size = stm->count;
 	priv_stm_get(stm, data, size);
 
-	while (stm->queue != 0 && stm->queue->tmp.stm.size <= priv_stm_space(stm))
+	while (stm->obj.queue != 0 && stm->obj.queue->tmp.stm.size <= priv_stm_space(stm))
 	{
-		priv_stm_put(stm, stm->queue->tmp.stm.data.out, stm->queue->tmp.stm.size);
-		stm->queue->tmp.stm.size = 0;
-		core_tsk_wakeup(stm->queue, E_SUCCESS);
+		priv_stm_put(stm, stm->obj.queue->tmp.stm.data.out, stm->obj.queue->tmp.stm.size);
+		stm->obj.queue->tmp.stm.size = 0;
+		core_tsk_wakeup(stm->obj.queue, E_SUCCESS);
 	}
 
 	return size;
@@ -198,14 +198,14 @@ void priv_stm_putUpdate( stm_t *stm, const char *data, unsigned size )
 
 	priv_stm_put(stm, data, size);
 
-	while (stm->queue != 0 && (size = priv_stm_count(stm)) > 0)
+	while (stm->obj.queue != 0 && (size = priv_stm_count(stm)) > 0)
 	{
-		if (size > stm->queue->tmp.stm.size)
-			size = stm->queue->tmp.stm.size;
+		if (size > stm->obj.queue->tmp.stm.size)
+			size = stm->obj.queue->tmp.stm.size;
 
-		priv_stm_get(stm, stm->queue->tmp.stm.data.in, size);
-		stm->queue->tmp.stm.size -= size;
-		core_tsk_wakeup(stm->queue, E_SUCCESS);
+		priv_stm_get(stm, stm->obj.queue->tmp.stm.data.in, size);
+		stm->obj.queue->tmp.stm.size -= size;
+		core_tsk_wakeup(stm->obj.queue, E_SUCCESS);
 	}
 }
 
@@ -234,7 +234,7 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -252,7 +252,7 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 	System.cur->tmp.stm.size = size;
 
 	if (size > 0)
-		wait(stm, time);
+		wait(&stm->obj.queue, time);
 
 	return size - System.cur->tmp.stm.size;
 }
@@ -312,7 +312,7 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -330,7 +330,7 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 	System.cur->tmp.stm.size = size;
 
 	if (size <= priv_stm_limit(stm))
-		wait(stm, time);
+		wait(&stm->obj.queue, time);
 
 	return size - System.cur->tmp.stm.size;
 }
@@ -376,7 +376,7 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 
 	sys_lock();
 	{
-		if ((stm->count == 0 || stm->queue == 0) && size <= priv_stm_limit(stm))
+		if ((stm->count == 0 || stm->obj.queue == 0) && size <= priv_stm_limit(stm))
 		{
 			if (size > priv_stm_space(stm))
 				priv_stm_skip(stm, size - priv_stm_space(stm));

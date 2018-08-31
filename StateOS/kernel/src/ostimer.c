@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -43,8 +43,8 @@ void tmr_init( tmr_t *tmr, fun_t *state )
 	{
 		memset(tmr, 0, sizeof(tmr_t));
 
-		tmr->id    = ID_STOPPED;
-		tmr->state = state;
+		tmr->sub.id = ID_STOPPED;
+		tmr->state  = state;
 	}
 	sys_unlock();
 }
@@ -61,7 +61,7 @@ tmr_t *tmr_create( fun_t *state )
 	{
 		tmr = core_sys_alloc(sizeof(tmr_t));
 		tmr_init(tmr, state);
-		tmr->obj.res = tmr;
+		tmr->sub.obj.res = tmr;
 	}
 	sys_unlock();
 
@@ -77,9 +77,9 @@ void tmr_kill( tmr_t *tmr )
 
 	sys_lock();
 	{
-		if (tmr->id != ID_STOPPED)
+		if (tmr->sub.id != ID_STOPPED)
 		{
-			core_all_wakeup(tmr, E_STOPPED);
+			core_all_wakeup(&tmr->sub.obj.queue, E_STOPPED);
 			core_tmr_remove(tmr);
 		}
 	}
@@ -93,7 +93,7 @@ void tmr_delete( tmr_t *tmr )
 	sys_lock();
 	{
 		tmr_kill(tmr);
-		core_sys_free(tmr->obj.res);
+		core_sys_free(tmr->sub.obj.res);
 	}
 	sys_unlock();
 }
@@ -105,7 +105,7 @@ void priv_tmr_start( tmr_t *tmr )
 {
 	assert(!port_isr_context());
 
-	if (tmr->id != ID_STOPPED)
+	if (tmr->sub.id != ID_STOPPED)
 		core_tmr_remove(tmr);
 	core_tmr_insert(tmr, ID_TIMER);
 }
@@ -185,7 +185,7 @@ unsigned tmr_take( tmr_t *tmr )
 {
 	assert(tmr);
 
-	if (tmr->id == ID_STOPPED)
+	if (tmr->sub.id == ID_STOPPED)
 		return E_SUCCESS;
 
 	return E_TIMEOUT;
@@ -193,16 +193,16 @@ unsigned tmr_take( tmr_t *tmr )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
 	assert(tmr);
 
-	if (tmr->id == ID_STOPPED)
+	if (tmr->sub.id == ID_STOPPED)
 		return E_SUCCESS;
 
-	return wait(tmr, time);
+	return wait(&tmr->sub.obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */

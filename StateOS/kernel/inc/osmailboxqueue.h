@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    27.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,8 +48,8 @@ typedef struct __box box_t, * const box_id;
 
 struct __box
 {
-	tsk_t  * queue; // inherited from stream buffer
-	void   * res;   // allocated mailbox queue object's resource
+	obj_t    obj;   // object header
+
 	unsigned count; // inherited from stream buffer
 	unsigned limit; // inherited from stream buffer
 
@@ -77,7 +77,7 @@ struct __box
  *
  ******************************************************************************/
 
-#define               _BOX_INIT( _limit, _data, _size ) { 0, 0, 0, _limit * _size, 0, 0, _data, _size }
+#define               _BOX_INIT( _limit, _data, _size ) { _OBJ_INIT(), 0, _limit * _size, 0, 0, _data, _size }
 
 /******************************************************************************
  *

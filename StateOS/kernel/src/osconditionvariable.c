@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -58,7 +58,7 @@ cnd_t *cnd_create( void )
 	{
 		cnd = core_sys_alloc(sizeof(cnd_t));
 		cnd_init(cnd);
-		cnd->res = cnd;
+		cnd->obj.res = cnd;
 	}
 	sys_unlock();
 
@@ -74,7 +74,7 @@ void cnd_kill( cnd_t *cnd )
 
 	sys_lock();
 	{
-		core_all_wakeup(cnd, E_STOPPED);
+		core_all_wakeup(&cnd->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -86,14 +86,14 @@ void cnd_delete( cnd_t *cnd )
 	sys_lock();
 	{
 		cnd_kill(cnd);
-		core_sys_free(cnd->res);
+		core_sys_free(cnd->obj.res);
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -106,7 +106,7 @@ unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(void
 	if (event != E_SUCCESS)
 		return event;
 
-	event = wait(cnd, time);
+	event = wait(&cnd->obj.queue, time);
 	if (event != E_SUCCESS)
 		return event;
 
@@ -151,8 +151,8 @@ void cnd_give( cnd_t *cnd, bool all )
 
 	sys_lock();
 	{
-		if (all) core_all_wakeup(cnd, E_SUCCESS);
-		else     core_one_wakeup(cnd, E_SUCCESS);
+		if (all) core_all_wakeup(&cnd->obj.queue, E_SUCCESS);
+		else     core_one_wakeup(&cnd->obj.queue, E_SUCCESS);
 	}
 	sys_unlock();
 }

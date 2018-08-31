@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -70,7 +70,7 @@ box_t *box_create( unsigned limit, unsigned size )
 		bufsize = limit * size;
 		box = core_sys_alloc(ABOVE(sizeof(box_t)) + bufsize);
 		box_init(box, size, (void *)((size_t)box + ABOVE(sizeof(box_t))), bufsize);
-		box->res = box;
+		box->obj.res = box;
 	}
 	sys_unlock();
 
@@ -90,7 +90,7 @@ void box_kill( box_t *box )
 		box->head  = 0;
 		box->tail  = 0;
 
-		core_all_wakeup(box, E_STOPPED);
+		core_all_wakeup(&box->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -102,7 +102,7 @@ void box_delete( box_t *box )
 	sys_lock();
 	{
 		box_kill(box);
-		core_sys_free(box->res);
+		core_sys_free(box->obj.res);
 	}
 	sys_unlock();
 }
@@ -169,7 +169,7 @@ void priv_box_getUpdate( box_t *box, char *data )
 	tsk_t *tsk;
 
 	priv_box_get(box, data);
-	tsk = core_one_wakeup(box, E_SUCCESS);
+	tsk = core_one_wakeup(&box->obj.queue, E_SUCCESS);
 	if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
 }
 
@@ -181,7 +181,7 @@ void priv_box_putUpdate( box_t *box, const char *data )
 	tsk_t *tsk;
 
 	priv_box_put(box, data);
-	tsk = core_one_wakeup(box, E_SUCCESS);
+	tsk = core_one_wakeup(&box->obj.queue, E_SUCCESS);
 	if (tsk) priv_box_get(box, tsk->tmp.box.data.in);
 }
 
@@ -213,7 +213,7 @@ unsigned box_take( box_t *box, void *data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -227,7 +227,7 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(void
 	}
 
 	System.cur->tmp.box.data.in = data;
-	return wait(box, time);
+	return wait(&box->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -288,7 +288,7 @@ unsigned box_give( box_t *box, const void *data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -302,7 +302,7 @@ unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait
 	}
 
 	System.cur->tmp.box.data.out = data;
-	return wait(box, time);
+	return wait(&box->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -346,7 +346,7 @@ unsigned box_push( box_t *box, const void *data )
 
 	sys_lock();
 	{
-		if (box->count == 0 || box->queue == 0)
+		if (box->count == 0 || box->obj.queue == 0)
 		{
 			if (box->count == box->limit)
 				priv_box_skip(box);

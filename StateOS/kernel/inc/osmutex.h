@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    22.08.2018
+    @date    30.08.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,8 +49,8 @@ typedef struct __mtx mtx_t, * const mtx_id;
 
 struct __mtx
 {
-	tsk_t  * queue; // next process in the DELAYED queue
-	void   * res;   // allocated mutex object's resource
+	obj_t    obj;   // object header
+
 	tsk_t  * owner; // owner task
 	unsigned count; // mutex's curent value
 	mtx_t  * list;  // list of mutexes held by owner
@@ -70,7 +70,7 @@ struct __mtx
  *
  ******************************************************************************/
 
-#define               _MTX_INIT() { 0, 0, 0, 0, 0 }
+#define               _MTX_INIT() { _OBJ_INIT(), 0, 0, 0 }
 
 /******************************************************************************
  *

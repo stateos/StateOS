@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -67,7 +67,7 @@ evt_t *evt_create( unsigned limit )
 		bufsize = limit * sizeof(unsigned);
 		evt = core_sys_alloc(ABOVE(sizeof(evt_t)) + bufsize);
 		evt_init(evt, (void *)((size_t)evt + ABOVE(sizeof(evt_t))), bufsize);
-		evt->res = evt;
+		evt->obj.res = evt;
 	}
 	sys_unlock();
 
@@ -87,7 +87,7 @@ void evt_kill( evt_t *evt )
 		evt->head  = 0;
 		evt->tail  = 0;
 
-		core_all_wakeup(evt, E_STOPPED);
+		core_all_wakeup(&evt->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -99,7 +99,7 @@ void evt_delete( evt_t *evt )
 	sys_lock();
 	{
 		evt_kill(evt);
-		core_sys_free(evt->res);
+		core_sys_free(evt->obj.res);
 	}
 	sys_unlock();
 }
@@ -148,7 +148,7 @@ void priv_evt_getUpdate( evt_t *evt, unsigned *data )
 	tsk_t *tsk;
 
 	priv_evt_get(evt, data);
-	tsk = core_one_wakeup(evt, E_SUCCESS);
+	tsk = core_one_wakeup(&evt->obj.queue, E_SUCCESS);
 	if (tsk) priv_evt_put(evt, tsk->tmp.evt.data.out);
 }
 
@@ -160,7 +160,7 @@ void priv_evt_putUpdate( evt_t *evt, const unsigned data )
 	tsk_t *tsk;
 
 	priv_evt_put(evt, data);
-	tsk = core_one_wakeup(evt, E_SUCCESS);
+	tsk = core_one_wakeup(&evt->obj.queue, E_SUCCESS);
 	if (tsk) priv_evt_get(evt, tsk->tmp.evt.data.in);
 }
 
@@ -191,7 +191,7 @@ unsigned evt_take( evt_t *evt, unsigned *data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_evt_wait( evt_t *evt, unsigned *data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_evt_wait( evt_t *evt, unsigned *data, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -204,7 +204,7 @@ unsigned priv_evt_wait( evt_t *evt, unsigned *data, cnt_t time, unsigned(*wait)(
 	}
 
 	System.cur->tmp.evt.data.in = data;
-	return wait(evt, time);
+	return wait(&evt->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -264,7 +264,7 @@ unsigned evt_give( evt_t *evt, unsigned data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_evt_send( evt_t *evt, unsigned data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_evt_send( evt_t *evt, unsigned data, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -277,7 +277,7 @@ unsigned priv_evt_send( evt_t *evt, unsigned data, cnt_t time, unsigned(*wait)(v
 	}
 
 	System.cur->tmp.evt.data.out = data;
-	return wait(evt, time);
+	return wait(&evt->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -320,7 +320,7 @@ unsigned evt_push( evt_t *evt, unsigned data )
 
 	sys_lock();
 	{
-		if (evt->count == 0 || evt->queue == 0)
+		if (evt->count == 0 || evt->obj.queue == 0)
 		{
 			if (evt->count == evt->limit)
 				priv_evt_skip(evt);

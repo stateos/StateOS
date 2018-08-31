@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -59,7 +59,7 @@ lst_t *lst_create( void )
 	{
 		lst = core_sys_alloc(sizeof(lst_t));
 		lst_init(lst);
-		lst->res = lst;
+		lst->obj.res = lst;
 	}
 	sys_unlock();
 
@@ -75,7 +75,7 @@ void lst_kill( lst_t *lst )
 
 	sys_lock();
 	{
-		core_all_wakeup(lst, E_STOPPED);
+		core_all_wakeup(&lst->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -87,7 +87,7 @@ void lst_delete( lst_t *lst )
 	sys_lock();
 	{
 		lst_kill(lst);
-		core_sys_free(lst->res);
+		core_sys_free(lst->obj.res);
 	}
 	sys_unlock();
 }
@@ -121,7 +121,7 @@ unsigned lst_take( lst_t *lst, void **data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -136,7 +136,7 @@ unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(voi
 	}
 
 	System.cur->tmp.lst.data.in = data;
-	return wait(lst, time);
+	return wait(&lst->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -181,7 +181,7 @@ void lst_give( lst_t *lst, const void *data )
 
 	sys_lock();
 	{
-		tsk = core_one_wakeup(lst, E_SUCCESS);
+		tsk = core_one_wakeup(&lst->obj.queue, E_SUCCESS);
 
 		if (tsk)
 		{

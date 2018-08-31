@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    08.08.2018
+    @date    30.08.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -75,18 +75,51 @@ typedef         void fun_t(); // timer/task procedure
 
 /* -------------------------------------------------------------------------- */
 
-// object (timer, task) header
+#define E_SUCCESS  ( 0U) // process was released as a result of taking the supervising object
+#define E_TIMEOUT  (~0U) // process was released as a result of the end of the timer countdown
+#define E_STOPPED  (~1U) // process was released as a result of killing the supervising object
+
+/* -------------------------------------------------------------------------- */
+
+// timer / task id
+
+typedef enum __tid
+{
+	ID_STOPPED = 0, // task or timer stopped
+	ID_READY,       // task running or ready to run
+	ID_DELAYED,     // task in the delayed state
+	ID_TIMER,       // timer in the countdown state
+	ID_IDLE,        // idle process
+
+}	tid_t;
+
+/* -------------------------------------------------------------------------- */
+
+// object header
 
 typedef struct __obj
 {
 	tsk_t  * queue; // next process in the DELAYED queue
 	void   * res;   // allocated object's resource
-	void   * prev;  // previous object (timer, task) in the READY queue
-	void   * next;  // next object (timer, task) in the READY queue
 
 }	obj_t;
 
-#define               _OBJ_INIT() { 0, 0, 0, 0 }
+#define               _OBJ_INIT() { 0, 0 }
+
+/* -------------------------------------------------------------------------- */
+
+// timer / task header
+
+typedef struct __sub
+{
+	obj_t    obj;   // object header
+	void   * prev;  // previous object (timer / task) in the READY queue
+	void   * next;  // next object (timer / task) in the READY queue
+	tid_t    id;    // timer / task id
+
+}	sub_t;
+
+#define               _SUB_INIT() { _OBJ_INIT(), 0, 0, ID_STOPPED }
 
 /* -------------------------------------------------------------------------- */
 
@@ -121,24 +154,6 @@ typedef struct __sys
 #if (OS_FREQUENCY) < (CNT_MAX)/86400
 #define  DAY       ((cnt_t)(OS_FREQUENCY)*86400)
 #endif
-
-/* -------------------------------------------------------------------------- */
-
-typedef enum __tid
-{
-	ID_STOPPED = 0, // task or timer stopped
-	ID_READY,       // task ready to run
-	ID_DELAYED,     // task in the delayed state
-	ID_TIMER,       // timer in the countdown state
-	ID_IDLE         // idle process
-
-}	tid_t;
-
-/* -------------------------------------------------------------------------- */
-
-#define E_SUCCESS  ( 0U) // process was released by taking the supervising object
-#define E_STOPPED  (~0U) // process was released by killing the supervising object
-#define E_TIMEOUT  (~1U) // process was released by the end of the timer countdown
 
 /* -------------------------------------------------------------------------- */
 

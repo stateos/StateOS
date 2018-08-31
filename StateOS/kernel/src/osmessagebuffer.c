@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    31.08.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -67,7 +67,7 @@ msg_t *msg_create( unsigned limit )
 		bufsize = limit;
 		msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + bufsize);
 		msg_init(msg, (void *)((size_t)msg + ABOVE(sizeof(msg_t))), bufsize);
-		msg->res = msg;
+		msg->obj.res = msg;
 	}
 	sys_unlock();
 
@@ -87,7 +87,7 @@ void msg_kill( msg_t *msg )
 		msg->head  = 0;
 		msg->tail  = 0;
 
-		core_all_wakeup(msg, E_STOPPED);
+		core_all_wakeup(&msg->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -99,7 +99,7 @@ void msg_delete( msg_t *msg )
 	sys_lock();
 	{
 		msg_kill(msg);
-		core_sys_free(msg->res);
+		core_sys_free(msg->obj.res);
 	}
 	sys_unlock();
 }
@@ -136,7 +136,7 @@ static
 unsigned priv_msg_space( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	return ((msg->count == 0 || msg->queue == 0) && msg->limit - msg->count > sizeof(unsigned)) ? msg->limit - msg->count - sizeof(unsigned) : 0;
+	return ((msg->count == 0 || msg->obj.queue == 0) && msg->limit - msg->count > sizeof(unsigned)) ? msg->limit - msg->count - sizeof(unsigned) : 0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -221,12 +221,12 @@ unsigned priv_msg_getUpdate( msg_t *msg, char *data, unsigned size )
 	size = priv_msg_getSize(msg);
 	priv_msg_get(msg, data, size);
 
-	while (msg->queue != 0 && msg->queue->tmp.msg.size <= priv_msg_space(msg))
+	while (msg->obj.queue != 0 && msg->obj.queue->tmp.msg.size <= priv_msg_space(msg))
 	{
-		priv_msg_putSize(msg, msg->queue->tmp.msg.size);
-		priv_msg_put(msg, msg->queue->tmp.msg.data.out, msg->queue->tmp.msg.size);
-		msg->queue->tmp.msg.size = 0;
-		core_tsk_wakeup(msg->queue, E_SUCCESS);
+		priv_msg_putSize(msg, msg->obj.queue->tmp.msg.size);
+		priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
+		msg->obj.queue->tmp.msg.size = 0;
+		core_tsk_wakeup(msg->obj.queue, E_SUCCESS);
 	}
 
 	return size;
@@ -242,18 +242,18 @@ void priv_msg_putUpdate( msg_t *msg, const char *data, unsigned size )
 	priv_msg_putSize(msg, size);
 	priv_msg_put(msg, data, size);
 
-	while (msg->queue != 0)
+	while (msg->obj.queue != 0)
 	{
-		if (msg->queue->tmp.msg.size >= priv_msg_count(msg))
+		if (msg->obj.queue->tmp.msg.size >= priv_msg_count(msg))
 		{
 			size = priv_msg_getSize(msg);
-			priv_msg_get(msg, msg->queue->tmp.msg.data.in, size);
-			msg->queue->tmp.msg.size -= size;
-			core_tsk_wakeup(msg->queue, E_SUCCESS);
+			priv_msg_get(msg, msg->obj.queue->tmp.msg.data.in, size);
+			msg->obj.queue->tmp.msg.size -= size;
+			core_tsk_wakeup(msg->obj.queue, E_SUCCESS);
 		}
 		else
 		{
-			core_tsk_wakeup(msg->queue, E_TIMEOUT);
+			core_tsk_wakeup(msg->obj.queue, E_TIMEOUT);
 		}
 	}
 }
@@ -282,7 +282,7 @@ unsigned msg_take( msg_t *msg, void *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -300,7 +300,7 @@ unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsig
 	System.cur->tmp.msg.size = size;
 
 	if (size > 0)
-		wait(msg, time);
+		wait(&msg->obj.queue, time);
 
 	return size - System.cur->tmp.msg.size;
 }
@@ -360,7 +360,7 @@ unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time, unsigned(*wait)(void*,cnt_t) )
+unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -378,7 +378,7 @@ unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time,
 	System.cur->tmp.msg.size = size;
 
 	if (size <= priv_msg_limit(msg))
-		wait(msg, time);
+		wait(&msg->obj.queue, time);
 
 	return size - System.cur->tmp.msg.size;
 }
@@ -424,7 +424,7 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 
 	sys_lock();
 	{
-		if ((msg->count == 0 || msg->queue == 0) && size <= priv_msg_limit(msg))
+		if ((msg->count == 0 || msg->obj.queue == 0) && size <= priv_msg_limit(msg))
 		{
 			while (size > priv_msg_space(msg))
 				priv_msg_skip(msg, priv_msg_getSize(msg));
