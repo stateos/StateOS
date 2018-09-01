@@ -2,19 +2,17 @@
 #include <os.h>
 
 sem_t *sem;
-tsk_t *sla;
-tsk_t *tck;
 
 void tick()
 {
-	tsk_kill(sla);
 	LED_Tick();
-	tsk_detach(tsk_this());
 	tsk_stop();
 }
 
 void slave()
 {
+	tsk_t *tck;
+
 	sem_wait(sem);
 	sem_delete(sem);
 	tck = tsk_create(2, tick);
@@ -24,6 +22,8 @@ void slave()
 
 void master()
 {
+	tsk_t *sla;
+
 	sem = sem_create(0, semBinary);
 	sla = tsk_create(1, slave);
 	sem_give(sem);
