@@ -560,11 +560,9 @@ osStatus_t osDelay (uint32_t ticks)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 
-	switch (tsk_sleepFor(ticks))
-	{
-		case E_TIMEOUT: return osOK;
-		default:        return osError;
-	}
+	tsk_sleepFor(ticks);
+
+	return osOK;
 }
 
 osStatus_t osDelayUntil (uint32_t ticks)
@@ -572,11 +570,9 @@ osStatus_t osDelayUntil (uint32_t ticks)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 
-	switch (tsk_sleepUntil(ticks))
-	{
-		case E_TIMEOUT: return osOK;
-		default:        return osError;
-	}
+	tsk_sleepUntil(ticks);
+
+	return osOK;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -1090,11 +1090,9 @@ void OS_TaskExit(void)
 
 int32 OS_TaskDelay(uint32 millisecond)
 {
-	switch (tsk_delay(millisecond*MSEC))
-	{
-		case E_TIMEOUT: return OS_SUCCESS;
-		default:        return OS_ERROR;
-	}
+	tsk_delay(millisecond*MSEC);
+
+	return OS_SUCCESS;
 }
 
 int32 OS_TaskSetPriority(uint32 task_id, uint32 new_priority)

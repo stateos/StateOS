@@ -387,9 +387,9 @@ unsigned tsk_resume( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->guard == &WAIT.hdr.obj.queue)
+		if (tsk->guard == &WAIT.hdr.obj.queue && tsk->delay == INFINITE)
 		{
-			core_tsk_wakeup(tsk, E_STOPPED);
+			core_tsk_wakeup(tsk, 0); // unused event value
 			event = E_SUCCESS;
 		}
 		else

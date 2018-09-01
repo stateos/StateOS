@@ -935,19 +935,17 @@ unsigned tsk_giveISR( tsk_t *tsk, unsigned flags ) { return tsk_give(tsk, flags)
  *                     IMMEDIATE: don't delay execution of current task
  *                     INFINITE:  delay indefinitely execution of current task
  *
- * Return
- *   E_TIMEOUT       : task object successfully finished countdown
- *   E_STOPPED       : task object was resumed (tsk_resume)
+ * Return            : none
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned tsk_sleepFor( cnt_t delay ) { return tmr_waitFor(&WAIT, delay); }
+void tsk_sleepFor( cnt_t delay ) { tmr_waitFor(&WAIT, delay); }
 
 __STATIC_INLINE
-unsigned tsk_delay( cnt_t delay ) { return tsk_sleepFor(delay); }
+void tsk_delay( cnt_t delay ) { tsk_sleepFor(delay); }
 
 /******************************************************************************
  *
@@ -961,16 +959,14 @@ unsigned tsk_delay( cnt_t delay ) { return tsk_sleepFor(delay); }
  *                     IMMEDIATE: don't delay execution of current task
  *                     INFINITE:  delay indefinitely execution of current task
  *
- * Return
- *   E_TIMEOUT       : task object successfully finished countdown
- *   E_STOPPED       : task object was resumed (tsk_resume)
+ * Return            : none
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned tsk_sleepNext( cnt_t delay ) { return tmr_waitNext(&WAIT, delay); }
+void tsk_sleepNext( cnt_t delay ) { tmr_waitNext(&WAIT, delay); }
 
 /******************************************************************************
  *
@@ -981,41 +977,39 @@ unsigned tsk_sleepNext( cnt_t delay ) { return tmr_waitNext(&WAIT, delay); }
  * Parameters
  *   time            : timepoint value
  *
- * Return
- *   E_TIMEOUT       : task object successfully finished countdown
- *   E_STOPPED       : task object was resumed (tsk_resume)
+ * Return            : none
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned tsk_sleepUntil( cnt_t time ) { return tmr_waitUntil(&WAIT, time); }
+void tsk_sleepUntil( cnt_t time ) { tmr_waitUntil(&WAIT, time); }
 
 /******************************************************************************
  *
  * Name              : tsk_sleep
  *
  * Description       : delay indefinitely execution of current task
+ *                     execution of the task can be resumed
  *
  * Parameters        : none
  *
- * Return
- *   E_STOPPED       : task object was resumed (tsk_resume)
+ * Return            : none
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned tsk_sleep( void ) { return tmr_wait(&WAIT); }
+void tsk_sleep( void ) { tmr_wait(&WAIT); }
 
 /******************************************************************************
  *
  * Name              : tsk_suspend
  *
  * Description       : delay indefinitely execution of given task
- *                     tasks from delayed queue can not be suspended
+ *                     execution of the task can be resumed
  *
  * Parameters
  *   tsk             : pointer to task object
@@ -1035,8 +1029,8 @@ unsigned tsk_suspend( tsk_t *tsk );
  * Name              : tsk_resume
  * ISR alias         : tsk_resumeISR
  *
- * Description       : resume execution of given delayed task
- *                     only suspended and sleeping tasks can be resumed
+ * Description       : resume execution of given suspended task
+ *                     only suspended or indefinitely delayed tasks can be resumed
  *
  * Parameters
  *   tsk             : pointer to delayed task object
@@ -1194,11 +1188,11 @@ namespace ThisTask
 	static inline unsigned waitFor   ( unsigned _flags, cnt_t _delay ) { return tsk_waitFor   (_flags, _delay);        }
 	static inline unsigned waitUntil ( unsigned _flags, cnt_t _time )  { return tsk_waitUntil (_flags, _time);         }
 	static inline unsigned wait      ( unsigned _flags )               { return tsk_wait      (_flags);                }
-	static inline unsigned sleepFor  ( cnt_t    _delay )               { return tsk_sleepFor  (_delay);                }
-	static inline unsigned sleepNext ( cnt_t    _delay )               { return tsk_sleepNext (_delay);                }
-	static inline unsigned sleepUntil( cnt_t    _time )                { return tsk_sleepUntil(_time);                 }
-	static inline unsigned sleep     ( void )                          { return tsk_sleep     ();                      }
-	static inline unsigned delay     ( cnt_t    _delay )               { return tsk_delay     (_delay);                }
+	static inline void     sleepFor  ( cnt_t    _delay )               {        tsk_sleepFor  (_delay);                }
+	static inline void     sleepNext ( cnt_t    _delay )               {        tsk_sleepNext (_delay);                }
+	static inline void     sleepUntil( cnt_t    _time )                {        tsk_sleepUntil(_time);                 }
+	static inline void     sleep     ( void )                          {        tsk_sleep     ();                      }
+	static inline void     delay     ( cnt_t    _delay )               {        tsk_delay     (_delay);                }
 }
 
 #endif//__cplusplus

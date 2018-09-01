@@ -58,6 +58,7 @@ Features:
 - reorganized kernel functions
 - added object header
 - added header init functions
+- rebuilded sleep and suspend / resume functions
 ---------
 6.1
 - updated os version
