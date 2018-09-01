@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    01.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,7 +48,7 @@ extern "C" {
 
 struct __tsk
 {
-	sub_t    sub;   // timer / task header
+	hdr_t    hdr;   // timer / task header
 
 	fun_t  * state; // task state (initial task function, doesn't have to be noreturn-type)
 	cnt_t    start; // inherited from timer
@@ -154,7 +154,7 @@ struct __tsk
  ******************************************************************************/
 
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _SUB_INIT(), _state, 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
+                       { _HDR_INIT(), _state, 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
 
 /******************************************************************************
  *
@@ -1080,7 +1080,7 @@ template<unsigned size_ = OS_STACK_SIZE>
 struct staticTaskT : public __tsk
 {
 	 staticTaskT( const unsigned _prio, fun_t *_state ): __tsk _TSK_INIT(_prio, _state, stack_, size_) {}
-	~staticTaskT( void ) { assert(__tsk::sub.id == ID_STOPPED); }
+	~staticTaskT( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
 	void     kill     ( void )            {        tsk_kill      (this);         }
 	unsigned detach   ( void )            { return tsk_detach    (this);         }
@@ -1095,7 +1095,7 @@ struct staticTaskT : public __tsk
 
 	unsigned prio     ( void )            { return __tsk::basic;                 }
 	unsigned getPrio  ( void )            { return __tsk::basic;                 }
-	bool     operator!( void )            { return __tsk::sub.id == ID_STOPPED;  }
+	bool     operator!( void )            { return __tsk::hdr.id == ID_STOPPED;  }
 
 	private:
 	stk_t stack_[SSIZE(size_)];

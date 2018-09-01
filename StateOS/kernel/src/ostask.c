@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    01.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -46,7 +46,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 	{
 		memset(tsk, 0, sizeof(tsk_t));
 
-		core_sub_init(&tsk->sub);
+		core_hdr_init(&tsk->hdr);
 
 		tsk->prio   = prio;
 		tsk->basic  = prio;
@@ -74,7 +74,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 	{
 		tsk = core_sys_alloc(ABOVE(sizeof(tsk_t)) + size);
 		tsk_init(tsk, prio, state, (void *)((size_t)tsk + ABOVE(sizeof(tsk_t))), size);
-		tsk->sub.obj.res = tsk;
+		tsk->hdr.obj.res = tsk;
 	}
 	sys_unlock();
 
@@ -91,7 +91,7 @@ void tsk_start( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->sub.id == ID_STOPPED)
+		if (tsk->hdr.id == ID_STOPPED)
 		{
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
@@ -110,7 +110,7 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 
 	sys_lock();
 	{
-		if (tsk->sub.id == ID_STOPPED)
+		if (tsk->hdr.id == ID_STOPPED)
 		{
 			tsk->state = state;
 
@@ -133,7 +133,7 @@ void tsk_stop( void )
 	if (System.cur->join != DETACHED)
 		core_tsk_wakeup(System.cur->join, E_SUCCESS);
 	else
-		core_sys_free(System.cur->sub.obj.res);
+		core_sys_free(System.cur->hdr.obj.res);
 
 	core_tsk_remove(System.cur);
 
@@ -149,7 +149,7 @@ void tsk_kill( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->sub.id != ID_STOPPED)
+		if (tsk->hdr.id != ID_STOPPED)
 		{
 			tsk->mtx.tree = 0;
 			while (tsk->mtx.list)
@@ -158,12 +158,12 @@ void tsk_kill( tsk_t *tsk )
 			if (tsk->join != DETACHED)
 				core_tsk_wakeup(tsk->join, E_STOPPED);
 			else
-				core_sys_free(tsk->sub.obj.res);
+				core_sys_free(tsk->hdr.obj.res);
 
-			if (tsk->sub.id == ID_READY)
+			if (tsk->hdr.id == ID_READY)
 				core_tsk_remove(tsk);
 			else
-			if (tsk->sub.id == ID_DELAYED)
+			if (tsk->hdr.id == ID_DELAYED)
 			{
 				core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
 				core_tmr_remove((tmr_t *)tsk);
@@ -196,9 +196,9 @@ unsigned tsk_detach( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if ((tsk->sub.id != ID_STOPPED) &&
+		if ((tsk->hdr.id != ID_STOPPED) &&
 		    (tsk->join != DETACHED) &&
-		    (tsk->sub.obj.res != 0))
+		    (tsk->hdr.obj.res != 0))
 		{
 			core_tsk_wakeup(tsk->join, E_TIMEOUT);
 			tsk->join = DETACHED;
@@ -228,13 +228,13 @@ unsigned tsk_join( tsk_t *tsk )
 		if (tsk->join != JOINABLE)
 			event = E_TIMEOUT;
 		else
-		if (tsk->sub.id != ID_STOPPED)
+		if (tsk->hdr.id != ID_STOPPED)
 			event = core_tsk_waitFor(&tsk->join, INFINITE);
 		else
 			event = E_SUCCESS;
 
 		if (event != E_TIMEOUT) // !detached
-			core_sys_free(tsk->sub.obj.res);
+			core_sys_free(tsk->hdr.obj.res);
 	}
 	sys_unlock();
 
@@ -291,7 +291,7 @@ unsigned priv_tsk_wait( unsigned flags, cnt_t time, unsigned(*wait)(tsk_t**,cnt_
 	assert(!port_isr_context());
 
 	System.cur->tmp.flg.flags = flags;
-	return wait(&System.cur->sub.obj.queue, time);
+	return wait(&System.cur->hdr.obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -334,7 +334,7 @@ unsigned tsk_give( tsk_t *tsk, unsigned flags )
 
 	sys_lock();
 	{
-		if (tsk->guard == &tsk->sub.obj.queue)
+		if (tsk->guard == &tsk->hdr.obj.queue)
 		{
 			if (tsk->tmp.flg.flags & flags)
 				flags = tsk->tmp.flg.flags &= ~flags;
@@ -362,7 +362,7 @@ unsigned tsk_suspend( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->sub.id == ID_READY)
+		if (tsk->hdr.id == ID_READY)
 		{
 			core_tsk_suspend(tsk);
 			event = E_SUCCESS;
@@ -387,7 +387,7 @@ unsigned tsk_resume( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->guard == &WAIT.sub.obj.queue)
+		if (tsk->guard == &WAIT.hdr.obj.queue)
 		{
 			core_tsk_wakeup(tsk, E_STOPPED);
 			event = E_SUCCESS;

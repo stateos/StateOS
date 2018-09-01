@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    01.09.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -118,25 +118,25 @@ void core_obj_init( obj_t *obj )
 
 // timer / task header
 
-typedef struct __sub
+typedef struct __hdr
 {
 	obj_t    obj;   // object header
 	void   * prev;  // previous object (timer / task) in the READY queue
 	void   * next;  // next object (timer / task) in the READY queue
 	tid_t    id;    // timer / task id
 
-}	sub_t;
+}	hdr_t;
 
-#define               _SUB_INIT() { _OBJ_INIT(), 0, 0, ID_STOPPED }
+#define               _HDR_INIT() { _OBJ_INIT(), 0, 0, ID_STOPPED }
 
 /* -------------------------------------------------------------------------- */
 
 __STATIC_INLINE
-void core_sub_init( sub_t *sub )
+void core_hdr_init( hdr_t *hdr )
 {
-	core_obj_init(&sub->obj);
+	core_obj_init(&hdr->obj);
 
-	sub->id = ID_STOPPED;
+	hdr->id = ID_STOPPED;
 }
 
 /* -------------------------------------------------------------------------- */

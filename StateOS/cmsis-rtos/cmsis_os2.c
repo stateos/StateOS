@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    01.09.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -256,9 +256,9 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	sys_lock();
 	{
 		tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, stack_mem, stack_size);
-		if (attr->cb_mem    == NULL || attr->cb_size    == 0U) thread->tsk.sub.obj.res = thread;
+		if (attr->cb_mem    == NULL || attr->cb_size    == 0U) thread->tsk.hdr.obj.res = thread;
 		else
-		if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.sub.obj.res = stack_mem;
+		if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.hdr.obj.res = stack_mem;
 		thread->tsk.join = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
 		flg_init(&thread->flg, 0);
 		thread->flags = flags;
@@ -293,7 +293,7 @@ osThreadState_t osThreadGetState (osThreadId_t thread_id)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_id == NULL))
 		return osThreadError;
 
-	switch (thread->tsk.sub.id)
+	switch (thread->tsk.hdr.id)
 	{
 		case ID_STOPPED: return osThreadTerminated;
 		case ID_READY:   return osThreadReady;
@@ -464,11 +464,11 @@ uint32_t osThreadGetCount (void)
 	{
 		count++;
 
-		for (tsk = IDLE.sub.next; tsk != &IDLE; tsk = tsk->sub.next)
+		for (tsk = IDLE.hdr.next; tsk != &IDLE; tsk = tsk->hdr.next)
 			count++;
 
-		for (tmr = WAIT.sub.next; tmr != &WAIT; tmr = tmr->sub.next)
-			if (tmr->sub.id == ID_DELAYED)
+		for (tmr = WAIT.hdr.next; tmr != &WAIT; tmr = tmr->hdr.next)
+			if (tmr->hdr.id == ID_DELAYED)
 				count++;
 	}
 	sys_unlock();
@@ -489,11 +489,11 @@ uint32_t osThreadEnumerate (osThreadId_t *thread_array, uint32_t array_items)
 	{
 		thread_array[count++] = &IDLE;
 
-		for (tsk = IDLE.sub.next; (tsk != &IDLE) && (count < array_items); tsk = tsk->sub.next)
+		for (tsk = IDLE.hdr.next; (tsk != &IDLE) && (count < array_items); tsk = tsk->hdr.next)
 			thread_array[count++] = tsk;
 
-		for (tmr = WAIT.sub.next; (tmr != &WAIT) && (count < array_items); tmr = tmr->sub.next)
-			if (tmr->sub.id == ID_DELAYED)
+		for (tmr = WAIT.hdr.next; (tmr != &WAIT) && (count < array_items); tmr = tmr->hdr.next)
+			if (tmr->hdr.id == ID_DELAYED)
 				thread_array[count++] = tmr;
 	}
 	sys_unlock();
@@ -619,7 +619,7 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 	sys_lock();
 	{
 		tmr_init(&timer->tmr, timer_handler);
-		if (attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.sub.obj.res = timer;
+		if (attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.hdr.obj.res = timer;
 		timer->flags = flags;
 		timer->name = (attr == NULL) ? NULL : attr->name;
 		timer->func = func;
@@ -675,7 +675,7 @@ uint32_t osTimerIsRunning (osTimerId_t timer_id)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (timer_id == NULL))
 		return 0U;
 
-	return (timer->tmr.sub.id != ID_STOPPED);
+	return (timer->tmr.hdr.id != ID_STOPPED);
 }
 
 osStatus_t osTimerDelete (osTimerId_t timer_id)

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    01.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -46,7 +46,7 @@ extern "C" {
 
 struct __tmr
 {
-	sub_t    sub;   // timer / task header
+	hdr_t    hdr;   // timer / task header
 
 	fun_t  * state; // callback procedure
 	cnt_t    start;
@@ -70,7 +70,7 @@ struct __tmr
  *
  ******************************************************************************/
 
-#define               _TMR_INIT( _state ) { _SUB_INIT(), _state, 0, 0, 0 }
+#define               _TMR_INIT( _state ) { _HDR_INIT(), _state, 0, 0, 0 }
 
 /******************************************************************************
  *
@@ -301,7 +301,7 @@ struct __tmr
  ******************************************************************************/
 
 __STATIC_INLINE
-tmr_t *tmr_thisISR( void ) { return (tmr_t *) WAIT.sub.next; }
+tmr_t *tmr_thisISR( void ) { return (tmr_t *) WAIT.hdr.next; }
 
 /******************************************************************************
  *
@@ -707,7 +707,7 @@ struct staticTimer : public __tmr
 {
 	 staticTimer( void ):          __tmr _TMR_INIT(0) {}
 	 staticTimer( fun_t *_state ): __tmr _TMR_INIT(_state) {}
-	~staticTimer( void ) { assert(__tmr::sub.id == ID_STOPPED); }
+	~staticTimer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
 
 	void kill         ( void )                                       {        tmr_kill         (this);                          }
 	void start        ( cnt_t _delay, cnt_t _period )                {        tmr_start        (this, _delay, _period);         }
@@ -725,7 +725,7 @@ struct staticTimer : public __tmr
 	unsigned take     ( void )                                       { return tmr_take         (this);                          }
 	unsigned takeISR  ( void )                                       { return tmr_takeISR      (this);                          }
 
-	bool     operator!( void )                                       { return __tmr::sub.id == ID_STOPPED;                      }
+	bool     operator!( void )                                       { return __tmr::hdr.id == ID_STOPPED;                      }
 };
 
 /******************************************************************************
@@ -748,7 +748,7 @@ struct Timer : public staticTimer
 	void  startFrom( cnt_t _delay, cnt_t _period, FUN_t _state ) { fun_ = _state; tmr_startFrom(this, _delay, _period, run_); }
 
 	static
-	void  run_( void ) { ((Timer *)WAIT.sub.next)->fun_(); }
+	void  run_( void ) { ((Timer *)WAIT.hdr.next)->fun_(); }
 	FUN_t fun_;
 #else
 	Timer( FUN_t _state ): staticTimer(_state) {}
@@ -857,7 +857,7 @@ struct startTimerUntil : public Timer
 namespace ThisTimer
 {
 #if OS_FUNCTIONAL
-	static inline void flipISR ( FUN_t _state ) { ((Timer *)WAIT.sub.next)->fun_ = _state;
+	static inline void flipISR ( FUN_t _state ) { ((Timer *)WAIT.hdr.next)->fun_ = _state;
 	                                              tmr_flipISR (Timer::run_);           }
 #else
 	static inline void flipISR ( FUN_t _state ) { tmr_flipISR (_state);                }
