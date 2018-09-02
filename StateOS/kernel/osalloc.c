@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    02.09.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -47,7 +47,7 @@ typedef struct __seg seg_t;
 struct __seg
 {
 	seg_t  * next;
-	size_t   size;
+	seg_t  * owner;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -59,7 +59,7 @@ struct __seg
 
 static
 seg_t Heap[HSIZE(OS_HEAP_SIZE)+1] =
-  { { Heap+HSIZE(OS_HEAP_SIZE), HSIZE(OS_HEAP_SIZE) } };
+  { { Heap+HSIZE(OS_HEAP_SIZE), Heap } };
 
 /* -------------------------------------------------------------------------- */
 
@@ -76,29 +76,31 @@ void *core_sys_alloc( size_t size )
 	{
 		for (mem = Heap; mem; mem = mem->next)
 		{
-			if (mem->size == 0)					// memory segment has already been allocated
+			if (mem->owner == 0)
+		//	memory segment has already been allocated
 				continue;
 
-			while ((nxt = mem->next)->size)		// it is possible to merge adjacent free memory segments
-			{
+			while (nxt = mem->next, nxt->owner)
+		//	it is possible to merge adjacent free memory segments
 				mem->next = nxt->next;
-				mem->size += nxt->size;
-			}
 
-			if (mem->size < size)				// memory segment is too small
+			if (nxt < mem + size)
+		//	memory segment is too small
 				continue;
 
-			if (mem->size > size)				// memory segment is larger than required
+			if (nxt > mem + size)
+		//	memory segment is larger than required
 			{
 				nxt = mem + size;
-				nxt->next = mem->next;
-				nxt->size = mem->size - size;
+				nxt->next  = mem->next;
+				nxt->owner = nxt;
 			}
 
 			mem = memset(mem, 0, size * sizeof(seg_t));
 			mem->next = nxt;
 			mem = mem + 1;
-			break;								// memory segment was successfully allocated
+		//	memory segment has been successfully allocated
+			break;
 		}
 	}
 	sys_unlock();
@@ -119,11 +121,13 @@ void core_sys_free( void *base )
 	{
 		for (mem = Heap; mem; mem = mem->next)
 		{
-			if (mem != seg)						// this is not the memory segment we are looking for
+			if (mem != seg)
+		//	this is not the memory segment we are looking for
 				continue;
 
-			mem->size = mem->next - mem;
-			break;								// memory segment was successfully released
+			mem->owner = mem;
+		//	memory segment has been successfully released
+			break;
 		}
 	}
 	sys_unlock();
