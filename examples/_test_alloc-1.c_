@@ -6,9 +6,10 @@ void slave()
 	size_t len = 1;
 	void * buf;
 
-	while ((buf = sys_alloc(len)) != 0)
+	while (buf = sys_alloc(len), buf)
 	{
 		sys_free(buf);
+		tsk_delay(25*MSEC); LEDs++;
 		len *= 2;
 	}
 
@@ -16,9 +17,10 @@ void slave()
 	{
 		buf = sys_alloc(len);
 		sys_free(buf);
+		tsk_delay(25*MSEC); LEDs--;
 	}
 
-	LED_Tick();
+	tsk_delay(500*MSEC);
 	tsk_stop();
 }
 
