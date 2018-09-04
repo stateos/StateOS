@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 #include "inc/osjobqueue.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void job_init( job_t *job, fun_t **data, unsigned bufsize )
@@ -67,8 +68,8 @@ job_t *job_create( unsigned limit )
 	sys_lock();
 	{
 		bufsize = limit * sizeof(fun_t *);
-		job = core_sys_alloc(ABOVE(sizeof(job_t)) + bufsize);
-		job_init(job, (void *)((size_t)job + ABOVE(sizeof(job_t))), bufsize);
+		job = sys_alloc(SEG_OVER(sizeof(job_t)) + bufsize);
+		job_init(job, (void *)((size_t)job + SEG_OVER(sizeof(job_t))), bufsize);
 		job->obj.res = job;
 	}
 	sys_unlock();
@@ -101,7 +102,7 @@ void job_delete( job_t *job )
 	sys_lock();
 	{
 		job_kill(job);
-		core_sys_free(job->obj.res);
+		sys_free(job->obj.res);
 	}
 	sys_unlock();
 }

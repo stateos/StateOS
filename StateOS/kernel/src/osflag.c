@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    01.09.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 #include "inc/osflag.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void flg_init( flg_t *flg, unsigned init )
@@ -61,7 +62,7 @@ flg_t *flg_create( unsigned init )
 
 	sys_lock();
 	{
-		flg = core_sys_alloc(sizeof(flg_t));
+		flg = sys_alloc(sizeof(flg_t));
 		flg_init(flg, init);
 		flg->obj.res = flg;
 	}
@@ -91,7 +92,7 @@ void flg_delete( flg_t *flg )
 	sys_lock();
 	{
 		flg_kill(flg);
-		core_sys_free(flg->obj.res);
+		sys_free(flg->obj.res);
 	}
 	sys_unlock();
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    01.09.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size )
@@ -72,8 +73,8 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 
 	sys_lock();
 	{
-		tsk = core_sys_alloc(ABOVE(sizeof(tsk_t)) + size);
-		tsk_init(tsk, prio, state, (void *)((size_t)tsk + ABOVE(sizeof(tsk_t))), size);
+		tsk = sys_alloc(SEG_OVER(sizeof(tsk_t)) + size);
+		tsk_init(tsk, prio, state, (void *)((size_t)tsk + SEG_OVER(sizeof(tsk_t))), size);
 		tsk->hdr.obj.res = tsk;
 	}
 	sys_unlock();
@@ -133,7 +134,7 @@ void tsk_stop( void )
 	if (System.cur->join != DETACHED)
 		core_tsk_wakeup(System.cur->join, E_SUCCESS);
 	else
-		core_sys_free(System.cur->hdr.obj.res);
+		sys_free(System.cur->hdr.obj.res);
 
 	core_tsk_remove(System.cur);
 
@@ -158,7 +159,7 @@ void tsk_kill( tsk_t *tsk )
 			if (tsk->join != DETACHED)
 				core_tsk_wakeup(tsk->join, E_STOPPED);
 			else
-				core_sys_free(tsk->hdr.obj.res);
+				sys_free(tsk->hdr.obj.res);
 
 			if (tsk->hdr.id == ID_READY)
 				core_tsk_remove(tsk);
@@ -234,7 +235,7 @@ unsigned tsk_join( tsk_t *tsk )
 			event = E_SUCCESS;
 
 		if (event != E_TIMEOUT) // !detached
-			core_sys_free(tsk->hdr.obj.res);
+			sys_free(tsk->hdr.obj.res);
 	}
 	sys_unlock();
 
@@ -266,7 +267,7 @@ void tsk_flip( fun_t *state )
 	System.cur->state = state;
 
 	core_ctx_switch();
-	core_tsk_flip(System.cur->stack + LIMITED_SIZE(System.cur->size, stk_t));
+	core_tsk_flip((void *)STK_CROP(System.cur->stack, System.cur->size));
 }
 
 /* -------------------------------------------------------------------------- */

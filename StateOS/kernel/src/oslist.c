@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 #include "inc/oslist.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void lst_init( lst_t *lst )
@@ -59,7 +60,7 @@ lst_t *lst_create( void )
 
 	sys_lock();
 	{
-		lst = core_sys_alloc(sizeof(lst_t));
+		lst = sys_alloc(sizeof(lst_t));
 		lst_init(lst);
 		lst->obj.res = lst;
 	}
@@ -89,7 +90,7 @@ void lst_delete( lst_t *lst )
 	sys_lock();
 	{
 		lst_kill(lst);
-		core_sys_free(lst->obj.res);
+		sys_free(lst->obj.res);
 	}
 	sys_unlock();
 }

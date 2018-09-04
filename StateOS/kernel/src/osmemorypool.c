@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 #include "inc/osmemorypool.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void mem_bind( mem_t *mem )
@@ -73,8 +74,8 @@ void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize )
 
 		core_obj_init(&mem->lst.obj);
 
-		mem->limit = bufsize / (1 + MSIZE(size)) / sizeof(que_t);
-		mem->size  = MSIZE(size);
+		mem->limit = bufsize / (1 + MEM_SIZE(size)) / sizeof(que_t);
+		mem->size  = MEM_SIZE(size);
 		mem->data  = data;
 
 		mem_bind(mem);
@@ -95,9 +96,9 @@ mem_t *mem_create( unsigned limit, unsigned size )
 
 	sys_lock();
 	{
-		bufsize = limit * (1 + MSIZE(size)) * sizeof(que_t);
-		mem = core_sys_alloc(ABOVE(sizeof(mem_t)) + bufsize);
-		mem_init(mem, size, (void *)((size_t)mem + ABOVE(sizeof(mem_t))), bufsize);
+		bufsize = limit * (1 + MEM_SIZE(size)) * sizeof(que_t);
+		mem = sys_alloc(SEG_OVER(sizeof(mem_t)) + bufsize);
+		mem_init(mem, size, (void *)((size_t)mem + SEG_OVER(sizeof(mem_t))), bufsize);
 		mem->lst.obj.res = mem;
 	}
 	sys_unlock();
@@ -126,7 +127,7 @@ void mem_delete( mem_t *mem )
 	sys_lock();
 	{
 		mem_kill(mem);
-		core_sys_free(mem->lst.obj.res);
+		sys_free(mem->lst.obj.res);
 	}
 	sys_unlock();
 }

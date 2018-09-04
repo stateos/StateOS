@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    @file    StateOS: os.h
+    @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
     @date    04.09.2018
     @brief   This file contains definitions for StateOS.
@@ -29,91 +29,63 @@
 
  ******************************************************************************/
 
-#ifndef __STATEOS
-
-#define __STATEOS_MAJOR       6
-#define __STATEOS_MINOR       3
-#define __STATEOS_BUILD       0
-
-#define __STATEOS       ((((__STATEOS_MAJOR)&0xFFUL)<<24)|(((__STATEOS_MINOR)&0xFFUL)<<16)|((__STATEOS_BUILD)&0xFFFFUL))
-
-#define __STATEOS__          "StateOS v" STRINGIZE(__STATEOS_MAJOR) "." STRINGIZE(__STATEOS_MINOR) "." STRINGIZE(__STATEOS_BUILD)
-
-#define STRINGIZE(n) STRINGIZE_HELPER(n)
-#define STRINGIZE_HELPER(n) #n
-
-/* -------------------------------------------------------------------------- */
+#ifndef __STATEOSALLOC_H
+#define __STATEOSALLOC_H
 
 #include "oskernel.h"
-#include "osalloc.h"
-#include "inc/oscriticalsection.h"
-#include "inc/osspinlock.h"
-#include "inc/ossignal.h"
-#include "inc/osflag.h"
-#include "inc/osbarrier.h"
-#include "inc/ossemaphore.h"
-#include "inc/osmutex.h"
-#include "inc/osfastmutex.h"
-#include "inc/osconditionvariable.h"
-#include "inc/oslist.h"
-#include "inc/osmemorypool.h"
-#include "inc/osstreambuffer.h"
-#include "inc/osmessagebuffer.h"
-#include "inc/osmailboxqueue.h"
-#include "inc/oseventqueue.h"
-#include "inc/osjobqueue.h"
-#include "inc/ostimer.h"
-#include "inc/ostask.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/* -------------------------------------------------------------------------- */
+
+#define SEG_SIZE( size ) \
+    ALIGNED_SIZE( size, seg_t )
+
+#define SEG_OVER( size ) \
+         ALIGNED( size, seg_t )
+
 /******************************************************************************
  *
- * Name              : sys_init
- *
- * Description       : initialize system timer and enable services
- *
- * Parameters        : none
- *
- * Return            : none
- *
- * Note              : function port_sys_init should be invoked as a constructor
- *                   : otherwise, call sys_init as the first instruction in function main
+ * Name              : memory segment header
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-void sys_init( void ) { port_sys_init(); }
+typedef struct __seg seg_t;
+
+struct __seg
+{
+	seg_t  * next;  // next memory block
+	seg_t  * owner; // owner of memory block
+};
 
 /******************************************************************************
  *
- * Name              : sys_time
- * ISR alias         : sys_timeISR
+ * Name              : sys_alloc
  *
- * Description       : return current value of system counter
+ * Description       : system malloc procedure with clearing the allocated memory
  *
- * Parameters        : none
+ * Parameters
+ *   size            : required size of the memory segment (in bytes)
  *
- * Return            : current value of system counter
+ * Return            : pointer to the beginning of allocated and cleared memory segment
+ *   0               : memory segment not allocated (not enough free memory)
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-cnt_t sys_time( void );
-
-__STATIC_INLINE
-cnt_t sys_timeISR( void ) { return sys_time(); }
+void *sys_alloc( size_t size );
 
 /******************************************************************************
  *
- * Name              : stk_assert
+ * Name              : sys_free
  *
- * Description       : check stack integrity of the current task
+ * Description       : system free procedure
  *
- * Parameters        : none
+ * Parameters
+ *   ptr             : pointer to a memory segment previously allocated with sys_alloc, xxx_create or xxx_new functions
  *
  * Return            : none
  *
@@ -121,11 +93,10 @@ cnt_t sys_timeISR( void ) { return sys_time(); }
  *
  ******************************************************************************/
 
-#define                stk_assert() \
-                       core_stk_assert()
+void sys_free( void *ptr );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif//__STATEOS
+#endif//__STATEOSALLOC_H

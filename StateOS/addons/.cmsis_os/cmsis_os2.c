@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    01.09.2018
+    @date    04.09.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -232,8 +232,8 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	if (thread == NULL && stack_mem == NULL)
 	{
 		stack_size = osThreadStackSize(stack_size);
-		thread = sys_alloc(ABOVE(osThreadCbSize) + stack_size);
-		stack_mem = (void *)((size_t)thread + ABOVE(osThreadCbSize));
+		thread = sys_alloc(SEG_OVER(osThreadCbSize) + stack_size);
+		stack_mem = (void *)((size_t)thread + SEG_OVER(osThreadCbSize));
 		if (thread == NULL)
 			return NULL;
 	}
@@ -1041,8 +1041,8 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 
 	if (mp == NULL && data == NULL)
 	{
-		mp = sys_alloc(ABOVE(osMemoryPoolCbSize) + size);
-		data = (void *)((size_t)mp + ABOVE(osMemoryPoolCbSize));
+		mp = sys_alloc(SEG_OVER(osMemoryPoolCbSize) + size);
+		data = (void *)((size_t)mp + SEG_OVER(osMemoryPoolCbSize));
 		if (mp == NULL)
 			return NULL;
 	}
@@ -1215,8 +1215,8 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 
 	if (mq == NULL && data == NULL)
 	{
-		mq = sys_alloc(ABOVE(osMessageQueueCbSize) + size);
-		data = (void *)((size_t)mq + ABOVE(osMessageQueueCbSize));
+		mq = sys_alloc(SEG_OVER(osMessageQueueCbSize) + size);
+		data = (void *)((size_t)mq + SEG_OVER(osMessageQueueCbSize));
 		if (mq == NULL)
 			return NULL;
 	}

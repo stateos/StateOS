@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 #include "inc/oseventqueue.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void evt_init( evt_t *evt, unsigned *data, unsigned bufsize )
@@ -67,8 +68,8 @@ evt_t *evt_create( unsigned limit )
 	sys_lock();
 	{
 		bufsize = limit * sizeof(unsigned);
-		evt = core_sys_alloc(ABOVE(sizeof(evt_t)) + bufsize);
-		evt_init(evt, (void *)((size_t)evt + ABOVE(sizeof(evt_t))), bufsize);
+		evt = sys_alloc(SEG_OVER(sizeof(evt_t)) + bufsize);
+		evt_init(evt, (void *)((size_t)evt + SEG_OVER(sizeof(evt_t))), bufsize);
 		evt->obj.res = evt;
 	}
 	sys_unlock();
@@ -101,7 +102,7 @@ void evt_delete( evt_t *evt )
 	sys_lock();
 	{
 		evt_kill(evt);
-		core_sys_free(evt->obj.res);
+		sys_free(evt->obj.res);
 	}
 	sys_unlock();
 }

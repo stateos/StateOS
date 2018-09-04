@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,8 +41,8 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#define MSIZE( size ) \
- ALIGNED_SIZE( size, que_t )
+#define MEM_SIZE( size ) \
+    ALIGNED_SIZE( size, que_t )
 
 /******************************************************************************
  *
@@ -113,9 +113,9 @@ struct __mem
  *
  ******************************************************************************/
 
-#define             OS_MEM( mem, limit, size )                                       \
-                       que_t mem##__buf[limit * (1 + MSIZE(size))];                   \
-                       mem_t mem##__mem = _MEM_INIT( limit, MSIZE(size), mem##__buf ); \
+#define             OS_MEM( mem, limit, size )                                          \
+                       que_t mem##__buf[limit * (1 + MEM_SIZE(size))];                   \
+                       mem_t mem##__mem = _MEM_INIT( limit, MEM_SIZE(size), mem##__buf ); \
                        mem_id mem = & mem##__mem
 
 /******************************************************************************
@@ -131,9 +131,9 @@ struct __mem
  *
  ******************************************************************************/
 
-#define         static_MEM( mem, limit, size )                                       \
-                static que_t mem##__buf[limit * (1 + MSIZE(size))];                   \
-                static mem_t mem##__mem = _MEM_INIT( limit, MSIZE(size), mem##__buf ); \
+#define         static_MEM( mem, limit, size )                                          \
+                static que_t mem##__buf[limit * (1 + MEM_SIZE(size))];                   \
+                static mem_t mem##__mem = _MEM_INIT( limit, MEM_SIZE(size), mem##__buf ); \
                 static mem_id mem = & mem##__mem
 
 /******************************************************************************
@@ -154,7 +154,7 @@ struct __mem
 
 #ifndef __cplusplus
 #define                MEM_INIT( limit, size ) \
-                      _MEM_INIT( limit, MSIZE(size), _MEM_DATA(limit, MSIZE(size)) )
+                      _MEM_INIT( limit, MEM_SIZE(size), _MEM_DATA(limit, MEM_SIZE(size)) )
 #endif
 
 /******************************************************************************
@@ -419,7 +419,7 @@ void mem_giveISR( mem_t *mem, const void *data ) { lst_giveISR(&mem->lst, data);
 template<unsigned limit_, unsigned size_>
 struct MemoryPoolT : public __mem
 {
-	 MemoryPoolT( void ): __mem _MEM_INIT(limit_, MSIZE(size_), data_) { mem_bind(this); }
+	 MemoryPoolT( void ): __mem _MEM_INIT(limit_, MEM_SIZE(size_), data_) { mem_bind(this); }
 	~MemoryPoolT( void ) { assert(__mem::lst.obj.queue == nullptr); }
 
 	void     kill     ( void )                             {        mem_kill     (this);                }
@@ -432,7 +432,7 @@ struct MemoryPoolT : public __mem
 	void     giveISR  ( const void  *_data )               {        mem_giveISR  (this, _data);         }
 
 	private:
-	que_t data_[limit_ * (1 + MSIZE(size_))];
+	que_t data_[limit_ * (1 + MEM_SIZE(size_))];
 };
 
 /******************************************************************************

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/ossemaphore.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void sem_init( sem_t *sem, unsigned init, unsigned limit )
@@ -62,7 +63,7 @@ sem_t *sem_create( unsigned init, unsigned limit )
 
 	sys_lock();
 	{
-		sem = core_sys_alloc(sizeof(sem_t));
+		sem = sys_alloc(sizeof(sem_t));
 		sem_init(sem, init, limit);
 		sem->obj.res = sem;
 	}
@@ -94,7 +95,7 @@ void sem_delete( sem_t *sem )
 	sys_lock();
 	{
 		sem_kill(sem);
-		core_sys_free(sem->obj.res);
+		sys_free(sem->obj.res);
 	}
 	sys_unlock();
 }

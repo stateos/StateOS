@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    02.09.2018
+    @date    04.09.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 
  ******************************************************************************/
 
-#include "oskernel.h"
+#include "osalloc.h"
 #include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
@@ -38,39 +38,20 @@
 
 #if OS_HEAP_SIZE
 
-/* -------------------------------------------------------------------------- */
-
-// memory segment header
-
-typedef struct __seg seg_t;
-
-struct __seg
-{
-	seg_t  * next;
-	seg_t  * owner;
-};
-
-/* -------------------------------------------------------------------------- */
-
-#define HSIZE( size ) \
- ALIGNED_SIZE( size, seg_t )
-
-/* -------------------------------------------------------------------------- */
-
 static
-seg_t Heap[HSIZE(OS_HEAP_SIZE)+1] =
-  { { Heap+HSIZE(OS_HEAP_SIZE), Heap } };
+seg_t Heap[SEG_SIZE(OS_HEAP_SIZE)+1] =
+  { { Heap+SEG_SIZE(OS_HEAP_SIZE), Heap } };
 
 /* -------------------------------------------------------------------------- */
 
-void *core_sys_alloc( size_t size )
+void *sys_alloc( size_t size )
 {
 	seg_t *mem;
 	seg_t *nxt;
 
-	assert(HSIZE(size));
+	assert(SEG_SIZE(size));
 
-	size = HSIZE(size) + 1;
+	size = SEG_SIZE(size) + 1;
 
 	sys_lock();
 	{
@@ -112,7 +93,7 @@ void *core_sys_alloc( size_t size )
 
 /* -------------------------------------------------------------------------- */
 
-void core_sys_free( void *base )
+void sys_free( void *base )
 {
 	seg_t *mem;
 	seg_t *seg = (seg_t *)base - 1;
@@ -133,11 +114,13 @@ void core_sys_free( void *base )
 	sys_unlock();
 }
 
+#endif
+
 /* -------------------------------------------------------------------------- */
 
-#else
+#if OS_HEAP_SIZE == 0
 
-void *core_sys_alloc( size_t size )
+void *sys_alloc( size_t size )
 {
 	void *mem;
 
@@ -155,7 +138,7 @@ void *core_sys_alloc( size_t size )
 
 /* -------------------------------------------------------------------------- */
 
-void core_sys_free( void *base )
+void sys_free( void *base )
 {
 	free(base);
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/ossignal.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void sig_init( sig_t *sig, bool type )
@@ -60,7 +61,7 @@ sig_t *sig_create( bool type )
 
 	sys_lock();
 	{
-		sig = core_sys_alloc(sizeof(sig_t));
+		sig = sys_alloc(sizeof(sig_t));
 		sig_init(sig, type);
 		sig->obj.res = sig;
 	}
@@ -92,7 +93,7 @@ void sig_delete( sig_t *sig )
 	sys_lock();
 	{
 		sig_kill(sig);
-		core_sys_free(sig->obj.res);
+		sys_free(sig->obj.res);
 	}
 	sys_unlock();
 }

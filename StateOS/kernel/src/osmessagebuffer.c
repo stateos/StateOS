@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 #include "inc/osmessagebuffer.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void msg_init( msg_t *msg, void *data, unsigned bufsize )
@@ -67,8 +68,8 @@ msg_t *msg_create( unsigned limit )
 	sys_lock();
 	{
 		bufsize = limit;
-		msg = core_sys_alloc(ABOVE(sizeof(msg_t)) + bufsize);
-		msg_init(msg, (void *)((size_t)msg + ABOVE(sizeof(msg_t))), bufsize);
+		msg = sys_alloc(SEG_OVER(sizeof(msg_t)) + bufsize);
+		msg_init(msg, (void *)((size_t)msg + SEG_OVER(sizeof(msg_t))), bufsize);
 		msg->obj.res = msg;
 	}
 	sys_unlock();
@@ -101,7 +102,7 @@ void msg_delete( msg_t *msg )
 	sys_lock();
 	{
 		msg_kill(msg);
-		core_sys_free(msg->obj.res);
+		sys_free(msg->obj.res);
 	}
 	sys_unlock();
 }

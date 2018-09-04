@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/osfastmutex.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void mut_init( mut_t *mut )
@@ -58,7 +59,7 @@ mut_t *mut_create( void )
 
 	sys_lock();
 	{
-		mut = core_sys_alloc(sizeof(mut_t));
+		mut = sys_alloc(sizeof(mut_t));
 		mut_init(mut);
 		mut->obj.res = mut;
 	}
@@ -88,7 +89,7 @@ void mut_delete( mut_t *mut )
 	sys_lock();
 	{
 		mut_kill(mut);
-		core_sys_free(mut->obj.res);
+		sys_free(mut->obj.res);
 	}
 	sys_unlock();
 }

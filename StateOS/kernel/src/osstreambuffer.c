@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 #include "inc/osstreambuffer.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void stm_init( stm_t *stm, void *data, unsigned bufsize )
@@ -67,8 +68,8 @@ stm_t *stm_create( unsigned limit )
 	sys_lock();
 	{
 		bufsize = limit;
-		stm = core_sys_alloc(ABOVE(sizeof(stm_t)) + bufsize);
-		stm_init(stm, (void *)((size_t)stm + ABOVE(sizeof(stm_t))), bufsize);
+		stm = sys_alloc(SEG_OVER(sizeof(stm_t)) + bufsize);
+		stm_init(stm, (void *)((size_t)stm + SEG_OVER(sizeof(stm_t))), bufsize);
 		stm->obj.res = stm;
 	}
 	sys_unlock();
@@ -101,7 +102,7 @@ void stm_delete( stm_t *stm )
 	sys_lock();
 	{
 		stm_kill(stm);
-		core_sys_free(stm->obj.res);
+		sys_free(stm->obj.res);
 	}
 	sys_unlock();
 }

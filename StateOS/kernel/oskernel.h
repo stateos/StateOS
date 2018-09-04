@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -61,23 +61,17 @@ typedef     void (* FUN_t)( void );
 
 /* -------------------------------------------------------------------------- */
 
-#define ALIGNED( size, type ) \
-     (((size_t)( size )+sizeof(type)-1)&~(sizeof(type)-1))
-
-#define LIMITED( size, type ) \
-     (((size_t)( size ))&~(sizeof(type)-1))
-
 #define ALIGNED_SIZE( size, type ) \
-          (((size_t)( size )+sizeof(type)-1)/sizeof(type))
+          (((size_t)( size ) + sizeof(type) - 1) / sizeof(type))
 
 #define LIMITED_SIZE( size, type ) \
-          (((size_t)( size ))/sizeof(type))
+          (((size_t)( size )) / sizeof(type))
 
-#define ABOVE( size ) \
-      ALIGNED( size, stk_t )
+#define      ALIGNED( size, type ) \
+       (ALIGNED_SIZE( size, type ) * sizeof(type))
 
-#define SSIZE( size ) \
- ALIGNED_SIZE( size, stk_t )
+#define      LIMITED( size, type ) \
+       (LIMITED_SIZE( size, type ) * sizeof(type))
 
 /* -------------------------------------------------------------------------- */
 
@@ -130,14 +124,6 @@ void core_ctx_reset( void )
 {
 	port_ctx_reset();
 }
-
-/* -------------------------------------------------------------------------- */
-
-// system malloc procedure with clearing the allocated memory
-void *core_sys_alloc( size_t size );
-
-// system free procedure
-void core_sys_free( void *ptr );
 
 /* -------------------------------------------------------------------------- */
 

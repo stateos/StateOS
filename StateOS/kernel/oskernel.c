@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    01.09.2018
+    @date    04.09.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -210,12 +210,12 @@ void core_tmr_handler( void )
 /* -------------------------------------------------------------------------- */
 
 #ifndef MAIN_TOP
-static  stk_t     MAIN_STK[SSIZE(OS_STACK_SIZE)];
-#define MAIN_TOP (MAIN_STK+SSIZE(OS_STACK_SIZE))
+static  stk_t     MAIN_STK[STK_SIZE(OS_STACK_SIZE)];
+#define MAIN_TOP (MAIN_STK+STK_SIZE(OS_STACK_SIZE))
 #endif
 
-static  union  { stk_t STK[SSIZE(OS_IDLE_STACK)];
-        struct { char  stk[ABOVE(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
+static  union  { stk_t STK[STK_SIZE(OS_IDLE_STACK)];
+        struct { char  stk[STK_OVER(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
         IDLE_STACK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
 #define IDLE_STK (void *)(&IDLE_STACK)
 #define IDLE_SP  (void *)(&IDLE_STACK.CTX.ctx)
@@ -275,7 +275,7 @@ void core_ctx_init( tsk_t *tsk )
 #ifdef DEBUG
 	memset(tsk->stack, 0xFF, tsk->size);
 #endif
-	tsk->sp = (ctx_t *)LIMITED((size_t)tsk->stack + tsk->size, stk_t) - 1;
+	tsk->sp = (ctx_t *)STK_CROP(tsk->stack, tsk->size) - 1;
 	port_ctx_init(tsk->sp, core_tsk_loop);
 }
 

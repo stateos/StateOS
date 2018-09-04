@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    01.09.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -31,6 +31,7 @@
 
 #include "inc/ostimer.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void tmr_init( tmr_t *tmr, fun_t *state )
@@ -60,7 +61,7 @@ tmr_t *tmr_create( fun_t *state )
 
 	sys_lock();
 	{
-		tmr = core_sys_alloc(sizeof(tmr_t));
+		tmr = sys_alloc(sizeof(tmr_t));
 		tmr_init(tmr, state);
 		tmr->hdr.obj.res = tmr;
 	}
@@ -94,7 +95,7 @@ void tmr_delete( tmr_t *tmr )
 	sys_lock();
 	{
 		tmr_kill(tmr);
-		core_sys_free(tmr->hdr.obj.res);
+		sys_free(tmr->hdr.obj.res);
 	}
 	sys_unlock();
 }

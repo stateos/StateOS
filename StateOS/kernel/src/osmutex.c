@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    04.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 #include "inc/osmutex.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void mtx_init( mtx_t *mtx )
@@ -59,7 +60,7 @@ mtx_t *mtx_create( void )
 
 	sys_lock();
 	{
-		mtx = core_sys_alloc(sizeof(mtx_t));
+		mtx = sys_alloc(sizeof(mtx_t));
 		mtx_init(mtx);
 		mtx->obj.res = mtx;
 	}
@@ -137,7 +138,7 @@ void mtx_delete( mtx_t *mtx )
 	sys_lock();
 	{
 		mtx_kill(mtx);
-		core_sys_free(mtx->obj.res);
+		sys_free(mtx->obj.res);
 	}
 	sys_unlock();
 }
