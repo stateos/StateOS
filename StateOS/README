@@ -33,6 +33,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+6.3
+- merged test branch
+---------
 6.2
 - updated kernel
 - added initial value for flag object
