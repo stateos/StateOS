@@ -1,0 +1,33 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+auto led = Led();
+auto nfo = Notification();
+
+void slave()
+{
+	led = nfo.wait();
+}
+
+void master()
+{
+	unsigned x = 1;
+
+	for (;;)
+	{
+		ThisTask::delay(SEC);
+		nfo.give(x);
+		x = (x << 1) | (x >> 3);
+	}
+}
+
+auto sla = Task(0, slave);
+auto mas = Task(0, master);
+
+int main()
+{
+	sla.start();
+	mas.start();
+
+	ThisTask::stop();
+}

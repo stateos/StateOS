@@ -36,6 +36,7 @@ Features:
 6.3
 - merged test branch
 - renamed 'SIZE' definitions
+- added notification object
 ---------
 6.2
 - updated kernel

@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    07.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,6 +48,7 @@
 #include "osalloc.h"
 #include "inc/oscriticalsection.h"
 #include "inc/osspinlock.h"
+#include "inc/osnotification.h"
 #include "inc/ossignal.h"
 #include "inc/osflag.h"
 #include "inc/osbarrier.h"
