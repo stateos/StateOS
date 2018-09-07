@@ -17,6 +17,7 @@ There's a dedicated function for immediate change the task state.
 - kernel can operate with 16, 32 or 64-bit timer counter
 - kernel can operate in tick-less mode
 - spin locks
+- notification of the event
 - signals (clear, protect)
 - flags (any, all, protect, ignore)
 - barriers
