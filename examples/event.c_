@@ -1,11 +1,11 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-OS_NFO(nfo);
+OS_EVT(evt);
 
 void slave()
 {
-	LEDs = nfo_wait(nfo);
+	LEDs = evt_wait(evt);
 }
 
 void master()
@@ -15,7 +15,7 @@ void master()
 	for (;;)
 	{
 		tsk_delay(SEC);
-		nfo_give(nfo, x);
+		evt_give(evt, x);
 		x = (x << 1) | (x >> 3);
 	}
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    08.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -130,7 +130,7 @@ struct __tsk
 	unsigned out;
 	unsigned*in;
 	}        data;
-	}        evt;   // temporary data used by event queue object
+	}        evq;   // temporary data used by event queue object
 
 	struct {
 	fun_t  * fun;

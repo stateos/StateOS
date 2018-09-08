@@ -2,11 +2,11 @@
 #include <os.h>
 
 auto led = Led();
-auto nfo = Notification();
+auto evt = Event();
 
 void slave()
 {
-	led = nfo.wait();
+	led = evt.wait();
 }
 
 void master()
@@ -16,7 +16,7 @@ void master()
 	for (;;)
 	{
 		ThisTask::delay(SEC);
-		nfo.give(x);
+		evt.give(x);
 		x = (x << 1) | (x >> 3);
 	}
 }

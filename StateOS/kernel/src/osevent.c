@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    StateOS: osnotification.c
+    @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    07.09.2018
+    @date    08.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,89 +29,89 @@
 
  ******************************************************************************/
 
-#include "inc/osnotification.h"
+#include "inc/osevent.h"
 #include "inc/oscriticalsection.h"
 #include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
-void nfo_init( nfo_t *nfo )
+void evt_init( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
-	assert(nfo);
+	assert(evt);
 
 	sys_lock();
 	{
-		memset(nfo, 0, sizeof(nfo_t));
+		memset(evt, 0, sizeof(evt_t));
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-nfo_t *nfo_create( void )
+evt_t *evt_create( void )
 /* -------------------------------------------------------------------------- */
 {
-	nfo_t *nfo;
+	evt_t *evt;
 
 	assert(!port_isr_context());
 
 	sys_lock();
 	{
-		nfo = sys_alloc(sizeof(nfo_t));
-		nfo_init(nfo);
-		nfo->obj.res = nfo;
+		evt = sys_alloc(sizeof(evt_t));
+		evt_init(evt);
+		evt->obj.res = evt;
 	}
 	sys_unlock();
 
-	return nfo;
+	return evt;
 }
 
 /* -------------------------------------------------------------------------- */
-void nfo_kill( nfo_t *nfo )
+void evt_kill( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
-	assert(nfo);
+	assert(evt);
 
 	sys_lock();
 	{
-		core_all_wakeup(&nfo->obj.queue, E_STOPPED);
+		core_all_wakeup(&evt->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-void nfo_delete( nfo_t *nfo )
+void evt_delete( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
 	sys_lock();
 	{
-		nfo_kill(nfo);
-		sys_free(nfo->obj.res);
+		evt_kill(evt);
+		sys_free(evt->obj.res);
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_nfo_wait( nfo_t *nfo, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_evt_wait( evt_t *evt, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
-	assert(nfo);
+	assert(evt);
 
-	return wait(&nfo->obj.queue, time);
+	return wait(&evt->obj.queue, time);
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned nfo_waitFor( nfo_t *nfo, cnt_t delay )
+unsigned evt_waitFor( evt_t *evt, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	sys_lock();
 	{
-		event = priv_nfo_wait(nfo, delay, core_tsk_waitFor);
+		event = priv_evt_wait(evt, delay, core_tsk_waitFor);
 	}
 	sys_unlock();
 
@@ -119,14 +119,14 @@ unsigned nfo_waitFor( nfo_t *nfo, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned nfo_waitUntil( nfo_t *nfo, cnt_t time )
+unsigned evt_waitUntil( evt_t *evt, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	sys_lock();
 	{
-		event = priv_nfo_wait(nfo, time, core_tsk_waitUntil);
+		event = priv_evt_wait(evt, time, core_tsk_waitUntil);
 	}
 	sys_unlock();
 
@@ -134,14 +134,14 @@ unsigned nfo_waitUntil( nfo_t *nfo, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-void nfo_give( nfo_t *nfo, unsigned event )
+void evt_give( evt_t *evt, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
-	assert(nfo);
+	assert(evt);
 
 	sys_lock();
 	{
-		core_all_wakeup(&nfo->obj.queue, event);
+		core_all_wakeup(&evt->obj.queue, event);
 	}
 	sys_unlock();
 }

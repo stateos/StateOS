@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    StateOS: osnotification.h
+    @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    07.09.2018
+    @date    08.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -29,8 +29,8 @@
 
  ******************************************************************************/
 
-#ifndef __STATEOS_NFO_H
-#define __STATEOS_NFO_H
+#ifndef __STATEOS_EVT_H
+#define __STATEOS_EVT_H
 
 #include "oskernel.h"
 
@@ -40,112 +40,112 @@ extern "C" {
 
 /******************************************************************************
  *
- * Name              : notification of the event
+ * Name              : event
  *
  ******************************************************************************/
 
-typedef struct __nfo nfo_t, * const nfo_id;
+typedef struct __evt evt_t, * const evt_id;
 
-struct __nfo
+struct __evt
 {
 	obj_t    obj;   // object header
 };
 
 /******************************************************************************
  *
- * Name              : _NFO_INIT
+ * Name              : _EVT_INIT
  *
- * Description       : create and initialize an notification object
+ * Description       : create and initialize an event object
  *
  * Parameters        : none
  *
- * Return            : notification object
+ * Return            : event object
  *
  * Note              : for internal use
  *
  ******************************************************************************/
 
-#define               _NFO_INIT() { _OBJ_INIT() }
+#define               _EVT_INIT() { _OBJ_INIT() }
 
 /******************************************************************************
  *
- * Name              : OS_NFO
+ * Name              : OS_EVT
  *
- * Description       : define and initialize an notification object
+ * Description       : define and initialize an event object
  *
  * Parameters
- *   nfo             : name of a pointer to notification object
+ *   evt             : name of a pointer to event object
  *
  ******************************************************************************/
 
-#define             OS_NFO( nfo )                     \
-                       nfo_t nfo##__nfo = _NFO_INIT(); \
-                       nfo_id nfo = & nfo##__nfo
+#define             OS_EVT( evt )                     \
+                       evt_t evt##__evt = _EVT_INIT(); \
+                       evt_id evt = & evt##__evt
 
 /******************************************************************************
  *
- * Name              : static_NFO
+ * Name              : static_EVT
  *
- * Description       : define and initialize a static notification object
+ * Description       : define and initialize a static event object
  *
  * Parameters
- *   nfo             : name of a pointer to notification object
+ *   evt             : name of a pointer to event object
  *
  ******************************************************************************/
 
-#define         static_NFO( nfo )                     \
-                static nfo_t nfo##__nfo = _NFO_INIT(); \
-                static nfo_id nfo = & nfo##__nfo
+#define         static_EVT( evt )                     \
+                static evt_t evt##__evt = _EVT_INIT(); \
+                static evt_id evt = & evt##__evt
 
 /******************************************************************************
  *
- * Name              : NFO_INIT
+ * Name              : EVT_INIT
  *
- * Description       : create and initialize an notification object
+ * Description       : create and initialize an event object
  *
  * Parameters        : none
  *
- * Return            : notification object
+ * Return            : event object
  *
  * Note              : use only in 'C' code
  *
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                NFO_INIT() \
-                      _NFO_INIT()
+#define                EVT_INIT() \
+                      _EVT_INIT()
 #endif
 
 /******************************************************************************
  *
- * Name              : NFO_CREATE
- * Alias             : NFO_NEW
+ * Name              : EVT_CREATE
+ * Alias             : EVT_NEW
  *
- * Description       : create and initialize an notification object
+ * Description       : create and initialize an event object
  *
  * Parameters        : none
  *
- * Return            : pointer to notification object
+ * Return            : pointer to event object
  *
  * Note              : use only in 'C' code
  *
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                NFO_CREATE() \
-           (nfo_t[]) { NFO_INIT  () }
-#define                NFO_NEW \
-                       NFO_CREATE
+#define                EVT_CREATE() \
+           (evt_t[]) { EVT_INIT  () }
+#define                EVT_NEW \
+                       EVT_CREATE
 #endif
 
 /******************************************************************************
  *
- * Name              : nfo_init
+ * Name              : evt_init
  *
- * Description       : initialize an notification object
+ * Description       : initialize an event object
  *
  * Parameters
- *   nfo             : pointer to notification object
+ *   evt             : pointer to event object
  *
  * Return            : none
  *
@@ -153,37 +153,37 @@ struct __nfo
  *
  ******************************************************************************/
 
-void nfo_init( nfo_t *nfo );
+void evt_init( evt_t *evt );
 
 /******************************************************************************
  *
- * Name              : nfo_create
- * Alias             : nfo_new
+ * Name              : evt_create
+ * Alias             : evt_new
  *
- * Description       : create and initialize a new notification object
+ * Description       : create and initialize a new event object
  *
  * Parameters        : none
  *
- * Return            : pointer to notification object (notification successfully created)
- *   0               : notification not created (not enough free memory)
+ * Return            : pointer to event object (event successfully created)
+ *   0               : event not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-nfo_t *nfo_create( void );
+evt_t *evt_create( void );
 
 __STATIC_INLINE
-nfo_t *nfo_new( void ) { return nfo_create(); }
+evt_t *evt_new( void ) { return evt_create(); }
 
 /******************************************************************************
  *
- * Name              : nfo_kill
+ * Name              : evt_kill
  *
- * Description       : reset the notification object and wake up all waiting tasks with 'E_STOPPED' event value
+ * Description       : reset the event object and wake up all waiting tasks with 'E_STOPPED' event value
  *
  * Parameters
- *   nfo             : pointer to notification object
+ *   evt             : pointer to event object
  *
  * Return            : none
  *
@@ -191,16 +191,16 @@ nfo_t *nfo_new( void ) { return nfo_create(); }
  *
  ******************************************************************************/
 
-void nfo_kill( nfo_t *nfo );
+void evt_kill( evt_t *evt );
 
 /******************************************************************************
  *
- * Name              : nfo_delete
+ * Name              : evt_delete
  *
- * Description       : reset the notification object and free allocated resource
+ * Description       : reset the event object and free allocated resource
  *
  * Parameters
- *   nfo             : pointer to notification object
+ *   evt             : pointer to event object
  *
  * Return            : none
  *
@@ -208,81 +208,81 @@ void nfo_kill( nfo_t *nfo );
  *
  ******************************************************************************/
 
-void nfo_delete( nfo_t *nfo );
+void evt_delete( evt_t *evt );
 
 /******************************************************************************
  *
- * Name              : nfo_waitFor
+ * Name              : evt_waitFor
  *
- * Description       : wait for release the notification object for given duration of time
+ * Description       : wait for release the event object for given duration of time
  *
  * Parameters
- *   nfo             : pointer to notification object
- *   delay           : duration of time (maximum number of ticks to wait for release the notification object)
- *                     IMMEDIATE: don't wait until the notification object has been released
- *                     INFINITE:  wait indefinitely until the notification object has been released
+ *   evt             : pointer to event object
+ *   delay           : duration of time (maximum number of ticks to wait for release the event object)
+ *                     IMMEDIATE: don't wait until the event object has been released
+ *                     INFINITE:  wait indefinitely until the event object has been released
  *
  * Return
- *   E_STOPPED       : notification object was killed before the specified timeout expired
- *   E_TIMEOUT       : notification object was not released before the specified timeout expired
- *   'another'       : notification object was successfully released
+ *   E_STOPPED       : event object was killed before the specified timeout expired
+ *   E_TIMEOUT       : event object was not released before the specified timeout expired
+ *   'another'       : event object was successfully released
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned nfo_waitFor( nfo_t *nfo, cnt_t delay );
+unsigned evt_waitFor( evt_t *evt, cnt_t delay );
 
 /******************************************************************************
  *
- * Name              : nfo_waitUntil
+ * Name              : evt_waitUntil
  *
- * Description       : wait for release the notification object until given timepoint
+ * Description       : wait for release the event object until given timepoint
  *
  * Parameters
- *   nfo             : pointer to notification object
+ *   evt             : pointer to event object
  *   time            : timepoint value
  *
  * Return
- *   E_STOPPED       : notification object was killed before the specified timeout expired
- *   E_TIMEOUT       : notification object was not released before the specified timeout expired
- *   'another'       : notification object was successfully released
+ *   E_STOPPED       : event object was killed before the specified timeout expired
+ *   E_TIMEOUT       : event object was not released before the specified timeout expired
+ *   'another'       : event object was successfully released
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned nfo_waitUntil( nfo_t *nfo, cnt_t time );
+unsigned evt_waitUntil( evt_t *evt, cnt_t time );
 
 /******************************************************************************
  *
- * Name              : nfo_wait
+ * Name              : evt_wait
  *
- * Description       : wait indefinitely until the notification object has been released
+ * Description       : wait indefinitely until the event object has been released
  *
  * Parameters
- *   nfo             : pointer to notification object
+ *   evt             : pointer to event object
  *
  * Return
- *   E_STOPPED       : notification object was killed
- *   'another'       : notification object was successfully released
+ *   E_STOPPED       : event object was killed
+ *   'another'       : event object was successfully released
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned nfo_wait( nfo_t *nfo ) { return nfo_waitFor(nfo, INFINITE); }
+unsigned evt_wait( evt_t *evt ) { return evt_waitFor(evt, INFINITE); }
 
 /******************************************************************************
  *
- * Name              : nfo_give
- * ISR alias         : nfo_giveISR
+ * Name              : evt_give
+ * ISR alias         : evt_giveISR
  *
- * Description       : resume all tasks that are waiting on the notification object
+ * Description       : resume all tasks that are waiting on the event object
  *
  * Parameters
- *   nfo             : pointer to notification object
+ *   evt             : pointer to event object
  *   event           : all waiting tasks are resumed with the 'event' value
  *
  * Return            : none
@@ -291,10 +291,10 @@ unsigned nfo_wait( nfo_t *nfo ) { return nfo_waitFor(nfo, INFINITE); }
  *
  ******************************************************************************/
 
-void nfo_give( nfo_t *nfo, unsigned event );
+void evt_give( evt_t *evt, unsigned event );
 
 __STATIC_INLINE
-void nfo_giveISR( nfo_t *nfo, unsigned event ) { nfo_give(nfo, event); }
+void evt_giveISR( evt_t *evt, unsigned event ) { evt_give(evt, event); }
 
 #ifdef __cplusplus
 }
@@ -306,30 +306,30 @@ void nfo_giveISR( nfo_t *nfo, unsigned event ) { nfo_give(nfo, event); }
 
 /******************************************************************************
  *
- * Class             : Notification
+ * Class             : Event
  *
- * Description       : create and initialize an notification object
+ * Description       : create and initialize an event object
  *
  * Constructor parameters
  *                   : none
  *
  ******************************************************************************/
 
-struct Notification : public __nfo
+struct Event : public __evt
 {
-	 Notification( void ): __nfo _NFO_INIT() {}
-	~Notification( void ) { assert(__nfo::obj.queue == nullptr); }
+	 Event( void ): __evt _EVT_INIT() {}
+	~Event( void ) { assert(__evt::obj.queue == nullptr); }
 
-	void     kill     ( void )            {        nfo_kill     (this);         }
-	unsigned waitFor  ( cnt_t _delay )    { return nfo_waitFor  (this, _delay); }
-	unsigned waitUntil( cnt_t _time )     { return nfo_waitUntil(this, _time);  }
-	unsigned wait     ( void )            { return nfo_wait     (this);         }
-	void     give     ( unsigned _event ) {        nfo_give     (this, _event); }
-	void     giveISR  ( unsigned _event ) {        nfo_giveISR  (this, _event); }
+	void     kill     ( void )            {        evt_kill     (this);         }
+	unsigned waitFor  ( cnt_t _delay )    { return evt_waitFor  (this, _delay); }
+	unsigned waitUntil( cnt_t _time )     { return evt_waitUntil(this, _time);  }
+	unsigned wait     ( void )            { return evt_wait     (this);         }
+	void     give     ( unsigned _event ) {        evt_give     (this, _event); }
+	void     giveISR  ( unsigned _event ) {        evt_giveISR  (this, _event); }
 };
 
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */
 
-#endif//__STATEOS_NFO_H
+#endif//__STATEOS_EVT_H
