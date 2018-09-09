@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -332,6 +332,7 @@ unsigned flg_wait( flg_t *flg, unsigned flags, char mode ) { return flg_waitFor(
 /******************************************************************************
  *
  * Name              : flg_take
+ * Alias             : flg_tryWait
  * ISR alias         : flg_takeISR
  *
  * Description       : don't wait on flag object until requested flags have been set
@@ -355,6 +356,9 @@ unsigned flg_wait( flg_t *flg, unsigned flags, char mode ) { return flg_waitFor(
  ******************************************************************************/
 
 unsigned flg_take( flg_t *flg, unsigned flags, char mode );
+
+__STATIC_INLINE
+unsigned flg_tryWait( flg_t *flg, unsigned flags, char mode ) { return flg_take(flg, flags, mode); }
 
 __STATIC_INLINE
 unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(flg, flags, mode); }
@@ -432,6 +436,7 @@ struct Flag : public __flg
 	unsigned waitUntil( unsigned _flags, char _mode, cnt_t _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
 	unsigned wait     ( unsigned _flags, char _mode = flgAll )      { return flg_wait     (this, _flags, _mode);         }
 	unsigned take     ( unsigned _flags, char _mode = flgAll )      { return flg_take     (this, _flags, _mode);         }
+	unsigned tryWait  ( unsigned _flags, char _mode = flgAll )      { return flg_tryWait  (this, _flags, _mode);         }
 	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )      { return flg_takeISR  (this, _flags, _mode);         }
 	unsigned give     ( unsigned _flags )                           { return flg_give     (this, _flags);                }
 	unsigned giveISR  ( unsigned _flags )                           { return flg_giveISR  (this, _flags);                }

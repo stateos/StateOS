@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -318,6 +318,7 @@ unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
 /******************************************************************************
  *
  * Name              : sig_take
+ * Alias             : sig_tryWait
  * ISR alias         : sig_takeISR
  *
  * Description       : check if the signal object has been released
@@ -336,11 +337,15 @@ unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
 unsigned sig_take( sig_t *sig );
 
 __STATIC_INLINE
+unsigned sig_tryWait( sig_t *sig ) { return sig_take(sig); }
+
+__STATIC_INLINE
 unsigned sig_takeISR( sig_t *sig ) { return sig_take(sig); }
 
 /******************************************************************************
  *
  * Name              : sig_give
+ * Alias             : sig_set
  * ISR alias         : sig_giveISR
  *
  * Description       : release the signal object
@@ -356,6 +361,9 @@ unsigned sig_takeISR( sig_t *sig ) { return sig_take(sig); }
  ******************************************************************************/
 
 void sig_give( sig_t *sig );
+
+__STATIC_INLINE
+void sig_set( sig_t *sig ) { sig_give(sig); }
 
 __STATIC_INLINE
 void sig_giveISR( sig_t *sig ) { sig_give(sig); }
@@ -412,8 +420,10 @@ struct Signal : public __sig
 	unsigned waitUntil( cnt_t _time  ) { return sig_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return sig_wait     (this);         }
 	unsigned take     ( void )         { return sig_take     (this);         }
+	unsigned tryWait  ( void )         { return sig_tryWait  (this);         }
 	unsigned takeISR  ( void )         { return sig_takeISR  (this);         }
 	void     give     ( void )         {        sig_give     (this);         }
+	void     set      ( void )         {        sig_set      (this);         }
 	void     giveISR  ( void )         {        sig_giveISR  (this);         }
 	void     clear    ( void )         {        sig_clear    (this);         }
 	void     clearISR ( void )         {        sig_clearISR (this);         }

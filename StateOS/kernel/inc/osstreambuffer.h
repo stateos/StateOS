@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -331,6 +331,7 @@ unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(
 /******************************************************************************
  *
  * Name              : stm_take
+ * Alias             : stm_tryWait
  * ISR alias         : stm_takeISR
  *
  * Description       : try to transfer data from the stream buffer object,
@@ -348,6 +349,9 @@ unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(
  ******************************************************************************/
 
 unsigned stm_take( stm_t *stm, void *data, unsigned size );
+
+__STATIC_INLINE
+unsigned stm_tryWait( stm_t *stm, void *data, unsigned size ) { return stm_take(stm, data, size); }
 
 __STATIC_INLINE
 unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(stm, data, size); }
@@ -558,6 +562,7 @@ struct StreamBufferT : public __stm
 	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time )  { return stm_waitUntil(this, _data, _size, _time);  }
 	unsigned wait     (       void *_data, unsigned _size )               { return stm_wait     (this, _data, _size);         }
 	unsigned take     (       void *_data, unsigned _size )               { return stm_take     (this, _data, _size);         }
+	unsigned tryWait  (       void *_data, unsigned _size )               { return stm_tryWait  (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return stm_takeISR  (this, _data, _size);         }
 	unsigned sendFor  ( const void *_data, unsigned _size, cnt_t _delay ) { return stm_sendFor  (this, _data, _size, _delay); }
 	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time )  { return stm_sendUntil(this, _data, _size, _time);  }
@@ -598,6 +603,7 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(T)>
 	unsigned waitUntil(       T *_data, cnt_t _time )  { return stm_waitUntil(this, _data, sizeof(T), _time);  }
 	unsigned wait     (       T *_data )               { return stm_wait     (this, _data, sizeof(T));         }
 	unsigned take     (       T *_data )               { return stm_take     (this, _data, sizeof(T));         }
+	unsigned tryWait  (       T *_data )               { return stm_tryWait  (this, _data, sizeof(T));         }
 	unsigned takeISR  (       T *_data )               { return stm_takeISR  (this, _data, sizeof(T));         }
 	unsigned sendFor  ( const T *_data, cnt_t _delay ) { return stm_sendFor  (this, _data, sizeof(T), _delay); }
 	unsigned sendUntil( const T *_data, cnt_t _time )  { return stm_sendUntil(this, _data, sizeof(T), _time);  }

@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -314,6 +314,7 @@ unsigned lst_wait( lst_t *lst, void **data ) { return lst_waitFor(lst, data, INF
 /******************************************************************************
  *
  * Name              : lst_take
+ * Alias             : lst_tryWait
  * ISR alias         : lst_takeISR
  *
  * Description       : try to get memory object from the list object,
@@ -332,6 +333,9 @@ unsigned lst_wait( lst_t *lst, void **data ) { return lst_waitFor(lst, data, INF
  ******************************************************************************/
 
 unsigned lst_take( lst_t *lst, void **data );
+
+__STATIC_INLINE
+unsigned lst_tryWait( lst_t *lst, void **data ) { return lst_take(lst, data); }
 
 __STATIC_INLINE
 unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_take(lst, data); }
@@ -388,6 +392,7 @@ struct ListTT : public __lst
 	unsigned waitUntil(       T   **_data, cnt_t _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
 	unsigned wait     (       T   **_data )               { return lst_wait     (this, reinterpret_cast<void **>(_data));         }
 	unsigned take     (       T   **_data )               { return lst_take     (this, reinterpret_cast<void **>(_data));         }
+	unsigned tryWait  (       T   **_data )               { return lst_tryWait  (this, reinterpret_cast<void **>(_data));         }
 	unsigned takeISR  (       T   **_data )               { return lst_takeISR  (this, reinterpret_cast<void **>(_data));         }
 	void     give     ( const void *_data )               {        lst_give     (this,                           _data);          }
 	void     giveISR  ( const void *_data )               {        lst_giveISR  (this,                           _data);          }

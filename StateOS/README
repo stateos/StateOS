@@ -38,6 +38,7 @@ Features:
 - merged test branch
 - renamed 'SIZE' definitions
 - back to the event (evt) and event queue (evq)
+- added a few function aliases
 ---------
 6.2
 - updated kernel

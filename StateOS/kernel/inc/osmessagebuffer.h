@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -331,6 +331,7 @@ unsigned msg_wait( msg_t *msg, void *data, unsigned size ) { return msg_waitFor(
 /******************************************************************************
  *
  * Name              : msg_take
+ * Alias             : msg_tryWait
  * ISR alias         : msg_takeISR
  *
  * Description       : try to transfer data from the message buffer object,
@@ -348,6 +349,9 @@ unsigned msg_wait( msg_t *msg, void *data, unsigned size ) { return msg_waitFor(
  ******************************************************************************/
 
 unsigned msg_take( msg_t *msg, void *data, unsigned size );
+
+__STATIC_INLINE
+unsigned msg_tryWait( msg_t *msg, void *data, unsigned size ) { return msg_take(msg, data, size); }
 
 __STATIC_INLINE
 unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(msg, data, size); }
@@ -558,6 +562,7 @@ struct MessageBufferT : public __msg
 	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time )  { return msg_waitUntil(this, _data, _size, _time);  }
 	unsigned wait     (       void *_data, unsigned _size )               { return msg_wait     (this, _data, _size);         }
 	unsigned take     (       void *_data, unsigned _size )               { return msg_take     (this, _data, _size);         }
+	unsigned tryWait  (       void *_data, unsigned _size )               { return msg_tryWait  (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return msg_takeISR  (this, _data, _size);         }
 	unsigned sendFor  ( const void *_data, unsigned _size, cnt_t _delay ) { return msg_sendFor  (this, _data, _size, _delay); }
 	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time )  { return msg_sendUntil(this, _data, _size, _time);  }
@@ -598,6 +603,7 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T
 	unsigned waitUntil(       T *_data, cnt_t _time )  { return msg_waitUntil(this, _data, sizeof(T), _time);  }
 	unsigned wait     (       T *_data )               { return msg_wait     (this, _data, sizeof(T));         }
 	unsigned take     (       T *_data )               { return msg_take     (this, _data, sizeof(T));         }
+	unsigned tryWait  (       T *_data )               { return msg_tryWait  (this, _data, sizeof(T));         }
 	unsigned takeISR  (       T *_data )               { return msg_takeISR  (this, _data, sizeof(T));         }
 	unsigned sendFor  ( const T *_data, cnt_t _delay ) { return msg_sendFor  (this, _data, sizeof(T), _delay); }
 	unsigned sendUntil( const T *_data, cnt_t _time )  { return msg_sendUntil(this, _data, sizeof(T), _time);  }

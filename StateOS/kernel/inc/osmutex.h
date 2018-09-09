@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -264,6 +264,7 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
 /******************************************************************************
  *
  * Name              : mtx_wait
+ * Alias             : mtx_lock
  *
  * Description       : try to lock the mutex object,
  *                     wait indefinitely if the mutex object can't be locked immediately
@@ -282,9 +283,13 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
 __STATIC_INLINE
 unsigned mtx_wait( mtx_t *mtx ) { return mtx_waitFor(mtx, INFINITE); }
 
+__STATIC_INLINE
+unsigned mtx_lock( mtx_t *mtx ) { return mtx_wait(mtx); }
+
 /******************************************************************************
  *
  * Name              : mtx_take
+ * Alias             : mtx_tryLock
  *
  * Description       : try to lock the mutex object,
  *                     don't wait if the mutex object can't be locked immediately
@@ -303,9 +308,13 @@ unsigned mtx_wait( mtx_t *mtx ) { return mtx_waitFor(mtx, INFINITE); }
 __STATIC_INLINE
 unsigned mtx_take( mtx_t *mtx ) { return mtx_waitFor(mtx, IMMEDIATE); }
 
+__STATIC_INLINE
+unsigned mtx_tryLock( mtx_t *mtx ) { return mtx_take(mtx); }
+
 /******************************************************************************
  *
  * Name              : mtx_give
+ * Alias             : mtx_unlock
  *
  * Description       : try to unlock the mutex object (only owner task can unlock mutex object),
  *                     don't wait if the mutex object can't be unlocked
@@ -322,6 +331,9 @@ unsigned mtx_take( mtx_t *mtx ) { return mtx_waitFor(mtx, IMMEDIATE); }
  ******************************************************************************/
 
 unsigned mtx_give( mtx_t *mtx );
+
+__STATIC_INLINE
+unsigned mtx_unlock( mtx_t *mtx ) { return mtx_give(mtx); }
 
 #ifdef __cplusplus
 }
@@ -351,8 +363,11 @@ struct Mutex : public __mtx
 	unsigned waitFor  ( cnt_t _delay ) { return mtx_waitFor  (this, _delay); }
 	unsigned waitUntil( cnt_t _time  ) { return mtx_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return mtx_wait     (this);         }
+	unsigned lock     ( void )         { return mtx_lock     (this);         }
 	unsigned take     ( void )         { return mtx_take     (this);         }
+	unsigned tryLock  ( void )         { return mtx_tryLock  (this);         }
 	unsigned give     ( void )         { return mtx_give     (this);         }
+	unsigned unlock   ( void )         { return mtx_unlock   (this);         }
 };
 
 #endif//__cplusplus

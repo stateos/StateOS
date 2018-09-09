@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -350,6 +350,7 @@ unsigned mem_wait( mem_t *mem, void **data ) { return lst_wait(&mem->lst, data);
 /******************************************************************************
  *
  * Name              : mem_take
+ * Alias             : mem_tryWait
  * ISR alias         : mem_takeISR
  *
  * Description       : try to get memory object from the memory pool object,
@@ -369,6 +370,9 @@ unsigned mem_wait( mem_t *mem, void **data ) { return lst_wait(&mem->lst, data);
 
 __STATIC_INLINE
 unsigned mem_take( mem_t *mem, void **data ) { return lst_take(&mem->lst, data); }
+
+__STATIC_INLINE
+unsigned mem_tryWait( mem_t *mem, void **data ) { return lst_take(&mem->lst, data); }
 
 __STATIC_INLINE
 unsigned mem_takeISR( mem_t *mem, void **data ) { return lst_takeISR(&mem->lst, data); }
@@ -427,6 +431,7 @@ struct MemoryPoolT : public __mem
 	unsigned waitUntil(       void **_data, cnt_t _time )  { return mem_waitUntil(this, _data, _time);  }
 	unsigned wait     (       void **_data )               { return mem_wait     (this, _data);         }
 	unsigned take     (       void **_data )               { return mem_take     (this, _data);         }
+	unsigned tryWait  (       void **_data )               { return mem_tryWait  (this, _data);         }
 	unsigned takeISR  (       void **_data )               { return mem_takeISR  (this, _data);         }
 	void     give     ( const void  *_data )               {        mem_give     (this, _data);         }
 	void     giveISR  ( const void  *_data )               {        mem_giveISR  (this, _data);         }
@@ -456,6 +461,7 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
 	unsigned waitUntil( T **_data, cnt_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
 	unsigned wait     ( T **_data )               { return mem_wait     (this, reinterpret_cast<void **>(_data));         }
 	unsigned take     ( T **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data));         }
+	unsigned tryWait  ( T **_data )               { return mem_tryWait  (this, reinterpret_cast<void **>(_data));         }
 	unsigned takeISR  ( T **_data )               { return mem_takeISR  (this, reinterpret_cast<void **>(_data));         }
 };
 

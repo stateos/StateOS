@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -330,6 +330,7 @@ unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFI
 /******************************************************************************
  *
  * Name              : box_take
+ * Alias             : box_tryWait
  * ISR alias         : box_takeISR
  *
  * Description       : try to transfer mailbox data from the mailbox queue object,
@@ -348,6 +349,9 @@ unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFI
  ******************************************************************************/
 
 unsigned box_take( box_t *box, void *data );
+
+__STATIC_INLINE
+unsigned box_tryWait( box_t *box, void *data ) { return box_take(box, data); }
 
 __STATIC_INLINE
 unsigned box_takeISR( box_t *box, void *data ) { return box_take(box, data); }
@@ -541,6 +545,7 @@ struct MailBoxQueueT : public __box
 	unsigned waitUntil(       void *_data, cnt_t _time )  { return box_waitUntil(this, _data, _time);  }
 	unsigned wait     (       void *_data )               { return box_wait     (this, _data);         }
 	unsigned take     (       void *_data )               { return box_take     (this, _data);         }
+	unsigned tryWait  (       void *_data )               { return box_tryWait  (this, _data);         }
 	unsigned takeISR  (       void *_data )               { return box_takeISR  (this, _data);         }
 	unsigned sendFor  ( const void *_data, cnt_t _delay ) { return box_sendFor  (this, _data, _delay); }
 	unsigned sendUntil( const void *_data, cnt_t _time )  { return box_sendUntil(this, _data, _time);  }

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    08.09.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -320,6 +320,7 @@ unsigned evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, 
 /******************************************************************************
  *
  * Name              : evq_take
+ * Alias             : evq_tryWait
  * ISR alias         : evq_takeISR
  *
  * Description       : try to transfer event data from the event queue object,
@@ -338,6 +339,9 @@ unsigned evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, 
  ******************************************************************************/
 
 unsigned evq_take( evq_t *evq, unsigned *data );
+
+__STATIC_INLINE
+unsigned evq_tryWait( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
 
 __STATIC_INLINE
 unsigned evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
@@ -492,6 +496,7 @@ struct EventQueueT : public __evq
 	unsigned waitUntil( unsigned *_data, cnt_t _time )  { return evq_waitUntil(this, _data, _time);  }
 	unsigned wait     ( unsigned *_data )               { return evq_wait     (this, _data);         }
 	unsigned take     ( unsigned *_data )               { return evq_take     (this, _data);         }
+	unsigned tryWait  ( unsigned *_data )               { return evq_tryWait  (this, _data);         }
 	unsigned takeISR  ( unsigned *_data )               { return evq_takeISR  (this, _data);         }
 	unsigned sendFor  ( unsigned  _data, cnt_t _delay ) { return evq_sendFor  (this, _data, _delay); }
 	unsigned sendUntil( unsigned  _data, cnt_t _time )  { return evq_sendUntil(this, _data, _time);  }

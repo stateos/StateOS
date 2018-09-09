@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -318,6 +318,7 @@ unsigned job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
 /******************************************************************************
  *
  * Name              : job_take
+ * Alias             : job_tryWait
  * ISR alias         : job_takeISR
  *
  * Description       : try to transfer job data from the job queue object and execute the job procedure,
@@ -335,6 +336,9 @@ unsigned job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
  ******************************************************************************/
 
 unsigned job_take( job_t *job );
+
+__STATIC_INLINE
+unsigned job_tryWait( job_t *job ) { return job_take(job); }
 
 __STATIC_INLINE
 unsigned job_takeISR( job_t *job ) { return job_take(job); }
@@ -492,6 +496,8 @@ struct staticJobQueueT : public __job
 	unsigned waitUntil( cnt_t  _time )              { return job_waitUntil(this, _time);        }
 	unsigned wait     ( void )                      { return job_wait     (this);               }
 	unsigned take     ( void )                      { return job_take     (this);               }
+	unsigned tryWait  ( void )                      { return job_tryWait  (this);               }
+	unsigned takeISR  ( void )                      { return job_takeISR  (this);               }
 	unsigned sendFor  ( fun_t *_fun, cnt_t _delay ) { return job_sendFor  (this, _fun, _delay); }
 	unsigned sendUntil( fun_t *_fun, cnt_t _time )  { return job_sendUntil(this, _fun, _time);  }
 	unsigned send     ( fun_t *_fun )               { return job_send     (this, _fun);         }
@@ -528,6 +534,8 @@ struct JobQueueT : public __box
 	unsigned waitUntil( cnt_t _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
 	unsigned wait     ( void )                     { FUN_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
 	unsigned take     ( void )                     { FUN_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned tryWait  ( void )                     { FUN_t _fun; unsigned event = box_tryWait  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned takeISR  ( void )                     { FUN_t _fun; unsigned event = box_takeISR  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
 	unsigned sendFor  ( FUN_t _fun, cnt_t _delay ) {             unsigned event = box_sendFor  (this, &_fun, _delay);                                 return event; }
 	unsigned sendUntil( FUN_t _fun, cnt_t _time )  {             unsigned event = box_sendUntil(this, &_fun, _time);                                  return event; }
 	unsigned send     ( FUN_t _fun )               {             unsigned event = box_send     (this, &_fun);                                         return event; }

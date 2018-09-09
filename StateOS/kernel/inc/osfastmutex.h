@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    30.08.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -263,6 +263,7 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time );
 /******************************************************************************
  *
  * Name              : mut_wait
+ * Alias             : mut_lock
  *
  * Description       : try to lock the fast mutex object,
  *                     wait indefinitely if the fast mutex object can't be locked immediately
@@ -281,9 +282,13 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time );
 __STATIC_INLINE
 unsigned mut_wait( mut_t *mut ) { return mut_waitFor(mut, INFINITE); }
 
+__STATIC_INLINE
+unsigned mut_lock( mut_t *mut ) { return mut_wait(mut); }
+
 /******************************************************************************
  *
  * Name              : mut_take
+ * Alias             : mut_tryLock
  *
  * Description       : try to lock the fast mutex object,
  *                     don't wait if the fast mutex object can't be locked immediately
@@ -302,9 +307,13 @@ unsigned mut_wait( mut_t *mut ) { return mut_waitFor(mut, INFINITE); }
 __STATIC_INLINE
 unsigned mut_take( mut_t *mut ) { return mut_waitFor(mut, IMMEDIATE); }
 
+__STATIC_INLINE
+unsigned mut_tryLock( mut_t *mut ) { return mut_take(mut); }
+
 /******************************************************************************
  *
  * Name              : mut_give
+ * Alias             : mut_unlock
  *
  * Description       : try to unlock the fast mutex object (only owner task can unlock fast mutex object),
  *                     don't wait if the fast mutex object can't be unlocked
@@ -321,6 +330,9 @@ unsigned mut_take( mut_t *mut ) { return mut_waitFor(mut, IMMEDIATE); }
  ******************************************************************************/
 
 unsigned mut_give( mut_t *mut );
+
+__STATIC_INLINE
+unsigned mut_unlock( mut_t *mut ) { return mut_give(mut); }
 
 #ifdef __cplusplus
 }
@@ -350,8 +362,11 @@ struct FastMutex : public __mut
 	unsigned waitFor  ( cnt_t _delay ) { return mut_waitFor  (this, _delay); }
 	unsigned waitUntil( cnt_t _time )  { return mut_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return mut_wait     (this);         }
+	unsigned lock     ( void )         { return mut_lock     (this);         }
 	unsigned take     ( void )         { return mut_take     (this);         }
+	unsigned tryLock  ( void )         { return mut_tryLock  (this);         }
 	unsigned give     ( void )         { return mut_give     (this);         }
+	unsigned unlock   ( void )         { return mut_unlock   (this);         }
 };
 
 #endif//__cplusplus

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    01.09.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -625,6 +625,7 @@ unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
 /******************************************************************************
  *
  * Name              : tmr_take
+ * Alias             : tmr_tryWait
  * ISR alias         : tmr_takeISR
  *
  * Description       : check if the timer finishes countdown
@@ -641,6 +642,9 @@ unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
  ******************************************************************************/
 
 unsigned tmr_take( tmr_t *tmr );
+
+__STATIC_INLINE
+unsigned tmr_tryWait( tmr_t *tmr ) { return tmr_take(tmr); }
 
 __STATIC_INLINE
 unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_take(tmr); }
@@ -723,6 +727,7 @@ struct staticTimer : public __tmr
 	unsigned waitUntil( cnt_t _time )                                { return tmr_waitUntil    (this, _time);                   }
 	unsigned wait     ( void )                                       { return tmr_wait         (this);                          }
 	unsigned take     ( void )                                       { return tmr_take         (this);                          }
+	unsigned tryWait  ( void )                                       { return tmr_tryWait      (this);                          }
 	unsigned takeISR  ( void )                                       { return tmr_takeISR      (this);                          }
 
 	bool     operator!( void )                                       { return __tmr::hdr.id == ID_STOPPED;                      }
