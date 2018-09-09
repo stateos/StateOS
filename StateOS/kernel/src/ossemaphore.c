@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    09.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -250,6 +250,21 @@ unsigned sem_sendUntil( sem_t *sem, cnt_t time )
 	sys_unlock();
 
 	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned sem_getValue( sem_t *sem )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned val;
+
+	sys_lock();
+	{
+		val = sem->count;
+	}
+	sys_unlock();
+
+	return val;
 }
 
 /* -------------------------------------------------------------------------- */

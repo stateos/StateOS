@@ -456,6 +456,21 @@ unsigned sem_post( sem_t *sem ) { return sem_give(sem); }
 __STATIC_INLINE
 unsigned sem_giveISR( sem_t *sem ) { return sem_give(sem); }
 
+/******************************************************************************
+ *
+ * Name              : sem_getValue
+ *
+ * Description       : return current value of semaphore
+ *
+ * Parameters
+ *   sem             : pointer to semaphore object
+ *
+ * Return            : current value of semaphore
+ *
+ ******************************************************************************/
+
+unsigned sem_getValue( sem_t *sem );
+
 #ifdef __cplusplus
 }
 #endif
@@ -497,6 +512,7 @@ struct Semaphore : public __sem
 	unsigned give     ( void )         { return sem_give     (this);         }
 	unsigned post     ( void )         { return sem_post     (this);         }
 	unsigned giveISR  ( void )         { return sem_giveISR  (this);         }
+	unsigned getValue ( void )         { return sem_getValue (this);         }
 };
 
 /******************************************************************************
