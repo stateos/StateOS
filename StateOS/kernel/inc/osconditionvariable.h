@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    31.08.2018
+    @date    09.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -311,6 +311,42 @@ void cnd_give( cnd_t *cnd, bool all );
 __STATIC_INLINE
 void cnd_giveISR( cnd_t *cnd, bool all ) { cnd_give(cnd, all); }
 
+/******************************************************************************
+ *
+ * Name              : cnd_notifyOne
+ *
+ * Description       : signal one task waiting on the condition variable
+ *
+ * Parameters
+ *   cnd             : pointer to condition variable object
+ *
+ * Return            : none
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+void cnd_notifyOne( cnd_t *cnd ) { cnd_give(cnd, false); }
+
+/******************************************************************************
+ *
+ * Name              : cnd_notifyAll
+ *
+ * Description       : signal all tasks waiting on the condition variable
+ *
+ * Parameters
+ *   cnd             : pointer to condition variable object
+ *
+ * Return            : none
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+void cnd_notifyAll( cnd_t *cnd ) { cnd_give(cnd, true); }
+
 #ifdef __cplusplus
 }
 #endif
@@ -344,6 +380,8 @@ struct ConditionVariable : public __cnd
 	unsigned wait     ( mtx_t &_mtx )               { return cnd_wait     (this,&_mtx);         }
 	void     give     ( bool   _all = cndAll )      {        cnd_give     (this, _all);         }
 	void     giveISR  ( bool   _all = cndAll )      {        cnd_giveISR  (this, _all);         }
+	void     notifyOne( void )                      {        cnd_notifyOne(this);               }
+	void     notifyAll( void )                      {        cnd_notifyAll(this);               }
 };
 
 #endif//__cplusplus
