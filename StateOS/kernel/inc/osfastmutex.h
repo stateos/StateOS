@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    10.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -52,7 +52,7 @@ struct __mut
 {
 	obj_t    obj;   // object header
 
-	tsk_t  * owner; // owner task
+	tsk_t  * owner; // mutex owner
 };
 
 /******************************************************************************

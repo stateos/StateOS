@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    10.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -51,8 +51,8 @@ struct __mtx
 {
 	obj_t    obj;   // object header
 
-	tsk_t  * owner; // owner task
-	unsigned count; // mutex's curent value
+	tsk_t  * owner; // mutex owner
+	unsigned count; // current value of the mutex counter
 	mtx_t  * list;  // list of mutexes held by owner
 };
 
