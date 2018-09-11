@@ -40,15 +40,18 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+/////// mutex type
 //      mtxNormal         // undefined, unused
-#define mtxErrorCheck   0 // error checking mutex type
-#define mtxRecursive    1 // recursive mutex type
+#define mtxErrorCheck   0 // error checking mutex
+#define mtxRecursive    1 // recursive mutex
 
-#define mtxPrioNone     0 // none mutex protocol
-#define mtxPrioInherit  2 // priority inheritance mutex protocol
-#define mtxPrioProtect  4 // priority protected mutex protocol
+/////// mutex protocol
+#define mtxPrioNone     0 // none
+#define mtxPrioInherit  2 // priority inheritance mutex
+#define mtxPrioProtect  4 // priority protected mutex
 #define mtxPrioMASK   ( mtxPrioInherit | mtxPrioProtect )
 
+/////// mutex robustness
 #define mtxStalled      0 // stalled mutex
 #define mtxRobust       8 // robust mutex
 
