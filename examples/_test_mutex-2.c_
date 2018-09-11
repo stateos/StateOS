@@ -1,54 +1,60 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-OS_MTX(mtx2);
-OS_MTX(mtx1);
+OS_MTX(mtx1, mtxPrioProtect);
+OS_MTX(mtx2, mtxPrioInherit);
 
 OS_TSK_DEF(tsk4, 4)
 {
-	mtx_wait(mtx2);
-	mtx_give(mtx2);
+	if (mtx_wait(mtx2) == E_SUCCESS)
+	{
+		mtx_give(mtx2);
+		LEDs = 15;     // OK
+	}
 
-	LEDs = 15;
-	for (;;); // BREAKPOINT: 1 (priority inheritance mutex)
+	for (;;) LEDG = 1; // BREAKPOINT: 1 (priority inheritance mutex)
 }
 
 OS_TSK_DEF(tsk3, 3)
 {
 	tsk_start(tsk4);
 
-	LEDO = 1;
-	for (;;); // BREAKPOINT: 2 (error)
+	for (;;) LEDR = 1; // BREAKPOINT: 2 (error)
 }
 
 OS_TSK_DEF(tsk2, 2)
 {
-	mtx_wait(mtx2);
-	mtx_wait(mtx1);
-	mtx_give(mtx1);
-	mtx_give(mtx2);
+	if (mtx_wait(mtx2) == E_SUCCESS)
+	{
+		mtx_setPrio(mtx1, tsk_getPrio());
 
-	LEDG = 1;
-	for (;;);
+		if (mtx_wait(mtx1) == E_SUCCESS)
+		{
+			mtx_give(mtx1);
+			mtx_give(mtx2);
+		}
+	}
+
+	for (;;) LEDO = 1;
 }
 
 OS_TSK_DEF(tsk1, 1)
 {
 	tsk_start(tsk2);
 
-	LEDB = 1;
-	for (;;); // BREAKPOINT: 3 (fast mutex)
+	for (;;) LEDB = 1; // BREAKPOINT: 3 (fast mutex)
 }
 
 int main()
 {
 	LED_Init();
-	
-	mtx_wait(mtx1);
-	tsk_start(tsk1);
-	tsk_start(tsk3);
-	mtx_give(mtx1);
 
-	LEDR = 1;
-	for (;;); // BREAKPOINT: 4 (error)
+	if (mtx_wait(mtx1) == E_SUCCESS)
+	{
+		tsk_start(tsk1);
+		tsk_start(tsk3);
+		mtx_give(mtx1);
+	}
+
+	for (;;) LEDR = 1; // BREAKPOINT: 4 (error)
 }

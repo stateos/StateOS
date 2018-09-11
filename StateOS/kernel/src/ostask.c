@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    11.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -145,6 +145,9 @@ void tsk_stop( void )
 void tsk_kill( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
+	mtx_t *mtx;
+	mtx_t *nxt;
+
 	assert(!port_isr_context());
 	assert(tsk);
 
@@ -153,8 +156,12 @@ void tsk_kill( tsk_t *tsk )
 		if (tsk->hdr.id != ID_STOPPED)
 		{
 			tsk->mtx.tree = 0;
-			while (tsk->mtx.list)
-				mtx_kill(tsk->mtx.list);
+			for (mtx = tsk->mtx.list; mtx; mtx = nxt)
+			{
+				nxt = mtx->list;
+			    if ((mtx->mode & mtxRobust))
+					mtx_kill(mtx);
+			}
 
 			if (tsk->join != DETACHED)
 				core_tsk_wakeup(tsk->join, E_STOPPED);
@@ -271,7 +278,7 @@ void tsk_flip( fun_t *state )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_prio( unsigned prio )
+void tsk_setPrio( unsigned prio )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
@@ -282,6 +289,23 @@ void tsk_prio( unsigned prio )
 		core_cur_prio(prio);
 	}
 	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_getPrio( void )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned prio;
+
+	assert(!port_isr_context());
+
+	sys_lock();
+	{
+		prio = System.cur->basic;
+	}
+	sys_unlock();
+
+	return prio;
 }
 
 /* -------------------------------------------------------------------------- */

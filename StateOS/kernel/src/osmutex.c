@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    11.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,23 +35,27 @@
 #include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
-void mtx_init( mtx_t *mtx )
+void mtx_init( mtx_t *mtx, unsigned mode )
 /* -------------------------------------------------------------------------- */
 {
 	assert(!port_isr_context());
 	assert(mtx);
+	assert((mtx->mode & ~mtxMASK) == 0);
+	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
 	sys_lock();
 	{
 		memset(mtx, 0, sizeof(mtx_t));
 
 		core_obj_init(&mtx->obj);
+
+		mtx->mode = mode;
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-mtx_t *mtx_create( void )
+mtx_t *mtx_create( unsigned mode )
 /* -------------------------------------------------------------------------- */
 {
 	mtx_t *mtx;
@@ -61,12 +65,46 @@ mtx_t *mtx_create( void )
 	sys_lock();
 	{
 		mtx = sys_alloc(sizeof(mtx_t));
-		mtx_init(mtx);
+		mtx_init(mtx, mode);
 		mtx->obj.res = mtx;
 	}
 	sys_unlock();
 
 	return mtx;
+}
+
+/* -------------------------------------------------------------------------- */
+void mtx_setPrio( mtx_t *mtx, unsigned prio )
+/* -------------------------------------------------------------------------- */
+{
+	assert(!port_isr_context());
+
+	sys_lock();
+	{
+		mtx->prio = prio;
+
+		if ((mtx->mode & mtxPrioProtect))
+			while (mtx->obj.queue && mtx->obj.queue->prio > prio)
+				core_tsk_wakeup(mtx->obj.queue, E_TIMEOUT);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned mtx_getPrio( mtx_t *mtx )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned prio;
+
+	assert(!port_isr_context());
+
+	sys_lock();
+	{
+		prio = mtx->prio;
+	}
+	sys_unlock();
+
+	return prio;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -150,9 +188,13 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 {
 	assert(!port_isr_context());
 	assert(mtx);
+	assert((mtx->mode & ~mtxMASK) == 0);
+	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
 	if (mtx->owner == 0)
 	{
+		assert(mtx->count == 0);
+
 		priv_mtx_link(mtx, System.cur);
 		return E_SUCCESS;
 	}
@@ -161,7 +203,10 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 	{
 		unsigned event;
 
-		if (mtx->owner->prio < System.cur->prio)
+		if ((mtx->mode & mtxPrioProtect) && (System.cur->prio > mtx->prio))
+			return E_TIMEOUT;
+
+		if ((mtx->mode & mtxPrioMASK) && (System.cur->prio > mtx->owner->prio))
 			core_tsk_prio(mtx->owner, System.cur->prio);
 
 		System.cur->mtx.tree = mtx->owner;
@@ -171,7 +216,7 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 		return event;
 	}
 
-	if (mtx->count + 1 != 0)
+	if ((mtx->mode & mtxRecursive) && (mtx->count < ~0U))
 	{
 		mtx->count++;
 		return E_SUCCESS;
@@ -218,6 +263,8 @@ unsigned mtx_give( mtx_t *mtx )
 
 	assert(!port_isr_context());
 	assert(mtx);
+	assert((mtx->mode & ~mtxMASK) == 0);
+	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
 	sys_lock();
 	{

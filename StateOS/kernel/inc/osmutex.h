@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    10.09.2018
+    @date    11.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -38,9 +38,27 @@
 extern "C" {
 #endif
 
+/* -------------------------------------------------------------------------- */
+
+//      mtxNormal         // undefined, unused
+#define mtxErrorCheck   0 // error checking mutex type
+#define mtxRecursive    1 // recursive mutex type
+
+#define mtxPrioNone     0 // none mutex protocol
+#define mtxPrioInherit  2 // priority inheritance mutex protocol
+#define mtxPrioProtect  4 // priority protected mutex protocol
+#define mtxPrioMASK   ( mtxPrioInherit | mtxPrioProtect )
+
+#define mtxStalled      0 // stalled mutex
+#define mtxRobust       8 // robust mutex
+
+#define mtxMASK       ( mtxRecursive + mtxPrioMASK + mtxRobust )
+
+#define mtxDefault    ( mtxErrorCheck + mtxPrioNone + mtxStalled )
+
 /******************************************************************************
  *
- * Name              : mutex (recursive, priority inheritance, robust)
+ * Name              : mutex
  *                     like a POSIX pthread_mutex_t
  *
  ******************************************************************************/
@@ -52,7 +70,9 @@ struct __mtx
 	obj_t    obj;   // object header
 
 	tsk_t  * owner; // mutex owner
+	unsigned mode;  // mutex mode: mutex type + mutex protocol + mutex robustness
 	unsigned count; // current value of the mutex counter
+	unsigned prio;  // mutex priority (unused if mtxPrioProtect protocol is not set)
 	mtx_t  * list;  // list of mutexes held by owner
 };
 
@@ -62,7 +82,11 @@ struct __mtx
  *
  * Description       : create and initialize a mutex object
  *
- * Parameters        : none
+ * Parameters
+ *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
+ *                           type: mtxErrorCheck or mtxRecursive
+ *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
+ *                     robustness: mtxStalled or mtxRobust
  *
  * Return            : mutex object
  *
@@ -70,7 +94,20 @@ struct __mtx
  *
  ******************************************************************************/
 
-#define               _MTX_INIT() { _OBJ_INIT(), 0, 0, 0 }
+#define               _MTX_INIT( _mode ) { _OBJ_INIT(), 0, _mode, 0, 0, 0 }
+
+/******************************************************************************
+ *
+ * Name              : _VA_MTX
+ *
+ * Description       : calculate mutex mode from optional parameter
+ *                     default: 0 ( mtxErrorCheck + mtxPrioNone + mtxStalled )
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+#define               _VA_MTX( _mode ) ( _mode + 0 )
 
 /******************************************************************************
  *
@@ -80,11 +117,15 @@ struct __mtx
  *
  * Parameters
  *   mtx             : name of a pointer to mutex object
+ *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
+ *                           type: mtxErrorCheck or mtxRecursive
+ *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
+ *                     robustness: mtxStalled or mtxRobust
  *
  ******************************************************************************/
 
-#define             OS_MTX( mtx )                     \
-                       mtx_t mtx##__mtx = _MTX_INIT(); \
+#define             OS_MTX( mtx, ... )                                    \
+                       mtx_t mtx##__mtx = _MTX_INIT(_VA_MTX(__VA_ARGS__)); \
                        mtx_id mtx = & mtx##__mtx
 
 /******************************************************************************
@@ -95,11 +136,15 @@ struct __mtx
  *
  * Parameters
  *   mtx             : name of a pointer to mutex object
+ *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
+ *                           type: mtxErrorCheck or mtxRecursive
+ *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
+ *                     robustness: mtxStalled or mtxRobust
  *
  ******************************************************************************/
 
-#define         static_MTX( mtx )                     \
-                static mtx_t mtx##__mtx = _MTX_INIT(); \
+#define         static_MTX( mtx, ... )                                    \
+                static mtx_t mtx##__mtx = _MTX_INIT(_VA_MTX(__VA_ARGS__)); \
                 static mtx_id mtx = & mtx##__mtx
 
 /******************************************************************************
@@ -108,7 +153,11 @@ struct __mtx
  *
  * Description       : create and initialize a mutex object
  *
- * Parameters        : none
+ * Parameters
+ *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
+ *                           type: mtxErrorCheck or mtxRecursive
+ *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
+ *                     robustness: mtxStalled or mtxRobust
  *
  * Return            : mutex object
  *
@@ -117,8 +166,8 @@ struct __mtx
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                MTX_INIT() \
-                      _MTX_INIT()
+#define                MTX_INIT( ... ) \
+                      _MTX_INIT(_VA_MTX(__VA_ARGS__))
 #endif
 
 /******************************************************************************
@@ -128,7 +177,11 @@ struct __mtx
  *
  * Description       : create and initialize a mutex object
  *
- * Parameters        : none
+ * Parameters
+ *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
+ *                           type: mtxErrorCheck or mtxRecursive
+ *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
+ *                     robustness: mtxStalled or mtxRobust
  *
  * Return            : pointer to mutex object
  *
@@ -137,8 +190,8 @@ struct __mtx
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                MTX_CREATE() \
-           (mtx_t[]) { MTX_INIT  () }
+#define                MTX_CREATE( ... ) \
+           (mtx_t[]) { MTX_INIT  (_VA_MTX(__VA_ARGS__)) }
 #define                MTX_NEW \
                        MTX_CREATE
 #endif
@@ -151,6 +204,10 @@ struct __mtx
  *
  * Parameters
  *   mtx             : pointer to mutex object
+ *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
+ *                           type: mtxErrorCheck or mtxRecursive
+ *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
+ *                     robustness: mtxStalled or mtxRobust
  *
  * Return            : none
  *
@@ -158,7 +215,7 @@ struct __mtx
  *
  ******************************************************************************/
 
-void mtx_init( mtx_t *mtx );
+void mtx_init( mtx_t *mtx, unsigned mode );
 
 /******************************************************************************
  *
@@ -167,7 +224,11 @@ void mtx_init( mtx_t *mtx );
  *
  * Description       : create and initialize a new mutex object
  *
- * Parameters        : none
+ * Parameters
+ *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
+ *                           type: mtxErrorCheck or mtxRecursive
+ *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
+ *                     robustness: mtxStalled or mtxRobust
  *
  * Return            : pointer to mutex object (mutex successfully created)
  *   0               : mutex not created (not enough free memory)
@@ -176,10 +237,10 @@ void mtx_init( mtx_t *mtx );
  *
  ******************************************************************************/
 
-mtx_t *mtx_create( void );
+mtx_t *mtx_create( unsigned mode );
 
 __STATIC_INLINE
-mtx_t *mtx_new( void ) { return mtx_create(); }
+mtx_t *mtx_new( unsigned mode ) { return mtx_create(mode); }
 
 /******************************************************************************
  *
@@ -217,6 +278,45 @@ void mtx_delete( mtx_t *mtx );
 
 /******************************************************************************
  *
+ * Name              : mtx_setPrio
+ * Alias             : mtx_prio
+ *
+ * Description       : set priority of given mutex
+ *
+ * Parameters
+ *   mtx             : pointer to mutex object
+ *   prio            : new mutex priority value
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+void mtx_setPrio( mtx_t *mtx, unsigned prio );
+
+__STATIC_INLINE
+void mtx_prio( mtx_t *mtx, unsigned prio ) { mtx_setPrio(mtx, prio); }
+
+/******************************************************************************
+ *
+ * Name              : mtx_getPrio
+ *
+ * Description       : get priority of given mutex
+ *
+ * Parameters
+ *   mtx             : pointer to mutex object
+ *
+ * Return            : mutex priority
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned mtx_getPrio( mtx_t *mtx );
+
+/******************************************************************************
+ *
  * Name              : mtx_waitFor
  *
  * Description       : try to lock the mutex object,
@@ -231,7 +331,8 @@ void mtx_delete( mtx_t *mtx );
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
  *   E_STOPPED       : mutex object was killed before the specified timeout expired
- *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired
+ *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired or
+ *                     locking is not possible due to priority protection
  *
  * Note              : use only in thread mode
  *
@@ -253,7 +354,8 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay );
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
  *   E_STOPPED       : mutex object was killed before the specified timeout expired
- *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired
+ *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired or
+ *                     locking is not possible due to priority protection
  *
  * Note              : use only in thread mode
  *
@@ -275,6 +377,7 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
  *   E_STOPPED       : mutex object was killed
+ *   E_TIMEOUT       : locking is not possible due to priority protection
  *
  * Note              : use only in thread mode
  *
@@ -299,7 +402,8 @@ unsigned mtx_lock( mtx_t *mtx ) { return mtx_wait(mtx); }
  *
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
- *   E_TIMEOUT       : mutex object can't be locked immediately
+ *   E_TIMEOUT       : mutex object can't be locked immediately or
+ *                     locking is not possible due to priority protection
  *
  * Note              : use only in thread mode
  *
@@ -350,24 +454,31 @@ unsigned mtx_unlock( mtx_t *mtx ) { return mtx_give(mtx); }
  * Description       : create and initialize a mutex object
  *
  * Constructor parameters
- *                   : none
+ *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
+ *                           type: mtxErrorCheck or mtxRecursive
+ *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
+ *                     robustness: mtxStalled or mtxRobust
  *
  ******************************************************************************/
 
 struct Mutex : public __mtx
 {
-	 Mutex( void ): __mtx _MTX_INIT() {}
+	 Mutex( const unsigned _mode = mtxDefault ): __mtx _MTX_INIT(_mode) {}
 	~Mutex( void ) { assert(__mtx::owner == nullptr); }
 
-	void     kill     ( void )         {        mtx_kill     (this);         }
-	unsigned waitFor  ( cnt_t _delay ) { return mtx_waitFor  (this, _delay); }
-	unsigned waitUntil( cnt_t _time  ) { return mtx_waitUntil(this, _time);  }
-	unsigned wait     ( void )         { return mtx_wait     (this);         }
-	unsigned lock     ( void )         { return mtx_lock     (this);         }
-	unsigned take     ( void )         { return mtx_take     (this);         }
-	unsigned tryLock  ( void )         { return mtx_tryLock  (this);         }
-	unsigned give     ( void )         { return mtx_give     (this);         }
-	unsigned unlock   ( void )         { return mtx_unlock   (this);         }
+	void     kill     ( void )            {        mtx_kill     (this);         }
+	void     setPrio  ( unsigned _prio )  {        mtx_setPrio  (this, _prio);  }
+	void     prio     ( unsigned _prio )  {        mtx_prio     (this, _prio);  }
+	unsigned getPrio  ( void )            { return mtx_getPrio  (this);         }
+	unsigned prio     ( void )            { return mtx_getPrio  (this);         }
+	unsigned waitFor  ( cnt_t    _delay ) { return mtx_waitFor  (this, _delay); }
+	unsigned waitUntil( cnt_t    _time )  { return mtx_waitUntil(this, _time);  }
+	unsigned wait     ( void )            { return mtx_wait     (this);         }
+	unsigned lock     ( void )            { return mtx_lock     (this);         }
+	unsigned take     ( void )            { return mtx_take     (this);         }
+	unsigned tryLock  ( void )            { return mtx_tryLock  (this);         }
+	unsigned give     ( void )            { return mtx_give     (this);         }
+	unsigned unlock   ( void )            { return mtx_unlock   (this);         }
 };
 
 #endif//__cplusplus

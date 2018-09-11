@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    08.09.2018
+    @date    11.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -807,8 +807,8 @@ void tsk_flip( fun_t *state );
 
 /******************************************************************************
  *
- * Name              : tsk_prio
- * Alias             : tsk_setPrio
+ * Name              : tsk_setPrio
+ * Alias             : tsk_prio
  *
  * Description       : set current task priority
  *
@@ -821,10 +821,10 @@ void tsk_flip( fun_t *state );
  *
  ******************************************************************************/
 
-void tsk_prio   ( unsigned prio );
+void tsk_setPrio( unsigned prio );
 
 __STATIC_INLINE
-void tsk_setPrio( unsigned prio ) { tsk_prio(prio); }
+void tsk_prio( unsigned prio ) { tsk_setPrio(prio); }
 
 /******************************************************************************
  *
@@ -840,8 +840,7 @@ void tsk_setPrio( unsigned prio ) { tsk_prio(prio); }
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned tsk_getPrio( void ) { return System.cur->basic; }
+unsigned tsk_getPrio( void );
 
 /******************************************************************************
  *
@@ -1187,8 +1186,8 @@ namespace ThisTask
 	static inline void     flip      ( FUN_t    _state )               {        tsk_flip      (_state);                }
 #endif
 	static inline void     stop      ( void )                          {        tsk_stop      ();                      }
-	static inline void     prio      ( unsigned _prio )                {        tsk_prio      (_prio);                 }
 	static inline void     setPrio   ( unsigned _prio )                {        tsk_setPrio   (_prio);                 }
+	static inline void     prio      ( unsigned _prio )                {        tsk_prio      (_prio);                 }
 	static inline unsigned getPrio   ( void )                          { return tsk_getPrio   ();                      }
 	static inline unsigned prio      ( void )                          { return tsk_getPrio   ();                      }
 

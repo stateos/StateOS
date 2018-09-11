@@ -18,7 +18,7 @@ Features:
 - flags (any, all, protect, ignore)
 - barriers
 - semaphores (binary, limited, counting)
-- mutexes (recursive, priority inheritance, robust)
+- mutexes with configurable type, protocol and robustness
 - fast mutexes (error checking)
 - condition variables
 - memory pools
@@ -41,6 +41,7 @@ Features:
 - back to the event (evt) and event queue (evq)
 - added a few function aliases
 - added once flag object
+- added mutex mode (type, protocol, robustness)
 ---------
 6.2
 - updated kernel

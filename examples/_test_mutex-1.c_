@@ -1,15 +1,17 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-OS_MTX(mtx);
+OS_MTX(mtx, mtxPrioInherit);
 
 void master()
 {
-	mtx_wait(mtx);
-	mtx_give(mtx);
+	if (mtx_wait(mtx) == E_SUCCESS)
+	{
+		mtx_give(mtx);
+		LEDs = 15;     // OK
+	}
 
-	LEDG = 1;
-	for (;;); // BREAKPOINT: 1 (priority inheritance mutex)
+	for (;;) LEDG = 1; // BREAKPOINT: 1 (priority inheritance mutex)
 }
 
 OS_TSK(mas, 2, master);
@@ -18,8 +20,7 @@ void slave()
 {
 	tsk_start(mas);
 
-	LEDB = 1;
-	for (;;); // BREAKPOINT: 2 (fast mutex)
+	for (;;) LEDB = 1; // BREAKPOINT: 2 (fast mutex)
 }
 
 OS_TSK(sla, 1, slave);
@@ -28,10 +29,11 @@ int main()
 {
 	LED_Init();
 	
-	mtx_wait(mtx);
-	tsk_start(sla);
-	mtx_give(mtx);
+	if (mtx_wait(mtx) == E_SUCCESS)
+	{
+		tsk_start(sla);
+		mtx_give(mtx);
+	}
 
-	LEDR = 1;
-	for (;;); // BREAKPOINT: 3 (error)
+	for (;;) LEDR = 1; // BREAKPOINT: 3 (error)
 }

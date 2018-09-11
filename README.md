@@ -23,7 +23,7 @@ There's a dedicated function for immediate change the task state.
 - flags (any, all, protect, ignore)
 - barriers
 - semaphores (binary, limited, counting)
-- mutexes (recursive, priority inheritance, robust)
+- mutexes with configurable type, protocol and robustness
 - fast mutexes (error checking)
 - condition variables
 - memory pools

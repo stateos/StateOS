@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    10.09.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -829,7 +829,7 @@ osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 
 	sys_lock();
 	{
-		mtx_init(&mutex->mtx);
+		mtx_init(&mutex->mtx, flags & mtxMASK);
 		if (attr->cb_mem == NULL || attr->cb_size == 0U) mutex->mtx.obj.res = mutex;
 		mutex->flags = flags;
 		mutex->name = (attr == NULL) ? NULL : attr->name;
