@@ -8,10 +8,10 @@ void master()
 	if (mtx_wait(mtx) == E_SUCCESS)
 	{
 		mtx_give(mtx);
-		LEDs = 15;     // OK
+		for (;;) LEDs = 15; // OK (priority inheritance mutex)
 	}
 
-	for (;;) LEDG = 1; // BREAKPOINT: 1 (priority inheritance mutex)
+	for (;;) LEDG = 1;
 }
 
 OS_TSK(mas, 2, master);
@@ -20,7 +20,7 @@ void slave()
 {
 	tsk_start(mas);
 
-	for (;;) LEDB = 1; // BREAKPOINT: 2 (fast mutex)
+	for (;;) LEDB = 1;
 }
 
 OS_TSK(sla, 1, slave);
@@ -35,5 +35,5 @@ int main()
 		mtx_give(mtx);
 	}
 
-	for (;;) LEDR = 1; // BREAKPOINT: 3 (error)
+	for (;;) LEDR = 1;
 }
