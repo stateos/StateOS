@@ -2,7 +2,7 @@
 #include <os.h>
 
 auto led = Led();
-auto mtx = Mutex();
+auto mtx = Mutex(mtxDefault);
 auto cnd = ConditionVariable();
 
 void slave()

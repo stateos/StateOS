@@ -1,0 +1,58 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+OS_MTX(mtx1, mtxPrioProtect, 4);
+OS_MTX(mtx2, mtxPrioProtect, 4);
+
+OS_TSK_DEF(tsk4, 4)
+{
+	if (mtx_wait(mtx2) == E_SUCCESS)
+	{
+		mtx_give(mtx2);
+		for (;;) LEDs = 15; // OK (priority inheritance mutex)
+	}
+
+	for (;;) LEDG = 1;
+}
+
+OS_TSK_DEF(tsk3, 3)
+{
+	tsk_start(tsk4);
+
+	for (;;) LEDR = 1;
+}
+
+OS_TSK_DEF(tsk2, 2)
+{
+	if (mtx_wait(mtx2) == E_SUCCESS)
+	{
+		if (mtx_wait(mtx1) == E_SUCCESS)
+		{
+			mtx_give(mtx1);
+			mtx_give(mtx2);
+		}
+	}
+
+	for (;;) LEDO = 1;
+}
+
+OS_TSK_DEF(tsk1, 1)
+{
+	tsk_start(tsk2);
+
+	for (;;) LEDB = 1;
+}
+
+int main()
+{
+	LED_Init();
+
+	if (mtx_wait(mtx1) == E_SUCCESS)
+	{
+		tsk_start(tsk1);
+		tsk_start(tsk3);
+		mtx_give(mtx1);
+	}
+
+	for (;;) LEDR = 1;
+}

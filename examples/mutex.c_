@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-OS_MTX(mtx);
+OS_MTX(mtx, mtxDefault);
 
 OS_TSK_DEF(sla, 0)
 {

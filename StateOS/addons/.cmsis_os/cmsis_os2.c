@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    10.09.2018
+    @date    14.09.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -800,6 +800,19 @@ const char *osEventFlagsGetName (osEventFlagsId_t ef_id)
 
 /* -------------------------------------------------------------------------- */
 
+static unsigned mutex_mode (const uint32_t attr_bits)
+{
+	unsigned mode = 0;
+
+	mode |= (attr_bits & osMutexRecursive)   ? mtxRecursive   : mtxErrorCheck;
+	mode |= (attr_bits & osMutexPrioInherit) ? mtxPrioInherit : mtxPrioNone;
+	mode |= (attr_bits & osMutexRobust)      ? mtxRobust      : mtxStalled;
+	
+	return mode;
+}
+
+/* -------------------------------------------------------------------------- */
+
 osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 {
 	osMutex_t *mutex = NULL;
@@ -829,7 +842,7 @@ osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 
 	sys_lock();
 	{
-		mtx_init(&mutex->mtx, flags & mtxMASK);
+		mtx_init(&mutex->mtx, mutex_mode(flags), 0);
 		if (attr->cb_mem == NULL || attr->cb_size == 0U) mutex->mtx.obj.res = mutex;
 		mutex->flags = flags;
 		mutex->name = (attr == NULL) ? NULL : attr->name;

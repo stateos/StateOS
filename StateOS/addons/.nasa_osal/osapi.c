@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    10.09.2018
+    @date    14.09.2018
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -818,7 +818,7 @@ int32 OS_MutSemCreate(uint32 *semaphore_id, const char *sem_name, uint32 options
 				else
 				{
 					*semaphore_id = rec - OS_mut_sem_table;
-					mtx_init(&rec->mtx, mtxDefault);
+					mtx_init(&rec->mtx, mtxDefault, 0);
 					strcpy(rec->name, sem_name);
 					rec->creator = OS_TaskGetId();
 					rec->used = 1;

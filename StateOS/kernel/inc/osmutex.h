@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    11.09.2018
+    @date    14.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,23 +41,25 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 /////// mutex type
-//      mtxNormal         // undefined, unused
-#define mtxErrorCheck   0 // error checking mutex
-#define mtxRecursive    1 // recursive mutex
+#define mtxNormal       0 // normal mutex
+#define mtxErrorCheck   1 // error checking mutex
+#define mtxRecursive    2 // recursive mutex
+#define mtxTypeMASK   ( mtxNormal | mtxErrorCheck | mtxRecursive )
 
 /////// mutex protocol
 #define mtxPrioNone     0 // none
-#define mtxPrioInherit  2 // priority inheritance mutex
-#define mtxPrioProtect  4 // priority protected mutex
-#define mtxPrioMASK   ( mtxPrioInherit | mtxPrioProtect )
+#define mtxPrioInherit  4 // priority inheritance mutex
+#define mtxPrioProtect  8 // priority protected mutex
+#define mtxPrioMASK   ( mtxPrioNone | mtxPrioInherit | mtxPrioProtect )
 
 /////// mutex robustness
 #define mtxStalled      0 // stalled mutex
-#define mtxRobust       8 // robust mutex
+#define mtxRobust      16 // robust mutex
+#define mtxRobustMASK ( mtxStalled | mtxRobust )
 
-#define mtxMASK       ( mtxRecursive + mtxPrioMASK + mtxRobust )
+#define mtxMASK       ( mtxTypeMASK + mtxPrioMASK + mtxRobustMASK )
 
-#define mtxDefault    ( mtxErrorCheck + mtxPrioNone + mtxStalled )
+#define mtxDefault      mtxNormal
 
 /******************************************************************************
  *
@@ -75,7 +77,7 @@ struct __mtx
 	tsk_t  * owner; // mutex owner
 	unsigned mode;  // mutex mode: mutex type + mutex protocol + mutex robustness
 	unsigned count; // current value of the mutex counter
-	unsigned prio;  // mutex priority (unused if mtxPrioProtect protocol is not set)
+	unsigned prio;  // mutex priority; unused if mtxPrioProtect protocol is not set
 	mtx_t  * list;  // list of mutexes held by owner
 };
 
@@ -90,6 +92,7 @@ struct __mtx
  *                           type: mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
+ *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
  * Return            : mutex object
  *
@@ -97,20 +100,20 @@ struct __mtx
  *
  ******************************************************************************/
 
-#define               _MTX_INIT( _mode ) { _OBJ_INIT(), 0, _mode, 0, 0, 0 }
+#define               _MTX_INIT( _mode, _prio ) { _OBJ_INIT(), 0, _mode, 0, _prio, 0 }
 
 /******************************************************************************
  *
  * Name              : _VA_MTX
  *
- * Description       : calculate mutex mode from optional parameter
- *                     default: 0 ( mtxErrorCheck + mtxPrioNone + mtxStalled )
+ * Description       : calculate mutex priority from optional parameter
+ *                     default: 0
  *
  * Note              : for internal use
  *
  ******************************************************************************/
 
-#define               _VA_MTX( _mode ) ( _mode + 0 )
+#define               _VA_MTX( _prio ) ( _prio + 0 )
 
 /******************************************************************************
  *
@@ -124,11 +127,12 @@ struct __mtx
  *                           type: mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
+ *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
  ******************************************************************************/
 
-#define             OS_MTX( mtx, ... )                                    \
-                       mtx_t mtx##__mtx = _MTX_INIT(_VA_MTX(__VA_ARGS__)); \
+#define             OS_MTX( mtx, mode, ... )                                    \
+                       mtx_t mtx##__mtx = _MTX_INIT(mode, _VA_MTX(__VA_ARGS__)); \
                        mtx_id mtx = & mtx##__mtx
 
 /******************************************************************************
@@ -143,11 +147,12 @@ struct __mtx
  *                           type: mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
+ *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
  ******************************************************************************/
 
-#define         static_MTX( mtx, ... )                                    \
-                static mtx_t mtx##__mtx = _MTX_INIT(_VA_MTX(__VA_ARGS__)); \
+#define         static_MTX( mtx, mode, ... )                                    \
+                static mtx_t mtx##__mtx = _MTX_INIT(mode, _VA_MTX(__VA_ARGS__)); \
                 static mtx_id mtx = & mtx##__mtx
 
 /******************************************************************************
@@ -161,6 +166,7 @@ struct __mtx
  *                           type: mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
+ *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
  * Return            : mutex object
  *
@@ -169,8 +175,8 @@ struct __mtx
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                MTX_INIT( ... ) \
-                      _MTX_INIT(_VA_MTX(__VA_ARGS__))
+#define                MTX_INIT( mode, ... ) \
+                      _MTX_INIT( mode, _VA_MTX(__VA_ARGS__) )
 #endif
 
 /******************************************************************************
@@ -185,6 +191,7 @@ struct __mtx
  *                           type: mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
+ *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
  * Return            : pointer to mutex object
  *
@@ -193,8 +200,8 @@ struct __mtx
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define                MTX_CREATE( ... ) \
-           (mtx_t[]) { MTX_INIT  (_VA_MTX(__VA_ARGS__)) }
+#define                MTX_CREATE( mode, ... ) \
+           (mtx_t[]) { MTX_INIT  ( mode, _VA_MTX(__VA_ARGS__) ) }
 #define                MTX_NEW \
                        MTX_CREATE
 #endif
@@ -211,6 +218,7 @@ struct __mtx
  *                           type: mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
+ *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
  * Return            : none
  *
@@ -218,7 +226,7 @@ struct __mtx
  *
  ******************************************************************************/
 
-void mtx_init( mtx_t *mtx, unsigned mode );
+void mtx_init( mtx_t *mtx, unsigned mode, unsigned prio );
 
 /******************************************************************************
  *
@@ -232,6 +240,7 @@ void mtx_init( mtx_t *mtx, unsigned mode );
  *                           type: mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
+ *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
  * Return            : pointer to mutex object (mutex successfully created)
  *   0               : mutex not created (not enough free memory)
@@ -240,10 +249,10 @@ void mtx_init( mtx_t *mtx, unsigned mode );
  *
  ******************************************************************************/
 
-mtx_t *mtx_create( unsigned mode );
+mtx_t *mtx_create( unsigned mode, unsigned prio );
 
 __STATIC_INLINE
-mtx_t *mtx_new( unsigned mode ) { return mtx_create(mode); }
+mtx_t *mtx_new( unsigned mode, unsigned prio ) { return mtx_create(mode, prio); }
 
 /******************************************************************************
  *
@@ -461,12 +470,13 @@ unsigned mtx_unlock( mtx_t *mtx ) { return mtx_give(mtx); }
  *                           type: mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
+ *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
  ******************************************************************************/
 
 struct Mutex : public __mtx
 {
-	 Mutex( const unsigned _mode = mtxDefault ): __mtx _MTX_INIT(_mode) {}
+	 Mutex( const unsigned _mode, const unsigned _prio = 0 ): __mtx _MTX_INIT(_mode, _prio) {}
 	~Mutex( void ) { assert(__mtx::owner == nullptr); }
 
 	void     kill     ( void )            {        mtx_kill     (this);         }
