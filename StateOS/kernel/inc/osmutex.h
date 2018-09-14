@@ -49,7 +49,7 @@ extern "C" {
 /////// mutex protocol
 #define mtxPrioNone     0 // none
 #define mtxPrioInherit  4 // priority inheritance mutex
-#define mtxPrioProtect  8 // priority protected mutex
+#define mtxPrioProtect  8 // priority protected mutex (OCPP)
 #define mtxPrioMASK   ( mtxPrioNone | mtxPrioInherit | mtxPrioProtect )
 
 /////// mutex robustness
