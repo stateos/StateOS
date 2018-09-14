@@ -9,7 +9,7 @@ OS_TSK_DEF(tsk4, 4)
 	if (mtx_wait(mtx2) == E_SUCCESS)
 	{
 		mtx_give(mtx2);
-		for (;;) LEDs = 15; // OK (priority inheritance mutex)
+		for (;;) LEDs = 15; // OK (priority protected mutex)
 	}
 
 	for (;;) LEDG = 1;
