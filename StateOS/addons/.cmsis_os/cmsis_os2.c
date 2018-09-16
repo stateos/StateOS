@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    14.09.2018
+    @date    16.09.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -532,7 +532,7 @@ uint32_t osThreadFlagsGet (void)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
 
-	return thread->flg.flags;
+	return flg_get(&thread->flg);
 }
 
 uint32_t osThreadFlagsWait (uint32_t flags, uint32_t options, uint32_t timeout)

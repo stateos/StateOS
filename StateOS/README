@@ -42,6 +42,7 @@ Features:
 - added a few function aliases
 - added once flag object
 - added mutex mode (type, protocol, robustness)
+- updated flag object
 ---------
 6.2
 - updated kernel

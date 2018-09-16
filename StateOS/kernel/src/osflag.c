@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    16.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -101,25 +101,22 @@ void flg_delete( flg_t *flg )
 unsigned flg_take( flg_t *flg, unsigned flags, char mode )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-	unsigned value = flags;
+	unsigned entry = flags;
 
 	assert(flg);
 	assert((mode & ~flgMASK) == 0);
 
 	sys_lock();
 	{
-		if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
-		if ((mode & flgProtect) == 0) flg->flags &= ~flags;
+		if ((mode & flgIgnore)  == 0) flags &= ~flg->flags;
+		if ((mode & flgProtect) == 0) flg->flags &= ~entry;
 
-		if (value == 0 || (value != flags && (mode & flgAll) == 0))
-			event = E_SUCCESS;
-		else
-			event = E_TIMEOUT;
+		if (flags != entry && (mode & flgAll) == 0)
+			flags = 0;
 	}
 	sys_unlock();
 
-	return event;
+	return flags;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -127,20 +124,20 @@ static
 unsigned priv_flg_wait( flg_t *flg, unsigned flags, char mode, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned value = flags;
+	unsigned entry = flags;
 
 	assert(!port_isr_context());
 	assert(flg);
 	assert((mode & ~flgMASK) == 0);
 
-	if ((mode & flgIgnore)  == 0) value &= ~flg->flags;
-	if ((mode & flgProtect) == 0) flg->flags &= ~flags;
+	if ((mode & flgIgnore)  == 0) flags &= ~flg->flags;
+	if ((mode & flgProtect) == 0) flg->flags &= ~entry;
 
-	if (value == 0 || (value != flags && (mode & flgAll) == 0))
+	if (flags == 0 || (flags != entry && (mode & flgAll) == 0))
 		return E_SUCCESS;
 	
 	System.cur->tmp.flg.mode  = mode;
-	System.cur->tmp.flg.flags = value;
+	System.cur->tmp.flg.flags = flags;
 	return wait(&flg->obj.queue, time);
 }
 
@@ -178,7 +175,6 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
 unsigned flg_give( flg_t *flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned state;
 	obj_t  * obj;
 	tsk_t  * tsk;
 
@@ -186,8 +182,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 
 	sys_lock();
 	{
-		state = flg->flags;
-		flags = flg->flags |= flags;
+		flg->flags |= flags;
 
 		for (obj = &flg->obj; obj->queue; obj = &obj->queue->hdr.obj)
 		{
@@ -206,25 +201,43 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 	}
 	sys_unlock();
 
-	return state;
+	return flags;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned flg_clear( flg_t *flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned state;
+	unsigned temp;
 
 	assert(flg);
 
 	sys_lock();
 	{
-		state = flg->flags;
+		temp = flg->flags;
 		flg->flags &= ~flags;
+		flags = temp;
 	}
 	sys_unlock();
 
-	return state;
+	return flags;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned flg_get( flg_t *flg )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned flags;
+
+	assert(flg);
+
+	sys_lock();
+	{
+		flags = flg->flags;
+	}
+	sys_unlock();
+
+	return flags;
 }
 
 /* -------------------------------------------------------------------------- */
