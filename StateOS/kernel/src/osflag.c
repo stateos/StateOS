@@ -175,8 +175,8 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
 unsigned flg_give( flg_t *flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
-	obj_t  * obj;
-	tsk_t  * tsk;
+	obj_t *obj = &flg->obj;
+	tsk_t *tsk;
 
 	assert(flg);
 
@@ -184,7 +184,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 	{
 		flg->flags |= flags;
 
-		for (obj = &flg->obj; obj->queue; obj = &obj->queue->hdr.obj)
+		while (obj->queue)
 		{
 			tsk = obj->queue;
 			if (tsk->tmp.flg.flags & flags)
@@ -193,8 +193,12 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 					flg->flags &= ~tsk->tmp.flg.flags;
 				tsk->tmp.flg.flags &= ~flags;
 				if (tsk->tmp.flg.flags == 0 || (tsk->tmp.flg.mode & flgAll) == 0)
+				{
 					core_tsk_wakeup(tsk, E_SUCCESS);
+					continue;
+				}
 			}
+			obj = &tsk->hdr.obj;
 		}
 
 		flags = flg->flags;
