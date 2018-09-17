@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    14.09.2018
+    @date    16.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -309,25 +309,17 @@ unsigned tsk_getPrio( void )
 }
 
 /* -------------------------------------------------------------------------- */
-static
-unsigned priv_tsk_wait( unsigned flags, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
-/* -------------------------------------------------------------------------- */
-{
-	assert(!port_isr_context());
-
-	System.cur->tmp.flg.flags = flags;
-	return wait(&System.cur->hdr.obj.queue, time);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned tsk_waitFor( unsigned flags, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_tsk_wait(flags, delay, core_tsk_waitFor);
+		System.cur->tmp.flg.flags = flags;
+		event = core_tsk_waitFor(&System.cur->hdr.obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -340,13 +332,35 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_tsk_wait(flags, time, core_tsk_waitUntil);
+		System.cur->tmp.flg.flags = flags;
+		event = core_tsk_waitUntil(&System.cur->hdr.obj.queue, time);
 	}
 	sys_unlock();
 
 	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_tsk_give( tsk_t *tsk, unsigned flags )
+/* -------------------------------------------------------------------------- */
+{
+	assert(tsk);
+
+	if (tsk->guard == &tsk->hdr.obj.queue)
+	{
+		if (tsk->tmp.flg.flags & flags)
+			flags = tsk->tmp.flg.flags &= ~flags;
+		if (tsk->tmp.flg.flags == 0)
+			core_tsk_wakeup(tsk, flags);
+		return E_SUCCESS;
+	}
+
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -355,22 +369,9 @@ unsigned tsk_give( tsk_t *tsk, unsigned flags )
 {
 	unsigned event;
 
-	assert(tsk);
-
 	sys_lock();
 	{
-		if (tsk->guard == &tsk->hdr.obj.queue)
-		{
-			if (tsk->tmp.flg.flags & flags)
-				flags = tsk->tmp.flg.flags &= ~flags;
-			if (tsk->tmp.flg.flags == 0)
-				core_tsk_wakeup(tsk, flags);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
+		event = priv_tsk_give(tsk, flags);
 	}
 	sys_unlock();
 

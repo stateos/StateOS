@@ -212,66 +212,38 @@ void priv_job_skipUpdate( job_t *job )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_take( job_t *job )
-/* -------------------------------------------------------------------------- */
-{
-	fun_t  * fun;
-	unsigned event;
-
-	assert(job);
-	assert(job->data);
-	assert(job->limit);
-
-	sys_lock();
-	{
-		if (job->count > 0)
-		{
-			fun = priv_job_getUpdate(job);
-
-			port_clr_lock();
-			fun();
-
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
-	}
-	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
 static
-unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_job_take( job_t *job, fun_t **fun )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t  * fun;
-	unsigned event;
-
-	assert(!port_isr_context());
 	assert(job);
 	assert(job->data);
 	assert(job->limit);
 
 	if (job->count > 0)
 	{
-		fun = priv_job_getUpdate(job);
-		event = E_SUCCESS;
-	}
-	else
-	{
-		event = wait(&job->obj.queue, time);
-		fun = System.cur->tmp.job.fun;
+		*fun = priv_job_getUpdate(job);
+		return E_SUCCESS;
 	}
 
-	if (event == E_SUCCESS)
+	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned job_take( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	fun_t  * fun;
+	unsigned event;
+
+	sys_lock();
 	{
-		port_clr_lock();
-		fun();
+		event = priv_job_take(job, &fun);
 	}
+	sys_unlock();
+
+	if (event == E_SUCCESS)
+		fun();
 
 	return event;
 }
@@ -280,13 +252,25 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 unsigned job_waitFor( job_t *job, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
+	fun_t  * fun;
 	unsigned event;
+
+	assert(!port_isr_context());
 
 	sys_lock();
 	{
-		event = priv_job_wait(job, delay, core_tsk_waitFor);
+		event = priv_job_take(job, &fun);
+
+		if (event != E_SUCCESS)
+		{
+			event = core_tsk_waitFor(&job->obj.queue, delay);
+			fun = System.cur->tmp.job.fun;
+		}
 	}
 	sys_unlock();
+
+	if (event == E_SUCCESS)
+		fun();
 
 	return event;
 }
@@ -295,51 +279,34 @@ unsigned job_waitFor( job_t *job, cnt_t delay )
 unsigned job_waitUntil( job_t *job, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
+	fun_t  * fun;
 	unsigned event;
+
+	assert(!port_isr_context());
 
 	sys_lock();
 	{
-		event = priv_job_wait(job, time, core_tsk_waitUntil);
-	}
-	sys_unlock();
+		event = priv_job_take(job, &fun);
 
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned job_give( job_t *job, fun_t *fun )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert(job);
-	assert(job->data);
-	assert(job->limit);
-	assert(fun);
-
-	sys_lock();
-	{
-		if (job->count < job->limit)
+		if (event != E_SUCCESS)
 		{
-			priv_job_putUpdate(job, fun);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
+			event = core_tsk_waitUntil(&job->obj.queue, time);
+			fun = System.cur->tmp.job.fun;
 		}
 	}
 	sys_unlock();
+
+	if (event == E_SUCCESS)
+		fun();
 
 	return event;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_job_give( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
 	assert(job);
 	assert(job->data);
 	assert(job->limit);
@@ -351,8 +318,22 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(tsk_
 		return E_SUCCESS;
 	}
 
-	System.cur->tmp.job.fun = fun;
-	return wait(&job->obj.queue, time);
+	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned job_give( job_t *job, fun_t *fun )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_job_give(job, fun);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -361,9 +342,17 @@ unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_job_send(job, fun, delay, core_tsk_waitFor);
+		event = priv_job_give(job, fun);
+
+		if (event != E_SUCCESS)
+		{
+			System.cur->tmp.job.fun = fun;
+			event = core_tsk_waitFor(&job->obj.queue, delay);
+		}
 	}
 	sys_unlock();
 
@@ -376,9 +365,17 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_job_send(job, fun, time, core_tsk_waitUntil);
+		event = priv_job_give(job, fun);
+
+		if (event != E_SUCCESS)
+		{
+			System.cur->tmp.job.fun = fun;
+			event = core_tsk_waitUntil(&job->obj.queue, time);
+		}
 	}
 	sys_unlock();
 

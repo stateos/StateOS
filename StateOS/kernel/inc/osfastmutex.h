@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    10.09.2018
+    @date    17.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -304,8 +304,7 @@ unsigned mut_lock( mut_t *mut ) { return mut_wait(mut); }
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned mut_take( mut_t *mut ) { return mut_waitFor(mut, IMMEDIATE); }
+unsigned mut_take( mut_t *mut );
 
 __STATIC_INLINE
 unsigned mut_tryLock( mut_t *mut ) { return mut_take(mut); }

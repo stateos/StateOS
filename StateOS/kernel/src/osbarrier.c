@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    16.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -103,10 +103,9 @@ void bar_delete( bar_t *bar )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_bar_take( bar_t *bar )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
 	assert(bar);
 	assert(bar->count);
 
@@ -114,10 +113,11 @@ unsigned priv_bar_wait( bar_t *bar, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 	{
 		bar->count = bar->limit;
 		core_all_wakeup(&bar->obj.queue, E_SUCCESS);
+
 		return E_SUCCESS;
 	}
 
-	return wait(&bar->obj.queue, time);
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -126,9 +126,14 @@ unsigned bar_waitFor( bar_t *bar, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_bar_wait(bar, delay, core_tsk_waitFor);
+		event = priv_bar_take(bar);
+
+		if (event != E_SUCCESS)
+			event = core_tsk_waitFor(&bar->obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -141,9 +146,14 @@ unsigned bar_waitUntil( bar_t *bar, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_bar_wait(bar, time, core_tsk_waitUntil);
+		event = priv_bar_take(bar);
+
+		if (event != E_SUCCESS)
+			event = core_tsk_waitUntil(&bar->obj.queue, time);
 	}
 	sys_unlock();
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    08.09.2018
+    @date    16.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -93,25 +93,17 @@ void evt_delete( evt_t *evt )
 }
 
 /* -------------------------------------------------------------------------- */
-static
-unsigned priv_evt_wait( evt_t *evt, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
-/* -------------------------------------------------------------------------- */
-{
-	assert(!port_isr_context());
-	assert(evt);
-
-	return wait(&evt->obj.queue, time);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned evt_waitFor( evt_t *evt, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+	assert(evt);
+
 	sys_lock();
 	{
-		event = priv_evt_wait(evt, delay, core_tsk_waitFor);
+		event = core_tsk_waitFor(&evt->obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -124,9 +116,12 @@ unsigned evt_waitUntil( evt_t *evt, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+	assert(evt);
+
 	sys_lock();
 	{
-		event = priv_evt_wait(evt, time, core_tsk_waitUntil);
+		event = core_tsk_waitUntil(&evt->obj.queue, time);
 	}
 	sys_unlock();
 

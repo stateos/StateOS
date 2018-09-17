@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    16.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -101,38 +101,10 @@ void sem_delete( sem_t *sem )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sem_take( sem_t *sem )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert(sem);
-	assert(sem->limit);
-
-	sys_lock();
-	{
-		if (sem->count > 0)
-		{
-			if (core_one_wakeup(&sem->obj.queue, E_SUCCESS) == 0)
-				sem->count--;
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
-	}
-	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
 static
-unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_sem_take( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
 	assert(sem);
 	assert(sem->limit);
 
@@ -140,10 +112,26 @@ unsigned priv_sem_wait( sem_t *sem, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 	{
 		if (core_one_wakeup(&sem->obj.queue, E_SUCCESS) == 0)
 			sem->count--;
+
 		return E_SUCCESS;
 	}
 
-	return wait(&sem->obj.queue, time);
+	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned sem_take( sem_t *sem )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_sem_take(sem);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -152,9 +140,14 @@ unsigned sem_waitFor( sem_t *sem, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_sem_wait(sem, delay, core_tsk_waitFor);
+		event = priv_sem_take(sem);
+
+		if (event != E_SUCCESS)
+			event = core_tsk_waitFor(&sem->obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -167,36 +160,14 @@ unsigned sem_waitUntil( sem_t *sem, cnt_t time )
 {
 	unsigned event;
 
-	sys_lock();
-	{
-		event = priv_sem_wait(sem, time, core_tsk_waitUntil);
-	}
-	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned sem_give( sem_t *sem )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert(sem);
-	assert(sem->limit);
+	assert(!port_isr_context());
 
 	sys_lock();
 	{
-		if (sem->count < sem->limit)
-		{
-			if (core_one_wakeup(&sem->obj.queue, E_SUCCESS) == 0)
-				sem->count++;
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
+		event = priv_sem_take(sem);
+
+		if (event != E_SUCCESS)
+			event = core_tsk_waitUntil(&sem->obj.queue, time);
 	}
 	sys_unlock();
 
@@ -205,10 +176,9 @@ unsigned sem_give( sem_t *sem )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_sem_give( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
 	assert(sem);
 	assert(sem->limit);
 
@@ -216,10 +186,26 @@ unsigned priv_sem_send( sem_t *sem, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 	{
 		if (core_one_wakeup(&sem->obj.queue, E_SUCCESS) == 0)
 			sem->count++;
+
 		return E_SUCCESS;
 	}
 
-	return wait(&sem->obj.queue, time);
+	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned sem_give( sem_t *sem )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_sem_give(sem);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -228,9 +214,14 @@ unsigned sem_sendFor( sem_t *sem, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_sem_send(sem, delay, core_tsk_waitFor);
+		event = priv_sem_give(sem);
+
+		if (event != E_SUCCESS)
+			event = core_tsk_waitFor(&sem->obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -243,9 +234,14 @@ unsigned sem_sendUntil( sem_t *sem, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_sem_send(sem, time, core_tsk_waitUntil);
+		event = priv_sem_give(sem);
+
+		if (event != E_SUCCESS)
+			event = core_tsk_waitUntil(&sem->obj.queue, time);
 	}
 	sys_unlock();
 

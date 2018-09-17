@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    14.09.2018
+    @date    17.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -185,10 +185,9 @@ void mtx_delete( mtx_t *mtx )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_mtx_take( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
 	assert(mtx);
 	assert((mtx->mode & ~mtxMASK) == 0);
 	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
@@ -202,30 +201,33 @@ unsigned priv_mtx_wait( mtx_t *mtx, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 		return E_SUCCESS;
 	}
 
-	if ((mtx->mode & mtxTypeMASK) == mtxNormal || mtx->owner != System.cur)
+	if (mtx->owner == System.cur)
 	{
-		unsigned event;
-
-		if ((mtx->mode & mtxPrioMASK) == mtxPrioProtect && System.cur->prio > mtx->prio)
-			return E_TIMEOUT;
-
-		if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && System.cur->prio > mtx->owner->prio)
-			core_tsk_prio(mtx->owner, System.cur->prio);
-
-		System.cur->mtx.tree = mtx->owner;
-		event = wait(&mtx->obj.queue, time);
-		System.cur->mtx.tree = 0;
-
-		return event;
-	}
-
-	if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count < ~0U)
-	{
-		mtx->count++;
-		return E_SUCCESS;
+		if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count + 1 != 0)
+		{
+			mtx->count = mtx->count + 1;
+			return E_SUCCESS;
+		}
 	}
 
 	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned mtx_take( mtx_t *mtx )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	assert(!port_isr_context());
+
+	sys_lock();
+	{
+		event = priv_mtx_take(mtx);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -234,9 +236,24 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_mtx_wait(mtx, delay, core_tsk_waitFor);
+		event = priv_mtx_take(mtx);
+
+		if (event != E_SUCCESS && mtx->owner != System.cur)
+		{
+			if ((mtx->mode & mtxPrioMASK) != mtxPrioProtect || System.cur->prio <= mtx->prio)
+			{
+				if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && System.cur->prio > mtx->owner->prio)
+					core_tsk_prio(mtx->owner, System.cur->prio);
+
+				System.cur->mtx.tree = mtx->owner;
+				event = core_tsk_waitFor(&mtx->obj.queue, delay);
+				System.cur->mtx.tree = 0;
+			}
+		}
 	}
 	sys_unlock();
 
@@ -249,13 +266,55 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_mtx_wait(mtx, time, core_tsk_waitUntil);
+		event = priv_mtx_take(mtx);
+
+		if (event != E_SUCCESS && mtx->owner != System.cur)
+		{
+			if ((mtx->mode & mtxPrioMASK) != mtxPrioProtect || System.cur->prio <= mtx->prio)
+			{
+				if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && System.cur->prio > mtx->owner->prio)
+					core_tsk_prio(mtx->owner, System.cur->prio);
+
+				System.cur->mtx.tree = mtx->owner;
+				event = core_tsk_waitUntil(&mtx->obj.queue, time);
+				System.cur->mtx.tree = 0;
+			}
+		}
 	}
 	sys_unlock();
 
 	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_mtx_give( mtx_t *mtx )
+/* -------------------------------------------------------------------------- */
+{
+	assert(mtx);
+	assert((mtx->mode & ~mtxMASK) == 0);
+	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
+	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
+
+	if (mtx->owner == System.cur)
+	{
+		if (mtx->count > 0)
+		{
+			mtx->count--;
+			return E_SUCCESS;
+		}
+
+		priv_mtx_unlink(mtx);
+		priv_mtx_link(mtx, core_one_wakeup(&mtx->obj.queue, E_SUCCESS));
+		return E_SUCCESS;
+		
+	}
+
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -265,29 +324,10 @@ unsigned mtx_give( mtx_t *mtx )
 	unsigned event;
 
 	assert(!port_isr_context());
-	assert(mtx);
-	assert((mtx->mode & ~mtxMASK) == 0);
-	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
-	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
 	sys_lock();
 	{
-		if (mtx->owner != System.cur)
-		{
-			event = E_TIMEOUT;
-		}
-		else
-		if (mtx->count > 0)
-		{
-			mtx->count--;
-			event = E_SUCCESS;
-		}
-		else
-		{
-			priv_mtx_unlink(mtx);
-			priv_mtx_link(mtx, core_one_wakeup(&mtx->obj.queue, E_SUCCESS));
-			event = E_SUCCESS;
-		}
+		event = priv_mtx_give(mtx);
 	}
 	sys_unlock();
 

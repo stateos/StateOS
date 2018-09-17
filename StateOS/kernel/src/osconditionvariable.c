@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    17.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -95,8 +95,7 @@ void cnd_delete( cnd_t *cnd )
 }
 
 /* -------------------------------------------------------------------------- */
-static
-unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -105,26 +104,17 @@ unsigned priv_cnd_wait( cnd_t *cnd, mtx_t *mtx, cnt_t time, unsigned(*wait)(tsk_
 	assert(cnd);
 	assert(mtx);
 
-	event = mtx_give(mtx);
-	if (event != E_SUCCESS)
-		return event;
-
-	event = wait(&cnd->obj.queue, time);
-	if (event != E_SUCCESS)
-		return event;
-
-	return mtx_wait(mtx);
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
 	sys_lock();
 	{
-		event = priv_cnd_wait(cnd, mtx, delay, core_tsk_waitFor);
+		event = mtx_give(mtx);
+		if (event == E_SUCCESS)
+		{
+			event = core_tsk_waitFor(&cnd->obj.queue, delay);
+			if (event == E_SUCCESS)
+			{
+				event = mtx_wait(mtx);
+			}
+		}
 	}
 	sys_unlock();
 
@@ -137,9 +127,21 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+	assert(cnd);
+	assert(mtx);
+
 	sys_lock();
 	{
-		event = priv_cnd_wait(cnd, mtx, time, core_tsk_waitUntil);
+		event = mtx_give(mtx);
+		if (event == E_SUCCESS)
+		{
+			event = core_tsk_waitUntil(&cnd->obj.queue, time);
+			if (event == E_SUCCESS)
+			{
+				event = mtx_wait(mtx);
+			}
+		}
 	}
 	sys_unlock();
 

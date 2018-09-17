@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    16.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -194,28 +194,19 @@ unsigned tmr_take( tmr_t *tmr )
 }
 
 /* -------------------------------------------------------------------------- */
-static
-unsigned priv_tmr_wait( tmr_t *tmr, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
-/* -------------------------------------------------------------------------- */
-{
-	assert(!port_isr_context());
-	assert(tmr);
-
-	if (tmr->hdr.id == ID_STOPPED)
-		return E_SUCCESS;
-
-	return wait(&tmr->hdr.obj.queue, time);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_tmr_wait(tmr, delay, core_tsk_waitFor);
+		event = tmr_take(tmr);
+
+		if (event != E_SUCCESS)
+			core_tsk_waitFor(&tmr->hdr.obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -228,9 +219,14 @@ unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_tmr_wait(tmr, delay, core_tsk_waitNext);
+		event = tmr_take(tmr);
+
+		if (event != E_SUCCESS)
+			core_tsk_waitNext(&tmr->hdr.obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -243,9 +239,14 @@ unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_tmr_wait(tmr, time, core_tsk_waitUntil);
+		event = tmr_take(tmr);
+
+		if (event != E_SUCCESS)
+			core_tsk_waitUntil(&tmr->hdr.obj.queue, time);
 	}
 	sys_unlock();
 

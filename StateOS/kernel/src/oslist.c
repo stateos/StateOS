@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    16.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -96,38 +96,10 @@ void lst_delete( lst_t *lst )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned lst_take( lst_t *lst, void **data )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert(lst);
-	assert(data);
-
-	sys_lock();
-	{
-		if (lst->head.next)
-		{
-			*data = lst->head.next + 1;
-			lst->head.next = lst->head.next->next;
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
-	}
-	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
 static
-unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_lst_take( lst_t *lst, void **data )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
 	assert(lst);
 	assert(data);
 
@@ -138,8 +110,22 @@ unsigned priv_lst_wait( lst_t *lst, void **data, cnt_t time, unsigned(*wait)(tsk
 		return E_SUCCESS;
 	}
 
-	System.cur->tmp.lst.data.in = data;
-	return wait(&lst->obj.queue, time);
+	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned lst_take( lst_t *lst, void **data )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_lst_take(lst, data);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -148,9 +134,17 @@ unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_lst_wait(lst, data, delay, core_tsk_waitFor);
+		event = priv_lst_take(lst, data);
+
+		if (event != E_SUCCESS)
+		{
+			System.cur->tmp.lst.data.in = data;
+			event = core_tsk_waitFor(&lst->obj.queue, delay);
+		}
 	}
 	sys_unlock();
 
@@ -163,9 +157,17 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_lst_wait(lst, data, time, core_tsk_waitUntil);
+		event = priv_lst_take(lst, data);
+
+		if (event != E_SUCCESS)
+		{
+			System.cur->tmp.lst.data.in = data;
+			event = core_tsk_waitUntil(&lst->obj.queue, time);
+		}
 	}
 	sys_unlock();
 

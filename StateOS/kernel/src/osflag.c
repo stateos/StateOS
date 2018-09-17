@@ -98,47 +98,35 @@ void flg_delete( flg_t *flg )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_take( flg_t *flg, unsigned flags, char mode )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned entry = flags;
-
-	assert(flg);
-	assert((mode & ~flgMASK) == 0);
-
-	sys_lock();
-	{
-		if ((mode & flgIgnore)  == 0) flags &= ~flg->flags;
-		if ((mode & flgProtect) == 0) flg->flags &= ~entry;
-
-		if (flags != entry && (mode & flgAll) == 0)
-			flags = 0;
-	}
-	sys_unlock();
-
-	return flags;
-}
-
-/* -------------------------------------------------------------------------- */
 static
-unsigned priv_flg_wait( flg_t *flg, unsigned flags, char mode, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_flg_take( flg_t *flg, unsigned flags, char mode )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned entry = flags;
 
-	assert(!port_isr_context());
 	assert(flg);
 	assert((mode & ~flgMASK) == 0);
 
 	if ((mode & flgIgnore)  == 0) flags &= ~flg->flags;
 	if ((mode & flgProtect) == 0) flg->flags &= ~entry;
 
-	if (flags == 0 || (flags != entry && (mode & flgAll) == 0))
-		return E_SUCCESS;
-	
-	System.cur->tmp.flg.mode  = mode;
-	System.cur->tmp.flg.flags = flags;
-	return wait(&flg->obj.queue, time);
+	if (flags != entry && (mode & flgAll) == 0)
+		flags = 0;
+
+	return flags;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned flg_take( flg_t *flg, unsigned flags, char mode )
+/* -------------------------------------------------------------------------- */
+{
+	sys_lock();
+	{
+		flags = priv_flg_take(flg, flags, mode);
+	}
+	sys_unlock();
+
+	return flags;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -149,7 +137,18 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_flg_wait(flg, flags, mode, delay, core_tsk_waitFor);
+		flags = priv_flg_take(flg, flags, mode);
+
+		if (flags == 0)
+		{
+			event = E_SUCCESS;
+		}
+		else
+		{
+			System.cur->tmp.flg.mode  = mode;
+			System.cur->tmp.flg.flags = flags;
+			event = core_tsk_waitFor(&flg->obj.queue, delay);
+		}
 	}
 	sys_unlock();
 
@@ -164,7 +163,18 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_flg_wait(flg, flags, mode, time, core_tsk_waitUntil);
+		flags = priv_flg_take(flg, flags, mode);
+
+		if (flags == 0)
+		{
+			event = E_SUCCESS;
+		}
+		else
+		{
+			System.cur->tmp.flg.mode  = mode;
+			System.cur->tmp.flg.flags = flags;
+			event = core_tsk_waitUntil(&flg->obj.queue, time);
+		}
 	}
 	sys_unlock();
 

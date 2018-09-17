@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    17.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -96,10 +96,9 @@ void mut_delete( mut_t *mut )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_mut_take( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
 	assert(mut);
 
 	if (mut->owner == 0)
@@ -108,10 +107,24 @@ unsigned priv_mut_wait( mut_t *mut, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 		return E_SUCCESS;
 	}
 
-	if (mut->owner == System.cur)
-		return E_TIMEOUT;
+	return E_TIMEOUT;
+}
 
-	return wait(&mut->obj.queue, time);
+/* -------------------------------------------------------------------------- */
+unsigned mut_take( mut_t *mut )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	assert(!port_isr_context());
+
+	sys_lock();
+	{
+		event = priv_mut_take(mut);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -120,9 +133,14 @@ unsigned mut_waitFor( mut_t *mut, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_mut_wait(mut, delay, core_tsk_waitFor);
+		event = priv_mut_take(mut);
+
+		if (event != E_SUCCESS && mut->owner != System.cur)
+			event = core_tsk_waitFor(&mut->obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -135,13 +153,34 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_mut_wait(mut, time, core_tsk_waitUntil);
+		event = priv_mut_take(mut);
+
+		if (event != E_SUCCESS && mut->owner != System.cur)
+			event = core_tsk_waitUntil(&mut->obj.queue, time);
 	}
 	sys_unlock();
 
 	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_mut_give( mut_t *mut )
+/* -------------------------------------------------------------------------- */
+{
+	assert(mut);
+
+	if (mut->owner == System.cur)
+	{
+		mut->owner = core_one_wakeup(&mut->obj.queue, E_SUCCESS);
+		return E_SUCCESS;
+	}
+
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -151,19 +190,10 @@ unsigned mut_give( mut_t *mut )
 	unsigned event;
 
 	assert(!port_isr_context());
-	assert(mut);
 
 	sys_lock();
 	{
-		if (mut->owner == System.cur)
-		{
-			mut->owner = core_one_wakeup(&mut->obj.queue, E_SUCCESS);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
+		event = priv_mut_give(mut);
 	}
 	sys_unlock();
 

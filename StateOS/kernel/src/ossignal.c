@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    16.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -99,36 +99,10 @@ void sig_delete( sig_t *sig )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_take( sig_t *sig )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert(sig);
-
-	sys_lock();
-	{
-		if (sig->flag)
-		{
-			sig->flag = sig->type;
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
-	}
-	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
 static
-unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_sig_take( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
 	assert(sig);
 
 	if (sig->flag)
@@ -137,7 +111,22 @@ unsigned priv_sig_wait( sig_t *sig, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 		return E_SUCCESS;
 	}
 
-	return wait(&sig->obj.queue, time);
+	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned sig_take( sig_t *sig )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_sig_take(sig);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -146,9 +135,14 @@ unsigned sig_waitFor( sig_t *sig, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_sig_wait(sig, delay, core_tsk_waitFor);
+		event = priv_sig_take(sig);
+
+		if (event != E_SUCCESS)
+			event = core_tsk_waitFor(&sig->obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -161,9 +155,14 @@ unsigned sig_waitUntil( sig_t *sig, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_sig_wait(sig, time, core_tsk_waitUntil);
+		event = priv_sig_take(sig);
+
+		if (event != E_SUCCESS)
+			event = core_tsk_waitUntil(&sig->obj.queue, time);
 	}
 	sys_unlock();
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    14.09.2018
+    @date    17.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -421,8 +421,7 @@ unsigned mtx_lock( mtx_t *mtx ) { return mtx_wait(mtx); }
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-unsigned mtx_take( mtx_t *mtx ) { return mtx_waitFor(mtx, IMMEDIATE); }
+unsigned mtx_take( mtx_t *mtx );
 
 __STATIC_INLINE
 unsigned mtx_tryLock( mtx_t *mtx ) { return mtx_take(mtx); }

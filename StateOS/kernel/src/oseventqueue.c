@@ -207,38 +207,10 @@ void priv_evq_skipUpdate( evq_t *evq )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evq_take( evq_t *evq, unsigned *data )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert(evq);
-	assert(evq->data);
-	assert(evq->limit);
-
-	sys_lock();
-	{
-		if (evq->count > 0)
-		{
-			priv_evq_getUpdate(evq, data);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
-	}
-	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
 static
-unsigned priv_evq_wait( evq_t *evq, unsigned *data, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_evq_take( evq_t *evq, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
 	assert(evq);
 	assert(evq->data);
 	assert(evq->limit);
@@ -249,8 +221,22 @@ unsigned priv_evq_wait( evq_t *evq, unsigned *data, cnt_t time, unsigned(*wait)(
 		return E_SUCCESS;
 	}
 
-	System.cur->tmp.evq.data.in = data;
-	return wait(&evq->obj.queue, time);
+	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evq_take( evq_t *evq, unsigned *data )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_evq_take(evq, data);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -259,9 +245,17 @@ unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_evq_wait(evq, data, delay, core_tsk_waitFor);
+		event = priv_evq_take(evq, data);
+
+		if (event != E_SUCCESS)
+		{
+			System.cur->tmp.evq.data.in = data;
+			event = core_tsk_waitFor(&evq->obj.queue, delay);
+		}
 	}
 	sys_unlock();
 
@@ -274,35 +268,16 @@ unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time )
 {
 	unsigned event;
 
-	sys_lock();
-	{
-		event = priv_evq_wait(evq, data, time, core_tsk_waitUntil);
-	}
-	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned evq_give( evq_t *evq, unsigned data )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert(evq);
-	assert(evq->data);
-	assert(evq->limit);
+	assert(!port_isr_context());
 
 	sys_lock();
 	{
-		if (evq->count < evq->limit)
+		event = priv_evq_take(evq, data);
+
+		if (event != E_SUCCESS)
 		{
-			priv_evq_putUpdate(evq, data);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
+			System.cur->tmp.evq.data.in = data;
+			event = core_tsk_waitUntil(&evq->obj.queue, time);
 		}
 	}
 	sys_unlock();
@@ -312,10 +287,9 @@ unsigned evq_give( evq_t *evq, unsigned data )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
+unsigned priv_evq_give( evq_t *evq, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
 	assert(evq);
 	assert(evq->data);
 	assert(evq->limit);
@@ -326,8 +300,22 @@ unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(t
 		return E_SUCCESS;
 	}
 
-	System.cur->tmp.evq.data.out = data;
-	return wait(&evq->obj.queue, time);
+	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evq_give( evq_t *evq, unsigned data )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_evq_give(evq, data);
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -336,9 +324,17 @@ unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_evq_send(evq, data, delay, core_tsk_waitFor);
+		event = priv_evq_give(evq, data);
+
+		if (event != E_SUCCESS)
+		{
+			System.cur->tmp.evq.data.out = data;
+			event = core_tsk_waitFor(&evq->obj.queue, delay);
+		}
 	}
 	sys_unlock();
 
@@ -351,9 +347,17 @@ unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
 {
 	unsigned event;
 
+	assert(!port_isr_context());
+
 	sys_lock();
 	{
-		event = priv_evq_send(evq, data, time, core_tsk_waitUntil);
+		event = priv_evq_give(evq, data);
+
+		if (event != E_SUCCESS)
+		{
+			System.cur->tmp.evq.data.out = data;
+			event = core_tsk_waitUntil(&evq->obj.queue, time);
+		}
 	}
 	sys_unlock();
 
