@@ -224,7 +224,7 @@ unsigned priv_msg_getUpdate( msg_t *msg, char *data, unsigned size )
 	size = priv_msg_getSize(msg);
 	priv_msg_get(msg, data, size);
 
-	while (msg->obj.queue != 0 && msg->obj.queue->tmp.msg.size <= priv_msg_space(msg))
+	while (msg->obj.queue != 0 && msg->count + sizeof(unsigned) + msg->obj.queue->tmp.msg.size <= msg->limit)
 	{
 		priv_msg_putSize(msg, msg->obj.queue->tmp.msg.size);
 		priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
@@ -240,8 +240,6 @@ static
 void priv_msg_putUpdate( msg_t *msg, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	assert(size <= priv_msg_space(msg));
-
 	priv_msg_putSize(msg, size);
 	priv_msg_put(msg, data, size);
 
