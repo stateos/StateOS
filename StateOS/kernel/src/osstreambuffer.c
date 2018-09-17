@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    17.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -182,7 +182,7 @@ unsigned priv_stm_getUpdate( stm_t *stm, char *data, unsigned size )
 		size = stm->count;
 	priv_stm_get(stm, data, size);
 
-	while (stm->obj.queue != 0 && stm->obj.queue->tmp.stm.size <= priv_stm_space(stm))
+	while (stm->obj.queue != 0 && stm->count + stm->obj.queue->tmp.stm.size <= stm->limit)
 	{
 		priv_stm_put(stm, stm->obj.queue->tmp.stm.data.out, stm->obj.queue->tmp.stm.size);
 		stm->obj.queue->tmp.stm.size = 0;
@@ -197,12 +197,12 @@ static
 void priv_stm_putUpdate( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	assert(size <= priv_stm_space(stm));
-
 	priv_stm_put(stm, data, size);
 
-	while (stm->obj.queue != 0 && (size = priv_stm_count(stm)) > 0)
+	while (stm->obj.queue != 0 && stm->count > 0)
 	{
+		size = stm->count;
+
 		if (size > stm->obj.queue->tmp.stm.size)
 			size = stm->obj.queue->tmp.stm.size;
 
@@ -213,12 +213,36 @@ void priv_stm_putUpdate( stm_t *stm, const char *data, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_stm_skipUpdate( stm_t *stm, unsigned size )
+/* -------------------------------------------------------------------------- */
+{
+	while (size > priv_stm_space(stm))
+	{
+		if (stm->obj.queue != 0)
+		{
+			if (stm->count + stm->obj.queue->tmp.stm.size > stm->limit)
+				priv_stm_skip(stm, stm->count + stm->obj.queue->tmp.stm.size - stm->limit);
+			priv_stm_put(stm, stm->obj.queue->tmp.stm.data.out, stm->obj.queue->tmp.stm.size);
+			stm->obj.queue->tmp.stm.size = 0;
+			core_tsk_wakeup(stm->obj.queue, E_SUCCESS);
+		}
+
+		if (stm->count + size > stm->limit)
+			priv_stm_skip(stm, stm->count + size - stm->limit);
+	}
+
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned stm_take( stm_t *stm, void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned len = 0;
 
 	assert(stm);
+	assert(stm->data);
+	assert(stm->limit);
 	assert(data);
 
 	sys_lock();
@@ -242,6 +266,8 @@ unsigned priv_stm_wait( stm_t *stm, char *data, unsigned size, cnt_t time, unsig
 {
 	assert(!port_isr_context());
 	assert(stm);
+	assert(stm->data);
+	assert(stm->limit);
 	assert(data);
 
 	if (stm->count > 0)
@@ -297,6 +323,8 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 	unsigned len = 0;
 
 	assert(stm);
+	assert(stm->data);
+	assert(stm->limit);
 	assert(data);
 
 	sys_lock();
@@ -320,6 +348,8 @@ unsigned priv_stm_send( stm_t *stm, const char *data, unsigned size, cnt_t time,
 {
 	assert(!port_isr_context());
 	assert(stm);
+	assert(stm->data);
+	assert(stm->limit);
 	assert(data);
 
 	if (size <= priv_stm_space(stm))
@@ -375,16 +405,16 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 	unsigned len = 0;
 
 	assert(stm);
+	assert(stm->data);
+	assert(stm->limit);
 	assert(data);
 
 	sys_lock();
 	{
-		if ((stm->count == 0 || stm->obj.queue == 0) && size <= priv_stm_limit(stm))
+		if (size > 0 && size <= priv_stm_limit(stm))
 		{
-			if (size > priv_stm_space(stm))
-				priv_stm_skip(stm, size - priv_stm_space(stm));
-			if (size > 0)
-				priv_stm_putUpdate(stm, data, size);
+			priv_stm_skipUpdate(stm, size);
+			priv_stm_putUpdate(stm, data, size);
 			len = size;
 		}
 	}

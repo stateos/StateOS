@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    17.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -453,18 +453,16 @@ unsigned evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); 
  *   evq             : pointer to event queue object
  *   data            : event value
  *
- * Return
- *   E_SUCCESS       : event data was successfully transfered to the event queue object
- *   E_TIMEOUT       : there are tasks waiting for writing to the event queue object
+ * Return            : none
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned evq_push( evq_t *evq, unsigned data );
+void evq_push( evq_t *evq, unsigned data );
 
 __STATIC_INLINE
-unsigned evq_pushISR( evq_t *evq, unsigned data ) { return evq_push(evq, data); }
+void evq_pushISR( evq_t *evq, unsigned data ) { evq_push(evq, data); }
 
 #ifdef __cplusplus
 }
@@ -503,8 +501,14 @@ struct EventQueueT : public __evq
 	unsigned send     ( unsigned  _data )               { return evq_send     (this, _data);         }
 	unsigned give     ( unsigned  _data )               { return evq_give     (this, _data);         }
 	unsigned giveISR  ( unsigned  _data )               { return evq_giveISR  (this, _data);         }
-	unsigned push     ( unsigned  _data )               { return evq_push     (this, _data);         }
-	unsigned pushISR  ( unsigned  _data )               { return evq_pushISR  (this, _data);         }
+	void     push     ( unsigned  _data )               {        evq_push     (this, _data);         }
+	void     pushISR  ( unsigned  _data )               {        evq_pushISR  (this, _data);         }
+	unsigned count    ( void )                          { return evq_count    (this);                }
+	unsigned countISR ( void )                          { return evq_countISR (this);                }
+	unsigned space    ( void )                          { return evq_space    (this);                }
+	unsigned spaceISR ( void )                          { return evq_spaceISR (this);                }
+	unsigned limit    ( void )                          { return evq_limit    (this);                }
+	unsigned limitISR ( void )                          { return evq_limitISR (this);                }
 
 	private:
 	unsigned data_[limit_];

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    17.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -463,18 +463,16 @@ unsigned box_giveISR( box_t *box, const void *data ) { return box_give(box, data
  *   box             : pointer to mailbox queue object
  *   data            : pointer to mailbox data
  *
- * Return
- *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
- *   E_TIMEOUT       : there are tasks waiting for writing to the mailbox queue object
+ * Return            : none
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned box_push( box_t *box, const void *data );
+void box_push( box_t *box, const void *data );
 
 __STATIC_INLINE
-unsigned box_pushISR( box_t *box, const void *data ) { return box_push(box, data); }
+void box_pushISR( box_t *box, const void *data ) { box_push(box, data); }
 
 /******************************************************************************
  *
@@ -552,12 +550,14 @@ struct MailBoxQueueT : public __box
 	unsigned send     ( const void *_data )               { return box_send     (this, _data);         }
 	unsigned give     ( const void *_data )               { return box_give     (this, _data);         }
 	unsigned giveISR  ( const void *_data )               { return box_giveISR  (this, _data);         }
-	unsigned push     ( const void *_data )               { return box_push     (this, _data);         }
-	unsigned pushISR  ( const void *_data )               { return box_pushISR  (this, _data);         }
+	void     push     ( const void *_data )               {        box_push     (this, _data);         }
+	void     pushISR  ( const void *_data )               {        box_pushISR  (this, _data);         }
 	unsigned count    ( void )                            { return box_count    (this);                }
 	unsigned countISR ( void )                            { return box_countISR (this);                }
 	unsigned space    ( void )                            { return box_space    (this);                }
 	unsigned spaceISR ( void )                            { return box_spaceISR (this);                }
+	unsigned limit    ( void )                            { return box_limit    (this);                }
+	unsigned limitISR ( void )                            { return box_limitISR (this);                }
 
 	private:
 	char data_[limit_ * size_];

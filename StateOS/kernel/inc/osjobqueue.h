@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    17.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -450,18 +450,16 @@ unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_give(job, fun); }
  *   job             : pointer to job queue object
  *   fun             : pointer to job procedure
  *
- * Return
- *   E_SUCCESS       : job data was successfully transfered to the job queue object
- *   E_TIMEOUT       : there are tasks waiting for writing to the job queue object
+ * Return            : none
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned job_push( job_t *job, fun_t *fun );
+void job_push( job_t *job, fun_t *fun );
 
 __STATIC_INLINE
-unsigned job_pushISR( job_t *job, fun_t *fun ) { return job_push(job, fun); }
+void job_pushISR( job_t *job, fun_t *fun ) { job_push(job, fun); }
 
 #ifdef __cplusplus
 }
@@ -503,8 +501,14 @@ struct staticJobQueueT : public __job
 	unsigned send     ( fun_t *_fun )               { return job_send     (this, _fun);         }
 	unsigned give     ( fun_t *_fun )               { return job_give     (this, _fun);         }
 	unsigned giveISR  ( fun_t *_fun )               { return job_giveISR  (this, _fun);         }
-	unsigned push     ( fun_t *_fun )               { return job_push     (this, _fun);         }
-	unsigned pushISR  ( fun_t *_fun )               { return job_pushISR  (this, _fun);         }
+	void     push     ( fun_t *_fun )               {        job_push     (this, _fun);         }
+	void     pushISR  ( fun_t *_fun )               {        job_pushISR  (this, _fun);         }
+	unsigned count    ( void )                      { return job_count    (this);               }
+	unsigned countISR ( void )                      { return job_countISR (this);               }
+	unsigned space    ( void )                      { return job_space    (this);               }
+	unsigned spaceISR ( void )                      { return job_spaceISR (this);               }
+	unsigned limit    ( void )                      { return job_limit    (this);               }
+	unsigned limitISR ( void )                      { return job_limitISR (this);               }
 
 	private:
 	fun_t *data_[limit_];
@@ -541,8 +545,14 @@ struct JobQueueT : public __box
 	unsigned send     ( FUN_t _fun )               {             unsigned event = box_send     (this, &_fun);                                         return event; }
 	unsigned give     ( FUN_t _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
 	unsigned giveISR  ( FUN_t _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
-	unsigned push     ( FUN_t _fun )               {             unsigned event = box_push     (this, &_fun);                                         return event; }
-	unsigned pushISR  ( FUN_t _fun )               {             unsigned event = box_pushISR  (this, &_fun);                                         return event; }
+	void     push     ( FUN_t _fun )               {                              box_push     (this, &_fun);                                                       }
+	void     pushISR  ( FUN_t _fun )               {                              box_pushISR  (this, &_fun);                                                       }
+	unsigned count    ( void )                     {             unsigned count = box_count    (this);                                                return count; }
+	unsigned countISR ( void )                     {             unsigned count = box_countISR (this);                                                return count; }
+	unsigned space    ( void )                     {             unsigned space = box_space    (this);                                                return space; }
+	unsigned spaceISR ( void )                     {             unsigned space = box_spaceISR (this);                                                return space; }
+	unsigned limit    ( void )                     {             unsigned limit = box_limit    (this);                                                return limit; }
+	unsigned limitISR ( void )                     {             unsigned limit = box_limitISR (this);                                                return limit; }
 
 	private:
 	FUN_t data_[limit_];

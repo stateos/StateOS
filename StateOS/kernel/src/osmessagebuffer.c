@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    17.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -262,12 +262,33 @@ void priv_msg_putUpdate( msg_t *msg, const char *data, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_msg_skipUpdate( msg_t *msg, unsigned size )
+/* -------------------------------------------------------------------------- */
+{
+	while (size > priv_msg_space(msg))
+	{
+		priv_msg_skip(msg, priv_msg_getSize(msg));
+
+		while (msg->obj.queue != 0 && msg->count + sizeof(unsigned) + msg->obj.queue->tmp.msg.size <= msg->limit)
+		{
+			priv_msg_putSize(msg, msg->obj.queue->tmp.msg.size);
+			priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
+			msg->obj.queue->tmp.msg.size = 0;
+			core_tsk_wakeup(msg->obj.queue, E_SUCCESS);
+		}
+	}
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned msg_take( msg_t *msg, void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned len = 0;
 
 	assert(msg);
+	assert(msg->data);
+	assert(msg->limit);
 	assert(data);
 
 	sys_lock();
@@ -290,6 +311,8 @@ unsigned priv_msg_wait( msg_t *msg, char *data, unsigned size, cnt_t time, unsig
 {
 	assert(!port_isr_context());
 	assert(msg);
+	assert(msg->data);
+	assert(msg->limit);
 	assert(data);
 
 	if (msg->count > 0)
@@ -345,6 +368,8 @@ unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 	unsigned len = 0;
 
 	assert(msg);
+	assert(msg->data);
+	assert(msg->limit);
 	assert(data);
 
 	sys_lock();
@@ -368,6 +393,8 @@ unsigned priv_msg_send( msg_t *msg, const char *data, unsigned size, cnt_t time,
 {
 	assert(!port_isr_context());
 	assert(msg);
+	assert(msg->data);
+	assert(msg->limit);
 	assert(data);
 
 	if (size <= priv_msg_space(msg))
@@ -423,16 +450,16 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 	unsigned len = 0;
 
 	assert(msg);
+	assert(msg->data);
+	assert(msg->limit);
 	assert(data);
 
 	sys_lock();
 	{
-		if ((msg->count == 0 || msg->obj.queue == 0) && size <= priv_msg_limit(msg))
+		if (size > 0 && size <= priv_msg_limit(msg))
 		{
-			while (size > priv_msg_space(msg))
-				priv_msg_skip(msg, priv_msg_getSize(msg));
-			if (size > 0)
-				priv_msg_putUpdate(msg, data, size);
+			priv_msg_skipUpdate(msg, size);
+			priv_msg_putUpdate(msg, data, size);
 			len = size;
 		}
 	}

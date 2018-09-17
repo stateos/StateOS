@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    17.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -53,6 +53,30 @@ void job_init( job_t *job, fun_t **data, unsigned bufsize )
 		job->data  = data;
 	}
 	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_job_count( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	return job->count;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_job_space( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	return job->limit - job->count;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_job_limit( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	return job->limit;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -173,6 +197,21 @@ void priv_job_putUpdate( job_t *job, fun_t *fun )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_job_skipUpdate( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	while (job->count == job->limit)
+	{
+		priv_job_skip(job);
+		tsk = core_one_wakeup(&job->obj.queue, E_SUCCESS);
+		if (tsk) priv_job_put(job, tsk->tmp.job.fun);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned job_take( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
@@ -180,6 +219,8 @@ unsigned job_take( job_t *job )
 	unsigned event;
 
 	assert(job);
+	assert(job->data);
+	assert(job->limit);
 
 	sys_lock();
 	{
@@ -212,6 +253,8 @@ unsigned priv_job_wait( job_t *job, cnt_t time, unsigned(*wait)(tsk_t**,cnt_t) )
 
 	assert(!port_isr_context());
 	assert(job);
+	assert(job->data);
+	assert(job->limit);
 
 	if (job->count > 0)
 	{
@@ -270,6 +313,8 @@ unsigned job_give( job_t *job, fun_t *fun )
 	unsigned event;
 
 	assert(job);
+	assert(job->data);
+	assert(job->limit);
 	assert(fun);
 
 	sys_lock();
@@ -296,6 +341,8 @@ unsigned priv_job_send( job_t *job, fun_t *fun, cnt_t time, unsigned(*wait)(tsk_
 {
 	assert(!port_isr_context());
 	assert(job);
+	assert(job->data);
+	assert(job->limit);
 	assert(fun);
 
 	if (job->count < job->limit)
@@ -339,31 +386,71 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_push( job_t *job, fun_t *fun )
+void job_push( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(job);
+	assert(job->data);
+	assert(job->limit);
 	assert(fun);
 
 	sys_lock();
 	{
-		if (job->count == 0 || job->obj.queue == 0)
-		{
-			if (job->count == job->limit)
-				priv_job_skip(job);
-			priv_job_putUpdate(job, fun);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
+		priv_job_skipUpdate(job);
+		priv_job_putUpdate(job, fun);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned job_count( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned cnt;
+
+	assert(job);
+
+	sys_lock();
+	{
+		cnt = priv_job_count(job);
 	}
 	sys_unlock();
 
-	return event;
+	return cnt;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned job_space( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned cnt;
+
+	assert(job);
+
+	sys_lock();
+	{
+		cnt = priv_job_space(job);
+	}
+	sys_unlock();
+
+	return cnt;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned job_limit( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned cnt;
+
+	assert(job);
+
+	sys_lock();
+	{
+		cnt = priv_job_limit(job);
+	}
+	sys_unlock();
+
+	return cnt;
 }
 
 /* -------------------------------------------------------------------------- */

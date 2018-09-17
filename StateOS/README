@@ -43,6 +43,7 @@ Features:
 - added once flag object
 - added mutex mode (type, protocol, robustness)
 - updated flag object
+- updated queue/buffer objects
 ---------
 6.2
 - updated kernel

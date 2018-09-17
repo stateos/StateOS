@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    17.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -128,6 +128,14 @@ unsigned priv_box_space( box_t *box )
 
 /* -------------------------------------------------------------------------- */
 static
+unsigned priv_box_limit( box_t *box )
+/* -------------------------------------------------------------------------- */
+{
+	return box->limit / box->size;
+}
+
+/* -------------------------------------------------------------------------- */
+static
 void priv_box_get( box_t *box, char *data )
 /* -------------------------------------------------------------------------- */
 {
@@ -189,12 +197,29 @@ void priv_box_putUpdate( box_t *box, const char *data )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_box_skipUpdate( box_t *box )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	while (box->count == box->limit)
+	{
+		priv_box_skip(box);
+		tsk = core_one_wakeup(&box->obj.queue, E_SUCCESS);
+		if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned box_take( box_t *box, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	assert(box);
+	assert(box->data);
+	assert(box->limit);
 	assert(data);
 
 	sys_lock();
@@ -221,6 +246,8 @@ unsigned priv_box_wait( box_t *box, void *data, cnt_t time, unsigned(*wait)(tsk_
 {
 	assert(!port_isr_context());
 	assert(box);
+	assert(box->data);
+	assert(box->limit);
 	assert(data);
 
 	if (box->count > 0)
@@ -270,6 +297,8 @@ unsigned box_give( box_t *box, const void *data )
 	unsigned event;
 
 	assert(box);
+	assert(box->data);
+	assert(box->limit);
 	assert(data);
 
 	sys_lock();
@@ -296,6 +325,8 @@ unsigned priv_box_send( box_t *box, const void *data, cnt_t time, unsigned(*wait
 {
 	assert(!port_isr_context());
 	assert(box);
+	assert(box->data);
+	assert(box->limit);
 	assert(data);
 
 	if (box->count < box->limit)
@@ -339,31 +370,20 @@ unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_push( box_t *box, const void *data )
+void box_push( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert(box);
+	assert(box->data);
+	assert(box->limit);
 	assert(data);
 
 	sys_lock();
 	{
-		if (box->count == 0 || box->obj.queue == 0)
-		{
-			if (box->count == box->limit)
-				priv_box_skip(box);
-			priv_box_putUpdate(box, data);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
+		priv_box_skipUpdate(box);
+		priv_box_putUpdate(box, data);
 	}
 	sys_unlock();
-
-	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -394,6 +414,23 @@ unsigned box_space( box_t *box )
 	sys_lock();
 	{
 		cnt = priv_box_space(box);
+	}
+	sys_unlock();
+
+	return cnt;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned box_limit( box_t *box )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned cnt;
+
+	assert(box);
+
+	sys_lock();
+	{
+		cnt = priv_box_limit(box);
 	}
 	sys_unlock();
 

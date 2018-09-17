@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    08.09.2018
+    @date    17.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -53,6 +53,30 @@ void evq_init( evq_t *evq, unsigned *data, unsigned bufsize )
 		evq->data  = data;
 	}
 	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_evq_count( evq_t *evq )
+/* -------------------------------------------------------------------------- */
+{
+	return evq->count;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_evq_space( evq_t *evq )
+/* -------------------------------------------------------------------------- */
+{
+	return evq->limit - evq->count;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_evq_limit( evq_t *evq )
+/* -------------------------------------------------------------------------- */
+{
+	return evq->limit;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -168,12 +192,29 @@ void priv_evq_putUpdate( evq_t *evq, const unsigned data )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_evq_skipUpdate( evq_t *evq )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	while (evq->count == evq->limit)
+	{
+		priv_evq_skip(evq);
+		tsk = core_one_wakeup(&evq->obj.queue, E_SUCCESS);
+		if (tsk) priv_evq_put(evq, tsk->tmp.evq.data.out);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned evq_take( evq_t *evq, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	assert(evq);
+	assert(evq->data);
+	assert(evq->limit);
 
 	sys_lock();
 	{
@@ -199,6 +240,8 @@ unsigned priv_evq_wait( evq_t *evq, unsigned *data, cnt_t time, unsigned(*wait)(
 {
 	assert(!port_isr_context());
 	assert(evq);
+	assert(evq->data);
+	assert(evq->limit);
 
 	if (evq->count > 0)
 	{
@@ -247,6 +290,8 @@ unsigned evq_give( evq_t *evq, unsigned data )
 	unsigned event;
 
 	assert(evq);
+	assert(evq->data);
+	assert(evq->limit);
 
 	sys_lock();
 	{
@@ -272,6 +317,8 @@ unsigned priv_evq_send( evq_t *evq, unsigned data, cnt_t time, unsigned(*wait)(t
 {
 	assert(!port_isr_context());
 	assert(evq);
+	assert(evq->data);
+	assert(evq->limit);
 
 	if (evq->count < evq->limit)
 	{
@@ -314,30 +361,70 @@ unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evq_push( evq_t *evq, unsigned data )
+void evq_push( evq_t *evq, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	assert(evq);
+	assert(evq->data);
+	assert(evq->limit);
+
+	sys_lock();
+	{
+		priv_evq_skipUpdate(evq);
+		priv_evq_putUpdate(evq, data);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evq_count( evq_t *evq )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned cnt;
 
 	assert(evq);
 
 	sys_lock();
 	{
-		if (evq->count == 0 || evq->obj.queue == 0)
-		{
-			if (evq->count == evq->limit)
-				priv_evq_skip(evq);
-			priv_evq_putUpdate(evq, data);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_TIMEOUT;
-		}
+		cnt = priv_evq_count(evq);
 	}
 	sys_unlock();
 
-	return event;
+	return cnt;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evq_space( evq_t *evq )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned cnt;
+
+	assert(evq);
+
+	sys_lock();
+	{
+		cnt = priv_evq_space(evq);
+	}
+	sys_unlock();
+
+	return cnt;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned evq_limit( evq_t *evq )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned cnt;
+
+	assert(evq);
+
+	sys_lock();
+	{
+		cnt = priv_evq_limit(evq);
+	}
+	sys_unlock();
+
+	return cnt;
 }
 
 /* -------------------------------------------------------------------------- */
