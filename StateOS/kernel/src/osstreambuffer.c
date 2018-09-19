@@ -109,30 +109,6 @@ void stm_delete( stm_t *stm )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_count( stm_t *stm )
-/* -------------------------------------------------------------------------- */
-{
-	return stm->count;
-}
-
-/* -------------------------------------------------------------------------- */
-static
-unsigned priv_stm_space( stm_t *stm )
-/* -------------------------------------------------------------------------- */
-{
-	return (stm->count == 0 || stm->obj.queue == 0) ? stm->limit - stm->count : 0;
-}
-
-/* -------------------------------------------------------------------------- */
-static
-unsigned priv_stm_limit( stm_t *stm )
-/* -------------------------------------------------------------------------- */
-{
-	return stm->limit;
-}
-
-/* -------------------------------------------------------------------------- */
-static
 void priv_stm_get( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
@@ -319,7 +295,7 @@ unsigned priv_stm_give( stm_t *stm, const char *data, unsigned size )
 	assert(stm->limit);
 	assert(data);
 
-	if (size > 0 && size <= priv_stm_space(stm))
+	if (size > 0 && stm->count + size <= stm->limit)
 	{
 		priv_stm_putUpdate(stm, data, size);
 		return size;
@@ -355,7 +331,7 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
 	{
 		len = priv_stm_give(stm, data, size);
 
-		if (len == 0 && size > 0 && size <= priv_stm_limit(stm))
+		if (len == 0 && size > 0 && size <= stm->limit)
 		{
 			System.cur->tmp.stm.data.out = data;
 			System.cur->tmp.stm.size = size;
@@ -380,7 +356,7 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
 	{
 		len = priv_stm_give(stm, data, size);
 
-		if (len == 0 && size > 0 && size <= priv_stm_limit(stm))
+		if (len == 0 && size > 0 && size <= stm->limit)
 		{
 			System.cur->tmp.stm.data.out = data;
 			System.cur->tmp.stm.size = size;
@@ -406,7 +382,7 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 
 	sys_lock();
 	{
-		if (size > 0 && size <= priv_stm_limit(stm))
+		if (size > 0 && size <= stm->limit)
 		{
 			priv_stm_skipUpdate(stm, size);
 			priv_stm_putUpdate(stm, data, size);
