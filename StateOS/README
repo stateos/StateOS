@@ -44,7 +44,7 @@ Features:
 - added mutex mode (type, protocol, robustness)
 - updated flag object
 - updated queue/buffer objects
-- updated object functions
+- updated queue/buffer functions
 ---------
 6.2
 - updated kernel

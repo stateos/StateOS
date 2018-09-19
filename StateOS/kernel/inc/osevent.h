@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    08.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -222,10 +222,9 @@ void evt_delete( evt_t *evt );
  *                     IMMEDIATE: don't wait until the event object has been released
  *                     INFINITE:  wait indefinitely until the event object has been released
  *
- * Return
+ * Return            : event value or
  *   E_STOPPED       : event object was killed before the specified timeout expired
  *   E_TIMEOUT       : event object was not released before the specified timeout expired
- *   'another'       : event object was successfully released
  *
  * Note              : use only in thread mode
  *
@@ -243,10 +242,9 @@ unsigned evt_waitFor( evt_t *evt, cnt_t delay );
  *   evt             : pointer to event object
  *   time            : timepoint value
  *
- * Return
+ * Return            : event value or
  *   E_STOPPED       : event object was killed before the specified timeout expired
  *   E_TIMEOUT       : event object was not released before the specified timeout expired
- *   'another'       : event object was successfully released
  *
  * Note              : use only in thread mode
  *
@@ -263,9 +261,8 @@ unsigned evt_waitUntil( evt_t *evt, cnt_t time );
  * Parameters
  *   evt             : pointer to event object
  *
- * Return
- *   E_STOPPED       : event object was killed
- *   'another'       : event object was successfully released
+ * Return            : event value or
+ *   E_STOPPED       : event object was killed before the specified timeout expired
  *
  * Note              : use only in thread mode
  *

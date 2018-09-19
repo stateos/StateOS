@@ -277,7 +277,8 @@ void stm_delete( stm_t *stm );
  *   data            : pointer to write buffer
  *   size            : size of write buffer
  *
- * Return            : number of bytes read from the stream buffer
+ * Return            : number of bytes read from the stream buffer or
+ *   E_TIMEOUT       : stream buffer object is empty
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -306,7 +307,9 @@ unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(
  *                     IMMEDIATE: don't wait if the stream buffer object is empty
  *                     INFINITE:  wait indefinitely while the stream buffer object is empty
  *
- * Return            : number of bytes read from the stream buffer
+ * Return            : number of bytes read from the stream buffer or
+ *   E_STOPPED       : stream buffer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : stream buffer object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -327,7 +330,9 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
  *   size            : size of write buffer
  *   time            : timepoint value
  *
- * Return            : number of bytes read from the stream buffer
+ * Return            : number of bytes read from the stream buffer or
+ *   E_STOPPED       : stream buffer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : stream buffer object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -347,7 +352,8 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
  *   data            : pointer to write buffer
  *   size            : size of write buffer
  *
- * Return            : number of bytes read from the stream buffer
+ * Return            : number of bytes read from the stream buffer or
+ *   E_STOPPED       : stream buffer object was killed before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -369,7 +375,9 @@ unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(
  *   data            : pointer to read buffer
  *   size            : size of read buffer
  *
- * Return            : number of bytes written to the stream buffer
+ * Return
+ *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
+ *   E_TIMEOUT       : not enough space in the stream buffer
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -395,7 +403,11 @@ unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm
  *                     IMMEDIATE: don't wait if the stream buffer object is full
  *                     INFINITE:  wait indefinitely while the stream buffer object is full
  *
- * Return            : number of bytes written to the stream buffer
+ * Return
+ *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
+ *   E_STOPPED       : stream buffer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : size of the stream data is out of the limit or
+ *                     stream buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -416,7 +428,11 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
  *   size            : size of read buffer
  *   time            : timepoint value
  *
- * Return            : number of bytes written to the stream buffer
+ * Return
+ *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
+ *   E_STOPPED       : stream buffer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : size of the stream data is out of the limit or
+ *                     stream buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -436,7 +452,10 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
  *   data            : pointer to read buffer
  *   size            : size of read buffer
  *
- * Return            : number of bytes written to the stream buffer
+ * Return
+ *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
+ *   E_STOPPED       : stream buffer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : size of the stream data is out of the limit
  *
  * Note              : use only in thread mode
  *
@@ -458,7 +477,9 @@ unsigned stm_send( stm_t *stm, const void *data, unsigned size ) { return stm_se
  *   data            : pointer to read buffer
  *   size            : size of read buffer
  *
- * Return            : number of bytes written to the stream buffer
+ * Return
+ *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
+ *   E_TIMEOUT       : size of the stream data is out of the limit
  *
  * Note              : may be used both in thread and handler mode
  *

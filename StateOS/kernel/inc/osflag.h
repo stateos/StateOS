@@ -262,9 +262,8 @@ void flg_delete( flg_t *flg );
  *                     flgIgnore:  ignore flags in flag object that have been set and not accepted before
  *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
  *
- * Return
+ * Return            : flags that remain to be set or
  *   0               : requested flags have been set
- *   'another'       : flags that remain to be set
  *
  * Note              : may be used both in thread and handler mode
  *

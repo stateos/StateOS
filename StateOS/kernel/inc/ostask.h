@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    11.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -855,10 +855,9 @@ unsigned tsk_getPrio( void );
  *                     IMMEDIATE: don't delay execution of current task
  *                     INFINITE:  delay indefinitely execution of current task
  *
- * Return
+ * Return            : event value or
+ *   0               : requested flags have been set
  *   E_TIMEOUT       : task object was not released before the specified timeout expired
- *   0               : task object resumed by direct transfer of all flags (tsk_give)
- *   'another'       : task object resumed by direct transfer of any event (tsk_give)
  *
  * Note              : use only in thread mode
  *
@@ -877,10 +876,9 @@ unsigned tsk_waitFor( unsigned flags, cnt_t delay );
  *                     0: wait for any event
  *   time            : timepoint value
  *
- * Return
+ * Return            : event value or
+ *   0               : requested flags have been set
  *   E_TIMEOUT       : task object was not released before the specified timeout expired
- *   0               : task object resumed by direct transfer of all flags (tsk_give)
- *   'another'       : task object resumed by direct transfer of any event (tsk_give)
  *
  * Note              : use only in thread mode
  *
@@ -898,9 +896,8 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time );
  *   flags           : all flags to wait
  *                     0: wait for any event
  *
- * Return
- *   0               : task object resumed by direct transfer of all flags (tsk_give)
- *   'another'       : task object resumed by direct transfer of any event (tsk_give)
+ * Return            : event value or
+ *   0               : requested flags have been set
  *
  * Note              : use only in thread mode
  *

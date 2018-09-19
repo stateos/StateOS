@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    18.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -330,7 +330,9 @@ unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay );
  *   size            : size of write buffer
  *   time            : timepoint value
  *
- * Return            : number of bytes read from the message buffer
+ * Return            : number of bytes read from the message buffer or
+ *   E_STOPPED       : message buffer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : message buffer object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -350,7 +352,8 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time );
  *   data            : pointer to write buffer
  *   size            : size of write buffer
  *
- * Return            : number of bytes read from the message buffer
+ * Return            : number of bytes read from the message buffer or
+ *   E_STOPPED       : message buffer object was killed before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -372,7 +375,9 @@ unsigned msg_wait( msg_t *msg, void *data, unsigned size ) { return msg_waitFor(
  *   data            : pointer to read buffer
  *   size            : size of read buffer
  *
- * Return            : number of bytes written to the message buffer
+ * Return
+ *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_TIMEOUT       : not enough space in the message buffer
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -398,7 +403,11 @@ unsigned msg_giveISR( msg_t *msg, const void *data, unsigned size ) { return msg
  *                     IMMEDIATE: don't wait if the message buffer object is full
  *                     INFINITE:  wait indefinitely while the message buffer object is full
  *
- * Return            : number of bytes written to the message buffer
+ * Return
+ *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_STOPPED       : message buffer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : size of the message data is out of the limit or
+ *                     message buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -419,7 +428,11 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
  *   size            : size of read buffer
  *   time            : timepoint value
  *
- * Return            : number of bytes written to the message buffer
+ * Return
+ *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_STOPPED       : message buffer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : size of the message data is out of the limit or
+ *                     message buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -439,7 +452,10 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
  *   data            : pointer to read buffer
  *   size            : size of read buffer
  *
- * Return            : number of bytes written to the message buffer
+ * Return
+ *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_STOPPED       : message buffer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : size of the message data is out of the limit
  *
  * Note              : use only in thread mode
  *
@@ -461,7 +477,9 @@ unsigned msg_send( msg_t *msg, const void *data, unsigned size ) { return msg_se
  *   data            : pointer to read buffer
  *   size            : size of read buffer
  *
- * Return            : number of bytes written to the message buffer
+ * Return
+ *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_TIMEOUT       : size of the message data is out of the limit
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -535,6 +553,27 @@ unsigned msg_limit( msg_t *msg );
 __STATIC_INLINE
 unsigned msg_limitISR( msg_t *msg ) { return msg_limit(msg); }
 
+/******************************************************************************
+ *
+ * Name              : msg_size
+ * ISR alias         : msg_sizeISR
+ *
+ * Description       : return the size of first message in the message buffer
+ *
+ * Parameters
+ *   msg             : pointer to message buffer object
+ *
+ * Return            : size of first message in the message buffer
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned msg_size( msg_t *msg );
+
+__STATIC_INLINE
+unsigned msg_sizeISR( msg_t *msg ) { return msg_size(msg); }
+
 #ifdef __cplusplus
 }
 #endif
@@ -580,6 +619,8 @@ struct MessageBufferT : public __msg
 	unsigned spaceISR ( void )                                            { return msg_spaceISR (this);                       }
 	unsigned limit    ( void )                                            { return msg_limit    (this);                       }
 	unsigned limitISR ( void )                                            { return msg_limitISR (this);                       }
+	unsigned size     ( void )                                            { return msg_size     (this);                       }
+	unsigned sizeISR  ( void )                                            { return msg_sizeISR  (this);                       }
 
 	private:
 	char data_[limit_];

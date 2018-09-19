@@ -123,35 +123,6 @@ void priv_msg_peek( msg_t *msg, char *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_count( msg_t *msg )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned count = msg->count;
-
-	if (count > 0)
-		priv_msg_peek(msg, (void *)&count, sizeof(unsigned));
-
-	return count;
-}
-
-/* -------------------------------------------------------------------------- */
-static
-unsigned priv_msg_space( msg_t *msg )
-/* -------------------------------------------------------------------------- */
-{
-	return ((msg->count == 0 || msg->obj.queue == 0) && msg->limit - msg->count > sizeof(unsigned)) ? msg->limit - msg->count - sizeof(unsigned) : 0;
-}
-
-/* -------------------------------------------------------------------------- */
-static
-unsigned priv_msg_limit( msg_t *msg )
-/* -------------------------------------------------------------------------- */
-{
-	return (msg->limit > sizeof(unsigned)) ? msg->limit - sizeof(unsigned) : 0;
-}
-
-/* -------------------------------------------------------------------------- */
-static
 void priv_msg_get( msg_t *msg, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
@@ -194,12 +165,26 @@ void priv_msg_skip( msg_t *msg, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
+unsigned priv_msg_size( msg_t *msg )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned size;
+
+	assert(msg->count);
+
+	priv_msg_peek(msg, (void *)&size, sizeof(unsigned));
+
+	return size;
+}
+
+/* -------------------------------------------------------------------------- */
+static
 unsigned priv_msg_getSize( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	assert(msg->count);
-
 	unsigned size;
+
+	assert(msg->count);
 
 	priv_msg_get(msg, (void *)&size, sizeof(unsigned));
 
@@ -211,8 +196,6 @@ static
 void priv_msg_putSize( msg_t *msg, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	assert(size);
-
 	priv_msg_put(msg, (const void *)&size, sizeof(unsigned));
 }
 
@@ -228,7 +211,6 @@ unsigned priv_msg_getUpdate( msg_t *msg, char *data, unsigned size )
 	{
 		priv_msg_putSize(msg, msg->obj.queue->tmp.msg.size);
 		priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
-		msg->obj.queue->tmp.msg.size = 0;
 		core_tsk_wakeup(msg->obj.queue, E_SUCCESS);
 	}
 
@@ -245,12 +227,11 @@ void priv_msg_putUpdate( msg_t *msg, const char *data, unsigned size )
 
 	while (msg->obj.queue != 0)
 	{
-		if (msg->obj.queue->tmp.msg.size >= priv_msg_count(msg))
+		if (msg->obj.queue->tmp.msg.size >= priv_msg_size(msg))
 		{
 			size = priv_msg_getSize(msg);
 			priv_msg_get(msg, msg->obj.queue->tmp.msg.data.in, size);
-			msg->obj.queue->tmp.msg.size -= size;
-			core_tsk_wakeup(msg->obj.queue, E_SUCCESS);
+			core_tsk_wakeup(msg->obj.queue, size);
 		}
 		else
 		{
@@ -264,7 +245,7 @@ static
 void priv_msg_skipUpdate( msg_t *msg, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	while (size > priv_msg_space(msg))
+	while (msg->count + sizeof(unsigned) + size > msg->limit)
 	{
 		priv_msg_skip(msg, priv_msg_getSize(msg));
 
@@ -272,7 +253,6 @@ void priv_msg_skipUpdate( msg_t *msg, unsigned size )
 		{
 			priv_msg_putSize(msg, msg->obj.queue->tmp.msg.size);
 			priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
-			msg->obj.queue->tmp.msg.size = 0;
 			core_tsk_wakeup(msg->obj.queue, E_SUCCESS);
 		}
 	}
@@ -288,10 +268,10 @@ unsigned priv_msg_take( msg_t *msg, char *data, unsigned size )
 	assert(msg->limit);
 	assert(data);
 
-	if (msg->count > 0 && size >= priv_msg_count(msg))
+	if (msg->count > 0 && size >= priv_msg_size(msg))
 		return priv_msg_getUpdate(msg, data, size);
 
-	return 0;
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -321,12 +301,11 @@ unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay )
 	{
 		len = priv_msg_take(msg, data, size);
 
-		if (len == 0 && size > 0)
+		if (len == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.in = data;
 			System.cur->tmp.msg.size = size;
-			core_tsk_waitFor(&msg->obj.queue, delay);
-			len = size - System.cur->tmp.msg.size;
+			len = core_tsk_waitFor(&msg->obj.queue, delay);
 		}
 	}
 	sys_unlock();
@@ -346,12 +325,11 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time )
 	{
 		len = priv_msg_take(msg, data, size);
 
-		if (len == 0 && size > 0)
+		if (len == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.in = data;
 			System.cur->tmp.msg.size = size;
-			core_tsk_waitUntil(&msg->obj.queue, time);
-			len = size - System.cur->tmp.msg.size;
+			len = core_tsk_waitUntil(&msg->obj.queue, time);
 		}
 	}
 	sys_unlock();
@@ -369,85 +347,83 @@ unsigned priv_msg_give( msg_t *msg, const char *data, unsigned size )
 	assert(msg->limit);
 	assert(data);
 
-	if (size > 0 && size <= priv_msg_space(msg))
+	if (msg->count + sizeof(unsigned) + size <= msg->limit)
 	{
 		priv_msg_putUpdate(msg, data, size);
-		return size;
+		return E_SUCCESS;
 	}
 
-	return 0;
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len = 0;
+	unsigned event;
 
 	sys_lock();
 	{
-		len = priv_msg_give(msg, data, size);
+		event = priv_msg_give(msg, data, size);
 	}
 	sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned event;
 
 	assert(!port_isr_context());
 
 	sys_lock();
 	{
-		len = priv_msg_give(msg, data, size);
+		event = priv_msg_give(msg, data, size);
 
-		if (len == 0 && size > 0 && size <= priv_msg_limit(msg))
+		if (event != E_SUCCESS && sizeof(unsigned) + size <= msg->limit)
 		{
 			System.cur->tmp.msg.data.out = data;
 			System.cur->tmp.msg.size = size;
-			core_tsk_waitFor(&msg->obj.queue, delay);
-			len = size - System.cur->tmp.msg.size;
+			event = core_tsk_waitFor(&msg->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned event;
 
 	assert(!port_isr_context());
 
 	sys_lock();
 	{
-		len = priv_msg_give(msg, data, size);
+		event = priv_msg_give(msg, data, size);
 
-		if (len == 0 && size > 0 && size <= priv_msg_limit(msg))
+		if (event != E_SUCCESS && sizeof(unsigned) + size <= msg->limit)
 		{
 			System.cur->tmp.msg.data.out = data;
 			System.cur->tmp.msg.size = size;
-			core_tsk_waitUntil(&msg->obj.queue, time);
-			len = size - System.cur->tmp.msg.size;
+			event = core_tsk_waitUntil(&msg->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len = 0;
+	unsigned event;
 
 	assert(msg);
 	assert(msg->data);
@@ -456,16 +432,20 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 
 	sys_lock();
 	{
-		if (size > 0 && size <= priv_msg_limit(msg))
+		if (sizeof(unsigned) + size <= msg->limit)
 		{
 			priv_msg_skipUpdate(msg, size);
 			priv_msg_putUpdate(msg, data, size);
-			len = size;
+			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_TIMEOUT;
 		}
 	}
 	sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -478,7 +458,7 @@ unsigned msg_count( msg_t *msg )
 
 	sys_lock();
 	{
-		count = priv_msg_count(msg);
+		count = msg->count;
 	}
 	sys_unlock();
 
@@ -495,7 +475,7 @@ unsigned msg_space( msg_t *msg )
 
 	sys_lock();
 	{
-		space = priv_msg_space(msg);
+		space = (msg->limit >= msg->count + sizeof(unsigned)) ? msg->limit - msg->count - sizeof(unsigned) : 0;
 	}
 	sys_unlock();
 
@@ -512,11 +492,29 @@ unsigned msg_limit( msg_t *msg )
 
 	sys_lock();
 	{
-		limit = priv_msg_limit(msg);
+		limit = (msg->limit >= sizeof(unsigned)) ? msg->limit - sizeof(unsigned) : 0;
 	}
 	sys_unlock();
 
 	return limit;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned msg_size( msg_t *msg )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned size = 0;
+
+	assert(msg);
+
+	sys_lock();
+	{
+		if (msg->count > 0)
+			size = priv_msg_size(msg);
+	}
+	sys_unlock();
+
+	return size;
 }
 
 /* -------------------------------------------------------------------------- */
