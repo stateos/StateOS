@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    17.09.2018
+    @date    19.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -242,17 +242,16 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay )
 	{
 		event = priv_mtx_take(mtx);
 
-		if (event != E_SUCCESS && mtx->owner != System.cur)
+		if (event != E_SUCCESS &&
+		   ((mtx->mode & mtxTypeMASK) == mtxNormal      || mtx->owner != System.cur) &&
+		   ((mtx->mode & mtxPrioMASK) != mtxPrioProtect || mtx->prio  >= System.cur->prio))
 		{
-			if ((mtx->mode & mtxPrioMASK) != mtxPrioProtect || System.cur->prio <= mtx->prio)
-			{
-				if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && System.cur->prio > mtx->owner->prio)
-					core_tsk_prio(mtx->owner, System.cur->prio);
+			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && System.cur->prio > mtx->owner->prio)
+				core_tsk_prio(mtx->owner, System.cur->prio);
 
-				System.cur->mtx.tree = mtx->owner;
-				event = core_tsk_waitFor(&mtx->obj.queue, delay);
-				System.cur->mtx.tree = 0;
-			}
+			System.cur->mtx.tree = mtx->owner;
+			event = core_tsk_waitFor(&mtx->obj.queue, delay);
+			System.cur->mtx.tree = 0;
 		}
 	}
 	sys_unlock();
@@ -272,17 +271,16 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
 	{
 		event = priv_mtx_take(mtx);
 
-		if (event != E_SUCCESS && mtx->owner != System.cur)
+		if (event != E_SUCCESS &&
+		   ((mtx->mode & mtxTypeMASK) == mtxNormal      || mtx->owner != System.cur) &&
+		   ((mtx->mode & mtxPrioMASK) != mtxPrioProtect || mtx->prio  >= System.cur->prio))
 		{
-			if ((mtx->mode & mtxPrioMASK) != mtxPrioProtect || System.cur->prio <= mtx->prio)
-			{
-				if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && System.cur->prio > mtx->owner->prio)
-					core_tsk_prio(mtx->owner, System.cur->prio);
+			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && System.cur->prio > mtx->owner->prio)
+				core_tsk_prio(mtx->owner, System.cur->prio);
 
-				System.cur->mtx.tree = mtx->owner;
-				event = core_tsk_waitUntil(&mtx->obj.queue, time);
-				System.cur->mtx.tree = 0;
-			}
+			System.cur->mtx.tree = mtx->owner;
+			event = core_tsk_waitUntil(&mtx->obj.queue, time);
+			System.cur->mtx.tree = 0;
 		}
 	}
 	sys_unlock();
