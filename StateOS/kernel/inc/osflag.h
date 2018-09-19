@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    16.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -246,6 +246,40 @@ void flg_delete( flg_t *flg );
 
 /******************************************************************************
  *
+ * Name              : flg_take
+ * Alias             : flg_tryWait
+ * ISR alias         : flg_takeISR
+ *
+ * Description       : don't wait on flag object until requested flags have been set
+ *
+ * Parameters
+ *   flg             : pointer to flag object
+ *   flags           : all flags to wait
+ *   mode            : waiting mode
+ *                     flgAny:     wait for any flags to be set
+ *                     flgAll:     wait for all flags to be set
+ *                     flgProtect: don't clear flags in flag object
+ *                     flgIgnore:  ignore flags in flag object that have been set and not accepted before
+ *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
+ *
+ * Return
+ *   0               : requested flags have been set
+ *   'another'       : flags that remain to be set
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned flg_take( flg_t *flg, unsigned flags, char mode );
+
+__STATIC_INLINE
+unsigned flg_tryWait( flg_t *flg, unsigned flags, char mode ) { return flg_take(flg, flags, mode); }
+
+__STATIC_INLINE
+unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(flg, flags, mode); }
+
+/******************************************************************************
+ *
  * Name              : flg_waitFor
  *
  * Description       : wait on flag object for given flags for given duration of time
@@ -328,40 +362,6 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
 
 __STATIC_INLINE
 unsigned flg_wait( flg_t *flg, unsigned flags, char mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
-
-/******************************************************************************
- *
- * Name              : flg_take
- * Alias             : flg_tryWait
- * ISR alias         : flg_takeISR
- *
- * Description       : don't wait on flag object until requested flags have been set
- *
- * Parameters
- *   flg             : pointer to flag object
- *   flags           : all flags to wait
- *   mode            : waiting mode
- *                     flgAny:     wait for any flags to be set
- *                     flgAll:     wait for all flags to be set
- *                     flgProtect: don't clear flags in flag object
- *                     flgIgnore:  ignore flags in flag object that have been set and not accepted before
- *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
- *
- * Return
- *   0               : requested flags have been set
- *   'another'       : flags that remain to be set
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-unsigned flg_take( flg_t *flg, unsigned flags, char mode );
-
-__STATIC_INLINE
-unsigned flg_tryWait( flg_t *flg, unsigned flags, char mode ) { return flg_take(flg, flags, mode); }
-
-__STATIC_INLINE
-unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(flg, flags, mode); }
 
 /******************************************************************************
  *
@@ -457,12 +457,12 @@ struct Flag : public __flg
 	~Flag( void ) { assert(__flg::obj.queue == nullptr); }
 
 	void     kill     ( void )                                      {        flg_kill     (this);                        }
-	unsigned waitFor  ( unsigned _flags, char _mode, cnt_t _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
-	unsigned waitUntil( unsigned _flags, char _mode, cnt_t _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
-	unsigned wait     ( unsigned _flags, char _mode = flgAll )      { return flg_wait     (this, _flags, _mode);         }
 	unsigned take     ( unsigned _flags, char _mode = flgAll )      { return flg_take     (this, _flags, _mode);         }
 	unsigned tryWait  ( unsigned _flags, char _mode = flgAll )      { return flg_tryWait  (this, _flags, _mode);         }
 	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )      { return flg_takeISR  (this, _flags, _mode);         }
+	unsigned waitFor  ( unsigned _flags, char _mode, cnt_t _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
+	unsigned waitUntil( unsigned _flags, char _mode, cnt_t _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
+	unsigned wait     ( unsigned _flags, char _mode = flgAll )      { return flg_wait     (this, _flags, _mode);         }
 	unsigned give     ( unsigned _flags )                           { return flg_give     (this, _flags);                }
 	unsigned set      ( unsigned _flags )                           { return flg_set      (this, _flags);                }
 	unsigned giveISR  ( unsigned _flags )                           { return flg_giveISR  (this, _flags);                }

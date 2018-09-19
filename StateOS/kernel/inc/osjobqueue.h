@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    17.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -250,6 +250,34 @@ void job_delete( job_t *job );
 
 /******************************************************************************
  *
+ * Name              : job_take
+ * Alias             : job_tryWait
+ * ISR alias         : job_takeISR
+ *
+ * Description       : try to transfer job data from the job queue object and execute the job procedure,
+ *                     don't wait if the job queue object is empty
+ *
+ * Parameters
+ *   job             : pointer to job queue object
+ *
+ * Return
+ *   E_SUCCESS       : job data was successfully transfered from the job queue object
+ *   E_TIMEOUT       : job queue object is empty
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned job_take( job_t *job );
+
+__STATIC_INLINE
+unsigned job_tryWait( job_t *job ) { return job_take(job); }
+
+__STATIC_INLINE
+unsigned job_takeISR( job_t *job ) { return job_take(job); }
+
+/******************************************************************************
+ *
  * Name              : job_waitFor
  *
  * Description       : try to transfer job data from the job queue object and execute the job procedure,
@@ -317,31 +345,28 @@ unsigned job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
 
 /******************************************************************************
  *
- * Name              : job_take
- * Alias             : job_tryWait
- * ISR alias         : job_takeISR
+ * Name              : job_give
+ * ISR alias         : job_giveISR
  *
- * Description       : try to transfer job data from the job queue object and execute the job procedure,
- *                     don't wait if the job queue object is empty
+ * Description       : try to transfer job data to the job queue object,
+ *                     don't wait if the job queue object is full
  *
  * Parameters
  *   job             : pointer to job queue object
+ *   fun             : pointer to job procedure
  *
  * Return
- *   E_SUCCESS       : job data was successfully transfered from the job queue object
- *   E_TIMEOUT       : job queue object is empty
+ *   E_SUCCESS       : job data was successfully transfered to the job queue object
+ *   E_TIMEOUT       : job queue object is full
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned job_take( job_t *job );
+unsigned job_give( job_t *job, fun_t *fun );
 
 __STATIC_INLINE
-unsigned job_tryWait( job_t *job ) { return job_take(job); }
-
-__STATIC_INLINE
-unsigned job_takeISR( job_t *job ) { return job_take(job); }
+unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_give(job, fun); }
 
 /******************************************************************************
  *
@@ -412,31 +437,6 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
 
 __STATIC_INLINE
 unsigned job_send( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, INFINITE); }
-
-/******************************************************************************
- *
- * Name              : job_give
- * ISR alias         : job_giveISR
- *
- * Description       : try to transfer job data to the job queue object,
- *                     don't wait if the job queue object is full
- *
- * Parameters
- *   job             : pointer to job queue object
- *   fun             : pointer to job procedure
- *
- * Return
- *   E_SUCCESS       : job data was successfully transfered to the job queue object
- *   E_TIMEOUT       : job queue object is full
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-unsigned job_give( job_t *job, fun_t *fun );
-
-__STATIC_INLINE
-unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_give(job, fun); }
 
 /******************************************************************************
  *
@@ -534,17 +534,17 @@ struct JobQueueT : public __box
 	~JobQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	void     kill     ( void )                     {                              box_kill     (this);                                                              }
-	unsigned waitFor  ( cnt_t _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
-	unsigned waitUntil( cnt_t _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
-	unsigned wait     ( void )                     { FUN_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
 	unsigned take     ( void )                     { FUN_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
 	unsigned tryWait  ( void )                     { FUN_t _fun; unsigned event = box_tryWait  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
 	unsigned takeISR  ( void )                     { FUN_t _fun; unsigned event = box_takeISR  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned waitFor  ( cnt_t _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
+	unsigned waitUntil( cnt_t _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
+	unsigned wait     ( void )                     { FUN_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned give     ( FUN_t _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
+	unsigned giveISR  ( FUN_t _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
 	unsigned sendFor  ( FUN_t _fun, cnt_t _delay ) {             unsigned event = box_sendFor  (this, &_fun, _delay);                                 return event; }
 	unsigned sendUntil( FUN_t _fun, cnt_t _time )  {             unsigned event = box_sendUntil(this, &_fun, _time);                                  return event; }
 	unsigned send     ( FUN_t _fun )               {             unsigned event = box_send     (this, &_fun);                                         return event; }
-	unsigned give     ( FUN_t _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
-	unsigned giveISR  ( FUN_t _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
 	void     push     ( FUN_t _fun )               {                              box_push     (this, &_fun);                                                       }
 	void     pushISR  ( FUN_t _fun )               {                              box_pushISR  (this, &_fun);                                                       }
 	unsigned count    ( void )                     {             unsigned count = box_count    (this);                                                return count; }

@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -265,6 +265,34 @@ void stm_delete( stm_t *stm );
 
 /******************************************************************************
  *
+ * Name              : stm_take
+ * Alias             : stm_tryWait
+ * ISR alias         : stm_takeISR
+ *
+ * Description       : try to transfer data from the stream buffer object,
+ *                     don't wait if the stream buffer object is empty
+ *
+ * Parameters
+ *   stm             : pointer to stream buffer object
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
+ *
+ * Return            : number of bytes read from the stream buffer
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned stm_take( stm_t *stm, void *data, unsigned size );
+
+__STATIC_INLINE
+unsigned stm_tryWait( stm_t *stm, void *data, unsigned size ) { return stm_take(stm, data, size); }
+
+__STATIC_INLINE
+unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(stm, data, size); }
+
+/******************************************************************************
+ *
  * Name              : stm_waitFor
  *
  * Description       : try to transfer data from the stream buffer object,
@@ -330,31 +358,27 @@ unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(
 
 /******************************************************************************
  *
- * Name              : stm_take
- * Alias             : stm_tryWait
- * ISR alias         : stm_takeISR
+ * Name              : stm_give
+ * ISR alias         : stm_giveISR
  *
- * Description       : try to transfer data from the stream buffer object,
- *                     don't wait if the stream buffer object is empty
+ * Description       : try to transfer data to the stream buffer object,
+ *                     don't wait if the stream buffer object is full
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
  *
- * Return            : number of bytes read from the stream buffer
+ * Return            : number of bytes written to the stream buffer
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned stm_take( stm_t *stm, void *data, unsigned size );
+unsigned stm_give( stm_t *stm, const void *data, unsigned size );
 
 __STATIC_INLINE
-unsigned stm_tryWait( stm_t *stm, void *data, unsigned size ) { return stm_take(stm, data, size); }
-
-__STATIC_INLINE
-unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(stm, data, size); }
+unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm_give(stm, data, size); }
 
 /******************************************************************************
  *
@@ -420,30 +444,6 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
 
 __STATIC_INLINE
 unsigned stm_send( stm_t *stm, const void *data, unsigned size ) { return stm_sendFor(stm, data, size, INFINITE); }
-
-/******************************************************************************
- *
- * Name              : stm_give
- * ISR alias         : stm_giveISR
- *
- * Description       : try to transfer data to the stream buffer object,
- *                     don't wait if the stream buffer object is full
- *
- * Parameters
- *   stm             : pointer to stream buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
- *
- * Return            : number of bytes written to the stream buffer
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-unsigned stm_give( stm_t *stm, const void *data, unsigned size );
-
-__STATIC_INLINE
-unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm_give(stm, data, size); }
 
 /******************************************************************************
  *
@@ -558,17 +558,17 @@ struct StreamBufferT : public __stm
 	~StreamBufferT( void ) { assert(__stm::obj.queue == nullptr); }
 
 	void     kill     ( void )                                            {        stm_kill     (this);                       }
-	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return stm_waitFor  (this, _data, _size, _delay); }
-	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time )  { return stm_waitUntil(this, _data, _size, _time);  }
-	unsigned wait     (       void *_data, unsigned _size )               { return stm_wait     (this, _data, _size);         }
 	unsigned take     (       void *_data, unsigned _size )               { return stm_take     (this, _data, _size);         }
 	unsigned tryWait  (       void *_data, unsigned _size )               { return stm_tryWait  (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return stm_takeISR  (this, _data, _size);         }
+	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return stm_waitFor  (this, _data, _size, _delay); }
+	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time )  { return stm_waitUntil(this, _data, _size, _time);  }
+	unsigned wait     (       void *_data, unsigned _size )               { return stm_wait     (this, _data, _size);         }
+	unsigned give     ( const void *_data, unsigned _size )               { return stm_give     (this, _data, _size);         }
+	unsigned giveISR  ( const void *_data, unsigned _size )               { return stm_giveISR  (this, _data, _size);         }
 	unsigned sendFor  ( const void *_data, unsigned _size, cnt_t _delay ) { return stm_sendFor  (this, _data, _size, _delay); }
 	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time )  { return stm_sendUntil(this, _data, _size, _time);  }
 	unsigned send     ( const void *_data, unsigned _size )               { return stm_send     (this, _data, _size);         }
-	unsigned give     ( const void *_data, unsigned _size )               { return stm_give     (this, _data, _size);         }
-	unsigned giveISR  ( const void *_data, unsigned _size )               { return stm_giveISR  (this, _data, _size);         }
 	unsigned push     ( const void *_data, unsigned _size )               { return stm_push     (this, _data, _size);         }
 	unsigned pushISR  ( const void *_data, unsigned _size )               { return stm_pushISR  (this, _data, _size);         }
 	unsigned count    ( void )                                            { return stm_count    (this);                       }
@@ -599,17 +599,17 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(T)>
 {
 	StreamBufferTT( void ): StreamBufferT<limit_*sizeof(T)>() {}
 
-	unsigned waitFor  (       T *_data, cnt_t _delay ) { return stm_waitFor  (this, _data, sizeof(T), _delay); }
-	unsigned waitUntil(       T *_data, cnt_t _time )  { return stm_waitUntil(this, _data, sizeof(T), _time);  }
-	unsigned wait     (       T *_data )               { return stm_wait     (this, _data, sizeof(T));         }
 	unsigned take     (       T *_data )               { return stm_take     (this, _data, sizeof(T));         }
 	unsigned tryWait  (       T *_data )               { return stm_tryWait  (this, _data, sizeof(T));         }
 	unsigned takeISR  (       T *_data )               { return stm_takeISR  (this, _data, sizeof(T));         }
+	unsigned waitFor  (       T *_data, cnt_t _delay ) { return stm_waitFor  (this, _data, sizeof(T), _delay); }
+	unsigned waitUntil(       T *_data, cnt_t _time )  { return stm_waitUntil(this, _data, sizeof(T), _time);  }
+	unsigned wait     (       T *_data )               { return stm_wait     (this, _data, sizeof(T));         }
+	unsigned give     ( const T *_data )               { return stm_give     (this, _data, sizeof(T));         }
+	unsigned giveISR  ( const T *_data )               { return stm_giveISR  (this, _data, sizeof(T));         }
 	unsigned sendFor  ( const T *_data, cnt_t _delay ) { return stm_sendFor  (this, _data, sizeof(T), _delay); }
 	unsigned sendUntil( const T *_data, cnt_t _time )  { return stm_sendUntil(this, _data, sizeof(T), _time);  }
 	unsigned send     ( const T *_data )               { return stm_send     (this, _data, sizeof(T));         }
-	unsigned give     ( const T *_data )               { return stm_give     (this, _data, sizeof(T));         }
-	unsigned giveISR  ( const T *_data )               { return stm_giveISR  (this, _data, sizeof(T));         }
 	unsigned push     ( const T *_data )               { return stm_push     (this, _data, sizeof(T));         }
 	unsigned pushISR  ( const T *_data )               { return stm_pushISR  (this, _data, sizeof(T));         }
 };

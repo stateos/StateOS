@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    18.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -265,6 +265,35 @@ void msg_delete( msg_t *msg );
 
 /******************************************************************************
  *
+ * Name              : msg_take
+ * Alias             : msg_tryWait
+ * ISR alias         : msg_takeISR
+ *
+ * Description       : try to transfer data from the message buffer object,
+ *                     don't wait if the message buffer object is empty
+ *
+ * Parameters
+ *   msg             : pointer to message buffer object
+ *   data            : pointer to write buffer
+ *   size            : size of write buffer
+ *
+ * Return            : number of bytes read from the message buffer or
+ *   E_TIMEOUT       : message buffer object is empty or not enough space in the write buffer
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned msg_take( msg_t *msg, void *data, unsigned size );
+
+__STATIC_INLINE
+unsigned msg_tryWait( msg_t *msg, void *data, unsigned size ) { return msg_take(msg, data, size); }
+
+__STATIC_INLINE
+unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(msg, data, size); }
+
+/******************************************************************************
+ *
  * Name              : msg_waitFor
  *
  * Description       : try to transfer data from the message buffer object,
@@ -278,7 +307,9 @@ void msg_delete( msg_t *msg );
  *                     IMMEDIATE: don't wait if the message buffer object is empty
  *                     INFINITE:  wait indefinitely while the message buffer object is empty
  *
- * Return            : number of bytes read from the message buffer
+ * Return            : number of bytes read from the message buffer or
+ *   E_STOPPED       : message buffer object was killed before the specified timeout expired
+ *   E_TIMEOUT       : message buffer object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -330,31 +361,27 @@ unsigned msg_wait( msg_t *msg, void *data, unsigned size ) { return msg_waitFor(
 
 /******************************************************************************
  *
- * Name              : msg_take
- * Alias             : msg_tryWait
- * ISR alias         : msg_takeISR
+ * Name              : msg_give
+ * ISR alias         : msg_giveISR
  *
- * Description       : try to transfer data from the message buffer object,
- *                     don't wait if the message buffer object is empty
+ * Description       : try to transfer data to the message buffer object,
+ *                     don't wait if the message buffer object is full
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to read buffer
+ *   size            : size of read buffer
  *
- * Return            : number of bytes read from the message buffer
+ * Return            : number of bytes written to the message buffer
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned msg_take( msg_t *msg, void *data, unsigned size );
+unsigned msg_give( msg_t *msg, const void *data, unsigned size );
 
 __STATIC_INLINE
-unsigned msg_tryWait( msg_t *msg, void *data, unsigned size ) { return msg_take(msg, data, size); }
-
-__STATIC_INLINE
-unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(msg, data, size); }
+unsigned msg_giveISR( msg_t *msg, const void *data, unsigned size ) { return msg_give(msg, data, size); }
 
 /******************************************************************************
  *
@@ -420,30 +447,6 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
 
 __STATIC_INLINE
 unsigned msg_send( msg_t *msg, const void *data, unsigned size ) { return msg_sendFor(msg, data, size, INFINITE); }
-
-/******************************************************************************
- *
- * Name              : msg_give
- * ISR alias         : msg_giveISR
- *
- * Description       : try to transfer data to the message buffer object,
- *                     don't wait if the message buffer object is full
- *
- * Parameters
- *   msg             : pointer to message buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
- *
- * Return            : number of bytes written to the message buffer
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-unsigned msg_give( msg_t *msg, const void *data, unsigned size );
-
-__STATIC_INLINE
-unsigned msg_giveISR( msg_t *msg, const void *data, unsigned size ) { return msg_give(msg, data, size); }
 
 /******************************************************************************
  *
@@ -558,17 +561,17 @@ struct MessageBufferT : public __msg
 	~MessageBufferT( void ) { assert(__msg::obj.queue == nullptr); }
 
 	void     kill     ( void )                                            {        msg_kill     (this);                       }
-	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return msg_waitFor  (this, _data, _size, _delay); }
-	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time )  { return msg_waitUntil(this, _data, _size, _time);  }
-	unsigned wait     (       void *_data, unsigned _size )               { return msg_wait     (this, _data, _size);         }
 	unsigned take     (       void *_data, unsigned _size )               { return msg_take     (this, _data, _size);         }
 	unsigned tryWait  (       void *_data, unsigned _size )               { return msg_tryWait  (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return msg_takeISR  (this, _data, _size);         }
+	unsigned waitFor  (       void *_data, unsigned _size, cnt_t _delay ) { return msg_waitFor  (this, _data, _size, _delay); }
+	unsigned waitUntil(       void *_data, unsigned _size, cnt_t _time )  { return msg_waitUntil(this, _data, _size, _time);  }
+	unsigned wait     (       void *_data, unsigned _size )               { return msg_wait     (this, _data, _size);         }
+	unsigned give     ( const void *_data, unsigned _size )               { return msg_give     (this, _data, _size);         }
+	unsigned giveISR  ( const void *_data, unsigned _size )               { return msg_giveISR  (this, _data, _size);         }
 	unsigned sendFor  ( const void *_data, unsigned _size, cnt_t _delay ) { return msg_sendFor  (this, _data, _size, _delay); }
 	unsigned sendUntil( const void *_data, unsigned _size, cnt_t _time )  { return msg_sendUntil(this, _data, _size, _time);  }
 	unsigned send     ( const void *_data, unsigned _size )               { return msg_send     (this, _data, _size);         }
-	unsigned give     ( const void *_data, unsigned _size )               { return msg_give     (this, _data, _size);         }
-	unsigned giveISR  ( const void *_data, unsigned _size )               { return msg_giveISR  (this, _data, _size);         }
 	unsigned push     ( const void *_data, unsigned _size )               { return msg_push     (this, _data, _size);         }
 	unsigned pushISR  ( const void *_data, unsigned _size )               { return msg_pushISR  (this, _data, _size);         }
 	unsigned count    ( void )                                            { return msg_count    (this);                       }
@@ -599,17 +602,17 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T
 {
 	MessageBufferTT( void ): MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T))>() {}
 
-	unsigned waitFor  (       T *_data, cnt_t _delay ) { return msg_waitFor  (this, _data, sizeof(T), _delay); }
-	unsigned waitUntil(       T *_data, cnt_t _time )  { return msg_waitUntil(this, _data, sizeof(T), _time);  }
-	unsigned wait     (       T *_data )               { return msg_wait     (this, _data, sizeof(T));         }
 	unsigned take     (       T *_data )               { return msg_take     (this, _data, sizeof(T));         }
 	unsigned tryWait  (       T *_data )               { return msg_tryWait  (this, _data, sizeof(T));         }
 	unsigned takeISR  (       T *_data )               { return msg_takeISR  (this, _data, sizeof(T));         }
+	unsigned waitFor  (       T *_data, cnt_t _delay ) { return msg_waitFor  (this, _data, sizeof(T), _delay); }
+	unsigned waitUntil(       T *_data, cnt_t _time )  { return msg_waitUntil(this, _data, sizeof(T), _time);  }
+	unsigned wait     (       T *_data )               { return msg_wait     (this, _data, sizeof(T));         }
+	unsigned give     ( const T *_data )               { return msg_give     (this, _data, sizeof(T));         }
+	unsigned giveISR  ( const T *_data )               { return msg_giveISR  (this, _data, sizeof(T));         }
 	unsigned sendFor  ( const T *_data, cnt_t _delay ) { return msg_sendFor  (this, _data, sizeof(T), _delay); }
 	unsigned sendUntil( const T *_data, cnt_t _time )  { return msg_sendUntil(this, _data, sizeof(T), _time);  }
 	unsigned send     ( const T *_data )               { return msg_send     (this, _data, sizeof(T));         }
-	unsigned give     ( const T *_data )               { return msg_give     (this, _data, sizeof(T));         }
-	unsigned giveISR  ( const T *_data )               { return msg_giveISR  (this, _data, sizeof(T));         }
 	unsigned push     ( const T *_data )               { return msg_push     (this, _data, sizeof(T));         }
 	unsigned pushISR  ( const T *_data )               { return msg_pushISR  (this, _data, sizeof(T));         }
 };

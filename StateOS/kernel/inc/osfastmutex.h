@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    17.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -216,6 +216,30 @@ void mut_delete( mut_t *mut );
 
 /******************************************************************************
  *
+ * Name              : mut_take
+ * Alias             : mut_tryLock
+ *
+ * Description       : try to lock the fast mutex object,
+ *                     don't wait if the fast mutex object can't be locked immediately
+ *
+ * Parameters
+ *   mut             : pointer to fast mutex object
+ *
+ * Return
+ *   E_SUCCESS       : fast mutex object was successfully locked
+ *   E_TIMEOUT       : fast mutex object can't be locked immediately
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned mut_take( mut_t *mut );
+
+__STATIC_INLINE
+unsigned mut_tryLock( mut_t *mut ) { return mut_take(mut); }
+
+/******************************************************************************
+ *
  * Name              : mut_waitFor
  *
  * Description       : try to lock the fast mutex object,
@@ -287,30 +311,6 @@ unsigned mut_lock( mut_t *mut ) { return mut_wait(mut); }
 
 /******************************************************************************
  *
- * Name              : mut_take
- * Alias             : mut_tryLock
- *
- * Description       : try to lock the fast mutex object,
- *                     don't wait if the fast mutex object can't be locked immediately
- *
- * Parameters
- *   mut             : pointer to fast mutex object
- *
- * Return
- *   E_SUCCESS       : fast mutex object was successfully locked
- *   E_TIMEOUT       : fast mutex object can't be locked immediately
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned mut_take( mut_t *mut );
-
-__STATIC_INLINE
-unsigned mut_tryLock( mut_t *mut ) { return mut_take(mut); }
-
-/******************************************************************************
- *
  * Name              : mut_give
  * Alias             : mut_unlock
  *
@@ -358,12 +358,12 @@ struct FastMutex : public __mut
 	~FastMutex( void ) { assert(__mut::owner == nullptr); }
 
 	void     kill     ( void )         {        mut_kill     (this);         }
+	unsigned take     ( void )         { return mut_take     (this);         }
+	unsigned tryLock  ( void )         { return mut_tryLock  (this);         }
 	unsigned waitFor  ( cnt_t _delay ) { return mut_waitFor  (this, _delay); }
 	unsigned waitUntil( cnt_t _time )  { return mut_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return mut_wait     (this);         }
 	unsigned lock     ( void )         { return mut_lock     (this);         }
-	unsigned take     ( void )         { return mut_take     (this);         }
-	unsigned tryLock  ( void )         { return mut_tryLock  (this);         }
 	unsigned give     ( void )         { return mut_give     (this);         }
 	unsigned unlock   ( void )         { return mut_unlock   (this);         }
 };

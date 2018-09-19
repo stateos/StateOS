@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -253,6 +253,33 @@ void sig_delete( sig_t *sig );
 
 /******************************************************************************
  *
+ * Name              : sig_take
+ * Alias             : sig_tryWait
+ * ISR alias         : sig_takeISR
+ *
+ * Description       : check if the signal object has been released
+ *
+ * Parameters
+ *   sig             : pointer to signal object
+ *
+ * Return
+ *   E_SUCCESS       : signal object was successfully released
+ *   E_TIMEOUT       : signal object was not released
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned sig_take( sig_t *sig );
+
+__STATIC_INLINE
+unsigned sig_tryWait( sig_t *sig ) { return sig_take(sig); }
+
+__STATIC_INLINE
+unsigned sig_takeISR( sig_t *sig ) { return sig_take(sig); }
+
+/******************************************************************************
+ *
  * Name              : sig_waitFor
  *
  * Description       : wait for release the signal object for given duration of time
@@ -314,33 +341,6 @@ unsigned sig_waitUntil( sig_t *sig, cnt_t time );
 
 __STATIC_INLINE
 unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
-
-/******************************************************************************
- *
- * Name              : sig_take
- * Alias             : sig_tryWait
- * ISR alias         : sig_takeISR
- *
- * Description       : check if the signal object has been released
- *
- * Parameters
- *   sig             : pointer to signal object
- *
- * Return
- *   E_SUCCESS       : signal object was successfully released
- *   E_TIMEOUT       : signal object was not released
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-unsigned sig_take( sig_t *sig );
-
-__STATIC_INLINE
-unsigned sig_tryWait( sig_t *sig ) { return sig_take(sig); }
-
-__STATIC_INLINE
-unsigned sig_takeISR( sig_t *sig ) { return sig_take(sig); }
 
 /******************************************************************************
  *
@@ -416,12 +416,12 @@ struct Signal : public __sig
 	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
 	void     kill     ( void )         {        sig_kill     (this);         }
-	unsigned waitFor  ( cnt_t _delay ) { return sig_waitFor  (this, _delay); }
-	unsigned waitUntil( cnt_t _time  ) { return sig_waitUntil(this, _time);  }
-	unsigned wait     ( void )         { return sig_wait     (this);         }
 	unsigned take     ( void )         { return sig_take     (this);         }
 	unsigned tryWait  ( void )         { return sig_tryWait  (this);         }
 	unsigned takeISR  ( void )         { return sig_takeISR  (this);         }
+	unsigned waitFor  ( cnt_t _delay ) { return sig_waitFor  (this, _delay); }
+	unsigned waitUntil( cnt_t _time  ) { return sig_waitUntil(this, _time);  }
+	unsigned wait     ( void )         { return sig_wait     (this);         }
 	void     give     ( void )         {        sig_give     (this);         }
 	void     set      ( void )         {        sig_set      (this);         }
 	void     giveISR  ( void )         {        sig_giveISR  (this);         }

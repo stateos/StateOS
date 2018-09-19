@@ -536,6 +536,33 @@ void tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0); }
 
 /******************************************************************************
  *
+ * Name              : tmr_take
+ * Alias             : tmr_tryWait
+ * ISR alias         : tmr_takeISR
+ *
+ * Description       : check if the timer finishes countdown
+ *
+ * Parameters
+ *   tmr             : pointer to timer object
+ *
+ * Return
+ *   E_SUCCESS       : timer object successfully finished countdown
+ *   E_TIMEOUT       : timer object has not yet completed counting
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned tmr_take( tmr_t *tmr );
+
+__STATIC_INLINE
+unsigned tmr_tryWait( tmr_t *tmr ) { return tmr_take(tmr); }
+
+__STATIC_INLINE
+unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_take(tmr); }
+
+/******************************************************************************
+ *
  * Name              : tmr_waitFor
  *
  * Description       : wait for given duration of time until the timer finishes countdown
@@ -624,33 +651,6 @@ unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
 
 /******************************************************************************
  *
- * Name              : tmr_take
- * Alias             : tmr_tryWait
- * ISR alias         : tmr_takeISR
- *
- * Description       : check if the timer finishes countdown
- *
- * Parameters
- *   tmr             : pointer to timer object
- *
- * Return
- *   E_SUCCESS       : timer object successfully finished countdown
- *   E_TIMEOUT       : timer object has not yet completed counting
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-unsigned tmr_take( tmr_t *tmr );
-
-__STATIC_INLINE
-unsigned tmr_tryWait( tmr_t *tmr ) { return tmr_take(tmr); }
-
-__STATIC_INLINE
-unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_take(tmr); }
-
-/******************************************************************************
- *
  * Name              : tmr_flipISR
  *
  * Description       : change callback procedure for current periodic timer (available in next period)
@@ -722,13 +722,13 @@ struct staticTimer : public __tmr
 	void startUntil   ( cnt_t _time )                                {        tmr_startUntil   (this, _time);                   }
 	void stop         ( void )                                       {        tmr_stop         (this);                          }
 
+	unsigned take     ( void )                                       { return tmr_take         (this);                          }
+	unsigned tryWait  ( void )                                       { return tmr_tryWait      (this);                          }
+	unsigned takeISR  ( void )                                       { return tmr_takeISR      (this);                          }
 	unsigned waitFor  ( cnt_t _delay )                               { return tmr_waitFor      (this, _delay);                  }
 	unsigned waitNext ( cnt_t _delay )                               { return tmr_waitNext     (this, _delay);                  }
 	unsigned waitUntil( cnt_t _time )                                { return tmr_waitUntil    (this, _time);                   }
 	unsigned wait     ( void )                                       { return tmr_wait         (this);                          }
-	unsigned take     ( void )                                       { return tmr_take         (this);                          }
-	unsigned tryWait  ( void )                                       { return tmr_tryWait      (this);                          }
-	unsigned takeISR  ( void )                                       { return tmr_takeISR      (this);                          }
 
 	bool     operator!( void )                                       { return __tmr::hdr.id == ID_STOPPED;                      }
 };

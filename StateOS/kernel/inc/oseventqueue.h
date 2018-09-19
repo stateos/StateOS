@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    17.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -249,6 +249,35 @@ void evq_delete( evq_t *evq );
 
 /******************************************************************************
  *
+ * Name              : evq_take
+ * Alias             : evq_tryWait
+ * ISR alias         : evq_takeISR
+ *
+ * Description       : try to transfer event data from the event queue object,
+ *                     don't wait if the event queue object is empty
+ *
+ * Parameters
+ *   evq             : pointer to event queue object
+ *   data            : pointer to store event data
+ *
+ * Return
+ *   E_SUCCESS       : event data was successfully transfered from the event queue object
+ *   E_TIMEOUT       : event queue object is empty
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned evq_take( evq_t *evq, unsigned *data );
+
+__STATIC_INLINE
+unsigned evq_tryWait( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
+
+__STATIC_INLINE
+unsigned evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
+
+/******************************************************************************
+ *
  * Name              : evq_waitFor
  *
  * Description       : try to transfer event data from the event queue object,
@@ -319,32 +348,28 @@ unsigned evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, 
 
 /******************************************************************************
  *
- * Name              : evq_take
- * Alias             : evq_tryWait
- * ISR alias         : evq_takeISR
+ * Name              : evq_give
+ * ISR alias         : evq_giveISR
  *
- * Description       : try to transfer event data from the event queue object,
- *                     don't wait if the event queue object is empty
+ * Description       : try to transfer event data to the event queue object,
+ *                     don't wait if the event queue object is full
  *
  * Parameters
  *   evq             : pointer to event queue object
- *   data            : pointer to store event data
+ *   data            : event value
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered from the event queue object
- *   E_TIMEOUT       : event queue object is empty
+ *   E_SUCCESS       : event data was successfully transfered to the event queue object
+ *   E_TIMEOUT       : event queue object is full
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned evq_take( evq_t *evq, unsigned *data );
+unsigned evq_give( evq_t *evq, unsigned data );
 
 __STATIC_INLINE
-unsigned evq_tryWait( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
-
-__STATIC_INLINE
-unsigned evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
+unsigned evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); }
 
 /******************************************************************************
  *
@@ -418,31 +443,6 @@ unsigned evq_send( evq_t *evq, unsigned data ) { return evq_sendFor(evq, data, I
 
 /******************************************************************************
  *
- * Name              : evq_give
- * ISR alias         : evq_giveISR
- *
- * Description       : try to transfer event data to the event queue object,
- *                     don't wait if the event queue object is full
- *
- * Parameters
- *   evq             : pointer to event queue object
- *   data            : event value
- *
- * Return
- *   E_SUCCESS       : event data was successfully transfered to the event queue object
- *   E_TIMEOUT       : event queue object is full
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-unsigned evq_give( evq_t *evq, unsigned data );
-
-__STATIC_INLINE
-unsigned evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); }
-
-/******************************************************************************
- *
  * Name              : evq_push
  * ISR alias         : evq_pushISR
  *
@@ -490,17 +490,17 @@ struct EventQueueT : public __evq
 	~EventQueueT( void ) { assert(__evq::obj.queue == nullptr); }
 
 	void     kill     ( void )                          {        evq_kill     (this);                }
-	unsigned waitFor  ( unsigned *_data, cnt_t _delay ) { return evq_waitFor  (this, _data, _delay); }
-	unsigned waitUntil( unsigned *_data, cnt_t _time )  { return evq_waitUntil(this, _data, _time);  }
-	unsigned wait     ( unsigned *_data )               { return evq_wait     (this, _data);         }
 	unsigned take     ( unsigned *_data )               { return evq_take     (this, _data);         }
 	unsigned tryWait  ( unsigned *_data )               { return evq_tryWait  (this, _data);         }
 	unsigned takeISR  ( unsigned *_data )               { return evq_takeISR  (this, _data);         }
+	unsigned waitFor  ( unsigned *_data, cnt_t _delay ) { return evq_waitFor  (this, _data, _delay); }
+	unsigned waitUntil( unsigned *_data, cnt_t _time )  { return evq_waitUntil(this, _data, _time);  }
+	unsigned wait     ( unsigned *_data )               { return evq_wait     (this, _data);         }
+	unsigned give     ( unsigned  _data )               { return evq_give     (this, _data);         }
+	unsigned giveISR  ( unsigned  _data )               { return evq_giveISR  (this, _data);         }
 	unsigned sendFor  ( unsigned  _data, cnt_t _delay ) { return evq_sendFor  (this, _data, _delay); }
 	unsigned sendUntil( unsigned  _data, cnt_t _time )  { return evq_sendUntil(this, _data, _time);  }
 	unsigned send     ( unsigned  _data )               { return evq_send     (this, _data);         }
-	unsigned give     ( unsigned  _data )               { return evq_give     (this, _data);         }
-	unsigned giveISR  ( unsigned  _data )               { return evq_giveISR  (this, _data);         }
 	void     push     ( unsigned  _data )               {        evq_push     (this, _data);         }
 	void     pushISR  ( unsigned  _data )               {        evq_pushISR  (this, _data);         }
 	unsigned count    ( void )                          { return evq_count    (this);                }

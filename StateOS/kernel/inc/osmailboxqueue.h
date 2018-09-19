@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    17.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -259,6 +259,35 @@ void box_delete( box_t *box );
 
 /******************************************************************************
  *
+ * Name              : box_take
+ * Alias             : box_tryWait
+ * ISR alias         : box_takeISR
+ *
+ * Description       : try to transfer mailbox data from the mailbox queue object,
+ *                     don't wait if the mailbox queue object is empty
+ *
+ * Parameters
+ *   box             : pointer to mailbox queue object
+ *   data            : pointer to store mailbox data
+ *
+ * Return
+ *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
+ *   E_TIMEOUT       : mailbox queue object is empty
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned box_take( box_t *box, void *data );
+
+__STATIC_INLINE
+unsigned box_tryWait( box_t *box, void *data ) { return box_take(box, data); }
+
+__STATIC_INLINE
+unsigned box_takeISR( box_t *box, void *data ) { return box_take(box, data); }
+
+/******************************************************************************
+ *
  * Name              : box_waitFor
  *
  * Description       : try to transfer mailbox data from the mailbox queue object,
@@ -329,32 +358,28 @@ unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFI
 
 /******************************************************************************
  *
- * Name              : box_take
- * Alias             : box_tryWait
- * ISR alias         : box_takeISR
+ * Name              : box_give
+ * ISR alias         : box_giveISR
  *
- * Description       : try to transfer mailbox data from the mailbox queue object,
- *                     don't wait if the mailbox queue object is empty
+ * Description       : try to transfer mailbox data to the mailbox queue object,
+ *                     don't wait if the mailbox queue object is full
  *
  * Parameters
  *   box             : pointer to mailbox queue object
- *   data            : pointer to store mailbox data
+ *   data            : pointer to mailbox data
  *
  * Return
- *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
- *   E_TIMEOUT       : mailbox queue object is empty
+ *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
+ *   E_TIMEOUT       : mailbox queue object is full
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned box_take( box_t *box, void *data );
+unsigned box_give( box_t *box, const void *data );
 
 __STATIC_INLINE
-unsigned box_tryWait( box_t *box, void *data ) { return box_take(box, data); }
-
-__STATIC_INLINE
-unsigned box_takeISR( box_t *box, void *data ) { return box_take(box, data); }
+unsigned box_giveISR( box_t *box, const void *data ) { return box_give(box, data); }
 
 /******************************************************************************
  *
@@ -425,31 +450,6 @@ unsigned box_sendUntil( box_t *box, const void *data, cnt_t time );
 
 __STATIC_INLINE
 unsigned box_send( box_t *box, const void *data ) { return box_sendFor(box, data, INFINITE); }
-
-/******************************************************************************
- *
- * Name              : box_give
- * ISR alias         : box_giveISR
- *
- * Description       : try to transfer mailbox data to the mailbox queue object,
- *                     don't wait if the mailbox queue object is full
- *
- * Parameters
- *   box             : pointer to mailbox queue object
- *   data            : pointer to mailbox data
- *
- * Return
- *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
- *   E_TIMEOUT       : mailbox queue object is full
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-unsigned box_give( box_t *box, const void *data );
-
-__STATIC_INLINE
-unsigned box_giveISR( box_t *box, const void *data ) { return box_give(box, data); }
 
 /******************************************************************************
  *
@@ -539,17 +539,17 @@ struct MailBoxQueueT : public __box
 	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	void     kill     ( void )                            {        box_kill     (this);                }
-	unsigned waitFor  (       void *_data, cnt_t _delay ) { return box_waitFor  (this, _data, _delay); }
-	unsigned waitUntil(       void *_data, cnt_t _time )  { return box_waitUntil(this, _data, _time);  }
-	unsigned wait     (       void *_data )               { return box_wait     (this, _data);         }
 	unsigned take     (       void *_data )               { return box_take     (this, _data);         }
 	unsigned tryWait  (       void *_data )               { return box_tryWait  (this, _data);         }
 	unsigned takeISR  (       void *_data )               { return box_takeISR  (this, _data);         }
+	unsigned waitFor  (       void *_data, cnt_t _delay ) { return box_waitFor  (this, _data, _delay); }
+	unsigned waitUntil(       void *_data, cnt_t _time )  { return box_waitUntil(this, _data, _time);  }
+	unsigned wait     (       void *_data )               { return box_wait     (this, _data);         }
+	unsigned give     ( const void *_data )               { return box_give     (this, _data);         }
+	unsigned giveISR  ( const void *_data )               { return box_giveISR  (this, _data);         }
 	unsigned sendFor  ( const void *_data, cnt_t _delay ) { return box_sendFor  (this, _data, _delay); }
 	unsigned sendUntil( const void *_data, cnt_t _time )  { return box_sendUntil(this, _data, _time);  }
 	unsigned send     ( const void *_data )               { return box_send     (this, _data);         }
-	unsigned give     ( const void *_data )               { return box_give     (this, _data);         }
-	unsigned giveISR  ( const void *_data )               { return box_giveISR  (this, _data);         }
 	void     push     ( const void *_data )               {        box_push     (this, _data);         }
 	void     pushISR  ( const void *_data )               {        box_pushISR  (this, _data);         }
 	unsigned count    ( void )                            { return box_count    (this);                }

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    17.09.2018
+    @date    19.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -329,6 +329,31 @@ unsigned mtx_getPrio( mtx_t *mtx );
 
 /******************************************************************************
  *
+ * Name              : mtx_take
+ * Alias             : mtx_tryLock
+ *
+ * Description       : try to lock the mutex object,
+ *                     don't wait if the mutex object can't be locked immediately
+ *
+ * Parameters
+ *   mtx             : pointer to mutex object
+ *
+ * Return
+ *   E_SUCCESS       : mutex object was successfully locked
+ *   E_TIMEOUT       : mutex object can't be locked immediately or
+ *                     locking is not possible due to priority protection
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned mtx_take( mtx_t *mtx );
+
+__STATIC_INLINE
+unsigned mtx_tryLock( mtx_t *mtx ) { return mtx_take(mtx); }
+
+/******************************************************************************
+ *
  * Name              : mtx_waitFor
  *
  * Description       : try to lock the mutex object,
@@ -403,31 +428,6 @@ unsigned mtx_lock( mtx_t *mtx ) { return mtx_wait(mtx); }
 
 /******************************************************************************
  *
- * Name              : mtx_take
- * Alias             : mtx_tryLock
- *
- * Description       : try to lock the mutex object,
- *                     don't wait if the mutex object can't be locked immediately
- *
- * Parameters
- *   mtx             : pointer to mutex object
- *
- * Return
- *   E_SUCCESS       : mutex object was successfully locked
- *   E_TIMEOUT       : mutex object can't be locked immediately or
- *                     locking is not possible due to priority protection
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned mtx_take( mtx_t *mtx );
-
-__STATIC_INLINE
-unsigned mtx_tryLock( mtx_t *mtx ) { return mtx_take(mtx); }
-
-/******************************************************************************
- *
  * Name              : mtx_give
  * Alias             : mtx_unlock
  *
@@ -483,12 +483,12 @@ struct Mutex : public __mtx
 	void     prio     ( unsigned _prio )  {        mtx_prio     (this, _prio);  }
 	unsigned getPrio  ( void )            { return mtx_getPrio  (this);         }
 	unsigned prio     ( void )            { return mtx_getPrio  (this);         }
+	unsigned take     ( void )            { return mtx_take     (this);         }
+	unsigned tryLock  ( void )            { return mtx_tryLock  (this);         }
 	unsigned waitFor  ( cnt_t    _delay ) { return mtx_waitFor  (this, _delay); }
 	unsigned waitUntil( cnt_t    _time )  { return mtx_waitUntil(this, _time);  }
 	unsigned wait     ( void )            { return mtx_wait     (this);         }
 	unsigned lock     ( void )            { return mtx_lock     (this);         }
-	unsigned take     ( void )            { return mtx_take     (this);         }
-	unsigned tryLock  ( void )            { return mtx_tryLock  (this);         }
 	unsigned give     ( void )            { return mtx_give     (this);         }
 	unsigned unlock   ( void )            { return mtx_unlock   (this);         }
 };
