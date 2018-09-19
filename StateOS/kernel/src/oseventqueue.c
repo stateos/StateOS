@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    17.09.2018
+    @date    19.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -384,51 +384,51 @@ void evq_push( evq_t *evq, unsigned data )
 unsigned evq_count( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned cnt;
+	unsigned count;
 
 	assert(evq);
 
 	sys_lock();
 	{
-		cnt = priv_evq_count(evq);
+		count = evq->count;
 	}
 	sys_unlock();
 
-	return cnt;
+	return count;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned evq_space( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned cnt;
+	unsigned space;
 
 	assert(evq);
 
 	sys_lock();
 	{
-		cnt = priv_evq_space(evq);
+		space = evq->limit - evq->count;
 	}
 	sys_unlock();
 
-	return cnt;
+	return space;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned evq_limit( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned cnt;
+	unsigned limit;
 
 	assert(evq);
 
 	sys_lock();
 	{
-		cnt = priv_evq_limit(evq);
+		limit = evq->limit;
 	}
 	sys_unlock();
 
-	return cnt;
+	return limit;
 }
 
 /* -------------------------------------------------------------------------- */

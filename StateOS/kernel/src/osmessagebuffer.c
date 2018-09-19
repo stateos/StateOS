@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    17.09.2018
+    @date    19.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -472,51 +472,51 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 unsigned msg_count( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned cnt;
+	unsigned count;
 
 	assert(msg);
 
 	sys_lock();
 	{
-		cnt = priv_msg_count(msg);
+		count = priv_msg_count(msg);
 	}
 	sys_unlock();
 
-	return cnt;
+	return count;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned msg_space( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned cnt;
+	unsigned space;
 
 	assert(msg);
 
 	sys_lock();
 	{
-		cnt = priv_msg_space(msg);
+		space = priv_msg_space(msg);
 	}
 	sys_unlock();
 
-	return cnt;
+	return space;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned msg_limit( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned cnt;
+	unsigned limit;
 
 	assert(msg);
 
 	sys_lock();
 	{
-		cnt = priv_msg_limit(msg);
+		limit = priv_msg_limit(msg);
 	}
 	sys_unlock();
 
-	return cnt;
+	return limit;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    17.09.2018
+    @date    19.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -422,51 +422,51 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 unsigned stm_count( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned cnt;
+	unsigned count;
 
 	assert(stm);
 
 	sys_lock();
 	{
-		cnt = priv_stm_count(stm);
+		count = stm->count;
 	}
 	sys_unlock();
 
-	return cnt;
+	return count;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned stm_space( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned cnt;
+	unsigned space;
 
 	assert(stm);
 
 	sys_lock();
 	{
-		cnt = priv_stm_space(stm);
+		space = stm->limit - stm->count;
 	}
 	sys_unlock();
 
-	return cnt;
+	return space;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned stm_limit( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned cnt;
+	unsigned limit;
 
 	assert(stm);
 
 	sys_lock();
 	{
-		cnt = priv_stm_limit(stm);
+		limit = stm->limit;
 	}
 	sys_unlock();
 
-	return cnt;
+	return limit;
 }
 
 /* -------------------------------------------------------------------------- */
