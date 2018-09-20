@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    16.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -208,13 +208,13 @@ unsigned tsk_detach( tsk_t *tsk )
 		    (tsk->join != DETACHED) &&
 		    (tsk->hdr.obj.res != 0))
 		{
-			core_tsk_wakeup(tsk->join, E_TIMEOUT);
+			core_tsk_wakeup(tsk->join, E_FAILURE);
 			tsk->join = DETACHED;
 			event = E_SUCCESS;
 		}
 		else
 		{
-			event = E_TIMEOUT;
+			event = E_FAILURE;
 		}
 	}
 	sys_unlock();
@@ -234,14 +234,14 @@ unsigned tsk_join( tsk_t *tsk )
 	sys_lock();
 	{
 		if (tsk->join != JOINABLE)
-			event = E_TIMEOUT;
+			event = E_FAILURE;
 		else
 		if (tsk->hdr.id != ID_STOPPED)
 			event = core_tsk_waitFor(&tsk->join, INFINITE);
 		else
 			event = E_SUCCESS;
 
-		if (event != E_TIMEOUT) // !detached
+		if (event != E_FAILURE) // !detached
 			sys_free(tsk->hdr.obj.res);
 	}
 	sys_unlock();
@@ -360,7 +360,7 @@ unsigned priv_tsk_give( tsk_t *tsk, unsigned flags )
 		return E_SUCCESS;
 	}
 
-	return E_TIMEOUT;
+	return E_FAILURE;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -395,7 +395,7 @@ unsigned tsk_suspend( tsk_t *tsk )
 		}
 		else
 		{
-			event = E_TIMEOUT;
+			event = E_FAILURE;
 		}
 	}
 	sys_unlock();
@@ -420,7 +420,7 @@ unsigned tsk_resume( tsk_t *tsk )
 		}
 		else
 		{
-			event = E_TIMEOUT;
+			event = E_FAILURE;
 		}
 	}
 	sys_unlock();

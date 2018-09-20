@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -227,7 +227,7 @@ unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay )
 	{
 		event = priv_evq_take(evq, data);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.evq.data.in = data;
 			event = core_tsk_waitFor(&evq->obj.queue, delay);
@@ -250,7 +250,7 @@ unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time )
 	{
 		event = priv_evq_take(evq, data);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.evq.data.in = data;
 			event = core_tsk_waitUntil(&evq->obj.queue, time);
@@ -306,7 +306,7 @@ unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
 	{
 		event = priv_evq_give(evq, data);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.evq.data.out = data;
 			event = core_tsk_waitFor(&evq->obj.queue, delay);
@@ -329,7 +329,7 @@ unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
 	{
 		event = priv_evq_give(evq, data);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.evq.data.out = data;
 			event = core_tsk_waitUntil(&evq->obj.queue, time);

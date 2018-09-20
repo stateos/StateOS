@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    17.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -107,7 +107,10 @@ unsigned priv_mut_take( mut_t *mut )
 		return E_SUCCESS;
 	}
 
-	return E_TIMEOUT;
+	if (mut->owner != System.cur)
+		return E_TIMEOUT;
+
+	return E_FAILURE;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -139,7 +142,7 @@ unsigned mut_waitFor( mut_t *mut, cnt_t delay )
 	{
 		event = priv_mut_take(mut);
 
-		if (event != E_SUCCESS && mut->owner != System.cur)
+		if (event == E_TIMEOUT)
 			event = core_tsk_waitFor(&mut->obj.queue, delay);
 	}
 	sys_unlock();
@@ -159,7 +162,7 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time )
 	{
 		event = priv_mut_take(mut);
 
-		if (event != E_SUCCESS && mut->owner != System.cur)
+		if (event == E_TIMEOUT)
 			event = core_tsk_waitUntil(&mut->obj.queue, time);
 	}
 	sys_unlock();
@@ -180,7 +183,7 @@ unsigned priv_mut_give( mut_t *mut )
 		return E_SUCCESS;
 	}
 
-	return E_TIMEOUT;
+	return E_FAILURE;
 }
 
 /* -------------------------------------------------------------------------- */

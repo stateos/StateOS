@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -201,16 +201,21 @@ unsigned priv_mtx_take( mtx_t *mtx )
 		return E_SUCCESS;
 	}
 
-	if (mtx->owner == System.cur)
+	if ((mtx->mode & mtxTypeMASK) == mtxNormal || mtx->owner != System.cur)
 	{
-		if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count + 1 != 0)
-		{
-			mtx->count = mtx->count + 1;
-			return E_SUCCESS;
-		}
+		if ((mtx->mode & mtxPrioMASK) == mtxPrioProtect && mtx->prio < System.cur->prio)
+			return E_FAILURE;
+
+		return E_TIMEOUT;
 	}
 
-	return E_TIMEOUT;
+	if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count + 1 != 0)
+	{
+		mtx->count = mtx->count + 1;
+		return E_SUCCESS;
+	}
+
+	return E_FAILURE;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -242,11 +247,9 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay )
 	{
 		event = priv_mtx_take(mtx);
 
-		if (event != E_SUCCESS &&
-		   ((mtx->mode & mtxTypeMASK) == mtxNormal      || mtx->owner != System.cur) &&
-		   ((mtx->mode & mtxPrioMASK) != mtxPrioProtect || mtx->prio  >= System.cur->prio))
+		if (event == E_TIMEOUT)
 		{
-			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && System.cur->prio > mtx->owner->prio)
+			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && mtx->owner->prio < System.cur->prio)
 				core_tsk_prio(mtx->owner, System.cur->prio);
 
 			System.cur->mtx.tree = mtx->owner;
@@ -271,11 +274,9 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
 	{
 		event = priv_mtx_take(mtx);
 
-		if (event != E_SUCCESS &&
-		   ((mtx->mode & mtxTypeMASK) == mtxNormal      || mtx->owner != System.cur) &&
-		   ((mtx->mode & mtxPrioMASK) != mtxPrioProtect || mtx->prio  >= System.cur->prio))
+		if (event == E_TIMEOUT)
 		{
-			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && System.cur->prio > mtx->owner->prio)
+			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && mtx->owner->prio < System.cur->prio)
 				core_tsk_prio(mtx->owner, System.cur->prio);
 
 			System.cur->mtx.tree = mtx->owner;
@@ -309,10 +310,9 @@ unsigned priv_mtx_give( mtx_t *mtx )
 		priv_mtx_unlink(mtx);
 		priv_mtx_link(mtx, core_one_wakeup(&mtx->obj.queue, E_SUCCESS));
 		return E_SUCCESS;
-		
 	}
 
-	return E_TIMEOUT;
+	return E_FAILURE;
 }
 
 /* -------------------------------------------------------------------------- */

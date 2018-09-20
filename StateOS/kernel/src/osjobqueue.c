@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -237,7 +237,7 @@ unsigned job_waitFor( job_t *job, cnt_t delay )
 	{
 		event = priv_job_take(job, &fun);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			event = core_tsk_waitFor(&job->obj.queue, delay);
 			fun = System.cur->tmp.job.fun;
@@ -264,7 +264,7 @@ unsigned job_waitUntil( job_t *job, cnt_t time )
 	{
 		event = priv_job_take(job, &fun);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			event = core_tsk_waitUntil(&job->obj.queue, time);
 			fun = System.cur->tmp.job.fun;
@@ -324,7 +324,7 @@ unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 	{
 		event = priv_job_give(job, fun);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.job.fun = fun;
 			event = core_tsk_waitFor(&job->obj.queue, delay);
@@ -347,7 +347,7 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 	{
 		event = priv_job_give(job, fun);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.job.fun = fun;
 			event = core_tsk_waitUntil(&job->obj.queue, time);

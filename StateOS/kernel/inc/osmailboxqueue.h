@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -272,7 +272,7 @@ void box_delete( box_t *box );
  *
  * Return
  *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
- *   E_TIMEOUT       : mailbox queue object is empty
+ *   E_TIMEOUT       : mailbox queue object is empty, try wait
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -370,7 +370,7 @@ unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFI
  *
  * Return
  *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
- *   E_TIMEOUT       : mailbox queue object is full
+ *   E_TIMEOUT       : mailbox queue object is full, try wait
  *
  * Note              : may be used both in thread and handler mode
  *

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -547,7 +547,7 @@ void tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0); }
  *
  * Return
  *   E_SUCCESS       : timer object successfully finished countdown
- *   E_TIMEOUT       : timer object has not yet completed counting
+ *   E_TIMEOUT       : timer object has not yet completed counting, try wait
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -640,7 +640,7 @@ unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : timer object successfully finished countdown
- *   E_STOPPED       : timer object was killed before the specified timeout expired
+ *   E_STOPPED       : timer object was killed before the countdown ended
  *
  * Note              : use only in thread mode
  *

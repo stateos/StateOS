@@ -45,6 +45,7 @@ Features:
 - updated flag object
 - updated queue/buffer objects
 - updated queue/buffer functions
+- added E_FAILURE event
 ---------
 6.2
 - updated kernel

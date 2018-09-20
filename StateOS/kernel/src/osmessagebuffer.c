@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -235,7 +235,7 @@ void priv_msg_putUpdate( msg_t *msg, const char *data, unsigned size )
 		}
 		else
 		{
-			core_tsk_wakeup(msg->obj.queue, E_TIMEOUT);
+			core_tsk_wakeup(msg->obj.queue, E_FAILURE);
 		}
 	}
 }
@@ -268,8 +268,13 @@ unsigned priv_msg_take( msg_t *msg, char *data, unsigned size )
 	assert(msg->limit);
 	assert(data);
 
-	if (msg->count > 0 && size >= priv_msg_size(msg))
-		return priv_msg_getUpdate(msg, data, size);
+	if (msg->count > 0)
+	{
+		if (size >= priv_msg_size(msg))
+			return priv_msg_getUpdate(msg, data, size);
+
+		return E_FAILURE;
+	}
 
 	return E_TIMEOUT;
 }
@@ -353,7 +358,10 @@ unsigned priv_msg_give( msg_t *msg, const char *data, unsigned size )
 		return E_SUCCESS;
 	}
 
-	return E_TIMEOUT;
+	if (sizeof(unsigned) + size <= msg->limit)
+		return E_TIMEOUT;
+
+	return E_FAILURE;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -383,7 +391,7 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
 	{
 		event = priv_msg_give(msg, data, size);
 
-		if (event != E_SUCCESS && sizeof(unsigned) + size <= msg->limit)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.out = data;
 			System.cur->tmp.msg.size = size;
@@ -407,7 +415,7 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
 	{
 		event = priv_msg_give(msg, data, size);
 
-		if (event != E_SUCCESS && sizeof(unsigned) + size <= msg->limit)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.out = data;
 			System.cur->tmp.msg.size = size;
@@ -440,7 +448,7 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 		}
 		else
 		{
-			event = E_TIMEOUT;
+			event = E_FAILURE;
 		}
 	}
 	sys_unlock();

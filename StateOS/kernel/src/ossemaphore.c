@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    16.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -146,7 +146,7 @@ unsigned sem_waitFor( sem_t *sem, cnt_t delay )
 	{
 		event = priv_sem_take(sem);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 			event = core_tsk_waitFor(&sem->obj.queue, delay);
 	}
 	sys_unlock();
@@ -166,7 +166,7 @@ unsigned sem_waitUntil( sem_t *sem, cnt_t time )
 	{
 		event = priv_sem_take(sem);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 			event = core_tsk_waitUntil(&sem->obj.queue, time);
 	}
 	sys_unlock();
@@ -220,7 +220,7 @@ unsigned sem_sendFor( sem_t *sem, cnt_t delay )
 	{
 		event = priv_sem_give(sem);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 			event = core_tsk_waitFor(&sem->obj.queue, delay);
 	}
 	sys_unlock();
@@ -240,7 +240,7 @@ unsigned sem_sendUntil( sem_t *sem, cnt_t time )
 	{
 		event = priv_sem_give(sem);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 			event = core_tsk_waitUntil(&sem->obj.queue, time);
 	}
 	sys_unlock();

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    16.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -141,7 +141,7 @@ unsigned sig_waitFor( sig_t *sig, cnt_t delay )
 	{
 		event = priv_sig_take(sig);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 			event = core_tsk_waitFor(&sig->obj.queue, delay);
 	}
 	sys_unlock();
@@ -161,7 +161,7 @@ unsigned sig_waitUntil( sig_t *sig, cnt_t time )
 	{
 		event = priv_sig_take(sig);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 			event = core_tsk_waitUntil(&sig->obj.queue, time);
 	}
 	sys_unlock();

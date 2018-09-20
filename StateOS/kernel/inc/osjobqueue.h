@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -262,7 +262,7 @@ void job_delete( job_t *job );
  *
  * Return
  *   E_SUCCESS       : job data was successfully transfered from the job queue object
- *   E_TIMEOUT       : job queue object is empty
+ *   E_TIMEOUT       : job queue object is empty, try wait
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -357,7 +357,7 @@ unsigned job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
  *
  * Return
  *   E_SUCCESS       : job data was successfully transfered to the job queue object
- *   E_TIMEOUT       : job queue object is full
+ *   E_TIMEOUT       : job queue object is full, try wait
  *
  * Note              : may be used both in thread and handler mode
  *

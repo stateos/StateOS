@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -340,8 +340,8 @@ unsigned mtx_getPrio( mtx_t *mtx );
  *
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
- *   E_TIMEOUT       : mutex object can't be locked immediately or
- *                     locking is not possible due to priority protection
+ *   E_FAILURE       : mutex object can't be locked
+ *   E_TIMEOUT       : mutex object can't be locked immediately, try wait
  *
  * Note              : use only in thread mode
  *
@@ -367,9 +367,9 @@ unsigned mtx_tryLock( mtx_t *mtx ) { return mtx_take(mtx); }
  *
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
+ *   E_FAILURE       : mutex object can't be locked
  *   E_STOPPED       : mutex object was killed before the specified timeout expired
- *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired or
- *                     locking is not possible due to priority protection
+ *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -390,9 +390,9 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
+ *   E_FAILURE       : mutex object can't be locked
  *   E_STOPPED       : mutex object was killed before the specified timeout expired
- *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired or
- *                     locking is not possible due to priority protection
+ *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -413,8 +413,8 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
+ *   E_FAILURE       : mutex object can't be locked
  *   E_STOPPED       : mutex object was killed
- *   E_TIMEOUT       : locking is not possible due to priority protection
  *
  * Note              : use only in thread mode
  *
@@ -439,7 +439,7 @@ unsigned mtx_lock( mtx_t *mtx ) { return mtx_wait(mtx); }
  *
  * Return
  *   E_SUCCESS       : mutex object was successfully unlocked
- *   E_TIMEOUT       : mutex object can't be unlocked
+ *   E_FAILURE       : mutex object can't be unlocked
  *
  * Note              : use only in thread mode
  *

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -280,7 +280,7 @@ void sem_delete( sem_t *sem );
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully locked
- *   E_TIMEOUT       : semaphore object can't be locked immediately
+ *   E_TIMEOUT       : semaphore object can't be locked immediately, try wait
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -375,7 +375,7 @@ unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully unlocked
- *   E_TIMEOUT       : semaphore object can't be unlocked immediately
+ *   E_TIMEOUT       : semaphore object can't be unlocked immediately, try wait
  *
  * Note              : may be used both in thread and handler mode
  *

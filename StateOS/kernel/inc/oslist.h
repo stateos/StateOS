@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -256,7 +256,7 @@ void lst_delete( lst_t *lst );
  *
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_TIMEOUT       : list object is empty
+ *   E_TIMEOUT       : list object is empty, try wait
  *
  * Note              : may be used both in thread and handler mode
  *

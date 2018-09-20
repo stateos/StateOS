@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -739,7 +739,7 @@ void tsk_delete( tsk_t *tsk );
  *
  * Return
  *   E_SUCCESS       : given task was successfully detached
- *   E_TIMEOUT       : given task can not be detached
+ *   E_FAILURE       : given task can not be detached
  *
  * Note              : use only in thread mode
  *
@@ -759,7 +759,7 @@ unsigned tsk_detach( tsk_t *tsk );
  * Return
  *   E_SUCCESS       : joined task was stopped its execution
  *   E_STOPPED       : joined task was killed
- *   E_TIMEOUT       : joined task was detached
+ *   E_FAILURE       : joined task was detached
  *
  * Note              : use only in thread mode
  *
@@ -919,7 +919,7 @@ unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, INFINITE); }
  *
  * Return
  *   E_SUCCESS       : given flags have been successfully transferred to the task
- *   E_TIMEOUT       : given flags have not been transferred to the task
+ *   E_FAILURE       : given flags have not been transferred to the task
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -1023,7 +1023,7 @@ void tsk_sleep( void ) { tmr_wait(&WAIT); }
  *
  * Return
  *   E_SUCCESS       : task was successfully suspended
- *   E_TIMEOUT       : task can not be suspended
+ *   E_FAILURE       : task can not be suspended
  *
  * Note              : use only in thread mode
  *
@@ -1044,7 +1044,7 @@ unsigned tsk_suspend( tsk_t *tsk );
  *
  * Return
  *   E_SUCCESS       : task was successfully resumed
- *   E_TIMEOUT       : task can not be resumed
+ *   E_FAILURE       : task can not be resumed
  *
  * Note              : may be used both in thread and handler mode
  *

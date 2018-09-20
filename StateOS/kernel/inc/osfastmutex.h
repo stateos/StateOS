@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -227,7 +227,8 @@ void mut_delete( mut_t *mut );
  *
  * Return
  *   E_SUCCESS       : fast mutex object was successfully locked
- *   E_TIMEOUT       : fast mutex object can't be locked immediately
+ *   E_FAILURE       : fast mutex object can't be locked by owner task
+ *   E_TIMEOUT       : fast mutex object can't be locked immediately, try wait
  *
  * Note              : use only in thread mode
  *
@@ -253,6 +254,7 @@ unsigned mut_tryLock( mut_t *mut ) { return mut_take(mut); }
  *
  * Return
  *   E_SUCCESS       : fast mutex object was successfully locked
+ *   E_FAILURE       : fast mutex object can't be locked by owner task
  *   E_STOPPED       : fast mutex object was killed before the specified timeout expired
  *   E_TIMEOUT       : fast mutex object was not locked before the specified timeout expired
  *
@@ -275,6 +277,7 @@ unsigned mut_waitFor( mut_t *mut, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : fast mutex object was successfully locked
+ *   E_FAILURE       : fast mutex object can't be locked by owner task
  *   E_STOPPED       : fast mutex object was killed before the specified timeout expired
  *   E_TIMEOUT       : fast mutex object was not locked before the specified timeout expired
  *
@@ -297,6 +300,7 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : fast mutex object was successfully locked
+ *   E_FAILURE       : fast mutex object can't be locked by owner task
  *   E_STOPPED       : fast mutex object was killed
  *
  * Note              : use only in thread mode
@@ -322,7 +326,7 @@ unsigned mut_lock( mut_t *mut ) { return mut_wait(mut); }
  *
  * Return
  *   E_SUCCESS       : fast mutex object was successfully unlocked
- *   E_TIMEOUT       : fast mutex object can't be unlocked
+ *   E_FAILURE       : fast mutex object can't be unlocked
  *
  * Note              : use only in thread mode
  *

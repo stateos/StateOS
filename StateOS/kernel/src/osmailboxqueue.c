@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -233,7 +233,7 @@ unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
 	{
 		event = priv_box_take(box, data);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.in = data;
 			event = core_tsk_waitFor(&box->obj.queue, delay);
@@ -256,7 +256,7 @@ unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
 	{
 		event = priv_box_take(box, data);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.in = data;
 			event = core_tsk_waitUntil(&box->obj.queue, time);
@@ -313,7 +313,7 @@ unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
 	{
 		event = priv_box_give(box, data);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.out = data;
 			event = core_tsk_waitFor(&box->obj.queue, delay);
@@ -336,7 +336,7 @@ unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
 	{
 		event = priv_box_give(box, data);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.out = data;
 			event = core_tsk_waitUntil(&box->obj.queue, time);

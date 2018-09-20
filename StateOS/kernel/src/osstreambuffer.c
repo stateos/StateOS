@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -296,7 +296,10 @@ unsigned priv_stm_give( stm_t *stm, const char *data, unsigned size )
 		return E_SUCCESS;
 	}
 
-	return E_TIMEOUT;
+	if (size <= stm->limit)
+		return E_TIMEOUT;
+
+	return E_FAILURE;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -326,7 +329,7 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
 	{
 		event = priv_stm_give(stm, data, size);
 
-		if (event != E_SUCCESS && size <= stm->limit)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.out = data;
 			System.cur->tmp.stm.size = size;
@@ -350,7 +353,7 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
 	{
 		event = priv_stm_give(stm, data, size);
 
-		if (event != E_SUCCESS && size <= stm->limit)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.out = data;
 			System.cur->tmp.stm.size = size;
@@ -383,7 +386,7 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 		}
 		else
 		{
-			event = E_TIMEOUT;
+			event = E_FAILURE;
 		}
 	}
 	sys_unlock();

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -262,7 +262,7 @@ void evq_delete( evq_t *evq );
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered from the event queue object
- *   E_TIMEOUT       : event queue object is empty
+ *   E_TIMEOUT       : event queue object is empty, try wait
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -360,7 +360,7 @@ unsigned evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, 
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered to the event queue object
- *   E_TIMEOUT       : event queue object is full
+ *   E_TIMEOUT       : event queue object is full, try wait
  *
  * Note              : may be used both in thread and handler mode
  *

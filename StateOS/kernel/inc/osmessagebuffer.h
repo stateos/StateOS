@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -278,7 +278,8 @@ void msg_delete( msg_t *msg );
  *   size            : size of write buffer
  *
  * Return            : number of bytes read from the message buffer or
- *   E_TIMEOUT       : message buffer object is empty or not enough space in the write buffer
+ *   E_FAILURE       : not enough space in the write buffer
+ *   E_TIMEOUT       : message buffer object is empty, try wait
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -308,6 +309,7 @@ unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(
  *                     INFINITE:  wait indefinitely while the message buffer object is empty
  *
  * Return            : number of bytes read from the message buffer or
+ *   E_FAILURE       : not enough space in the write buffer
  *   E_STOPPED       : message buffer object was killed before the specified timeout expired
  *   E_TIMEOUT       : message buffer object is empty and was not received data before the specified timeout expired
  *
@@ -331,6 +333,7 @@ unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay );
  *   time            : timepoint value
  *
  * Return            : number of bytes read from the message buffer or
+ *   E_FAILURE       : not enough space in the write buffer
  *   E_STOPPED       : message buffer object was killed before the specified timeout expired
  *   E_TIMEOUT       : message buffer object is empty and was not received data before the specified timeout expired
  *
@@ -353,7 +356,8 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time );
  *   size            : size of write buffer
  *
  * Return            : number of bytes read from the message buffer or
- *   E_STOPPED       : message buffer object was killed before the specified timeout expired
+ *   E_FAILURE       : not enough space in the write buffer
+ *   E_STOPPED       : message buffer object was killed
  *
  * Note              : use only in thread mode
  *
@@ -377,7 +381,8 @@ unsigned msg_wait( msg_t *msg, void *data, unsigned size ) { return msg_waitFor(
  *
  * Return
  *   E_SUCCESS       : message data was successfully transfered to the message buffer object
- *   E_TIMEOUT       : not enough space in the message buffer
+ *   E_FAILURE       : size of the message data is out of the limit
+ *   E_TIMEOUT       : not enough space in the message buffer, try wait
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -405,9 +410,9 @@ unsigned msg_giveISR( msg_t *msg, const void *data, unsigned size ) { return msg
  *
  * Return
  *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_FAILURE       : size of the message data is out of the limit
  *   E_STOPPED       : message buffer object was killed before the specified timeout expired
- *   E_TIMEOUT       : size of the message data is out of the limit or
- *                     message buffer object is full and was not issued data before the specified timeout expired
+ *   E_TIMEOUT       : message buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -430,9 +435,9 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
  *
  * Return
  *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_FAILURE       : size of the message data is out of the limit
  *   E_STOPPED       : message buffer object was killed before the specified timeout expired
- *   E_TIMEOUT       : size of the message data is out of the limit or
- *                     message buffer object is full and was not issued data before the specified timeout expired
+ *   E_TIMEOUT       : message buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -454,8 +459,8 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
  *
  * Return
  *   E_SUCCESS       : message data was successfully transfered to the message buffer object
- *   E_STOPPED       : message buffer object was killed before the specified timeout expired
- *   E_TIMEOUT       : size of the message data is out of the limit
+ *   E_FAILURE       : size of the message data is out of the limit
+ *   E_STOPPED       : message buffer object was killed
  *
  * Note              : use only in thread mode
  *
@@ -479,7 +484,7 @@ unsigned msg_send( msg_t *msg, const void *data, unsigned size ) { return msg_se
  *
  * Return
  *   E_SUCCESS       : message data was successfully transfered to the message buffer object
- *   E_TIMEOUT       : size of the message data is out of the limit
+ *   E_FAILURE       : size of the message data is out of the limit
  *
  * Note              : may be used both in thread and handler mode
  *

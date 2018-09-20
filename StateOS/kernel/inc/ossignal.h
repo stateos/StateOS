@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    20.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -264,7 +264,7 @@ void sig_delete( sig_t *sig );
  *
  * Return
  *   E_SUCCESS       : signal object was successfully released
- *   E_TIMEOUT       : signal object was not released
+ *   E_TIMEOUT       : signal object was not released, try wait
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -333,7 +333,7 @@ unsigned sig_waitUntil( sig_t *sig, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : signal object was successfully released
- *   E_STOPPED       : signal object was killed before the specified timeout expired
+ *   E_STOPPED       : signal object was killed
  *
  * Note              : use only in thread mode
  *

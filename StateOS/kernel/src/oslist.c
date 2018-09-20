@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    16.09.2018
+    @date    20.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -140,7 +140,7 @@ unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 	{
 		event = priv_lst_take(lst, data);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.lst.data.in = data;
 			event = core_tsk_waitFor(&lst->obj.queue, delay);
@@ -163,7 +163,7 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 	{
 		event = priv_lst_take(lst, data);
 
-		if (event != E_SUCCESS)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.lst.data.in = data;
 			event = core_tsk_waitUntil(&lst->obj.queue, time);
