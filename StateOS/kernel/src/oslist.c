@@ -186,7 +186,7 @@ void lst_give( lst_t *lst, const void *data )
 
 	sys_lock();
 	{
-		tsk = core_one_wakeup(&lst->obj.queue, E_SUCCESS);
+		tsk = core_tsk_wakeup(lst->obj.queue, E_SUCCESS);
 
 		if (tsk)
 		{

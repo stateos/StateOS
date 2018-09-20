@@ -179,7 +179,7 @@ unsigned priv_mut_give( mut_t *mut )
 
 	if (mut->owner == System.cur)
 	{
-		mut->owner = core_one_wakeup(&mut->obj.queue, E_SUCCESS);
+		mut->owner = core_tsk_wakeup(mut->obj.queue, E_SUCCESS);
 		return E_SUCCESS;
 	}
 

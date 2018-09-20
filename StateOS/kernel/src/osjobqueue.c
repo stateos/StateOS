@@ -154,7 +154,7 @@ fun_t *priv_job_getUpdate( job_t *job )
 	tsk_t *tsk;
 
 	fun = priv_job_get(job);
-	tsk = core_one_wakeup(&job->obj.queue, E_SUCCESS);
+	tsk = core_tsk_wakeup(job->obj.queue, E_SUCCESS);
 	if (tsk) priv_job_put(job, tsk->tmp.job.fun);
 
 	return fun;
@@ -168,7 +168,7 @@ void priv_job_putUpdate( job_t *job, fun_t *fun )
 	tsk_t *tsk;
 
 	priv_job_put(job, fun);
-	tsk = core_one_wakeup(&job->obj.queue, E_SUCCESS);
+	tsk = core_tsk_wakeup(job->obj.queue, E_SUCCESS);
 	if (tsk) tsk->tmp.job.fun = priv_job_get(job);
 }
 
@@ -182,7 +182,7 @@ void priv_job_skipUpdate( job_t *job )
 	while (job->count == job->limit)
 	{
 		priv_job_skip(job);
-		tsk = core_one_wakeup(&job->obj.queue, E_SUCCESS);
+		tsk = core_tsk_wakeup(job->obj.queue, E_SUCCESS);
 		if (tsk) priv_job_put(job, tsk->tmp.job.fun);
 	}
 }

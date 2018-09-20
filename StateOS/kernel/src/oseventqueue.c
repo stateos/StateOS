@@ -151,7 +151,7 @@ void priv_evq_getUpdate( evq_t *evq, unsigned *data )
 	tsk_t *tsk;
 
 	priv_evq_get(evq, data);
-	tsk = core_one_wakeup(&evq->obj.queue, E_SUCCESS);
+	tsk = core_tsk_wakeup(evq->obj.queue, E_SUCCESS);
 	if (tsk) priv_evq_put(evq, tsk->tmp.evq.data.out);
 }
 
@@ -163,7 +163,7 @@ void priv_evq_putUpdate( evq_t *evq, const unsigned data )
 	tsk_t *tsk;
 
 	priv_evq_put(evq, data);
-	tsk = core_one_wakeup(&evq->obj.queue, E_SUCCESS);
+	tsk = core_tsk_wakeup(evq->obj.queue, E_SUCCESS);
 	if (tsk) priv_evq_get(evq, tsk->tmp.evq.data.in);
 }
 
@@ -177,7 +177,7 @@ void priv_evq_skipUpdate( evq_t *evq )
 	while (evq->count == evq->limit)
 	{
 		priv_evq_skip(evq);
-		tsk = core_one_wakeup(&evq->obj.queue, E_SUCCESS);
+		tsk = core_tsk_wakeup(evq->obj.queue, E_SUCCESS);
 		if (tsk) priv_evq_put(evq, tsk->tmp.evq.data.out);
 	}
 }

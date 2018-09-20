@@ -179,7 +179,7 @@ void sig_give( sig_t *sig )
 	{
 		if (sig->type == sigClear)
 		{
-			sig->flag = !core_one_wakeup(&sig->obj.queue, E_SUCCESS);
+			sig->flag = !core_tsk_wakeup(sig->obj.queue, E_SUCCESS);
 		}
 		else
 		{

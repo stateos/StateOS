@@ -308,7 +308,7 @@ unsigned priv_mtx_give( mtx_t *mtx )
 		}
 
 		priv_mtx_unlink(mtx);
-		priv_mtx_link(mtx, core_one_wakeup(&mtx->obj.queue, E_SUCCESS));
+		priv_mtx_link(mtx, core_tsk_wakeup(mtx->obj.queue, E_SUCCESS));
 		return E_SUCCESS;
 	}
 

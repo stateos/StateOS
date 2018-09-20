@@ -156,7 +156,7 @@ void priv_box_getUpdate( box_t *box, char *data )
 	tsk_t *tsk;
 
 	priv_box_get(box, data);
-	tsk = core_one_wakeup(&box->obj.queue, E_SUCCESS);
+	tsk = core_tsk_wakeup(box->obj.queue, E_SUCCESS);
 	if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
 }
 
@@ -168,7 +168,7 @@ void priv_box_putUpdate( box_t *box, const char *data )
 	tsk_t *tsk;
 
 	priv_box_put(box, data);
-	tsk = core_one_wakeup(&box->obj.queue, E_SUCCESS);
+	tsk = core_tsk_wakeup(box->obj.queue, E_SUCCESS);
 	if (tsk) priv_box_get(box, tsk->tmp.box.data.in);
 }
 
@@ -182,7 +182,7 @@ void priv_box_skipUpdate( box_t *box )
 	while (box->count == box->limit)
 	{
 		priv_box_skip(box);
-		tsk = core_one_wakeup(&box->obj.queue, E_SUCCESS);
+		tsk = core_tsk_wakeup(box->obj.queue, E_SUCCESS);
 		if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
 	}
 }

@@ -110,7 +110,7 @@ unsigned priv_sem_take( sem_t *sem )
 
 	if (sem->count > 0)
 	{
-		if (core_one_wakeup(&sem->obj.queue, E_SUCCESS) == 0)
+		if (core_tsk_wakeup(sem->obj.queue, E_SUCCESS) == 0)
 			sem->count--;
 
 		return E_SUCCESS;
@@ -184,7 +184,7 @@ unsigned priv_sem_give( sem_t *sem )
 
 	if (sem->count < sem->limit)
 	{
-		if (core_one_wakeup(&sem->obj.queue, E_SUCCESS) == 0)
+		if (core_tsk_wakeup(sem->obj.queue, E_SUCCESS) == 0)
 			sem->count++;
 
 		return E_SUCCESS;
