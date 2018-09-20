@@ -1,0 +1,27 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+void tickLoop(sem_t *own, sem_t *another)
+{
+	static one_t one = 0;
+	one_call(&one, LED_Init);
+
+	for (;;)
+	{
+		sem_wait(own);
+		tsk_delay(SEC);
+		LED_Tick();
+		sem_post(another);
+	}
+}
+
+OS_SEM(sla_sem, 0);
+OS_SEM(mas_sem, 1);
+
+OS_TSK_START(sla, 0) { tickLoop(sla_sem, mas_sem); }
+OS_TSK_START(mas, 0) { tickLoop(mas_sem, sla_sem); }
+
+int main()
+{
+	tsk_sleep();
+}
