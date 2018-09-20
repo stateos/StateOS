@@ -87,7 +87,7 @@ void mtx_setPrio( mtx_t *mtx, unsigned prio )
 
 		if ((mtx->mode & mtxPrioMASK) == mtxPrioProtect)
 			while (mtx->obj.queue && mtx->obj.queue->prio > prio)
-				core_tsk_wakeup(mtx->obj.queue, E_TIMEOUT);
+				core_tsk_wakeup(mtx->obj.queue, E_FAILURE);
 	}
 	sys_unlock();
 }
