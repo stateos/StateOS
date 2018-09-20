@@ -466,7 +466,7 @@ unsigned mtx_unlock( mtx_t *mtx ) { return mtx_give(mtx); }
  *
  * Constructor parameters
  *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
- *                           type: mtxErrorCheck or mtxRecursive
+ *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
