@@ -256,7 +256,7 @@ void lst_delete( lst_t *lst );
  *
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_TIMEOUT       : list object is empty, try wait
+ *   E_TIMEOUT       : list object is empty, try again
  *
  * Note              : may be used both in thread and handler mode
  *

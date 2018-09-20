@@ -264,7 +264,7 @@ void sig_delete( sig_t *sig );
  *
  * Return
  *   E_SUCCESS       : signal object was successfully released
- *   E_TIMEOUT       : signal object was not released, try wait
+ *   E_TIMEOUT       : signal object was not released, try again
  *
  * Note              : may be used both in thread and handler mode
  *

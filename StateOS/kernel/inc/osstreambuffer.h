@@ -278,7 +278,7 @@ void stm_delete( stm_t *stm );
  *   size            : size of write buffer
  *
  * Return            : number of bytes read from the stream buffer or
- *   E_TIMEOUT       : stream buffer object is empty, try wait
+ *   E_TIMEOUT       : stream buffer object is empty, try again
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -378,7 +378,7 @@ unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(
  * Return
  *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
- *   E_TIMEOUT       : not enough space in the stream buffer, try wait
+ *   E_TIMEOUT       : not enough space in the stream buffer, try again
  *
  * Note              : may be used both in thread and handler mode
  *

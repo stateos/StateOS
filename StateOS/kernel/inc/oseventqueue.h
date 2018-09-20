@@ -262,7 +262,7 @@ void evq_delete( evq_t *evq );
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered from the event queue object
- *   E_TIMEOUT       : event queue object is empty, try wait
+ *   E_TIMEOUT       : event queue object is empty, try again
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -360,7 +360,7 @@ unsigned evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, 
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered to the event queue object
- *   E_TIMEOUT       : event queue object is full, try wait
+ *   E_TIMEOUT       : event queue object is full, try again
  *
  * Note              : may be used both in thread and handler mode
  *

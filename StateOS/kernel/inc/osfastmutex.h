@@ -228,7 +228,7 @@ void mut_delete( mut_t *mut );
  * Return
  *   E_SUCCESS       : fast mutex object was successfully locked
  *   E_FAILURE       : fast mutex object can't be locked by owner task
- *   E_TIMEOUT       : fast mutex object can't be locked immediately, try wait
+ *   E_TIMEOUT       : fast mutex object can't be locked immediately, try again
  *
  * Note              : use only in thread mode
  *

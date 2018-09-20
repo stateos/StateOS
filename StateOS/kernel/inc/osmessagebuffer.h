@@ -279,7 +279,7 @@ void msg_delete( msg_t *msg );
  *
  * Return            : number of bytes read from the message buffer or
  *   E_FAILURE       : not enough space in the write buffer
- *   E_TIMEOUT       : message buffer object is empty, try wait
+ *   E_TIMEOUT       : message buffer object is empty, try again
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -382,7 +382,7 @@ unsigned msg_wait( msg_t *msg, void *data, unsigned size ) { return msg_waitFor(
  * Return
  *   E_SUCCESS       : message data was successfully transfered to the message buffer object
  *   E_FAILURE       : size of the message data is out of the limit
- *   E_TIMEOUT       : not enough space in the message buffer, try wait
+ *   E_TIMEOUT       : not enough space in the message buffer, try again
  *
  * Note              : may be used both in thread and handler mode
  *

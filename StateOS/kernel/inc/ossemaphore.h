@@ -280,7 +280,7 @@ void sem_delete( sem_t *sem );
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully locked
- *   E_TIMEOUT       : semaphore object can't be locked immediately, try wait
+ *   E_TIMEOUT       : semaphore object can't be locked immediately, try again
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -375,7 +375,7 @@ unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully unlocked
- *   E_TIMEOUT       : semaphore object can't be unlocked immediately, try wait
+ *   E_TIMEOUT       : semaphore object can't be unlocked immediately, try again
  *
  * Note              : may be used both in thread and handler mode
  *

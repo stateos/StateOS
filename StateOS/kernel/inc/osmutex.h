@@ -341,7 +341,7 @@ unsigned mtx_getPrio( mtx_t *mtx );
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
  *   E_FAILURE       : mutex object can't be locked
- *   E_TIMEOUT       : mutex object can't be locked immediately, try wait
+ *   E_TIMEOUT       : mutex object can't be locked immediately, try again
  *
  * Note              : use only in thread mode
  *

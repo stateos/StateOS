@@ -272,7 +272,7 @@ void box_delete( box_t *box );
  *
  * Return
  *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
- *   E_TIMEOUT       : mailbox queue object is empty, try wait
+ *   E_TIMEOUT       : mailbox queue object is empty, try again
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -370,7 +370,7 @@ unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFI
  *
  * Return
  *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
- *   E_TIMEOUT       : mailbox queue object is full, try wait
+ *   E_TIMEOUT       : mailbox queue object is full, try again
  *
  * Note              : may be used both in thread and handler mode
  *

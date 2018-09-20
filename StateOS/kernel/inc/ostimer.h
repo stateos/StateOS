@@ -547,7 +547,7 @@ void tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0); }
  *
  * Return
  *   E_SUCCESS       : timer object successfully finished countdown
- *   E_TIMEOUT       : timer object has not yet completed counting, try wait
+ *   E_TIMEOUT       : timer object has not yet completed counting, try again
  *
  * Note              : may be used both in thread and handler mode
  *
