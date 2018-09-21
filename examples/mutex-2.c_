@@ -1,21 +1,22 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-OS_MTX(mtx, mtxDefault);
+OS_MTX(mtx, mtxNormal); // normal mutex works like a binary semaphore
 
-OS_TSK_DEF(sla, 0)
+void slave()
 {
 	mtx_wait(mtx);
 	LED_Tick();
-	mtx_give(mtx);
 }
 
-OS_TSK_DEF(mas, 1)
+void master()
 {
-	mtx_wait(mtx);
 	tsk_delay(SEC);
 	mtx_give(mtx);
 }
+
+OS_TSK(sla, 0, slave,  256);
+OS_TSK(mas, 0, master, 256);
 
 int main()
 {
