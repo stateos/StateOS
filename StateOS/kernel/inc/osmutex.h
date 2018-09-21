@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    21.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -60,6 +60,8 @@ extern "C" {
 #define mtxMASK       ( mtxTypeMASK + mtxPrioMASK + mtxRobustMASK )
 
 #define mtxDefault      mtxNormal
+
+#define mtxLIMIT      (~0U)
 
 /******************************************************************************
  *

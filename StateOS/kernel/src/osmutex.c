@@ -207,9 +207,9 @@ unsigned priv_mtx_take( mtx_t *mtx )
 	if ((mtx->mode & mtxTypeMASK) == mtxNormal || mtx->owner != System.cur)
 		return E_TIMEOUT;
 
-	if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count + 1 != 0)
+	if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count < mtxLIMIT)
 	{
-		mtx->count = mtx->count + 1;
+		mtx->count++;
 		return E_SUCCESS;
 	}
 
