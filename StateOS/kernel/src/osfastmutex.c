@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -37,7 +37,7 @@
 void mut_init( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(mut);
 
 	sys_lock();
@@ -55,7 +55,7 @@ mut_t *mut_create( void )
 {
 	mut_t *mut;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -72,7 +72,7 @@ mut_t *mut_create( void )
 void mut_kill( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(mut);
 
 	sys_lock();
@@ -119,7 +119,7 @@ unsigned mut_take( mut_t *mut )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -136,7 +136,7 @@ unsigned mut_waitFor( mut_t *mut, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -156,7 +156,7 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -192,7 +192,7 @@ unsigned mut_give( mut_t *mut )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{

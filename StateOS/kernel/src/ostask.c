@@ -37,7 +37,7 @@
 void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(tsk);
 	assert(state);
 	assert(stack);
@@ -67,7 +67,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 {
 	tsk_t *tsk;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(state);
 	assert(size);
 
@@ -86,7 +86,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 void tsk_start( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(tsk);
 	assert(tsk->state);
 
@@ -105,7 +105,7 @@ void tsk_start( tsk_t *tsk )
 void tsk_startFrom( tsk_t *tsk, fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(tsk);
 	assert(state);
 
@@ -126,7 +126,7 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(!System.cur->mtx.list);
 
 	port_set_lock();
@@ -148,7 +148,7 @@ void tsk_kill( tsk_t *tsk )
 	mtx_t *mtx;
 	mtx_t *nxt;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(tsk);
 
 	sys_lock();
@@ -199,7 +199,7 @@ unsigned tsk_detach( tsk_t *tsk )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(tsk);
 
 	sys_lock();
@@ -228,7 +228,7 @@ unsigned tsk_join( tsk_t *tsk )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(tsk);
 
 	sys_lock();
@@ -253,7 +253,7 @@ unsigned tsk_join( tsk_t *tsk )
 void tsk_yield( void )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -266,7 +266,7 @@ void tsk_yield( void )
 void tsk_flip( fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(state);
 
 	port_set_lock();
@@ -281,7 +281,7 @@ void tsk_flip( fun_t *state )
 void tsk_setPrio( unsigned prio )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -297,7 +297,7 @@ unsigned tsk_getPrio( void )
 {
 	unsigned prio;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -314,7 +314,7 @@ unsigned tsk_waitFor( unsigned flags, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -332,7 +332,7 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{

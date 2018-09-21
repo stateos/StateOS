@@ -184,7 +184,7 @@ void core_tmr_handler( void )
 {
 	tmr_t *tmr;
 
-	core_stk_assert();
+	assert_stk_integrity();
 
 	port_set_lock();
 	{
@@ -350,7 +350,7 @@ void core_tsk_transfer( tsk_t *tsk, tsk_t **que )
 static
 unsigned priv_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield )
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	core_tsk_append((tsk_t *)tsk, que);
 	priv_tsk_remove((tsk_t *)tsk);
@@ -506,7 +506,7 @@ void *core_tsk_handler( void *sp )
 {
 	tsk_t *cur, *nxt;
 
-	core_stk_assert();
+	assert_stk_integrity();
 
 	port_set_lock();
 	{

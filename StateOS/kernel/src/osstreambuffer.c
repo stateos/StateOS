@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -38,7 +38,7 @@
 void stm_init( stm_t *stm, void *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(stm);
 	assert(data);
 	assert(bufsize);
@@ -62,7 +62,7 @@ stm_t *stm_create( unsigned limit )
 	stm_t  * stm;
 	unsigned bufsize;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(limit);
 
 	sys_lock();
@@ -81,7 +81,7 @@ stm_t *stm_create( unsigned limit )
 void stm_kill( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(stm);
 
 	sys_lock();
@@ -238,7 +238,7 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay )
 {
 	unsigned len;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -262,7 +262,7 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time )
 {
 	unsigned len;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -323,7 +323,7 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -347,7 +347,7 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{

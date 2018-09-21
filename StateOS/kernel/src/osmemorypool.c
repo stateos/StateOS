@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -41,7 +41,7 @@ void mem_bind( mem_t *mem )
 	que_t  * ptr;
 	unsigned cnt;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(mem);
 	assert(mem->limit);
 	assert(mem->size);
@@ -62,7 +62,7 @@ void mem_bind( mem_t *mem )
 void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(mem);
 	assert(size);
 	assert(data);
@@ -90,7 +90,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 	mem_t  * mem;
 	unsigned bufsize;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(limit);
 	assert(size);
 
@@ -110,7 +110,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 void mem_kill( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(mem);
 
 	sys_lock();

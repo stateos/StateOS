@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    16.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -38,7 +38,7 @@
 void flg_init( flg_t *flg, unsigned init )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(flg);
 
 	sys_lock();
@@ -58,7 +58,7 @@ flg_t *flg_create( unsigned init )
 {
 	flg_t *flg;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -75,7 +75,7 @@ flg_t *flg_create( unsigned init )
 void flg_kill( flg_t *flg )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(flg);
 
 	sys_lock();

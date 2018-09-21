@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    10.09.2018
+    @date    21.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -108,23 +108,6 @@ cnt_t sys_time( void );
 
 __STATIC_INLINE
 cnt_t sys_timeISR( void ) { return sys_time(); }
-
-/******************************************************************************
- *
- * Name              : stk_assert
- *
- * Description       : check stack integrity of the current task
- *
- * Parameters        : none
- *
- * Return            : none
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-#define                stk_assert() \
-                       core_stk_assert()
 
 #ifdef __cplusplus
 }

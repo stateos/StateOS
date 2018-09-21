@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -38,7 +38,7 @@
 void evq_init( evq_t *evq, unsigned *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(evq);
 	assert(data);
 	assert(bufsize);
@@ -62,7 +62,7 @@ evq_t *evq_create( unsigned limit )
 	evq_t  * evq;
 	unsigned bufsize;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(limit);
 
 	sys_lock();
@@ -81,7 +81,7 @@ evq_t *evq_create( unsigned limit )
 void evq_kill( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(evq);
 
 	sys_lock();
@@ -221,7 +221,7 @@ unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -244,7 +244,7 @@ unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -300,7 +300,7 @@ unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -323,7 +323,7 @@ unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{

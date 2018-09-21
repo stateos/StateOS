@@ -47,6 +47,7 @@ Features:
 - updated queue/buffer functions
 - added E_FAILURE event
 - added examples
+- changed assert definitions
 ---------
 6.2
 - updated kernel

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -37,7 +37,7 @@
 void tmr_init( tmr_t *tmr, fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(tmr);
 
 	sys_lock();
@@ -57,7 +57,7 @@ tmr_t *tmr_create( fun_t *state )
 {
 	tmr_t *tmr;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -74,7 +74,7 @@ tmr_t *tmr_create( fun_t *state )
 void tmr_kill( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(tmr);
 
 	sys_lock();
@@ -105,7 +105,7 @@ static
 void priv_tmr_start( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	if (tmr->hdr.id != ID_STOPPED)
 		core_tmr_remove(tmr);
@@ -199,7 +199,7 @@ unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -219,7 +219,7 @@ unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -239,7 +239,7 @@ unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{

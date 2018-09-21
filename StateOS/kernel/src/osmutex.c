@@ -38,7 +38,7 @@
 void mtx_init( mtx_t *mtx, unsigned mode, unsigned prio )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(mtx);
 	assert((mtx->mode & ~mtxMASK) == 0);
 	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
@@ -62,7 +62,7 @@ mtx_t *mtx_create( unsigned mode, unsigned prio )
 {
 	mtx_t *mtx;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -79,7 +79,7 @@ mtx_t *mtx_create( unsigned mode, unsigned prio )
 void mtx_setPrio( mtx_t *mtx, unsigned prio )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -98,7 +98,7 @@ unsigned mtx_getPrio( mtx_t *mtx )
 {
 	unsigned prio;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -157,7 +157,7 @@ void priv_mtx_unlink( mtx_t *mtx )
 void mtx_kill( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(mtx);
 
 	sys_lock();
@@ -222,7 +222,7 @@ unsigned mtx_take( mtx_t *mtx )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -239,7 +239,7 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -266,7 +266,7 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -319,7 +319,7 @@ unsigned mtx_give( mtx_t *mtx )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{

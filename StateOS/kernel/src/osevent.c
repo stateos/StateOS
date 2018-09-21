@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    16.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -37,7 +37,7 @@
 void evt_init( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(evt);
 
 	sys_lock();
@@ -53,7 +53,7 @@ evt_t *evt_create( void )
 {
 	evt_t *evt;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -70,7 +70,7 @@ evt_t *evt_create( void )
 void evt_kill( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(evt);
 
 	sys_lock();
@@ -98,7 +98,7 @@ unsigned evt_waitFor( evt_t *evt, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(evt);
 
 	sys_lock();
@@ -116,7 +116,7 @@ unsigned evt_waitUntil( evt_t *evt, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(evt);
 
 	sys_lock();

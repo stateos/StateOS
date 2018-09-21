@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -38,7 +38,7 @@
 void lst_init( lst_t *lst )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(lst);
 
 	sys_lock();
@@ -56,7 +56,7 @@ lst_t *lst_create( void )
 {
 	lst_t *lst;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -73,7 +73,7 @@ lst_t *lst_create( void )
 void lst_kill( lst_t *lst )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(lst);
 
 	sys_lock();
@@ -134,7 +134,7 @@ unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -157,7 +157,7 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{

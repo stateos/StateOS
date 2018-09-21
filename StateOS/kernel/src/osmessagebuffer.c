@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -38,7 +38,7 @@
 void msg_init( msg_t *msg, void *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(msg);
 	assert(data);
 	assert(bufsize);
@@ -62,7 +62,7 @@ msg_t *msg_create( unsigned limit )
 	msg_t  * msg;
 	unsigned bufsize;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(limit);
 
 	sys_lock();
@@ -81,7 +81,7 @@ msg_t *msg_create( unsigned limit )
 void msg_kill( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(msg);
 
 	sys_lock();
@@ -300,7 +300,7 @@ unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay )
 {
 	unsigned len;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -324,7 +324,7 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time )
 {
 	unsigned len;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -385,7 +385,7 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -409,7 +409,7 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{

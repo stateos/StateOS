@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -37,7 +37,7 @@
 void sem_init( sem_t *sem, unsigned init, unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(sem);
 	assert(init<=limit);
 
@@ -59,7 +59,7 @@ sem_t *sem_create( unsigned init, unsigned limit )
 {
 	sem_t *sem;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -76,7 +76,7 @@ sem_t *sem_create( unsigned init, unsigned limit )
 void sem_kill( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(sem);
 
 	sys_lock();
@@ -140,7 +140,7 @@ unsigned sem_waitFor( sem_t *sem, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -160,7 +160,7 @@ unsigned sem_waitUntil( sem_t *sem, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -214,7 +214,7 @@ unsigned sem_sendFor( sem_t *sem, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -234,7 +234,7 @@ unsigned sem_sendUntil( sem_t *sem, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{

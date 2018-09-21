@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -38,7 +38,7 @@
 void job_init( job_t *job, fun_t **data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(job);
 	assert(data);
 	assert(bufsize);
@@ -62,7 +62,7 @@ job_t *job_create( unsigned limit )
 	job_t  * job;
 	unsigned bufsize;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(limit);
 
 	sys_lock();
@@ -81,7 +81,7 @@ job_t *job_create( unsigned limit )
 void job_kill( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
-	assert(!port_isr_context());
+	assert_tsk_context();
 	assert(job);
 
 	sys_lock();
@@ -231,7 +231,7 @@ unsigned job_waitFor( job_t *job, cnt_t delay )
 	fun_t  * fun;
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -258,7 +258,7 @@ unsigned job_waitUntil( job_t *job, cnt_t time )
 	fun_t  * fun;
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -318,7 +318,7 @@ unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -341,7 +341,7 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 {
 	unsigned event;
 
-	assert(!port_isr_context());
+	assert_tsk_context();
 
 	sys_lock();
 	{
