@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    21.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -193,6 +193,9 @@ unsigned priv_mtx_take( mtx_t *mtx )
 	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
 	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
+	if ((mtx->mode & mtxPrioMASK) == mtxPrioProtect && mtx->prio < System.cur->prio)
+		return E_FAILURE;
+
 	if (mtx->owner == 0)
 	{
 		assert(mtx->count == 0);
@@ -202,12 +205,7 @@ unsigned priv_mtx_take( mtx_t *mtx )
 	}
 
 	if ((mtx->mode & mtxTypeMASK) == mtxNormal || mtx->owner != System.cur)
-	{
-		if ((mtx->mode & mtxPrioMASK) == mtxPrioProtect && mtx->prio < System.cur->prio)
-			return E_FAILURE;
-
 		return E_TIMEOUT;
-	}
 
 	if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count + 1 != 0)
 	{
@@ -299,9 +297,9 @@ unsigned priv_mtx_give( mtx_t *mtx )
 	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
 	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
-	if (mtx->owner == System.cur)
+	if ((mtx->mode & mtxTypeMASK) == mtxNormal || mtx->owner == System.cur)
 	{
-		if (mtx->count > 0)
+		if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count > 0)
 		{
 			mtx->count--;
 			return E_SUCCESS;
