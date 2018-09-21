@@ -446,7 +446,7 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 		prio = tsk->basic;
 
 	for (mtx = tsk->mtx.list; mtx; mtx = mtx->list)
-		if ((mtx->mode & mtxPrioMASK) != mtxNormal && mtx->obj.queue)
+		if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && mtx->obj.queue)
 			if (prio < mtx->obj.queue->prio)
 				prio = mtx->obj.queue->prio;
 
@@ -487,7 +487,7 @@ void core_cur_prio( unsigned prio )
 		prio = tsk->basic;
 
 	for (mtx = tsk->mtx.list; mtx; mtx = mtx->list)
-		if ((mtx->mode & mtxPrioMASK) != mtxNormal && mtx->obj.queue)
+		if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && mtx->obj.queue)
 			if (prio < mtx->obj.queue->prio)
 				prio = mtx->obj.queue->prio;
 
