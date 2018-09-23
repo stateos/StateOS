@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    22.09.2018
+    @date    23.09.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -69,6 +69,7 @@ typedef uint64_t     cnt_t;
 
 /* -------------------------------------------------------------------------- */
 
+typedef struct __mtx mtx_t, * const mtx_id;
 typedef struct __tmr tmr_t, * const tmr_id; // timer
 typedef struct __tsk tsk_t, * const tsk_id; // task
 typedef         void fun_t(); // timer/task procedure
@@ -76,6 +77,7 @@ typedef         void fun_t(); // timer/task procedure
 /* -------------------------------------------------------------------------- */
 
 #define E_SUCCESS  ( 0U )     // process was released as a result of taking the supervising object
+#define OWNERDEAD  ( 1U )     // previous owner has been killed
 #define E_FAILURE  ( 0U - 1 ) // process was released as a result of any failure
 #define E_STOPPED  ( 0U - 2 ) // process was released as a result of killing the supervising object
 #define E_TIMEOUT  ( 0U - 3 ) // process was released as a result of the end of the timer countdown

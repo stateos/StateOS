@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    23.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -76,6 +76,33 @@ mtx_t *mtx_create( unsigned mode, unsigned prio )
 }
 
 /* -------------------------------------------------------------------------- */
+void mtx_kill( mtx_t *mtx )
+/* -------------------------------------------------------------------------- */
+{
+	assert_tsk_context();
+	assert(mtx);
+
+	sys_lock();
+	{
+		core_mtx_unlink(mtx);
+		core_all_wakeup(&mtx->obj.queue, E_STOPPED);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void mtx_delete( mtx_t *mtx )
+/* -------------------------------------------------------------------------- */
+{
+	sys_lock();
+	{
+		mtx_kill(mtx);
+		sys_free(mtx->obj.res);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 void mtx_setPrio( mtx_t *mtx, unsigned prio )
 /* -------------------------------------------------------------------------- */
 {
@@ -111,80 +138,6 @@ unsigned mtx_getPrio( mtx_t *mtx )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_mtx_link( mtx_t *mtx, tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
-	assert(mtx);
-
-	mtx->owner = tsk;
-
-	if (tsk)
-	{
-		mtx->list = tsk->mtx.list;
-		tsk->mtx.list = mtx;
-	}
-}
-
-/* -------------------------------------------------------------------------- */
-static
-void priv_mtx_unlink( mtx_t *mtx )
-/* -------------------------------------------------------------------------- */
-{
-	tsk_t *tsk;
-	mtx_t *lst;
-
-	assert(mtx);
-
-	if (mtx->owner)
-	{
-		tsk = mtx->owner;
-
-		if (tsk->mtx.list == mtx)
-			tsk->mtx.list = mtx->list;
-
-		for (lst = tsk->mtx.list; lst; lst = lst->list)
-			if (lst->list == mtx)
-				lst->list = mtx->list;
-
-		mtx->list  = 0;
-		mtx->owner = 0;
-
-		core_tsk_prio(tsk, tsk->basic);
-	}
-}
-
-/* -------------------------------------------------------------------------- */
-void mtx_kill( mtx_t *mtx )
-/* -------------------------------------------------------------------------- */
-{
-	assert_tsk_context();
-	assert(mtx);
-
-	sys_lock();
-	{
-		priv_mtx_unlink(mtx);
-
-		mtx->count = 0;
-
-		core_all_wakeup(&mtx->obj.queue, E_STOPPED);
-	}
-	sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-void mtx_delete( mtx_t *mtx )
-/* -------------------------------------------------------------------------- */
-{
-	sys_lock();
-	{
-		mtx_kill(mtx);
-		sys_free(mtx->obj.res);
-	}
-	sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-static
 unsigned priv_mtx_take( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
@@ -200,14 +153,21 @@ unsigned priv_mtx_take( mtx_t *mtx )
 	{
 		assert(mtx->count == 0);
 
-		priv_mtx_link(mtx, System.cur);
+		core_mtx_link(mtx, System.cur);
+
+		if ((mtx->mode & mtxInconsistent))
+		{
+			mtx->mode &= ~mtxInconsistent;
+			return OWNERDEAD;
+		}
+
 		return E_SUCCESS;
 	}
 
 	if ((mtx->mode & mtxTypeMASK) == mtxNormal || mtx->owner != System.cur)
 		return E_TIMEOUT;
 
-	if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count < mtxLIMIT)
+	if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count < MTX_LIMIT)
 	{
 		mtx->count++;
 		return E_SUCCESS;
@@ -297,16 +257,15 @@ unsigned priv_mtx_give( mtx_t *mtx )
 	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
 	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
-	if ((mtx->mode & mtxTypeMASK) == mtxNormal || mtx->owner == System.cur)
+	if ((mtx->mode & (mtxTypeMASK + mtxRobustMASK)) == (mtxNormal + mtxStalled) || mtx->owner == System.cur)
 	{
-		if ((mtx->mode & mtxTypeMASK) == mtxRecursive && mtx->count > 0)
+		if (mtx->count > 0)
 		{
 			mtx->count--;
 			return E_SUCCESS;
 		}
 
-		priv_mtx_unlink(mtx);
-		priv_mtx_link(mtx, core_tsk_wakeup(mtx->obj.queue, E_SUCCESS));
+		core_mtx_transferLock(mtx, E_SUCCESS);
 		return E_SUCCESS;
 	}
 

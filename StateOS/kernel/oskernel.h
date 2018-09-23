@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    23.09.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -234,6 +234,19 @@ void core_cur_prio( unsigned prio );
 // reset context switch timer counter
 // return a pointer to the stack pointer of the next READY task the highest priority
 void *core_tsk_handler( void *sp );
+
+/* -------------------------------------------------------------------------- */
+
+// set the task 'tsk' as the owner of the mutex 'mtx'
+void core_mtx_link( mtx_t *mtx, tsk_t *tsk );
+
+// remove owner of the mutex 'mtx'
+void core_mtx_unlink( mtx_t *mtx );
+
+// transfer lock to the next task in the delayed queue of mutex 'mtx'
+// the task is waked with event 'event'
+// return pointer to the waked task or 0 if the delayed queue of 'mtx' is empty
+tsk_t *core_mtx_transferLock( mtx_t *mtx, unsigned event );
 
 /* -------------------------------------------------------------------------- */
 

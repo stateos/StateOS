@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    23.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,27 +41,31 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 /////// mutex type
-#define mtxNormal       0 // normal mutex
-#define mtxErrorCheck   1 // error checking mutex
-#define mtxRecursive    2 // recursive mutex
+#define mtxNormal        0 // normal mutex
+#define mtxErrorCheck    1 // error checking mutex
+#define mtxRecursive     2 // recursive mutex
 #define mtxTypeMASK   ( mtxNormal | mtxErrorCheck | mtxRecursive )
 
 /////// mutex protocol
-#define mtxPrioNone     0 // none
-#define mtxPrioInherit  4 // priority inheritance mutex
-#define mtxPrioProtect  8 // priority protected mutex (OCPP)
+#define mtxPrioNone      0 // none
+#define mtxPrioInherit   4 // priority inheritance mutex
+#define mtxPrioProtect   8 // priority protected mutex (OCPP)
 #define mtxPrioMASK   ( mtxPrioNone | mtxPrioInherit | mtxPrioProtect )
 
 /////// mutex robustness
-#define mtxStalled      0 // stalled mutex
-#define mtxRobust      16 // robust mutex
+#define mtxStalled       0 // stalled mutex
+#define mtxRobust       16 // robust mutex
 #define mtxRobustMASK ( mtxStalled | mtxRobust )
 
-#define mtxMASK       ( mtxTypeMASK + mtxPrioMASK + mtxRobustMASK )
+#define mtxInconsistent 32 // inconsistent mutex
 
-#define mtxDefault      mtxNormal
+#define mtxMASK       ( mtxTypeMASK + mtxPrioMASK + mtxRobustMASK + mtxInconsistent )
 
-#define mtxLIMIT      (~0U)
+#define mtxDefault    ( mtxNormal + mtxPrioNone + mtxStalled )
+
+/* -------------------------------------------------------------------------- */
+
+#define MTX_LIMIT      (~0U)
 
 /******************************************************************************
  *
@@ -69,8 +73,6 @@ extern "C" {
  *                     like a POSIX pthread_mutex_t
  *
  ******************************************************************************/
-
-typedef struct __mtx mtx_t, * const mtx_id;
 
 struct __mtx
 {

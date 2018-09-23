@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    23.09.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,7 @@
 #include "oskernel.h"
 #include "inc/ostimer.h"
 #include "inc/ostask.h"
+#include "inc/osmutex.h"
 
 /* -------------------------------------------------------------------------- */
 // SYSTEM INTERNAL SERVICES
@@ -536,6 +537,66 @@ void *core_tsk_handler( void *sp )
 	return sp;
 }
 
+/* -------------------------------------------------------------------------- */
+// SYSTEM MUTEX SERVICES
+/* -------------------------------------------------------------------------- */
+
+void core_mtx_link( mtx_t *mtx, tsk_t *tsk )
+{
+	assert(mtx);
+
+	mtx->owner = tsk;
+
+	if (tsk)
+	{
+		mtx->list = tsk->mtx.list;
+		tsk->mtx.list = mtx;
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_mtx_unlink( mtx_t *mtx )
+{
+	tsk_t *tsk;
+	mtx_t *lst;
+
+	assert(mtx);
+
+	tsk = mtx->owner;
+
+	if (tsk)
+	{
+		if (tsk->mtx.list == mtx)
+			tsk->mtx.list = mtx->list;
+
+		for (lst = tsk->mtx.list; lst; lst = lst->list)
+			if (lst->list == mtx)
+				lst->list = mtx->list;
+
+		mtx->list  = 0;
+		mtx->owner = 0;
+		mtx->count = 0;
+
+		core_tsk_prio(tsk, tsk->basic);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+
+tsk_t *core_mtx_transferLock( mtx_t *mtx, unsigned event )
+{
+	tsk_t *tsk;
+
+	core_mtx_unlink(mtx);
+	tsk = core_tsk_wakeup(mtx->obj.queue, event);
+	core_mtx_link(mtx, tsk);
+
+	return tsk;
+}
+
+/* -------------------------------------------------------------------------- */
+// OTHER SYSTEM SERVICES
 /* -------------------------------------------------------------------------- */
 
 #if HW_TIMER_SIZE == 0

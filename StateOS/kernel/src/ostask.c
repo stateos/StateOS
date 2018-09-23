@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    23.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -160,7 +160,8 @@ void tsk_kill( tsk_t *tsk )
 			{
 				nxt = mtx->list;
 			    if ((mtx->mode & mtxRobustMASK) == mtxRobust)
-					mtx_kill(mtx);
+					if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
+						mtx->mode |= mtxInconsistent;
 			}
 
 			if (tsk->join != DETACHED)
