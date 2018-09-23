@@ -49,6 +49,7 @@ Features:
 - added examples
 - changed assert definitions
 - definitions regarding the task have been moved to the task header file
+- updated condition variable object
 ---------
 6.2
 - updated kernel

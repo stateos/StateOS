@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    09.09.2018
+    @date    23.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -232,9 +232,11 @@ void cnd_delete( cnd_t *cnd );
  *                     INFINITE:  wait indefinitely on the condition variable object
  *
  * Return
- *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again
- *   E_STOPPED       : condition variable object was killed before the specified timeout expired
- *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired
+ *   E_SUCCESS       : condition variable object was successfully signalled; owned mutex was locked again
+ *   OWNERDEAD       : owned mutex was locked again but previous owner of the mutex was killed
+ *   E_FAILURE       : condition variable object was killed before the specified timeout expired; owned mutex was locked again
+ *   E_STOPPED       : mutex object was killed
+ *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired; owned mutex was locked again
  *
  * Note              : use only in thread mode
  *
@@ -255,9 +257,11 @@ unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay );
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again
- *   E_STOPPED       : condition variable object was killed before the specified timeout expired
- *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired
+ *   E_SUCCESS       : condition variable object was successfully signalled; owned mutex was locked again
+ *   OWNERDEAD       : owned mutex was locked again but previous owner of the mutex was killed
+ *   E_FAILURE       : condition variable object was killed before the specified timeout expired; owned mutex was locked again
+ *   E_STOPPED       : mutex object was killed
+ *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired; owned mutex was locked again
  *
  * Note              : use only in thread mode
  *
@@ -277,8 +281,10 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time );
  *   mtx             : currently owned mutex
  *
  * Return
- *   E_SUCCESS       : condition variable object was successfully signalled and owned mutex locked again
- *   E_STOPPED       : condition variable object was killed
+ *   E_SUCCESS       : condition variable object was successfully signalled; owned mutex was locked again
+ *   OWNERDEAD       : owned mutex was locked again but previous owner of the mutex was killed
+ *   E_FAILURE       : condition variable object was killed before the specified timeout expired; owned mutex was locked again
+ *   E_STOPPED       : mutex object was killed
  *
  * Note              : use only in thread mode
  *

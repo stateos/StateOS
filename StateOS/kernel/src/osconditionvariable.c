@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    23.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -77,7 +77,7 @@ void cnd_kill( cnd_t *cnd )
 
 	sys_lock();
 	{
-		core_all_wakeup(&cnd->obj.queue, E_STOPPED);
+		core_all_wakeup(&cnd->obj.queue, E_FAILURE);
 	}
 	sys_unlock();
 }
@@ -99,6 +99,7 @@ unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
+	unsigned wait_event;
 
 	assert_tsk_context();
 	assert(cnd);
@@ -109,11 +110,10 @@ unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
 		event = mtx_give(mtx);
 		if (event == E_SUCCESS)
 		{
-			event = core_tsk_waitFor(&cnd->obj.queue, delay);
+			wait_event = core_tsk_waitFor(&cnd->obj.queue, delay);
+			event = mtx_wait(mtx);
 			if (event == E_SUCCESS)
-			{
-				event = mtx_wait(mtx);
-			}
+				event = wait_event;
 		}
 	}
 	sys_unlock();
@@ -126,6 +126,7 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
+	unsigned wait_event;
 
 	assert_tsk_context();
 	assert(cnd);
@@ -136,11 +137,10 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
 		event = mtx_give(mtx);
 		if (event == E_SUCCESS)
 		{
-			event = core_tsk_waitUntil(&cnd->obj.queue, time);
+			wait_event = core_tsk_waitUntil(&cnd->obj.queue, time);
+			event = mtx_wait(mtx);
 			if (event == E_SUCCESS)
-			{
-				event = mtx_wait(mtx);
-			}
+				event = wait_event;
 		}
 	}
 	sys_unlock();
