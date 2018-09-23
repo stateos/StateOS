@@ -257,7 +257,7 @@ unsigned priv_mtx_give( mtx_t *mtx )
 	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
 	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
-	if ((mtx->mode & (mtxTypeMASK + mtxRobustMASK)) == (mtxNormal + mtxStalled) || mtx->owner == System.cur)
+	if ((mtx->mode & (mtxTypeMASK + mtxRobust)) == mtxNormal || mtx->owner == System.cur)
 	{
 		if (mtx->count > 0)
 		{

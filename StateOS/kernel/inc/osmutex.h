@@ -55,17 +55,17 @@ extern "C" {
 /////// mutex robustness
 #define mtxStalled       0 // stalled mutex
 #define mtxRobust       16 // robust mutex
-#define mtxRobustMASK ( mtxStalled | mtxRobust )
 
+/////// inconsistency of robust mutex
 #define mtxInconsistent 32 // inconsistent mutex
 
-#define mtxMASK       ( mtxTypeMASK + mtxPrioMASK + mtxRobustMASK + mtxInconsistent )
+#define mtxMASK       ( mtxTypeMASK + mtxPrioMASK + mtxRobust + mtxInconsistent )
 
 #define mtxDefault    ( mtxNormal + mtxPrioNone + mtxStalled )
 
 /* -------------------------------------------------------------------------- */
 
-#define MTX_LIMIT      (~0U)
+#define MTX_LIMIT     ( ~0U )
 
 /******************************************************************************
  *
@@ -93,7 +93,7 @@ struct __mtx
  *
  * Parameters
  *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
- *                           type: mtxErrorCheck or mtxRecursive
+ *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
@@ -128,7 +128,7 @@ struct __mtx
  * Parameters
  *   mtx             : name of a pointer to mutex object
  *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
- *                           type: mtxErrorCheck or mtxRecursive
+ *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
@@ -148,7 +148,7 @@ struct __mtx
  * Parameters
  *   mtx             : name of a pointer to mutex object
  *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
- *                           type: mtxErrorCheck or mtxRecursive
+ *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
@@ -167,7 +167,7 @@ struct __mtx
  *
  * Parameters
  *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
- *                           type: mtxErrorCheck or mtxRecursive
+ *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
@@ -192,7 +192,7 @@ struct __mtx
  *
  * Parameters
  *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
- *                           type: mtxErrorCheck or mtxRecursive
+ *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
@@ -219,7 +219,7 @@ struct __mtx
  * Parameters
  *   mtx             : pointer to mutex object
  *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
- *                           type: mtxErrorCheck or mtxRecursive
+ *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
@@ -241,7 +241,7 @@ void mtx_init( mtx_t *mtx, unsigned mode, unsigned prio );
  *
  * Parameters
  *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
- *                           type: mtxErrorCheck or mtxRecursive
+ *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set

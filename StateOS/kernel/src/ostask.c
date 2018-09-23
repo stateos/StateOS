@@ -159,7 +159,7 @@ void tsk_kill( tsk_t *tsk )
 			for (mtx = tsk->mtx.list; mtx; mtx = nxt)
 			{
 				nxt = mtx->list;
-			    if ((mtx->mode & mtxRobustMASK) == mtxRobust)
+				if ((mtx->mode & mtxRobust))
 					if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
 						mtx->mode |= mtxInconsistent;
 			}
