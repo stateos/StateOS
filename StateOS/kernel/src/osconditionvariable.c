@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    23.09.2018
+    @date    24.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -77,7 +77,7 @@ void cnd_kill( cnd_t *cnd )
 
 	sys_lock();
 	{
-		core_all_wakeup(&cnd->obj.queue, E_FAILURE);
+		core_all_wakeup(&cnd->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
