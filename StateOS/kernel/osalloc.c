@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    24.09.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -57,7 +57,7 @@ void *sys_alloc( size_t size )
 	{
 		for (mem = Heap; mem; mem = mem->next)
 		{
-			if (mem->owner == 0)
+			if (mem->owner != mem)
 		//	memory segment has already been allocated
 				continue;
 
