@@ -44,6 +44,7 @@ extern "C" {
 #define mtxNormal        0 // normal mutex
 #define mtxErrorCheck    1 // error checking mutex
 #define mtxRecursive     2 // recursive mutex
+#define mtxDefault      mtxNormal
 #define mtxTypeMASK   ( mtxNormal | mtxErrorCheck | mtxRecursive )
 
 /////// mutex protocol
@@ -60,8 +61,6 @@ extern "C" {
 #define mtxInconsistent 32 // inconsistent mutex
 
 #define mtxMASK       ( mtxTypeMASK + mtxPrioMASK + mtxRobust + mtxInconsistent )
-
-#define mtxDefault    ( mtxNormal + mtxPrioNone + mtxStalled )
 
 /* -------------------------------------------------------------------------- */
 
