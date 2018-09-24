@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    23.09.2018
+    @date    24.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -261,6 +261,7 @@ mtx_t *mtx_new( unsigned mode, unsigned prio ) { return mtx_create(mode, prio); 
 /******************************************************************************
  *
  * Name              : mtx_kill
+ * Alias             : mtx_reset
  *
  * Description       : reset the mutex object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -274,6 +275,9 @@ mtx_t *mtx_new( unsigned mode, unsigned prio ) { return mtx_create(mode, prio); 
  ******************************************************************************/
 
 void mtx_kill( mtx_t *mtx );
+
+__STATIC_INLINE
+void mtx_reset( mtx_t *mtx ) { mtx_kill(mtx); }
 
 /******************************************************************************
  *
@@ -487,6 +491,7 @@ struct Mutex : public __mtx
 	~Mutex( void ) { assert(__mtx::owner == nullptr); }
 
 	void     kill     ( void )            {        mtx_kill     (this);         }
+	void     reset    ( void )            {        mtx_reset    (this);         }
 	void     setPrio  ( unsigned _prio )  {        mtx_setPrio  (this, _prio);  }
 	void     prio     ( unsigned _prio )  {        mtx_prio     (this, _prio);  }
 	unsigned getPrio  ( void )            { return mtx_getPrio  (this);         }

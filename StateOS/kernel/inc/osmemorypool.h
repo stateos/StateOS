@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    24.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -244,6 +244,7 @@ mem_t *mem_new( unsigned limit, unsigned size ) { return mem_create(limit, size)
 /******************************************************************************
  *
  * Name              : mem_kill
+ * Alias             : mem_reset
  *
  * Description       : wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -257,6 +258,9 @@ mem_t *mem_new( unsigned limit, unsigned size ) { return mem_create(limit, size)
  ******************************************************************************/
 
 void mem_kill( mem_t *mem );
+
+__STATIC_INLINE
+void mem_reset( mem_t *mem ) { mem_kill(mem); }
 
 /******************************************************************************
  *
@@ -427,6 +431,7 @@ struct MemoryPoolT : public __mem
 	~MemoryPoolT( void ) { assert(__mem::lst.obj.queue == nullptr); }
 
 	void     kill     ( void )                             {        mem_kill     (this);                }
+	void     reset    ( void )                             {        mem_reset    (this);                }
 	unsigned take     (       void **_data )               { return mem_take     (this, _data);         }
 	unsigned tryWait  (       void **_data )               { return mem_tryWait  (this, _data);         }
 	unsigned takeISR  (       void **_data )               { return mem_takeISR  (this, _data);         }

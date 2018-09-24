@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    24.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -183,6 +183,7 @@ mut_t *mut_new( void ) { return mut_create(); }
 /******************************************************************************
  *
  * Name              : mut_kill
+ * Alias             : mut_reset
  *
  * Description       : reset the fast mutex object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -196,6 +197,9 @@ mut_t *mut_new( void ) { return mut_create(); }
  ******************************************************************************/
 
 void mut_kill( mut_t *mut );
+
+__STATIC_INLINE
+void mut_reset( mut_t *mut ) { mut_kill(mut); }
 
 /******************************************************************************
  *
@@ -362,6 +366,7 @@ struct FastMutex : public __mut
 	~FastMutex( void ) { assert(__mut::owner == nullptr); }
 
 	void     kill     ( void )         {        mut_kill     (this);         }
+	void     reset    ( void )         {        mut_reset    (this);         }
 	unsigned take     ( void )         { return mut_take     (this);         }
 	unsigned tryLock  ( void )         { return mut_tryLock  (this);         }
 	unsigned waitFor  ( cnt_t _delay ) { return mut_waitFor  (this, _delay); }

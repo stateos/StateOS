@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    24.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -213,6 +213,7 @@ flg_t *flg_new( unsigned init ) { return flg_create(init); }
 /******************************************************************************
  *
  * Name              : flg_kill
+ * Alias             : flg_reset
  *
  * Description       : reset the flag object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -226,6 +227,9 @@ flg_t *flg_new( unsigned init ) { return flg_create(init); }
  ******************************************************************************/
 
 void flg_kill( flg_t *flg );
+
+__STATIC_INLINE
+void flg_reset( flg_t *flg ) { flg_kill(flg); }
 
 /******************************************************************************
  *
@@ -456,6 +460,7 @@ struct Flag : public __flg
 	~Flag( void ) { assert(__flg::obj.queue == nullptr); }
 
 	void     kill     ( void )                                      {        flg_kill     (this);                        }
+	void     reset    ( void )                                      {        flg_reset    (this);                        }
 	unsigned take     ( unsigned _flags, char _mode = flgAll )      { return flg_take     (this, _flags, _mode);         }
 	unsigned tryWait  ( unsigned _flags, char _mode = flgAll )      { return flg_tryWait  (this, _flags, _mode);         }
 	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )      { return flg_takeISR  (this, _flags, _mode);         }

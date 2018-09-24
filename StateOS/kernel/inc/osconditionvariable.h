@@ -186,6 +186,7 @@ cnd_t *cnd_new( void ) { return cnd_create(); }
 /******************************************************************************
  *
  * Name              : cnd_kill
+ * Alias             : cnd_reset
  *
  * Description       : reset the condition variable object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -199,6 +200,9 @@ cnd_t *cnd_new( void ) { return cnd_create(); }
  ******************************************************************************/
 
 void cnd_kill( cnd_t *cnd );
+
+__STATIC_INLINE
+void cnd_reset( cnd_t *cnd ) { cnd_kill(cnd); }
 
 /******************************************************************************
  *
@@ -378,6 +382,7 @@ struct ConditionVariable : public __cnd
 	~ConditionVariable( void ) { assert(__cnd::obj.queue == nullptr); }
 
 	void     kill     ( void )                      {        cnd_kill     (this);               }
+	void     reset    ( void )                      {        cnd_reset    (this);               }
 	unsigned waitFor  ( mtx_t *_mtx, cnt_t _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
 	unsigned waitFor  ( mtx_t &_mtx, cnt_t _delay ) { return cnd_waitFor  (this,&_mtx, _delay); }
 	unsigned waitUntil( mtx_t *_mtx, cnt_t _time )  { return cnd_waitUntil(this, _mtx, _time);  }

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    22.09.2018
+    @date    24.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -702,6 +702,7 @@ void tsk_stop( void );
 /******************************************************************************
  *
  * Name              : tsk_kill
+ * Alias             : tsk_reset
  *
  * Description       : reset the task object and remove it from READY/DELAYED queue
  *
@@ -715,6 +716,9 @@ void tsk_stop( void );
  ******************************************************************************/
 
 void tsk_kill( tsk_t *tsk );
+
+__STATIC_INLINE
+void tsk_reset( tsk_t *tsk ) { tsk_kill(tsk); }
 
 /******************************************************************************
  *
@@ -1089,6 +1093,7 @@ struct staticTaskT : public __tsk
 	~staticTaskT( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
 	void     kill     ( void )            {        tsk_kill      (this);         }
+	void     reset    ( void )            {        tsk_reset     (this);         }
 	unsigned detach   ( void )            { return tsk_detach    (this);         }
 	unsigned join     ( void )            { return tsk_join      (this);         }
 	void     start    ( void )            {        tsk_start     (this);         }
@@ -1194,6 +1199,7 @@ namespace ThisTask
 	static inline unsigned prio      ( void )                          { return tsk_getPrio   ();                      }
 
 	static inline void     kill      ( void )                          {        tsk_kill      (System.cur);            }
+	static inline void     reset     ( void )                          {        tsk_reset     (System.cur);            }
 	static inline unsigned detach    ( void )                          { return tsk_detach    (System.cur);            }
 	static inline void     suspend   ( void )                          {        tsk_suspend   (System.cur);            }
 

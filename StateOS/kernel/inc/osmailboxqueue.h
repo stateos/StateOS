@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    24.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -226,6 +226,7 @@ box_t *box_new( unsigned limit, unsigned size ) { return box_create(limit, size)
 /******************************************************************************
  *
  * Name              : box_kill
+ * Alias             : box_reset
  *
  * Description       : reset the mailbox queue object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -239,6 +240,9 @@ box_t *box_new( unsigned limit, unsigned size ) { return box_create(limit, size)
  ******************************************************************************/
 
 void box_kill( box_t *box );
+
+__STATIC_INLINE
+void box_reset( box_t *box ) { box_kill(box); }
 
 /******************************************************************************
  *
@@ -539,6 +543,7 @@ struct MailBoxQueueT : public __box
 	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	void     kill     ( void )                            {        box_kill     (this);                }
+	void     reset    ( void )                            {        box_reset    (this);                }
 	unsigned take     (       void *_data )               { return box_take     (this, _data);         }
 	unsigned tryWait  (       void *_data )               { return box_tryWait  (this, _data);         }
 	unsigned takeISR  (       void *_data )               { return box_takeISR  (this, _data);         }

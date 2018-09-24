@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    24.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -220,6 +220,7 @@ sig_t *sig_new( bool type ) { return sig_create(type); }
 /******************************************************************************
  *
  * Name              : sig_kill
+ * Alias             : sig_reset
  *
  * Description       : reset the signal object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -233,6 +234,9 @@ sig_t *sig_new( bool type ) { return sig_create(type); }
  ******************************************************************************/
 
 void sig_kill( sig_t *sig );
+
+__STATIC_INLINE
+void sig_reset( sig_t *sig ) { sig_kill(sig); }
 
 /******************************************************************************
  *
@@ -416,6 +420,7 @@ struct Signal : public __sig
 	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
 	void     kill     ( void )         {        sig_kill     (this);         }
+	void     reset    ( void )         {        sig_reset    (this);         }
 	unsigned take     ( void )         { return sig_take     (this);         }
 	unsigned tryWait  ( void )         { return sig_tryWait  (this);         }
 	unsigned takeISR  ( void )         { return sig_takeISR  (this);         }

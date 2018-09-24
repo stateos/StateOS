@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    20.09.2018
+    @date    24.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -348,6 +348,7 @@ tmr_t *tmr_new( fun_t *state ) { return tmr_create(state); }
 /******************************************************************************
  *
  * Name              : tmr_kill
+ * Alias             : tmr_reset
  *
  * Description       : reset the timer object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -361,6 +362,9 @@ tmr_t *tmr_new( fun_t *state ) { return tmr_create(state); }
  ******************************************************************************/
 
 void tmr_kill( tmr_t *tmr );
+
+__STATIC_INLINE
+void tmr_reset( tmr_t *tmr ) { tmr_kill(tmr); }
 
 /******************************************************************************
  *
@@ -714,6 +718,7 @@ struct staticTimer : public __tmr
 	~staticTimer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
 
 	void kill         ( void )                                       {        tmr_kill         (this);                          }
+	void reset        ( void )                                       {        tmr_reset        (this);                          }
 	void start        ( cnt_t _delay, cnt_t _period )                {        tmr_start        (this, _delay, _period);         }
 	void startFor     ( cnt_t _delay )                               {        tmr_startFor     (this, _delay);                  }
 	void startPeriodic( cnt_t _period )                              {        tmr_startPeriodic(this,         _period);         }

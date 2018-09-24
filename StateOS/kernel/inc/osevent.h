@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    19.09.2018
+    @date    24.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -179,6 +179,7 @@ evt_t *evt_new( void ) { return evt_create(); }
 /******************************************************************************
  *
  * Name              : evt_kill
+ * Alias             : evt_reset
  *
  * Description       : reset the event object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -192,6 +193,9 @@ evt_t *evt_new( void ) { return evt_create(); }
  ******************************************************************************/
 
 void evt_kill( evt_t *evt );
+
+__STATIC_INLINE
+void evt_reset( evt_t *evt ) { evt_kill(evt); }
 
 /******************************************************************************
  *
@@ -318,6 +322,7 @@ struct Event : public __evt
 	~Event( void ) { assert(__evt::obj.queue == nullptr); }
 
 	void     kill     ( void )            {        evt_kill     (this);         }
+	void     reset    ( void )            {        evt_reset    (this);         }
 	unsigned waitFor  ( cnt_t _delay )    { return evt_waitFor  (this, _delay); }
 	unsigned waitUntil( cnt_t _time )     { return evt_waitUntil(this, _time);  }
 	unsigned wait     ( void )            { return evt_wait     (this);         }
