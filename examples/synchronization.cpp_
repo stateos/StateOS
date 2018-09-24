@@ -1,0 +1,28 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+auto led = Led();
+auto one = OnceFlag();
+
+void tickLoop(Semaphore &own, Semaphore &another)
+{
+	for (;;)
+	{
+		one.call([] { led = 0; });
+		own.wait();
+		ThisTask::delay(SEC);
+		led.tick();
+		another.post();
+	}
+}
+
+auto sla_sem = Semaphore(0);
+auto mas_sem = Semaphore(1);
+
+auto sla = startTask(0, [] { tickLoop(sla_sem, mas_sem); });
+auto mas = startTask(0, [] { tickLoop(mas_sem, sla_sem); });
+
+int main()
+{
+	ThisTask::sleep();
+}

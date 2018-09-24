@@ -1,13 +1,19 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
+void resetLed()
+{
+	LED_Init();
+	LEDs = 0;
+}
+
+OS_ONE(one);
+
 void tickLoop(sem_t *own, sem_t *another)
 {
-	static one_t one = 0;
-	one_call(&one, LED_Init);
-
 	for (;;)
 	{
+		one_call(one, resetLed);
 		sem_wait(own);
 		tsk_delay(SEC);
 		LED_Tick();
