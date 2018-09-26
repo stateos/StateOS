@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -83,7 +83,7 @@ void sem_kill( sem_t *sem )
 	{
 		sem->count = 0;
 
-		core_all_wakeup(&sem->obj.queue, E_STOPPED);
+		core_all_wakeup(sem->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -110,7 +110,7 @@ unsigned priv_sem_take( sem_t *sem )
 
 	if (sem->count > 0)
 	{
-		if (core_tsk_wakeup(sem->obj.queue, E_SUCCESS) == 0)
+		if (core_one_wakeup(sem->obj.queue, E_SUCCESS) == 0)
 			sem->count--;
 
 		return E_SUCCESS;
@@ -184,7 +184,7 @@ unsigned priv_sem_give( sem_t *sem )
 
 	if (sem->count < sem->limit)
 	{
-		if (core_tsk_wakeup(sem->obj.queue, E_SUCCESS) == 0)
+		if (core_one_wakeup(sem->obj.queue, E_SUCCESS) == 0)
 			sem->count++;
 
 		return E_SUCCESS;

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -93,7 +93,7 @@ void box_kill( box_t *box )
 		box->head  = 0;
 		box->tail  = 0;
 
-		core_all_wakeup(&box->obj.queue, E_STOPPED);
+		core_all_wakeup(box->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -156,7 +156,7 @@ void priv_box_getUpdate( box_t *box, char *data )
 	tsk_t *tsk;
 
 	priv_box_get(box, data);
-	tsk = core_tsk_wakeup(box->obj.queue, E_SUCCESS);
+	tsk = core_one_wakeup(box->obj.queue, E_SUCCESS);
 	if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
 }
 
@@ -168,7 +168,7 @@ void priv_box_putUpdate( box_t *box, const char *data )
 	tsk_t *tsk;
 
 	priv_box_put(box, data);
-	tsk = core_tsk_wakeup(box->obj.queue, E_SUCCESS);
+	tsk = core_one_wakeup(box->obj.queue, E_SUCCESS);
 	if (tsk) priv_box_get(box, tsk->tmp.box.data.in);
 }
 
@@ -182,7 +182,7 @@ void priv_box_skipUpdate( box_t *box )
 	while (box->count == box->limit)
 	{
 		priv_box_skip(box);
-		tsk = core_tsk_wakeup(box->obj.queue, E_SUCCESS);
+		tsk = core_one_wakeup(box->obj.queue, E_SUCCESS);
 		if (tsk) priv_box_put(box, tsk->tmp.box.data.out);
 	}
 }

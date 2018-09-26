@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -77,7 +77,7 @@ void mut_kill( mut_t *mut )
 
 	sys_lock();
 	{
-		core_all_wakeup(&mut->obj.queue, E_STOPPED);
+		core_all_wakeup(mut->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -179,7 +179,7 @@ unsigned priv_mut_give( mut_t *mut )
 
 	if (mut->owner == System.cur)
 	{
-		mut->owner = core_tsk_wakeup(mut->obj.queue, E_SUCCESS);
+		mut->owner = core_one_wakeup(mut->obj.queue, E_SUCCESS);
 		return E_SUCCESS;
 	}
 

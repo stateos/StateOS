@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -90,7 +90,7 @@ void job_kill( job_t *job )
 		job->head  = 0;
 		job->tail  = 0;
 
-		core_all_wakeup(&job->obj.queue, E_STOPPED);
+		core_all_wakeup(job->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -154,7 +154,7 @@ fun_t *priv_job_getUpdate( job_t *job )
 	tsk_t *tsk;
 
 	fun = priv_job_get(job);
-	tsk = core_tsk_wakeup(job->obj.queue, E_SUCCESS);
+	tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
 	if (tsk) priv_job_put(job, tsk->tmp.job.fun);
 
 	return fun;
@@ -168,7 +168,7 @@ void priv_job_putUpdate( job_t *job, fun_t *fun )
 	tsk_t *tsk;
 
 	priv_job_put(job, fun);
-	tsk = core_tsk_wakeup(job->obj.queue, E_SUCCESS);
+	tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
 	if (tsk) tsk->tmp.job.fun = priv_job_get(job);
 }
 
@@ -182,7 +182,7 @@ void priv_job_skipUpdate( job_t *job )
 	while (job->count == job->limit)
 	{
 		priv_job_skip(job);
-		tsk = core_tsk_wakeup(job->obj.queue, E_SUCCESS);
+		tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
 		if (tsk) priv_job_put(job, tsk->tmp.job.fun);
 	}
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    23.09.2018
+    @date    26.09.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -176,7 +176,7 @@ void priv_tmr_wakeup( tmr_t *tmr, unsigned event )
 	if (tmr->delay >= (cnt_t)(core_sys_time() - tmr->start + 1))
 		priv_tmr_insert(tmr, ID_TIMER);
 
-	core_all_wakeup(&tmr->hdr.obj.queue, event);
+	core_all_wakeup(tmr->hdr.obj.queue, event);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -432,9 +432,15 @@ tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event )
 
 /* -------------------------------------------------------------------------- */
 
-void core_all_wakeup( tsk_t **que, unsigned event )
+void core_all_wakeup( tsk_t *tsk, unsigned event )
 {
-	while (core_tsk_wakeup(*que, event));
+	tsk_t**que;
+
+	if (tsk)
+	{
+		que = tsk->back;
+		while (core_tsk_wakeup(*que, event));
+	}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -589,7 +595,7 @@ tsk_t *core_mtx_transferLock( mtx_t *mtx, unsigned event )
 	tsk_t *tsk;
 
 	core_mtx_unlink(mtx);
-	tsk = core_tsk_wakeup(mtx->obj.queue, event);
+	tsk = core_one_wakeup(mtx->obj.queue, event);
 	core_mtx_link(mtx, tsk);
 
 	return tsk;

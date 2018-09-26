@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    23.09.2018
+    @date    26.09.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -195,31 +195,31 @@ unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time );
 void core_tsk_suspend( tsk_t *tsk );
 
 // resume execution of delayed task 'tsk' with event value 'event'
-// remove task 'tsk' from guard object delayed queue
-// remove task 'tsk' from timers READY queue
-// insert task 'tsk' into tasks READY queue
-// force context switch if priority of task 'tsk' is greater then priority of the current task and kernel works in preemptive mode
-// return 'tsk'
-tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event );
-
-// resume execution of first task from delayed queue 'que' with event value 'event'
-// remove first task from delayed queue 'que'
+// remove resumed task from guard object delayed queue
 // remove resumed task from timers READY queue
 // insert resumed task into tasks READY queue
 // force context switch if priority of resumed task is greater then priority of the current task and kernel works in preemptive mode
-// return pointer to resumed task
+// return 'tsk'
+tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event );
+
+// resume execution of first task from delayed queue with event value 'event'; 'tsk' is the head (first task) of the queue
+// remove resumed task from guard object delayed queue
+// remove resumed task from timers READY queue
+// insert resumed task into tasks READY queue
+// force context switch if priority of resumed task is greater then priority of the current task and kernel works in preemptive mode
+// return 'tsk'
 __STATIC_INLINE
-tsk_t *core_one_wakeup( tsk_t **que, unsigned event )
+tsk_t *core_one_wakeup( tsk_t *tsk, unsigned event )
 {
-	return core_tsk_wakeup(*que, event);
+	return core_tsk_wakeup(tsk, event);
 }
 
-// resume execution of all tasks from delayed queue 'que' with event value 'event'
-// remove all tasks from delayed queue 'que'
+// resume execution of all tasks from delayed queue with event value 'event'; 'tsk' is the head (first task) of the queue
+// remove all resumed tasks from guard object delayed queue
 // remove all resumed tasks from timers READY queue
 // insert all resumed tasks into tasks READY queue
 // force context switch if priority of any resumed task is greater then priority of the current task and kernel works in preemptive mode
-void core_all_wakeup( tsk_t **que, unsigned event );
+void core_all_wakeup( tsk_t *tsk, unsigned event );
 
 // set task 'tsk' priority
 // force context switch if new priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -81,7 +81,7 @@ void sig_kill( sig_t *sig )
 	{
 		sig->flag = false;
 
-		core_all_wakeup(&sig->obj.queue, E_STOPPED);
+		core_all_wakeup(sig->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -179,12 +179,12 @@ void sig_give( sig_t *sig )
 	{
 		if (sig->type == sigClear)
 		{
-			sig->flag = !core_tsk_wakeup(sig->obj.queue, E_SUCCESS);
+			sig->flag = !core_one_wakeup(sig->obj.queue, E_SUCCESS);
 		}
 		else
 		{
 			sig->flag = true;
-			core_all_wakeup(&sig->obj.queue, E_SUCCESS);
+			core_all_wakeup(sig->obj.queue, E_SUCCESS);
 		}
 	}
 	sys_unlock();

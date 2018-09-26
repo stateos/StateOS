@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    25.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -84,7 +84,7 @@ void bar_kill( bar_t *bar )
 	{
 		bar->count = bar->limit;
 
-		core_all_wakeup(&bar->obj.queue, E_STOPPED);
+		core_all_wakeup(bar->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -112,7 +112,7 @@ unsigned priv_bar_take( bar_t *bar )
 	if (--bar->count == 0)
 	{
 		bar->count = bar->limit;
-		core_all_wakeup(&bar->obj.queue, E_SUCCESS);
+		core_all_wakeup(bar->obj.queue, E_SUCCESS);
 
 		return E_SUCCESS;
 	}

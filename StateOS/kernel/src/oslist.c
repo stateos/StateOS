@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,7 +78,7 @@ void lst_kill( lst_t *lst )
 
 	sys_lock();
 	{
-		core_all_wakeup(&lst->obj.queue, E_STOPPED);
+		core_all_wakeup(lst->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -186,7 +186,7 @@ void lst_give( lst_t *lst, const void *data )
 
 	sys_lock();
 	{
-		tsk = core_tsk_wakeup(lst->obj.queue, E_SUCCESS);
+		tsk = core_one_wakeup(lst->obj.queue, E_SUCCESS);
 
 		if (tsk)
 		{

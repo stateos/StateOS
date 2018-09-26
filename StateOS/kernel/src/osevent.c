@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    25.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -75,7 +75,7 @@ void evt_kill( evt_t *evt )
 
 	sys_lock();
 	{
-		core_all_wakeup(&evt->obj.queue, E_STOPPED);
+		core_all_wakeup(evt->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -136,7 +136,7 @@ void evt_give( evt_t *evt, unsigned event )
 
 	sys_lock();
 	{
-		core_all_wakeup(&evt->obj.queue, event);
+		core_all_wakeup(evt->obj.queue, event);
 	}
 	sys_unlock();
 }

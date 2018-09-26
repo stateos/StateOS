@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    25.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -81,7 +81,7 @@ void tmr_kill( tmr_t *tmr )
 	{
 		if (tmr->hdr.id != ID_STOPPED)
 		{
-			core_all_wakeup(&tmr->hdr.obj.queue, E_STOPPED);
+			core_all_wakeup(tmr->hdr.obj.queue, E_STOPPED);
 			core_tmr_remove(tmr);
 		}
 	}

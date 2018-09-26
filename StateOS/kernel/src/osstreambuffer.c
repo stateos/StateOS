@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -90,7 +90,7 @@ void stm_kill( stm_t *stm )
 		stm->head  = 0;
 		stm->tail  = 0;
 
-		core_all_wakeup(&stm->obj.queue, E_STOPPED);
+		core_all_wakeup(stm->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -161,7 +161,7 @@ unsigned priv_stm_getUpdate( stm_t *stm, char *data, unsigned size )
 	while (stm->obj.queue != 0 && stm->count + stm->obj.queue->tmp.stm.size <= stm->limit)
 	{
 		priv_stm_put(stm, stm->obj.queue->tmp.stm.data.out, stm->obj.queue->tmp.stm.size);
-		core_tsk_wakeup(stm->obj.queue, E_SUCCESS);
+		core_one_wakeup(stm->obj.queue, E_SUCCESS);
 	}
 
 	return size;
@@ -180,7 +180,7 @@ void priv_stm_putUpdate( stm_t *stm, const char *data, unsigned size )
 		if (size > stm->count)
 			size = stm->count;
 		priv_stm_get(stm, stm->obj.queue->tmp.stm.data.in, size);
-		core_tsk_wakeup(stm->obj.queue, size);
+		core_one_wakeup(stm->obj.queue, size);
 	}
 }
 
@@ -194,7 +194,7 @@ void priv_stm_skipUpdate( stm_t *stm, unsigned size )
 		if (stm->count + stm->obj.queue->tmp.stm.size > stm->limit)
 			priv_stm_skip(stm, stm->count + stm->obj.queue->tmp.stm.size - stm->limit);
 		priv_stm_put(stm, stm->obj.queue->tmp.stm.data.out, stm->obj.queue->tmp.stm.size);
-		core_tsk_wakeup(stm->obj.queue, E_SUCCESS);
+		core_one_wakeup(stm->obj.queue, E_SUCCESS);
 	}
 
 	if (stm->count + size > stm->limit)

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -90,7 +90,7 @@ void msg_kill( msg_t *msg )
 		msg->head  = 0;
 		msg->tail  = 0;
 
-		core_all_wakeup(&msg->obj.queue, E_STOPPED);
+		core_all_wakeup(msg->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -211,7 +211,7 @@ unsigned priv_msg_getUpdate( msg_t *msg, char *data, unsigned size )
 	{
 		priv_msg_putSize(msg, msg->obj.queue->tmp.msg.size);
 		priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
-		core_tsk_wakeup(msg->obj.queue, E_SUCCESS);
+		core_one_wakeup(msg->obj.queue, E_SUCCESS);
 	}
 
 	return size;
@@ -231,11 +231,11 @@ void priv_msg_putUpdate( msg_t *msg, const char *data, unsigned size )
 		{
 			size = priv_msg_getSize(msg);
 			priv_msg_get(msg, msg->obj.queue->tmp.msg.data.in, size);
-			core_tsk_wakeup(msg->obj.queue, size);
+			core_one_wakeup(msg->obj.queue, size);
 		}
 		else
 		{
-			core_tsk_wakeup(msg->obj.queue, E_FAILURE);
+			core_one_wakeup(msg->obj.queue, E_FAILURE);
 		}
 	}
 }
@@ -253,7 +253,7 @@ void priv_msg_skipUpdate( msg_t *msg, unsigned size )
 		{
 			priv_msg_putSize(msg, msg->obj.queue->tmp.msg.size);
 			priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
-			core_tsk_wakeup(msg->obj.queue, E_SUCCESS);
+			core_one_wakeup(msg->obj.queue, E_SUCCESS);
 		}
 	}
 }

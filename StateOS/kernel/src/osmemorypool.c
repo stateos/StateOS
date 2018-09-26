@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    25.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -115,7 +115,7 @@ void mem_kill( mem_t *mem )
 
 	sys_lock();
 	{
-		core_all_wakeup(&mem->lst.obj.queue, E_STOPPED);
+		core_all_wakeup(mem->lst.obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }

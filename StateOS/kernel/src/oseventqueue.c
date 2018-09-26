@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    21.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -90,7 +90,7 @@ void evq_kill( evq_t *evq )
 		evq->head  = 0;
 		evq->tail  = 0;
 
-		core_all_wakeup(&evq->obj.queue, E_STOPPED);
+		core_all_wakeup(evq->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -151,7 +151,7 @@ void priv_evq_getUpdate( evq_t *evq, unsigned *data )
 	tsk_t *tsk;
 
 	priv_evq_get(evq, data);
-	tsk = core_tsk_wakeup(evq->obj.queue, E_SUCCESS);
+	tsk = core_one_wakeup(evq->obj.queue, E_SUCCESS);
 	if (tsk) priv_evq_put(evq, tsk->tmp.evq.data.out);
 }
 
@@ -163,7 +163,7 @@ void priv_evq_putUpdate( evq_t *evq, const unsigned data )
 	tsk_t *tsk;
 
 	priv_evq_put(evq, data);
-	tsk = core_tsk_wakeup(evq->obj.queue, E_SUCCESS);
+	tsk = core_one_wakeup(evq->obj.queue, E_SUCCESS);
 	if (tsk) priv_evq_get(evq, tsk->tmp.evq.data.in);
 }
 
@@ -177,7 +177,7 @@ void priv_evq_skipUpdate( evq_t *evq )
 	while (evq->count == evq->limit)
 	{
 		priv_evq_skip(evq);
-		tsk = core_tsk_wakeup(evq->obj.queue, E_SUCCESS);
+		tsk = core_one_wakeup(evq->obj.queue, E_SUCCESS);
 		if (tsk) priv_evq_put(evq, tsk->tmp.evq.data.out);
 	}
 }
