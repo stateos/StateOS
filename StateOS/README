@@ -52,6 +52,7 @@ Features:
 - updated condition variable object
 - fixed bug in tmr_wait functions
 - updated tsk_sleep functions
+- added system delayed queues
 ---------
 6.2
 - updated kernel

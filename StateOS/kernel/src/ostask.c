@@ -320,7 +320,7 @@ unsigned tsk_waitFor( unsigned flags, cnt_t delay )
 	sys_lock();
 	{
 		System.cur->tmp.flg.flags = flags;
-		event = core_tsk_waitFor(&System.cur->hdr.obj.queue, delay);
+		event = core_tsk_waitFor(&System.wai, delay);
 	}
 	sys_unlock();
 
@@ -338,7 +338,7 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time )
 	sys_lock();
 	{
 		System.cur->tmp.flg.flags = flags;
-		event = core_tsk_waitUntil(&System.cur->hdr.obj.queue, time);
+		event = core_tsk_waitUntil(&System.wai, time);
 	}
 	sys_unlock();
 
@@ -352,7 +352,7 @@ unsigned priv_tsk_give( tsk_t *tsk, unsigned flags )
 {
 	assert(tsk);
 
-	if (tsk->guard == &tsk->hdr.obj.queue)
+	if (tsk->guard == &System.wai)
 	{
 		if (tsk->tmp.flg.flags & flags)
 			flags = tsk->tmp.flg.flags &= ~flags;
@@ -385,7 +385,7 @@ void tsk_sleepFor( cnt_t delay )
 {
 	sys_lock();
 	{
-		core_tsk_waitFor(&WAIT.hdr.obj.queue, delay);
+		core_tsk_waitFor(&System.dly, delay);
 	}
 	sys_unlock();
 }
@@ -396,7 +396,7 @@ void tsk_sleepNext( cnt_t delay )
 {
 	sys_lock();
 	{
-		core_tsk_waitNext(&WAIT.hdr.obj.queue, delay);
+		core_tsk_waitNext(&System.dly, delay);
 	}
 	sys_unlock();
 }
@@ -407,7 +407,7 @@ void tsk_sleepUntil( cnt_t time )
 {
 	sys_lock();
 	{
-		core_tsk_waitUntil(&WAIT.hdr.obj.queue, time);
+		core_tsk_waitUntil(&System.dly, time);
 	}
 	sys_unlock();
 }
@@ -447,7 +447,7 @@ unsigned tsk_resume( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->guard == &WAIT.hdr.obj.queue && tsk->delay == INFINITE)
+		if (tsk->guard == &System.dly && tsk->delay == INFINITE)
 		{
 			core_tsk_wakeup(tsk, 0); // unused event value
 			event = E_SUCCESS;

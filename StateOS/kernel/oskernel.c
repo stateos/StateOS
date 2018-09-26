@@ -330,12 +330,11 @@ void core_tsk_unlink( tsk_t *tsk, unsigned event )
 	tsk_t**que = tsk->back;
 	tsk_t *nxt = tsk->hdr.obj.queue;
 	tsk->event = event;
+	tsk->guard = 0;
 
 	if (nxt)
 		nxt->back = que;
 	*que = nxt;
-	tsk->hdr.obj.queue = 0; // necessary because of tsk_wait[Until|For] functions
-	tsk->guard = 0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -413,7 +412,7 @@ void core_tsk_suspend( tsk_t *tsk )
 {
 	tsk->delay = INFINITE;
 
-	priv_tsk_wait(tsk, &WAIT.hdr.obj.queue, tsk == System.cur);
+	priv_tsk_wait(tsk, &System.dly, tsk == System.cur);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -434,13 +433,7 @@ tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event )
 
 void core_all_wakeup( tsk_t *tsk, unsigned event )
 {
-	tsk_t**que;
-
-	if (tsk)
-	{
-		que = tsk->back;
-		while (core_tsk_wakeup(*que, event));
-	}
+	while ((tsk = core_tsk_wakeup(tsk, event))) tsk = tsk->hdr.obj.queue;
 }
 
 /* -------------------------------------------------------------------------- */

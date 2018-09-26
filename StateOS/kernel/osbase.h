@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    23.09.2018
+    @date    26.09.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -153,6 +153,8 @@ typedef struct __sys
 	volatile
 	cnt_t    cnt;   // system timer counter
 #endif
+	tsk_t  * wai;   // queue of tasks waiting for an event / flags
+	tsk_t  * dly;   // queue of sleeping and suspended tasks
 }	sys_t;
 
 /* -------------------------------------------------------------------------- */

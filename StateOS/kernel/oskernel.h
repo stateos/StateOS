@@ -188,7 +188,7 @@ unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay );
 unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time );
 
 // delay indefinitely execution of given task
-// append given task to WAIT timer delayed queue
+// append given task to System.dly queue
 // remove given task from tasks READY queue
 // insert given task into timers READY queue
 // force context switch if it is the current task
