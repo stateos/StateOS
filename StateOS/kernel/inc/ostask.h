@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    26.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -957,8 +957,7 @@ unsigned tsk_giveISR( tsk_t *tsk, unsigned flags ) { return tsk_give(tsk, flags)
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-void tsk_sleepFor( cnt_t delay ) { tmr_waitFor(&WAIT, delay); }
+void tsk_sleepFor( cnt_t delay );
 
 __STATIC_INLINE
 void tsk_delay( cnt_t delay ) { tsk_sleepFor(delay); }
@@ -981,8 +980,7 @@ void tsk_delay( cnt_t delay ) { tsk_sleepFor(delay); }
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-void tsk_sleepNext( cnt_t delay ) { tmr_waitNext(&WAIT, delay); }
+void tsk_sleepNext( cnt_t delay );
 
 /******************************************************************************
  *
@@ -999,8 +997,7 @@ void tsk_sleepNext( cnt_t delay ) { tmr_waitNext(&WAIT, delay); }
  *
  ******************************************************************************/
 
-__STATIC_INLINE
-void tsk_sleepUntil( cnt_t time ) { tmr_waitUntil(&WAIT, time); }
+void tsk_sleepUntil( cnt_t time );
 
 /******************************************************************************
  *
@@ -1018,7 +1015,7 @@ void tsk_sleepUntil( cnt_t time ) { tmr_waitUntil(&WAIT, time); }
  ******************************************************************************/
 
 __STATIC_INLINE
-void tsk_sleep( void ) { tmr_wait(&WAIT); }
+void tsk_sleep( void ) { tsk_sleepFor(INFINITE); }
 
 /******************************************************************************
  *

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    25.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -155,7 +155,7 @@ void tmr_startNext( tmr_t *tmr, cnt_t delay )
 
 	sys_lock();
 	{
-		tmr->delay  = delay;
+		tmr->delay = delay;
 
 		priv_tmr_start(tmr);
 	}
@@ -170,8 +170,8 @@ void tmr_startUntil( tmr_t *tmr, cnt_t time )
 
 	sys_lock();
 	{
-		tmr->start  = core_sys_time();
-		tmr->delay  = time - tmr->start;
+		tmr->start = core_sys_time();
+		tmr->delay = time - tmr->start;
 		if (tmr->delay > ((CNT_MAX)>>1))
 			tmr->delay = 0;
 		tmr->period = 0;

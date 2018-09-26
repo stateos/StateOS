@@ -51,6 +51,7 @@ Features:
 - definitions regarding the task have been moved to the task header file
 - updated condition variable object
 - fixed bug in tmr_wait functions
+- updated tsk_sleep functions
 ---------
 6.2
 - updated kernel

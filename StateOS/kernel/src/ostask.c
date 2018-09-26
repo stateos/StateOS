@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    23.09.2018
+    @date    26.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -377,6 +377,39 @@ unsigned tsk_give( tsk_t *tsk, unsigned flags )
 	sys_unlock();
 
 	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_sleepFor( cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	sys_lock();
+	{
+		core_tsk_waitFor(&WAIT.hdr.obj.queue, delay);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_sleepNext( cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	sys_lock();
+	{
+		core_tsk_waitNext(&WAIT.hdr.obj.queue, delay);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_sleepUntil( cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	sys_lock();
+	{
+		core_tsk_waitUntil(&WAIT.hdr.obj.queue, time);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

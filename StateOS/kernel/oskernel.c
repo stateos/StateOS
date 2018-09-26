@@ -91,12 +91,12 @@ static
 void priv_tmr_insert( tmr_t *tmr, tid_t id )
 {
 	tmr_t *nxt = &WAIT;
-	tmr->hdr.id = id;
 
 	if (tmr->delay != INFINITE)
 		do nxt = nxt->hdr.next;
 		while (nxt->delay < (cnt_t)(tmr->start + tmr->delay - nxt->start));
 
+	tmr->hdr.id = id;
 	priv_rdy_insert(&tmr->hdr, &nxt->hdr);
 }
 
@@ -105,6 +105,7 @@ void priv_tmr_insert( tmr_t *tmr, tid_t id )
 static
 void priv_tmr_remove( tmr_t *tmr )
 {
+	tmr->hdr.id = ID_STOPPED;
 	priv_rdy_remove(&tmr->hdr);
 }
 
@@ -120,7 +121,6 @@ void core_tmr_insert( tmr_t *tmr, tid_t id )
 
 void core_tmr_remove( tmr_t *tmr )
 {
-	tmr->hdr.id = ID_STOPPED;
 	priv_tmr_remove(tmr);
 }
 
