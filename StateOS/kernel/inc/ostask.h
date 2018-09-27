@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    26.09.2018
+    @date    27.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -748,7 +748,7 @@ void tsk_delete( tsk_t *tsk );
  *
  * Return
  *   E_SUCCESS       : given task was successfully detached
- *   E_FAILURE       : given task can not be detached
+ *   E_FAILURE       : given task cannot be detached
  *
  * Note              : use only in thread mode
  *
@@ -766,9 +766,9 @@ unsigned tsk_detach( tsk_t *tsk );
  *   tsk             : pointer to task object
  *
  * Return
- *   E_SUCCESS       : joined task was stopped its execution
- *   E_STOPPED       : joined task was killed
- *   E_FAILURE       : joined task was detached
+ *   E_SUCCESS       : given task was stopped
+ *   E_STOPPED       : given task was killed
+ *   E_FAILURE       : given task cannot be joined
  *
  * Note              : use only in thread mode
  *
@@ -1029,7 +1029,7 @@ void tsk_sleep( void ) { tsk_sleepFor(INFINITE); }
  *
  * Return
  *   E_SUCCESS       : task was successfully suspended
- *   E_FAILURE       : task can not be suspended
+ *   E_FAILURE       : task cannot be suspended
  *
  * Note              : use only in thread mode
  *
@@ -1050,7 +1050,7 @@ unsigned tsk_suspend( tsk_t *tsk );
  *
  * Return
  *   E_SUCCESS       : task was successfully resumed
- *   E_FAILURE       : task can not be resumed
+ *   E_FAILURE       : task cannot be resumed
  *
  * Note              : may be used both in thread and handler mode
  *
