@@ -433,7 +433,7 @@ tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event )
 
 void core_all_wakeup( tsk_t *tsk, unsigned event )
 {
-	while ((tsk = core_tsk_wakeup(tsk, event))) tsk = tsk->hdr.obj.queue;
+	while (tsk = core_tsk_wakeup(tsk, event), tsk) tsk = tsk->hdr.obj.queue;
 }
 
 /* -------------------------------------------------------------------------- */
