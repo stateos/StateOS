@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    27.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -51,8 +51,7 @@ struct __bar
 {
 	obj_t    obj;   // object header
 
-	unsigned count; // barrier's current value
-	unsigned limit; // barrier's value limit
+	unsigned limit; // limit of tasks blocked on the barrier object
 };
 
 /******************************************************************************
@@ -70,7 +69,7 @@ struct __bar
  *
  ******************************************************************************/
 
-#define               _BAR_INIT( _limit ) { _OBJ_INIT(), _limit, _limit }
+#define               _BAR_INIT( _limit ) { _OBJ_INIT(), _limit }
 
 /******************************************************************************
  *

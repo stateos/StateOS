@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    26.09.2018
+    @date    27.09.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -220,6 +220,9 @@ tsk_t *core_one_wakeup( tsk_t *tsk, unsigned event )
 // insert all resumed tasks into tasks READY queue
 // force context switch if priority of any resumed task is greater then priority of the current task and kernel works in preemptive mode
 void core_all_wakeup( tsk_t *tsk, unsigned event );
+
+// return count of tasks blocked on the queue; 'tsk' is the head (first task) of the queue
+unsigned core_tsk_count( tsk_t *tsk );
 
 // set task 'tsk' priority
 // force context switch if new priority of task 'tsk' is greater then priority of current task and kernel works in preemptive mode

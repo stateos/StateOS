@@ -53,6 +53,7 @@ Features:
 - fixed bug in tmr_wait functions
 - updated tsk_sleep functions
 - added system delayed queues
+- updated barrier object
 ---------
 6.2
 - updated kernel
