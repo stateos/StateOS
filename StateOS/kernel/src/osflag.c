@@ -80,9 +80,9 @@ void flg_kill( flg_t *flg )
 
 	sys_lock();
 	{
-		core_all_wakeup(flg->obj.queue, E_STOPPED);
-
 		flg->flags = 0;
+
+		core_all_wakeup(flg->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }

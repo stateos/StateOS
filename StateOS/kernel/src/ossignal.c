@@ -44,7 +44,9 @@ void sig_init( sig_t *sig, unsigned mask )
 	sys_lock();
 	{
 		memset(sig, 0, sizeof(sig_t));
+
 		core_obj_init(&sig->obj);
+
 		sig->mask = mask;
 	}
 	sys_unlock();
@@ -78,9 +80,9 @@ void sig_kill( sig_t *sig )
 
 	sys_lock();
 	{
-		core_all_wakeup(sig->obj.queue, E_STOPPED);
-
 		sig->flags = 0;
+
+		core_all_wakeup(sig->obj.queue, E_STOPPED);
 	}
 	sys_unlock();
 }

@@ -49,11 +49,11 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 
 		core_hdr_init(&tsk->hdr);
 
-		tsk->prio   = prio;
-		tsk->basic  = prio;
-		tsk->state  = state;
-		tsk->stack  = stack;
-		tsk->size   = size;
+		tsk->prio  = prio;
+		tsk->basic = prio;
+		tsk->state = state;
+		tsk->stack = stack;
+		tsk->size  = size;
 
 		core_ctx_init(tsk);
 		core_tsk_insert(tsk);
