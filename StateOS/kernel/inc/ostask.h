@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    27.09.2018
+    @date    28.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -92,6 +92,10 @@ struct __tsk
 	union  {
 
 	struct {
+	unsigned num;
+	}        sig;   // temporary data used by signal object
+
+	struct {
 	unsigned flags;
 	unsigned mode;
 	}        flg;   // temporary data used by flag object
@@ -170,7 +174,7 @@ struct __tsk
  ******************************************************************************/
 
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _HDR_INIT(), _state, 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0, 0 } }, _TSK_EXTRA }
+                       { _HDR_INIT(), _state, 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { { 0 } }, _TSK_EXTRA }
 
 /******************************************************************************
  *

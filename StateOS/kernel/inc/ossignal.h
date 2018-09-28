@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    28.09.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -38,11 +38,6 @@
 extern "C" {
 #endif
 
-/* -------------------------------------------------------------------------- */
-
-#define sigClear     ( false ) // auto clearing signal
-#define sigProtect   ( true  ) // protected signal
-
 /******************************************************************************
  *
  * Name              : signal
@@ -55,8 +50,8 @@ struct __sig
 {
 	obj_t    obj;   // object header
 
-	bool     flag;  // signal's current value
-	bool     type;  // signal type: sigClear, sigProtect
+	unsigned flags; // signal's current value
+	unsigned mask;  // protection mask
 };
 
 /******************************************************************************
@@ -66,9 +61,7 @@ struct __sig
  * Description       : create and initialize a signal object
  *
  * Parameters
- *   type            : signal type
- *                     sigClear:   auto clearing signal
- *                     sigProtect: protected signal
+ *   mask            : protection mask of signal object
  *
  * Return            : signal object
  *
@@ -76,19 +69,19 @@ struct __sig
  *
  ******************************************************************************/
 
-#define               _SIG_INIT( _type ) { _OBJ_INIT(), false, _type }
+#define               _SIG_INIT( _mask ) { _OBJ_INIT(), 0, _mask }
 
 /******************************************************************************
  *
  * Name              : _VA_SIG
  *
- * Description       : calculate signal type from optional parameter
+ * Description       : calculate protection mask from optional parameter
  *
  * Note              : for internal use
  *
  ******************************************************************************/
 
-#define               _VA_SIG( _type ) ( ( _type + 0 ) ? sigProtect : sigClear )
+#define               _VA_SIG( _mask ) ( _mask + 0 )
 
 /******************************************************************************
  *
@@ -98,9 +91,7 @@ struct __sig
  *
  * Parameters
  *   sig             : name of a pointer to signal object
- *   type            : (optional) signal type
- *                     sigClear:   auto clearing signal (default)
- *                     sigProtect: protected signal
+ *   mask            : (optional) protection mask; default: 0
  *
  ******************************************************************************/
 
@@ -116,9 +107,7 @@ struct __sig
  *
  * Parameters
  *   sig             : name of a pointer to signal object
- *   type            : (optional) signal type
- *                     sigClear:   auto clearing signal (default)
- *                     sigProtect: protected signal
+ *   mask            : (optional) protection mask; default: 0
  *
  ******************************************************************************/
 
@@ -133,9 +122,7 @@ struct __sig
  * Description       : create and initialize a signal object
  *
  * Parameters
- *   type            : (optional) signal type
- *                     sigClear:   auto clearing signal (default)
- *                     sigProtect: protected signal
+ *   mask            : (optional) protection mask; default: 0
  *
  * Return            : signal object
  *
@@ -156,9 +143,7 @@ struct __sig
  * Description       : create and initialize a signal object
  *
  * Parameters
- *   type            : (optional) signal type
- *                     sigClear:   auto clearing signal (default)
- *                     sigProtect: protected signal
+ *   mask            : (optional) protection mask; default: 0
  *
  * Return            : pointer to signal object
  *
@@ -181,9 +166,7 @@ struct __sig
  *
  * Parameters
  *   sig             : pointer to signal object
- *   type            : signal type
- *                     sigClear:   auto clearing signal
- *                     sigProtect: protected signal
+ *   mask            : protection mask of signal object
  *
  * Return            : none
  *
@@ -191,7 +174,7 @@ struct __sig
  *
  ******************************************************************************/
 
-void sig_init( sig_t *sig, bool type );
+void sig_init( sig_t *sig, unsigned mask );
 
 /******************************************************************************
  *
@@ -201,9 +184,7 @@ void sig_init( sig_t *sig, bool type );
  * Description       : create and initialize a new signal object
  *
  * Parameters
- *   type            : signal type
- *                     sigClear:   auto clearing signal
- *                     sigProtect: protected signal
+ *   mask            : protection mask of signal object
  *
  * Return            : pointer to signal object (signal successfully created)
  *   0               : signal not created (not enough free memory)
@@ -212,10 +193,10 @@ void sig_init( sig_t *sig, bool type );
  *
  ******************************************************************************/
 
-sig_t *sig_create( bool type );
+sig_t *sig_create( unsigned mask );
 
 __STATIC_INLINE
-sig_t *sig_new( bool type ) { return sig_create(type); }
+sig_t *sig_new( unsigned mask ) { return sig_create(mask); }
 
 /******************************************************************************
  *
@@ -265,6 +246,7 @@ void sig_delete( sig_t *sig );
  *
  * Parameters
  *   sig             : pointer to signal object
+ *   num             : signal number
  *
  * Return
  *   E_SUCCESS       : signal object was successfully released
@@ -274,13 +256,13 @@ void sig_delete( sig_t *sig );
  *
  ******************************************************************************/
 
-unsigned sig_take( sig_t *sig );
+unsigned sig_take( sig_t *sig, unsigned num );
 
 __STATIC_INLINE
-unsigned sig_tryWait( sig_t *sig ) { return sig_take(sig); }
+unsigned sig_tryWait( sig_t *sig, unsigned num ) { return sig_take(sig, num); }
 
 __STATIC_INLINE
-unsigned sig_takeISR( sig_t *sig ) { return sig_take(sig); }
+unsigned sig_takeISR( sig_t *sig, unsigned num ) { return sig_take(sig, num); }
 
 /******************************************************************************
  *
@@ -290,6 +272,7 @@ unsigned sig_takeISR( sig_t *sig ) { return sig_take(sig); }
  *
  * Parameters
  *   sig             : pointer to signal object
+ *   num             : signal number
  *   delay           : duration of time (maximum number of ticks to wait for release the signal object)
  *                     IMMEDIATE: don't wait until the signal object has been released
  *                     INFINITE:  wait indefinitely until the signal object has been released
@@ -303,7 +286,7 @@ unsigned sig_takeISR( sig_t *sig ) { return sig_take(sig); }
  *
  ******************************************************************************/
 
-unsigned sig_waitFor( sig_t *sig, cnt_t delay );
+unsigned sig_waitFor( sig_t *sig, unsigned num, cnt_t delay );
 
 /******************************************************************************
  *
@@ -313,6 +296,7 @@ unsigned sig_waitFor( sig_t *sig, cnt_t delay );
  *
  * Parameters
  *   sig             : pointer to signal object
+ *   num             : signal number
  *   time            : timepoint value
  *
  * Return
@@ -324,7 +308,7 @@ unsigned sig_waitFor( sig_t *sig, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned sig_waitUntil( sig_t *sig, cnt_t time );
+unsigned sig_waitUntil( sig_t *sig, unsigned num, cnt_t time );
 
 /******************************************************************************
  *
@@ -334,6 +318,7 @@ unsigned sig_waitUntil( sig_t *sig, cnt_t time );
  *
  * Parameters
  *   sig             : pointer to signal object
+ *   num             : signal number
  *
  * Return
  *   E_SUCCESS       : signal object was successfully released
@@ -344,7 +329,7 @@ unsigned sig_waitUntil( sig_t *sig, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
+unsigned sig_wait( sig_t *sig, unsigned num ) { return sig_waitFor(sig, num, INFINITE); }
 
 /******************************************************************************
  *
@@ -357,6 +342,7 @@ unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
  *
  * Parameters
  *   sig             : pointer to signal object
+ *   num             : signal number
  *
  * Return            : none
  *
@@ -364,13 +350,13 @@ unsigned sig_wait( sig_t *sig ) { return sig_waitFor(sig, INFINITE); }
  *
  ******************************************************************************/
 
-void sig_give( sig_t *sig );
+void sig_give( sig_t *sig, unsigned num );
 
 __STATIC_INLINE
-void sig_set( sig_t *sig ) { sig_give(sig); }
+void sig_set( sig_t *sig, unsigned num ) { sig_give(sig, num); }
 
 __STATIC_INLINE
-void sig_giveISR( sig_t *sig ) { sig_give(sig); }
+void sig_giveISR( sig_t *sig, unsigned num ) { sig_give(sig, num); }
 
 /******************************************************************************
  *
@@ -381,6 +367,7 @@ void sig_giveISR( sig_t *sig ) { sig_give(sig); }
  *
  * Parameters
  *   sig             : pointer to signal object
+ *   num             : signal number
  *
  * Return            : none
  *
@@ -388,10 +375,31 @@ void sig_giveISR( sig_t *sig ) { sig_give(sig); }
  *
  ******************************************************************************/
 
-void sig_clear( sig_t *sig );
+void sig_clear( sig_t *sig, unsigned num );
 
 __STATIC_INLINE
-void sig_clearISR( sig_t *sig ) { sig_clear(sig); }
+void sig_clearISR( sig_t *sig, unsigned num ) { sig_clear(sig, num); }
+
+/******************************************************************************
+ *
+ * Name              : sig_get
+ * ISR alias         : sig_getISR
+ *
+ * Description       : get given signal state from signal object
+ *
+ * Parameters
+ *   sig             : pointer to signal object
+ *
+ * Return            : signal state in signal object
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+bool sig_get( sig_t *sig, unsigned num );
+
+__STATIC_INLINE
+bool sig_getISR( sig_t *sig, unsigned num ) { return sig_get(sig, num); }
 
 #ifdef __cplusplus
 }
@@ -408,30 +416,30 @@ void sig_clearISR( sig_t *sig ) { sig_clear(sig); }
  * Description       : create and initialize a signal object
  *
  * Constructor parameters
- *   type            : signal type
- *                     sigClear:   auto clearing signal (default)
- *                     sigProtect: protected signal
+ *   mask            : protection mask of signal object
  *
  ******************************************************************************/
 
 struct Signal : public __sig
 {
-	 Signal( const bool _type = sigClear ): __sig _SIG_INIT(_type) {}
+	 Signal( const unsigned _mask = 0 ): __sig _SIG_INIT(_mask) {}
 	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
-	void     kill     ( void )         {        sig_kill     (this);         }
-	void     reset    ( void )         {        sig_reset    (this);         }
-	unsigned take     ( void )         { return sig_take     (this);         }
-	unsigned tryWait  ( void )         { return sig_tryWait  (this);         }
-	unsigned takeISR  ( void )         { return sig_takeISR  (this);         }
-	unsigned waitFor  ( cnt_t _delay ) { return sig_waitFor  (this, _delay); }
-	unsigned waitUntil( cnt_t _time  ) { return sig_waitUntil(this, _time);  }
-	unsigned wait     ( void )         { return sig_wait     (this);         }
-	void     give     ( void )         {        sig_give     (this);         }
-	void     set      ( void )         {        sig_set      (this);         }
-	void     giveISR  ( void )         {        sig_giveISR  (this);         }
-	void     clear    ( void )         {        sig_clear    (this);         }
-	void     clearISR ( void )         {        sig_clearISR (this);         }
+	void     kill     ( void )                       {        sig_kill     (this);              }
+	void     reset    ( void )                       {        sig_reset    (this);              }
+	unsigned take     ( unsigned num )               { return sig_take     (this, num);         }
+	unsigned tryWait  ( unsigned num )               { return sig_tryWait  (this, num);         }
+	unsigned takeISR  ( unsigned num )               { return sig_takeISR  (this, num);         }
+	unsigned waitFor  ( unsigned num, cnt_t _delay ) { return sig_waitFor  (this, num, _delay); }
+	unsigned waitUntil( unsigned num, cnt_t _time )  { return sig_waitUntil(this, num, _time);  }
+	unsigned wait     ( unsigned num )               { return sig_wait     (this, num);         }
+	void     give     ( unsigned num )               {        sig_give     (this, num);         }
+	void     set      ( unsigned num )               {        sig_set      (this, num);         }
+	void     giveISR  ( unsigned num )               {        sig_giveISR  (this, num);         }
+	void     clear    ( unsigned num )               {        sig_clear    (this, num);         }
+	void     clearISR ( unsigned num )               {        sig_clearISR (this, num);         }
+	bool     get      ( unsigned num )               { return sig_get      (this, num);         }
+	bool     getISR   ( unsigned num )               { return sig_getISR   (this, num);         }
 };
 
 #endif//__cplusplus

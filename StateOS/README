@@ -14,7 +14,7 @@ Features:
 - spin locks
 - once flags
 - events
-- signals (clear, protect)
+- signals with protection mask
 - flags (any, all, protect, ignore)
 - barriers
 - semaphores (binary, limited, counting)
@@ -54,6 +54,7 @@ Features:
 - updated tsk_sleep functions
 - added system delayed queues
 - updated barrier object
+- updated signal object
 ---------
 6.2
 - updated kernel

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    26.09.2018
+    @date    28.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -30,11 +30,12 @@
  ******************************************************************************/
 
 #include "inc/ossignal.h"
+#include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
 #include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
-void sig_init( sig_t *sig, bool type )
+void sig_init( sig_t *sig, unsigned mask )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -43,16 +44,14 @@ void sig_init( sig_t *sig, bool type )
 	sys_lock();
 	{
 		memset(sig, 0, sizeof(sig_t));
-
 		core_obj_init(&sig->obj);
-
-		sig->type = type;
+		sig->mask = mask;
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-sig_t *sig_create( bool type )
+sig_t *sig_create( unsigned mask )
 /* -------------------------------------------------------------------------- */
 {
 	sig_t *sig;
@@ -62,7 +61,7 @@ sig_t *sig_create( bool type )
 	sys_lock();
 	{
 		sig = sys_alloc(sizeof(sig_t));
-		sig_init(sig, type);
+		sig_init(sig, mask);
 		sig->obj.res = sig;
 	}
 	sys_unlock();
@@ -79,9 +78,9 @@ void sig_kill( sig_t *sig )
 
 	sys_lock();
 	{
-		sig->flag = false;
-
 		core_all_wakeup(sig->obj.queue, E_STOPPED);
+
+		sig->flags = 0;
 	}
 	sys_unlock();
 }
@@ -100,29 +99,28 @@ void sig_delete( sig_t *sig )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sig_take( sig_t *sig )
+unsigned priv_sig_take( sig_t *sig, unsigned num )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned flag = 1U << num;
+
 	assert(sig);
 
-	if (sig->flag)
-	{
-		sig->flag = sig->type;
-		return E_SUCCESS;
-	}
-
-	return E_TIMEOUT;
+	flag &= sig->flags;
+	sig->flags &= (~flag | sig->mask);
+		
+	return (flag != 0) ? E_SUCCESS : E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_take( sig_t *sig )
+unsigned sig_take( sig_t *sig, unsigned num )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig);
+		event = priv_sig_take(sig, num);
 	}
 	sys_unlock();
 
@@ -130,7 +128,7 @@ unsigned sig_take( sig_t *sig )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitFor( sig_t *sig, cnt_t delay )
+unsigned sig_waitFor( sig_t *sig, unsigned num, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -139,10 +137,13 @@ unsigned sig_waitFor( sig_t *sig, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig);
+		event = priv_sig_take(sig, num);
 
 		if (event == E_TIMEOUT)
+		{
+			System.cur->tmp.sig.num = num;
 			event = core_tsk_waitFor(&sig->obj.queue, delay);
+		}
 	}
 	sys_unlock();
 
@@ -150,7 +151,7 @@ unsigned sig_waitFor( sig_t *sig, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitUntil( sig_t *sig, cnt_t time )
+unsigned sig_waitUntil( sig_t *sig, unsigned num, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -159,10 +160,13 @@ unsigned sig_waitUntil( sig_t *sig, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig);
+		event = priv_sig_take(sig, num);
 
 		if (event == E_TIMEOUT)
+		{
+			System.cur->tmp.sig.num = num;
 			event = core_tsk_waitUntil(&sig->obj.queue, time);
+		}
 	}
 	sys_unlock();
 
@@ -170,33 +174,67 @@ unsigned sig_waitUntil( sig_t *sig, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-void sig_give( sig_t *sig )
+void sig_give( sig_t *sig, unsigned num )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned flag = 1U << num;
+	obj_t  * obj;
+	tsk_t  * tsk;
+
 	assert(sig);
 
 	sys_lock();
 	{
-		if (sig->type == sigClear)
+		sig->flags |= flag;
+
+		obj = &sig->obj;
+		while (obj->queue)
 		{
-			sig->flag = !core_one_wakeup(sig->obj.queue, E_SUCCESS);
-		}
-		else
-		{
-			sig->flag = true;
-			core_all_wakeup(sig->obj.queue, E_SUCCESS);
+			tsk = obj->queue;
+			if (tsk->tmp.sig.num == num)
+			{
+				sig->flags &= (~flag | sig->mask);
+				core_tsk_wakeup(tsk, E_SUCCESS);
+				continue;
+			}
+			obj = &tsk->hdr.obj;
 		}
 	}
 	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
-void sig_clear( sig_t *sig )
+void sig_clear( sig_t *sig, unsigned num )
 /* -------------------------------------------------------------------------- */
 {
-	assert(sig);
+	unsigned flag = 1U << num;
 
-	sig->flag = false;
+	assert(sig);
+	assert(flag);
+
+	sys_lock();
+	{
+		sig->flags &= ~flag;
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+bool sig_get( sig_t *sig, unsigned num )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned flag = 1U << num;
+
+	assert(sig);
+	assert(flag);
+
+	sys_lock();
+	{
+		flag &= sig->flags;
+	}
+	sys_unlock();
+
+	return flag != 0;
 }
 
 /* -------------------------------------------------------------------------- */
