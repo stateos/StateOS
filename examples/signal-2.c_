@@ -1,18 +1,18 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-sig_id sig = SIG_CREATE(sigClear);
+sig_id sig = SIG_CREATE(0);
 
 void slave()
 {
-	sig_wait(sig);
+	sig_wait(sig, 100);
 	LED_Tick();
 }
 
 void master()
 {
 	tsk_delay(SEC);
-	sig_give(sig);
+	sig_give(sig, 100);
 }
 
 int main()

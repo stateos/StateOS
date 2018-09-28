@@ -1,18 +1,18 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-sig_t sig = SIG_INIT(sigClear);
+sig_t sig = SIG_INIT();
 
 void slave()
 {
-	sig_wait(&sig);
+	sig_wait(&sig, 0);
 	LED_Tick();
 }
 
 void master()
 {
 	tsk_delay(SEC);
-	sig_give(&sig);
+	sig_give(&sig, 0);
 }
 
 tsk_t sla = TSK_INIT(0, slave);
