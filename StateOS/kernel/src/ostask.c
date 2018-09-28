@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    27.09.2018
+    @date    28.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -346,33 +346,27 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-static
-unsigned priv_tsk_give( tsk_t *tsk, unsigned flags )
-/* -------------------------------------------------------------------------- */
-{
-	assert(tsk);
-
-	if (tsk->guard == &System.wai)
-	{
-		if (tsk->tmp.flg.flags & flags)
-			flags = tsk->tmp.flg.flags &= ~flags;
-		if (tsk->tmp.flg.flags == 0)
-			core_tsk_wakeup(tsk, flags);
-		return E_SUCCESS;
-	}
-
-	return E_FAILURE;
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned tsk_give( tsk_t *tsk, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
+	assert(tsk);
+
 	sys_lock();
 	{
-		event = priv_tsk_give(tsk, flags);
+		if (tsk->guard == &System.wai)
+		{
+			if (tsk->tmp.flg.flags & flags)
+				flags = tsk->tmp.flg.flags &= ~flags;
+			if (tsk->tmp.flg.flags == 0)
+				core_tsk_wakeup(tsk, flags);
+			event = E_SUCCESS;
+		}
+		else
+		{
+			event = E_FAILURE;
+		}
 	}
 	sys_unlock();
 
