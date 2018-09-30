@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    28.09.2018
+    @date    30.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -191,7 +191,7 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
 unsigned flg_give( flg_t *flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
-	obj_t *obj = &flg->obj;
+	obj_t *obj;
 	tsk_t *tsk;
 
 	assert(flg);
@@ -200,6 +200,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 	{
 		flg->flags |= flags;
 
+		obj = &flg->obj;
 		while (obj->queue)
 		{
 			tsk = obj->queue;

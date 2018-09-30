@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    29.09.2018
+    @date    30.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -234,7 +234,7 @@ unsigned tsk_join( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk == System.cur || tsk->join != JOINABLE)
+		if (tsk->join != JOINABLE || tsk == System.cur)
 			event = E_FAILURE;
 		else
 		if (tsk->hdr.id == ID_STOPPED)
