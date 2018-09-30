@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    28.09.2018
+    @date    30.09.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -109,9 +109,15 @@ unsigned priv_sig_take( sig_t *sig, unsigned num )
 	assert(sig);
 
 	flag &= sig->flags;
-	sig->flags &= (~flag | sig->mask);
+
+	if (flag != 0)
+	{
+		sig->flags &= ~flag | sig->mask;
+
+		return E_SUCCESS;
+	}
 		
-	return (flag != 0) ? E_SUCCESS : E_TIMEOUT;
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -195,7 +201,7 @@ void sig_give( sig_t *sig, unsigned num )
 			tsk = obj->queue;
 			if (tsk->tmp.sig.num == num)
 			{
-				sig->flags &= (~flag | sig->mask);
+				sig->flags &= ~flag | sig->mask;
 				core_tsk_wakeup(tsk, E_SUCCESS);
 				continue;
 			}
