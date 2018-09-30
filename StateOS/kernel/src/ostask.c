@@ -127,7 +127,7 @@ void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
-	assert(!System.cur->mtx.list);
+	assert(System.cur->mtx.list == 0);
 
 	port_set_lock();
 
