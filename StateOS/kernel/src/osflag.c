@@ -104,16 +104,22 @@ static
 unsigned priv_flg_take( flg_t *flg, unsigned flags, char mode )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned entry = flags;
+	unsigned value;
 
 	assert(flg);
 	assert((mode & ~flgMASK) == 0);
 
-	if ((mode & flgIgnore)  == 0) flags &= ~flg->flags;
-	if ((mode & flgProtect) == 0) flg->flags &= ~entry;
+	if ((mode & flgIgnore) == 0)
+	{
+		value = flags;
+		flags &= ~flg->flags;
 
-	if (flags != entry && (mode & flgAll) == 0)
-		flags = 0;
+		if ((mode & flgProtect) == 0)
+			flg->flags &= ~value;
+
+		if (flags != value && (mode & flgAll) == 0)
+			flags = 0;
+	}
 
 	return flags;
 }
@@ -207,7 +213,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 			if (tsk->tmp.flg.flags & flags)
 			{
 				if ((tsk->tmp.flg.mode & flgProtect) == 0)
-					flg->flags &= ~tsk->tmp.flg.flags;
+					flg->flags &= ~(tsk->tmp.flg.flags & flags);
 				tsk->tmp.flg.flags &= ~flags;
 				if (tsk->tmp.flg.flags == 0 || (tsk->tmp.flg.mode & flgAll) == 0)
 				{
