@@ -42,29 +42,6 @@ extern "C" {
  *
  * Name              : core_set_lock
  *
- * Description       : set interrupts state
- *
- * Parameters
- *   lck             : required interrupts state
- *
- * Return            : previous interrupts state
- *
- * Note              : for internal use
- *
- ******************************************************************************/
-
-__STATIC_INLINE
-lck_t core_set_lock( lck_t lck )
-{
-	lck_t prv = port_get_lock();
-	port_put_lock(lck);
-	return prv;
-}
-
-/******************************************************************************
- *
- * Name              : core_sys_lock
- *
  * Description       : disable interrupts
  *
  * Parameters        : none
@@ -76,7 +53,7 @@ lck_t core_set_lock( lck_t lck )
  ******************************************************************************/
 
 __STATIC_INLINE
-lck_t core_sys_lock( void )
+lck_t core_set_lock( void )
 {
 	lck_t prv = port_get_lock();
 	port_set_lock();
@@ -85,7 +62,29 @@ lck_t core_sys_lock( void )
 
 /******************************************************************************
  *
- * Name              : core_sys_unlock
+ * Name              : core_clr_lock
+ *
+ * Description       : enable interrupts
+ *
+ * Parameters        : none
+ *
+ * Return            : previous interrupts state
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+lck_t core_clr_lock( void )
+{
+	lck_t prv = port_get_lock();
+	port_clr_lock();
+	return prv;
+}
+
+/******************************************************************************
+ *
+ * Name              : core_put_lock
  *
  * Description       : restore interrupts state
  *
@@ -99,9 +98,29 @@ lck_t core_sys_lock( void )
  ******************************************************************************/
 
 __STATIC_INLINE
-void core_sys_unlock( lck_t lck )
+void core_put_lock( lck_t lck )
 {
 	port_put_lock(lck);
+}
+
+/******************************************************************************
+ *
+ * Name              : core_get_lock
+ *
+ * Description       : return current interrupts state
+ *
+ * Parameters        : none
+ *
+ * Return            : current interrupts state
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+lck_t core_get_lock( void )
+{
+	return port_get_lock();
 }
 
 /******************************************************************************
@@ -121,7 +140,7 @@ void core_sys_unlock( lck_t lck )
  ******************************************************************************/
 
 #define                sys_lock() \
-                       do { lck_t __LOCK = core_sys_lock()
+                       do { lck_t __LOCK = core_set_lock()
 
 #define                sys_lockISR() \
                        sys_lock()
@@ -143,7 +162,7 @@ void core_sys_unlock( lck_t lck )
  ******************************************************************************/
 
 #define                sys_unlock() \
-                       core_sys_unlock(__LOCK); } while (0)
+                       core_put_lock(__LOCK); } while (0)
 
 #define                sys_unlockISR() \
                        sys_unlock()
@@ -169,8 +188,8 @@ void core_sys_unlock( lck_t lck )
 
 struct CriticalSection
 {
-	 CriticalSection( void ) { lck = core_sys_lock(); }
-	~CriticalSection( void ) { core_sys_unlock(lck);  }
+	 CriticalSection( void ) { lck = core_set_lock(); }
+	~CriticalSection( void ) { core_put_lock(lck);    }
 
 	private:
 	lck_t lck;

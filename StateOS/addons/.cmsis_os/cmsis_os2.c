@@ -98,7 +98,7 @@ int32_t osKernelLock (void)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return (int32_t)osErrorISR;
 
-	return (int32_t) core_sys_lock();
+	return (int32_t) core_set_lock();
 }
 
 int32_t osKernelUnlock (void)
@@ -106,7 +106,7 @@ int32_t osKernelUnlock (void)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return (int32_t)osErrorISR;
 
-	return (int32_t) core_set_lock(0);
+	return (int32_t) core_clr_lock();
 }
 
 int32_t osKernelRestoreLock (int32_t lock)
@@ -114,7 +114,7 @@ int32_t osKernelRestoreLock (int32_t lock)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return (int32_t)osErrorISR;
 
-	core_sys_unlock(lock);
+	core_put_lock((lck_t) lock);
 
 	return lock;
 }

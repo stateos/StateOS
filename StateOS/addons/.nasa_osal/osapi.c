@@ -1271,12 +1271,14 @@ int32 OS_IntAttachHandler(uint32 InterruptNumber, osal_task_entry InterruptHandl
 
 int32 OS_IntUnlock(int32 IntLevel)
 {
-	return (int32) core_set_lock(IntLevel);
+	int32 lckLevel = (int32) core_get_lock();
+	core_put_lock((lck_t) IntLevel);
+	return lckLevel;
 }
 
 int32 OS_IntLock(void)
 {
-	return (int32) core_sys_lock();
+	return (int32) core_set_lock();
 }
 
 int32 OS_IntEnable(int32 Level)
