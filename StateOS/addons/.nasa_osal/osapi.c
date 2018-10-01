@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    14.09.2018
+    @date    01.10.2018
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -1271,16 +1271,12 @@ int32 OS_IntAttachHandler(uint32 InterruptNumber, osal_task_entry InterruptHandl
 
 int32 OS_IntUnlock(int32 IntLevel)
 {
-	uint32 lock = port_get_lock();
-	port_put_lock(IntLevel);
-	return lock;
+	return (int32) core_set_lock(IntLevel);
 }
 
 int32 OS_IntLock(void)
 {
-	uint32 lock = port_get_lock();
-	port_set_lock();
-	return lock;
+	return (int32) core_sys_lock();
 }
 
 int32 OS_IntEnable(int32 Level)

@@ -2,7 +2,7 @@
 
     @file    StateOS: oscriticalsection.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    01.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,6 +40,29 @@ extern "C" {
 
 /******************************************************************************
  *
+ * Name              : core_set_lock
+ *
+ * Description       : set interrupts state
+ *
+ * Parameters
+ *   lck             : required interrupts state
+ *
+ * Return            : previous interrupts state
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+lck_t core_set_lock( lck_t lck )
+{
+	lck_t prv = port_get_lock();
+	port_put_lock(lck);
+	return prv;
+}
+
+/******************************************************************************
+ *
  * Name              : core_sys_lock
  *
  * Description       : disable interrupts
@@ -55,19 +78,19 @@ extern "C" {
 __STATIC_INLINE
 lck_t core_sys_lock( void )
 {
-	lck_t lck = port_get_lock();
+	lck_t prv = port_get_lock();
 	port_set_lock();
-	return lck;
+	return prv;
 }
 
 /******************************************************************************
  *
  * Name              : core_sys_unlock
  *
- * Description       : restore previous interrupts state
+ * Description       : restore interrupts state
  *
  * Parameters
- *   lck             : previous interrupts state
+ *   lck             : interrupts state
  *
  * Return            : none
  *

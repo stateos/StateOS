@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    16.09.2018
+    @date    01.10.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -95,26 +95,18 @@ osStatus_t osKernelStart (void)
 
 int32_t osKernelLock (void)
 {
-	int32_t lock;
-
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return (int32_t)osErrorISR;
 
-	lock = port_get_lock();
-	port_set_lock();
-	return lock;
+	return (int32_t) core_sys_lock();
 }
 
 int32_t osKernelUnlock (void)
 {
-	int32_t lock;
-
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return (int32_t)osErrorISR;
 
-	lock = port_get_lock();
-	port_clr_lock();
-	return lock;
+	return (int32_t) core_set_lock(0);
 }
 
 int32_t osKernelRestoreLock (int32_t lock)
@@ -122,7 +114,8 @@ int32_t osKernelRestoreLock (int32_t lock)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return (int32_t)osErrorISR;
 
-	port_put_lock(lock);
+	core_sys_unlock(lock);
+
 	return lock;
 }
 
