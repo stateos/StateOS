@@ -4,8 +4,9 @@
 
 // Sleeping barber problem
 
-#define DELAY  256
-#define CHAIRS 4 // num of chairs in waiting room
+#define BARBERS 2 // num of barbers
+#define CHAIRS  4 // num of chairs in the waiting room
+#define DLY   256
 
 OS_SEM(chairs, CHAIRS);
 OS_SEM(barbers, 0);
@@ -16,7 +17,7 @@ void cut_hair()
 {
 	static cnt_t dly = 0;
 
-	dly = (dly + 4) % DELAY;
+	dly = (dly + 4) % DLY;
 	tsk_delay(dly * MSEC);
 
 	sem_give(end_of_haircut);
@@ -56,18 +57,19 @@ void customer()
 int main()
 {
 	cnt_t dly;
+	int i;
 
 	srand(0);
 	LED_Init();
 
-	tsk_create(1, barber);
-	tsk_create(1, barber);
+	for (i = 0; i < BARBERS; i++)
+		tsk_create(1, barber);
 
 	for (;;)
 	{
 		tsk_create(1, customer);
 
-		dly = (rand() % DELAY) * MSEC;
+		dly = (rand() % DLY) * MSEC;
 		tsk_delay(dly);
 	}
 }
