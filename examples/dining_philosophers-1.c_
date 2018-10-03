@@ -1,6 +1,5 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 // Dining philosophers problem: resource hierarchy solution (Dijkstra)

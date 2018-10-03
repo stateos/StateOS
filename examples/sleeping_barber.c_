@@ -43,9 +43,9 @@ void customer()
 {
 	if (sem_take(chairs) == E_SUCCESS)
 	{
+		sem_give(customers);
 		sem_wait(barbers);
 		sem_give(chairs);
-		sem_give(customers);
 		get_haircut();
 	}
 
