@@ -286,8 +286,11 @@ osThreadState_t osThreadGetState (osThreadId_t thread_id)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_id == NULL))
 		return osThreadError;
 
-	if (&thread->tsk == System.cur)
+	if (thread_id == osThreadGetId())
 		return osThreadRunning;
+
+	if (thread->tsk.hdr.next == 0)
+		return osThreadInactive;
 
 	switch (thread->tsk.hdr.id)
 	{
@@ -668,7 +671,7 @@ uint32_t osTimerIsRunning (osTimerId_t timer_id)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (timer_id == NULL))
 		return 0U;
 
-	return (timer->tmr.hdr.id != ID_STOPPED);
+	return (timer->tmr.hdr.id == ID_TIMER);
 }
 
 osStatus_t osTimerDelete (osTimerId_t timer_id)
