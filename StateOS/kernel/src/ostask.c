@@ -205,16 +205,13 @@ unsigned tsk_detach( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->hdr.id != ID_STOPPED &&
-		    tsk->join != DETACHED)
+		if (tsk->join == DETACHED || tsk->hdr.id == ID_STOPPED)
+			event = E_FAILURE;
+		else
 		{
 			core_tsk_wakeup(tsk->join, E_FAILURE);
 			tsk->join = DETACHED;
 			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_FAILURE;
 		}
 	}
 	sys_unlock();
