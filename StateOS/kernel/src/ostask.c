@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    30.09.2018
+    @date    04.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -206,8 +206,7 @@ unsigned tsk_detach( tsk_t *tsk )
 	sys_lock();
 	{
 		if (tsk->hdr.id != ID_STOPPED &&
-		    tsk->join != DETACHED &&
-		    tsk->hdr.obj.res != 0)
+		    tsk->join != DETACHED)
 		{
 			core_tsk_wakeup(tsk->join, E_FAILURE);
 			tsk->join = DETACHED;
