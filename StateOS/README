@@ -55,6 +55,7 @@ Features:
 - added system delayed queues
 - updated barrier object
 - updated signal object
+- renamed ID_DELAYED to ID_BLOCKED
 ---------
 6.2
 - updated kernel

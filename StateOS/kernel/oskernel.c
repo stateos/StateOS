@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    27.09.2018
+    @date    04.10.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -199,7 +199,7 @@ void core_tmr_handler( void )
 
 				priv_tmr_wakeup((tmr_t *)tmr, E_SUCCESS);
 			}
-			else  /* id == ID_DELAYED */
+			else  /* hdr.id == ID_BLOCKED */
 				core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
 		}
 	}
@@ -354,7 +354,7 @@ unsigned priv_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield )
 
 	core_tsk_append((tsk_t *)tsk, que);
 	priv_tsk_remove((tsk_t *)tsk);
-	core_tmr_insert((tmr_t *)tsk, ID_DELAYED);
+	core_tmr_insert((tmr_t *)tsk, ID_BLOCKED);
 
 	if (yield)
 		priv_ctx_switchNow();
@@ -478,7 +478,7 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 			core_tsk_insert(tsk);
 		}
 		else
-		if (tsk->hdr.id == ID_DELAYED)
+		if (tsk->hdr.id == ID_BLOCKED)
 		{
 			core_tsk_transfer(tsk, tsk->guard);
 			if (tsk->mtx.tree)

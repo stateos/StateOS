@@ -172,7 +172,7 @@ void tsk_kill( tsk_t *tsk )
 			if (tsk->hdr.id == ID_READY)
 				core_tsk_remove(tsk);
 			else
-			if (tsk->hdr.id == ID_DELAYED)
+			if (tsk->hdr.id == ID_BLOCKED)
 			{
 				core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
 				core_tmr_remove((tmr_t *)tsk);

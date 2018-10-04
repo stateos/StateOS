@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    26.09.2018
+    @date    04.10.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -90,7 +90,7 @@ typedef enum __tid
 {
 	ID_STOPPED = 0, // task or timer stopped
 	ID_READY,       // task running or ready to run
-	ID_DELAYED,     // task in the delayed state
+	ID_BLOCKED,     // task in the delayed state
 	ID_TIMER,       // timer in the countdown state
 	ID_IDLE,        // idle process
 
