@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    28.09.2018
+    @date    04.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -71,7 +71,7 @@ struct __tsk
 	cnt_t    delay; // inherited from timer
 	cnt_t    slice;	// time slice
 
-	tsk_t ** back;  // previous object in the DELAYED queue
+	tsk_t ** back;  // previous object in the BLOCKED queue
 	stk_t  * stack; // base of stack
 	unsigned size;  // size of stack (in bytes)
 	void   * sp;    // current stack pointer
@@ -80,7 +80,7 @@ struct __tsk
 	unsigned prio;  // current priority
 
 	tsk_t  * join;  // joinable state
-	tsk_t ** guard; // DELAYED queue for the pending process
+	tsk_t ** guard; // BLOCKED queue for the pending process
 
 	unsigned event; // wakeup event
 
@@ -708,7 +708,7 @@ void tsk_stop( void );
  * Name              : tsk_kill
  * Alias             : tsk_reset
  *
- * Description       : reset the task object and remove it from READY/DELAYED queue
+ * Description       : reset the task object and remove it from READY/BLOCKED queue
  *
  * Parameters
  *   tsk             : pointer to task object
@@ -927,7 +927,7 @@ unsigned tsk_wait( unsigned flags ) { return tsk_waitFor(flags, INFINITE); }
  * Description       : set given flags or event of waiting task (tsk_wait)
  *
  * Parameters
- *   tsk             : pointer to delayed task object
+ *   tsk             : pointer to blocked task object
  *   flags           : flags or event to be transferred to the task
  *
  * Return
@@ -1047,10 +1047,10 @@ unsigned tsk_suspend( tsk_t *tsk );
  * ISR alias         : tsk_resumeISR
  *
  * Description       : resume execution of given suspended task
- *                     only suspended or indefinitely delayed tasks can be resumed
+ *                     only suspended or indefinitely blocked tasks can be resumed
  *
  * Parameters
- *   tsk             : pointer to delayed task object
+ *   tsk             : pointer to suspended task object
  *
  * Return
  *   E_SUCCESS       : task was successfully resumed

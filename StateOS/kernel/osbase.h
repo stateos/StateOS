@@ -88,9 +88,9 @@ typedef         void fun_t(); // timer/task procedure
 
 typedef enum __tid
 {
-	ID_STOPPED = 0, // task or timer stopped
+	ID_STOPPED = 0, // task or timer just created or stopped
 	ID_READY,       // task running or ready to run
-	ID_BLOCKED,     // task in the delayed state
+	ID_BLOCKED,     // task in the blocked state
 	ID_TIMER,       // timer in the countdown state
 	ID_IDLE,        // idle process
 
@@ -102,7 +102,7 @@ typedef enum __tid
 
 typedef struct __obj
 {
-	tsk_t  * queue; // next process in the DELAYED queue
+	tsk_t  * queue; // next process in the BLOCKED queue
 	void   * res;   // allocated object's resource
 
 }	obj_t;

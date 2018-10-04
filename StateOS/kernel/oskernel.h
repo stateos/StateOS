@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    27.09.2018
+    @date    04.10.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -154,17 +154,17 @@ void core_tsk_insert( tsk_t *tsk );
 // remove task 'tsk' from tasks READY queue
 void core_tsk_remove( tsk_t *tsk );
 
-// append task 'tsk' to the delayed queue 'que'
+// append task 'tsk' to the blocked queue 'que'
 void core_tsk_append( tsk_t *tsk, tsk_t **obj );
 
-// remove task 'tsk' from the delayed queue with event value 'event'
+// remove task 'tsk' from the blocked queue with event value 'event'
 void core_tsk_unlink( tsk_t *tsk, unsigned event );
 
-// transfer task 'tsk' to the delayed queue 'que'
+// transfer task 'tsk' to the blocked queue 'que'
 void core_tsk_transfer( tsk_t *tsk, tsk_t **que );
 
 // delay execution of current task for given duration of time 'delay'
-// append the current task to the delayed queue 'que'
+// append the current task to the blocked queue 'que'
 // remove the current task from tasks READY queue
 // insert the current task into timers READY queue
 // force context switch
@@ -172,7 +172,7 @@ void core_tsk_transfer( tsk_t *tsk, tsk_t **que );
 unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay );
 
 // delay execution of current task for given duration of time 'delay' from the end of the previous countdown
-// append the current task to the delayed queue 'que'
+// append the current task to the blocked queue 'que'
 // remove the current task from tasks READY queue
 // insert the current task into timers READY queue
 // force context switch
@@ -180,7 +180,7 @@ unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay );
 unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay );
 
 // delay execution of the current task until given time point 'time'
-// append the current task to the delayed queue 'que'
+// append the current task to the blocked queue 'que'
 // remove the current task from tasks READY queue
 // insert the current task into timers READY queue
 // force context switch
@@ -194,16 +194,16 @@ unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time );
 // force context switch if it is the current task
 void core_tsk_suspend( tsk_t *tsk );
 
-// resume execution of delayed task 'tsk' with event value 'event'
-// remove resumed task from guard object delayed queue
+// resume execution of blocked task 'tsk' with event value 'event'
+// remove resumed task from guard object blocked queue
 // remove resumed task from timers READY queue
 // insert resumed task into tasks READY queue
 // force context switch if priority of resumed task is greater then priority of the current task and kernel works in preemptive mode
 // return 'tsk'
 tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event );
 
-// resume execution of first task from delayed queue with event value 'event'; 'tsk' is the head (first task) of the queue
-// remove resumed task from guard object delayed queue
+// resume execution of first task from blocked queue with event value 'event'; 'tsk' is the head (first task) of the queue
+// remove resumed task from guard object blocked queue
 // remove resumed task from timers READY queue
 // insert resumed task into tasks READY queue
 // force context switch if priority of resumed task is greater then priority of the current task and kernel works in preemptive mode
@@ -214,8 +214,8 @@ tsk_t *core_one_wakeup( tsk_t *tsk, unsigned event )
 	return core_tsk_wakeup(tsk, event);
 }
 
-// resume execution of all tasks from delayed queue with event value 'event'; 'tsk' is the head (first task) of the queue
-// remove all resumed tasks from guard object delayed queue
+// resume execution of all tasks from blocked queue with event value 'event'; 'tsk' is the head (first task) of the queue
+// remove all resumed tasks from guard object blocked queue
 // remove all resumed tasks from timers READY queue
 // insert all resumed tasks into tasks READY queue
 // force context switch if priority of any resumed task is greater then priority of the current task and kernel works in preemptive mode
@@ -246,9 +246,9 @@ void core_mtx_link( mtx_t *mtx, tsk_t *tsk );
 // remove owner of the mutex 'mtx'
 void core_mtx_unlink( mtx_t *mtx );
 
-// transfer lock to the next task in the delayed queue of mutex 'mtx'
+// transfer lock to the next task in the blocked queue of mutex 'mtx'
 // the task is waked with event 'event'
-// return pointer to the waked task or 0 if the delayed queue of 'mtx' is empty
+// return pointer to the waked task or 0 if the blocked queue of 'mtx' is empty
 tsk_t *core_mtx_transferLock( mtx_t *mtx, unsigned event );
 
 /* -------------------------------------------------------------------------- */
