@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    26.09.2018
+    @date    04.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -186,6 +186,9 @@ unsigned tmr_take( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
 	assert(tmr);
+
+	if (tmr->hdr.next == 0)
+		return E_FAILURE; // timer has not yet been started
 
 	if (tmr->hdr.id == ID_STOPPED)
 		return E_SUCCESS;
