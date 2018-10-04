@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    03.10.2018
+    @date    04.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -381,6 +381,7 @@ unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully unlocked
+ *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
  *   E_TIMEOUT       : semaphore object can't be unlocked immediately, try again
  *
  * Note              : may be used both in thread and handler mode
@@ -410,6 +411,7 @@ unsigned sem_giveISR( sem_t *sem ) { return sem_give(sem); }
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully unlocked
+ *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
  *   E_STOPPED       : semaphore object was killed before the specified timeout expired
  *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired
  *
@@ -432,6 +434,7 @@ unsigned sem_sendFor( sem_t *sem, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully unlocked
+ *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
  *   E_STOPPED       : semaphore object was killed before the specified timeout expired
  *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired
  *
@@ -453,6 +456,7 @@ unsigned sem_sendUntil( sem_t *sem, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully unlocked
+ *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
  *   E_STOPPED       : semaphore object was killed
  *
  * Note              : use only in thread mode
