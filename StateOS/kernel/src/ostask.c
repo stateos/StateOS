@@ -105,43 +105,93 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_start( tsk_t *tsk )
+unsigned tsk_start( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned event;
+
 	assert_tsk_context();
 	assert(tsk);
 	assert(tsk->state);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id == ID_STOPPED)
+		if (tsk->hdr.id != ID_STOPPED)
+			event = E_SUCCESS;
+		else
+		if (tsk->join == DETACHED)
+			event = E_FAILURE;
+		else
 		{
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
+
+			event = E_SUCCESS;
 		}
 	}
 	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_startFrom( tsk_t *tsk, fun_t *state )
+unsigned tsk_startFrom( tsk_t *tsk, fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned event;
+
 	assert_tsk_context();
 	assert(tsk);
 	assert(state);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id == ID_STOPPED)
+		if (tsk->hdr.id != ID_STOPPED)
+			event = E_SUCCESS;
+		else
+		if (tsk->join == DETACHED)
+			event = E_FAILURE;
+		else
 		{
 			tsk->state = state;
 
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
+
+			event = E_SUCCESS;
 		}
 	}
 	sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_tsk_free( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	if (tsk->hdr.obj.res != 0)
+	{
+		core_res_free(&tsk->hdr.obj.res);
+		tsk->join = DETACHED;
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+static
+bool priv_tsk_detachable( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	return (tsk->join != DETACHED && tsk->hdr.obj.res != 0);
+}
+
+/* -------------------------------------------------------------------------- */
+static
+bool priv_tsk_joinable( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	return (tsk->join == JOINABLE && tsk != System.cur);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -155,8 +205,14 @@ unsigned tsk_detach( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join == DETACHED || tsk->hdr.id == ID_STOPPED)
+		if (priv_tsk_detachable(tsk) == false)
 			event = E_FAILURE;
+		else
+		if (tsk->hdr.id == ID_STOPPED)
+		{
+			priv_tsk_free(tsk);
+			event = E_SUCCESS;
+		}
 		else
 		{
 			core_tsk_wakeup(tsk->join, E_FAILURE);
@@ -180,7 +236,7 @@ unsigned tsk_join( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join != JOINABLE || tsk == System.cur)
+		if (priv_tsk_joinable(tsk) == false)
 			event = E_FAILURE;
 		else
 		if (tsk->hdr.id == ID_STOPPED)
@@ -189,7 +245,7 @@ unsigned tsk_join( tsk_t *tsk )
 			event = core_tsk_waitFor(&tsk->join, INFINITE);
 
 		if (event != E_FAILURE) // !detached
-			core_res_free(&tsk->hdr.obj.res);
+			priv_tsk_free(tsk);
 	}
 	sys_unlock();
 
@@ -208,7 +264,7 @@ void tsk_stop( void )
 	if (System.cur->join != DETACHED)
 		core_tsk_wakeup(System.cur->join, E_SUCCESS);
 	else
-		core_res_free(&System.cur->hdr.obj.res);
+		priv_tsk_free(System.cur);
 
 	core_tsk_remove(System.cur);
 
@@ -262,9 +318,11 @@ void tsk_delete( tsk_t *tsk )
 	sys_lock();
 	{
 		join = tsk->join;
+
 		tsk_kill(tsk);
+
 		if (join == JOINABLE)
-			core_res_free(&tsk->hdr.obj.res);
+			priv_tsk_free(tsk);
 	}
 	sys_unlock();
 }
@@ -378,14 +436,14 @@ unsigned tsk_give( tsk_t *tsk, unsigned flags )
 		{
 			if (tsk->tmp.flg.flags & flags)
 				flags = tsk->tmp.flg.flags &= ~flags;
+
 			if (tsk->tmp.flg.flags == 0)
 				core_tsk_wakeup(tsk, flags);
+
 			event = E_SUCCESS;
 		}
 		else
-		{
 			event = E_FAILURE;
-		}
 	}
 	sys_unlock();
 
@@ -441,9 +499,7 @@ unsigned tsk_suspend( tsk_t *tsk )
 			event = E_SUCCESS;
 		}
 		else
-		{
 			event = E_FAILURE;
-		}
 	}
 	sys_unlock();
 
@@ -466,9 +522,7 @@ unsigned tsk_resume( tsk_t *tsk )
 			event = E_SUCCESS;
 		}
 		else
-		{
 			event = E_FAILURE;
-		}
 	}
 	sys_unlock();
 

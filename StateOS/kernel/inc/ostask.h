@@ -699,13 +699,15 @@ tsk_t *tsk_detached( unsigned prio, fun_t *state ) { return wrk_detached(prio, s
  * Parameters
  *   tsk             : pointer to task object
  *
- * Return            : none
+ * Return
+ *   E_SUCCESS       : given task is running
+ *   E_FAILURE       : cannot start detached task
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-void tsk_start( tsk_t *tsk );
+unsigned tsk_start( tsk_t *tsk );
 
 /******************************************************************************
  *
@@ -718,13 +720,15 @@ void tsk_start( tsk_t *tsk );
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
  *
- * Return            : none
+ * Return
+ *   E_SUCCESS       : given task is running
+ *   E_FAILURE       : cannot start detached task
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-void tsk_startFrom( tsk_t *tsk, fun_t *state );
+unsigned tsk_startFrom( tsk_t *tsk, fun_t *state );
 
 /******************************************************************************
  *
