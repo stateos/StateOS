@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    04.10.2018
+    @date    05.10.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -286,7 +286,7 @@ osThreadState_t osThreadGetState (osThreadId_t thread_id)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (thread_id == NULL))
 		return osThreadError;
 
-	if (thread_id == osThreadGetId())
+	if (&thread->tsk == tsk_this())
 		return osThreadRunning;
 
 	if (thread->tsk.hdr.next == 0)
