@@ -264,7 +264,7 @@ void tsk_delete( tsk_t *tsk )
 		join = tsk->join;
 		tsk_kill(tsk);
 		if (join == JOINABLE)
-			core_res_free(&System.cur->hdr.obj.res);
+			core_res_free(&tsk->hdr.obj.res);
 	}
 	sys_unlock();
 }
