@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    04.10.2018
+    @date    05.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -79,7 +79,7 @@ void tmr_kill( tmr_t *tmr )
 
 	sys_lock();
 	{
-		if (tmr->hdr.id != ID_STOPPED)
+		if (tmr->hdr.id == ID_TIMER)
 		{
 			core_all_wakeup(tmr->hdr.obj.queue, E_STOPPED);
 			core_tmr_remove(tmr);
@@ -107,7 +107,7 @@ void priv_tmr_start( tmr_t *tmr )
 {
 	assert_tsk_context();
 
-	if (tmr->hdr.id != ID_STOPPED)
+	if (tmr->hdr.id == ID_TIMER)
 		core_tmr_remove(tmr);
 	core_tmr_insert(tmr, ID_TIMER);
 }
@@ -190,10 +190,10 @@ unsigned tmr_take( tmr_t *tmr )
 	if (tmr->hdr.next == 0)
 		return E_FAILURE; // timer has not yet been started
 
-	if (tmr->hdr.id == ID_STOPPED)
-		return E_SUCCESS;
+	if (tmr->hdr.id == ID_TIMER)
+		return E_TIMEOUT;
 
-	return E_TIMEOUT;
+	return E_SUCCESS;
 }
 
 /* -------------------------------------------------------------------------- */
