@@ -61,7 +61,6 @@ void customer()
 		mtx_unlock(doors);
 	}
 
-	tsk_detach(tsk_this());
 	tsk_stop();
 }		
 
@@ -74,11 +73,11 @@ int main()
 	LED_Init();
 
 	for (i = 0; i < BARBERS; i++)
-		tsk_new(1, barber);
+		tsk_detached(1, barber);
 
 	for (;;)
 	{
-		tsk_new(1, customer);
+		tsk_detached(1, customer);
 
 		dly = rand() % DELAY;
 		tsk_delay(dly * MSEC);

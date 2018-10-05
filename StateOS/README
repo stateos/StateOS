@@ -56,6 +56,7 @@ Features:
 - updated barrier object
 - updated signal object
 - renamed ID_DELAYED to ID_BLOCKED
+- changed resource management
 ---------
 6.2
 - updated kernel

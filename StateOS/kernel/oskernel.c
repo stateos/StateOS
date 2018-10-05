@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    04.10.2018
+    @date    05.10.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #include "inc/ostimer.h"
 #include "inc/ostask.h"
 #include "inc/osmutex.h"
+#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 // SYSTEM INTERNAL SERVICES
@@ -622,5 +623,13 @@ void core_sys_tick( void )
 }
 
 #endif
+
+void core_res_free( void **res )
+{
+	void *tmp = *res;
+
+	*res = 0;
+	sys_free(tmp);
+}
 
 /* -------------------------------------------------------------------------- */

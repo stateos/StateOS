@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    26.09.2018
+    @date    05.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -105,7 +105,7 @@ void box_delete( box_t *box )
 	sys_lock();
 	{
 		box_kill(box);
-		sys_free(box->obj.res);
+		core_res_free(&box->obj.res);
 	}
 	sys_unlock();
 }

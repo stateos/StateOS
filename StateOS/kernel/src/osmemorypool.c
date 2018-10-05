@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    25.09.2018
+    @date    05.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -127,7 +127,7 @@ void mem_delete( mem_t *mem )
 	sys_lock();
 	{
 		mem_kill(mem);
-		sys_free(mem->lst.obj.res);
+		core_res_free(&mem->lst.obj.res);
 	}
 	sys_unlock();
 }

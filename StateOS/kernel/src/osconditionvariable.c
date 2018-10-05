@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    26.09.2018
+    @date    05.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -89,7 +89,7 @@ void cnd_delete( cnd_t *cnd )
 	sys_lock();
 	{
 		cnd_kill(cnd);
-		sys_free(cnd->obj.res);
+		core_res_free(&cnd->obj.res);
 	}
 	sys_unlock();
 }

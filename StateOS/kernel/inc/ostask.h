@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    04.10.2018
+    @date    05.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -625,6 +625,27 @@ tsk_t *wrk_new( unsigned prio, fun_t *state, unsigned size ) { return wrk_create
 
 /******************************************************************************
  *
+ * Name              : wrk_detached
+ *
+ * Description       : create and initialize complete work area for detached task object and start the task
+ *
+ * Parameters
+ *   prio            : initial task priority (any unsigned int value)
+ *   state           : task state (initial task function) doesn't have to be noreturn-type
+ *                     it will be executed into an infinite system-implemented loop
+ *   size            : size of task private stack (in bytes)
+ *
+ * Return            : pointer to task object (task successfully created)
+ *   0               : task not created (not enough free memory)
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+tsk_t *wrk_detached( unsigned prio, fun_t *state, unsigned size );
+
+/******************************************************************************
+ *
  * Name              : tsk_create
  * Alias             : tsk_new
  *
@@ -647,6 +668,27 @@ tsk_t *tsk_create( unsigned prio, fun_t *state ) { return wrk_create(prio, state
 
 __STATIC_INLINE
 tsk_t *tsk_new   ( unsigned prio, fun_t *state ) { return wrk_create(prio, state, OS_STACK_SIZE); }
+
+/******************************************************************************
+ *
+ * Name              : tsk_detached
+ *
+ * Description       : create and initialize complete work area for detached task object with default stack size
+ *
+ * Parameters
+ *   prio            : initial task priority (any unsigned int value)
+ *   state           : task state (initial task function) doesn't have to be noreturn-type
+ *                     it will be executed into an infinite system-implemented loop
+ *
+ * Return            : pointer to task object (task successfully created)
+ *   0               : task not created (not enough free memory)
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+tsk_t *tsk_detached( unsigned prio, fun_t *state ) { return wrk_detached(prio, state, OS_STACK_SIZE); }
 
 /******************************************************************************
  *
@@ -683,6 +725,45 @@ void tsk_start( tsk_t *tsk );
  ******************************************************************************/
 
 void tsk_startFrom( tsk_t *tsk, fun_t *state );
+
+/******************************************************************************
+ *
+ * Name              : tsk_detach
+ *
+ * Description       : detach given task
+ *
+ * Parameters
+ *   tsk             : pointer to task object
+ *
+ * Return
+ *   E_SUCCESS       : given task was successfully detached
+ *   E_FAILURE       : given task cannot be detached
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned tsk_detach( tsk_t *tsk );
+
+/******************************************************************************
+ *
+ * Name              : tsk_join
+ *
+ * Description       : delay execution of current task until termination of given task
+ *
+ * Parameters
+ *   tsk             : pointer to task object
+ *
+ * Return
+ *   E_SUCCESS       : given task was stopped
+ *   E_STOPPED       : given task was killed
+ *   E_FAILURE       : given task cannot be joined
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned tsk_join( tsk_t *tsk );
 
 /******************************************************************************
  *
@@ -740,45 +821,6 @@ void tsk_reset( tsk_t *tsk ) { tsk_kill(tsk); }
  ******************************************************************************/
 
 void tsk_delete( tsk_t *tsk );
-
-/******************************************************************************
- *
- * Name              : tsk_detach
- *
- * Description       : detach given task
- *
- * Parameters
- *   tsk             : pointer to task object
- *
- * Return
- *   E_SUCCESS       : given task was successfully detached
- *   E_FAILURE       : given task cannot be detached
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned tsk_detach( tsk_t *tsk );
-
-/******************************************************************************
- *
- * Name              : tsk_join
- *
- * Description       : delay execution of current task until termination of given task
- *
- * Parameters
- *   tsk             : pointer to task object
- *
- * Return
- *   E_SUCCESS       : given task was stopped
- *   E_STOPPED       : given task was killed
- *   E_FAILURE       : given task cannot be joined
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned tsk_join( tsk_t *tsk );
 
 /******************************************************************************
  *
@@ -1093,20 +1135,19 @@ struct staticTaskT : public __tsk
 	 staticTaskT( const unsigned _prio, fun_t *_state ): __tsk _TSK_INIT(_prio, _state, stack_, size_) {}
 	~staticTaskT( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
-	void     kill     ( void )            {        tsk_kill      (this);         }
-	void     reset    ( void )            {        tsk_reset     (this);         }
-	unsigned detach   ( void )            { return tsk_detach    (this);         }
-	unsigned join     ( void )            { return tsk_join      (this);         }
 	void     start    ( void )            {        tsk_start     (this);         }
 	void     startFrom( fun_t  * _state ) {        tsk_startFrom (this, _state); }
+	unsigned detach   ( void )            { return tsk_detach    (this);         }
+	unsigned join     ( void )            { return tsk_join      (this);         }
+	void     kill     ( void )            {        tsk_kill      (this);         }
+	void     reset    ( void )            {        tsk_reset     (this);         }
+	unsigned prio     ( void )            { return __tsk::basic;                 }
+	unsigned getPrio  ( void )            { return __tsk::basic;                 }
 	unsigned give     ( unsigned _flags ) { return tsk_give      (this, _flags); }
 	unsigned giveISR  ( unsigned _flags ) { return tsk_giveISR   (this, _flags); }
 	unsigned suspend  ( void )            { return tsk_suspend   (this);         }
 	unsigned resume   ( void )            { return tsk_resume    (this);         }
 	unsigned resumeISR( void )            { return tsk_resumeISR (this);         }
-
-	unsigned prio     ( void )            { return __tsk::basic;                 }
-	unsigned getPrio  ( void )            { return __tsk::basic;                 }
 	bool     operator!( void )            { return __tsk::hdr.id == ID_STOPPED;  }
 
 	private:
@@ -1185,33 +1226,31 @@ typedef startTaskT<OS_STACK_SIZE> startTask;
 
 namespace ThisTask
 {
-	static inline void     pass      ( void )                          {        tsk_pass      ();                      }
+	static inline unsigned detach    ( void )                          { return tsk_detach    (System.cur);            }
+	static inline void     stop      ( void )                          {        tsk_stop      ();                      }
+	static inline void     kill      ( void )                          {        tsk_kill      (System.cur);            }
+	static inline void     reset     ( void )                          {        tsk_reset     (System.cur);            }
 	static inline void     yield     ( void )                          {        tsk_yield     ();                      }
+	static inline void     pass      ( void )                          {        tsk_pass      ();                      }
 #if OS_FUNCTIONAL
 	static inline void     flip      ( FUN_t    _state )               {        ((TaskT<>*)System.cur)->fun_ = _state;
 	                                                                            tsk_flip      (TaskT<>::run_);         }
 #else
 	static inline void     flip      ( FUN_t    _state )               {        tsk_flip      (_state);                }
 #endif
-	static inline void     stop      ( void )                          {        tsk_stop      ();                      }
 	static inline void     setPrio   ( unsigned _prio )                {        tsk_setPrio   (_prio);                 }
 	static inline void     prio      ( unsigned _prio )                {        tsk_prio      (_prio);                 }
 	static inline unsigned getPrio   ( void )                          { return tsk_getPrio   ();                      }
 	static inline unsigned prio      ( void )                          { return tsk_getPrio   ();                      }
-
-	static inline void     kill      ( void )                          {        tsk_kill      (System.cur);            }
-	static inline void     reset     ( void )                          {        tsk_reset     (System.cur);            }
-	static inline unsigned detach    ( void )                          { return tsk_detach    (System.cur);            }
-	static inline void     suspend   ( void )                          {        tsk_suspend   (System.cur);            }
-
-	static inline unsigned waitFor   ( unsigned _flags, cnt_t _delay ) { return tsk_waitFor   (_flags, _delay);        }
-	static inline unsigned waitUntil ( unsigned _flags, cnt_t _time )  { return tsk_waitUntil (_flags, _time);         }
-	static inline unsigned wait      ( unsigned _flags )               { return tsk_wait      (_flags);                }
 	static inline void     sleepFor  ( cnt_t    _delay )               {        tsk_sleepFor  (_delay);                }
 	static inline void     sleepNext ( cnt_t    _delay )               {        tsk_sleepNext (_delay);                }
 	static inline void     sleepUntil( cnt_t    _time )                {        tsk_sleepUntil(_time);                 }
 	static inline void     sleep     ( void )                          {        tsk_sleep     ();                      }
 	static inline void     delay     ( cnt_t    _delay )               {        tsk_delay     (_delay);                }
+	static inline unsigned waitFor   ( unsigned _flags, cnt_t _delay ) { return tsk_waitFor   (_flags, _delay);        }
+	static inline unsigned waitUntil ( unsigned _flags, cnt_t _time )  { return tsk_waitUntil (_flags, _time);         }
+	static inline unsigned wait      ( unsigned _flags )               { return tsk_wait      (_flags);                }
+	static inline void     suspend   ( void )                          {        tsk_suspend   (System.cur);            }
 }
 
 #endif//__cplusplus

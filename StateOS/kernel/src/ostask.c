@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    04.10.2018
+    @date    05.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -83,6 +83,28 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
+tsk_t *wrk_detached( unsigned prio, fun_t *state, unsigned size )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	assert_tsk_context();
+	assert(state);
+	assert(size);
+
+	sys_lock();
+	{
+		tsk = sys_alloc(SEG_OVER(sizeof(tsk_t)) + size);
+		tsk_init(tsk, prio, state, (void *)((size_t)tsk + SEG_OVER(sizeof(tsk_t))), size);
+		tsk->hdr.obj.res = tsk;
+		tsk->join = DETACHED;
+	}
+	sys_unlock();
+
+	return tsk;
+}
+
+/* -------------------------------------------------------------------------- */
 void tsk_start( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
@@ -118,78 +140,6 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
 		}
-	}
-	sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-void tsk_stop( void )
-/* -------------------------------------------------------------------------- */
-{
-	assert_tsk_context();
-	assert(System.cur->mtx.list == 0);
-
-	port_set_lock();
-
-	if (System.cur->join != DETACHED)
-		core_tsk_wakeup(System.cur->join, E_SUCCESS);
-	else
-		sys_free(System.cur->hdr.obj.res);
-
-	core_tsk_remove(System.cur);
-
-	for (;;);
-}
-
-/* -------------------------------------------------------------------------- */
-void tsk_kill( tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
-	mtx_t *mtx;
-	mtx_t *nxt;
-
-	assert_tsk_context();
-	assert(tsk);
-
-	sys_lock();
-	{
-		if (tsk->hdr.id != ID_STOPPED)
-		{
-			tsk->mtx.tree = 0;
-			for (mtx = tsk->mtx.list; mtx; mtx = nxt)
-			{
-				nxt = mtx->list;
-				if ((mtx->mode & mtxRobust))
-					if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
-						mtx->mode |= mtxInconsistent;
-			}
-
-			if (tsk->join != DETACHED)
-				core_tsk_wakeup(tsk->join, E_STOPPED);
-			else
-				sys_free(tsk->hdr.obj.res);
-
-			if (tsk->hdr.id == ID_READY)
-				core_tsk_remove(tsk);
-			else
-			if (tsk->hdr.id == ID_BLOCKED)
-			{
-				core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
-				core_tmr_remove((tmr_t *)tsk);
-			}
-		}
-	}
-	sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-void tsk_delete( tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
-	sys_lock();
-	{
-		tsk_detach(tsk);
-		tsk_kill(tsk);
 	}
 	sys_unlock();
 }
@@ -239,11 +189,84 @@ unsigned tsk_join( tsk_t *tsk )
 			event = core_tsk_waitFor(&tsk->join, INFINITE);
 
 		if (event != E_FAILURE) // !detached
-			sys_free(tsk->hdr.obj.res);
+			core_res_free(&tsk->hdr.obj.res);
 	}
 	sys_unlock();
 
 	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_stop( void )
+/* -------------------------------------------------------------------------- */
+{
+	assert_tsk_context();
+	assert(System.cur->mtx.list == 0);
+
+	port_set_lock();
+
+	if (System.cur->join != DETACHED)
+		core_tsk_wakeup(System.cur->join, E_SUCCESS);
+	else
+		core_res_free(&System.cur->hdr.obj.res);
+
+	core_tsk_remove(System.cur);
+
+	for (;;);
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_kill( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	mtx_t *mtx;
+	mtx_t *nxt;
+
+	assert_tsk_context();
+	assert(tsk);
+
+	sys_lock();
+	{
+		if (tsk->join != DETACHED && tsk->hdr.id != ID_STOPPED)
+		{
+			tsk->mtx.tree = 0;
+			for (mtx = tsk->mtx.list; mtx; mtx = nxt)
+			{
+				nxt = mtx->list;
+				if ((mtx->mode & mtxRobust))
+					if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
+						mtx->mode |= mtxInconsistent;
+			}
+
+			core_tsk_wakeup(tsk->join, E_STOPPED);
+
+			if (tsk->hdr.id == ID_READY)
+				core_tsk_remove(tsk);
+			else
+			if (tsk->hdr.id == ID_BLOCKED)
+			{
+				core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
+				core_tmr_remove((tmr_t *)tsk);
+			}
+		}
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_delete( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *join;
+	
+	sys_lock();
+	{
+		join = tsk->join;
+		tsk_kill(tsk);
+		if (join == JOINABLE)
+			core_res_free(&System.cur->hdr.obj.res);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */

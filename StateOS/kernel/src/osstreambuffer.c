@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    26.09.2018
+    @date    05.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -102,7 +102,7 @@ void stm_delete( stm_t *stm )
 	sys_lock();
 	{
 		stm_kill(stm);
-		sys_free(stm->obj.res);
+		core_res_free(&stm->obj.res);
 	}
 	sys_unlock();
 }

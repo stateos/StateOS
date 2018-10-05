@@ -95,7 +95,7 @@ void tmr_delete( tmr_t *tmr )
 	sys_lock();
 	{
 		tmr_kill(tmr);
-		sys_free(tmr->hdr.obj.res);
+		core_res_free(&tmr->hdr.obj.res);
 	}
 	sys_unlock();
 }
@@ -190,10 +190,10 @@ unsigned tmr_take( tmr_t *tmr )
 	if (tmr->hdr.next == 0)
 		return E_FAILURE; // timer has not yet been started
 
-	if (tmr->hdr.id == ID_TIMER)
-		return E_TIMEOUT;
+	if (tmr->hdr.id == ID_STOPPED)
+		return E_SUCCESS;
 
-	return E_SUCCESS;
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */

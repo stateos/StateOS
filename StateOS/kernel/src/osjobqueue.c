@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    26.09.2018
+    @date    05.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -102,7 +102,7 @@ void job_delete( job_t *job )
 	sys_lock();
 	{
 		job_kill(job);
-		sys_free(job->obj.res);
+		core_res_free(&job->obj.res);
 	}
 	sys_unlock();
 }
