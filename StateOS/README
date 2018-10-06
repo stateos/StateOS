@@ -58,6 +58,7 @@ Features:
 - renamed ID_DELAYED to ID_BLOCKED
 - changed resource management
 - changed task start procedures
+- added function aliases for the current task
 ---------
 6.2
 - updated kernel

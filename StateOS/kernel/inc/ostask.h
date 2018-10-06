@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    06.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -562,6 +562,7 @@ struct __tsk
 /******************************************************************************
  *
  * Name              : tsk_this
+ * Alias             : cur_task
  *
  * Description       : return current task object
  *
@@ -575,6 +576,9 @@ struct __tsk
 
 __STATIC_INLINE
 tsk_t *tsk_this( void ) { return System.cur; }
+
+__STATIC_INLINE
+tsk_t *cur_task( void ) { return System.cur; }
 
 /******************************************************************************
  *
@@ -751,6 +755,25 @@ unsigned tsk_detach( tsk_t *tsk );
 
 /******************************************************************************
  *
+ * Name              : cur_detach
+ *
+ * Description       : detach the current task
+ *
+ * Parameters        : none
+ *
+ * Return
+ *   E_SUCCESS       : current task was successfully detached
+ *   E_FAILURE       : current task cannot be detached
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+unsigned cur_detach( void ) { return tsk_detach(System.cur); }
+
+/******************************************************************************
+ *
  * Name              : tsk_join
  *
  * Description       : delay execution of current task until termination of given task
@@ -811,9 +834,30 @@ void tsk_reset( tsk_t *tsk ) { tsk_kill(tsk); }
 
 /******************************************************************************
  *
+ * Name              : cur_kill
+ * Alias             : cur_reset
+ *
+ * Description       : reset the current task and remove it from READY/BLOCKED queue
+ *
+ * Parameters        : none
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+void cur_kill( void ) { tsk_kill(System.cur); }
+
+__STATIC_INLINE
+void cur_reset( void ) { tsk_reset(System.cur); }
+
+/******************************************************************************
+ *
  * Name              : tsk_delete
  *
- * Description       : reset the task object and free allocated resource
+ * Description       : reset the task object and free allocated resources
  *
  * Parameters
  *   tsk             : pointer to task object
@@ -825,6 +869,23 @@ void tsk_reset( tsk_t *tsk ) { tsk_kill(tsk); }
  ******************************************************************************/
 
 void tsk_delete( tsk_t *tsk );
+
+/******************************************************************************
+ *
+ * Name              : cur_delete
+ *
+ * Description       : reset the current task and free allocated resources
+ *
+ * Parameters        : none
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+void cur_delete( void ) { tsk_delete(System.cur); }
 
 /******************************************************************************
  *
@@ -1089,6 +1150,24 @@ unsigned tsk_suspend( tsk_t *tsk );
 
 /******************************************************************************
  *
+ * Name              : cur_suspend
+ *
+ * Description       : delay indefinitely execution of current task
+ *                     execution of the task can be resumed
+ *
+ * Parameters        : none
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+void cur_suspend( void ) { tsk_suspend(System.cur); }
+
+/******************************************************************************
+ *
  * Name              : tsk_resume
  * ISR alias         : tsk_resumeISR
  *
@@ -1230,10 +1309,10 @@ typedef startTaskT<OS_STACK_SIZE> startTask;
 
 namespace ThisTask
 {
-	static inline unsigned detach    ( void )                          { return tsk_detach    (System.cur);            }
+	static inline unsigned detach    ( void )                          { return cur_detach    ();                      }
 	static inline void     stop      ( void )                          {        tsk_stop      ();                      }
-	static inline void     kill      ( void )                          {        tsk_kill      (System.cur);            }
-	static inline void     reset     ( void )                          {        tsk_reset     (System.cur);            }
+	static inline void     kill      ( void )                          {        cur_kill      ();                      }
+	static inline void     reset     ( void )                          {        cur_reset     ();                      }
 	static inline void     yield     ( void )                          {        tsk_yield     ();                      }
 	static inline void     pass      ( void )                          {        tsk_pass      ();                      }
 #if OS_FUNCTIONAL
@@ -1254,7 +1333,7 @@ namespace ThisTask
 	static inline unsigned waitFor   ( unsigned _flags, cnt_t _delay ) { return tsk_waitFor   (_flags, _delay);        }
 	static inline unsigned waitUntil ( unsigned _flags, cnt_t _time )  { return tsk_waitUntil (_flags, _time);         }
 	static inline unsigned wait      ( unsigned _flags )               { return tsk_wait      (_flags);                }
-	static inline void     suspend   ( void )                          {        tsk_suspend   (System.cur);            }
+	static inline void     suspend   ( void )                          {        cur_suspend   ();                      }
 }
 
 #endif//__cplusplus
