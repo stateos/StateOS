@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    06.10.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -281,9 +281,6 @@ void core_sys_tick( void )
 #endif
 }
 #endif
-
-// frees given resources 'res'
-void core_res_free( void **res );
 
 /* -------------------------------------------------------------------------- */
 

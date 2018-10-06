@@ -57,6 +57,7 @@ Features:
 - updated signal object
 - renamed ID_DELAYED to ID_BLOCKED
 - changed resource management
+- changed task start procedures
 ---------
 6.2
 - updated kernel

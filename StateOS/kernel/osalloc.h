@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    04.09.2018
+    @date    06.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -94,6 +94,24 @@ void *sys_alloc( size_t size );
  ******************************************************************************/
 
 void sys_free( void *ptr );
+
+/******************************************************************************
+ *
+ * Name              : core_res_free
+ *
+ * Description       : frees given resources
+ *
+ * Parameters
+ *   ptr             : pointer to a pointer to a resources
+ *
+ * Return            : none
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+void core_res_free( void **res ) { void *tmp = *res; *res = 0; sys_free(tmp); }
 
 #ifdef __cplusplus
 }

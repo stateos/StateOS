@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    06.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -116,12 +116,12 @@ unsigned tsk_start( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->hdr.id != ID_STOPPED)
+		if (tsk->hdr.id != ID_STOPPED) // task is already active
 			event = E_SUCCESS;
 		else
-		if (tsk->join == DETACHED)
+		if (tsk->join == DETACHED)     // detached task cannot be started
 			event = E_FAILURE;
-		else
+		else                           // task is inactive and can be started
 		{
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
@@ -146,12 +146,12 @@ unsigned tsk_startFrom( tsk_t *tsk, fun_t *state )
 
 	sys_lock();
 	{
-		if (tsk->hdr.id != ID_STOPPED)
+		if (tsk->hdr.id != ID_STOPPED) // task is already active
 			event = E_SUCCESS;
 		else
-		if (tsk->join == DETACHED)
+		if (tsk->join == DETACHED)     // detached task cannot be started
 			event = E_FAILURE;
-		else
+		else                           // task is inactive and can be started
 		{
 			tsk->state = state;
 
@@ -179,22 +179,6 @@ void priv_tsk_free( tsk_t *tsk )
 }
 
 /* -------------------------------------------------------------------------- */
-static
-bool priv_tsk_detachable( tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
-	return (tsk->join != DETACHED && tsk->hdr.obj.res != 0);
-}
-
-/* -------------------------------------------------------------------------- */
-static
-bool priv_tsk_joinable( tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
-	return (tsk->join == JOINABLE && tsk != System.cur);
-}
-
-/* -------------------------------------------------------------------------- */
 unsigned tsk_detach( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
@@ -205,15 +189,16 @@ unsigned tsk_detach( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (priv_tsk_detachable(tsk) == false)
+		if (tsk->join == DETACHED ||   // task has already been detached
+		    tsk->hdr.obj.res == 0)     // task is undetachable
 			event = E_FAILURE;
 		else
-		if (tsk->hdr.id == ID_STOPPED)
+		if (tsk->hdr.id == ID_STOPPED) // task is inactive
 		{
-			priv_tsk_free(tsk);
+			priv_tsk_free(tsk);        // resources can be released
 			event = E_SUCCESS;
 		}
-		else
+		else                           // task is active and can be detached
 		{
 			core_tsk_wakeup(tsk->join, E_FAILURE);
 			tsk->join = DETACHED;
@@ -236,16 +221,17 @@ unsigned tsk_join( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (priv_tsk_joinable(tsk) == false)
+		if (tsk->join != JOINABLE ||   // task is unjoinable
+		    tsk == System.cur)         // deadlock detected
 			event = E_FAILURE;
 		else
-		if (tsk->hdr.id == ID_STOPPED)
+		if (tsk->hdr.id == ID_STOPPED) // task is inactive
 			event = E_SUCCESS;
-		else
+		else                           // task is active; wait for termination
 			event = core_tsk_waitFor(&tsk->join, INFINITE);
 
-		if (event != E_FAILURE) // !detached
-			priv_tsk_free(tsk);
+		if (event != E_FAILURE)        // task has not been detached
+			priv_tsk_free(tsk);        // resources can be released
 	}
 	sys_unlock();
 
@@ -283,7 +269,7 @@ void tsk_kill( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join != DETACHED && tsk->hdr.id != ID_STOPPED)
+		if (tsk->hdr.id != ID_STOPPED && tsk->join != DETACHED)
 		{
 			tsk->mtx.tree = 0;
 			for (mtx = tsk->mtx.list; mtx; mtx = nxt)
