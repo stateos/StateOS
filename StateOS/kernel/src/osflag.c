@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -77,6 +77,7 @@ void flg_kill( flg_t *flg )
 {
 	assert_tsk_context();
 	assert(flg);
+	assert(flg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -91,6 +92,10 @@ void flg_kill( flg_t *flg )
 void flg_delete( flg_t *flg )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(flg);
+	assert(flg->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		flg_kill(flg);
@@ -105,9 +110,6 @@ unsigned priv_flg_take( flg_t *flg, unsigned flags, char mode )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned value;
-
-	assert(flg);
-	assert((mode & ~flgMASK) == 0);
 
 	if ((mode & flgIgnore) == 0)
 	{
@@ -128,6 +130,10 @@ unsigned priv_flg_take( flg_t *flg, unsigned flags, char mode )
 unsigned flg_take( flg_t *flg, unsigned flags, char mode )
 /* -------------------------------------------------------------------------- */
 {
+	assert(flg);
+	assert(flg->obj.res!=RELEASED);
+	assert((mode & ~flgMASK) == 0);
+
 	sys_lock();
 	{
 		flags = priv_flg_take(flg, flags, mode);
@@ -144,6 +150,9 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(flg);
+	assert(flg->obj.res!=RELEASED);
+	assert((mode & ~flgMASK) == 0);
 
 	sys_lock();
 	{
@@ -172,6 +181,9 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(flg);
+	assert(flg->obj.res!=RELEASED);
+	assert((mode & ~flgMASK) == 0);
 
 	sys_lock();
 	{
@@ -201,6 +213,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 	tsk_t *tsk;
 
 	assert(flg);
+	assert(flg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -238,6 +251,7 @@ unsigned flg_clear( flg_t *flg, unsigned flags )
 	unsigned temp;
 
 	assert(flg);
+	assert(flg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -257,6 +271,7 @@ unsigned flg_get( flg_t *flg )
 	unsigned flags;
 
 	assert(flg);
+	assert(flg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
