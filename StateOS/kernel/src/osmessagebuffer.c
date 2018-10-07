@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -83,6 +83,7 @@ void msg_kill( msg_t *msg )
 {
 	assert_tsk_context();
 	assert(msg);
+	assert(msg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -99,6 +100,10 @@ void msg_kill( msg_t *msg )
 void msg_delete( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(msg);
+	assert(msg->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		msg_kill(msg);
@@ -263,11 +268,6 @@ static
 unsigned priv_msg_take( msg_t *msg, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	assert(msg);
-	assert(msg->data);
-	assert(msg->limit);
-	assert(data);
-
 	if (msg->count > 0)
 	{
 		if (size >= priv_msg_size(msg))
@@ -285,6 +285,12 @@ unsigned msg_take( msg_t *msg, void *data, unsigned size )
 {
 	unsigned len;
 
+	assert(msg);
+	assert(msg->obj.res!=RELEASED);
+	assert(msg->data);
+	assert(msg->limit);
+	assert(data);
+
 	sys_lock();
 	{
 		len = priv_msg_take(msg, data, size);
@@ -301,6 +307,11 @@ unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay )
 	unsigned len;
 
 	assert_tsk_context();
+	assert(msg);
+	assert(msg->obj.res!=RELEASED);
+	assert(msg->data);
+	assert(msg->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -325,6 +336,11 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time )
 	unsigned len;
 
 	assert_tsk_context();
+	assert(msg);
+	assert(msg->obj.res!=RELEASED);
+	assert(msg->data);
+	assert(msg->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -347,11 +363,6 @@ static
 unsigned priv_msg_give( msg_t *msg, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	assert(msg);
-	assert(msg->data);
-	assert(msg->limit);
-	assert(data);
-
 	if (msg->count + sizeof(unsigned) + size <= msg->limit)
 	{
 		priv_msg_putUpdate(msg, data, size);
@@ -370,6 +381,12 @@ unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 {
 	unsigned event;
 
+	assert(msg);
+	assert(msg->obj.res!=RELEASED);
+	assert(msg->data);
+	assert(msg->limit);
+	assert(data);
+
 	sys_lock();
 	{
 		event = priv_msg_give(msg, data, size);
@@ -386,6 +403,11 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(msg);
+	assert(msg->obj.res!=RELEASED);
+	assert(msg->data);
+	assert(msg->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -410,6 +432,11 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
 	unsigned event;
 
 	assert_tsk_context();
+	assert(msg);
+	assert(msg->obj.res!=RELEASED);
+	assert(msg->data);
+	assert(msg->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -434,6 +461,7 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 	unsigned event;
 
 	assert(msg);
+	assert(msg->obj.res!=RELEASED);
 	assert(msg->data);
 	assert(msg->limit);
 	assert(data);
@@ -463,6 +491,7 @@ unsigned msg_count( msg_t *msg )
 	unsigned count;
 
 	assert(msg);
+	assert(msg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -480,6 +509,7 @@ unsigned msg_space( msg_t *msg )
 	unsigned space;
 
 	assert(msg);
+	assert(msg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -497,6 +527,7 @@ unsigned msg_limit( msg_t *msg )
 	unsigned limit;
 
 	assert(msg);
+	assert(msg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -514,6 +545,7 @@ unsigned msg_size( msg_t *msg )
 	unsigned size = 0;
 
 	assert(msg);
+	assert(msg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
