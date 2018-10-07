@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -83,6 +83,7 @@ void job_kill( job_t *job )
 {
 	assert_tsk_context();
 	assert(job);
+	assert(job->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -99,6 +100,10 @@ void job_kill( job_t *job )
 void job_delete( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(job);
+	assert(job->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		job_kill(job);
@@ -192,10 +197,6 @@ static
 unsigned priv_job_take( job_t *job, fun_t **fun )
 /* -------------------------------------------------------------------------- */
 {
-	assert(job);
-	assert(job->data);
-	assert(job->limit);
-
 	if (job->count > 0)
 	{
 		*fun = priv_job_getUpdate(job);
@@ -211,6 +212,11 @@ unsigned job_take( job_t *job )
 {
 	fun_t  * fun;
 	unsigned event;
+
+	assert(job);
+	assert(job->obj.res!=RELEASED);
+	assert(job->data);
+	assert(job->limit);
 
 	sys_lock();
 	{
@@ -232,6 +238,10 @@ unsigned job_waitFor( job_t *job, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(job);
+	assert(job->obj.res!=RELEASED);
+	assert(job->data);
+	assert(job->limit);
 
 	sys_lock();
 	{
@@ -259,6 +269,10 @@ unsigned job_waitUntil( job_t *job, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(job);
+	assert(job->obj.res!=RELEASED);
+	assert(job->data);
+	assert(job->limit);
 
 	sys_lock();
 	{
@@ -283,11 +297,6 @@ static
 unsigned priv_job_give( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
-	assert(job);
-	assert(job->data);
-	assert(job->limit);
-	assert(fun);
-
 	if (job->count < job->limit)
 	{
 		priv_job_putUpdate(job, fun);
@@ -302,6 +311,12 @@ unsigned job_give( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
+
+	assert(job);
+	assert(job->obj.res!=RELEASED);
+	assert(job->data);
+	assert(job->limit);
+	assert(fun);
 
 	sys_lock();
 	{
@@ -319,6 +334,11 @@ unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(job);
+	assert(job->obj.res!=RELEASED);
+	assert(job->data);
+	assert(job->limit);
+	assert(fun);
 
 	sys_lock();
 	{
@@ -342,6 +362,11 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(job);
+	assert(job->obj.res!=RELEASED);
+	assert(job->data);
+	assert(job->limit);
+	assert(fun);
 
 	sys_lock();
 	{
@@ -363,6 +388,7 @@ void job_push( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
 	assert(job);
+	assert(job->obj.res!=RELEASED);
 	assert(job->data);
 	assert(job->limit);
 	assert(fun);
@@ -382,6 +408,7 @@ unsigned job_count( job_t *job )
 	unsigned count;
 
 	assert(job);
+	assert(job->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -399,6 +426,7 @@ unsigned job_space( job_t *job )
 	unsigned space;
 
 	assert(job);
+	assert(job->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -416,6 +444,7 @@ unsigned job_limit( job_t *job )
 	unsigned limit;
 
 	assert(job);
+	assert(job->obj.res!=RELEASED);
 
 	sys_lock();
 	{
