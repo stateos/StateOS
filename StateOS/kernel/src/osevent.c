@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -72,6 +72,7 @@ void evt_kill( evt_t *evt )
 {
 	assert_tsk_context();
 	assert(evt);
+	assert(evt->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -84,6 +85,10 @@ void evt_kill( evt_t *evt )
 void evt_delete( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(evt);
+	assert(evt->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		evt_kill(evt);
@@ -100,6 +105,7 @@ unsigned evt_waitFor( evt_t *evt, cnt_t delay )
 
 	assert_tsk_context();
 	assert(evt);
+	assert(evt->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -118,6 +124,7 @@ unsigned evt_waitUntil( evt_t *evt, cnt_t time )
 
 	assert_tsk_context();
 	assert(evt);
+	assert(evt->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -133,6 +140,7 @@ void evt_give( evt_t *evt, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
 	assert(evt);
+	assert(evt->obj.res!=RELEASED);
 
 	sys_lock();
 	{
