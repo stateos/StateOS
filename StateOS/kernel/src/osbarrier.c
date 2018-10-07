@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,6 +78,7 @@ void bar_kill( bar_t *bar )
 {
 	assert_tsk_context();
 	assert(bar);
+	assert(bar->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -90,6 +91,10 @@ void bar_kill( bar_t *bar )
 void bar_delete( bar_t *bar )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(bar);
+	assert(bar->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		bar_kill(bar);
@@ -103,9 +108,6 @@ static
 unsigned priv_bar_take( bar_t *bar )
 /* -------------------------------------------------------------------------- */
 {
-	assert(bar);
-	assert(bar->limit);
-
 	if (core_tsk_count(bar->obj.queue) + 1 == bar->limit)
 	{
 		core_all_wakeup(bar->obj.queue, E_SUCCESS);
@@ -123,6 +125,9 @@ unsigned bar_waitFor( bar_t *bar, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(bar);
+	assert(bar->obj.res!=RELEASED);
+	assert(bar->limit);
 
 	sys_lock();
 	{
@@ -143,6 +148,9 @@ unsigned bar_waitUntil( bar_t *bar, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(bar);
+	assert(bar->obj.res!=RELEASED);
+	assert(bar->limit);
 
 	sys_lock();
 	{
