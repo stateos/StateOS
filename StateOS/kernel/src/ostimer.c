@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -76,6 +76,7 @@ void tmr_kill( tmr_t *tmr )
 {
 	assert_tsk_context();
 	assert(tmr);
+	assert(tmr->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -92,6 +93,9 @@ void tmr_kill( tmr_t *tmr )
 void tmr_delete( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
+	assert(tmr);
+	assert(tmr->hdr.obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		tmr_kill(tmr);
@@ -105,8 +109,6 @@ static
 void priv_tmr_start( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
-	assert_tsk_context();
-
 	if (tmr->hdr.id == ID_TIMER)
 		core_tmr_remove(tmr);
 	core_tmr_insert(tmr, ID_TIMER);
@@ -116,7 +118,9 @@ void priv_tmr_start( tmr_t *tmr )
 void tmr_start( tmr_t *tmr, cnt_t delay, cnt_t period )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
 	assert(tmr);
+	assert(tmr->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -133,7 +137,9 @@ void tmr_start( tmr_t *tmr, cnt_t delay, cnt_t period )
 void tmr_startFrom( tmr_t *tmr, cnt_t delay, cnt_t period, fun_t *proc )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
 	assert(tmr);
+	assert(tmr->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -151,7 +157,9 @@ void tmr_startFrom( tmr_t *tmr, cnt_t delay, cnt_t period, fun_t *proc )
 void tmr_startNext( tmr_t *tmr, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
 	assert(tmr);
+	assert(tmr->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -166,7 +174,9 @@ void tmr_startNext( tmr_t *tmr, cnt_t delay )
 void tmr_startUntil( tmr_t *tmr, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
 	assert(tmr);
+	assert(tmr->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -182,11 +192,10 @@ void tmr_startUntil( tmr_t *tmr, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_take( tmr_t *tmr )
+static
+unsigned priv_tmr_take( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
-	assert(tmr);
-
 	if (tmr->hdr.next == 0)
 		return E_FAILURE; // timer has not yet been started
 
@@ -197,16 +206,36 @@ unsigned tmr_take( tmr_t *tmr )
 }
 
 /* -------------------------------------------------------------------------- */
+unsigned tmr_take( tmr_t *tmr )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	assert(tmr);
+	assert(tmr->hdr.obj.res!=RELEASED);
+
+	sys_lock();
+	{
+		event = priv_tmr_take(tmr);
+	}
+	sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	assert_tsk_context();
+	assert(tmr);
+	assert(tmr->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		event = tmr_take(tmr);
+		event = priv_tmr_take(tmr);
 
 		if (event == E_TIMEOUT)
 			event = core_tsk_waitFor(&tmr->hdr.obj.queue, delay);
@@ -223,10 +252,12 @@ unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(tmr);
+	assert(tmr->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		event = tmr_take(tmr);
+		event = priv_tmr_take(tmr);
 
 		if (event == E_TIMEOUT)
 			event = core_tsk_waitNext(&tmr->hdr.obj.queue, delay);
@@ -243,10 +274,12 @@ unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(tmr);
+	assert(tmr->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		event = tmr_take(tmr);
+		event = priv_tmr_take(tmr);
 
 		if (event == E_TIMEOUT)
 			event = core_tsk_waitUntil(&tmr->hdr.obj.queue, time);
