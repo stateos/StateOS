@@ -112,7 +112,7 @@ void mem_kill( mem_t *mem )
 {
 	assert_tsk_context();
 	assert(mem);
-	assert(mem->obj.res!=RELEASED);
+	assert(mem->lst.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -127,7 +127,7 @@ void mem_delete( mem_t *mem )
 {
 	assert_tsk_context();
 	assert(mem);
-	assert(mem->obj.res!=RELEASED);
+	assert(mem->lst.obj.res!=RELEASED);
 
 	sys_lock();
 	{
