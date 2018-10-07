@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -83,6 +83,7 @@ void stm_kill( stm_t *stm )
 {
 	assert_tsk_context();
 	assert(stm);
+	assert(stm->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -99,6 +100,10 @@ void stm_kill( stm_t *stm )
 void stm_delete( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(stm);
+	assert(stm->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		stm_kill(stm);
@@ -206,11 +211,6 @@ static
 unsigned priv_stm_take( stm_t *stm, char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	assert(stm);
-	assert(stm->data);
-	assert(stm->limit);
-	assert(data);
-
 	if (stm->count > 0)
 		return priv_stm_getUpdate(stm, data, size);
 
@@ -222,6 +222,12 @@ unsigned stm_take( stm_t *stm, void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned len;
+
+	assert(stm);
+	assert(stm->obj.res!=RELEASED);
+	assert(stm->data);
+	assert(stm->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -239,6 +245,11 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay )
 	unsigned len;
 
 	assert_tsk_context();
+	assert(stm);
+	assert(stm->obj.res!=RELEASED);
+	assert(stm->data);
+	assert(stm->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -263,6 +274,11 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time )
 	unsigned len;
 
 	assert_tsk_context();
+	assert(stm);
+	assert(stm->obj.res!=RELEASED);
+	assert(stm->data);
+	assert(stm->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -285,11 +301,6 @@ static
 unsigned priv_stm_give( stm_t *stm, const char *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	assert(stm);
-	assert(stm->data);
-	assert(stm->limit);
-	assert(data);
-
 	if (stm->count + size <= stm->limit)
 	{
 		priv_stm_putUpdate(stm, data, size);
@@ -308,6 +319,12 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 {
 	unsigned event;
 
+	assert(stm);
+	assert(stm->obj.res!=RELEASED);
+	assert(stm->data);
+	assert(stm->limit);
+	assert(data);
+
 	sys_lock();
 	{
 		event = priv_stm_give(stm, data, size);
@@ -324,6 +341,11 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(stm);
+	assert(stm->obj.res!=RELEASED);
+	assert(stm->data);
+	assert(stm->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -348,6 +370,11 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
 	unsigned event;
 
 	assert_tsk_context();
+	assert(stm);
+	assert(stm->obj.res!=RELEASED);
+	assert(stm->data);
+	assert(stm->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -372,6 +399,7 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 	unsigned event;
 
 	assert(stm);
+	assert(stm->obj.res!=RELEASED);
 	assert(stm->data);
 	assert(stm->limit);
 	assert(data);
@@ -401,6 +429,7 @@ unsigned stm_count( stm_t *stm )
 	unsigned count;
 
 	assert(stm);
+	assert(stm->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -418,6 +447,7 @@ unsigned stm_space( stm_t *stm )
 	unsigned space;
 
 	assert(stm);
+	assert(stm->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -435,6 +465,7 @@ unsigned stm_limit( stm_t *stm )
 	unsigned limit;
 
 	assert(stm);
+	assert(stm->obj.res!=RELEASED);
 
 	sys_lock();
 	{
