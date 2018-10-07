@@ -93,6 +93,7 @@ void tmr_kill( tmr_t *tmr )
 void tmr_delete( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
 	assert(tmr);
 	assert(tmr->hdr.obj.res!=RELEASED);
 
