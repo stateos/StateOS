@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -112,6 +112,7 @@ void mem_kill( mem_t *mem )
 {
 	assert_tsk_context();
 	assert(mem);
+	assert(mem->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -124,6 +125,10 @@ void mem_kill( mem_t *mem )
 void mem_delete( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(mem);
+	assert(mem->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		mem_kill(mem);
