@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -75,6 +75,7 @@ void lst_kill( lst_t *lst )
 {
 	assert_tsk_context();
 	assert(lst);
+	assert(lst->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -87,6 +88,10 @@ void lst_kill( lst_t *lst )
 void lst_delete( lst_t *lst )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(lst);
+	assert(lst->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		lst_kill(lst);
@@ -100,9 +105,6 @@ static
 unsigned priv_lst_take( lst_t *lst, void **data )
 /* -------------------------------------------------------------------------- */
 {
-	assert(lst);
-	assert(data);
-
 	if (lst->head.next)
 	{
 		*data = lst->head.next + 1;
@@ -118,6 +120,10 @@ unsigned lst_take( lst_t *lst, void **data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
+
+	assert(lst);
+	assert(lst->obj.res!=RELEASED);
+	assert(data);
 
 	sys_lock();
 	{
@@ -135,6 +141,9 @@ unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(lst);
+	assert(lst->obj.res!=RELEASED);
+	assert(data);
 
 	sys_lock();
 	{
@@ -158,6 +167,9 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(lst);
+	assert(lst->obj.res!=RELEASED);
+	assert(data);
 
 	sys_lock();
 	{
@@ -182,6 +194,7 @@ void lst_give( lst_t *lst, const void *data )
 	que_t *ptr;
 
 	assert(lst);
+	assert(lst->obj.res!=RELEASED);
 	assert(data);
 
 	sys_lock();
