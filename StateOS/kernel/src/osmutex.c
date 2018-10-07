@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -81,6 +81,7 @@ void mtx_kill( mtx_t *mtx )
 {
 	assert_tsk_context();
 	assert(mtx);
+	assert(mtx->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -94,6 +95,10 @@ void mtx_kill( mtx_t *mtx )
 void mtx_delete( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(mtx);
+	assert(mtx->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		mtx_kill(mtx);
@@ -107,6 +112,8 @@ void mtx_setPrio( mtx_t *mtx, unsigned prio )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
+	assert(mtx);
+	assert(mtx->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -126,6 +133,8 @@ unsigned mtx_getPrio( mtx_t *mtx )
 	unsigned prio;
 
 	assert_tsk_context();
+	assert(mtx);
+	assert(mtx->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -141,11 +150,6 @@ static
 unsigned priv_mtx_take( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	assert(mtx);
-	assert((mtx->mode & ~mtxMASK) == 0);
-	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
-	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
-
 	if ((mtx->mode & mtxPrioMASK) == mtxPrioProtect && mtx->prio < System.cur->prio)
 		return E_FAILURE;
 
@@ -183,6 +187,11 @@ unsigned mtx_take( mtx_t *mtx )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(mtx);
+	assert(mtx->obj.res!=RELEASED);
+	assert((mtx->mode & ~mtxMASK) == 0);
+	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
+	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
 	sys_lock();
 	{
@@ -200,6 +209,11 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(mtx);
+	assert(mtx->obj.res!=RELEASED);
+	assert((mtx->mode & ~mtxMASK) == 0);
+	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
+	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
 	sys_lock();
 	{
@@ -227,6 +241,11 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(mtx);
+	assert(mtx->obj.res!=RELEASED);
+	assert((mtx->mode & ~mtxMASK) == 0);
+	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
+	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
 	sys_lock();
 	{
@@ -252,11 +271,6 @@ static
 unsigned priv_mtx_give( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	assert(mtx);
-	assert((mtx->mode & ~mtxMASK) == 0);
-	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
-	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
-
 	if ((mtx->mode & (mtxTypeMASK + mtxRobust)) == mtxNormal || mtx->owner == System.cur)
 	{
 		if (mtx->count > 0)
@@ -279,6 +293,11 @@ unsigned mtx_give( mtx_t *mtx )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(mtx);
+	assert(mtx->obj.res!=RELEASED);
+	assert((mtx->mode & ~mtxMASK) == 0);
+	assert((mtx->mode &  mtxTypeMASK) != mtxTypeMASK);
+	assert((mtx->mode &  mtxPrioMASK) != mtxPrioMASK);
 
 	sys_lock();
 	{
