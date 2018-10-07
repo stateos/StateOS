@@ -105,77 +105,45 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_start( tsk_t *tsk )
+void tsk_start( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert_tsk_context();
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED); // object with released resources cannot be used
 	assert(tsk->state);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id != ID_STOPPED) // task is already active
-			event = E_SUCCESS;
-		else
-		if (tsk->join == DETACHED)     // detached task cannot be started
-			event = E_FAILURE;
-		else                           // task is inactive and can be started
+		if (tsk->hdr.id == ID_STOPPED)
 		{
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
-
-			event = E_SUCCESS;
 		}
 	}
 	sys_unlock();
-
-	return event;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_startFrom( tsk_t *tsk, fun_t *state )
+void tsk_startFrom( tsk_t *tsk, fun_t *state )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-
 	assert_tsk_context();
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED); // object with released resources cannot be used
 	assert(state);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id != ID_STOPPED) // task is already active
-			event = E_SUCCESS;
-		else
-		if (tsk->join == DETACHED)     // detached task cannot be started
-			event = E_FAILURE;
-		else                           // task is inactive and can be started
+		if (tsk->hdr.id == ID_STOPPED)
 		{
 			tsk->state = state;
 
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
-
-			event = E_SUCCESS;
 		}
 	}
 	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
-static
-void priv_tsk_free( tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
-	if (tsk->hdr.obj.res != 0)
-	{
-		core_res_free(&tsk->hdr.obj.res);
-		tsk->join = DETACHED;
-	}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -186,6 +154,7 @@ unsigned tsk_detach( tsk_t *tsk )
 
 	assert_tsk_context();
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -195,7 +164,7 @@ unsigned tsk_detach( tsk_t *tsk )
 		else
 		if (tsk->hdr.id == ID_STOPPED) // task is inactive
 		{
-			priv_tsk_free(tsk);        // resources can be released
+			core_res_free(&tsk->hdr.obj.res);
 			event = E_SUCCESS;
 		}
 		else                           // task is active and can be detached
@@ -218,6 +187,7 @@ unsigned tsk_join( tsk_t *tsk )
 
 	assert_tsk_context();
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -231,7 +201,7 @@ unsigned tsk_join( tsk_t *tsk )
 			event = core_tsk_waitFor(&tsk->join, INFINITE);
 
 		if (event != E_FAILURE)        // task has not been detached
-			priv_tsk_free(tsk);        // resources can be released
+			core_res_free(&tsk->hdr.obj.res);
 	}
 	sys_unlock();
 
@@ -250,7 +220,7 @@ void tsk_stop( void )
 	if (System.cur->join != DETACHED)
 		core_tsk_wakeup(System.cur->join, E_SUCCESS);
 	else
-		priv_tsk_free(System.cur);
+		core_res_free(&System.cur->hdr.obj.res);
 
 	core_tsk_remove(System.cur);
 
@@ -292,6 +262,7 @@ void tsk_kill( tsk_t *tsk )
 {
 	assert_tsk_context();
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -308,12 +279,13 @@ void tsk_delete( tsk_t *tsk )
 {
 	assert_tsk_context();
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
 		if (tsk->join != DETACHED)         // detached task cannot be deleted
 		{
-			priv_tsk_free(tsk);            // resources can be released
+			core_res_free(&tsk->hdr.obj.res);
 
 			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be reseted
 				priv_tsk_reset(tsk, E_FAILURE);

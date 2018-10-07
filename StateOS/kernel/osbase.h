@@ -190,8 +190,7 @@ typedef struct __sys
 
 /* -------------------------------------------------------------------------- */
 
-#define JOINABLE    (void *)(0)           // task in joinable state
-#define DETACHED    (void *)(UINTPTR_MAX) // task in detached state
+#define RELEASED   ((void *)((uintptr_t)0 - 1)) // released resouces
 
 /* -------------------------------------------------------------------------- */
 

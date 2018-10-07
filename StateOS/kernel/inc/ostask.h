@@ -51,6 +51,11 @@ extern "C" {
 #define STK_CROP( base, size ) \
          LIMITED( (size_t)base + size, stk_t )
 
+/* -------------------------------------------------------------------------- */
+
+#define JOINABLE     ((tsk_t *)((uintptr_t)0))     // task in joinable state
+#define DETACHED     ((tsk_t *)((uintptr_t)0 - 1)) // task in detached state
+
 /******************************************************************************
  *
  * Name              : task (thread)
@@ -698,15 +703,13 @@ tsk_t *tsk_detached( unsigned prio, fun_t *state ) { return wrk_detached(prio, s
  * Parameters
  *   tsk             : pointer to task object
  *
- * Return
- *   E_SUCCESS       : given task is running
- *   E_FAILURE       : cannot start detached task
+ * Return            : none
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned tsk_start( tsk_t *tsk );
+void tsk_start( tsk_t *tsk );
 
 /******************************************************************************
  *
@@ -719,15 +722,13 @@ unsigned tsk_start( tsk_t *tsk );
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
  *
- * Return
- *   E_SUCCESS       : given task is running
- *   E_FAILURE       : cannot start detached task
+ * Return            : none
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned tsk_startFrom( tsk_t *tsk, fun_t *state );
+void tsk_startFrom( tsk_t *tsk, fun_t *state );
 
 /******************************************************************************
  *

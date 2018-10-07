@@ -118,7 +118,7 @@ bool core_res_free( void **res )
 	if (*res)
 	{
 		tmp = *res;
-		*res = DETACHED;
+		*res = RELEASED;
 		sys_free(tmp);
 		return true;
 	}
