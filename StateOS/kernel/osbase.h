@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -187,6 +187,11 @@ typedef struct __sys
 #ifndef INFINITE
 #define INFINITE     CNT_MAX // infinite waiting
 #endif
+
+/* -------------------------------------------------------------------------- */
+
+#define JOINABLE    (void *)(0)           // task in joinable state
+#define DETACHED    (void *)(UINTPTR_MAX) // task in detached state
 
 /* -------------------------------------------------------------------------- */
 

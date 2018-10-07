@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    06.10.2018
+    @date    07.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -50,11 +50,6 @@ extern "C" {
 
 #define STK_CROP( base, size ) \
          LIMITED( (size_t)base + size, stk_t )
-
-/* -------------------------------------------------------------------------- */
-
-#define JOINABLE       (tsk_t *)(0)           // task in joinable state
-#define DETACHED       (tsk_t *)(UINTPTR_MAX) // task in detached state
 
 /******************************************************************************
  *

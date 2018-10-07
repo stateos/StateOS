@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    06.10.2018
+    @date    07.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -104,14 +104,27 @@ void sys_free( void *ptr );
  * Parameters
  *   ptr             : pointer to a pointer to a resources
  *
- * Return            : none
+ * Return            : true if any resources have been released, otherwise false
  *
  * Note              : for internal use
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-void core_res_free( void **res ) { void *tmp = *res; *res = 0; sys_free(tmp); }
+bool core_res_free( void **res )
+{
+	void *tmp;
+
+	if (*res)
+	{
+		tmp = *res;
+		*res = DETACHED;
+		sys_free(tmp);
+		return true;
+	}
+
+	return false;
+}
 
 #ifdef __cplusplus
 }
