@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -74,6 +74,7 @@ void cnd_kill( cnd_t *cnd )
 {
 	assert_tsk_context();
 	assert(cnd);
+	assert(cnd->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -86,6 +87,10 @@ void cnd_kill( cnd_t *cnd )
 void cnd_delete( cnd_t *cnd )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(cnd);
+	assert(cnd->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		cnd_kill(cnd);
@@ -103,7 +108,9 @@ unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
 
 	assert_tsk_context();
 	assert(cnd);
+	assert(cnd->obj.res!=RELEASED);
 	assert(mtx);
+	assert(mtx->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -130,7 +137,9 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
 
 	assert_tsk_context();
 	assert(cnd);
+	assert(cnd->obj.res!=RELEASED);
 	assert(mtx);
+	assert(mtx->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -153,6 +162,7 @@ void cnd_give( cnd_t *cnd, bool all )
 /* -------------------------------------------------------------------------- */
 {
 	assert(cnd);
+	assert(cnd->obj.res!=RELEASED);
 
 	sys_lock();
 	{
