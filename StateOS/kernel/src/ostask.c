@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    06.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -258,39 +258,46 @@ void tsk_stop( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_kill( tsk_t *tsk )
+static
+void priv_tsk_reset( tsk_t *tsk, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
 	mtx_t *mtx;
 	mtx_t *nxt;
 
+	tsk->mtx.tree = 0;
+	for (mtx = tsk->mtx.list; mtx; mtx = nxt)
+	{
+		nxt = mtx->list;
+		if ((mtx->mode & mtxRobust))
+			if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
+				mtx->mode |= mtxInconsistent;
+	}
+
+	core_tsk_wakeup(tsk->join, event);
+
+	if (tsk->hdr.id == ID_READY)
+		core_tsk_remove(tsk);
+	else
+	if (tsk->hdr.id == ID_BLOCKED)
+	{
+		core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
+		core_tmr_remove((tmr_t *)tsk);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_kill( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
 	assert_tsk_context();
 	assert(tsk);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id != ID_STOPPED && tsk->join != DETACHED)
-		{
-			tsk->mtx.tree = 0;
-			for (mtx = tsk->mtx.list; mtx; mtx = nxt)
-			{
-				nxt = mtx->list;
-				if ((mtx->mode & mtxRobust))
-					if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
-						mtx->mode |= mtxInconsistent;
-			}
-
-			core_tsk_wakeup(tsk->join, E_STOPPED);
-
-			if (tsk->hdr.id == ID_READY)
-				core_tsk_remove(tsk);
-			else
-			if (tsk->hdr.id == ID_BLOCKED)
-			{
-				core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
-				core_tmr_remove((tmr_t *)tsk);
-			}
-		}
+		if (tsk->hdr.id != ID_STOPPED &&   // inactive task cannot be reseted
+		    tsk->join != DETACHED)         // detached task cannot be reseted
+			priv_tsk_reset(tsk, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -299,16 +306,18 @@ void tsk_kill( tsk_t *tsk )
 void tsk_delete( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t *join;
-	
+	assert_tsk_context();
+	assert(tsk);
+
 	sys_lock();
 	{
-		join = tsk->join;
+		if (tsk->join != DETACHED)         // detached task cannot be deleted
+		{
+			priv_tsk_free(tsk);            // resources can be released
 
-		tsk_kill(tsk);
-
-		if (join == JOINABLE)
-			priv_tsk_free(tsk);
+			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be reseted
+				priv_tsk_reset(tsk, E_FAILURE);
+		}
 	}
 	sys_unlock();
 }
