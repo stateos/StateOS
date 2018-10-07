@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -83,6 +83,7 @@ void evq_kill( evq_t *evq )
 {
 	assert_tsk_context();
 	assert(evq);
+	assert(evq->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -99,6 +100,10 @@ void evq_kill( evq_t *evq )
 void evq_delete( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(evq);
+	assert(evq->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		evq_kill(evq);
@@ -187,10 +192,6 @@ static
 unsigned priv_evq_take( evq_t *evq, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
-	assert(evq);
-	assert(evq->data);
-	assert(evq->limit);
-
 	if (evq->count > 0)
 	{
 		priv_evq_getUpdate(evq, data);
@@ -205,6 +206,11 @@ unsigned evq_take( evq_t *evq, unsigned *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
+
+	assert(evq);
+	assert(evq->obj.res!=RELEASED);
+	assert(evq->data);
+	assert(evq->limit);
 
 	sys_lock();
 	{
@@ -222,6 +228,10 @@ unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(evq);
+	assert(evq->obj.res!=RELEASED);
+	assert(evq->data);
+	assert(evq->limit);
 
 	sys_lock();
 	{
@@ -245,6 +255,10 @@ unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(evq);
+	assert(evq->obj.res!=RELEASED);
+	assert(evq->data);
+	assert(evq->limit);
 
 	sys_lock();
 	{
@@ -266,10 +280,6 @@ static
 unsigned priv_evq_give( evq_t *evq, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
-	assert(evq);
-	assert(evq->data);
-	assert(evq->limit);
-
 	if (evq->count < evq->limit)
 	{
 		priv_evq_putUpdate(evq, data);
@@ -284,6 +294,11 @@ unsigned evq_give( evq_t *evq, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
+
+	assert(evq);
+	assert(evq->obj.res!=RELEASED);
+	assert(evq->data);
+	assert(evq->limit);
 
 	sys_lock();
 	{
@@ -301,6 +316,10 @@ unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(evq);
+	assert(evq->obj.res!=RELEASED);
+	assert(evq->data);
+	assert(evq->limit);
 
 	sys_lock();
 	{
@@ -324,6 +343,10 @@ unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(evq);
+	assert(evq->obj.res!=RELEASED);
+	assert(evq->data);
+	assert(evq->limit);
 
 	sys_lock();
 	{
@@ -345,6 +368,7 @@ void evq_push( evq_t *evq, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
 	assert(evq);
+	assert(evq->obj.res!=RELEASED);
 	assert(evq->data);
 	assert(evq->limit);
 
@@ -363,6 +387,7 @@ unsigned evq_count( evq_t *evq )
 	unsigned count;
 
 	assert(evq);
+	assert(evq->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -380,6 +405,7 @@ unsigned evq_space( evq_t *evq )
 	unsigned space;
 
 	assert(evq);
+	assert(evq->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -397,6 +423,7 @@ unsigned evq_limit( evq_t *evq )
 	unsigned limit;
 
 	assert(evq);
+	assert(evq->obj.res!=RELEASED);
 
 	sys_lock();
 	{
