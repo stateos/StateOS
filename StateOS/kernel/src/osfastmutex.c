@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -74,6 +74,7 @@ void mut_kill( mut_t *mut )
 {
 	assert_tsk_context();
 	assert(mut);
+	assert(mut->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -86,6 +87,10 @@ void mut_kill( mut_t *mut )
 void mut_delete( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(mut);
+	assert(mut->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		mut_kill(mut);
@@ -99,8 +104,6 @@ static
 unsigned priv_mut_take( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	assert(mut);
-
 	if (mut->owner == 0)
 	{
 		mut->owner = System.cur;
@@ -120,6 +123,8 @@ unsigned mut_take( mut_t *mut )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(mut);
+	assert(mut->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -137,6 +142,8 @@ unsigned mut_waitFor( mut_t *mut, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(mut);
+	assert(mut->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -157,6 +164,8 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(mut);
+	assert(mut->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -175,8 +184,6 @@ static
 unsigned priv_mut_give( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	assert(mut);
-
 	if (mut->owner == System.cur)
 	{
 		mut->owner = core_one_wakeup(mut->obj.queue, E_SUCCESS);
@@ -193,6 +200,8 @@ unsigned mut_give( mut_t *mut )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(mut);
+	assert(mut->obj.res!=RELEASED);
 
 	sys_lock();
 	{
