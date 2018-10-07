@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -77,6 +77,7 @@ void sig_kill( sig_t *sig )
 {
 	assert_tsk_context();
 	assert(sig);
+	assert(sig->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -91,6 +92,10 @@ void sig_kill( sig_t *sig )
 void sig_delete( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(sig);
+	assert(sig->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		sig_kill(sig);
@@ -105,8 +110,6 @@ unsigned priv_sig_take( sig_t *sig, unsigned num )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned flag = 1U << num;
-
-	assert(sig);
 
 	flag &= sig->flags;
 
@@ -126,6 +129,9 @@ unsigned sig_take( sig_t *sig, unsigned num )
 {
 	unsigned event;
 
+	assert(sig);
+	assert(sig->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		event = priv_sig_take(sig, num);
@@ -142,6 +148,8 @@ unsigned sig_waitFor( sig_t *sig, unsigned num, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(sig);
+	assert(sig->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -165,6 +173,8 @@ unsigned sig_waitUntil( sig_t *sig, unsigned num, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(sig);
+	assert(sig->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -190,6 +200,7 @@ void sig_give( sig_t *sig, unsigned num )
 	tsk_t  * tsk;
 
 	assert(sig);
+	assert(sig->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -218,6 +229,7 @@ void sig_clear( sig_t *sig, unsigned num )
 	unsigned flag = 1U << num;
 
 	assert(sig);
+	assert(sig->obj.res!=RELEASED);
 	assert(flag);
 
 	sys_lock();
@@ -234,6 +246,7 @@ bool sig_get( sig_t *sig, unsigned num )
 	unsigned flag = 1U << num;
 
 	assert(sig);
+	assert(sig->obj.res!=RELEASED);
 	assert(flag);
 
 	sys_lock();
