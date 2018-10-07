@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -86,6 +86,7 @@ void box_kill( box_t *box )
 {
 	assert_tsk_context();
 	assert(box);
+	assert(box->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -102,6 +103,10 @@ void box_kill( box_t *box )
 void box_delete( box_t *box )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(box);
+	assert(box->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		box_kill(box);
@@ -192,11 +197,6 @@ static
 unsigned priv_box_take( box_t *box, void *data )
 /* -------------------------------------------------------------------------- */
 {
-	assert(box);
-	assert(box->data);
-	assert(box->limit);
-	assert(data);
-
 	if (box->count > 0)
 	{
 		priv_box_getUpdate(box, data);
@@ -211,6 +211,12 @@ unsigned box_take( box_t *box, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
+
+	assert(box);
+	assert(box->obj.res!=RELEASED);
+	assert(box->data);
+	assert(box->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -228,6 +234,11 @@ unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(box);
+	assert(box->obj.res!=RELEASED);
+	assert(box->data);
+	assert(box->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -251,6 +262,11 @@ unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(box);
+	assert(box->obj.res!=RELEASED);
+	assert(box->data);
+	assert(box->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -272,11 +288,6 @@ static
 unsigned priv_box_give( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
-	assert(box);
-	assert(box->data);
-	assert(box->limit);
-	assert(data);
-
 	if (box->count < box->limit)
 	{
 		priv_box_putUpdate(box, data);
@@ -291,6 +302,12 @@ unsigned box_give( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
+
+	assert(box);
+	assert(box->obj.res!=RELEASED);
+	assert(box->data);
+	assert(box->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -308,6 +325,11 @@ unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(box);
+	assert(box->obj.res!=RELEASED);
+	assert(box->data);
+	assert(box->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -331,6 +353,11 @@ unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(box);
+	assert(box->obj.res!=RELEASED);
+	assert(box->data);
+	assert(box->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -352,6 +379,7 @@ void box_push( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
 	assert(box);
+	assert(box->obj.res!=RELEASED);
 	assert(box->data);
 	assert(box->limit);
 	assert(data);
@@ -371,6 +399,7 @@ unsigned box_count( box_t *box )
 	unsigned count;
 
 	assert(box);
+	assert(box->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -388,6 +417,7 @@ unsigned box_space( box_t *box )
 	unsigned space;
 
 	assert(box);
+	assert(box->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -405,6 +435,7 @@ unsigned box_limit( box_t *box )
 	unsigned limit;
 
 	assert(box);
+	assert(box->obj.res!=RELEASED);
 
 	sys_lock();
 	{
