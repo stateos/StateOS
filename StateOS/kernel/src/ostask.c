@@ -396,6 +396,7 @@ unsigned tsk_give( tsk_t *tsk, unsigned flags )
 	unsigned event;
 
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -457,6 +458,7 @@ unsigned tsk_suspend( tsk_t *tsk )
 	unsigned event;
 
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -480,6 +482,7 @@ unsigned tsk_resume( tsk_t *tsk )
 	unsigned event;
 
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
