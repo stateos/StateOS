@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    07.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,6 +78,7 @@ void sem_kill( sem_t *sem )
 {
 	assert_tsk_context();
 	assert(sem);
+	assert(sem->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -92,6 +93,10 @@ void sem_kill( sem_t *sem )
 void sem_delete( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+	assert(sem);
+	assert(sem->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		sem_kill(sem);
@@ -105,8 +110,6 @@ static
 unsigned priv_sem_take( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	assert(sem);
-
 	if (sem->count > 0)
 	{
 		if (core_one_wakeup(sem->obj.queue, E_SUCCESS) == 0)
@@ -124,6 +127,9 @@ unsigned sem_take( sem_t *sem )
 {
 	unsigned event;
 
+	assert(sem);
+	assert(sem->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		event = priv_sem_take(sem);
@@ -140,6 +146,8 @@ unsigned sem_waitFor( sem_t *sem, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(sem);
+	assert(sem->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -160,6 +168,8 @@ unsigned sem_waitUntil( sem_t *sem, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(sem);
+	assert(sem->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -178,8 +188,6 @@ static
 unsigned priv_sem_give( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	assert(sem);
-
 	if (sem->count > sem->limit - 1)
 		return E_TIMEOUT;
 
@@ -199,6 +207,9 @@ unsigned sem_give( sem_t *sem )
 {
 	unsigned event;
 
+	assert(sem);
+	assert(sem->obj.res!=RELEASED);
+
 	sys_lock();
 	{
 		event = priv_sem_give(sem);
@@ -215,6 +226,8 @@ unsigned sem_sendFor( sem_t *sem, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(sem);
+	assert(sem->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -235,6 +248,8 @@ unsigned sem_sendUntil( sem_t *sem, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
+	assert(sem);
+	assert(sem->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -253,6 +268,9 @@ unsigned sem_getValue( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned val;
+
+	assert(sem);
+	assert(sem->obj.res!=RELEASED);
 
 	sys_lock();
 	{
