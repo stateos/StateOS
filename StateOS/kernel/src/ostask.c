@@ -326,8 +326,27 @@ void tsk_delete( tsk_t *tsk )
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
 
-	tsk_kill(tsk);
-	tsk_detach(tsk);
+	sys_lock();
+	{
+		if (tsk->join != DETACHED)         // detached task cannot be deleted
+		{
+			priv_mtx_remove(tsk);
+			core_tsk_wakeup(tsk->join, E_FAILURE);
+
+			if (tsk != System.cur)
+				core_res_free(&tsk->hdr.obj.res);
+			else
+			if (tsk->hdr.obj.res != 0)     // undetachable task cannot be detached
+			{
+				tsk->join = DETACHED;
+				priv_tsk_destroy(tsk);     // current task will be destroyed later
+			}
+
+			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be removed
+				priv_tsk_remove(tsk);
+		}
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
