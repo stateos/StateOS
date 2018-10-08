@@ -162,7 +162,7 @@ unsigned tsk_detach( tsk_t *tsk )
 		    tsk->hdr.obj.res == 0)     // task is undetachable
 			event = E_FAILURE;
 		else
-		if (tsk->hdr.id == ID_STOPPED) // task is inactive
+		if (tsk->hdr.id == ID_STOPPED) // task is already inactive
 		{
 			core_res_free(&tsk->hdr.obj.res);
 			event = E_SUCCESS;
@@ -195,13 +195,13 @@ unsigned tsk_join( tsk_t *tsk )
 		    tsk == System.cur)         // deadlock detected
 			event = E_FAILURE;
 		else
-		if (tsk->hdr.id == ID_STOPPED) // task is inactive
+		if (tsk->hdr.id == ID_STOPPED) // task is already inactive
 			event = E_SUCCESS;
 		else                           // task is active; wait for termination
 			event = core_tsk_waitFor(&tsk->join, INFINITE);
 
 		if (event != E_FAILURE &&      // task has not been detached
-		    tsk->hdr.id == ID_STOPPED) // task is inactive
+		    tsk->hdr.id == ID_STOPPED) // task is still inactive
 			core_res_free(&tsk->hdr.obj.res);
 	}
 	sys_unlock();
