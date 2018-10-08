@@ -225,8 +225,8 @@ void tsk_stop( void )
 
 	core_tsk_remove(System.cur);
 
-	assert(true); // system can not return here
-	for (;;);     // disable unnecessary warning
+	assert(!"system can not return here");
+	for (;;); // disable unnecessary warning
 }
 
 /* -------------------------------------------------------------------------- */
