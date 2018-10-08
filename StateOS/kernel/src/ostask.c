@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    08.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -200,7 +200,8 @@ unsigned tsk_join( tsk_t *tsk )
 		else                           // task is active; wait for termination
 			event = core_tsk_waitFor(&tsk->join, INFINITE);
 
-		if (event != E_FAILURE)        // task has not been detached
+		if (event != E_FAILURE &&      // task has not been detached
+		    tsk->hdr.id == ID_STOPPED) // task is inactive
 			core_res_free(&tsk->hdr.obj.res);
 	}
 	sys_unlock();
@@ -228,47 +229,41 @@ void tsk_stop( void )
 }
 
 /* -------------------------------------------------------------------------- */
-static
-void priv_tsk_reset( tsk_t *tsk, unsigned event )
+void tsk_kill( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	mtx_t *mtx;
 	mtx_t *nxt;
 
-	tsk->mtx.tree = 0;
-	for (mtx = tsk->mtx.list; mtx; mtx = nxt)
-	{
-		nxt = mtx->list;
-		if ((mtx->mode & mtxRobust))
-			if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
-				mtx->mode |= mtxInconsistent;
-	}
-
-	core_tsk_wakeup(tsk->join, event);
-
-	if (tsk->hdr.id == ID_READY)
-		core_tsk_remove(tsk);
-	else
-	if (tsk->hdr.id == ID_BLOCKED)
-	{
-		core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
-		core_tmr_remove((tmr_t *)tsk);
-	}
-}
-
-/* -------------------------------------------------------------------------- */
-void tsk_kill( tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
 	assert_tsk_context();
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id != ID_STOPPED &&   // inactive task cannot be reseted
-		    tsk->join != DETACHED)         // detached task cannot be reseted
-			priv_tsk_reset(tsk, E_STOPPED);
+		if (tsk->hdr.id != ID_STOPPED && // inactive task cannot be reseted
+		    tsk->join != DETACHED)       // detached task cannot be reseted
+		{
+			tsk->mtx.tree = 0;
+			for (mtx = tsk->mtx.list; mtx; mtx = nxt)
+			{
+				nxt = mtx->list;
+				if ((mtx->mode & mtxRobust))
+					if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
+						mtx->mode |= mtxInconsistent;
+			}
+
+			core_tsk_wakeup(tsk->join, E_STOPPED);
+
+			if (tsk->hdr.id == ID_READY)
+				core_tsk_remove(tsk);
+			else
+			if (tsk->hdr.id == ID_BLOCKED)
+			{
+				core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
+				core_tmr_remove((tmr_t *)tsk);
+			}
+		}
 	}
 	sys_unlock();
 }
@@ -281,17 +276,8 @@ void tsk_delete( tsk_t *tsk )
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
 
-	sys_lock();
-	{
-		if (tsk->join != DETACHED)         // detached task cannot be deleted
-		{
-			core_res_free(&tsk->hdr.obj.res);
-
-			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be reseted
-				priv_tsk_reset(tsk, E_FAILURE);
-		}
-	}
-	sys_unlock();
+	tsk_kill(tsk);
+	tsk_detach(tsk);
 }
 
 /* -------------------------------------------------------------------------- */
