@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    06.10.2018
+    @date    08.10.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -281,6 +281,9 @@ void core_sys_tick( void )
 #endif
 }
 #endif
+
+// default handler of idle process
+void core_tsk_idle( void );
 
 /* -------------------------------------------------------------------------- */
 
