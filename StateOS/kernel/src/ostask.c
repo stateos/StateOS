@@ -263,40 +263,56 @@ void tsk_stop( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_kill( tsk_t *tsk )
+static
+void priv_mtx_remove( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	mtx_t *mtx;
 	mtx_t *nxt;
 
+	tsk->mtx.tree = 0;
+
+	for (mtx = tsk->mtx.list; mtx; mtx = nxt)
+	{
+		nxt = mtx->list;
+		if ((mtx->mode & mtxRobust))
+			if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
+				mtx->mode |= mtxInconsistent;
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_tsk_remove( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	if (tsk->hdr.id == ID_READY)
+		core_tsk_remove(tsk);
+	else
+	if (tsk->hdr.id == ID_BLOCKED)
+	{
+		core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
+		core_tmr_remove((tmr_t *)tsk);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_kill( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
 	assert_tsk_context();
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id != ID_STOPPED && // inactive task cannot be reseted
-		    tsk->join != DETACHED)       // detached task cannot be reseted
+		if (tsk->join != DETACHED)         // detached task cannot be reseted
 		{
-			tsk->mtx.tree = 0;
-			for (mtx = tsk->mtx.list; mtx; mtx = nxt)
-			{
-				nxt = mtx->list;
-				if ((mtx->mode & mtxRobust))
-					if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
-						mtx->mode |= mtxInconsistent;
-			}
-
+			priv_mtx_remove(tsk);
 			core_tsk_wakeup(tsk->join, E_STOPPED);
 
-			if (tsk->hdr.id == ID_READY)
-				core_tsk_remove(tsk);
-			else
-			if (tsk->hdr.id == ID_BLOCKED)
-			{
-				core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
-				core_tmr_remove((tmr_t *)tsk);
-			}
+			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be removed
+				priv_tsk_remove(tsk);
 		}
 	}
 	sys_unlock();
