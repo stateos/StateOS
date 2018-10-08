@@ -59,6 +59,7 @@ Features:
 - changed resource management
 - changed task start procedures
 - added function aliases for the current task
+- added resource assertions
 ---------
 6.2
 - updated kernel
