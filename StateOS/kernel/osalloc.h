@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    08.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -111,19 +111,16 @@ void sys_free( void *ptr );
  ******************************************************************************/
 
 __STATIC_INLINE
-bool core_res_free( void **res )
+void core_res_free( void **res )
 {
 	void *tmp;
 
-	if (*res)
+	if (*res != 0 && *res != RELEASED)
 	{
 		tmp = *res;
 		*res = RELEASED;
 		sys_free(tmp);
-		return true;
 	}
-
-	return false;
 }
 
 #ifdef __cplusplus
