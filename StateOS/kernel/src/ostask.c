@@ -233,6 +233,16 @@ void priv_tsk_terminator( void )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_tsk_destroy( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	tsk->hdr.obj.queue = IDLE.hdr.obj.queue;
+	IDLE.hdr.obj.queue = tsk;
+	IDLE.state = priv_tsk_terminator;
+}
+
+/* -------------------------------------------------------------------------- */
 void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
@@ -244,16 +254,12 @@ void tsk_stop( void )
 	if (System.cur->join != DETACHED)
 		core_tsk_wakeup(System.cur->join, E_SUCCESS);
 	else
-	{
-		System.cur->hdr.obj.queue = IDLE.hdr.obj.queue;
-		IDLE.hdr.obj.queue = System.cur;
-		IDLE.state = priv_tsk_terminator;
-	}
+		priv_tsk_destroy(System.cur); // current task will be destroyed later
 
 	core_tsk_remove(System.cur);
 
 	assert(!"system can not return here");
-	for (;;); // disable unnecessary warning
+	for (;;);                         // disable unnecessary warning
 }
 
 /* -------------------------------------------------------------------------- */
