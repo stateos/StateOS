@@ -110,12 +110,13 @@ void tsk_start( tsk_t *tsk )
 {
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED); // object with released resources cannot be used
+	assert(tsk->hdr.obj.res!=RELEASED);  // object with released resources cannot be used
 	assert(tsk->state);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id == ID_STOPPED)
+		if (tsk->hdr.id == ID_STOPPED && // task is already active
+		    tsk->join != DETACHED)       // detached task cannot be (re)started
 		{
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
@@ -130,12 +131,13 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 {
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED); // object with released resources cannot be used
+	assert(tsk->hdr.obj.res!=RELEASED);  // object with released resources cannot be used
 	assert(state);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id == ID_STOPPED)
+		if (tsk->hdr.id == ID_STOPPED && // task is already active
+		    tsk->join != DETACHED)       // detached task cannot be (re)started
 		{
 			tsk->state = state;
 
@@ -210,6 +212,27 @@ unsigned tsk_join( tsk_t *tsk )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_tsk_terminator( void )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	sys_lock();
+	{
+		while (IDLE.hdr.obj.queue)
+		{
+			tsk = IDLE.hdr.obj.queue;
+			IDLE.hdr.obj.queue = tsk->hdr.obj.queue;
+			core_res_free(&tsk->hdr.obj.res);
+		}
+
+		IDLE.state = core_tsk_idle;
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
 void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
@@ -221,7 +244,11 @@ void tsk_stop( void )
 	if (System.cur->join != DETACHED)
 		core_tsk_wakeup(System.cur->join, E_SUCCESS);
 	else
-		core_res_free(&System.cur->hdr.obj.res);
+	{
+		System.cur->hdr.obj.queue = IDLE.hdr.obj.queue;
+		IDLE.hdr.obj.queue = System.cur;
+		IDLE.state = priv_tsk_terminator;
+	}
 
 	core_tsk_remove(System.cur);
 

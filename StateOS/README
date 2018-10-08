@@ -60,6 +60,7 @@ Features:
 - changed task start procedures
 - added function aliases for the current task
 - added resource assertions
+- current task is destroyed asynchronously by the idle task if it has been detached
 ---------
 6.2
 - updated kernel
