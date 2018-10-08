@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    08.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -114,17 +114,14 @@ void job_delete( job_t *job )
 
 /* -------------------------------------------------------------------------- */
 static
-fun_t *priv_job_get( job_t *job )
+void priv_job_get( job_t *job, fun_t **fun )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t  * fun;
 	unsigned i = job->head;
 
-	fun = job->data[i++];
+	*fun = job->data[i++];
 	job->head = (i < job->limit) ? i : 0;
 	job->count--;
-
-	return fun;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -152,17 +149,14 @@ void priv_job_skip( job_t *job )
 
 /* -------------------------------------------------------------------------- */
 static
-fun_t *priv_job_getUpdate( job_t *job )
+void priv_job_getUpdate( job_t *job, fun_t **fun )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t *fun;
 	tsk_t *tsk;
 
-	fun = priv_job_get(job);
+	priv_job_get(job, fun);
 	tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
-	if (tsk) priv_job_put(job, tsk->tmp.job.fun);
-
-	return fun;
+	if (tsk) priv_job_put(job, tsk->tmp.job.data.out);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -174,7 +168,7 @@ void priv_job_putUpdate( job_t *job, fun_t *fun )
 
 	priv_job_put(job, fun);
 	tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
-	if (tsk) tsk->tmp.job.fun = priv_job_get(job);
+	if (tsk) priv_job_get(job, tsk->tmp.job.data.in);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -188,7 +182,7 @@ void priv_job_skipUpdate( job_t *job )
 	{
 		priv_job_skip(job);
 		tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
-		if (tsk) priv_job_put(job, tsk->tmp.job.fun);
+		if (tsk) priv_job_put(job, tsk->tmp.job.data.out);
 	}
 }
 
@@ -199,7 +193,7 @@ unsigned priv_job_take( job_t *job, fun_t **fun )
 {
 	if (job->count > 0)
 	{
-		*fun = priv_job_getUpdate(job);
+		priv_job_getUpdate(job, fun);
 		return E_SUCCESS;
 	}
 
@@ -249,8 +243,8 @@ unsigned job_waitFor( job_t *job, cnt_t delay )
 
 		if (event == E_TIMEOUT)
 		{
+			System.cur->tmp.job.data.in = &fun;
 			event = core_tsk_waitFor(&job->obj.queue, delay);
-			fun = System.cur->tmp.job.fun;
 		}
 	}
 	sys_unlock();
@@ -280,8 +274,8 @@ unsigned job_waitUntil( job_t *job, cnt_t time )
 
 		if (event == E_TIMEOUT)
 		{
+			System.cur->tmp.job.data.in = &fun;
 			event = core_tsk_waitUntil(&job->obj.queue, time);
-			fun = System.cur->tmp.job.fun;
 		}
 	}
 	sys_unlock();
@@ -346,7 +340,7 @@ unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 
 		if (event == E_TIMEOUT)
 		{
-			System.cur->tmp.job.fun = fun;
+			System.cur->tmp.job.data.out = fun;
 			event = core_tsk_waitFor(&job->obj.queue, delay);
 		}
 	}
@@ -374,7 +368,7 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 
 		if (event == E_TIMEOUT)
 		{
-			System.cur->tmp.job.fun = fun;
+			System.cur->tmp.job.data.out = fun;
 			event = core_tsk_waitUntil(&job->obj.queue, time);
 		}
 	}
