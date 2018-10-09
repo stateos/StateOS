@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    08.10.2018
+    @date    09.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -110,13 +110,12 @@ void tsk_start( tsk_t *tsk )
 {
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);  // object with released resources cannot be used
+	assert(tsk->hdr.obj.res!=RELEASED); // object with released resources cannot be used
 	assert(tsk->state);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id == ID_STOPPED && // task is already active
-		    tsk->join != DETACHED)       // detached task cannot be (re)started
+		if (tsk->hdr.id == ID_STOPPED)  // active tasks cannot be started
 		{
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
@@ -131,13 +130,12 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 {
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);  // object with released resources cannot be used
+	assert(tsk->hdr.obj.res!=RELEASED); // object with released resources cannot be used
 	assert(state);
 
 	sys_lock();
 	{
-		if (tsk->hdr.id == ID_STOPPED && // task is already active
-		    tsk->join != DETACHED)       // detached task cannot be (re)started
+		if (tsk->hdr.id == ID_STOPPED)  // active tasks cannot be started
 		{
 			tsk->state = state;
 
@@ -213,57 +211,6 @@ unsigned tsk_join( tsk_t *tsk )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_tsk_terminator( void )
-/* -------------------------------------------------------------------------- */
-{
-	tsk_t *tsk;
-
-	sys_lock();
-	{
-		while (IDLE.hdr.obj.queue)
-		{
-			tsk = IDLE.hdr.obj.queue;
-			IDLE.hdr.obj.queue = tsk->hdr.obj.queue;
-			core_res_free(&tsk->hdr.obj.res);
-		}
-
-		IDLE.state = core_tsk_idle;
-	}
-	sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-static
-void priv_tsk_destroy( tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
-	tsk->hdr.obj.queue = IDLE.hdr.obj.queue;
-	IDLE.hdr.obj.queue = tsk;
-	IDLE.state = priv_tsk_terminator;
-}
-
-/* -------------------------------------------------------------------------- */
-void tsk_stop( void )
-/* -------------------------------------------------------------------------- */
-{
-	assert_tsk_context();
-	assert(System.cur->mtx.list == 0);
-
-	port_set_lock();
-
-	if (System.cur->join != DETACHED)
-		core_tsk_wakeup(System.cur->join, E_SUCCESS);
-	else
-		priv_tsk_destroy(System.cur); // current task will be destroyed later
-
-	core_tsk_remove(System.cur);
-
-	assert(!"system can not return here");
-	for (;;);                         // disable unnecessary warning
-}
-
-/* -------------------------------------------------------------------------- */
-static
 void priv_mtx_remove( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
@@ -291,9 +238,57 @@ void priv_tsk_remove( tsk_t *tsk )
 	else
 	if (tsk->hdr.id == ID_BLOCKED)
 	{
-		core_tsk_unlink((tsk_t *)tsk, E_STOPPED);
+		core_tsk_unlink(tsk, E_STOPPED);
 		core_tmr_remove((tmr_t *)tsk);
 	}
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_tsk_destructor( void )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	sys_lock();
+	{
+		while (System.des)
+		{
+			tsk = System.des;
+			if (tsk->join != DETACHED)
+			{
+				priv_mtx_remove(tsk);
+				core_tsk_wakeup(tsk->join, E_FAILURE);
+			}
+			priv_tsk_remove(tsk);
+			core_res_free(&tsk->hdr.obj.res);
+		}
+
+		IDLE.state = core_tsk_idle;
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_stop( void )
+/* -------------------------------------------------------------------------- */
+{
+	assert_tsk_context();
+	assert(System.cur->mtx.list == 0);
+
+	port_set_lock();
+
+	if (System.cur->join == DETACHED) // detached task will be destroyed by destructor
+	{
+		IDLE.state = priv_tsk_destructor;
+		core_tsk_waitFor(&System.des, INFINITE);
+	}
+
+	core_tsk_wakeup(System.cur->join, E_SUCCESS);
+	core_tsk_remove(System.cur);
+
+	assert(!"system can not return here");
+	for (;;);                         // disable unnecessary warning
 }
 
 /* -------------------------------------------------------------------------- */
@@ -308,11 +303,12 @@ void tsk_kill( tsk_t *tsk )
 	{
 		if (tsk->join != DETACHED)         // detached task cannot be reseted
 		{
-			priv_mtx_remove(tsk);
-			core_tsk_wakeup(tsk->join, E_STOPPED);
-
 			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be removed
+			{
+				priv_mtx_remove(tsk);
+				core_tsk_wakeup(tsk->join, E_STOPPED);
 				priv_tsk_remove(tsk);
+			}
 		}
 	}
 	sys_unlock();
@@ -330,20 +326,20 @@ void tsk_delete( tsk_t *tsk )
 	{
 		if (tsk->join != DETACHED)         // detached task cannot be deleted
 		{
-			priv_mtx_remove(tsk);
-			core_tsk_wakeup(tsk->join, E_FAILURE);
-
-			if (tsk != System.cur)
-				core_res_free(&tsk->hdr.obj.res);
-			else
-			if (tsk->hdr.obj.res != 0)     // undetachable task cannot be detached
+			if (tsk == System.cur)         // current task will be destroyed by destructor
 			{
-				tsk->join = DETACHED;
-				priv_tsk_destroy(tsk);     // current task will be destroyed later
+				IDLE.state = priv_tsk_destructor;
+				core_tsk_waitFor(&System.des, INFINITE);
 			}
 
 			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be removed
+			{
+				priv_mtx_remove(tsk);
+				core_tsk_wakeup(tsk->join, E_FAILURE);
 				priv_tsk_remove(tsk);
+			}
+
+			core_res_free(&tsk->hdr.obj.res);
 		}
 	}
 	sys_unlock();

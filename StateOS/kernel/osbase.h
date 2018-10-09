@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    09.10.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -155,6 +155,7 @@ typedef struct __sys
 #endif
 	tsk_t  * wai;   // queue of tasks waiting for an event / flags
 	tsk_t  * dly;   // queue of sleeping and suspended tasks
+	tsk_t  * des;   // queue of tasks waiting for destruction
 
 }	sys_t;
 
