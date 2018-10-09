@@ -244,8 +244,14 @@ void priv_tsk_remove( tsk_t *tsk )
 }
 
 /* -------------------------------------------------------------------------- */
-static
-void priv_tsk_destructor( void )
+void idle_tsk_default( void )
+/* -------------------------------------------------------------------------- */
+{
+	__WFI();
+}
+
+/* -------------------------------------------------------------------------- */
+void idle_tsk_destructor( void )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
@@ -266,7 +272,7 @@ void priv_tsk_destructor( void )
 			core_res_free(&tsk->hdr.obj.res);
 		}
 
-		IDLE.state = core_tsk_idle;
+		IDLE.state = idle_tsk_default;
 	}
 	sys_unlock();
 }
@@ -276,9 +282,9 @@ static
 void priv_tsk_destroy( void )
 /* -------------------------------------------------------------------------- */
 {
-	priv_tsk_destructor();
+	idle_tsk_destructor();
 
-	IDLE.state = priv_tsk_destructor;
+	IDLE.state = idle_tsk_destructor;
 	core_tsk_waitFor(&System.des, INFINITE);
 
 	assert(!"system can not return here");
