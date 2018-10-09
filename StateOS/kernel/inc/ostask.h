@@ -820,16 +820,18 @@ void tsk_stop( void );
  * Parameters
  *   tsk             : pointer to task object
  *
- * Return            : none
+ * Return
+ *   E_SUCCESS       : given task was already inactive or has been reseted
+ *   E_FAILURE       : given task cannot be reseted
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-void tsk_kill( tsk_t *tsk );
+unsigned tsk_kill( tsk_t *tsk );
 
 __STATIC_INLINE
-void tsk_reset( tsk_t *tsk ) { tsk_kill(tsk); }
+unsigned tsk_reset( tsk_t *tsk ) { return tsk_kill(tsk); }
 
 /******************************************************************************
  *
@@ -840,17 +842,19 @@ void tsk_reset( tsk_t *tsk ) { tsk_kill(tsk); }
  *
  * Parameters        : none
  *
- * Return            : none
+ * Return
+ *   E_SUCCESS       : current task has been reseted
+ *   E_FAILURE       : current task cannot be reseted
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-void cur_kill( void ) { tsk_kill(System.cur); }
+unsigned cur_kill( void ) { return tsk_kill(System.cur); }
 
 __STATIC_INLINE
-void cur_reset( void ) { tsk_reset(System.cur); }
+unsigned cur_reset( void ) { return tsk_reset(System.cur); }
 
 /******************************************************************************
  *
@@ -861,13 +865,15 @@ void cur_reset( void ) { tsk_reset(System.cur); }
  * Parameters
  *   tsk             : pointer to task object
  *
- * Return            : none
+ * Return
+ *   E_SUCCESS       : given task has been destroyed
+ *   E_FAILURE       : given task cannot be destroyed
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-void tsk_delete( tsk_t *tsk );
+unsigned tsk_delete( tsk_t *tsk );
 
 /******************************************************************************
  *
@@ -877,14 +883,16 @@ void tsk_delete( tsk_t *tsk );
  *
  * Parameters        : none
  *
- * Return            : none
+ * Return
+ *   E_SUCCESS       : current task has been destroyed
+ *   E_FAILURE       : current task cannot be destroyed
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-void cur_delete( void ) { tsk_delete(System.cur); }
+unsigned cur_delete( void ) { return tsk_delete(System.cur); }
 
 /******************************************************************************
  *

@@ -255,11 +255,13 @@ void priv_tsk_destructor( void )
 		while (System.des)
 		{
 			tsk = System.des;
+
 			if (tsk->join != DETACHED)
 			{
 				priv_mtx_remove(tsk);
 				core_tsk_wakeup(tsk->join, E_FAILURE);
 			}
+
 			priv_tsk_remove(tsk);
 			core_res_free(&tsk->hdr.obj.res);
 		}
@@ -267,6 +269,19 @@ void priv_tsk_destructor( void )
 		IDLE.state = core_tsk_idle;
 	}
 	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+static
+void priv_tsk_destroy( void )
+/* -------------------------------------------------------------------------- */
+{
+	priv_tsk_destructor();
+
+	IDLE.state = priv_tsk_destructor;
+	core_tsk_waitFor(&System.des, INFINITE);
+
+	assert(!"system can not return here");
 }
 
 /* -------------------------------------------------------------------------- */
@@ -279,10 +294,7 @@ void tsk_stop( void )
 	port_set_lock();
 
 	if (System.cur->join == DETACHED) // detached task will be destroyed by destructor
-	{
-		IDLE.state = priv_tsk_destructor;
-		core_tsk_waitFor(&System.des, INFINITE);
-	}
+		priv_tsk_destroy();
 
 	core_tsk_wakeup(System.cur->join, E_SUCCESS);
 	core_tsk_remove(System.cur);
@@ -292,16 +304,20 @@ void tsk_stop( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_kill( tsk_t *tsk )
+unsigned tsk_kill( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned event;
+
 	assert_tsk_context();
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		if (tsk->join != DETACHED)         // detached task cannot be reseted
+		if (tsk->join == DETACHED)         // detached task cannot be reseted
+			event = E_FAILURE;
+		else
 		{
 			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be removed
 			{
@@ -309,28 +325,33 @@ void tsk_kill( tsk_t *tsk )
 				core_tsk_wakeup(tsk->join, E_STOPPED);
 				priv_tsk_remove(tsk);
 			}
+
+			event = E_SUCCESS;
 		}
 	}
 	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_delete( tsk_t *tsk )
+unsigned tsk_delete( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned event;
+
 	assert_tsk_context();
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		if (tsk->join != DETACHED)         // detached task cannot be deleted
+		if (tsk->join == DETACHED)         // detached task cannot be deleted
+			event = E_FAILURE;
+		else
 		{
 			if (tsk == System.cur)         // current task will be destroyed by destructor
-			{
-				IDLE.state = priv_tsk_destructor;
-				core_tsk_waitFor(&System.des, INFINITE);
-			}
+				priv_tsk_destroy();
 
 			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be removed
 			{
@@ -340,9 +361,12 @@ void tsk_delete( tsk_t *tsk )
 			}
 
 			core_res_free(&tsk->hdr.obj.res);
+			event = E_SUCCESS;
 		}
 	}
 	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
