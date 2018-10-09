@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    08.10.2018
+    @date    09.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -86,7 +86,7 @@ struct __tsk
 
 	struct {
 	mtx_t  * list;  // list of mutexes held
-	tsk_t  * tree;  // tree of tasks waiting for mutexes
+	mtx_t  * tree;  // tree of tasks waiting for mutexes
 	}        mtx;
 
 	union  {

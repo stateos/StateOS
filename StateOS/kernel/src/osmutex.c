@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    09.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -224,7 +224,7 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay )
 			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && mtx->owner->prio < System.cur->prio)
 				core_tsk_prio(mtx->owner, System.cur->prio);
 
-			System.cur->mtx.tree = mtx->owner;
+			System.cur->mtx.tree = mtx;
 			event = core_tsk_waitFor(&mtx->obj.queue, delay);
 			System.cur->mtx.tree = 0;
 		}
@@ -256,7 +256,7 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
 			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && mtx->owner->prio < System.cur->prio)
 				core_tsk_prio(mtx->owner, System.cur->prio);
 
-			System.cur->mtx.tree = mtx->owner;
+			System.cur->mtx.tree = mtx;
 			event = core_tsk_waitUntil(&mtx->obj.queue, time);
 			System.cur->mtx.tree = 0;
 		}
