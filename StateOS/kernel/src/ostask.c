@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    09.10.2018
+    @date    10.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -158,19 +158,19 @@ unsigned tsk_detach( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join == DETACHED ||   // task has already been detached
-		    tsk->hdr.obj.res == 0)     // task is undetachable
+		if (tsk->join == DETACHED ||               // task has already been detached
+		    tsk->hdr.obj.res == 0)                 // task is undetachable
 			event = E_FAILURE;
 		else
-		if (tsk->hdr.id == ID_STOPPED) // task is already inactive
+		if (tsk->hdr.id == ID_STOPPED)             // task is already inactive
 		{
-			core_res_free(&tsk->hdr.obj.res);
+			core_res_free(&tsk->hdr.obj.res);      // release resources
 			event = E_SUCCESS;
 		}
-		else                           // task is active and can be detached
+		else                                       // task is active and can be detached
 		{
-			core_tsk_wakeup(tsk->join, E_FAILURE);
-			tsk->join = DETACHED;
+			core_tsk_wakeup(tsk->join, E_FAILURE); // notify waiting task
+			tsk->join = DETACHED;                  // mark as detached
 			event = E_SUCCESS;
 		}
 	}
@@ -191,18 +191,18 @@ unsigned tsk_join( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join != JOINABLE ||   // task is unjoinable
-		    tsk == System.cur)         // deadlock detected
+		if (tsk->join != JOINABLE ||                        // task is unjoinable
+		    tsk == System.cur)                              // deadlock detected
 			event = E_FAILURE;
 		else
-		if (tsk->hdr.id == ID_STOPPED) // task is already inactive
+		if (tsk->hdr.id == ID_STOPPED)                      // task is already inactive
 			event = E_SUCCESS;
-		else                           // task is active; wait for termination
-			event = core_tsk_waitFor(&tsk->join, INFINITE);
+		else                                                // task is active
+			event = core_tsk_waitFor(&tsk->join, INFINITE); // wait for termination
 
-		if (event != E_FAILURE &&      // task has not been detached
-		    tsk->hdr.id == ID_STOPPED) // task is still inactive
-			core_res_free(&tsk->hdr.obj.res);
+		if (event != E_FAILURE &&                           // task has not been detached
+		    tsk->hdr.id == ID_STOPPED)                      // task is still inactive
+			core_res_free(&tsk->hdr.obj.res);               // release resources
 	}
 	sys_unlock();
 
@@ -233,13 +233,13 @@ static
 void priv_tsk_remove( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	if (tsk->hdr.id == ID_READY)
-		core_tsk_remove(tsk);
+	if (tsk->hdr.id == ID_READY)         // ready task
+		core_tsk_remove(tsk);            // remove task from ready queue
 	else
-	if (tsk->hdr.id == ID_BLOCKED)
+	if (tsk->hdr.id == ID_BLOCKED)       // blocked task
 	{
-		core_tsk_unlink(tsk, E_STOPPED);
-		core_tmr_remove((tmr_t *)tsk);
+		core_tsk_unlink(tsk, E_STOPPED); // remove task from blocked queue
+		core_tmr_remove((tmr_t *)tsk);   // remove task from timers queue
 	}
 }
 
@@ -260,19 +260,19 @@ void idle_tsk_destructor( void )
 	{
 		while (System.des)
 		{
-			tsk = System.des;
+			tsk = System.des;                          // task waiting for destruction
 
-			if (tsk->join != DETACHED)
+			if (tsk->join != DETACHED)                 // task not detached
 			{
-				priv_mtx_remove(tsk);
-				core_tsk_wakeup(tsk->join, E_FAILURE);
+				priv_mtx_remove(tsk);                  // release all owned robust mutexes
+				core_tsk_wakeup(tsk->join, E_FAILURE); // notify waiting task
 			}
 
-			priv_tsk_remove(tsk);
-			core_res_free(&tsk->hdr.obj.res);
+			priv_tsk_remove(tsk);                      // remove task from all queues
+			core_res_free(&tsk->hdr.obj.res);          // release resources
 		}
 
-		IDLE.state = idle_tsk_default;
+		IDLE.state = idle_tsk_default;                 // use default handler for idle process
 	}
 	sys_unlock();
 }
@@ -282,12 +282,12 @@ static
 void priv_tsk_destroy( void )
 /* -------------------------------------------------------------------------- */
 {
-	idle_tsk_destructor();
+	idle_tsk_destructor();                   // destroy all tasks waiting for destruction
 
-	IDLE.state = idle_tsk_destructor;
-	core_tsk_waitFor(&System.des, INFINITE);
+	IDLE.state = idle_tsk_destructor;        // use destructor handler for idle process
+	core_tsk_waitFor(&System.des, INFINITE); // wait for destruction
 
-	assert(!"system can not return here");
+	assert(!"system cannot return here");
 }
 
 /* -------------------------------------------------------------------------- */
@@ -299,14 +299,14 @@ void tsk_stop( void )
 
 	port_set_lock();
 
-	if (System.cur->join == DETACHED) // detached task will be destroyed by destructor
-		priv_tsk_destroy();
+	if (System.cur->join == DETACHED)             // current task is detached
+		priv_tsk_destroy();                       // wait for destruction
 
-	core_tsk_wakeup(System.cur->join, E_SUCCESS);
-	core_tsk_remove(System.cur);
+	core_tsk_wakeup(System.cur->join, E_SUCCESS); // notify waiting task
+	core_tsk_remove(System.cur);                  // remove current task from ready queue
 
-	assert(!"system can not return here");
-	for (;;);                         // disable unnecessary warning
+	assert(!"system cannot return here");
+	for (;;);                                     // disable unnecessary warning
 }
 
 /* -------------------------------------------------------------------------- */
@@ -321,15 +321,15 @@ unsigned tsk_kill( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join == DETACHED)         // detached task cannot be reseted
+		if (tsk->join == DETACHED)                     // detached task cannot be reseted
 			event = E_FAILURE;
 		else
 		{
-			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be removed
+			if (tsk->hdr.id != ID_STOPPED)             // inactive task cannot be removed
 			{
-				priv_mtx_remove(tsk);
-				core_tsk_wakeup(tsk->join, E_STOPPED);
-				priv_tsk_remove(tsk);
+				priv_mtx_remove(tsk);                  // release all owned robust mutexes
+				core_tsk_wakeup(tsk->join, E_STOPPED); // notify waiting task
+				priv_tsk_remove(tsk);                  // remove task from all queues
 			}
 
 			event = E_SUCCESS;
@@ -352,21 +352,21 @@ unsigned tsk_delete( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join == DETACHED)         // detached task cannot be deleted
+		if (tsk->join == DETACHED)                     // detached task cannot be deleted
 			event = E_FAILURE;
 		else
 		{
-			if (tsk == System.cur)         // current task will be destroyed by destructor
-				priv_tsk_destroy();
+			if (tsk == System.cur)                     // current task will be destroyed by destructor
+				priv_tsk_destroy();                    // wait for destruction
 
-			if (tsk->hdr.id != ID_STOPPED) // inactive task cannot be removed
+			if (tsk->hdr.id != ID_STOPPED)             // only active task can be removed
 			{
-				priv_mtx_remove(tsk);
-				core_tsk_wakeup(tsk->join, E_FAILURE);
-				priv_tsk_remove(tsk);
+				priv_mtx_remove(tsk);                  // release all owned robust mutexes
+				core_tsk_wakeup(tsk->join, E_FAILURE); // notify waiting task             
+				priv_tsk_remove(tsk);                  // remove task from all queues     
 			}
 
-			core_res_free(&tsk->hdr.obj.res);
+			core_res_free(&tsk->hdr.obj.res);          // release resources
 			event = E_SUCCESS;
 		}
 	}
@@ -401,6 +401,8 @@ void tsk_flip( fun_t *state )
 
 	core_ctx_switch();
 	core_tsk_flip((void *)STK_CROP(System.cur->stack, System.cur->size));
+
+	assert(!"system cannot return here");
 }
 
 /* -------------------------------------------------------------------------- */
