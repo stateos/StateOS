@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    10.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -112,7 +112,7 @@ void priv_tmr_start( tmr_t *tmr )
 {
 	if (tmr->hdr.id == ID_TIMER)
 		core_tmr_remove(tmr);
-	core_tmr_insert(tmr, ID_TIMER);
+	core_tmr_insert(tmr);
 }
 
 /* -------------------------------------------------------------------------- */

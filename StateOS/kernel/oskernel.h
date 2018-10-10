@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    09.10.2018
+    @date    10.10.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -132,10 +132,10 @@ void core_ctx_reset( void )
 
 /* -------------------------------------------------------------------------- */
 
-// insert timer 'tmr' into timers READY queue with id 'id' and start it
-void core_tmr_insert( tmr_t *tmr, tid_t id );
+// insert task / timer 'tmr' into timers READY queue
+void core_tmr_insert( tmr_t *tmr );
 
-// remove timer 'tmr' from timers READY queue
+// remove task / timer 'tmr' from timers READY queue
 void core_tmr_remove( tmr_t *tmr );
 
 // timers queue handler procedure

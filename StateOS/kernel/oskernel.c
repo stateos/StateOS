@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    09.10.2018
+    @date    10.10.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -80,7 +80,7 @@ tmr_t WAIT = { .hdr={ .prev=&WAIT, .next=&WAIT, .id=ID_TIMER }, .delay=INFINITE 
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_tmr_insert( tmr_t *tmr, tid_t id )
+void priv_tmr_insert( tmr_t *tmr )
 {
 	tmr_t *nxt = &WAIT;
 
@@ -88,7 +88,7 @@ void priv_tmr_insert( tmr_t *tmr, tid_t id )
 		do nxt = nxt->hdr.next;
 		while (nxt->delay < (cnt_t)(tmr->start + tmr->delay - nxt->start));
 
-	tmr->hdr.id = id;
+	tmr->hdr.id = ID_TIMER;
 	priv_rdy_insert(&tmr->hdr, &nxt->hdr);
 }
 
@@ -103,9 +103,9 @@ void priv_tmr_remove( tmr_t *tmr )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tmr_insert( tmr_t *tmr, tid_t id )
+void core_tmr_insert( tmr_t *tmr )
 {
-	priv_tmr_insert(tmr, id);
+	priv_tmr_insert(tmr);
 	port_tmr_force();
 }
 
@@ -164,9 +164,9 @@ void priv_tmr_wakeup( tmr_t *tmr, unsigned event )
 	if (tmr->state)
 		tmr->state();
 
-	core_tmr_remove(tmr);
+	priv_tmr_remove(tmr);
 	if (tmr->delay >= (cnt_t)(core_sys_time() - tmr->start + 1))
-		priv_tmr_insert(tmr, ID_TIMER);
+		priv_tmr_insert(tmr);
 
 	core_all_wakeup(tmr->hdr.obj.queue, event);
 }
@@ -230,6 +230,7 @@ void priv_tsk_insert( tsk_t *tsk )
 		do nxt = nxt->hdr.next;
 		while (tsk->prio <= nxt->prio);
 
+	tsk->hdr.id = ID_READY;
 	priv_rdy_insert(&tsk->hdr, &nxt->hdr);
 }
 
@@ -238,6 +239,7 @@ void priv_tsk_insert( tsk_t *tsk )
 static
 void priv_tsk_remove( tsk_t *tsk )
 {
+	tsk->hdr.id = ID_STOPPED;
 	priv_rdy_remove(&tsk->hdr);
 }
 
@@ -245,7 +247,6 @@ void priv_tsk_remove( tsk_t *tsk )
 
 void core_tsk_insert( tsk_t *tsk )
 {
-	tsk->hdr.id = ID_READY;
 	priv_tsk_insert(tsk);
 	if (tsk == IDLE.hdr.next)
 		port_ctx_switch();
@@ -255,7 +256,6 @@ void core_tsk_insert( tsk_t *tsk )
 
 void core_tsk_remove( tsk_t *tsk )
 {
-	tsk->hdr.id = ID_STOPPED;
 	priv_tsk_remove(tsk);
 	if (tsk == System.cur)
 		priv_ctx_switchNow();
@@ -300,7 +300,8 @@ void core_tsk_loop( void )
 void core_tsk_append( tsk_t *tsk, tsk_t **que )
 {
 	tsk_t *nxt = *que;
-	tsk->guard = que;
+	tsk->guard  = que;
+	tsk->hdr.id = ID_BLOCKED;
 
 	while (nxt && tsk->prio <= nxt->prio)
 	{
@@ -344,9 +345,9 @@ unsigned priv_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield )
 {
 	assert_tsk_context();
 
-	core_tsk_append((tsk_t *)tsk, que);
 	priv_tsk_remove((tsk_t *)tsk);
-	core_tmr_insert((tmr_t *)tsk, ID_BLOCKED);
+	core_tmr_insert((tmr_t *)tsk);
+	core_tsk_append((tsk_t *)tsk, que); // must be last; sets ID_BLOCKED
 
 	if (yield)
 		priv_ctx_switchNow();
@@ -392,7 +393,7 @@ unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time )
 	cur->start = core_sys_time();
 	cur->delay = time - cur->start;
 
-	if (cur->delay > ((CNT_MAX)>>1))
+	if (cur->delay - 1 > ((CNT_MAX)>>1))
 		return E_TIMEOUT;
 
 	return priv_tsk_wait(cur, que, true);
@@ -414,7 +415,7 @@ tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event )
 	if (tsk)
 	{
 		core_tsk_unlink((tsk_t *)tsk, event);
-		core_tmr_remove((tmr_t *)tsk);
+		priv_tmr_remove((tmr_t *)tsk);
 		core_tsk_insert((tsk_t *)tsk);
 	}
 
