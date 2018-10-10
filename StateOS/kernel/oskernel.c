@@ -189,7 +189,7 @@ void core_tmr_handler( void )
 			{
 				tmr->delay = tmr->period;
 
-				priv_tmr_wakeup((tmr_t *)tmr, E_SUCCESS);
+				priv_tmr_wakeup(tmr, E_SUCCESS);
 			}
 			else  /* hdr.id == ID_BLOCKED */
 				core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
