@@ -242,15 +242,15 @@ void sig_delete( sig_t *sig );
  * Alias             : sig_tryWait
  * ISR alias         : sig_takeISR
  *
- * Description       : check if the signal object has been released
+ * Description       : check signal object for the given signal number
  *
  * Parameters
  *   sig             : pointer to signal object
  *   num             : signal number
  *
  * Return
- *   E_SUCCESS       : signal object was successfully released
- *   E_TIMEOUT       : signal object was not released, try again
+ *   E_SUCCESS       : required signal number has been set
+ *   E_TIMEOUT       : required signal number has not been set, try again
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -268,7 +268,7 @@ unsigned sig_takeISR( sig_t *sig, unsigned num ) { return sig_take(sig, num); }
  *
  * Name              : sig_waitFor
  *
- * Description       : wait for release the signal object for given duration of time
+ * Description       : wait for the given signal number for given duration of time
  *
  * Parameters
  *   sig             : pointer to signal object
@@ -278,9 +278,9 @@ unsigned sig_takeISR( sig_t *sig, unsigned num ) { return sig_take(sig, num); }
  *                     INFINITE:  wait indefinitely until the signal object has been released
  *
  * Return
- *   E_SUCCESS       : signal object was successfully released
+ *   E_SUCCESS       : required signal number has been set
  *   E_STOPPED       : signal object was killed before the specified timeout expired
- *   E_TIMEOUT       : signal object was not released before the specified timeout expired
+ *   E_TIMEOUT       : required signal number has not been set before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -292,7 +292,7 @@ unsigned sig_waitFor( sig_t *sig, unsigned num, cnt_t delay );
  *
  * Name              : sig_waitUntil
  *
- * Description       : wait for release the signal object until given timepoint
+ * Description       : wait for the given signal number until given timepoint
  *
  * Parameters
  *   sig             : pointer to signal object
@@ -300,9 +300,9 @@ unsigned sig_waitFor( sig_t *sig, unsigned num, cnt_t delay );
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : signal object was successfully released
+ *   E_SUCCESS       : required signal number has been set
  *   E_STOPPED       : signal object was killed before the specified timeout expired
- *   E_TIMEOUT       : signal object was not released before the specified timeout expired
+ *   E_TIMEOUT       : required signal number has not been set before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -314,14 +314,14 @@ unsigned sig_waitUntil( sig_t *sig, unsigned num, cnt_t time );
  *
  * Name              : sig_wait
  *
- * Description       : wait indefinitely until the signal object has been released
+ * Description       : wait indefinitely until the given signal number has been set
  *
  * Parameters
  *   sig             : pointer to signal object
  *   num             : signal number
  *
  * Return
- *   E_SUCCESS       : signal object was successfully released
+ *   E_SUCCESS       : required signal number has been set
  *   E_STOPPED       : signal object was killed
  *
  * Note              : use only in thread mode
@@ -337,8 +337,7 @@ unsigned sig_wait( sig_t *sig, unsigned num ) { return sig_waitFor(sig, num, INF
  * Alias             : sig_set
  * ISR alias         : sig_giveISR
  *
- * Description       : release the signal object
- *                     resume one (sigClear) or all (sigProtect) tasks that are waiting on the signal object
+ * Description       : set given signal number in the signal object
  *
  * Parameters
  *   sig             : pointer to signal object
@@ -363,7 +362,7 @@ void sig_giveISR( sig_t *sig, unsigned num ) { sig_give(sig, num); }
  * Name              : sig_clear
  * ISR alias         : sig_clearISR
  *
- * Description       : reset the signal object
+ * Description       : reset given signal number in the signal object
  *
  * Parameters
  *   sig             : pointer to signal object

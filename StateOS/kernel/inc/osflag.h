@@ -254,7 +254,7 @@ void flg_delete( flg_t *flg );
  * Alias             : flg_tryWait
  * ISR alias         : flg_takeISR
  *
- * Description       : don't wait on flag object until requested flags have been set
+ * Description       : check if required flags have been set in the flag object
  *
  * Parameters
  *   flg             : pointer to flag object
@@ -267,7 +267,7 @@ void flg_delete( flg_t *flg );
  *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
  *
  * Return            : flags that remain to be set or
- *   0               : requested flags have been set
+ *   0               : required flags have been set
  *
  * Note              : may be used both in thread and handler mode
  *
@@ -297,13 +297,13 @@ unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(
  *                     flgIgnore:  ignore flags in flag object that have been set and not accepted before
  *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
  *   delay           : duration of time (maximum number of ticks to wait on flag object for given flags)
- *                     IMMEDIATE: don't wait until requested flags have been set
- *                     INFINITE:  wait indefinitely until requested flags have been set
+ *                     IMMEDIATE: don't wait until required flags have been set
+ *                     INFINITE:  wait indefinitely until required flags have been set
  *
  * Return
- *   E_SUCCESS       : requested flags have been set before the specified timeout expired
+ *   E_SUCCESS       : required flags have been set
  *   E_STOPPED       : flag object was killed before the specified timeout expired
- *   E_TIMEOUT       : requested flags have not been set before the specified timeout expired
+ *   E_TIMEOUT       : required flags have not been set before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -329,9 +329,9 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay );
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : requested flags have been set before the specified timeout expired
+ *   E_SUCCESS       : required flags have been set
  *   E_STOPPED       : flag object was killed before the specified timeout expired
- *   E_TIMEOUT       : requested flags have not been set before the specified timeout expired
+ *   E_TIMEOUT       : required flags have not been set before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
@@ -343,7 +343,7 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
  *
  * Name              : flg_wait
  *
- * Description       : wait indefinitely on flag object until requested flags have been set
+ * Description       : wait indefinitely on flag object until required flags have been set
  *
  * Parameters
  *   flg             : pointer to flag object
@@ -356,7 +356,7 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
  *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
  *
  * Return
- *   E_SUCCESS       : requested flags have been set
+ *   E_SUCCESS       : required flags have been set
  *   E_STOPPED       : flag object was killed
  *
  * Note              : use only in thread mode
