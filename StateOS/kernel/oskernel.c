@@ -345,9 +345,9 @@ unsigned priv_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield )
 {
 	assert_tsk_context();
 
-	priv_tsk_remove((tsk_t *)tsk);
+	priv_tsk_remove(tsk);
 	core_tmr_insert((tmr_t *)tsk);
-	core_tsk_append((tsk_t *)tsk, que); // must be last; sets ID_BLOCKED
+	core_tsk_append(tsk, que); // must be last; sets ID_BLOCKED
 
 	if (yield)
 		priv_ctx_switchNow();
@@ -414,9 +414,9 @@ tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event )
 {
 	if (tsk)
 	{
-		core_tsk_unlink((tsk_t *)tsk, event);
+		core_tsk_unlink(tsk, event);
 		priv_tmr_remove((tmr_t *)tsk);
-		core_tsk_insert((tsk_t *)tsk);
+		core_tsk_insert(tsk);
 	}
 
 	return tsk;
