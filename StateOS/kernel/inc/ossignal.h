@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    28.09.2018
+    @date    10.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -50,7 +50,7 @@ struct __sig
 {
 	obj_t    obj;   // object header
 
-	unsigned flags; // signal's current value
+	unsigned flags; // pending signals
 	unsigned mask;  // protection mask
 };
 

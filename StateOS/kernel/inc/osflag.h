@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    10.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -63,7 +63,7 @@ struct __flg
 {
 	obj_t    obj;   // object header
 
-	unsigned flags; // flag's current value
+	unsigned flags; // pending flags
 };
 
 /******************************************************************************
