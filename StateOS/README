@@ -62,6 +62,7 @@ Features:
 - added resource assertions
 - current task is destroyed asynchronously by the destructor
 - renamed idle procedures
+- changed usage of signals sent directly to the task
 ---------
 6.2
 - updated kernel

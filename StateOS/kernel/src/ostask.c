@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    10.10.2018
+    @date    11.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -437,7 +437,41 @@ unsigned tsk_getPrio( void )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitFor( unsigned flags, cnt_t delay )
+static
+unsigned priv_tsk_take( unsigned sig )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned flag = 1U << sig;
+
+	flag &= System.cur->flags;
+
+	if (flag != 0)
+	{
+		System.cur->flags &= ~flag;
+
+		return E_SUCCESS;
+	}
+		
+	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_take( unsigned sig )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	sys_lock();
+	{
+		event = priv_tsk_take(sig);
+	}
+	sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_waitFor( unsigned sig, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -446,8 +480,13 @@ unsigned tsk_waitFor( unsigned flags, cnt_t delay )
 
 	sys_lock();
 	{
-		System.cur->tmp.flg.flags = flags;
-		event = core_tsk_waitFor(&System.wai, delay);
+		event = priv_tsk_take(sig);
+
+		if (event == E_TIMEOUT)
+		{
+			System.cur->tmp.sig.num = sig;
+			event = core_tsk_waitFor(&System.wai, delay);
+		}
 	}
 	sys_unlock();
 
@@ -455,7 +494,7 @@ unsigned tsk_waitFor( unsigned flags, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitUntil( unsigned flags, cnt_t time )
+unsigned tsk_waitUntil( unsigned sig, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -464,8 +503,13 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time )
 
 	sys_lock();
 	{
-		System.cur->tmp.flg.flags = flags;
-		event = core_tsk_waitUntil(&System.wai, time);
+		event = priv_tsk_take(sig);
+
+		if (event == E_TIMEOUT)
+		{
+			System.cur->tmp.sig.num = sig;
+			event = core_tsk_waitUntil(&System.wai, time);
+		}
 	}
 	sys_unlock();
 
@@ -473,32 +517,28 @@ unsigned tsk_waitUntil( unsigned flags, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_give( tsk_t *tsk, unsigned flags )
+void tsk_give( tsk_t *tsk, unsigned sig )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned flag = 1U << sig;
 
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
+		tsk->flags |= flag;
+
 		if (tsk->guard == &System.wai)
 		{
-			if (tsk->tmp.flg.flags & flags)
-				flags = tsk->tmp.flg.flags &= ~flags;
-
-			if (tsk->tmp.flg.flags == 0)
-				core_tsk_wakeup(tsk, flags);
-
-			event = E_SUCCESS;
+			if (tsk->tmp.sig.num == sig)
+			{
+				tsk->flags &= ~flag;
+				core_tsk_wakeup(tsk, E_SUCCESS);
+			}
 		}
-		else
-			event = E_FAILURE;
 	}
 	sys_unlock();
-
-	return event;
 }
 
 /* -------------------------------------------------------------------------- */
