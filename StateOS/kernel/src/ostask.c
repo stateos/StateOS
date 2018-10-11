@@ -117,6 +117,8 @@ void tsk_start( tsk_t *tsk )
 	{
 		if (tsk->hdr.id == ID_STOPPED)  // active tasks cannot be started
 		{
+			tsk->flags = 0;
+
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
 		}
@@ -138,6 +140,7 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 		if (tsk->hdr.id == ID_STOPPED)  // active tasks cannot be started
 		{
 			tsk->state = state;
+			tsk->flags = 0;
 
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
