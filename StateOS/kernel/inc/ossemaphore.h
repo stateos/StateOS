@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    04.10.2018
+    @date    12.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,9 +40,9 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#define semDirect    (  0U ) // direct semaphore
-#define semBinary    (  1U ) // binary semaphore
-#define semCounting  ( ~0U ) // counting semaphore
+#define semDirect    ( 0U )     // direct semaphore
+#define semBinary    ( 1U )     // binary semaphore
+#define semCounting  ( 0U-1 )   // counting semaphore
 #define semDefault     semCounting
 
 /******************************************************************************

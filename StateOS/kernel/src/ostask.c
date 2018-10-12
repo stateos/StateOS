@@ -446,7 +446,7 @@ unsigned priv_tsk_take( unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned flags = sigset & System.cur->flags;
-	unsigned signo = sizeof(unsigned) * 8;
+	unsigned signo = sizeof(unsigned) * CHAR_BIT;
 
 	if (flags)
 	{

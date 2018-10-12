@@ -41,7 +41,7 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 #define SIGSET(signo) (1U << (signo))   // signal mask from the signal number
-#define SIGALL        (~0U)             // signal mask for all signals
+#define SIGALL        (0U-1)            // signal mask for all signals
 
 /******************************************************************************
  *

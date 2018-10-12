@@ -110,7 +110,7 @@ unsigned priv_sig_take( sig_t *sig, unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned flags = sigset & sig->flags;
-	unsigned signo = sizeof(unsigned) * 8;
+	unsigned signo = sizeof(unsigned) * CHAR_BIT;
 	
 	if (flags)
 	{

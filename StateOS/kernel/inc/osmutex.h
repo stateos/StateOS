@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    12.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,30 +41,30 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 /////// mutex type
-#define mtxNormal        0 // normal mutex
-#define mtxErrorCheck    1 // error checking mutex
-#define mtxRecursive     2 // recursive mutex
+#define mtxNormal        0U // normal mutex
+#define mtxErrorCheck    1U // error checking mutex
+#define mtxRecursive     2U // recursive mutex
 #define mtxDefault      mtxNormal
 #define mtxTypeMASK   ( mtxNormal | mtxErrorCheck | mtxRecursive )
 
 /////// mutex protocol
-#define mtxPrioNone      0 // none
-#define mtxPrioInherit   4 // priority inheritance mutex
-#define mtxPrioProtect   8 // priority protected mutex (OCPP)
+#define mtxPrioNone      0U // none
+#define mtxPrioInherit   4U // priority inheritance mutex
+#define mtxPrioProtect   8U // priority protected mutex (OCPP)
 #define mtxPrioMASK   ( mtxPrioNone | mtxPrioInherit | mtxPrioProtect )
 
 /////// mutex robustness
-#define mtxStalled       0 // stalled mutex
-#define mtxRobust       16 // robust mutex
+#define mtxStalled       0U // stalled mutex
+#define mtxRobust       16U // robust mutex
 
 /////// inconsistency of robust mutex
-#define mtxInconsistent 32 // inconsistent mutex
+#define mtxInconsistent 32U // inconsistent mutex
 
 #define mtxMASK       ( mtxTypeMASK + mtxPrioMASK + mtxRobust + mtxInconsistent )
 
 /* -------------------------------------------------------------------------- */
 
-#define MTX_LIMIT     ( ~0U )
+#define MTX_LIMIT    ( 0U-1 )
 
 /******************************************************************************
  *
