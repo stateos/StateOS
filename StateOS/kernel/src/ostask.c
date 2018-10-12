@@ -492,7 +492,7 @@ unsigned tsk_waitFor( unsigned sigset, cnt_t delay )
 		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
-			event = core_tsk_waitFor(&System.wai, delay);
+			event = core_tsk_waitFor(&System.sig, delay);
 		}
 	}
 	sys_unlock();
@@ -516,7 +516,7 @@ unsigned tsk_waitUntil( unsigned sigset, cnt_t time )
 		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
-			event = core_tsk_waitUntil(&System.wai, time);
+			event = core_tsk_waitUntil(&System.sig, time);
 		}
 	}
 	sys_unlock();
@@ -538,7 +538,7 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 	{
 		tsk->flags |= flag;
 
-		if (tsk->guard == &System.wai)
+		if (tsk->guard == &System.sig)
 		{
 			if (tsk->tmp.sig.sigset & flag)
 			{
