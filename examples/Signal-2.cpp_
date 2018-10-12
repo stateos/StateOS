@@ -11,7 +11,7 @@ void slave()
 	for (;;)
 	{
 		x = sig.wait(SIGALL);
-		led = 1U << x;
+		led = SIGSET(x);
 	}
 }
 

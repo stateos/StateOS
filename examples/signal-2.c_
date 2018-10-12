@@ -1,14 +1,14 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-sig_t sig = SIG_INIT();
+sig_id sig = SIG_CREATE(0);
 
 void slave()
 {
 	unsigned x;
 
-	x = sig_wait(&sig, SIGALL);
-	LEDs = 1U << x;
+	x = sig_wait(sig, SIGALL);
+	LEDs = SIGSET(x);
 }
 
 void master()
@@ -18,18 +18,15 @@ void master()
 	for (;;)
 	{
 		tsk_delay(SEC);
-		sig_give(&sig, x++ % 4);
+		sig_give(sig, x++ % 4);
 	}
 }
-
-tsk_t sla = TSK_INIT(0, slave);
-tsk_t mas = TSK_INIT(0, master);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(&sla);
-	tsk_start(&mas);
-	tsk_stop();
+	tsk_start(TSK_CREATE(0, slave));
+	tsk_start(TSK_CREATE(0, master));
+	tsk_sleep();
 }
