@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    11.10.2018
+    @date    12.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -30,6 +30,7 @@
  ******************************************************************************/
 
 #include "inc/ostask.h"
+#include "inc/ossignal.h"
 #include "inc/oscriticalsection.h"
 #include "osalloc.h"
 
@@ -441,32 +442,34 @@ unsigned tsk_getPrio( void )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_tsk_take( unsigned sig )
+unsigned priv_tsk_take( unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flag = 1U << sig;
+	unsigned flags = sigset & System.cur->flags;
+	unsigned signo = sizeof(unsigned) * 8;
 
-	flag &= System.cur->flags;
-
-	if (flag != 0)
+	if (flags)
 	{
-		System.cur->flags &= ~flag;
+		do signo--; while ((flags <<= 1) != 0);
+		System.cur->flags &= ~SIGSET(signo);
 
-		return E_SUCCESS;
+		return signo;
 	}
-		
+
 	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_take( unsigned sig )
+unsigned tsk_take( unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
+	assert(sigset);
+
 	sys_lock();
 	{
-		event = priv_tsk_take(sig);
+		event = priv_tsk_take(sigset);
 	}
 	sys_unlock();
 
@@ -474,20 +477,21 @@ unsigned tsk_take( unsigned sig )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitFor( unsigned sig, cnt_t delay )
+unsigned tsk_waitFor( unsigned sigset, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	assert_tsk_context();
+	assert(sigset);
 
 	sys_lock();
 	{
-		event = priv_tsk_take(sig);
+		event = priv_tsk_take(sigset);
 
 		if (event == E_TIMEOUT)
 		{
-			System.cur->tmp.sig.num = sig;
+			System.cur->tmp.sig.sigset = sigset;
 			event = core_tsk_waitFor(&System.wai, delay);
 		}
 	}
@@ -497,20 +501,21 @@ unsigned tsk_waitFor( unsigned sig, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitUntil( unsigned sig, cnt_t time )
+unsigned tsk_waitUntil( unsigned sigset, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	assert_tsk_context();
+	assert(sigset);
 
 	sys_lock();
 	{
-		event = priv_tsk_take(sig);
+		event = priv_tsk_take(sigset);
 
 		if (event == E_TIMEOUT)
 		{
-			System.cur->tmp.sig.num = sig;
+			System.cur->tmp.sig.sigset = sigset;
 			event = core_tsk_waitUntil(&System.wai, time);
 		}
 	}
@@ -520,13 +525,14 @@ unsigned tsk_waitUntil( unsigned sig, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_give( tsk_t *tsk, unsigned sig )
+void tsk_give( tsk_t *tsk, unsigned signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flag = 1U << sig;
+	unsigned flag = SIGSET(signo);
 
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
+	assert(flag);
 
 	sys_lock();
 	{
@@ -534,10 +540,10 @@ void tsk_give( tsk_t *tsk, unsigned sig )
 
 		if (tsk->guard == &System.wai)
 		{
-			if (tsk->tmp.sig.num == sig)
+			if (tsk->tmp.sig.sigset & flag)
 			{
 				tsk->flags &= ~flag;
-				core_tsk_wakeup(tsk, E_SUCCESS);
+				core_tsk_wakeup(tsk, signo);
 			}
 		}
 	}

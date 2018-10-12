@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    12.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -106,35 +106,36 @@ void sig_delete( sig_t *sig )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sig_take( sig_t *sig, unsigned num )
+unsigned priv_sig_take( sig_t *sig, unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flag = 1U << num;
-
-	flag &= sig->flags;
-
-	if (flag != 0)
+	unsigned flags = sigset & sig->flags;
+	unsigned signo = sizeof(unsigned) * 8;
+	
+	if (flags)
 	{
-		sig->flags &= ~flag | sig->mask;
+		do signo--; while ((flags <<= 1) != 0);
+		sig->flags &= ~SIGSET(signo) | sig->mask;
 
-		return E_SUCCESS;
+		return signo;
 	}
 		
 	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_take( sig_t *sig, unsigned num )
+unsigned sig_take( sig_t *sig, unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
+	assert(sigset);
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, num);
+		event = priv_sig_take(sig, sigset);
 	}
 	sys_unlock();
 
@@ -142,7 +143,7 @@ unsigned sig_take( sig_t *sig, unsigned num )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitFor( sig_t *sig, unsigned num, cnt_t delay )
+unsigned sig_waitFor( sig_t *sig, unsigned sigset, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -150,14 +151,15 @@ unsigned sig_waitFor( sig_t *sig, unsigned num, cnt_t delay )
 	assert_tsk_context();
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
+	assert(sigset);
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, num);
+		event = priv_sig_take(sig, sigset);
 
 		if (event == E_TIMEOUT)
 		{
-			System.cur->tmp.sig.num = num;
+			System.cur->tmp.sig.sigset = sigset;
 			event = core_tsk_waitFor(&sig->obj.queue, delay);
 		}
 	}
@@ -167,7 +169,7 @@ unsigned sig_waitFor( sig_t *sig, unsigned num, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitUntil( sig_t *sig, unsigned num, cnt_t time )
+unsigned sig_waitUntil( sig_t *sig, unsigned sigset, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -175,14 +177,15 @@ unsigned sig_waitUntil( sig_t *sig, unsigned num, cnt_t time )
 	assert_tsk_context();
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
+	assert(sigset);
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, num);
+		event = priv_sig_take(sig, sigset);
 
 		if (event == E_TIMEOUT)
 		{
-			System.cur->tmp.sig.num = num;
+			System.cur->tmp.sig.sigset = sigset;
 			event = core_tsk_waitUntil(&sig->obj.queue, time);
 		}
 	}
@@ -192,15 +195,16 @@ unsigned sig_waitUntil( sig_t *sig, unsigned num, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-void sig_give( sig_t *sig, unsigned num )
+void sig_give( sig_t *sig, unsigned signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flag = 1U << num;
+	unsigned flag = SIGSET(signo);
 	obj_t  * obj;
 	tsk_t  * tsk;
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
+	assert(flag);
 
 	sys_lock();
 	{
@@ -210,10 +214,10 @@ void sig_give( sig_t *sig, unsigned num )
 		while (obj->queue)
 		{
 			tsk = obj->queue;
-			if (tsk->tmp.sig.num == num)
+			if (tsk->tmp.sig.sigset & flag)
 			{
 				sig->flags &= ~flag | sig->mask;
-				core_tsk_wakeup(tsk, E_SUCCESS);
+				core_tsk_wakeup(tsk, signo);
 				continue;
 			}
 			obj = &tsk->hdr.obj;
@@ -223,10 +227,10 @@ void sig_give( sig_t *sig, unsigned num )
 }
 
 /* -------------------------------------------------------------------------- */
-void sig_clear( sig_t *sig, unsigned num )
+void sig_clear( sig_t *sig, unsigned signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flag = 1U << num;
+	unsigned flag = SIGSET(signo);
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
@@ -240,10 +244,10 @@ void sig_clear( sig_t *sig, unsigned num )
 }
 
 /* -------------------------------------------------------------------------- */
-bool sig_get( sig_t *sig, unsigned num )
+bool sig_get( sig_t *sig, unsigned signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flag = 1U << num;
+	unsigned flag = SIGSET(signo);
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);

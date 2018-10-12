@@ -1,25 +1,35 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-sig_id sig = SIG_CREATE(0);
+sig_t sig = SIG_INIT();
 
 void slave()
 {
-	sig_wait(sig, 100);
-	LED_Tick();
+	unsigned x;
+
+	x = sig_wait(&sig, SIGALL);
+	LEDs = 1U << x;
 }
 
 void master()
 {
-	tsk_delay(SEC);
-	sig_give(sig, 100);
+	unsigned x = 0;
+
+	for (;;)
+	{
+		tsk_delay(SEC);
+		sig_give(&sig, x++ % 4);
+	}
 }
+
+tsk_t sla = TSK_INIT(0, slave);
+tsk_t mas = TSK_INIT(0, master);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(TSK_CREATE(0, slave));
-	tsk_start(TSK_CREATE(0, master));
-	tsk_sleep();
+	tsk_start(&sla);
+	tsk_start(&mas);
+	tsk_stop();
 }

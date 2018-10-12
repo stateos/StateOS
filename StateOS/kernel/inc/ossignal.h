@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    10.10.2018
+    @date    12.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -37,6 +37,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* -------------------------------------------------------------------------- */
+
+#define SIGSET(signo) (1U << (signo))   // signal mask from the signal number
+#define SIGALL        (~0U)             // signal mask for all signals
 
 /******************************************************************************
  *
@@ -242,86 +247,82 @@ void sig_delete( sig_t *sig );
  * Alias             : sig_tryWait
  * ISR alias         : sig_takeISR
  *
- * Description       : check signal object for the given signal number
+ * Description       : check signal object for a given set of signals
  *
  * Parameters
  *   sig             : pointer to signal object
- *   num             : signal number
+ *   sigset          : set of expected signals
  *
- * Return
- *   E_SUCCESS       : required signal number has been set
- *   E_TIMEOUT       : required signal number has not been set, try again
+ * Return            : the lowest number of expected signal from the set of all pending signals or
+ *   E_TIMEOUT       : no expected signal has been set, try again
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned sig_take( sig_t *sig, unsigned num );
+unsigned sig_take( sig_t *sig, unsigned sigset );
 
 __STATIC_INLINE
-unsigned sig_tryWait( sig_t *sig, unsigned num ) { return sig_take(sig, num); }
+unsigned sig_tryWait( sig_t *sig, unsigned sigset ) { return sig_take(sig, sigset); }
 
 __STATIC_INLINE
-unsigned sig_takeISR( sig_t *sig, unsigned num ) { return sig_take(sig, num); }
+unsigned sig_takeISR( sig_t *sig, unsigned sigset ) { return sig_take(sig, sigset); }
 
 /******************************************************************************
  *
  * Name              : sig_waitFor
  *
- * Description       : wait for the given signal number for given duration of time
+ * Description       : wait for a signal from the given set of signals for given duration of time
  *
  * Parameters
  *   sig             : pointer to signal object
- *   num             : signal number
+ *   sigset          : set of expected signals
  *   delay           : duration of time (maximum number of ticks to wait for release the signal object)
  *                     IMMEDIATE: don't wait until the signal object has been released
  *                     INFINITE:  wait indefinitely until the signal object has been released
  *
- * Return
- *   E_SUCCESS       : required signal number has been set
+ * Return            : the lowest number of expected signal from the set of all pending signals or
  *   E_STOPPED       : signal object was killed before the specified timeout expired
- *   E_TIMEOUT       : required signal number has not been set before the specified timeout expired
+ *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned sig_waitFor( sig_t *sig, unsigned num, cnt_t delay );
+unsigned sig_waitFor( sig_t *sig, unsigned sigset, cnt_t delay );
 
 /******************************************************************************
  *
  * Name              : sig_waitUntil
  *
- * Description       : wait for the given signal number until given timepoint
+ * Description       : wait for a signal from the given set of signals until given timepoint
  *
  * Parameters
  *   sig             : pointer to signal object
- *   num             : signal number
+ *   sigset          : set of expected signals
  *   time            : timepoint value
  *
- * Return
- *   E_SUCCESS       : required signal number has been set
+ * Return            : the lowest number of expected signal from the set of all pending signals or
  *   E_STOPPED       : signal object was killed before the specified timeout expired
- *   E_TIMEOUT       : required signal number has not been set before the specified timeout expired
+ *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned sig_waitUntil( sig_t *sig, unsigned num, cnt_t time );
+unsigned sig_waitUntil( sig_t *sig, unsigned sigset, cnt_t time );
 
 /******************************************************************************
  *
  * Name              : sig_wait
  *
- * Description       : wait indefinitely until the given signal number has been set
+ * Description       : wait indefinitely for a signal from the given set of signals
  *
  * Parameters
  *   sig             : pointer to signal object
- *   num             : signal number
+ *   sigset          : set of expected signals
  *
- * Return
- *   E_SUCCESS       : required signal number has been set
+ * Return            : the lowest number of expected signal from the set of all pending signals or
  *   E_STOPPED       : signal object was killed
  *
  * Note              : use only in thread mode
@@ -329,7 +330,7 @@ unsigned sig_waitUntil( sig_t *sig, unsigned num, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned sig_wait( sig_t *sig, unsigned num ) { return sig_waitFor(sig, num, INFINITE); }
+unsigned sig_wait( sig_t *sig, unsigned sigset ) { return sig_waitFor(sig, sigset, INFINITE); }
 
 /******************************************************************************
  *
@@ -337,11 +338,11 @@ unsigned sig_wait( sig_t *sig, unsigned num ) { return sig_waitFor(sig, num, INF
  * Alias             : sig_set
  * ISR alias         : sig_giveISR
  *
- * Description       : set given signal number in the signal object
+ * Description       : set given signal in the signal object
  *
  * Parameters
  *   sig             : pointer to signal object
- *   num             : signal number
+ *   signo           : signal number
  *
  * Return            : none
  *
@@ -349,24 +350,24 @@ unsigned sig_wait( sig_t *sig, unsigned num ) { return sig_waitFor(sig, num, INF
  *
  ******************************************************************************/
 
-void sig_give( sig_t *sig, unsigned num );
+void sig_give( sig_t *sig, unsigned signo );
 
 __STATIC_INLINE
-void sig_set( sig_t *sig, unsigned num ) { sig_give(sig, num); }
+void sig_set( sig_t *sig, unsigned signo ) { sig_give(sig, signo); }
 
 __STATIC_INLINE
-void sig_giveISR( sig_t *sig, unsigned num ) { sig_give(sig, num); }
+void sig_giveISR( sig_t *sig, unsigned signo ) { sig_give(sig, signo); }
 
 /******************************************************************************
  *
  * Name              : sig_clear
  * ISR alias         : sig_clearISR
  *
- * Description       : reset given signal number in the signal object
+ * Description       : reset given signal in the signal object
  *
  * Parameters
  *   sig             : pointer to signal object
- *   num             : signal number
+ *   signo           : signal number
  *
  * Return            : none
  *
@@ -374,20 +375,21 @@ void sig_giveISR( sig_t *sig, unsigned num ) { sig_give(sig, num); }
  *
  ******************************************************************************/
 
-void sig_clear( sig_t *sig, unsigned num );
+void sig_clear( sig_t *sig, unsigned signo );
 
 __STATIC_INLINE
-void sig_clearISR( sig_t *sig, unsigned num ) { sig_clear(sig, num); }
+void sig_clearISR( sig_t *sig, unsigned signo ) { sig_clear(sig, signo); }
 
 /******************************************************************************
  *
  * Name              : sig_get
  * ISR alias         : sig_getISR
  *
- * Description       : get given signal state from signal object
+ * Description       : get state of the given signal in the signal object
  *
  * Parameters
  *   sig             : pointer to signal object
+ *   signo           : signal number
  *
  * Return            : signal state in signal object
  *
@@ -395,10 +397,10 @@ void sig_clearISR( sig_t *sig, unsigned num ) { sig_clear(sig, num); }
  *
  ******************************************************************************/
 
-bool sig_get( sig_t *sig, unsigned num );
+bool sig_get( sig_t *sig, unsigned signo );
 
 __STATIC_INLINE
-bool sig_getISR( sig_t *sig, unsigned num ) { return sig_get(sig, num); }
+bool sig_getISR( sig_t *sig, unsigned signo ) { return sig_get(sig, signo); }
 
 #ifdef __cplusplus
 }
@@ -424,21 +426,21 @@ struct Signal : public __sig
 	 Signal( const unsigned _mask = 0 ): __sig _SIG_INIT(_mask) {}
 	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
-	void     kill     ( void )                       {        sig_kill     (this);              }
-	void     reset    ( void )                       {        sig_reset    (this);              }
-	unsigned take     ( unsigned num )               { return sig_take     (this, num);         }
-	unsigned tryWait  ( unsigned num )               { return sig_tryWait  (this, num);         }
-	unsigned takeISR  ( unsigned num )               { return sig_takeISR  (this, num);         }
-	unsigned waitFor  ( unsigned num, cnt_t _delay ) { return sig_waitFor  (this, num, _delay); }
-	unsigned waitUntil( unsigned num, cnt_t _time )  { return sig_waitUntil(this, num, _time);  }
-	unsigned wait     ( unsigned num )               { return sig_wait     (this, num);         }
-	void     give     ( unsigned num )               {        sig_give     (this, num);         }
-	void     set      ( unsigned num )               {        sig_set      (this, num);         }
-	void     giveISR  ( unsigned num )               {        sig_giveISR  (this, num);         }
-	void     clear    ( unsigned num )               {        sig_clear    (this, num);         }
-	void     clearISR ( unsigned num )               {        sig_clearISR (this, num);         }
-	bool     get      ( unsigned num )               { return sig_get      (this, num);         }
-	bool     getISR   ( unsigned num )               { return sig_getISR   (this, num);         }
+	void     kill     ( void )                           {        sig_kill     (this);                  }
+	void     reset    ( void )                           {        sig_reset    (this);                  }
+	unsigned take     ( unsigned _sigset )               { return sig_take     (this, _sigset);         }
+	unsigned tryWait  ( unsigned _sigset )               { return sig_tryWait  (this, _sigset);         }
+	unsigned takeISR  ( unsigned _sigset )               { return sig_takeISR  (this, _sigset);         }
+	unsigned waitFor  ( unsigned _sigset, cnt_t _delay ) { return sig_waitFor  (this, _sigset, _delay); }
+	unsigned waitUntil( unsigned _sigset, cnt_t _time )  { return sig_waitUntil(this, _sigset, _time);  }
+	unsigned wait     ( unsigned _sigset )               { return sig_wait     (this, _sigset);         }
+	void     give     ( unsigned _signo )                {        sig_give     (this, _signo);          }
+	void     set      ( unsigned _signo )                {        sig_set      (this, _signo);          }
+	void     giveISR  ( unsigned _signo )                {        sig_giveISR  (this, _signo);          }
+	void     clear    ( unsigned _signo )                {        sig_clear    (this, _signo);          }
+	void     clearISR ( unsigned _signo )                {        sig_clearISR (this, _signo);          }
+	bool     get      ( unsigned _signo )                { return sig_get      (this, _signo);          }
+	bool     getISR   ( unsigned _signo )                { return sig_getISR   (this, _signo);          }
 };
 
 #endif//__cplusplus

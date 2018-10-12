@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    11.10.2018
+    @date    12.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -93,7 +93,7 @@ struct __tsk
 	union  {
 
 	struct {
-	unsigned num;
+	unsigned sigset;
 	}        sig;   // temporary data used by signal object
 
 	struct {
@@ -974,80 +974,77 @@ unsigned tsk_getPrio( void );
  *
  * Name              : tsk_take
  *
- * Description       : check pending signals of the current task for the given signal
+ * Description       : check pending signals of the current task for the given set of signals
  *
  * Parameters
- *   sig             : signal number
+ *   sigset          : set of expected signals
  *
- * Return
- *   E_SUCCESS       : required signal has been set
- *   E_TIMEOUT       : required signal has not been set, try again
+ * Return            : the lowest number of expected signal from the set of all pending signals or
+ *   E_TIMEOUT       : no expected signal has been set, try again
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned tsk_take( unsigned sig );
+unsigned tsk_take( unsigned sigset );
 
 /******************************************************************************
  *
  * Name              : tsk_waitFor
  *
- * Description       : wait for the given signal for given duration of time
+ * Description       : wait for a signal from the given set of signals for given duration of time
  *
  * Parameters
- *   sig             : signal number
+ *   sigset          : set of expected signals
  *   delay           : duration of time (maximum number of ticks to delay execution of current task)
  *                     IMMEDIATE: don't delay execution of current task
  *                     INFINITE:  delay indefinitely execution of current task
  *
- * Return
- *   E_SUCCESS       : required signal has been set
- *   E_TIMEOUT       : required signal has not been set before the specified timeout expired
+ * Return            : the lowest number of expected signal from the set of all pending signals or
+ *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned tsk_waitFor( unsigned sig, cnt_t delay );
+unsigned tsk_waitFor( unsigned sigset, cnt_t delay );
 
 /******************************************************************************
  *
  * Name              : tsk_waitUntil
  *
- * Description       : wait for the given signal until given timepoint
+ * Description       : wait for a signal from the given set of signals until given timepoint
  *
  * Parameters
- *   sig             : signal number
+ *   sigset          : set of expected signals
  *   time            : timepoint value
  *
- * Return
- *   E_SUCCESS       : required signal has been set
- *   E_TIMEOUT       : required signal has not been set before the specified timeout expired
+ * Return            : the lowest number of expected signal from the set of all pending signals or
+ *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-unsigned tsk_waitUntil( unsigned sig, cnt_t time );
+unsigned tsk_waitUntil( unsigned sigset, cnt_t time );
 
 /******************************************************************************
  *
  * Name              : tsk_wait
  *
- * Description       : wait indefinitely until the given signal has been set
+ * Description       : wait indefinitely for a signal from the given set of signals
  *
  * Parameters
- *   sig             : signal number
+ *   sigset          : set of expected signals
  *
- * Return            : none
+ * Return            : the lowest number of expected signal from the set of all pending signals
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-void tsk_wait( unsigned sig ) { tsk_waitFor(sig, INFINITE); }
+unsigned tsk_wait( unsigned sigset ) { return tsk_waitFor(sigset, INFINITE); }
 
 /******************************************************************************
  *
@@ -1058,7 +1055,7 @@ void tsk_wait( unsigned sig ) { tsk_waitFor(sig, INFINITE); }
  *
  * Parameters
  *   tsk             : pointer to the task object
- *   sig             : signal number
+ *   signo           : signal number
  *
  * Return            : none
  *
@@ -1066,10 +1063,10 @@ void tsk_wait( unsigned sig ) { tsk_waitFor(sig, INFINITE); }
  *
  ******************************************************************************/
 
-void tsk_give( tsk_t *tsk, unsigned sig );
+void tsk_give( tsk_t *tsk, unsigned signo );
 
 __STATIC_INLINE
-void tsk_giveISR( tsk_t *tsk, unsigned sig ) { tsk_give(tsk, sig); }
+void tsk_giveISR( tsk_t *tsk, unsigned signo ) { tsk_give(tsk, signo); }
 
 /******************************************************************************
  *
@@ -1247,8 +1244,8 @@ struct staticTaskT : public __tsk
 	void     reset    ( void )            {        tsk_reset     (this);         }
 	unsigned prio     ( void )            { return __tsk::basic;                 }
 	unsigned getPrio  ( void )            { return __tsk::basic;                 }
-	void     give     ( unsigned _sig )   {        tsk_give      (this, _sig);   }
-	void     giveISR  ( unsigned _sig )   {        tsk_giveISR   (this, _sig);   }
+	void     give     ( unsigned _signo ) {        tsk_give      (this, _signo); }
+	void     giveISR  ( unsigned _signo ) {        tsk_giveISR   (this, _signo); }
 	unsigned suspend  ( void )            { return tsk_suspend   (this);         }
 	unsigned resume   ( void )            { return tsk_resume    (this);         }
 	unsigned resumeISR( void )            { return tsk_resumeISR (this);         }
@@ -1330,32 +1327,32 @@ typedef startTaskT<OS_STACK_SIZE> startTask;
 
 namespace ThisTask
 {
-	static inline unsigned detach    ( void )                        { return cur_detach    ();                    }
-	static inline void     stop      ( void )                        {        tsk_stop      ();                    }
-	static inline void     kill      ( void )                        {        cur_kill      ();                    }
-	static inline void     reset     ( void )                        {        cur_reset     ();                    }
-	static inline void     yield     ( void )                        {        tsk_yield     ();                    }
-	static inline void     pass      ( void )                        {        tsk_pass      ();                    }
+	static inline unsigned detach    ( void )                           { return cur_detach    ();                    }
+	static inline void     stop      ( void )                           {        tsk_stop      ();                    }
+	static inline void     kill      ( void )                           {        cur_kill      ();                    }
+	static inline void     reset     ( void )                           {        cur_reset     ();                    }
+	static inline void     yield     ( void )                           {        tsk_yield     ();                    }
+	static inline void     pass      ( void )                           {        tsk_pass      ();                    }
 #if OS_FUNCTIONAL
-	static inline void     flip      ( FUN_t    _state )             {      ((TaskT<>*)System.cur)->fun_ = _state;
-	                                                                          tsk_flip      (TaskT<>::run_);       }
+	static inline void     flip      ( FUN_t    _state )                {      ((TaskT<>*)System.cur)->fun_ = _state;
+	                                                                             tsk_flip      (TaskT<>::run_);       }
 #else
-	static inline void     flip      ( FUN_t    _state )             {        tsk_flip      (_state);              }
+	static inline void     flip      ( FUN_t    _state )                {        tsk_flip      (_state);              }
 #endif
-	static inline void     setPrio   ( unsigned _prio )              {        tsk_setPrio   (_prio);               }
-	static inline void     prio      ( unsigned _prio )              {        tsk_prio      (_prio);               }
-	static inline unsigned getPrio   ( void )                        { return tsk_getPrio   ();                    }
-	static inline unsigned prio      ( void )                        { return tsk_getPrio   ();                    }
-	static inline void     sleepFor  ( cnt_t    _delay )             {        tsk_sleepFor  (_delay);              }
-	static inline void     sleepNext ( cnt_t    _delay )             {        tsk_sleepNext (_delay);              }
-	static inline void     sleepUntil( cnt_t    _time )              {        tsk_sleepUntil(_time);               }
-	static inline void     sleep     ( void )                        {        tsk_sleep     ();                    }
-	static inline void     delay     ( cnt_t    _delay )             {        tsk_delay     (_delay);              }
-	static inline unsigned take      ( unsigned _sig )               { return tsk_take      (_sig);                }
-	static inline unsigned waitFor   ( unsigned _sig, cnt_t _delay ) { return tsk_waitFor   (_sig, _delay);        }
-	static inline unsigned waitUntil ( unsigned _sig, cnt_t _time )  { return tsk_waitUntil (_sig, _time);         }
-	static inline void     wait      ( unsigned _sig )               {        tsk_wait      (_sig);                }
-	static inline void     suspend   ( void )                        {        cur_suspend   ();                    }
+	static inline void     setPrio   ( unsigned _prio )                 {        tsk_setPrio   (_prio);               }
+	static inline void     prio      ( unsigned _prio )                 {        tsk_prio      (_prio);               }
+	static inline unsigned getPrio   ( void )                           { return tsk_getPrio   ();                    }
+	static inline unsigned prio      ( void )                           { return tsk_getPrio   ();                    }
+	static inline void     sleepFor  ( cnt_t    _delay )                {        tsk_sleepFor  (_delay);              }
+	static inline void     sleepNext ( cnt_t    _delay )                {        tsk_sleepNext (_delay);              }
+	static inline void     sleepUntil( cnt_t    _time )                 {        tsk_sleepUntil(_time);               }
+	static inline void     sleep     ( void )                           {        tsk_sleep     ();                    }
+	static inline void     delay     ( cnt_t    _delay )                {        tsk_delay     (_delay);              }
+	static inline unsigned take      ( unsigned _sigset )               { return tsk_take      (_sigset);             }
+	static inline unsigned waitFor   ( unsigned _sigset, cnt_t _delay ) { return tsk_waitFor   (_sigset, _delay);     }
+	static inline unsigned waitUntil ( unsigned _sigset, cnt_t _time )  { return tsk_waitUntil (_sigset, _time);      }
+	static inline unsigned wait      ( unsigned _sigset )               { return tsk_wait      (_sigset);             }
+	static inline void     suspend   ( void )                           {        cur_suspend   ();                    }
 }
 
 #endif//__cplusplus

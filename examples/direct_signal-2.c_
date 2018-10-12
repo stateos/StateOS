@@ -3,16 +3,23 @@
 
 void slave()
 {
-	tsk_wait(1);
-	LED_Tick();
+	unsigned x;
+
+	x = tsk_wait(SIGALL);
+	LEDs = 1U << x;
 }
 
 OS_TSK(sla, 0, slave);
 
 void master()
 {
-	tsk_delay(SEC);
-	tsk_give(sla, 1);
+	unsigned x = 0;
+
+	for (;;)
+	{
+		tsk_delay(SEC);
+		tsk_give(sla, x++ % 4);
+	}
 }
 
 OS_TSK(mas, 0, master);
