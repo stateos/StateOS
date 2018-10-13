@@ -465,8 +465,6 @@ unsigned tsk_take( unsigned sigset )
 {
 	unsigned event;
 
-	assert(sigset);
-
 	sys_lock();
 	{
 		event = priv_tsk_take(sigset);
@@ -483,7 +481,6 @@ unsigned tsk_waitFor( unsigned sigset, cnt_t delay )
 	unsigned event;
 
 	assert_tsk_context();
-	assert(sigset);
 
 	sys_lock();
 	{
@@ -507,7 +504,6 @@ unsigned tsk_waitUntil( unsigned sigset, cnt_t time )
 	unsigned event;
 
 	assert_tsk_context();
-	assert(sigset);
 
 	sys_lock();
 	{
@@ -532,7 +528,6 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
-	assert(sigset);
 
 	sys_lock();
 	{
@@ -540,7 +535,7 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 
 		if (tsk->guard == &System.sig)
 		{
-			if (tsk->tmp.sig.sigset & sigset)
+			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == SIGANY)
 			{
 				tsk->flags &= ~sigset;
 				core_tsk_wakeup(tsk, signo);

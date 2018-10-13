@@ -44,6 +44,7 @@ extern "C" {
 
 #define SIGSET(signo) (((signo) < UINT_BIT) ? 1U << (signo) : 0U)   // signal mask from the signal number
 #define SIGALL        (0U-1)                                        // signal mask for all signals
+#define SIGANY        (0U)
 
 /******************************************************************************
  *

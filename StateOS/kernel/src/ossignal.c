@@ -131,7 +131,6 @@ unsigned sig_take( sig_t *sig, unsigned sigset )
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
-	assert(sigset);
 
 	sys_lock();
 	{
@@ -151,7 +150,6 @@ unsigned sig_waitFor( sig_t *sig, unsigned sigset, cnt_t delay )
 	assert_tsk_context();
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
-	assert(sigset);
 
 	sys_lock();
 	{
@@ -177,7 +175,6 @@ unsigned sig_waitUntil( sig_t *sig, unsigned sigset, cnt_t time )
 	assert_tsk_context();
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
-	assert(sigset);
 
 	sys_lock();
 	{
@@ -204,7 +201,6 @@ void sig_give( sig_t *sig, unsigned signo )
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
-	assert(sigset);
 
 	sys_lock();
 	{
@@ -214,7 +210,7 @@ void sig_give( sig_t *sig, unsigned signo )
 		while (obj->queue)
 		{
 			tsk = obj->queue;
-			if (tsk->tmp.sig.sigset & sigset)
+			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == SIGANY)
 			{
 				sig->flags &= ~sigset | sig->mask;
 				core_tsk_wakeup(tsk, signo);
@@ -234,7 +230,6 @@ void sig_clear( sig_t *sig, unsigned signo )
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
-	assert(sigset);
 
 	sys_lock();
 	{
@@ -251,7 +246,6 @@ bool sig_get( sig_t *sig, unsigned signo )
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
-	assert(sigset);
 
 	sys_lock();
 	{
