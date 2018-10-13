@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    12.10.2018
+    @date    13.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,8 +40,10 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#define SIGSET(signo) (1U << (signo))   // signal mask from the signal number
-#define SIGALL        (0U-1)            // signal mask for all signals
+#define UINT_BIT      (sizeof(unsigned) * CHAR_BIT)
+
+#define SIGSET(signo) (((signo) < UINT_BIT) ? 1U << (signo) : 0U)   // signal mask from the signal number
+#define SIGALL        (0U-1)                                        // signal mask for all signals
 
 /******************************************************************************
  *

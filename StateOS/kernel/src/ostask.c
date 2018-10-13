@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    12.10.2018
+    @date    13.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -445,18 +445,18 @@ static
 unsigned priv_tsk_take( unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flags = sigset & System.cur->flags;
-	unsigned signo = sizeof(unsigned) * CHAR_BIT;
+	unsigned signo = E_TIMEOUT;
 
-	if (flags)
+	sigset &= System.cur->flags;
+
+	if (sigset)
 	{
-		do signo--; while ((flags <<= 1) != 0);
-		System.cur->flags &= ~SIGSET(signo);
-
-		return signo;
+		sigset &= -sigset;
+		System.cur->flags &= ~sigset;
+		for (signo = 0; sigset >>= 1; signo++);
 	}
 
-	return E_TIMEOUT;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -528,21 +528,21 @@ unsigned tsk_waitUntil( unsigned sigset, cnt_t time )
 void tsk_give( tsk_t *tsk, unsigned signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flag = SIGSET(signo);
+	unsigned sigset = SIGSET(signo);
 
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
-	assert(flag);
+	assert(sigset);
 
 	sys_lock();
 	{
-		tsk->flags |= flag;
+		tsk->flags |= sigset;
 
 		if (tsk->guard == &System.sig)
 		{
-			if (tsk->tmp.sig.sigset & flag)
+			if (tsk->tmp.sig.sigset & sigset)
 			{
-				tsk->flags &= ~flag;
+				tsk->flags &= ~sigset;
 				core_tsk_wakeup(tsk, signo);
 			}
 		}

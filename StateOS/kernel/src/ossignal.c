@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    12.10.2018
+    @date    13.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -109,18 +109,18 @@ static
 unsigned priv_sig_take( sig_t *sig, unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flags = sigset & sig->flags;
-	unsigned signo = sizeof(unsigned) * CHAR_BIT;
-	
-	if (flags)
-	{
-		do signo--; while ((flags <<= 1) != 0);
-		sig->flags &= ~SIGSET(signo) | sig->mask;
+	unsigned signo = E_TIMEOUT;
 
-		return signo;
+	sigset &= sig->flags;
+
+	if (sigset)
+	{
+		sigset &= -sigset;
+		sig->flags &= ~sigset | sig->mask;
+		for (signo = 0; sigset >>= 1; signo++);
 	}
-		
-	return E_TIMEOUT;
+
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -198,25 +198,25 @@ unsigned sig_waitUntil( sig_t *sig, unsigned sigset, cnt_t time )
 void sig_give( sig_t *sig, unsigned signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flag = SIGSET(signo);
+	unsigned sigset = SIGSET(signo);
 	obj_t  * obj;
 	tsk_t  * tsk;
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
-	assert(flag);
+	assert(sigset);
 
 	sys_lock();
 	{
-		sig->flags |= flag;
+		sig->flags |= sigset;
 
 		obj = &sig->obj;
 		while (obj->queue)
 		{
 			tsk = obj->queue;
-			if (tsk->tmp.sig.sigset & flag)
+			if (tsk->tmp.sig.sigset & sigset)
 			{
-				sig->flags &= ~flag | sig->mask;
+				sig->flags &= ~sigset | sig->mask;
 				core_tsk_wakeup(tsk, signo);
 				continue;
 			}
@@ -230,15 +230,15 @@ void sig_give( sig_t *sig, unsigned signo )
 void sig_clear( sig_t *sig, unsigned signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flag = SIGSET(signo);
+	unsigned sigset = SIGSET(signo);
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
-	assert(flag);
+	assert(sigset);
 
 	sys_lock();
 	{
-		sig->flags &= ~flag;
+		sig->flags &= ~sigset;
 	}
 	sys_unlock();
 }
@@ -247,19 +247,19 @@ void sig_clear( sig_t *sig, unsigned signo )
 bool sig_get( sig_t *sig, unsigned signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned flag = SIGSET(signo);
+	unsigned sigset = SIGSET(signo);
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
-	assert(flag);
+	assert(sigset);
 
 	sys_lock();
 	{
-		flag &= sig->flags;
+		sigset &= sig->flags;
 	}
 	sys_unlock();
 
-	return flag != 0;
+	return sigset != 0;
 }
 
 /* -------------------------------------------------------------------------- */
