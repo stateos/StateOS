@@ -383,28 +383,6 @@ void sig_clear( sig_t *sig, unsigned signo );
 __STATIC_INLINE
 void sig_clearISR( sig_t *sig, unsigned signo ) { sig_clear(sig, signo); }
 
-/******************************************************************************
- *
- * Name              : sig_get
- * ISR alias         : sig_getISR
- *
- * Description       : get state of the given signal in the signal object
- *
- * Parameters
- *   sig             : pointer to signal object
- *   signo           : signal number
- *
- * Return            : signal state in signal object
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-bool sig_get( sig_t *sig, unsigned signo );
-
-__STATIC_INLINE
-bool sig_getISR( sig_t *sig, unsigned signo ) { return sig_get(sig, signo); }
-
 #ifdef __cplusplus
 }
 #endif
@@ -442,8 +420,6 @@ struct Signal : public __sig
 	void     giveISR  ( unsigned _signo )                {        sig_giveISR  (this, _signo);          }
 	void     clear    ( unsigned _signo )                {        sig_clear    (this, _signo);          }
 	void     clearISR ( unsigned _signo )                {        sig_clearISR (this, _signo);          }
-	bool     get      ( unsigned _signo )                { return sig_get      (this, _signo);          }
-	bool     getISR   ( unsigned _signo )                { return sig_getISR   (this, _signo);          }
 };
 
 #endif//__cplusplus

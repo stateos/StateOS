@@ -239,21 +239,3 @@ void sig_clear( sig_t *sig, unsigned signo )
 }
 
 /* -------------------------------------------------------------------------- */
-bool sig_get( sig_t *sig, unsigned signo )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned sigset = SIGSET(signo);
-
-	assert(sig);
-	assert(sig->obj.res!=RELEASED);
-
-	sys_lock();
-	{
-		sigset &= sig->flags;
-	}
-	sys_unlock();
-
-	return sigset != 0;
-}
-
-/* -------------------------------------------------------------------------- */
