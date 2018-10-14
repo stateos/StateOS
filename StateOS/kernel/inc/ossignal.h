@@ -42,7 +42,7 @@ extern "C" {
 
 #define UINT_BIT      (sizeof(unsigned) * CHAR_BIT)
 
-#define SIGSET(signo) (((signo) < UINT_BIT) ? 1U << (signo) : 0U)   // signal mask from the signal number
+#define SIGSET(signo) (((signo) < UINT_BIT) ? 1U << (signo) : 0U)   // signal mask from the given signal number
 #define sigAll        (0U-1)                                        // signal mask for all signals
 #define sigAny        (0U)
 
