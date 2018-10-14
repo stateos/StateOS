@@ -81,7 +81,7 @@ void sig_kill( sig_t *sig )
 
 	sys_lock();
 	{
-		sig->flags = 0;
+		sig->sigset = 0;
 
 		core_all_wakeup(sig->obj.queue, E_STOPPED);
 	}
@@ -111,9 +111,9 @@ unsigned priv_sig_take( sig_t *sig, unsigned sigset )
 {
 	unsigned signo;
 
-	sigset &= sig->flags;
+	sigset &= sig->sigset;
 	sigset &= -sigset;
-	sig->flags &= ~sigset | sig->mask;
+	sig->sigset &= ~sigset | sig->mask;
 	for (signo = 0; sigset; sigset >>= 1, signo++);
 
 	return signo;
@@ -200,7 +200,7 @@ void sig_give( sig_t *sig, unsigned signo )
 
 	sys_lock();
 	{
-		sig->flags |= sigset;
+		sig->sigset |= sigset;
 
 		obj = &sig->obj;
 		while (obj->queue)
@@ -208,7 +208,7 @@ void sig_give( sig_t *sig, unsigned signo )
 			tsk = obj->queue;
 			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == 0)
 			{
-				sig->flags &= ~sigset | sig->mask;
+				sig->sigset &= ~sigset | sig->mask;
 				core_tsk_wakeup(tsk, signo);
 				continue;
 			}
@@ -229,7 +229,7 @@ void sig_clear( sig_t *sig, unsigned signo )
 
 	sys_lock();
 	{
-		sig->flags &= ~sigset;
+		sig->sigset &= ~sigset;
 	}
 	sys_unlock();
 }

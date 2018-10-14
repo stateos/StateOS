@@ -58,7 +58,7 @@ struct __sig
 {
 	obj_t    obj;   // object header
 
-	unsigned flags; // pending signals
+	unsigned sigset;// pending signals
 	unsigned mask;  // protection mask
 };
 

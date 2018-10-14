@@ -118,7 +118,7 @@ void tsk_start( tsk_t *tsk )
 	{
 		if (tsk->hdr.id == ID_STOPPED)  // active tasks cannot be started
 		{
-			tsk->flags = 0;
+			tsk->sigset = 0;
 
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
@@ -141,7 +141,7 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 		if (tsk->hdr.id == ID_STOPPED)  // active tasks cannot be started
 		{
 			tsk->state = state;
-			tsk->flags = 0;
+			tsk->sigset = 0;
 
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
@@ -447,9 +447,9 @@ unsigned priv_tsk_take( unsigned sigset )
 {
 	unsigned signo;
 
-	sigset &= System.cur->flags;
+	sigset &= System.cur->sigset;
 	sigset &= -sigset;
-	System.cur->flags &= ~sigset;
+	System.cur->sigset &= ~sigset;
 	for (signo = 0; sigset; sigset >>= 1, signo++);
 
 	return signo;
@@ -527,13 +527,13 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 
 	sys_lock();
 	{
-		tsk->flags |= sigset;
+		tsk->sigset |= sigset;
 
 		if (tsk->guard == &System.sig)
 		{
 			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == 0)
 			{
-				tsk->flags &= ~sigset;
+				tsk->sigset &= ~sigset;
 				core_tsk_wakeup(tsk, signo);
 			}
 		}

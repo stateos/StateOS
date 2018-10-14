@@ -82,7 +82,7 @@ struct __tsk
 	tsk_t  * join;  // joinable state
 	tsk_t ** guard; // BLOCKED queue for the pending process
 
-	unsigned flags; // pending signals
+	unsigned sigset;// pending signals
 	unsigned event; // wakeup event
 
 	struct {
