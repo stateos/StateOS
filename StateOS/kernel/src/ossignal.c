@@ -109,16 +109,12 @@ static
 unsigned priv_sig_take( sig_t *sig, unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned signo = E_TIMEOUT;
+	unsigned signo;
 
 	sigset &= sig->flags;
-
-	if (sigset)
-	{
-		sigset &= -sigset;
-		sig->flags &= ~sigset | sig->mask;
-		for (signo = 0; sigset >>= 1; signo++);
-	}
+	sigset &= -sigset;
+	sig->flags &= ~sigset | sig->mask;
+	for (signo = 0; sigset; sigset >>= 1, signo++);
 
 	return signo;
 }
@@ -127,25 +123,25 @@ unsigned priv_sig_take( sig_t *sig, unsigned sigset )
 unsigned sig_take( sig_t *sig, unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned signo;
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, sigset);
+		signo = priv_sig_take(sig, sigset);
 	}
 	sys_unlock();
 
-	return event;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned sig_waitFor( sig_t *sig, unsigned sigset, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned signo;
 
 	assert_tsk_context();
 	assert(sig);
@@ -153,24 +149,24 @@ unsigned sig_waitFor( sig_t *sig, unsigned sigset, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, sigset);
+		signo = priv_sig_take(sig, sigset);
 
-		if (event == E_TIMEOUT)
+		if (signo == 0)
 		{
 			System.cur->tmp.sig.sigset = sigset;
-			event = core_tsk_waitFor(&sig->obj.queue, delay);
+			signo = core_tsk_waitFor(&sig->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned sig_waitUntil( sig_t *sig, unsigned sigset, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned signo;
 
 	assert_tsk_context();
 	assert(sig);
@@ -178,17 +174,17 @@ unsigned sig_waitUntil( sig_t *sig, unsigned sigset, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, sigset);
+		signo = priv_sig_take(sig, sigset);
 
-		if (event == E_TIMEOUT)
+		if (signo == 0)
 		{
 			System.cur->tmp.sig.sigset = sigset;
-			event = core_tsk_waitUntil(&sig->obj.queue, time);
+			signo = core_tsk_waitUntil(&sig->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -210,7 +206,7 @@ void sig_give( sig_t *sig, unsigned signo )
 		while (obj->queue)
 		{
 			tsk = obj->queue;
-			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == sigAny)
+			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == 0)
 			{
 				sig->flags &= ~sigset | sig->mask;
 				core_tsk_wakeup(tsk, signo);

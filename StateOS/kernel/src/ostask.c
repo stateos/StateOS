@@ -445,16 +445,12 @@ static
 unsigned priv_tsk_take( unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned signo = E_TIMEOUT;
+	unsigned signo;
 
 	sigset &= System.cur->flags;
-
-	if (sigset)
-	{
-		sigset &= -sigset;
-		System.cur->flags &= ~sigset;
-		for (signo = 0; sigset >>= 1; signo++);
-	}
+	sigset &= -sigset;
+	System.cur->flags &= ~sigset;
+	for (signo = 0; sigset; sigset >>= 1, signo++);
 
 	return signo;
 }
@@ -463,61 +459,61 @@ unsigned priv_tsk_take( unsigned sigset )
 unsigned tsk_take( unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned signo;
 
 	sys_lock();
 	{
-		event = priv_tsk_take(sigset);
+		signo = priv_tsk_take(sigset);
 	}
 	sys_unlock();
 
-	return event;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned tsk_waitFor( unsigned sigset, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned signo;
 
 	assert_tsk_context();
 
 	sys_lock();
 	{
-		event = priv_tsk_take(sigset);
+		signo = priv_tsk_take(sigset);
 
-		if (event == E_TIMEOUT)
+		if (signo == 0)
 		{
 			System.cur->tmp.sig.sigset = sigset;
-			event = core_tsk_waitFor(&System.sig, delay);
+			signo = core_tsk_waitFor(&System.sig, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
 unsigned tsk_waitUntil( unsigned sigset, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned signo;
 
 	assert_tsk_context();
 
 	sys_lock();
 	{
-		event = priv_tsk_take(sigset);
+		signo = priv_tsk_take(sigset);
 
-		if (event == E_TIMEOUT)
+		if (signo == 0)
 		{
 			System.cur->tmp.sig.sigset = sigset;
-			event = core_tsk_waitUntil(&System.sig, time);
+			signo = core_tsk_waitUntil(&System.sig, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -535,7 +531,7 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 
 		if (tsk->guard == &System.sig)
 		{
-			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == sigAny)
+			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == 0)
 			{
 				tsk->flags &= ~sigset;
 				core_tsk_wakeup(tsk, signo);

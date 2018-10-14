@@ -13,12 +13,13 @@ OS_TSK(sla, 0, slave);
 
 void master()
 {
-	unsigned x = 0;
+	unsigned x = 1;
 
 	for (;;)
 	{
 		tsk_delay(SEC);
-		tsk_give(sla, x++ % 4);
+		tsk_give(sla, x);
+		x = (x % 4) + 1;
 	}
 }
 

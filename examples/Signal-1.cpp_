@@ -8,7 +8,7 @@ void slave()
 {
 	for (;;)
 	{
-		sig.wait(SIGSET(0));
+		sig.wait(SIGSET(1));
 		led.tick();
 	}
 }
@@ -18,7 +18,7 @@ void master()
 	for (;;)
 	{
 		ThisTask::sleepFor(SEC);
-		sig.give(0);
+		sig.give(1);
 	}
 }
 

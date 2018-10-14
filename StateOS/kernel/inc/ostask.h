@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    12.10.2018
+    @date    14.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -980,7 +980,7 @@ unsigned tsk_getPrio( void );
  *   sigset          : set of expected signals
  *
  * Return            : the lowest number of expected signal from the set of all pending signals or
- *   E_TIMEOUT       : no expected signal has been set, try again
+ *   0               : no expected signal has been set, try again
  *
  * Note              : use only in thread mode
  *

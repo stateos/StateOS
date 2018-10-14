@@ -13,12 +13,13 @@ void slave()
 
 void master()
 {
-	unsigned x = 0;
+	unsigned x = 1;
 
 	for (;;)
 	{
 		tsk_delay(SEC);
-		sig_give(sig, x++ % 4);
+		sig_give(sig, x);
+		x = (x % 4) + 1;
 	}
 }
 
