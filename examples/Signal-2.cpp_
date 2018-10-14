@@ -10,7 +10,7 @@ void slave()
 
 	for (;;)
 	{
-		x = sig.wait(SIGALL);
+		x = sig.wait(sigAll);
 		led = SIGSET(x);
 	}
 }

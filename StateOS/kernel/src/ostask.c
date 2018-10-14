@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    13.10.2018
+    @date    14.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -535,7 +535,7 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 
 		if (tsk->guard == &System.sig)
 		{
-			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == SIGANY)
+			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == sigAny)
 			{
 				tsk->flags &= ~sigset;
 				core_tsk_wakeup(tsk, signo);

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    13.10.2018
+    @date    14.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -210,7 +210,7 @@ void sig_give( sig_t *sig, unsigned signo )
 		while (obj->queue)
 		{
 			tsk = obj->queue;
-			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == SIGANY)
+			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == sigAny)
 			{
 				sig->flags &= ~sigset | sig->mask;
 				core_tsk_wakeup(tsk, signo);
