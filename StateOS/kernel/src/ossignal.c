@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    14.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -72,7 +72,7 @@ sig_t *sig_create( unsigned mask )
 }
 
 /* -------------------------------------------------------------------------- */
-void sig_kill( sig_t *sig )
+void sig_reset( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -98,7 +98,7 @@ void sig_delete( sig_t *sig )
 
 	sys_lock();
 	{
-		sig_kill(sig);
+		sig_reset(sig);
 		core_res_free(&sig->obj.res);
 	}
 	sys_unlock();
