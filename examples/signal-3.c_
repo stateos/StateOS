@@ -1,15 +1,15 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
+OS_SIG(sig);
+
 void slave()
 {
 	unsigned x;
 
-	x = tsk_wait(sigAny);
+	x = sig_wait(sig, sigAny);
 	LEDs = x;
 }
-
-OS_TSK(sla, 0, slave);
 
 void master()
 {
@@ -18,11 +18,12 @@ void master()
 	for (;;)
 	{
 		tsk_delay(SEC);
-		tsk_give(sla, x);
+		sig_give(sig, x);
 		x = (x << 1) | (x >> 3);
 	}
 }
 
+OS_TSK(sla, 0, slave);
 OS_TSK(mas, 0, master);
 
 int main()

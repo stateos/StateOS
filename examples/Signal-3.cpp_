@@ -1,0 +1,35 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+auto led = Led();
+auto sig = Signal();
+
+void slave()
+{
+	unsigned x;
+
+	x = sig.wait(sigAny);
+	led = x;
+}
+
+void master()
+{
+	unsigned x = 1;
+
+	for (;;)
+	{
+		ThisTask::sleepFor(SEC);
+		sig.give(x);
+		x = (x << 1) | (x >> 3);
+	}
+}
+
+auto sla = Task(0, slave);
+auto mas = Task(0, master);
+
+int main()
+{
+	sla.start();
+	mas.start();
+	ThisTask::sleep();
+}
