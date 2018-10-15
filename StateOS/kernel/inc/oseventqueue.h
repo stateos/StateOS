@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    15.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -215,8 +215,8 @@ evq_t *evq_new( unsigned limit ) { return evq_create(limit); }
 
 /******************************************************************************
  *
- * Name              : evq_kill
- * Alias             : evq_reset
+ * Name              : evq_reset
+ * Alias             : evq_kill
  *
  * Description       : reset the event queue object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -229,10 +229,10 @@ evq_t *evq_new( unsigned limit ) { return evq_create(limit); }
  *
  ******************************************************************************/
 
-void evq_kill( evq_t *evq );
+void evq_reset( evq_t *evq );
 
 __STATIC_INLINE
-void evq_reset( evq_t *evq ) { evq_kill(evq); }
+void evq_kill( evq_t *evq ) { evq_reset(evq); }
 
 /******************************************************************************
  *
@@ -493,8 +493,8 @@ struct EventQueueT : public __evq
 	 EventQueueT( void ): __evq _EVQ_INIT(limit_, data_) {}
 	~EventQueueT( void ) { assert(__evq::obj.queue == nullptr); }
 
-	void     kill     ( void )                          {        evq_kill     (this);                }
 	void     reset    ( void )                          {        evq_reset    (this);                }
+	void     kill     ( void )                          {        evq_kill     (this);                }
 	unsigned take     ( unsigned *_data )               { return evq_take     (this, _data);         }
 	unsigned tryWait  ( unsigned *_data )               { return evq_tryWait  (this, _data);         }
 	unsigned takeISR  ( unsigned *_data )               { return evq_takeISR  (this, _data);         }

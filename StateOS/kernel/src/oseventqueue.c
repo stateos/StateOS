@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,7 +78,7 @@ evq_t *evq_create( unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
-void evq_kill( evq_t *evq )
+void evq_reset( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -106,7 +106,7 @@ void evq_delete( evq_t *evq )
 
 	sys_lock();
 	{
-		evq_kill(evq);
+		evq_reset(evq);
 		core_res_free(&evq->obj.res);
 	}
 	sys_unlock();
