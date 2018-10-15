@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    15.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -231,8 +231,8 @@ msg_t *msg_new( unsigned limit ) { return msg_create(limit); }
 
 /******************************************************************************
  *
- * Name              : msg_kill
- * Alias             : msg_reset
+ * Name              : msg_reset
+ * Alias             : msg_kill
  *
  * Description       : reset the message buffer object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -245,10 +245,10 @@ msg_t *msg_new( unsigned limit ) { return msg_create(limit); }
  *
  ******************************************************************************/
 
-void msg_kill( msg_t *msg );
+void msg_reset( msg_t *msg );
 
 __STATIC_INLINE
-void msg_reset( msg_t *msg ) { msg_kill(msg); }
+void msg_kill( msg_t *msg ) { msg_reset(msg); }
 
 /******************************************************************************
  *
@@ -608,8 +608,8 @@ struct MessageBufferT : public __msg
 	 MessageBufferT( void ): __msg _MSG_INIT(limit_, data_) {}
 	~MessageBufferT( void ) { assert(__msg::obj.queue == nullptr); }
 
-	void     kill     ( void )                                            {        msg_kill     (this);                       }
 	void     reset    ( void )                                            {        msg_reset    (this);                       }
+	void     kill     ( void )                                            {        msg_kill     (this);                       }
 	unsigned take     (       void *_data, unsigned _size )               { return msg_take     (this, _data, _size);         }
 	unsigned tryWait  (       void *_data, unsigned _size )               { return msg_tryWait  (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return msg_takeISR  (this, _data, _size);         }

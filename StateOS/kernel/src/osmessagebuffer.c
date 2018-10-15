@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,7 +78,7 @@ msg_t *msg_create( unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
-void msg_kill( msg_t *msg )
+void msg_reset( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -106,7 +106,7 @@ void msg_delete( msg_t *msg )
 
 	sys_lock();
 	{
-		msg_kill(msg);
+		msg_reset(msg);
 		core_res_free(&msg->obj.res);
 	}
 	sys_unlock();
