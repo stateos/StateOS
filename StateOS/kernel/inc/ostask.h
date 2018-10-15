@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    14.10.2018
+    @date    15.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -813,8 +813,8 @@ void tsk_stop( void );
 
 /******************************************************************************
  *
- * Name              : tsk_kill
- * Alias             : tsk_reset
+ * Name              : tsk_reset
+ * Alias             : tsk_kill
  *
  * Description       : reset the task object and remove it from READY/BLOCKED queue
  *
@@ -829,15 +829,15 @@ void tsk_stop( void );
  *
  ******************************************************************************/
 
-unsigned tsk_kill( tsk_t *tsk );
+unsigned tsk_reset( tsk_t *tsk );
 
 __STATIC_INLINE
-unsigned tsk_reset( tsk_t *tsk ) { return tsk_kill(tsk); }
+unsigned tsk_kill( tsk_t *tsk ) { return tsk_reset(tsk); }
 
 /******************************************************************************
  *
- * Name              : cur_kill
- * Alias             : cur_reset
+ * Name              : cur_reset
+ * Alias             : cur_kill
  *
  * Description       : reset the current task and remove it from READY/BLOCKED queue
  *
@@ -852,10 +852,10 @@ unsigned tsk_reset( tsk_t *tsk ) { return tsk_kill(tsk); }
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned cur_kill( void ) { return tsk_kill(System.cur); }
+unsigned cur_reset( void ) { return tsk_reset(System.cur); }
 
 __STATIC_INLINE
-unsigned cur_reset( void ) { return tsk_reset(System.cur); }
+unsigned cur_kill( void ) { return cur_reset(); }
 
 /******************************************************************************
  *
@@ -1240,8 +1240,8 @@ struct staticTaskT : public __tsk
 	void     startFrom( fun_t  * _state ) {        tsk_startFrom (this, _state); }
 	unsigned detach   ( void )            { return tsk_detach    (this);         }
 	unsigned join     ( void )            { return tsk_join      (this);         }
-	void     kill     ( void )            {        tsk_kill      (this);         }
 	void     reset    ( void )            {        tsk_reset     (this);         }
+	void     kill     ( void )            {        tsk_kill      (this);         }
 	unsigned prio     ( void )            { return __tsk::basic;                 }
 	unsigned getPrio  ( void )            { return __tsk::basic;                 }
 	void     give     ( unsigned _signo ) {        tsk_give      (this, _signo); }
@@ -1329,8 +1329,8 @@ namespace ThisTask
 {
 	static inline unsigned detach    ( void )                           { return cur_detach    ();                    }
 	static inline void     stop      ( void )                           {        tsk_stop      ();                    }
-	static inline void     kill      ( void )                           {        cur_kill      ();                    }
 	static inline void     reset     ( void )                           {        cur_reset     ();                    }
+	static inline void     kill      ( void )                           {        cur_kill      ();                    }
 	static inline void     yield     ( void )                           {        tsk_yield     ();                    }
 	static inline void     pass      ( void )                           {        tsk_pass      ();                    }
 #if OS_FUNCTIONAL

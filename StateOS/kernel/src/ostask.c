@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    14.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -314,7 +314,7 @@ void tsk_stop( void )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_kill( tsk_t *tsk )
+unsigned tsk_reset( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
