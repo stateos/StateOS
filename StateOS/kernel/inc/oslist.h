@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    15.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -209,8 +209,8 @@ lst_t *lst_new( void ) { return lst_create(); }
 
 /******************************************************************************
  *
- * Name              : lst_kill
- * Alias             : lst_reset
+ * Name              : lst_reset
+ * Alias             : lst_kill
  *
  * Description       : wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -223,10 +223,10 @@ lst_t *lst_new( void ) { return lst_create(); }
  *
  ******************************************************************************/
 
-void lst_kill( lst_t *lst );
+void lst_reset( lst_t *lst );
 
 __STATIC_INLINE
-void lst_reset( lst_t *lst ) { lst_kill(lst); }
+void lst_kill( lst_t *lst ) { lst_reset(lst); }
 
 /******************************************************************************
  *
@@ -391,8 +391,8 @@ struct ListTT : public __lst
 	 ListTT( void ): __lst _LST_INIT() {}
 	~ListTT( void ) { assert(__lst::obj.queue == nullptr); }
 
-	void     kill     ( void )                            {        lst_kill     (this);                                           }
 	void     reset    ( void )                            {        lst_reset    (this);                                           }
+	void     kill     ( void )                            {        lst_kill     (this);                                           }
 	unsigned take     (       T   **_data )               { return lst_take     (this, reinterpret_cast<void **>(_data));         }
 	unsigned tryWait  (       T   **_data )               { return lst_tryWait  (this, reinterpret_cast<void **>(_data));         }
 	unsigned takeISR  (       T   **_data )               { return lst_takeISR  (this, reinterpret_cast<void **>(_data));         }

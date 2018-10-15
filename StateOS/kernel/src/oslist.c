@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -70,7 +70,7 @@ lst_t *lst_create( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void lst_kill( lst_t *lst )
+void lst_reset( lst_t *lst )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -94,7 +94,7 @@ void lst_delete( lst_t *lst )
 
 	sys_lock();
 	{
-		lst_kill(lst);
+		lst_reset(lst);
 		core_res_free(&lst->obj.res);
 	}
 	sys_unlock();
