@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    08.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,7 +78,7 @@ job_t *job_create( unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
-void job_kill( job_t *job )
+void job_reset( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -106,7 +106,7 @@ void job_delete( job_t *job )
 
 	sys_lock();
 	{
-		job_kill(job);
+		job_reset(job);
 		core_res_free(&job->obj.res);
 	}
 	sys_unlock();

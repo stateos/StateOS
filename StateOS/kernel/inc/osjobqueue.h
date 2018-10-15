@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    15.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -216,8 +216,8 @@ job_t *job_new( unsigned limit ) { return job_create(limit); }
 
 /******************************************************************************
  *
- * Name              : job_kill
- * Alias             : job_reset
+ * Name              : job_reset
+ * Alias             : job_kill
  *
  * Description       : reset the job queue object and wake up all waiting tasks with 'E_STOPPED' event
  *
@@ -230,10 +230,10 @@ job_t *job_new( unsigned limit ) { return job_create(limit); }
  *
  ******************************************************************************/
 
-void job_kill( job_t *job );
+void job_reset( job_t *job );
 
 __STATIC_INLINE
-void job_reset( job_t *job ) { job_kill(job); }
+void job_kill( job_t *job ) { job_reset(job); }
 
 /******************************************************************************
  *
@@ -493,8 +493,8 @@ struct staticJobQueueT : public __job
 	 staticJobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
 	~staticJobQueueT( void ) { assert(__job::obj.queue == nullptr); }
 
-	void     kill     ( void )                      {        job_kill     (this);               }
 	void     reset    ( void )                      {        job_reset    (this);               }
+	void     kill     ( void )                      {        job_kill     (this);               }
 	unsigned waitFor  ( cnt_t  _delay )             { return job_waitFor  (this, _delay);       }
 	unsigned waitUntil( cnt_t  _time )              { return job_waitUntil(this, _time);        }
 	unsigned wait     ( void )                      { return job_wait     (this);               }
@@ -538,8 +538,8 @@ struct JobQueueT : public __box
 	 JobQueueT( void ): __box _BOX_INIT(limit_, reinterpret_cast<char *>(data_), sizeof(FUN_t)) {}
 	~JobQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
-	void     kill     ( void )                     {                              box_kill     (this);                                                              }
 	void     reset    ( void )                     {                              box_reset    (this);                                                              }
+	void     kill     ( void )                     {                              box_kill     (this);                                                              }
 	unsigned take     ( void )                     { FUN_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
 	unsigned tryWait  ( void )                     { FUN_t _fun; unsigned event = box_tryWait  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
 	unsigned takeISR  ( void )                     { FUN_t _fun; unsigned event = box_takeISR  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
