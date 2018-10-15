@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    12.10.2018
+    @date    15.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -236,8 +236,8 @@ sem_t *sem_new( unsigned init, unsigned limit ) { return sem_create(init, limit)
 
 /******************************************************************************
  *
- * Name              : sem_kill
- * Alias             : sem_reset
+ * Name              : sem_reset
+ * Alias             : sem_kill
  *
  * Description       : reset the semaphore object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -250,10 +250,10 @@ sem_t *sem_new( unsigned init, unsigned limit ) { return sem_create(init, limit)
  *
  ******************************************************************************/
 
-void sem_kill( sem_t *sem );
+void sem_reset( sem_t *sem );
 
 __STATIC_INLINE
-void sem_reset( sem_t *sem ) { sem_kill(sem); }
+void sem_kill( sem_t *sem ) { sem_reset(sem); }
 
 /******************************************************************************
  *
@@ -509,8 +509,8 @@ struct Semaphore : public __sem
 	 Semaphore( const unsigned _init, const unsigned _limit = semCounting ): __sem _SEM_INIT(_init, _limit) {}
 	~Semaphore( void ) { assert(__sem::obj.queue == nullptr); }
 
-	void     kill     ( void )         {        sem_kill     (this);         }
 	void     reset    ( void )         {        sem_reset    (this);         }
+	void     kill     ( void )         {        sem_kill     (this);         }
 	unsigned take     ( void )         { return sem_take     (this);         }
 	unsigned tryWait  ( void )         { return sem_tryWait  (this);         }
 	unsigned takeISR  ( void )         { return sem_takeISR  (this);         }
