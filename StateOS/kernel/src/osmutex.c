@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    09.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -76,7 +76,7 @@ mtx_t *mtx_create( unsigned mode, unsigned prio )
 }
 
 /* -------------------------------------------------------------------------- */
-void mtx_kill( mtx_t *mtx )
+void mtx_reset( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -101,7 +101,7 @@ void mtx_delete( mtx_t *mtx )
 
 	sys_lock();
 	{
-		mtx_kill(mtx);
+		mtx_reset(mtx);
 		core_res_free(&mtx->obj.res);
 	}
 	sys_unlock();

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    12.10.2018
+    @date    15.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -259,8 +259,8 @@ mtx_t *mtx_new( unsigned mode, unsigned prio ) { return mtx_create(mode, prio); 
 
 /******************************************************************************
  *
- * Name              : mtx_kill
- * Alias             : mtx_reset
+ * Name              : mtx_reset
+ * Alias             : mtx_kill
  *
  * Description       : reset the mutex object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -273,10 +273,10 @@ mtx_t *mtx_new( unsigned mode, unsigned prio ) { return mtx_create(mode, prio); 
  *
  ******************************************************************************/
 
-void mtx_kill( mtx_t *mtx );
+void mtx_reset( mtx_t *mtx );
 
 __STATIC_INLINE
-void mtx_reset( mtx_t *mtx ) { mtx_kill(mtx); }
+void mtx_kill( mtx_t *mtx ) { mtx_reset(mtx); }
 
 /******************************************************************************
  *
@@ -489,8 +489,8 @@ struct Mutex : public __mtx
 	 Mutex( const unsigned _mode, const unsigned _prio = 0 ): __mtx _MTX_INIT(_mode, _prio) {}
 	~Mutex( void ) { assert(__mtx::owner == nullptr); }
 
-	void     kill     ( void )            {        mtx_kill     (this);         }
 	void     reset    ( void )            {        mtx_reset    (this);         }
+	void     kill     ( void )            {        mtx_kill     (this);         }
 	void     setPrio  ( unsigned _prio )  {        mtx_setPrio  (this, _prio);  }
 	void     prio     ( unsigned _prio )  {        mtx_prio     (this, _prio);  }
 	unsigned getPrio  ( void )            { return mtx_getPrio  (this);         }
