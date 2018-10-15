@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,7 +78,7 @@ stm_t *stm_create( unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
-void stm_kill( stm_t *stm )
+void stm_reset( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -106,7 +106,7 @@ void stm_delete( stm_t *stm )
 
 	sys_lock();
 	{
-		stm_kill(stm);
+		stm_reset(stm);
 		core_res_free(&stm->obj.res);
 	}
 	sys_unlock();

@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    15.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -231,8 +231,8 @@ stm_t *stm_new( unsigned limit ) { return stm_create(limit); }
 
 /******************************************************************************
  *
- * Name              : stm_kill
- * Alias             : stm_reset
+ * Name              : stm_reset
+ * Alias             : stm_kill
  *
  * Description       : reset the stream buffer object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -245,10 +245,10 @@ stm_t *stm_new( unsigned limit ) { return stm_create(limit); }
  *
  ******************************************************************************/
 
-void stm_kill( stm_t *stm );
+void stm_reset( stm_t *stm );
 
 __STATIC_INLINE
-void stm_reset( stm_t *stm ) { stm_kill(stm); }
+void stm_kill( stm_t *stm ) { stm_reset(stm); }
 
 /******************************************************************************
  *
@@ -583,8 +583,8 @@ struct StreamBufferT : public __stm
 	 StreamBufferT( void ): __stm _STM_INIT(limit_, data_) {}
 	~StreamBufferT( void ) { assert(__stm::obj.queue == nullptr); }
 
-	void     kill     ( void )                                            {        stm_kill     (this);                       }
 	void     reset    ( void )                                            {        stm_reset    (this);                       }
+	void     kill     ( void )                                            {        stm_kill     (this);                       }
 	unsigned take     (       void *_data, unsigned _size )               { return stm_take     (this, _data, _size);         }
 	unsigned tryWait  (       void *_data, unsigned _size )               { return stm_tryWait  (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return stm_takeISR  (this, _data, _size);         }
