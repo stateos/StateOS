@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -67,7 +67,7 @@ evt_t *evt_create( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void evt_kill( evt_t *evt )
+void evt_reset( evt_t *evt )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -91,7 +91,7 @@ void evt_delete( evt_t *evt )
 
 	sys_lock();
 	{
-		evt_kill(evt);
+		evt_reset(evt);
 		core_res_free(&evt->obj.res);
 	}
 	sys_unlock();
