@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    10.10.2018
+    @date    15.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -212,8 +212,8 @@ flg_t *flg_new( unsigned init ) { return flg_create(init); }
 
 /******************************************************************************
  *
- * Name              : flg_kill
- * Alias             : flg_reset
+ * Name              : flg_reset
+ * Alias             : flg_kill
  *
  * Description       : reset the flag object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -226,10 +226,10 @@ flg_t *flg_new( unsigned init ) { return flg_create(init); }
  *
  ******************************************************************************/
 
-void flg_kill( flg_t *flg );
+void flg_reset( flg_t *flg );
 
 __STATIC_INLINE
-void flg_reset( flg_t *flg ) { flg_kill(flg); }
+void flg_kill( flg_t *flg ) { flg_reset(flg); }
 
 /******************************************************************************
  *
@@ -459,8 +459,8 @@ struct Flag : public __flg
 	 Flag( const unsigned _init = 0 ): __flg _FLG_INIT(_init) {}
 	~Flag( void ) { assert(__flg::obj.queue == nullptr); }
 
-	void     kill     ( void )                                      {        flg_kill     (this);                        }
 	void     reset    ( void )                                      {        flg_reset    (this);                        }
+	void     kill     ( void )                                      {        flg_kill     (this);                        }
 	unsigned take     ( unsigned _flags, char _mode = flgAll )      { return flg_take     (this, _flags, _mode);         }
 	unsigned tryWait  ( unsigned _flags, char _mode = flgAll )      { return flg_tryWait  (this, _flags, _mode);         }
 	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )      { return flg_takeISR  (this, _flags, _mode);         }

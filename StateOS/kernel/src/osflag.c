@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -72,7 +72,7 @@ flg_t *flg_create( unsigned init )
 }
 
 /* -------------------------------------------------------------------------- */
-void flg_kill( flg_t *flg )
+void flg_reset( flg_t *flg )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -98,7 +98,7 @@ void flg_delete( flg_t *flg )
 
 	sys_lock();
 	{
-		flg_kill(flg);
+		flg_reset(flg);
 		core_res_free(&flg->obj.res);
 	}
 	sys_unlock();
