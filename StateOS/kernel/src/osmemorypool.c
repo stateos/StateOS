@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -107,7 +107,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-void mem_kill( mem_t *mem )
+void mem_reset( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -131,7 +131,7 @@ void mem_delete( mem_t *mem )
 
 	sys_lock();
 	{
-		mem_kill(mem);
+		mem_reset(mem);
 		core_res_free(&mem->lst.obj.res);
 	}
 	sys_unlock();
