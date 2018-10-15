@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -73,7 +73,7 @@ bar_t *bar_create( unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
-void bar_kill( bar_t *bar )
+void bar_reset( bar_t *bar )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -97,7 +97,7 @@ void bar_delete( bar_t *bar )
 
 	sys_lock();
 	{
-		bar_kill(bar);
+		bar_reset(bar);
 		core_res_free(&bar->obj.res);
 	}
 	sys_unlock();

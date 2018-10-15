@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    27.09.2018
+    @date    15.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -188,8 +188,8 @@ bar_t *bar_new( unsigned limit ) { return bar_create(limit); }
 
 /******************************************************************************
  *
- * Name              : bar_kill
- * Alias             : bar_reset
+ * Name              : bar_reset
+ * Alias             : bar_kill
  *
  * Description       : reset the barrier object and wake up all waiting tasks with 'E_STOPPED' event value
  *
@@ -202,10 +202,10 @@ bar_t *bar_new( unsigned limit ) { return bar_create(limit); }
  *
  ******************************************************************************/
 
-void bar_kill( bar_t *bar );
+void bar_reset( bar_t *bar );
 
 __STATIC_INLINE
-void bar_reset( bar_t *bar ) { bar_kill(bar); }
+void bar_kill( bar_t *bar ) { bar_reset(bar); }
 
 /******************************************************************************
  *
@@ -312,8 +312,8 @@ struct Barrier : public __bar
 	 Barrier( const unsigned _limit ): __bar _BAR_INIT(_limit) {}
 	~Barrier( void ) { assert(__bar::obj.queue == nullptr); }
 
-	void     kill     ( void )         {        bar_kill     (this);         }
 	void     reset    ( void )         {        bar_reset    (this);         }
+	void     kill     ( void )         {        bar_kill     (this);         }
 	unsigned waitFor  ( cnt_t _delay ) { return bar_waitFor  (this, _delay); }
 	unsigned waitUntil( cnt_t _time )  { return bar_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return bar_wait     (this);         }
