@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    07.10.2018
+    @date    15.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -81,7 +81,7 @@ box_t *box_create( unsigned limit, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-void box_kill( box_t *box )
+void box_reset( box_t *box )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -109,7 +109,7 @@ void box_delete( box_t *box )
 
 	sys_lock();
 	{
-		box_kill(box);
+		box_reset(box);
 		core_res_free(&box->obj.res);
 	}
 	sys_unlock();
