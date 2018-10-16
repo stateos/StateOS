@@ -275,7 +275,7 @@ void box_delete( box_t *box );
  *   data            : pointer to store mailbox data
  *
  * Return
- *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
+ *   E_SUCCESS       : mailbox data was successfully transferred from the mailbox queue object
  *   E_TIMEOUT       : mailbox queue object is empty, try again
  *
  * Note              : may be used both in thread and handler mode
@@ -305,7 +305,7 @@ unsigned box_takeISR( box_t *box, void *data ) { return box_take(box, data); }
  *                     INFINITE:  wait indefinitely while the mailbox queue object is empty
  *
  * Return
- *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
+ *   E_SUCCESS       : mailbox data was successfully transferred from the mailbox queue object
  *   E_STOPPED       : mailbox queue object was reseted before the specified timeout expired
  *   E_DELETED       : mailbox queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : mailbox queue object is empty and was not received data before the specified timeout expired
@@ -329,7 +329,7 @@ unsigned box_waitFor( box_t *box, void *data, cnt_t delay );
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
+ *   E_SUCCESS       : mailbox data was successfully transferred from the mailbox queue object
  *   E_STOPPED       : mailbox queue object was reseted before the specified timeout expired
  *   E_DELETED       : mailbox queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : mailbox queue object is empty and was not received data before the specified timeout expired
@@ -352,7 +352,7 @@ unsigned box_waitUntil( box_t *box, void *data, cnt_t time );
  *   data            : pointer to store mailbox data
  *
  * Return
- *   E_SUCCESS       : mailbox data was successfully transfered from the mailbox queue object
+ *   E_SUCCESS       : mailbox data was successfully transferred from the mailbox queue object
  *   E_STOPPED       : mailbox queue object was reseted
  *   E_DELETED       : mailbox queue object was deleted
  *
@@ -376,7 +376,7 @@ unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFI
  *   data            : pointer to mailbox data
  *
  * Return
- *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
+ *   E_SUCCESS       : mailbox data was successfully transferred to the mailbox queue object
  *   E_TIMEOUT       : mailbox queue object is full, try again
  *
  * Note              : may be used both in thread and handler mode
@@ -403,7 +403,7 @@ unsigned box_giveISR( box_t *box, const void *data ) { return box_give(box, data
  *                     INFINITE:  wait indefinitely while the mailbox queue object is full
  *
  * Return
- *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
+ *   E_SUCCESS       : mailbox data was successfully transferred to the mailbox queue object
  *   E_STOPPED       : mailbox queue object was reseted before the specified timeout expired
  *   E_DELETED       : mailbox queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : mailbox queue object is full and was not issued data before the specified timeout expired
@@ -427,7 +427,7 @@ unsigned box_sendFor( box_t *box, const void *data, cnt_t delay );
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
+ *   E_SUCCESS       : mailbox data was successfully transferred to the mailbox queue object
  *   E_STOPPED       : mailbox queue object was reseted before the specified timeout expired
  *   E_DELETED       : mailbox queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : mailbox queue object is full and was not issued data before the specified timeout expired
@@ -450,7 +450,7 @@ unsigned box_sendUntil( box_t *box, const void *data, cnt_t time );
  *   data            : pointer to mailbox data
  *
  * Return
- *   E_SUCCESS       : mailbox data was successfully transfered to the mailbox queue object
+ *   E_SUCCESS       : mailbox data was successfully transferred to the mailbox queue object
  *   E_STOPPED       : mailbox queue object was reseted
  *   E_DELETED       : mailbox queue object was deleted
  *

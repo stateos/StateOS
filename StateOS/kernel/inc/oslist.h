@@ -259,7 +259,7 @@ void lst_delete( lst_t *lst );
  *   data            : pointer to store the pointer to the memory object
  *
  * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
+ *   E_SUCCESS       : pointer to memory object was successfully transferred to the data pointer
  *   E_TIMEOUT       : list object is empty, try again
  *
  * Note              : may be used both in thread and handler mode
@@ -289,7 +289,7 @@ unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_take(lst, data); }
  *                     INFINITE:  wait indefinitely while the list object is empty
  *
  * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
+ *   E_SUCCESS       : pointer to memory object was successfully transferred to the data pointer
  *   E_STOPPED       : list object was reseted before the specified timeout expired
  *   E_DELETED       : list object was deleted before the specified timeout expired
  *   E_TIMEOUT       : list object is empty and was not received data before the specified timeout expired
@@ -313,7 +313,7 @@ unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay );
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
+ *   E_SUCCESS       : pointer to memory object was successfully transferred to the data pointer
  *   E_STOPPED       : list object was reseted before the specified timeout expired
  *   E_DELETED       : list object was deleted before the specified timeout expired
  *   E_TIMEOUT       : list object is empty and was not received data before the specified timeout expired
@@ -336,7 +336,7 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time );
  *   data            : pointer to store the pointer to the memory object
  *
  * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
+ *   E_SUCCESS       : pointer to memory object was successfully transferred to the data pointer
  *   E_STOPPED       : list object was reseted
  *   E_DELETED       : list object was deleted
  *

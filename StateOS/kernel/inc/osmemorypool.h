@@ -293,7 +293,7 @@ void mem_delete( mem_t *mem );
  *   data            : pointer to store the pointer to the memory object
  *
  * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
+ *   E_SUCCESS       : pointer to memory object was successfully transferred to the data pointer
  *   E_TIMEOUT       : memory pool object is empty
  *
  * Note              : may be used both in thread and handler mode
@@ -324,7 +324,7 @@ unsigned mem_takeISR( mem_t *mem, void **data ) { return lst_takeISR(&mem->lst, 
  *                     INFINITE:  wait indefinitely while the memory pool object is empty
  *
  * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
+ *   E_SUCCESS       : pointer to memory object was successfully transferred to the data pointer
  *   E_STOPPED       : memory pool object was reseted before the specified timeout expired
  *   E_DELETED       : memory pool object was deleted before the specified timeout expired
  *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired
@@ -349,7 +349,7 @@ unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay ) { return lst_waitFo
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
+ *   E_SUCCESS       : pointer to memory object was successfully transferred to the data pointer
  *   E_STOPPED       : memory pool object was reseted before the specified timeout expired
  *   E_DELETED       : memory pool object was deleted before the specified timeout expired
  *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired
@@ -373,7 +373,7 @@ unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time ) { return lst_waitU
  *   data            : pointer to store the pointer to the memory object
  *
  * Return
- *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
+ *   E_SUCCESS       : pointer to memory object was successfully transferred to the data pointer
  *   E_STOPPED       : memory pool object was reseted
  *   E_DELETED       : memory pool object was deleted
  *

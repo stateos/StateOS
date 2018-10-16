@@ -265,7 +265,7 @@ void evq_delete( evq_t *evq );
  *   data            : pointer to store event data
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered from the event queue object
+ *   E_SUCCESS       : event data was successfully transferred from the event queue object
  *   E_TIMEOUT       : event queue object is empty, try again
  *
  * Note              : may be used both in thread and handler mode
@@ -295,7 +295,7 @@ unsigned evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data);
  *                     INFINITE:  wait indefinitely while the event queue object is empty
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered from the event queue object
+ *   E_SUCCESS       : event data was successfully transferred from the event queue object
  *   E_STOPPED       : event queue object was reseted before the specified timeout expired
  *   E_DELETED       : event queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : event queue object is empty and was not received data before the specified timeout expired
@@ -319,7 +319,7 @@ unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay );
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered from the event queue object
+ *   E_SUCCESS       : event data was successfully transferred from the event queue object
  *   E_STOPPED       : event queue object was reseted before the specified timeout expired
  *   E_DELETED       : event queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : event queue object is empty and was not received data before the specified timeout expired
@@ -342,7 +342,7 @@ unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time );
  *   data            : pointer to store event data
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered from the event queue object
+ *   E_SUCCESS       : event data was successfully transferred from the event queue object
  *   E_STOPPED       : event queue object was reseted
  *   E_DELETED       : event queue object was deleted
  *
@@ -366,7 +366,7 @@ unsigned evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, 
  *   data            : event value
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered to the event queue object
+ *   E_SUCCESS       : event data was successfully transferred to the event queue object
  *   E_TIMEOUT       : event queue object is full, try again
  *
  * Note              : may be used both in thread and handler mode
@@ -393,7 +393,7 @@ unsigned evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); 
  *                     INFINITE:  wait indefinitely while the event queue object is full
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered to the event queue object
+ *   E_SUCCESS       : event data was successfully transferred to the event queue object
  *   E_STOPPED       : event queue object was reseted before the specified timeout expired
  *   E_DELETED       : event queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : event queue object is full and was not issued data before the specified timeout expired
@@ -417,7 +417,7 @@ unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay );
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered to the event queue object
+ *   E_SUCCESS       : event data was successfully transferred to the event queue object
  *   E_STOPPED       : event queue object was reseted before the specified timeout expired
  *   E_DELETED       : event queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : event queue object is full and was not issued data before the specified timeout expired
@@ -440,7 +440,7 @@ unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time );
  *   data            : event value
  *
  * Return
- *   E_SUCCESS       : event data was successfully transfered to the event queue object
+ *   E_SUCCESS       : event data was successfully transferred to the event queue object
  *   E_STOPPED       : event queue object was reseted
  *   E_DELETED       : event queue object was deleted
  *

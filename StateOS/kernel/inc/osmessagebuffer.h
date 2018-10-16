@@ -387,7 +387,7 @@ unsigned msg_wait( msg_t *msg, void *data, unsigned size ) { return msg_waitFor(
  *   size            : size of read buffer
  *
  * Return
- *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_SUCCESS       : message data was successfully transferred to the message buffer object
  *   E_FAILURE       : size of the message data is out of the limit
  *   E_TIMEOUT       : not enough space in the message buffer, try again
  *
@@ -416,7 +416,7 @@ unsigned msg_giveISR( msg_t *msg, const void *data, unsigned size ) { return msg
  *                     INFINITE:  wait indefinitely while the message buffer object is full
  *
  * Return
- *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_SUCCESS       : message data was successfully transferred to the message buffer object
  *   E_FAILURE       : size of the message data is out of the limit
  *   E_STOPPED       : message buffer object was reseted before the specified timeout expired
  *   E_DELETED       : message buffer object was deleted before the specified timeout expired
@@ -442,7 +442,7 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_SUCCESS       : message data was successfully transferred to the message buffer object
  *   E_FAILURE       : size of the message data is out of the limit
  *   E_STOPPED       : message buffer object was reseted before the specified timeout expired
  *   E_DELETED       : message buffer object was deleted before the specified timeout expired
@@ -467,7 +467,7 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
  *   size            : size of read buffer
  *
  * Return
- *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_SUCCESS       : message data was successfully transferred to the message buffer object
  *   E_FAILURE       : size of the message data is out of the limit
  *   E_STOPPED       : message buffer object was reseted
  *   E_DELETED       : message buffer object was deleted
@@ -493,7 +493,7 @@ unsigned msg_send( msg_t *msg, const void *data, unsigned size ) { return msg_se
  *   size            : size of read buffer
  *
  * Return
- *   E_SUCCESS       : message data was successfully transfered to the message buffer object
+ *   E_SUCCESS       : message data was successfully transferred to the message buffer object
  *   E_FAILURE       : size of the message data is out of the limit
  *
  * Note              : may be used both in thread and handler mode

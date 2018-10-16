@@ -383,7 +383,7 @@ unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(
  *   size            : size of read buffer
  *
  * Return
- *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
+ *   E_SUCCESS       : stream data was successfully transferred to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
  *   E_TIMEOUT       : not enough space in the stream buffer, try again
  *
@@ -412,7 +412,7 @@ unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm
  *                     INFINITE:  wait indefinitely while the stream buffer object is full
  *
  * Return
- *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
+ *   E_SUCCESS       : stream data was successfully transferred to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
  *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
  *   E_DELETED       : stream buffer object was deleted before the specified timeout expired
@@ -438,7 +438,7 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
+ *   E_SUCCESS       : stream data was successfully transferred to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
  *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
  *   E_DELETED       : stream buffer object was deleted before the specified timeout expired
@@ -463,7 +463,7 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
  *   size            : size of read buffer
  *
  * Return
- *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
+ *   E_SUCCESS       : stream data was successfully transferred to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
  *   E_STOPPED       : stream buffer object was reseted
  *   E_DELETED       : stream buffer object was deleted
@@ -489,7 +489,7 @@ unsigned stm_send( stm_t *stm, const void *data, unsigned size ) { return stm_se
  *   size            : size of read buffer
  *
  * Return
- *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
+ *   E_SUCCESS       : stream data was successfully transferred to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
  *
  * Note              : may be used both in thread and handler mode
