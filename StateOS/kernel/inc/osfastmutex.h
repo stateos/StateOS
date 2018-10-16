@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -259,7 +259,7 @@ unsigned mut_tryLock( mut_t *mut ) { return mut_take(mut); }
  * Return
  *   E_SUCCESS       : fast mutex object was successfully locked
  *   E_FAILURE       : fast mutex object can't be locked by owner task
- *   E_STOPPED       : fast mutex object was killed before the specified timeout expired
+ *   E_STOPPED       : fast mutex object was reseted before the specified timeout expired
  *   E_TIMEOUT       : fast mutex object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -282,7 +282,7 @@ unsigned mut_waitFor( mut_t *mut, cnt_t delay );
  * Return
  *   E_SUCCESS       : fast mutex object was successfully locked
  *   E_FAILURE       : fast mutex object can't be locked by owner task
- *   E_STOPPED       : fast mutex object was killed before the specified timeout expired
+ *   E_STOPPED       : fast mutex object was reseted before the specified timeout expired
  *   E_TIMEOUT       : fast mutex object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -305,7 +305,7 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time );
  * Return
  *   E_SUCCESS       : fast mutex object was successfully locked
  *   E_FAILURE       : fast mutex object can't be locked by owner task
- *   E_STOPPED       : fast mutex object was killed
+ *   E_STOPPED       : fast mutex object was reseted
  *
  * Note              : use only in thread mode
  *

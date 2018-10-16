@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -296,7 +296,7 @@ unsigned evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data);
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered from the event queue object
- *   E_STOPPED       : event queue object was killed before the specified timeout expired
+ *   E_STOPPED       : event queue object was reseted before the specified timeout expired
  *   E_TIMEOUT       : event queue object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -319,7 +319,7 @@ unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered from the event queue object
- *   E_STOPPED       : event queue object was killed before the specified timeout expired
+ *   E_STOPPED       : event queue object was reseted before the specified timeout expired
  *   E_TIMEOUT       : event queue object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -341,7 +341,7 @@ unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered from the event queue object
- *   E_STOPPED       : event queue object was killed
+ *   E_STOPPED       : event queue object was reseted
  *
  * Note              : use only in thread mode
  *
@@ -391,7 +391,7 @@ unsigned evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); 
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered to the event queue object
- *   E_STOPPED       : event queue object was killed before the specified timeout expired
+ *   E_STOPPED       : event queue object was reseted before the specified timeout expired
  *   E_TIMEOUT       : event queue object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -414,7 +414,7 @@ unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered to the event queue object
- *   E_STOPPED       : event queue object was killed before the specified timeout expired
+ *   E_STOPPED       : event queue object was reseted before the specified timeout expired
  *   E_TIMEOUT       : event queue object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -436,7 +436,7 @@ unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : event data was successfully transfered to the event queue object
- *   E_STOPPED       : event queue object was killed
+ *   E_STOPPED       : event queue object was reseted
  *
  * Note              : use only in thread mode
  *

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -325,7 +325,7 @@ unsigned mem_takeISR( mem_t *mem, void **data ) { return lst_takeISR(&mem->lst, 
  *
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_STOPPED       : memory pool object was killed before the specified timeout expired
+ *   E_STOPPED       : memory pool object was reseted before the specified timeout expired
  *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -349,7 +349,7 @@ unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay ) { return lst_waitFo
  *
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_STOPPED       : memory pool object was killed before the specified timeout expired
+ *   E_STOPPED       : memory pool object was reseted before the specified timeout expired
  *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -372,7 +372,7 @@ unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time ) { return lst_waitU
  *
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_STOPPED       : memory pool object was killed
+ *   E_STOPPED       : memory pool object was reseted
  *
  * Note              : use only in thread mode
  *

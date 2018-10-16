@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    01.10.2018
+    @date    16.10.2018
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -453,7 +453,7 @@ int32 OS_BinSemFlush(uint32 semaphore_id)
 			status = OS_INVALID_POINTER;
 		else
 		{
-			sem_kill(&rec->sem);
+			sem_reset(&rec->sem);
 			status = OS_SUCCESS;
 		}
 	}

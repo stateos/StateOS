@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -783,7 +783,7 @@ unsigned cur_detach( void ) { return tsk_detach(System.cur); }
  *
  * Return
  *   E_SUCCESS       : given task was stopped
- *   E_STOPPED       : given task was killed
+ *   E_STOPPED       : given task was reseted
  *   E_FAILURE       : given task cannot be joined
  *
  * Note              : use only in thread mode

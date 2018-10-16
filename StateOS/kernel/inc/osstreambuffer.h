@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -312,7 +312,7 @@ unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(
  *                     INFINITE:  wait indefinitely while the stream buffer object is empty
  *
  * Return            : number of bytes read from the stream buffer or
- *   E_STOPPED       : stream buffer object was killed before the specified timeout expired
+ *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
  *   E_TIMEOUT       : stream buffer object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -335,7 +335,7 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
  *   time            : timepoint value
  *
  * Return            : number of bytes read from the stream buffer or
- *   E_STOPPED       : stream buffer object was killed before the specified timeout expired
+ *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
  *   E_TIMEOUT       : stream buffer object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -357,7 +357,7 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
  *   size            : size of write buffer
  *
  * Return            : number of bytes read from the stream buffer or
- *   E_STOPPED       : stream buffer object was killed
+ *   E_STOPPED       : stream buffer object was reseted
  *
  * Note              : use only in thread mode
  *
@@ -411,7 +411,7 @@ unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm
  * Return
  *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
- *   E_STOPPED       : stream buffer object was killed before the specified timeout expired
+ *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
  *   E_TIMEOUT       : stream buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -436,7 +436,7 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
  * Return
  *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
- *   E_STOPPED       : stream buffer object was killed before the specified timeout expired
+ *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
  *   E_TIMEOUT       : stream buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -460,7 +460,7 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
  * Return
  *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
- *   E_STOPPED       : stream buffer object was killed
+ *   E_STOPPED       : stream buffer object was reseted
  *
  * Note              : use only in thread mode
  *

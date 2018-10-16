@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -347,7 +347,7 @@ unsigned mtx_getPrio( mtx_t *mtx );
  *
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
- *   OWNERDEAD       : mutex object was successfully locked, previous owner was killed
+ *   OWNERDEAD       : mutex object was successfully locked, previous owner was reseted
  *   E_FAILURE       : mutex object can't be locked
  *   E_TIMEOUT       : mutex object can't be locked immediately, try again
  *
@@ -375,9 +375,9 @@ unsigned mtx_tryLock( mtx_t *mtx ) { return mtx_take(mtx); }
  *
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
- *   OWNERDEAD       : mutex object was successfully locked, previous owner was killed
+ *   OWNERDEAD       : mutex object was successfully locked, previous owner was reseted
  *   E_FAILURE       : mutex object can't be locked
- *   E_STOPPED       : mutex object was killed before the specified timeout expired
+ *   E_STOPPED       : mutex object was reseted before the specified timeout expired
  *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -399,9 +399,9 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
- *   OWNERDEAD       : mutex object was successfully locked, previous owner was killed
+ *   OWNERDEAD       : mutex object was successfully locked, previous owner was reseted
  *   E_FAILURE       : mutex object can't be locked
- *   E_STOPPED       : mutex object was killed before the specified timeout expired
+ *   E_STOPPED       : mutex object was reseted before the specified timeout expired
  *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -423,9 +423,9 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : mutex object was successfully locked
- *   OWNERDEAD       : mutex object was successfully locked, previous owner was killed
+ *   OWNERDEAD       : mutex object was successfully locked, previous owner was reseted
  *   E_FAILURE       : mutex object can't be locked
- *   E_STOPPED       : mutex object was killed
+ *   E_STOPPED       : mutex object was reseted
  *
  * Note              : use only in thread mode
  *

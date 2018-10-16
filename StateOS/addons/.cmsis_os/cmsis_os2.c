@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    05.10.2018
+    @date    16.10.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -659,7 +659,7 @@ osStatus_t osTimerStop (osTimerId_t timer_id)
 	if (timer_id == NULL)
 		return osErrorParameter;
 
-	tmr_kill(&timer->tmr);
+	tmr_reset(&timer->tmr);
 
 	return osOK;
 }
@@ -1368,7 +1368,7 @@ osStatus_t osMessageQueueReset (osMessageQueueId_t mq_id)
 	if (mq_id == NULL)
 		return osErrorParameter;
 
-	box_kill(&mq->box);
+	box_reset(&mq->box);
 
 	return osOK;
 }

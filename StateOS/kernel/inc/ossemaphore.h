@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -315,7 +315,7 @@ unsigned sem_takeISR( sem_t *sem ) { return sem_take(sem); }
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully locked
- *   E_STOPPED       : semaphore object was killed before the specified timeout expired
+ *   E_STOPPED       : semaphore object was reseted before the specified timeout expired
  *   E_TIMEOUT       : semaphore object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -337,7 +337,7 @@ unsigned sem_waitFor( sem_t *sem, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully locked
- *   E_STOPPED       : semaphore object was killed before the specified timeout expired
+ *   E_STOPPED       : semaphore object was reseted before the specified timeout expired
  *   E_TIMEOUT       : semaphore object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -358,7 +358,7 @@ unsigned sem_waitUntil( sem_t *sem, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully locked
- *   E_STOPPED       : semaphore object was killed
+ *   E_STOPPED       : semaphore object was reseted
  *
  * Note              : use only in thread mode
  *
@@ -412,7 +412,7 @@ unsigned sem_giveISR( sem_t *sem ) { return sem_give(sem); }
  * Return
  *   E_SUCCESS       : semaphore object was successfully unlocked
  *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
- *   E_STOPPED       : semaphore object was killed before the specified timeout expired
+ *   E_STOPPED       : semaphore object was reseted before the specified timeout expired
  *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -435,7 +435,7 @@ unsigned sem_sendFor( sem_t *sem, cnt_t delay );
  * Return
  *   E_SUCCESS       : semaphore object was successfully unlocked
  *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
- *   E_STOPPED       : semaphore object was killed before the specified timeout expired
+ *   E_STOPPED       : semaphore object was reseted before the specified timeout expired
  *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -457,7 +457,7 @@ unsigned sem_sendUntil( sem_t *sem, cnt_t time );
  * Return
  *   E_SUCCESS       : semaphore object was successfully unlocked
  *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
- *   E_STOPPED       : semaphore object was killed
+ *   E_STOPPED       : semaphore object was reseted
  *
  * Note              : use only in thread mode
  *

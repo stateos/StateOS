@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -581,7 +581,7 @@ unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_take(tmr); }
  * Return
  *   E_SUCCESS       : timer object successfully finished countdown
  *   E_FAILURE       : timer has not yet been started
- *   E_STOPPED       : timer object was killed before the specified timeout expired
+ *   E_STOPPED       : timer object was reseted before the specified timeout expired
  *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -606,7 +606,7 @@ unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay );
  * Return
  *   E_SUCCESS       : timer object successfully finished countdown
  *   E_FAILURE       : timer has not yet been started
- *   E_STOPPED       : timer object was killed before the specified timeout expired
+ *   E_STOPPED       : timer object was reseted before the specified timeout expired
  *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -628,7 +628,7 @@ unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay );
  * Return
  *   E_SUCCESS       : timer object successfully finished countdown
  *   E_FAILURE       : timer has not yet been started
- *   E_STOPPED       : timer object was killed before the specified timeout expired
+ *   E_STOPPED       : timer object was reseted before the specified timeout expired
  *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -649,7 +649,7 @@ unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time );
  * Return
  *   E_SUCCESS       : timer object successfully finished countdown
  *   E_FAILURE       : timer has not yet been started
- *   E_STOPPED       : timer object was killed before the countdown ended
+ *   E_STOPPED       : timer object was reseted before the countdown ended
  *
  * Note              : use only in thread mode
  *

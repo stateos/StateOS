@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -285,7 +285,7 @@ unsigned sig_takeISR( sig_t *sig, unsigned sigset ) { return sig_take(sig, sigse
  *                     INFINITE:  wait indefinitely until the signal object has been released
  *
  * Return            : the lowest number of expected signal from the set of all pending signals or
- *   E_STOPPED       : signal object was killed before the specified timeout expired
+ *   E_STOPPED       : signal object was reseted before the specified timeout expired
  *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -306,7 +306,7 @@ unsigned sig_waitFor( sig_t *sig, unsigned sigset, cnt_t delay );
  *   time            : timepoint value
  *
  * Return            : the lowest number of expected signal from the set of all pending signals or
- *   E_STOPPED       : signal object was killed before the specified timeout expired
+ *   E_STOPPED       : signal object was reseted before the specified timeout expired
  *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -326,7 +326,7 @@ unsigned sig_waitUntil( sig_t *sig, unsigned sigset, cnt_t time );
  *   sigset          : set of expected signals
  *
  * Return            : the lowest number of expected signal from the set of all pending signals or
- *   E_STOPPED       : signal object was killed
+ *   E_STOPPED       : signal object was reseted
  *
  * Note              : use only in thread mode
  *

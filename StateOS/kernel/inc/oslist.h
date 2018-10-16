@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -290,7 +290,7 @@ unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_take(lst, data); }
  *
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_STOPPED       : list object was killed before the specified timeout expired
+ *   E_STOPPED       : list object was reseted before the specified timeout expired
  *   E_TIMEOUT       : list object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -313,7 +313,7 @@ unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_STOPPED       : list object was killed before the specified timeout expired
+ *   E_STOPPED       : list object was reseted before the specified timeout expired
  *   E_TIMEOUT       : list object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -335,7 +335,7 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
- *   E_STOPPED       : list object was killed
+ *   E_STOPPED       : list object was reseted
  *
  * Note              : use only in thread mode
  *

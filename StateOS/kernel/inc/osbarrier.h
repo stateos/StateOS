@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -238,7 +238,7 @@ void bar_delete( bar_t *bar );
  *
  * Return
  *   E_SUCCESS       : barrier object was successfully released
- *   E_STOPPED       : barrier object was killed before the specified timeout expired
+ *   E_STOPPED       : barrier object was reseted before the specified timeout expired
  *   E_TIMEOUT       : barrier object was not released before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -259,7 +259,7 @@ unsigned bar_waitFor( bar_t *bar, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : barrier object was successfully released
- *   E_STOPPED       : barrier object was killed before the specified timeout expired
+ *   E_STOPPED       : barrier object was reseted before the specified timeout expired
  *   E_TIMEOUT       : barrier object was not released before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -279,7 +279,7 @@ unsigned bar_waitUntil( bar_t *bar, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : barrier object was successfully released
- *   E_STOPPED       : barrier object was killed
+ *   E_STOPPED       : barrier object was reseted
  *
  * Note              : use only in thread mode
  *

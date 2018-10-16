@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -302,7 +302,7 @@ unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(
  *
  * Return
  *   E_SUCCESS       : required flags have been set
- *   E_STOPPED       : flag object was killed before the specified timeout expired
+ *   E_STOPPED       : flag object was reseted before the specified timeout expired
  *   E_TIMEOUT       : required flags have not been set before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -330,7 +330,7 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : required flags have been set
- *   E_STOPPED       : flag object was killed before the specified timeout expired
+ *   E_STOPPED       : flag object was reseted before the specified timeout expired
  *   E_TIMEOUT       : required flags have not been set before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -357,7 +357,7 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : required flags have been set
- *   E_STOPPED       : flag object was killed
+ *   E_STOPPED       : flag object was reseted
  *
  * Note              : use only in thread mode
  *
