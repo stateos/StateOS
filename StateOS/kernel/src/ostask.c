@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -226,9 +226,11 @@ void priv_mtx_remove( tsk_t *tsk )
 	for (mtx = tsk->mtx.list; mtx; mtx = nxt)
 	{
 		nxt = mtx->list;
-		if ((mtx->mode & mtxRobust))
-			if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
-				mtx->mode |= mtxInconsistent;
+		if ((mtx->mode & mtxRobust) == 0)
+			mtx_reset(mtx);
+		else
+		if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
+			mtx->mode |= mtxInconsistent;
 	}
 }
 
