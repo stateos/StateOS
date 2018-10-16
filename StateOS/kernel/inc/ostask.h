@@ -93,6 +93,10 @@ struct __tsk
 	union  {
 
 	struct {
+	unsigned*data;
+	}        evt;   // temporary data used by event object
+
+	struct {
 	unsigned sigset;
 	}        sig;   // temporary data used by signal object
 

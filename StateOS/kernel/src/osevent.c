@@ -30,6 +30,7 @@
  ******************************************************************************/
 
 #include "inc/osevent.h"
+#include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
 #include "osalloc.h"
 
@@ -106,7 +107,7 @@ void evt_delete( evt_t *evt )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitFor( evt_t *evt, cnt_t delay )
+unsigned evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -114,9 +115,11 @@ unsigned evt_waitFor( evt_t *evt, cnt_t delay )
 	assert_tsk_context();
 	assert(evt);
 	assert(evt->obj.res!=RELEASED);
+	assert(data);
 
 	sys_lock();
 	{
+		System.cur->tmp.evt.data = data;
 		event = core_tsk_waitFor(&evt->obj.queue, delay);
 	}
 	sys_unlock();
@@ -125,7 +128,7 @@ unsigned evt_waitFor( evt_t *evt, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitUntil( evt_t *evt, cnt_t time )
+unsigned evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -133,9 +136,11 @@ unsigned evt_waitUntil( evt_t *evt, cnt_t time )
 	assert_tsk_context();
 	assert(evt);
 	assert(evt->obj.res!=RELEASED);
+	assert(data);
 
 	sys_lock();
 	{
+		System.cur->tmp.evt.data = data;
 		event = core_tsk_waitUntil(&evt->obj.queue, time);
 	}
 	sys_unlock();
@@ -144,15 +149,21 @@ unsigned evt_waitUntil( evt_t *evt, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-void evt_give( evt_t *evt, unsigned event )
+void evt_give( evt_t *evt, unsigned data )
 /* -------------------------------------------------------------------------- */
 {
+	tsk_t *tsk;
+
 	assert(evt);
 	assert(evt->obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		core_all_wakeup(evt->obj.queue, event);
+		while ((tsk = evt->obj.queue) != 0)
+		{
+			*tsk->tmp.evt.data = data;
+			core_tsk_wakeup(tsk, E_SUCCESS);
+		}
 	}
 	sys_unlock();
 }

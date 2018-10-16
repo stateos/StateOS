@@ -64,6 +64,7 @@ Features:
 - renamed idle procedures
 - changed usage of signals
 - added E_DELETED event constant
+- updated event object and examples
 ---------
 6.2
 - updated kernel

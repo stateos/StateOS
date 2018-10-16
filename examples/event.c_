@@ -5,7 +5,10 @@ OS_EVT(evt);
 
 void slave()
 {
-	LEDs = evt_wait(evt);
+	unsigned x;
+
+	evt_wait(evt, &x);
+	LEDs = x;
 }
 
 void master()

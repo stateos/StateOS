@@ -222,11 +222,13 @@ void evt_delete( evt_t *evt );
  *
  * Parameters
  *   evt             : pointer to event object
+ *   data            : pointer to store event data
  *   delay           : duration of time (maximum number of ticks to wait for release the event object)
  *                     IMMEDIATE: don't wait until the event object has been released
  *                     INFINITE:  wait indefinitely until the event object has been released
  *
- * Return            : event value or
+ * Return
+ *   E_SUCCESS       : event data was successfully transferred from the event object
  *   E_STOPPED       : event object was reseted before the specified timeout expired
  *   E_DELETED       : event object was deleted before the specified timeout expired
  *   E_TIMEOUT       : event object was not released before the specified timeout expired
@@ -235,7 +237,7 @@ void evt_delete( evt_t *evt );
  *
  ******************************************************************************/
 
-unsigned evt_waitFor( evt_t *evt, cnt_t delay );
+unsigned evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay );
 
 /******************************************************************************
  *
@@ -245,9 +247,11 @@ unsigned evt_waitFor( evt_t *evt, cnt_t delay );
  *
  * Parameters
  *   evt             : pointer to event object
+ *   data            : pointer to store event data
  *   time            : timepoint value
  *
- * Return            : event value or
+ * Return
+ *   E_SUCCESS       : event data was successfully transferred from the event object
  *   E_STOPPED       : event object was reseted before the specified timeout expired
  *   E_DELETED       : event object was deleted before the specified timeout expired
  *   E_TIMEOUT       : event object was not released before the specified timeout expired
@@ -256,7 +260,7 @@ unsigned evt_waitFor( evt_t *evt, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned evt_waitUntil( evt_t *evt, cnt_t time );
+unsigned evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time );
 
 /******************************************************************************
  *
@@ -266,8 +270,10 @@ unsigned evt_waitUntil( evt_t *evt, cnt_t time );
  *
  * Parameters
  *   evt             : pointer to event object
+ *   data            : pointer to store event data
  *
- * Return            : event value or
+ * Return
+ *   E_SUCCESS       : event data was successfully transferred from the event object
  *   E_STOPPED       : event object was reseted
  *   E_DELETED       : event object was deleted
  *
@@ -276,7 +282,7 @@ unsigned evt_waitUntil( evt_t *evt, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned evt_wait( evt_t *evt ) { return evt_waitFor(evt, INFINITE); }
+unsigned evt_wait( evt_t *evt, unsigned *data ) { return evt_waitFor(evt, data, INFINITE); }
 
 /******************************************************************************
  *
@@ -287,7 +293,7 @@ unsigned evt_wait( evt_t *evt ) { return evt_waitFor(evt, INFINITE); }
  *
  * Parameters
  *   evt             : pointer to event object
- *   event           : all waiting tasks are resumed with the 'event' value
+ *   data            : event value
  *
  * Return            : none
  *
@@ -295,10 +301,10 @@ unsigned evt_wait( evt_t *evt ) { return evt_waitFor(evt, INFINITE); }
  *
  ******************************************************************************/
 
-void evt_give( evt_t *evt, unsigned event );
+void evt_give( evt_t *evt, unsigned data );
 
 __STATIC_INLINE
-void evt_giveISR( evt_t *evt, unsigned event ) { evt_give(evt, event); }
+void evt_giveISR( evt_t *evt, unsigned data ) { evt_give(evt, data); }
 
 #ifdef __cplusplus
 }
@@ -324,13 +330,16 @@ struct Event : public __evt
 	 Event( void ): __evt _EVT_INIT() {}
 	~Event( void ) { assert(__evt::obj.queue == nullptr); }
 
-	void     reset    ( void )            {        evt_reset    (this);         }
-	void     kill     ( void )            {        evt_kill     (this);         }
-	unsigned waitFor  ( cnt_t _delay )    { return evt_waitFor  (this, _delay); }
-	unsigned waitUntil( cnt_t _time )     { return evt_waitUntil(this, _time);  }
-	unsigned wait     ( void )            { return evt_wait     (this);         }
-	void     give     ( unsigned _event ) {        evt_give     (this, _event); }
-	void     giveISR  ( unsigned _event ) {        evt_giveISR  (this, _event); }
+	void     reset    ( void )                          {        evt_reset    (this);                 }
+	void     kill     ( void )                          {        evt_kill     (this);                 }
+	unsigned waitFor  ( unsigned*_event, cnt_t _delay ) { return evt_waitFor  (this, _event, _delay); }
+	unsigned waitFor  ( unsigned&_event, cnt_t _delay ) { return evt_waitFor  (this,&_event, _delay); }
+	unsigned waitUntil( unsigned*_event, cnt_t _time )  { return evt_waitUntil(this, _event, _time);  }
+	unsigned waitUntil( unsigned&_event, cnt_t _time )  { return evt_waitUntil(this,&_event, _time);  }
+	unsigned wait     ( unsigned*_event )               { return evt_wait     (this, _event);         }
+	unsigned wait     ( unsigned&_event )               { return evt_wait     (this,&_event);         }
+	void     give     ( unsigned _event )               {        evt_give     (this, _event);         }
+	void     giveISR  ( unsigned _event )               {        evt_giveISR  (this, _event);         }
 };
 
 #endif//__cplusplus
