@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,6 +78,18 @@ job_t *job_create( unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_job_reset( job_t *job, unsigned event )
+/* -------------------------------------------------------------------------- */
+{
+	job->count = 0;
+	job->head  = 0;
+	job->tail  = 0;
+
+	core_all_wakeup(job->obj.queue, event);
+}
+
+/* -------------------------------------------------------------------------- */
 void job_reset( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
@@ -87,11 +99,7 @@ void job_reset( job_t *job )
 
 	sys_lock();
 	{
-		job->count = 0;
-		job->head  = 0;
-		job->tail  = 0;
-
-		core_all_wakeup(job->obj.queue, E_STOPPED);
+		priv_job_reset(job, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -106,7 +114,7 @@ void job_delete( job_t *job )
 
 	sys_lock();
 	{
-		job_reset(job);
+		priv_job_reset(job, job->obj.res ? E_DELETED : E_STOPPED);
 		core_res_free(&job->obj.res);
 	}
 	sys_unlock();

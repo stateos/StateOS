@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -81,6 +81,18 @@ box_t *box_create( unsigned limit, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_box_reset( box_t *box, unsigned event )
+/* -------------------------------------------------------------------------- */
+{
+	box->count = 0;
+	box->head  = 0;
+	box->tail  = 0;
+
+	core_all_wakeup(box->obj.queue, event);
+}
+
+/* -------------------------------------------------------------------------- */
 void box_reset( box_t *box )
 /* -------------------------------------------------------------------------- */
 {
@@ -90,11 +102,7 @@ void box_reset( box_t *box )
 
 	sys_lock();
 	{
-		box->count = 0;
-		box->head  = 0;
-		box->tail  = 0;
-
-		core_all_wakeup(box->obj.queue, E_STOPPED);
+		priv_box_reset(box, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -109,7 +117,7 @@ void box_delete( box_t *box )
 
 	sys_lock();
 	{
-		box_reset(box);
+		priv_box_reset(box, box->obj.res ? E_DELETED : E_STOPPED);
 		core_res_free(&box->obj.res);
 	}
 	sys_unlock();

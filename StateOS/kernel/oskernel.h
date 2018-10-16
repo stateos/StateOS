@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    10.10.2018
+    @date    16.10.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -250,6 +250,9 @@ void core_mtx_unlink( mtx_t *mtx );
 // the task is waked with event 'event'
 // return pointer to the waked task or 0 if the blocked queue of 'mtx' is empty
 tsk_t *core_mtx_transferLock( mtx_t *mtx, unsigned event );
+
+// reset mutex 'mtx' and release all blocked tasks with event 'event'
+void core_mtx_reset( mtx_t *mtx, unsigned event );
 
 /* -------------------------------------------------------------------------- */
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    10.10.2018
+    @date    16.10.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -596,6 +596,14 @@ tsk_t *core_mtx_transferLock( mtx_t *mtx, unsigned event )
 	core_mtx_link(mtx, tsk);
 
 	return tsk;
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_mtx_reset( mtx_t *mtx, unsigned event )
+{
+	core_mtx_unlink(mtx);
+	core_all_wakeup(mtx->obj.queue, event);
 }
 
 /* -------------------------------------------------------------------------- */

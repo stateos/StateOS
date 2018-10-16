@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -72,6 +72,16 @@ flg_t *flg_create( unsigned init )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_flg_reset( flg_t *flg, unsigned event )
+/* -------------------------------------------------------------------------- */
+{
+	flg->flags = 0;
+
+	core_all_wakeup(flg->obj.queue, event);
+}
+
+/* -------------------------------------------------------------------------- */
 void flg_reset( flg_t *flg )
 /* -------------------------------------------------------------------------- */
 {
@@ -81,9 +91,7 @@ void flg_reset( flg_t *flg )
 
 	sys_lock();
 	{
-		flg->flags = 0;
-
-		core_all_wakeup(flg->obj.queue, E_STOPPED);
+		priv_flg_reset(flg, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -98,7 +106,7 @@ void flg_delete( flg_t *flg )
 
 	sys_lock();
 	{
-		flg_reset(flg);
+		priv_flg_reset(flg, flg->obj.res ? E_DELETED : E_STOPPED);
 		core_res_free(&flg->obj.res);
 	}
 	sys_unlock();

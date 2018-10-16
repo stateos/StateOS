@@ -235,7 +235,7 @@ void flg_kill( flg_t *flg ) { flg_reset(flg); }
  *
  * Name              : flg_delete
  *
- * Description       : reset the flag object and free allocated resource
+ * Description       : reset the flag object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   flg             : pointer to flag object
@@ -303,6 +303,7 @@ unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(
  * Return
  *   E_SUCCESS       : required flags have been set
  *   E_STOPPED       : flag object was reseted before the specified timeout expired
+ *   E_DELETED       : flag object was deleted before the specified timeout expired
  *   E_TIMEOUT       : required flags have not been set before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -331,6 +332,7 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay );
  * Return
  *   E_SUCCESS       : required flags have been set
  *   E_STOPPED       : flag object was reseted before the specified timeout expired
+ *   E_DELETED       : flag object was deleted before the specified timeout expired
  *   E_TIMEOUT       : required flags have not been set before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -358,6 +360,7 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
  * Return
  *   E_SUCCESS       : required flags have been set
  *   E_STOPPED       : flag object was reseted
+ *   E_DELETED       : flag object was deleted
  *
  * Note              : use only in thread mode
  *

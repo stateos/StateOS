@@ -784,6 +784,7 @@ unsigned cur_detach( void ) { return tsk_detach(System.cur); }
  * Return
  *   E_SUCCESS       : given task was stopped
  *   E_STOPPED       : given task was reseted
+ *   E_DELETED       : given task was deleted
  *   E_FAILURE       : given task cannot be joined
  *
  * Note              : use only in thread mode

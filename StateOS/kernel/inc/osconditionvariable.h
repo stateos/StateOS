@@ -208,7 +208,7 @@ void cnd_kill( cnd_t *cnd ) { cnd_reset(cnd); }
  *
  * Name              : cnd_delete
  *
- * Description       : reset the condition variable object and free allocated resource
+ * Description       : reset the condition variable object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   cnd             : pointer to condition variable object
@@ -240,6 +240,7 @@ void cnd_delete( cnd_t *cnd );
  *   OWNERDEAD       : owned mutex was locked again but previous owner of the mutex was reseted
  *   E_FAILURE       : mutex object can't be unlocked
  *   E_STOPPED       : condition variable or mutex object was reseted
+ *   E_DELETED       : condition variable or mutex object was deleted
  *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired; owned mutex was locked again
  *
  * Note              : use only in thread mode
@@ -265,6 +266,7 @@ unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay );
  *   OWNERDEAD       : owned mutex was locked again but previous owner of the mutex was reseted
  *   E_FAILURE       : mutex object can't be unlocked
  *   E_STOPPED       : condition variable or mutex object was reseted
+ *   E_DELETED       : condition variable or mutex object was deleted
  *   E_TIMEOUT       : condition variable object was not signalled before the specified timeout expired; owned mutex was locked again
  *
  * Note              : use only in thread mode
@@ -289,6 +291,7 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time );
  *   OWNERDEAD       : owned mutex was locked again but previous owner of the mutex was reseted
  *   E_FAILURE       : mutex object can't be unlocked
  *   E_STOPPED       : condition variable or mutex object was reseted
+ *   E_DELETED       : condition variable or mutex object was deleted
  *
  * Note              : use only in thread mode
  *

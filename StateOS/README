@@ -63,6 +63,7 @@ Features:
 - current task is destroyed asynchronously by the destructor
 - renamed idle procedures
 - changed usage of signals
+- added E_DELETED event constant
 ---------
 6.2
 - updated kernel

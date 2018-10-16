@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -107,6 +107,14 @@ mem_t *mem_create( unsigned limit, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_mem_reset( mem_t *mem, unsigned event )
+/* -------------------------------------------------------------------------- */
+{
+	core_all_wakeup(mem->lst.obj.queue, event);
+}
+
+/* -------------------------------------------------------------------------- */
 void mem_reset( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
@@ -116,7 +124,7 @@ void mem_reset( mem_t *mem )
 
 	sys_lock();
 	{
-		core_all_wakeup(mem->lst.obj.queue, E_STOPPED);
+		priv_mem_reset(mem, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -131,7 +139,7 @@ void mem_delete( mem_t *mem )
 
 	sys_lock();
 	{
-		mem_reset(mem);
+		priv_mem_reset(mem, mem->lst.obj.res ? E_DELETED : E_STOPPED);
 		core_res_free(&mem->lst.obj.res);
 	}
 	sys_unlock();

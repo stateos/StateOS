@@ -259,7 +259,7 @@ void sem_kill( sem_t *sem ) { sem_reset(sem); }
  *
  * Name              : sem_delete
  *
- * Description       : reset the semaphore object and free allocated resource
+ * Description       : reset the semaphore object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   sem             : pointer to semaphore object
@@ -316,6 +316,7 @@ unsigned sem_takeISR( sem_t *sem ) { return sem_take(sem); }
  * Return
  *   E_SUCCESS       : semaphore object was successfully locked
  *   E_STOPPED       : semaphore object was reseted before the specified timeout expired
+ *   E_DELETED       : semaphore object was deleted before the specified timeout expired
  *   E_TIMEOUT       : semaphore object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -338,6 +339,7 @@ unsigned sem_waitFor( sem_t *sem, cnt_t delay );
  * Return
  *   E_SUCCESS       : semaphore object was successfully locked
  *   E_STOPPED       : semaphore object was reseted before the specified timeout expired
+ *   E_DELETED       : semaphore object was deleted before the specified timeout expired
  *   E_TIMEOUT       : semaphore object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -359,6 +361,7 @@ unsigned sem_waitUntil( sem_t *sem, cnt_t time );
  * Return
  *   E_SUCCESS       : semaphore object was successfully locked
  *   E_STOPPED       : semaphore object was reseted
+ *   E_DELETED       : semaphore object was deleted
  *
  * Note              : use only in thread mode
  *
@@ -413,6 +416,7 @@ unsigned sem_giveISR( sem_t *sem ) { return sem_give(sem); }
  *   E_SUCCESS       : semaphore object was successfully unlocked
  *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
  *   E_STOPPED       : semaphore object was reseted before the specified timeout expired
+ *   E_DELETED       : semaphore object was deleted before the specified timeout expired
  *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -436,6 +440,7 @@ unsigned sem_sendFor( sem_t *sem, cnt_t delay );
  *   E_SUCCESS       : semaphore object was successfully unlocked
  *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
  *   E_STOPPED       : semaphore object was reseted before the specified timeout expired
+ *   E_DELETED       : semaphore object was deleted before the specified timeout expired
  *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -458,6 +463,7 @@ unsigned sem_sendUntil( sem_t *sem, cnt_t time );
  *   E_SUCCESS       : semaphore object was successfully unlocked
  *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
  *   E_STOPPED       : semaphore object was reseted
+ *   E_DELETED       : semaphore object was deleted
  *
  * Note              : use only in thread mode
  *

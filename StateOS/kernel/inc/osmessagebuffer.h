@@ -254,7 +254,7 @@ void msg_kill( msg_t *msg ) { msg_reset(msg); }
  *
  * Name              : msg_delete
  *
- * Description       : reset the message buffer object and free allocated resource
+ * Description       : reset the message buffer object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   msg             : pointer to message buffer object
@@ -315,6 +315,7 @@ unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(
  * Return            : number of bytes read from the message buffer or
  *   E_FAILURE       : not enough space in the write buffer
  *   E_STOPPED       : message buffer object was reseted before the specified timeout expired
+ *   E_DELETED       : message buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : message buffer object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -339,6 +340,7 @@ unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay );
  * Return            : number of bytes read from the message buffer or
  *   E_FAILURE       : not enough space in the write buffer
  *   E_STOPPED       : message buffer object was reseted before the specified timeout expired
+ *   E_DELETED       : message buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : message buffer object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -362,6 +364,7 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time );
  * Return            : number of bytes read from the message buffer or
  *   E_FAILURE       : not enough space in the write buffer
  *   E_STOPPED       : message buffer object was reseted
+ *   E_DELETED       : message buffer object was deleted
  *
  * Note              : use only in thread mode
  *
@@ -416,6 +419,7 @@ unsigned msg_giveISR( msg_t *msg, const void *data, unsigned size ) { return msg
  *   E_SUCCESS       : message data was successfully transfered to the message buffer object
  *   E_FAILURE       : size of the message data is out of the limit
  *   E_STOPPED       : message buffer object was reseted before the specified timeout expired
+ *   E_DELETED       : message buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : message buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -441,6 +445,7 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
  *   E_SUCCESS       : message data was successfully transfered to the message buffer object
  *   E_FAILURE       : size of the message data is out of the limit
  *   E_STOPPED       : message buffer object was reseted before the specified timeout expired
+ *   E_DELETED       : message buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : message buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -465,6 +470,7 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
  *   E_SUCCESS       : message data was successfully transfered to the message buffer object
  *   E_FAILURE       : size of the message data is out of the limit
  *   E_STOPPED       : message buffer object was reseted
+ *   E_DELETED       : message buffer object was deleted
  *
  * Note              : use only in thread mode
  *

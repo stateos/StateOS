@@ -232,7 +232,7 @@ void lst_kill( lst_t *lst ) { lst_reset(lst); }
  *
  * Name              : lst_delete
  *
- * Description       : reset the list object and free allocated resource
+ * Description       : reset the list object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   lst             : pointer to list object
@@ -291,6 +291,7 @@ unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_take(lst, data); }
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
  *   E_STOPPED       : list object was reseted before the specified timeout expired
+ *   E_DELETED       : list object was deleted before the specified timeout expired
  *   E_TIMEOUT       : list object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -314,6 +315,7 @@ unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay );
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
  *   E_STOPPED       : list object was reseted before the specified timeout expired
+ *   E_DELETED       : list object was deleted before the specified timeout expired
  *   E_TIMEOUT       : list object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -336,6 +338,7 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time );
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
  *   E_STOPPED       : list object was reseted
+ *   E_DELETED       : list object was deleted
  *
  * Note              : use only in thread mode
  *

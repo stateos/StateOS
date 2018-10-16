@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -72,6 +72,16 @@ sig_t *sig_create( unsigned mask )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_sig_reset( sig_t *sig, unsigned event )
+/* -------------------------------------------------------------------------- */
+{
+	sig->sigset = 0;
+
+	core_all_wakeup(sig->obj.queue, event);
+}
+
+/* -------------------------------------------------------------------------- */
 void sig_reset( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
@@ -81,9 +91,7 @@ void sig_reset( sig_t *sig )
 
 	sys_lock();
 	{
-		sig->sigset = 0;
-
-		core_all_wakeup(sig->obj.queue, E_STOPPED);
+		priv_sig_reset(sig, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -98,7 +106,7 @@ void sig_delete( sig_t *sig )
 
 	sys_lock();
 	{
-		sig_reset(sig);
+		priv_sig_reset(sig, sig->obj.res ? E_DELETED : E_STOPPED);
 		core_res_free(&sig->obj.res);
 	}
 	sys_unlock();

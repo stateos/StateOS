@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,6 +78,18 @@ stm_t *stm_create( unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_stm_reset( stm_t *stm, unsigned event )
+/* -------------------------------------------------------------------------- */
+{
+	stm->count = 0;
+	stm->head  = 0;
+	stm->tail  = 0;
+
+	core_all_wakeup(stm->obj.queue, event);
+}
+
+/* -------------------------------------------------------------------------- */
 void stm_reset( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
@@ -87,11 +99,7 @@ void stm_reset( stm_t *stm )
 
 	sys_lock();
 	{
-		stm->count = 0;
-		stm->head  = 0;
-		stm->tail  = 0;
-
-		core_all_wakeup(stm->obj.queue, E_STOPPED);
+		priv_stm_reset(stm, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -106,7 +114,7 @@ void stm_delete( stm_t *stm )
 
 	sys_lock();
 	{
-		stm_reset(stm);
+		priv_stm_reset(stm, stm->obj.res ? E_DELETED : E_STOPPED);
 		core_res_free(&stm->obj.res);
 	}
 	sys_unlock();

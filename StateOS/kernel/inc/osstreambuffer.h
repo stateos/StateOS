@@ -254,7 +254,7 @@ void stm_kill( stm_t *stm ) { stm_reset(stm); }
  *
  * Name              : stm_delete
  *
- * Description       : reset the stream buffer object and free allocated resource
+ * Description       : reset the stream buffer object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   stm             : pointer to stream buffer object
@@ -313,6 +313,7 @@ unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(
  *
  * Return            : number of bytes read from the stream buffer or
  *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
+ *   E_DELETED       : stream buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : stream buffer object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -336,6 +337,7 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
  *
  * Return            : number of bytes read from the stream buffer or
  *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
+ *   E_DELETED       : stream buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : stream buffer object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -358,6 +360,7 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
  *
  * Return            : number of bytes read from the stream buffer or
  *   E_STOPPED       : stream buffer object was reseted
+ *   E_DELETED       : stream buffer object was deleted
  *
  * Note              : use only in thread mode
  *
@@ -412,6 +415,7 @@ unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm
  *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
  *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
+ *   E_DELETED       : stream buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : stream buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -437,6 +441,7 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
  *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
  *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
+ *   E_DELETED       : stream buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : stream buffer object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -461,6 +466,7 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
  *   E_SUCCESS       : stream data was successfully transfered to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
  *   E_STOPPED       : stream buffer object was reseted
+ *   E_DELETED       : stream buffer object was deleted
  *
  * Note              : use only in thread mode
  *

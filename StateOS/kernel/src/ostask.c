@@ -205,6 +205,7 @@ unsigned tsk_join( tsk_t *tsk )
 			event = core_tsk_waitFor(&tsk->join, INFINITE); // wait for termination
 
 		if (event != E_FAILURE &&                           // task has not been detached
+		    event != E_DELETED &&                           // task has not been deleted
 		    tsk->hdr.id == ID_STOPPED)                      // task is still inactive
 			core_res_free(&tsk->hdr.obj.res);               // release resources
 	}
@@ -227,7 +228,7 @@ void priv_mtx_remove( tsk_t *tsk )
 	{
 		nxt = mtx->list;
 		if ((mtx->mode & mtxRobust) == 0)
-			mtx_reset(mtx);
+			core_mtx_reset(mtx, E_STOPPED);
 		else
 		if (core_mtx_transferLock(mtx, OWNERDEAD) == 0)
 			mtx->mode |= mtxInconsistent;
@@ -244,7 +245,7 @@ void priv_tsk_remove( tsk_t *tsk )
 	else
 	if (tsk->hdr.id == ID_BLOCKED)       // blocked task
 	{
-		core_tsk_unlink(tsk, E_STOPPED); // remove task from blocked queue
+		core_tsk_unlink(tsk, 0);         // remove task from blocked queue; ignored event value
 		core_tmr_remove((tmr_t *)tsk);   // remove task from timers queue
 	}
 }
@@ -271,7 +272,7 @@ void idle_tsk_destructor( void )
 			if (tsk->join != DETACHED)                 // task not detached
 			{
 				priv_mtx_remove(tsk);                  // release all owned robust mutexes
-				core_tsk_wakeup(tsk->join, E_FAILURE); // notify waiting task
+				core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task
 			}
 
 			priv_tsk_remove(tsk);                      // remove task from all queues
@@ -368,7 +369,7 @@ unsigned tsk_delete( tsk_t *tsk )
 			if (tsk->hdr.id != ID_STOPPED)             // only active task can be removed
 			{
 				priv_mtx_remove(tsk);                  // release all owned robust mutexes
-				core_tsk_wakeup(tsk->join, E_FAILURE); // notify waiting task             
+				core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task             
 				priv_tsk_remove(tsk);                  // remove task from all queues     
 			}
 
@@ -613,7 +614,7 @@ unsigned tsk_resume( tsk_t *tsk )
 	{
 		if (tsk->guard == &System.dly && tsk->delay == INFINITE)
 		{
-			core_tsk_wakeup(tsk, 0); // unused event value
+			core_tsk_wakeup(tsk, 0); // ignored event value
 			event = E_SUCCESS;
 		}
 		else

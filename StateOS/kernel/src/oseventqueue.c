@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,6 +78,18 @@ evq_t *evq_create( unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_evq_reset( evq_t *evq, unsigned event )
+/* -------------------------------------------------------------------------- */
+{
+	evq->count = 0;
+	evq->head  = 0;
+	evq->tail  = 0;
+
+	core_all_wakeup(evq->obj.queue, event);
+}
+
+/* -------------------------------------------------------------------------- */
 void evq_reset( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
@@ -87,11 +99,7 @@ void evq_reset( evq_t *evq )
 
 	sys_lock();
 	{
-		evq->count = 0;
-		evq->head  = 0;
-		evq->tail  = 0;
-
-		core_all_wakeup(evq->obj.queue, E_STOPPED);
+		priv_evq_reset(evq, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -106,7 +114,7 @@ void evq_delete( evq_t *evq )
 
 	sys_lock();
 	{
-		evq_reset(evq);
+		priv_evq_reset(evq, evq->obj.res ? E_DELETED : E_STOPPED);
 		core_res_free(&evq->obj.res);
 	}
 	sys_unlock();

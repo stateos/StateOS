@@ -231,7 +231,7 @@ void sig_kill( sig_t *sig ) { sig_reset(sig); }
  *
  * Name              : sig_delete
  *
- * Description       : reset the signal object and free allocated resource
+ * Description       : reset the signal object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   sig             : pointer to signal object
@@ -286,6 +286,7 @@ unsigned sig_takeISR( sig_t *sig, unsigned sigset ) { return sig_take(sig, sigse
  *
  * Return            : the lowest number of expected signal from the set of all pending signals or
  *   E_STOPPED       : signal object was reseted before the specified timeout expired
+ *   E_DELETED       : signal object was deleted before the specified timeout expired
  *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -307,6 +308,7 @@ unsigned sig_waitFor( sig_t *sig, unsigned sigset, cnt_t delay );
  *
  * Return            : the lowest number of expected signal from the set of all pending signals or
  *   E_STOPPED       : signal object was reseted before the specified timeout expired
+ *   E_DELETED       : signal object was deleted before the specified timeout expired
  *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -327,6 +329,7 @@ unsigned sig_waitUntil( sig_t *sig, unsigned sigset, cnt_t time );
  *
  * Return            : the lowest number of expected signal from the set of all pending signals or
  *   E_STOPPED       : signal object was reseted
+ *   E_DELETED       : signal object was deleted
  *
  * Note              : use only in thread mode
  *

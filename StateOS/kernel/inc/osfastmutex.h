@@ -205,7 +205,7 @@ void mut_kill( mut_t *mut ) { mut_reset(mut); }
  *
  * Name              : mut_delete
  *
- * Description       : reset the fast mutex object and free allocated resource
+ * Description       : reset the fast mutex object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   mut             : pointer to fast mutex object
@@ -260,6 +260,7 @@ unsigned mut_tryLock( mut_t *mut ) { return mut_take(mut); }
  *   E_SUCCESS       : fast mutex object was successfully locked
  *   E_FAILURE       : fast mutex object can't be locked by owner task
  *   E_STOPPED       : fast mutex object was reseted before the specified timeout expired
+ *   E_DELETED       : fast mutex object was deleted before the specified timeout expired
  *   E_TIMEOUT       : fast mutex object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -283,6 +284,7 @@ unsigned mut_waitFor( mut_t *mut, cnt_t delay );
  *   E_SUCCESS       : fast mutex object was successfully locked
  *   E_FAILURE       : fast mutex object can't be locked by owner task
  *   E_STOPPED       : fast mutex object was reseted before the specified timeout expired
+ *   E_DELETED       : fast mutex object was deleted before the specified timeout expired
  *   E_TIMEOUT       : fast mutex object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -306,6 +308,7 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time );
  *   E_SUCCESS       : fast mutex object was successfully locked
  *   E_FAILURE       : fast mutex object can't be locked by owner task
  *   E_STOPPED       : fast mutex object was reseted
+ *   E_DELETED       : fast mutex object was deleted
  *
  * Note              : use only in thread mode
  *

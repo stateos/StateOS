@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -73,6 +73,16 @@ sem_t *sem_create( unsigned init, unsigned limit )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_sem_reset( sem_t *sem, unsigned event )
+/* -------------------------------------------------------------------------- */
+{
+	sem->count = 0;
+
+	core_all_wakeup(sem->obj.queue, event);
+}
+
+/* -------------------------------------------------------------------------- */
 void sem_reset( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
@@ -82,9 +92,7 @@ void sem_reset( sem_t *sem )
 
 	sys_lock();
 	{
-		sem->count = 0;
-
-		core_all_wakeup(sem->obj.queue, E_STOPPED);
+		priv_sem_reset(sem, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -99,7 +107,7 @@ void sem_delete( sem_t *sem )
 
 	sys_lock();
 	{
-		sem_reset(sem);
+		priv_sem_reset(sem, sem->obj.res ? E_DELETED : E_STOPPED);
 		core_res_free(&sem->obj.res);
 	}
 	sys_unlock();

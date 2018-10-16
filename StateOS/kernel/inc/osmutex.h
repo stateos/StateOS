@@ -282,7 +282,7 @@ void mtx_kill( mtx_t *mtx ) { mtx_reset(mtx); }
  *
  * Name              : mtx_delete
  *
- * Description       : reset the mutex object and free allocated resource
+ * Description       : reset the mutex object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   mtx             : pointer to mutex object
@@ -378,6 +378,7 @@ unsigned mtx_tryLock( mtx_t *mtx ) { return mtx_take(mtx); }
  *   OWNERDEAD       : mutex object was successfully locked, previous owner was reseted
  *   E_FAILURE       : mutex object can't be locked
  *   E_STOPPED       : mutex object was reseted before the specified timeout expired
+ *   E_DELETED       : mutex object was deleted before the specified timeout expired
  *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -402,6 +403,7 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay );
  *   OWNERDEAD       : mutex object was successfully locked, previous owner was reseted
  *   E_FAILURE       : mutex object can't be locked
  *   E_STOPPED       : mutex object was reseted before the specified timeout expired
+ *   E_DELETED       : mutex object was deleted before the specified timeout expired
  *   E_TIMEOUT       : mutex object was not locked before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -426,6 +428,7 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
  *   OWNERDEAD       : mutex object was successfully locked, previous owner was reseted
  *   E_FAILURE       : mutex object can't be locked
  *   E_STOPPED       : mutex object was reseted
+ *   E_DELETED       : mutex object was deleted
  *
  * Note              : use only in thread mode
  *

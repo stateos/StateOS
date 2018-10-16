@@ -370,7 +370,7 @@ void tmr_kill( tmr_t *tmr ) { tmr_reset(tmr); }
  *
  * Name              : tmr_delete
  *
- * Description       : reset the timer object and free allocated resource
+ * Description       : reset the timer object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   tmr             : pointer to timer object
@@ -582,6 +582,7 @@ unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_take(tmr); }
  *   E_SUCCESS       : timer object successfully finished countdown
  *   E_FAILURE       : timer has not yet been started
  *   E_STOPPED       : timer object was reseted before the specified timeout expired
+ *   E_DELETED       : timer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -607,6 +608,7 @@ unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay );
  *   E_SUCCESS       : timer object successfully finished countdown
  *   E_FAILURE       : timer has not yet been started
  *   E_STOPPED       : timer object was reseted before the specified timeout expired
+ *   E_DELETED       : timer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -629,6 +631,7 @@ unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay );
  *   E_SUCCESS       : timer object successfully finished countdown
  *   E_FAILURE       : timer has not yet been started
  *   E_STOPPED       : timer object was reseted before the specified timeout expired
+ *   E_DELETED       : timer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : timer object has not finished countdown before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -650,6 +653,7 @@ unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time );
  *   E_SUCCESS       : timer object successfully finished countdown
  *   E_FAILURE       : timer has not yet been started
  *   E_STOPPED       : timer object was reseted before the countdown ended
+ *   E_DELETED       : timer object was deleted before the countdown ended
  *
  * Note              : use only in thread mode
  *

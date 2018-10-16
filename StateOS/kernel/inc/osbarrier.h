@@ -211,7 +211,7 @@ void bar_kill( bar_t *bar ) { bar_reset(bar); }
  *
  * Name              : bar_delete
  *
- * Description       : reset the barrier object and free allocated resource
+ * Description       : reset the barrier object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   bar             : pointer to barrier object
@@ -239,6 +239,7 @@ void bar_delete( bar_t *bar );
  * Return
  *   E_SUCCESS       : barrier object was successfully released
  *   E_STOPPED       : barrier object was reseted before the specified timeout expired
+ *   E_DELETED       : barrier object was deleted before the specified timeout expired
  *   E_TIMEOUT       : barrier object was not released before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -260,6 +261,7 @@ unsigned bar_waitFor( bar_t *bar, cnt_t delay );
  * Return
  *   E_SUCCESS       : barrier object was successfully released
  *   E_STOPPED       : barrier object was reseted before the specified timeout expired
+ *   E_DELETED       : barrier object was deleted before the specified timeout expired
  *   E_TIMEOUT       : barrier object was not released before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -280,6 +282,7 @@ unsigned bar_waitUntil( bar_t *bar, cnt_t time );
  * Return
  *   E_SUCCESS       : barrier object was successfully released
  *   E_STOPPED       : barrier object was reseted
+ *   E_DELETED       : barrier object was deleted
  *
  * Note              : use only in thread mode
  *

@@ -239,7 +239,7 @@ void job_kill( job_t *job ) { job_reset(job); }
  *
  * Name              : job_delete
  *
- * Description       : reset the job queue object and free allocated resource
+ * Description       : reset the job queue object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   job             : pointer to job queue object
@@ -296,6 +296,7 @@ unsigned job_takeISR( job_t *job ) { return job_take(job); }
  * Return
  *   E_SUCCESS       : job data was successfully transfered from the job queue object
  *   E_STOPPED       : job queue object was reseted before the specified timeout expired
+ *   E_DELETED       : job queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : job queue object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -318,6 +319,7 @@ unsigned job_waitFor( job_t *job, cnt_t delay );
  * Return
  *   E_SUCCESS       : job data was successfully transfered from the job queue object
  *   E_STOPPED       : job queue object was reseted before the specified timeout expired
+ *   E_DELETED       : job queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : job queue object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -339,6 +341,7 @@ unsigned job_waitUntil( job_t *job, cnt_t time );
  * Return
  *   E_SUCCESS       : job data was successfully transfered from the job queue object
  *   E_STOPPED       : job queue object was reseted
+ *   E_DELETED       : job queue object was deleted
  *
  * Note              : use only in thread mode
  *
@@ -389,6 +392,7 @@ unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_give(job, fun); }
  * Return
  *   E_SUCCESS       : job data was successfully transfered to the job queue object
  *   E_STOPPED       : job queue object was reseted before the specified timeout expired
+ *   E_DELETED       : job queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : job queue object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -412,6 +416,7 @@ unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay );
  * Return
  *   E_SUCCESS       : job data was successfully transfered to the job queue object
  *   E_STOPPED       : job queue object was reseted before the specified timeout expired
+ *   E_DELETED       : job queue object was deleted before the specified timeout expired
  *   E_TIMEOUT       : job queue object is full and was not issued data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -434,6 +439,7 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
  * Return
  *   E_SUCCESS       : job data was successfully transfered to the job queue object
  *   E_STOPPED       : job queue object was reseted
+ *   E_DELETED       : job queue object was deleted
  *
  * Note              : use only in thread mode
  *

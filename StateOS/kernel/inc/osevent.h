@@ -201,7 +201,7 @@ void evt_kill( evt_t *evt ) { evt_reset(evt); }
  *
  * Name              : evt_delete
  *
- * Description       : reset the event object and free allocated resource
+ * Description       : reset the event object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   evt             : pointer to event object
@@ -228,6 +228,7 @@ void evt_delete( evt_t *evt );
  *
  * Return            : event value or
  *   E_STOPPED       : event object was reseted before the specified timeout expired
+ *   E_DELETED       : event object was deleted before the specified timeout expired
  *   E_TIMEOUT       : event object was not released before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -248,6 +249,7 @@ unsigned evt_waitFor( evt_t *evt, cnt_t delay );
  *
  * Return            : event value or
  *   E_STOPPED       : event object was reseted before the specified timeout expired
+ *   E_DELETED       : event object was deleted before the specified timeout expired
  *   E_TIMEOUT       : event object was not released before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -266,7 +268,8 @@ unsigned evt_waitUntil( evt_t *evt, cnt_t time );
  *   evt             : pointer to event object
  *
  * Return            : event value or
- *   E_STOPPED       : event object was reseted before the specified timeout expired
+ *   E_STOPPED       : event object was reseted
+ *   E_DELETED       : event object was deleted
  *
  * Note              : use only in thread mode
  *

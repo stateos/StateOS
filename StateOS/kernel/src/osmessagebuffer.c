@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    15.10.2018
+    @date    16.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -76,6 +76,18 @@ msg_t *msg_create( unsigned limit )
 
 	return msg;
 }
+/* -------------------------------------------------------------------------- */
+static
+void priv_msg_reset( msg_t *msg, unsigned event )
+/* -------------------------------------------------------------------------- */
+{
+	msg->count = 0;
+	msg->head  = 0;
+	msg->tail  = 0;
+
+	core_all_wakeup(msg->obj.queue, event);
+}
+
 
 /* -------------------------------------------------------------------------- */
 void msg_reset( msg_t *msg )
@@ -87,11 +99,7 @@ void msg_reset( msg_t *msg )
 
 	sys_lock();
 	{
-		msg->count = 0;
-		msg->head  = 0;
-		msg->tail  = 0;
-
-		core_all_wakeup(msg->obj.queue, E_STOPPED);
+		priv_msg_reset(msg, E_STOPPED);
 	}
 	sys_unlock();
 }
@@ -106,7 +114,7 @@ void msg_delete( msg_t *msg )
 
 	sys_lock();
 	{
-		msg_reset(msg);
+		priv_msg_reset(msg, msg->obj.res ? E_DELETED : E_STOPPED);
 		core_res_free(&msg->obj.res);
 	}
 	sys_unlock();

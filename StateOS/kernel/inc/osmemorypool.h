@@ -246,7 +246,7 @@ mem_t *mem_new( unsigned limit, unsigned size ) { return mem_create(limit, size)
  * Name              : mem_reset
  * Alias             : mem_kill
  *
- * Description       : wake up all waiting tasks with 'E_STOPPED' event value
+ * Description       : reset the memory pool object and wake up all waiting tasks with 'E_STOPPED' event value
  *
  * Parameters
  *   mem             : pointer to memory pool object
@@ -266,7 +266,7 @@ void mem_kill( mem_t *mem ) { mem_reset(mem); }
  *
  * Name              : mem_delete
  *
- * Description       : reset the memory pool object and free allocated resource
+ * Description       : reset the memory pool object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
  * Parameters
  *   mem             : pointer to memory pool object
@@ -326,6 +326,7 @@ unsigned mem_takeISR( mem_t *mem, void **data ) { return lst_takeISR(&mem->lst, 
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
  *   E_STOPPED       : memory pool object was reseted before the specified timeout expired
+ *   E_DELETED       : memory pool object was deleted before the specified timeout expired
  *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -350,6 +351,7 @@ unsigned mem_waitFor( mem_t *mem, void **data, cnt_t delay ) { return lst_waitFo
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
  *   E_STOPPED       : memory pool object was reseted before the specified timeout expired
+ *   E_DELETED       : memory pool object was deleted before the specified timeout expired
  *   E_TIMEOUT       : memory pool object is empty and was not received data before the specified timeout expired
  *
  * Note              : use only in thread mode
@@ -373,6 +375,7 @@ unsigned mem_waitUntil( mem_t *mem, void **data, cnt_t time ) { return lst_waitU
  * Return
  *   E_SUCCESS       : pointer to memory object was successfully transfered to the data pointer
  *   E_STOPPED       : memory pool object was reseted
+ *   E_DELETED       : memory pool object was deleted
  *
  * Note              : use only in thread mode
  *
