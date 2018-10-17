@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    17.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -219,6 +219,7 @@ unsigned evq_take( evq_t *evq, unsigned *data )
 	assert(evq->obj.res!=RELEASED);
 	assert(evq->data);
 	assert(evq->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -240,6 +241,7 @@ unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay )
 	assert(evq->obj.res!=RELEASED);
 	assert(evq->data);
 	assert(evq->limit);
+	assert(data);
 
 	sys_lock();
 	{
@@ -267,6 +269,7 @@ unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time )
 	assert(evq->obj.res!=RELEASED);
 	assert(evq->data);
 	assert(evq->limit);
+	assert(data);
 
 	sys_lock();
 	{

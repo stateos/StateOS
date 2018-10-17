@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    17.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -499,27 +499,33 @@ struct EventQueueT : public __evq
 	 EventQueueT( void ): __evq _EVQ_INIT(limit_, data_) {}
 	~EventQueueT( void ) { assert(__evq::obj.queue == nullptr); }
 
-	void     reset    ( void )                          {        evq_reset    (this);                }
-	void     kill     ( void )                          {        evq_kill     (this);                }
-	unsigned take     ( unsigned *_data )               { return evq_take     (this, _data);         }
-	unsigned tryWait  ( unsigned *_data )               { return evq_tryWait  (this, _data);         }
-	unsigned takeISR  ( unsigned *_data )               { return evq_takeISR  (this, _data);         }
-	unsigned waitFor  ( unsigned *_data, cnt_t _delay ) { return evq_waitFor  (this, _data, _delay); }
-	unsigned waitUntil( unsigned *_data, cnt_t _time )  { return evq_waitUntil(this, _data, _time);  }
-	unsigned wait     ( unsigned *_data )               { return evq_wait     (this, _data);         }
-	unsigned give     ( unsigned  _data )               { return evq_give     (this, _data);         }
-	unsigned giveISR  ( unsigned  _data )               { return evq_giveISR  (this, _data);         }
-	unsigned sendFor  ( unsigned  _data, cnt_t _delay ) { return evq_sendFor  (this, _data, _delay); }
-	unsigned sendUntil( unsigned  _data, cnt_t _time )  { return evq_sendUntil(this, _data, _time);  }
-	unsigned send     ( unsigned  _data )               { return evq_send     (this, _data);         }
-	void     push     ( unsigned  _data )               {        evq_push     (this, _data);         }
-	void     pushISR  ( unsigned  _data )               {        evq_pushISR  (this, _data);         }
-	unsigned count    ( void )                          { return evq_count    (this);                }
-	unsigned countISR ( void )                          { return evq_countISR (this);                }
-	unsigned space    ( void )                          { return evq_space    (this);                }
-	unsigned spaceISR ( void )                          { return evq_spaceISR (this);                }
-	unsigned limit    ( void )                          { return evq_limit    (this);                }
-	unsigned limitISR ( void )                          { return evq_limitISR (this);                }
+	void     reset    ( void )                         {        evq_reset    (this);                }
+	void     kill     ( void )                         {        evq_kill     (this);                }
+	unsigned take     ( unsigned*_data )               { return evq_take     (this, _data);         }
+	unsigned take     ( unsigned&_data )               { return evq_take     (this,&_data);         }
+	unsigned tryWait  ( unsigned*_data )               { return evq_tryWait  (this, _data);         }
+	unsigned tryWait  ( unsigned&_data )               { return evq_tryWait  (this,&_data);         }
+	unsigned takeISR  ( unsigned*_data )               { return evq_takeISR  (this, _data);         }
+	unsigned takeISR  ( unsigned&_data )               { return evq_takeISR  (this,&_data);         }
+	unsigned waitFor  ( unsigned*_data, cnt_t _delay ) { return evq_waitFor  (this, _data, _delay); }
+	unsigned waitFor  ( unsigned&_data, cnt_t _delay ) { return evq_waitFor  (this,&_data, _delay); }
+	unsigned waitUntil( unsigned*_data, cnt_t _time )  { return evq_waitUntil(this, _data, _time);  }
+	unsigned waitUntil( unsigned&_data, cnt_t _time )  { return evq_waitUntil(this,&_data, _time);  }
+	unsigned wait     ( unsigned*_data )               { return evq_wait     (this, _data);         }
+	unsigned wait     ( unsigned&_data )               { return evq_wait     (this,&_data);         }
+	unsigned give     ( unsigned _data )               { return evq_give     (this, _data);         }
+	unsigned giveISR  ( unsigned _data )               { return evq_giveISR  (this, _data);         }
+	unsigned sendFor  ( unsigned _data, cnt_t _delay ) { return evq_sendFor  (this, _data, _delay); }
+	unsigned sendUntil( unsigned _data, cnt_t _time )  { return evq_sendUntil(this, _data, _time);  }
+	unsigned send     ( unsigned _data )               { return evq_send     (this, _data);         }
+	void     push     ( unsigned _data )               {        evq_push     (this, _data);         }
+	void     pushISR  ( unsigned _data )               {        evq_pushISR  (this, _data);         }
+	unsigned count    ( void )                         { return evq_count    (this);                }
+	unsigned countISR ( void )                         { return evq_countISR (this);                }
+	unsigned space    ( void )                         { return evq_space    (this);                }
+	unsigned spaceISR ( void )                         { return evq_spaceISR (this);                }
+	unsigned limit    ( void )                         { return evq_limit    (this);                }
+	unsigned limitISR ( void )                         { return evq_limitISR (this);                }
 
 	private:
 	unsigned data_[limit_];
