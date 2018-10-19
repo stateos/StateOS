@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    19.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -118,8 +118,6 @@ void tsk_start( tsk_t *tsk )
 	{
 		if (tsk->hdr.id == ID_STOPPED)  // active tasks cannot be started
 		{
-			tsk->sigset = 0;
-
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
 		}
@@ -141,7 +139,6 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 		if (tsk->hdr.id == ID_STOPPED)  // active tasks cannot be started
 		{
 			tsk->state = state;
-			tsk->sigset = 0;
 
 			core_ctx_init(tsk);
 			core_tsk_insert(tsk);
@@ -298,6 +295,14 @@ void priv_tsk_destroy( void )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_tsk_reset( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	tsk->sigset = 0;
+}
+
+/* -------------------------------------------------------------------------- */
 void tsk_stop( void )
 /* -------------------------------------------------------------------------- */
 {
@@ -305,6 +310,8 @@ void tsk_stop( void )
 	assert(System.cur->mtx.list == 0);
 
 	port_set_lock();
+
+	priv_tsk_reset(System.cur);                   // reset necessary variables of current task
 
 	if (System.cur->join == DETACHED)             // current task is detached
 		priv_tsk_destroy();                       // wait for destruction
@@ -332,6 +339,8 @@ unsigned tsk_reset( tsk_t *tsk )
 			event = E_FAILURE;
 		else
 		{
+			priv_tsk_reset(tsk);                       // reset necessary task variables
+
 			if (tsk->hdr.id != ID_STOPPED)             // inactive task cannot be removed
 			{
 				priv_mtx_remove(tsk);                  // release all owned robust mutexes
@@ -363,6 +372,8 @@ unsigned tsk_delete( tsk_t *tsk )
 			event = E_FAILURE;
 		else
 		{
+			priv_tsk_reset(tsk);                       // reset necessary task variables
+
 			if (tsk == System.cur)                     // current task will be destroyed by destructor
 				priv_tsk_destroy();                    // wait for destruction
 
@@ -441,6 +452,87 @@ unsigned tsk_getPrio( void )
 	sys_unlock();
 
 	return prio;
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_sleepFor( cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	sys_lock();
+	{
+		core_tsk_waitFor(&System.dly, delay);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_sleepNext( cnt_t delay )
+/* -------------------------------------------------------------------------- */
+{
+	sys_lock();
+	{
+		core_tsk_waitNext(&System.dly, delay);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_sleepUntil( cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	sys_lock();
+	{
+		core_tsk_waitUntil(&System.dly, time);
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_suspend( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
+
+	sys_lock();
+	{
+		if (tsk->hdr.id == ID_READY)
+		{
+			core_tsk_suspend(tsk);
+			event = E_SUCCESS;
+		}
+		else
+			event = E_FAILURE;
+	}
+	sys_unlock();
+
+	return event;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_resume( tsk_t *tsk )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned event;
+
+	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
+
+	sys_lock();
+	{
+		if (tsk->guard == &System.dly && tsk->delay == INFINITE)
+		{
+			core_tsk_wakeup(tsk, 0); // ignored event value
+			event = E_SUCCESS;
+		}
+		else
+			event = E_FAILURE;
+	}
+	sys_unlock();
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -542,87 +634,6 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 		}
 	}
 	sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-void tsk_sleepFor( cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	sys_lock();
-	{
-		core_tsk_waitFor(&System.dly, delay);
-	}
-	sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-void tsk_sleepNext( cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	sys_lock();
-	{
-		core_tsk_waitNext(&System.dly, delay);
-	}
-	sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-void tsk_sleepUntil( cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	sys_lock();
-	{
-		core_tsk_waitUntil(&System.dly, time);
-	}
-	sys_unlock();
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned tsk_suspend( tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
-
-	sys_lock();
-	{
-		if (tsk->hdr.id == ID_READY)
-		{
-			core_tsk_suspend(tsk);
-			event = E_SUCCESS;
-		}
-		else
-			event = E_FAILURE;
-	}
-	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned tsk_resume( tsk_t *tsk )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
-
-	sys_lock();
-	{
-		if (tsk->guard == &System.dly && tsk->delay == INFINITE)
-		{
-			core_tsk_wakeup(tsk, 0); // ignored event value
-			event = E_SUCCESS;
-		}
-		else
-			event = E_FAILURE;
-	}
-	sys_unlock();
-
-	return event;
 }
 
 /* -------------------------------------------------------------------------- */

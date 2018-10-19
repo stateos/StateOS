@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    19.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -977,104 +977,6 @@ unsigned tsk_getPrio( void );
 
 /******************************************************************************
  *
- * Name              : tsk_take
- *
- * Description       : check pending signals of the current task for the given set of signals
- *
- * Parameters
- *   sigset          : set of expected signals
- *
- * Return            : the lowest number of expected signal from the set of all pending signals or
- *   0               : no expected signal has been set, try again
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned tsk_take( unsigned sigset );
-
-/******************************************************************************
- *
- * Name              : tsk_waitFor
- *
- * Description       : wait for a signal from the given set of signals for given duration of time
- *
- * Parameters
- *   sigset          : set of expected signals
- *   delay           : duration of time (maximum number of ticks to delay execution of current task)
- *                     IMMEDIATE: don't delay execution of current task
- *                     INFINITE:  delay indefinitely execution of current task
- *
- * Return            : the lowest number of expected signal from the set of all pending signals or
- *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned tsk_waitFor( unsigned sigset, cnt_t delay );
-
-/******************************************************************************
- *
- * Name              : tsk_waitUntil
- *
- * Description       : wait for a signal from the given set of signals until given timepoint
- *
- * Parameters
- *   sigset          : set of expected signals
- *   time            : timepoint value
- *
- * Return            : the lowest number of expected signal from the set of all pending signals or
- *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned tsk_waitUntil( unsigned sigset, cnt_t time );
-
-/******************************************************************************
- *
- * Name              : tsk_wait
- *
- * Description       : wait indefinitely for a signal from the given set of signals
- *
- * Parameters
- *   sigset          : set of expected signals
- *
- * Return            : the lowest number of expected signal from the set of all pending signals
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-__STATIC_INLINE
-unsigned tsk_wait( unsigned sigset ) { return tsk_waitFor(sigset, INFINITE); }
-
-/******************************************************************************
- *
- * Name              : tsk_give
- * ISR alias         : tsk_giveISR
- *
- * Description       : set given signal for the given task
- *
- * Parameters
- *   tsk             : pointer to the task object
- *   signo           : signal number
- *
- * Return            : none
- *
- * Note              : may be used both in thread and handler mode
- *
- ******************************************************************************/
-
-void tsk_give( tsk_t *tsk, unsigned signo );
-
-__STATIC_INLINE
-void tsk_giveISR( tsk_t *tsk, unsigned signo ) { tsk_give(tsk, signo); }
-
-/******************************************************************************
- *
  * Name              : tsk_sleepFor
  * Alias             : tsk_delay
  *
@@ -1213,6 +1115,134 @@ unsigned tsk_resume( tsk_t *tsk );
 __STATIC_INLINE
 unsigned tsk_resumeISR( tsk_t *tsk ) { return tsk_resume(tsk); }
 
+/******************************************************************************
+ *
+ * Name              : tsk_take
+ *
+ * Description       : check pending signals of the current task for the given set of signals
+ *
+ * Parameters
+ *   sigset          : set of expected signals
+ *
+ * Return            : the lowest number of expected signal from the set of all pending signals or
+ *   0               : no expected signal has been set, try again
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned tsk_take( unsigned sigset );
+
+/******************************************************************************
+ *
+ * Name              : tsk_waitFor
+ *
+ * Description       : wait for a signal from the given set of signals for given duration of time
+ *
+ * Parameters
+ *   sigset          : set of expected signals
+ *   delay           : duration of time (maximum number of ticks to delay execution of current task)
+ *                     IMMEDIATE: don't delay execution of current task
+ *                     INFINITE:  delay indefinitely execution of current task
+ *
+ * Return            : the lowest number of expected signal from the set of all pending signals or
+ *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned tsk_waitFor( unsigned sigset, cnt_t delay );
+
+/******************************************************************************
+ *
+ * Name              : tsk_waitUntil
+ *
+ * Description       : wait for a signal from the given set of signals until given timepoint
+ *
+ * Parameters
+ *   sigset          : set of expected signals
+ *   time            : timepoint value
+ *
+ * Return            : the lowest number of expected signal from the set of all pending signals or
+ *   E_TIMEOUT       : no expected signal has been set before the specified timeout expired
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+unsigned tsk_waitUntil( unsigned sigset, cnt_t time );
+
+/******************************************************************************
+ *
+ * Name              : tsk_wait
+ *
+ * Description       : wait indefinitely for a signal from the given set of signals
+ *
+ * Parameters
+ *   sigset          : set of expected signals
+ *
+ * Return            : the lowest number of expected signal from the set of all pending signals
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+unsigned tsk_wait( unsigned sigset ) { return tsk_waitFor(sigset, INFINITE); }
+
+/******************************************************************************
+ *
+ * Name              : tsk_give
+ * Alias             : tsk_signal
+ * ISR alias         : tsk_giveISR
+ * ISR alias         : tsk_signalISR
+ *
+ * Description       : send given signal to the task
+ *
+ * Parameters
+ *   tsk             : pointer to the task object
+ *   signo           : signal number
+ *
+ * Return            : none
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+void tsk_give( tsk_t *tsk, unsigned signo );
+
+__STATIC_INLINE
+void tsk_signal( tsk_t *tsk, unsigned signo ) { tsk_give(tsk, signo); }
+
+__STATIC_INLINE
+void tsk_giveISR( tsk_t *tsk, unsigned signo ) { tsk_give(tsk, signo); }
+
+__STATIC_INLINE
+void tsk_signalISR( tsk_t *tsk, unsigned signo ) { tsk_signal(tsk, signo); }
+
+/******************************************************************************
+ *
+ * Name              : cur_give
+ * Alias             : cur_signal
+ *
+ * Description       : send given signal to the current task
+ *
+ * Parameters
+ *   signo           : signal number
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+void cur_give( unsigned signo ) { tsk_give(System.cur, signo); }
+
+__STATIC_INLINE
+void cur_signal( unsigned signo ) { cur_give(signo); }
+
 #ifdef __cplusplus
 }
 #endif
@@ -1249,11 +1279,13 @@ struct staticTaskT : public __tsk
 	void     kill     ( void )            {        tsk_kill      (this);         }
 	unsigned prio     ( void )            { return __tsk::basic;                 }
 	unsigned getPrio  ( void )            { return __tsk::basic;                 }
-	void     give     ( unsigned _signo ) {        tsk_give      (this, _signo); }
-	void     giveISR  ( unsigned _signo ) {        tsk_giveISR   (this, _signo); }
 	unsigned suspend  ( void )            { return tsk_suspend   (this);         }
 	unsigned resume   ( void )            { return tsk_resume    (this);         }
 	unsigned resumeISR( void )            { return tsk_resumeISR (this);         }
+	void     give     ( unsigned _signo ) {        tsk_give      (this, _signo); }
+	void     signal   ( unsigned _signo ) {        tsk_signal    (this, _signo); }
+	void     giveISR  ( unsigned _signo ) {        tsk_giveISR   (this, _signo); }
+	void     signalISR( unsigned _signo ) {        tsk_signalISR (this, _signo); }
 	bool     operator!( void )            { return __tsk::hdr.id == ID_STOPPED;  }
 
 	private:
@@ -1353,11 +1385,13 @@ namespace ThisTask
 	static inline void     sleepUntil( cnt_t    _time )                 {        tsk_sleepUntil(_time);               }
 	static inline void     sleep     ( void )                           {        tsk_sleep     ();                    }
 	static inline void     delay     ( cnt_t    _delay )                {        tsk_delay     (_delay);              }
+	static inline void     suspend   ( void )                           {        cur_suspend   ();                    }
 	static inline unsigned take      ( unsigned _sigset )               { return tsk_take      (_sigset);             }
 	static inline unsigned waitFor   ( unsigned _sigset, cnt_t _delay ) { return tsk_waitFor   (_sigset, _delay);     }
 	static inline unsigned waitUntil ( unsigned _sigset, cnt_t _time )  { return tsk_waitUntil (_sigset, _time);      }
 	static inline unsigned wait      ( unsigned _sigset )               { return tsk_wait      (_sigset);             }
-	static inline void     suspend   ( void )                           {        cur_suspend   ();                    }
+	static inline void     give      ( unsigned _signo )                {        cur_give      (_signo);              }
+	static inline void     signal    ( unsigned _signo )                {        cur_signal    (_signo);              }
 }
 
 #endif//__cplusplus
