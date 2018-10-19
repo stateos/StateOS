@@ -4,6 +4,11 @@
   [![Github Release](https://img.shields.io/github/release/stateos/StateOS.svg)](https://github.com/stateos/StateOS/releases)
   [![Software Download](https://img.shields.io/sourceforge/dt/stateos.svg)](https://sourceforge.net/projects/stateos/files/latest/download)
 
+  [![GitHub Release](https://img.shields.io/github/release/stateos/StateOS.svg)](https://github.com/stateos/StateOS/releases/latest)
+  [![Github Releases](https://img.shields.io/github/downloads/stateos/StateOS/latest/total.svg)](https://github.com/stateos/StateOS/releases/latest)
+  [![Github All Releases](https://img.shields.io/github/downloads/stateos/StateOS/total.svg)](https://github.com/stateos/StateOS/releases/latest)
+
+
 Free, extremely simple, amazingly tiny and very fast real-time operating system (RTOS) designed for deeply embedded applications.
 Target: ARM Cortex-M, STM8.
 It was inspired by the concept of a state machine.
