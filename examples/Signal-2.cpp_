@@ -17,13 +17,13 @@ void slave()
 
 void master()
 {
-	unsigned x = 1;
+	unsigned x = 0;
 
 	for (;;)
 	{
 		ThisTask::sleepFor(SEC);
 		sig.give(x);
-		x = (x % 4) + 1;
+		x = (x + 1) % 4;
 	}
 }
 

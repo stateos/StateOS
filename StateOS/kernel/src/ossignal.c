@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    19.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -117,12 +117,13 @@ static
 unsigned priv_sig_take( sig_t *sig, unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned signo;
+	unsigned signo = E_TIMEOUT;
 
 	sigset &= sig->sigset;
 	sigset &= -sigset;
 	sig->sigset &= ~sigset | sig->mask;
-	for (signo = 0; sigset; sigset >>= 1, signo++);
+	if (sigset)
+		for (signo = 0; sigset >>= 1; signo++);
 
 	return signo;
 }
@@ -159,7 +160,7 @@ unsigned sig_waitFor( sig_t *sig, unsigned sigset, cnt_t delay )
 	{
 		signo = priv_sig_take(sig, sigset);
 
-		if (signo == 0)
+		if (signo == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
 			signo = core_tsk_waitFor(&sig->obj.queue, delay);
@@ -184,7 +185,7 @@ unsigned sig_waitUntil( sig_t *sig, unsigned sigset, cnt_t time )
 	{
 		signo = priv_sig_take(sig, sigset);
 
-		if (signo == 0)
+		if (signo == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
 			signo = core_tsk_waitUntil(&sig->obj.queue, time);
@@ -214,7 +215,7 @@ void sig_give( sig_t *sig, unsigned signo )
 		while (obj->queue)
 		{
 			tsk = obj->queue;
-			if (tsk->tmp.sig.sigset & sigset || tsk->tmp.sig.sigset == 0)
+			if ((tsk->tmp.sig.sigset & sigset) != 0 || tsk->tmp.sig.sigset == 0)
 			{
 				sig->sigset &= ~sigset | sig->mask;
 				core_tsk_wakeup(tsk, signo);
@@ -234,6 +235,7 @@ void sig_clear( sig_t *sig, unsigned signo )
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
+	assert(sigset);
 
 	sys_lock();
 	{

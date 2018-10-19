@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    19.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,9 +42,9 @@ extern "C" {
 
 #define SIG_LIMIT     (sizeof(unsigned) * CHAR_BIT)
 
-#define SIGSET(signo) ((((signo)-1) < SIG_LIMIT) ? 1U<<((signo)-1) : 0U) // signal mask from the given signal number
-#define sigAll        (0U-1)                                             // signal mask for all signals
-#define sigAny        (0U)                                               // signal mask for any signal
+#define SIGSET(signo) (((signo) < SIG_LIMIT) ? 1U << (signo) : 0U) // signal mask from the given signal number
+#define sigAll        (0U-1)                                       // signal mask for all signals
+#define sigAny        (0U)                                         // signal mask for any signal
 
 /******************************************************************************
  *
@@ -257,7 +257,7 @@ void sig_delete( sig_t *sig );
  *   sigset          : set of expected signals
  *
  * Return            : the lowest number of expected signal from the set of all pending signals or
- *   0               : no expected signal has been set, try again
+ *   E_TIMEOUT       : no expected signal has been set, try again
  *
  * Note              : may be used both in thread and handler mode
  *

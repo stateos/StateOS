@@ -1125,7 +1125,7 @@ unsigned tsk_resumeISR( tsk_t *tsk ) { return tsk_resume(tsk); }
  *   sigset          : set of expected signals
  *
  * Return            : the lowest number of expected signal from the set of all pending signals or
- *   0               : no expected signal has been set, try again
+ *   E_TIMEOUT       : no expected signal has been set, try again
  *
  * Note              : use only in thread mode
  *

@@ -8,8 +8,11 @@ void slave()
 {
 	unsigned x;
 
-	x = sig.wait(sigAny);
-	led = x;
+	for (;;)
+	{
+		x = sig.wait(sigAny);
+		led = x;
+	}
 }
 
 void master()
@@ -24,12 +27,10 @@ void master()
 	}
 }
 
-auto sla = Task(0, slave);
-auto mas = Task(0, master);
-
 int main()
 {
-	sla.start();
-	mas.start();
+	auto sla = startTask(0, slave);
+	auto mas = startTask(0, master);
+
 	ThisTask::sleep();
 }
