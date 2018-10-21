@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    19.10.2018
+    @date    21.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -605,7 +605,7 @@ unsigned tsk_waitUntil( unsigned sigset, cnt_t time )
 	{
 		signo = priv_tsk_take(sigset);
 
-		if (signo == 0)
+		if (signo == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
 			signo = core_tsk_waitUntil(&System.sig, time);
