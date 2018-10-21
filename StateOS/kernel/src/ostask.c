@@ -537,12 +537,13 @@ unsigned tsk_resume( tsk_t *tsk )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_tsk_take( unsigned sigset )
+unsigned priv_tsk_take( void )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned signo = E_TIMEOUT;
+	unsigned sigset;
 
-	sigset &= System.cur->sigset;
+	sigset = System.cur->sigset;
 	sigset &= -sigset;
 	System.cur->sigset &= ~sigset;
 	if (sigset)
@@ -552,16 +553,14 @@ unsigned priv_tsk_take( unsigned sigset )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_take( unsigned sigset )
+unsigned tsk_take( void )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned signo;
 
-	assert(sigset);
-
 	sys_lock();
 	{
-		signo = priv_tsk_take(sigset);
+		signo = priv_tsk_take();
 	}
 	sys_unlock();
 
@@ -569,23 +568,19 @@ unsigned tsk_take( unsigned sigset )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitFor( unsigned sigset, cnt_t delay )
+unsigned tsk_waitFor( cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned signo;
 
 	assert_tsk_context();
-	assert(sigset);
 
 	sys_lock();
 	{
-		signo = priv_tsk_take(sigset);
+		signo = priv_tsk_take();
 
 		if (signo == E_TIMEOUT)
-		{
-			System.cur->tmp.sig.sigset = sigset;
 			signo = core_tsk_waitFor(&System.sig, delay);
-		}
 	}
 	sys_unlock();
 
@@ -593,23 +588,39 @@ unsigned tsk_waitFor( unsigned sigset, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitUntil( unsigned sigset, cnt_t time )
+unsigned tsk_waitNext( cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned signo;
 
 	assert_tsk_context();
-	assert(sigset);
 
 	sys_lock();
 	{
-		signo = priv_tsk_take(sigset);
+		signo = priv_tsk_take();
 
 		if (signo == E_TIMEOUT)
-		{
-			System.cur->tmp.sig.sigset = sigset;
+			signo = core_tsk_waitNext(&System.sig, delay);
+	}
+	sys_unlock();
+
+	return signo;
+}
+
+/* -------------------------------------------------------------------------- */
+unsigned tsk_waitUntil( cnt_t time )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned signo;
+
+	assert_tsk_context();
+
+	sys_lock();
+	{
+		signo = priv_tsk_take();
+
+		if (signo == E_TIMEOUT)
 			signo = core_tsk_waitUntil(&System.sig, time);
-		}
 	}
 	sys_unlock();
 
@@ -624,7 +635,6 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
-	assert(sigset);
 
 	sys_lock();
 	{
@@ -632,11 +642,8 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 
 		if (tsk->guard == &System.sig)
 		{
-			if ((tsk->tmp.sig.sigset & sigset) != 0)
-			{
-				tsk->sigset &= ~sigset;
-				core_tsk_wakeup(tsk, signo);
-			}
+			tsk->sigset &= ~sigset;
+			core_tsk_wakeup(tsk, signo);
 		}
 	}
 	sys_unlock();

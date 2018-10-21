@@ -5,7 +5,7 @@ void slave()
 {
 	unsigned x;
 
-	x = tsk_wait(sigAll);
+	x = tsk_wait();
 	LEDs = SIGSET(x);
 }
 
