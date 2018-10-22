@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    22.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -401,6 +401,22 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
 }
 
 /* -------------------------------------------------------------------------- */
+static
+unsigned priv_stm_push( stm_t *stm, const void *data, unsigned size )
+/* -------------------------------------------------------------------------- */
+{
+	if (size <= stm->limit)
+	{
+		priv_stm_skipUpdate(stm, size);
+		priv_stm_putUpdate(stm, data, size);
+
+		return E_SUCCESS;
+	}
+
+	return E_FAILURE;
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
@@ -414,16 +430,7 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 
 	sys_lock();
 	{
-		if (size <= stm->limit)
-		{
-			priv_stm_skipUpdate(stm, size);
-			priv_stm_putUpdate(stm, data, size);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_FAILURE;
-		}
+		event = priv_stm_push(stm, data, size);
 	}
 	sys_unlock();
 
