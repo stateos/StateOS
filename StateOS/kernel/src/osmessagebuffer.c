@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    22.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -463,6 +463,22 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
 }
 
 /* -------------------------------------------------------------------------- */
+static
+unsigned priv_msg_push( msg_t *msg, const void *data, unsigned size )
+/* -------------------------------------------------------------------------- */
+{
+	if (sizeof(unsigned) + size <= msg->limit)
+	{
+		priv_msg_skipUpdate(msg, size);
+		priv_msg_putUpdate(msg, data, size);
+
+		return E_SUCCESS;
+	}
+
+	return E_FAILURE;
+}
+
+/* -------------------------------------------------------------------------- */
 unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
@@ -476,16 +492,7 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 
 	sys_lock();
 	{
-		if (sizeof(unsigned) + size <= msg->limit)
-		{
-			priv_msg_skipUpdate(msg, size);
-			priv_msg_putUpdate(msg, data, size);
-			event = E_SUCCESS;
-		}
-		else
-		{
-			event = E_FAILURE;
-		}
+		event = priv_msg_push(msg, data, size);
 	}
 	sys_unlock();
 
