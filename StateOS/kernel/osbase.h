@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    23.10.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -77,12 +77,15 @@ typedef         void fun_t(); // timer/task procedure
 
 /* -------------------------------------------------------------------------- */
 
-#define E_SUCCESS  ( 0U )     // process was released as a result of taking the supervising object
-#define E_FAILURE  ( 0U-1 )   // process was released as a result of any failure
-#define E_STOPPED  ( 0U-2 )   // process was released as a result of reset the supervising object
-#define E_DELETED  ( 0U-3 )   // process was released as a result of deleting the supervising object
-#define E_TIMEOUT  ( 0U-4 )   // process was released as a result of the end of the timer countdown
-#define OWNERDEAD  ( 1U )     // previous owner has been killed
+enum
+{
+	E_SUCCESS = 0U,   // process was released as a result of taking the supervising object
+	E_FAILURE = 0U-1, // process was released as a result of any failure
+	E_STOPPED = 0U-2, // process was released as a result of reset the supervising object
+	E_DELETED = 0U-3, // process was released as a result of deleting the supervising object
+	E_TIMEOUT = 0U-4, // process was released as a result of the end of the timer countdown
+	OWNERDEAD = 1U,   // previous owner has been killed
+};
 
 /* -------------------------------------------------------------------------- */
 
