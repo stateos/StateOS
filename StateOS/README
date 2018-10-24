@@ -35,6 +35,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+6.4
+- removed ID_BLOCKED constant
+---------
 6.3
 - merged test branch
 - renamed 'SIZE' definitions

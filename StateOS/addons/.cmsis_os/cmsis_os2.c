@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    24.10.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -292,11 +292,13 @@ osThreadState_t osThreadGetState (osThreadId_t thread_id)
 	if (thread->tsk.hdr.next == 0)
 		return osThreadInactive;
 
+	if (thread->tsk.guard != 0)
+		return osThreadBlocked;
+
 	switch (thread->tsk.hdr.id)
 	{
 		case ID_IDLE:    /* falls through */
 		case ID_READY:   return osThreadReady;
-		case ID_BLOCKED: return osThreadBlocked;
 		case ID_STOPPED: return osThreadTerminated;
 		default:         return osThreadError;
 	}
@@ -468,7 +470,7 @@ uint32_t osThreadGetCount (void)
 			count++;
 
 		for (tmr = WAIT.hdr.next; tmr != &WAIT; tmr = tmr->hdr.next)
-			if (tmr->hdr.id == ID_BLOCKED)
+			if (tmr->hdr.id == ID_READY)
 				count++;
 	}
 	sys_unlock();
@@ -493,7 +495,7 @@ uint32_t osThreadEnumerate (osThreadId_t *thread_array, uint32_t array_items)
 			thread_array[count++] = tsk;
 
 		for (tmr = WAIT.hdr.next; (tmr != &WAIT) && (count < array_items); tmr = tmr->hdr.next)
-			if (tmr->hdr.id == ID_BLOCKED)
+			if (tmr->hdr.id == ID_READY)
 				thread_array[count++] = tmr;
 	}
 	sys_unlock();

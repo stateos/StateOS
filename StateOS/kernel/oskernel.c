@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    24.10.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -191,7 +191,7 @@ void core_tmr_handler( void )
 
 				priv_tmr_wakeup(tmr, E_SUCCESS);
 			}
-			else  /* hdr.id == ID_BLOCKED */
+			else  /* hdr.id == ID_READY */
 				core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
 		}
 	}
@@ -301,7 +301,7 @@ void core_tsk_append( tsk_t *tsk, tsk_t **que )
 {
 	tsk_t *nxt = *que;
 	tsk->guard  = que;
-	tsk->hdr.id = ID_BLOCKED;
+	tsk->hdr.id = ID_READY;
 
 	while (nxt && tsk->prio <= nxt->prio)
 	{
@@ -347,7 +347,7 @@ unsigned priv_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield )
 
 	priv_tsk_remove(tsk);
 	core_tmr_insert((tmr_t *)tsk);
-	core_tsk_append(tsk, que); // must be last; sets ID_BLOCKED
+	core_tsk_append(tsk, que); // must be last; sets ID_READY
 
 	if (yield)
 		priv_ctx_switchNow();
@@ -458,24 +458,24 @@ void core_tsk_prio( tsk_t *tsk, unsigned prio )
 	{
 		tsk->prio = prio;
 
-		if (tsk == System.cur)
+		if (tsk == System.cur)       // current task
 		{
 			tsk = tsk->hdr.next;
 			if (tsk->prio > prio)
 				port_ctx_switch();
 		}
 		else
-		if (tsk->hdr.id == ID_READY)
-		{
-			priv_tsk_remove(tsk);
-			core_tsk_insert(tsk);
-		}
-		else
-		if (tsk->hdr.id == ID_BLOCKED)
+		if (tsk->guard != 0)         // blocked task
 		{
 			core_tsk_transfer(tsk, tsk->guard);
 			if (tsk->mtx.tree)
 				core_tsk_prio(tsk->mtx.tree->owner, prio);
+		}
+		else
+		if (tsk->hdr.id == ID_READY) // ready task
+		{
+			priv_tsk_remove(tsk);
+			core_tsk_insert(tsk);
 		}
 	}
 }

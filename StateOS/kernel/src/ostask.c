@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    21.10.2018
+    @date    24.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -237,14 +237,14 @@ static
 void priv_tsk_remove( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	if (tsk->hdr.id == ID_READY)         // ready task
-		core_tsk_remove(tsk);            // remove task from ready queue
-	else
-	if (tsk->hdr.id == ID_BLOCKED)       // blocked task
+	if (tsk->guard != 0)                 // blocked task
 	{
 		core_tsk_unlink(tsk, 0);         // remove task from blocked queue; ignored event value
 		core_tmr_remove((tmr_t *)tsk);   // remove task from timers queue
 	}
+	else
+//	if (tsk->hdr.id == ID_READY)         // ready task
+		core_tsk_remove(tsk);            // remove task from ready queue
 }
 
 /* -------------------------------------------------------------------------- */
@@ -498,7 +498,7 @@ unsigned tsk_suspend( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->hdr.id == ID_READY)
+		if (tsk->hdr.id == ID_READY && tsk->guard == 0)
 		{
 			core_tsk_suspend(tsk);
 			event = E_SUCCESS;
