@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    24.10.2018
+    @date    25.10.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -188,11 +188,13 @@ void core_tmr_handler( void )
 			if (tmr->hdr.id == ID_TIMER)
 			{
 				tmr->delay = tmr->period;
-
 				priv_tmr_wakeup(tmr, E_SUCCESS);
 			}
 			else  /* hdr.id == ID_READY */
+			{
+				tmr->delay = 0;
 				core_tsk_wakeup((tsk_t *)tmr, E_TIMEOUT);
+			}
 		}
 	}
 	port_clr_lock();
