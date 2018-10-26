@@ -1330,35 +1330,35 @@ typedef startTaskT<OS_STACK_SIZE> startTask;
 
 namespace ThisTask
 {
-	static inline unsigned detach    ( void )             { return cur_detach    ();                      }
-	static inline void     stop      ( void )             {        tsk_stop      ();                      }
-	static inline void     reset     ( void )             {        cur_reset     ();                      }
-	static inline void     kill      ( void )             {        cur_kill      ();                      }
-	static inline void     yield     ( void )             {        tsk_yield     ();                      }
-	static inline void     pass      ( void )             {        tsk_pass      ();                      }
+	static inline unsigned detach    ( void )             { return cur_detach    ();              }
+	static inline void     stop      ( void )             {        tsk_stop      ();              }
+	static inline void     reset     ( void )             {        cur_reset     ();              }
+	static inline void     kill      ( void )             {        cur_kill      ();              }
+	static inline void     yield     ( void )             {        tsk_yield     ();              }
+	static inline void     pass      ( void )             {        tsk_pass      ();              }
+	static inline void     flip      ( FUN_t    _state )
 #if OS_FUNCTIONAL
-	static inline void     flip      ( FUN_t    _state )  {        ((TaskT<>*)System.cur)->Fun_ =   _state;
-	                                                               tsk_flip      (TaskT<>::fun_);         }
+	         { ((TaskT<>*)System.cur)->Fun_ =   _state;            tsk_flip      (TaskT<>::fun_); }
 #else
-	static inline void     flip      ( FUN_t    _state )  {        tsk_flip      (_state);                }
+	                                                      {        tsk_flip      (_state);        }
 #endif
-	static inline void     setPrio   ( unsigned _prio )   {        tsk_setPrio   (_prio);                 }
-	static inline void     prio      ( unsigned _prio )   {        tsk_prio      (_prio);                 }
-	static inline unsigned getPrio   ( void )             { return tsk_getPrio   ();                      }
-	static inline unsigned prio      ( void )             { return tsk_getPrio   ();                      }
-	static inline void     sleepFor  ( cnt_t    _delay )  {        tsk_sleepFor  (_delay);                }
-	static inline void     sleepNext ( cnt_t    _delay )  {        tsk_sleepNext (_delay);                }
-	static inline void     sleepUntil( cnt_t    _time )   {        tsk_sleepUntil(_time);                 }
-	static inline void     sleep     ( void )             {        tsk_sleep     ();                      }
-	static inline void     delay     ( cnt_t    _delay )  {        tsk_delay     (_delay);                }
-	static inline void     suspend   ( void )             {        cur_suspend   ();                      }
-	static inline void     give      ( unsigned _signo )  {        cur_give      (_signo);                }
-	static inline void     signal    ( unsigned _signo )  {        cur_signal    (_signo);                }
+	static inline void     setPrio   ( unsigned _prio )   {        tsk_setPrio   (_prio);         }
+	static inline void     prio      ( unsigned _prio )   {        tsk_prio      (_prio);         }
+	static inline unsigned getPrio   ( void )             { return tsk_getPrio   ();              }
+	static inline unsigned prio      ( void )             { return tsk_getPrio   ();              }
+	static inline void     sleepFor  ( cnt_t    _delay )  {        tsk_sleepFor  (_delay);        }
+	static inline void     sleepNext ( cnt_t    _delay )  {        tsk_sleepNext (_delay);        }
+	static inline void     sleepUntil( cnt_t    _time )   {        tsk_sleepUntil(_time);         }
+	static inline void     sleep     ( void )             {        tsk_sleep     ();              }
+	static inline void     delay     ( cnt_t    _delay )  {        tsk_delay     (_delay);        }
+	static inline void     suspend   ( void )             {        cur_suspend   ();              }
+	static inline void     give      ( unsigned _signo )  {        cur_give      (_signo);        }
+	static inline void     signal    ( unsigned _signo )  {        cur_signal    (_signo);        }
+	static inline void     action    ( ACT_t    _action )
 #if OS_FUNCTIONAL
-	static inline void     action    ( ACT_t    _action ) {        ((TaskT<>*)System.cur)->Act_ = &_action;
-	                                                               cur_action    (TaskT<>::act_);         }
+	         { ((TaskT<>*)System.cur)->Act_ =  &_action;           cur_action    (TaskT<>::act_); }
 #else
-	static inline void     action    ( ACT_t    _action ) {        cur_action    (_action);               }
+	                                                      {        cur_action    (_action);       }
 #endif
 }
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    25.10.2018
+    @date    26.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -875,13 +875,13 @@ struct startTimerUntil : public Timer
 
 namespace ThisTimer
 {
+	static inline void flipISR ( FUN_t  _state )
 #if OS_FUNCTIONAL
-	static inline void flipISR ( FUN_t _state ) { ((Timer *)WAIT.hdr.next)->Fun_ = _state;
-	                                              tmr_flipISR (Timer::fun_);               }
+	 { ((Timer *)WAIT.hdr.next)->Fun_ = _state;    tmr_flipISR (Timer::fun_); }
 #else
-	static inline void flipISR ( FUN_t _state ) { tmr_flipISR (_state);                    }
+	                                             { tmr_flipISR (_state);      }
 #endif
-	static inline void delayISR( cnt_t _delay ) { tmr_delayISR(_delay);                    }
+	static inline void delayISR( cnt_t  _delay ) { tmr_delayISR(_delay);      }
 }
 
 #endif//__cplusplus
