@@ -232,7 +232,6 @@ void priv_tsk_insert( tsk_t *tsk )
 		do nxt = nxt->hdr.next;
 		while (tsk->prio <= nxt->prio);
 
-	tsk->hdr.id = ID_READY;
 	priv_rdy_insert(&tsk->hdr, &nxt->hdr);
 }
 
@@ -241,7 +240,6 @@ void priv_tsk_insert( tsk_t *tsk )
 static
 void priv_tsk_remove( tsk_t *tsk )
 {
-	tsk->hdr.id = ID_STOPPED;
 	priv_rdy_remove(&tsk->hdr);
 }
 
@@ -249,6 +247,7 @@ void priv_tsk_remove( tsk_t *tsk )
 
 void core_tsk_insert( tsk_t *tsk )
 {
+	tsk->hdr.id = ID_READY;
 	priv_tsk_insert(tsk);
 	if (tsk == IDLE.hdr.next)
 		port_ctx_switch();
@@ -258,6 +257,7 @@ void core_tsk_insert( tsk_t *tsk )
 
 void core_tsk_remove( tsk_t *tsk )
 {
+	tsk->hdr.id = ID_STOPPED;
 	priv_tsk_remove(tsk);
 	if (tsk == System.cur)
 		priv_ctx_switchNow();
