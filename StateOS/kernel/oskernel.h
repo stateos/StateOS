@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    26.10.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -52,9 +52,11 @@
 
 #if OS_FUNCTIONAL
 #include <functional>
-typedef std::function<void( void )> FUN_t;
+typedef std::function<void( void )>     FUN_t;
+typedef std::function<void( unsigned )> ACT_t;
 #else
 typedef     void (* FUN_t)( void );
+typedef     void (* ACT_t)( unsigned );
 #endif
 
 #endif
@@ -170,6 +172,14 @@ void core_tsk_transfer( tsk_t *tsk, tsk_t **que );
 // force context switch
 // return event value
 unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay );
+
+// delay execution of given task 'tsk'
+// append the current task to the blocked queue 'que'
+// remove the current task from tasks READY queue
+// insert the current task into timers READY queue
+// context switch depends on the 'yield' value
+// return event value
+unsigned core_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield );
 
 // delay execution of current task for given duration of time 'delay' from the end of the previous countdown
 // append the current task to the blocked queue 'que'

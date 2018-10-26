@@ -38,6 +38,7 @@ Features:
 6.4
 - removed ID_BLOCKED constant
 - removed ID_IDLE constant
+- added signal handler
 ---------
 6.3
 - merged test branch

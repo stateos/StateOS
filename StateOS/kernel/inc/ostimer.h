@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    25.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -762,13 +762,13 @@ struct Timer : public staticTimer
 {
 	Timer( void ): staticTimer() {}
 #if OS_FUNCTIONAL
-	Timer( FUN_t _state ): staticTimer(run_), fun_(_state) {}
+	Timer( FUN_t _state ): staticTimer(fun_), Fun_(_state) {}
 
-	void  startFrom( cnt_t _delay, cnt_t _period, FUN_t _state ) { fun_ = _state; tmr_startFrom(this, _delay, _period, run_); }
+	void  startFrom( cnt_t _delay, cnt_t _period, FUN_t _state ) { Fun_ = _state; tmr_startFrom(this, _delay, _period, fun_); }
 
 	static
-	void  run_( void ) { ((Timer *)WAIT.hdr.next)->fun_(); }
-	FUN_t fun_;
+	void  fun_( void ) { ((Timer *)WAIT.hdr.next)->Fun_(); }
+	FUN_t Fun_;
 #else
 	Timer( FUN_t _state ): staticTimer(_state) {}
 #endif
@@ -876,12 +876,12 @@ struct startTimerUntil : public Timer
 namespace ThisTimer
 {
 #if OS_FUNCTIONAL
-	static inline void flipISR ( FUN_t _state ) { ((Timer *)WAIT.hdr.next)->fun_ = _state;
-	                                              tmr_flipISR (Timer::run_);           }
+	static inline void flipISR ( FUN_t _state ) { ((Timer *)WAIT.hdr.next)->Fun_ = _state;
+	                                              tmr_flipISR (Timer::fun_);               }
 #else
-	static inline void flipISR ( FUN_t _state ) { tmr_flipISR (_state);                }
+	static inline void flipISR ( FUN_t _state ) { tmr_flipISR (_state);                    }
 #endif
-	static inline void delayISR( cnt_t _delay ) { tmr_delayISR(_delay);                }
+	static inline void delayISR( cnt_t _delay ) { tmr_delayISR(_delay);                    }
 }
 
 #endif//__cplusplus

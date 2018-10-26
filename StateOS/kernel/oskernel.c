@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    25.10.2018
+    @date    26.10.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -342,14 +342,16 @@ void core_tsk_transfer( tsk_t *tsk, tsk_t **que )
 
 /* -------------------------------------------------------------------------- */
 
-static
-unsigned priv_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield )
+unsigned core_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield )
 {
 	assert_tsk_context();
 
-	priv_tsk_remove(tsk);
-	core_tmr_insert((tmr_t *)tsk);
-	core_tsk_append(tsk, que); // must be last; sets ID_READY
+	if (que)
+	{
+		priv_tsk_remove(tsk);
+		core_tmr_insert((tmr_t *)tsk);
+		core_tsk_append(tsk, que); // must be last; sets ID_READY
+	}
 
 	if (yield)
 		priv_ctx_switchNow();
@@ -369,7 +371,7 @@ unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay )
 	if (cur->delay == IMMEDIATE)
 		return E_TIMEOUT;
 
-	return priv_tsk_wait(cur, que, true);
+	return core_tsk_wait(cur, que, true);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -383,7 +385,7 @@ unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay )
 	if (cur->delay == IMMEDIATE)
 		return E_TIMEOUT;
 
-	return priv_tsk_wait(cur, que, true);
+	return core_tsk_wait(cur, que, true);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -398,7 +400,7 @@ unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time )
 	if (cur->delay - 1 > ((CNT_MAX)>>1))
 		return E_TIMEOUT;
 
-	return priv_tsk_wait(cur, que, true);
+	return core_tsk_wait(cur, que, true);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -407,7 +409,7 @@ void core_tsk_suspend( tsk_t *tsk )
 {
 	tsk->delay = INFINITE;
 
-	priv_tsk_wait(tsk, &System.dly, tsk == System.cur);
+	core_tsk_wait(tsk, &System.dly, tsk == System.cur);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -519,6 +521,11 @@ void *core_tsk_handler( void *sp )
 		core_ctx_reset();
 
 		cur = System.cur;
+		if (cur->newsp)
+		{
+			sp = cur->newsp;
+			cur->newsp = 0;
+		}
 		cur->sp = sp;
 
 		nxt = IDLE.hdr.next;

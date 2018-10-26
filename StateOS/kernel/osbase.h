@@ -73,7 +73,8 @@ typedef uint64_t     cnt_t;
 typedef struct __mtx mtx_t, * const mtx_id;
 typedef struct __tmr tmr_t, * const tmr_id; // timer
 typedef struct __tsk tsk_t, * const tsk_id; // task
-typedef         void fun_t(); // timer/task procedure
+typedef         void fun_t();               // timer/task procedure
+typedef         void act_t(unsigned);       // signal action
 
 /* -------------------------------------------------------------------------- */
 

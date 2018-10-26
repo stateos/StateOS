@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    25.10.2018
+    @date    26.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -299,7 +299,7 @@ static
 void priv_tsk_reset( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	tsk->sigset = 0;
+	tsk->sig.sigset = 0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -537,94 +537,70 @@ unsigned tsk_resume( tsk_t *tsk )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_tsk_take( void )
+void priv_sig_handler( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned signo = E_TIMEOUT;
+	unsigned signo;
 	unsigned sigset;
+	act_t  * action = tsk->sig.action;
 
-	sigset = System.cur->sigset;
-	sigset &= -sigset;
-	System.cur->sigset &= ~sigset;
-	if (sigset)
-		for (signo = 0; sigset >>= 1; signo++);
+	while (tsk->sig.sigset)
+	{
+		sigset = tsk->sig.sigset;
+		sigset &= -sigset;
+		tsk->sig.sigset &= ~sigset;
 
-	return signo;
+		port_clr_lock();
+		{
+			if (action)
+			{
+				for (signo = 0; sigset >>= 1; signo++);
+				action(signo);
+			}
+		}
+		port_set_lock();
+	}
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_take( void )
+static
+void priv_sig_deliver( void )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned signo;
+	tsk_t *tsk = System.cur;
 
-	sys_lock();
-	{
-		signo = priv_tsk_take();
-	}
-	sys_unlock();
+	port_set_lock();
 
-	return signo;
+	priv_sig_handler(tsk);
+
+	tsk->newsp = tsk->sig.backup.sp;
+
+	core_tsk_wait(tsk, tsk->sig.backup.guard, true);
+
+	assert(!"system cannot return here");
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_waitFor( cnt_t delay )
+static
+void priv_sig_dispatch( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned signo;
-
-	assert_tsk_context();
-
-	sys_lock();
+	if (tsk == System.cur)
 	{
-		signo = priv_tsk_take();
-
-		if (signo == E_TIMEOUT)
-			signo = core_tsk_waitFor(&System.sig, delay);
+		priv_sig_handler(tsk);
 	}
-	sys_unlock();
-
-	return signo;
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned tsk_waitNext( cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned signo;
-
-	assert_tsk_context();
-
-	sys_lock();
+	else
+	if (((ctx_t *)tsk->sp)->pc != priv_sig_deliver)
 	{
-		signo = priv_tsk_take();
+		tsk->sig.backup.sp = tsk->sp;
+		tsk->sig.backup.guard = tsk->guard;
 
-		if (signo == E_TIMEOUT)
-			signo = core_tsk_waitNext(&System.sig, delay);
+		tsk->sp = (ctx_t *)tsk->sp - 1;
+		port_ctx_init(tsk->sp, priv_sig_deliver);
+
+		if (tsk->guard)
+			core_tsk_wakeup(tsk, 0);
 	}
-	sys_unlock();
-
-	return signo;
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned tsk_waitUntil( cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned signo;
-
-	assert_tsk_context();
-
-	sys_lock();
-	{
-		signo = priv_tsk_take();
-
-		if (signo == E_TIMEOUT)
-			signo = core_tsk_waitUntil(&System.sig, time);
-	}
-	sys_unlock();
-
-	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -634,16 +610,33 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 	unsigned sigset = SIGSET(signo);
 
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
+	assert(sigset);
 
 	sys_lock();
 	{
-		tsk->sigset |= sigset;
-
-		if (tsk->guard == &System.sig)
+		if (tsk->hdr.id == ID_READY)
 		{
-			tsk->sigset &= ~sigset;
-			core_tsk_wakeup(tsk, signo);
+			tsk->sig.sigset |= sigset;
+			if (tsk->sig.sigset && tsk->sig.action)
+				priv_sig_dispatch(tsk);
+		}
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_action( tsk_t *tsk, act_t *action )
+/* -------------------------------------------------------------------------- */
+{
+	assert(tsk);
+
+	sys_lock();
+	{
+		if (tsk->hdr.id == ID_READY)
+		{
+			tsk->sig.action = action;
+			if (tsk->sig.action && tsk->sig.sigset)
+				priv_sig_dispatch(tsk);
 		}
 	}
 	sys_unlock();
