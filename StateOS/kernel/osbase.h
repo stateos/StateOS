@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    24.10.2018
+    @date    25.10.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -91,7 +91,6 @@ typedef         void fun_t(); // timer/task procedure
 typedef enum __tid
 {
 	ID_STOPPED = 0, // inactive object
-	ID_IDLE,        // idle process
 	ID_READY,       // active task
 	ID_TIMER,       // active timer
 

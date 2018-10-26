@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    24.10.2018
+    @date    25.10.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -297,7 +297,6 @@ osThreadState_t osThreadGetState (osThreadId_t thread_id)
 
 	switch (thread->tsk.hdr.id)
 	{
-		case ID_IDLE:    /* falls through */
 		case ID_READY:   return osThreadReady;
 		case ID_STOPPED: return osThreadTerminated;
 		default:         return osThreadError;
