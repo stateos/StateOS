@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    24.10.2018
+    @date    25.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -234,7 +234,7 @@ void priv_mtx_remove( tsk_t *tsk )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_tsk_remove( tsk_t *tsk )
+void priv_tsk_stop( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	if (tsk->guard != 0)                 // blocked task
@@ -272,7 +272,7 @@ void idle_tsk_destructor( void )
 				core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task
 			}
 
-			priv_tsk_remove(tsk);                      // remove task from all queues
+			priv_tsk_stop(tsk);                        // remove task from all queues
 			core_res_free(&tsk->hdr.obj.res);          // release resources
 		}
 
@@ -345,7 +345,7 @@ unsigned tsk_reset( tsk_t *tsk )
 			{
 				priv_mtx_remove(tsk);                  // release all owned robust mutexes
 				core_tsk_wakeup(tsk->join, E_STOPPED); // notify waiting task
-				priv_tsk_remove(tsk);                  // remove task from all queues
+				priv_tsk_stop(tsk);                    // remove task from all queues
 			}
 
 			event = E_SUCCESS;
@@ -381,7 +381,7 @@ unsigned tsk_delete( tsk_t *tsk )
 			{
 				priv_mtx_remove(tsk);                  // release all owned robust mutexes
 				core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task             
-				priv_tsk_remove(tsk);                  // remove task from all queues     
+				priv_tsk_stop(tsk);                    // remove task from all queues     
 			}
 
 			core_res_free(&tsk->hdr.obj.res);          // release resources
