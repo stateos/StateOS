@@ -1,10 +1,18 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
+void action( unsigned signo )
+{
+	(void) signo;
+
+	LED_Tick();
+}
+
 void slave()
 {
-	tsk_wait();
-	LED_Tick();
+	cur_action(action);
+	for (;;)
+		tsk_yield();
 }
 
 OS_TSK(sla, 0, slave);
