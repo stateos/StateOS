@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    26.10.2018
+    @date    27.10.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -521,12 +521,8 @@ void *core_tsk_handler( void *sp )
 		core_ctx_reset();
 
 		cur = System.cur;
-		if (cur->newsp)
-		{
-			sp = cur->newsp;
-			cur->newsp = 0;
-		}
-		cur->sp = sp;
+		if (cur->sp == 0)
+			cur->sp = sp;
 
 		nxt = IDLE.hdr.next;
 
@@ -543,6 +539,7 @@ void *core_tsk_handler( void *sp )
 
 		System.cur = nxt;
 		sp = nxt->sp;
+		nxt->sp = 0;
 	}
 	port_clr_lock();
 

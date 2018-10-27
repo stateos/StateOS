@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    26.10.2018
+    @date    27.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -75,7 +75,6 @@ struct __tsk
 	stk_t  * stack; // base of stack
 	unsigned size;  // size of stack (in bytes)
 	void   * sp;    // current stack pointer
-	void   * newsp; // temporary stack pointer
 
 	unsigned basic; // basic priority
 	unsigned prio;  // current priority
@@ -191,7 +190,7 @@ struct __tsk
  ******************************************************************************/
 
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _HDR_INIT(), _state, 0, 0, 0, 0, _stack, _size, 0, 0, _prio, _prio, 0, 0, { 0, 0, { 0, 0 } }, 0, { 0, 0 }, { { 0 } }, _TSK_EXTRA }
+                       { _HDR_INIT(), _state, 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, { 0, 0, { 0, 0 } }, 0, { 0, 0 }, { { 0 } }, _TSK_EXTRA }
 
 /******************************************************************************
  *

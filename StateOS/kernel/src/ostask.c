@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    26.10.2018
+    @date    27.10.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -573,7 +573,8 @@ void priv_sig_deliver( void )
 
 	priv_sig_handler(tsk);
 
-	tsk->newsp = tsk->sig.backup.sp;
+	tsk->sp = tsk->sig.backup.sp;
+	tsk->sig.backup.sp = 0;
 
 	core_tsk_wait(tsk, tsk->sig.backup.guard, true);
 
@@ -590,7 +591,7 @@ void priv_sig_dispatch( tsk_t *tsk )
 		priv_sig_handler(tsk);
 	}
 	else
-	if (((ctx_t *)tsk->sp)->pc != priv_sig_deliver)
+	if (tsk->sig.backup.sp == 0)
 	{
 		tsk->sig.backup.sp = tsk->sp;
 		tsk->sig.backup.guard = tsk->guard;
