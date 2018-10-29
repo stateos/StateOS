@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    26.10.2018
+    @date    29.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -726,8 +726,8 @@ struct staticTimer : public __tmr
 	 staticTimer( fun_t *_state ): __tmr _TMR_INIT(_state) {}
 	~staticTimer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
 
-	void kill         ( void )                                       {        tmr_reset         (this);                          }
-	void reset        ( void )                                       {        tmr_kill        (this);                          }
+	void kill         ( void )                                       {        tmr_reset        (this);                          }
+	void reset        ( void )                                       {        tmr_kill         (this);                          }
 	void start        ( cnt_t _delay, cnt_t _period )                {        tmr_start        (this, _delay, _period);         }
 	void startFor     ( cnt_t _delay )                               {        tmr_startFor     (this, _delay);                  }
 	void startPeriodic( cnt_t _period )                              {        tmr_startPeriodic(this,         _period);         }
@@ -745,6 +745,11 @@ struct staticTimer : public __tmr
 	unsigned wait     ( void )                                       { return tmr_wait         (this);                          }
 
 	bool     operator!( void )                                       { return __tmr::hdr.id == ID_STOPPED;                      }
+#if OS_FUNCTIONAL
+	static
+	void     fun_     ( void )                                       { reinterpret_cast<staticTimer *>(WAIT.hdr.next)->Fun_();  }
+	FUN_t    Fun_;
+#endif
 };
 
 /******************************************************************************
@@ -762,13 +767,9 @@ struct Timer : public staticTimer
 {
 	Timer( void ): staticTimer() {}
 #if OS_FUNCTIONAL
-	Timer( FUN_t _state ): staticTimer(fun_), Fun_(_state) {}
+	Timer( FUN_t _state ): staticTimer(staticTimer::fun_) { staticTimer::Fun_ = _state; }
 
-	void  startFrom( cnt_t _delay, cnt_t _period, FUN_t _state ) { Fun_ = _state; tmr_startFrom(this, _delay, _period, fun_); }
-
-	static
-	void  fun_( void ) { ((Timer *)WAIT.hdr.next)->Fun_(); }
-	FUN_t Fun_;
+	void  startFrom( cnt_t _delay, cnt_t _period, FUN_t _state ) { staticTimer::Fun_ = _state; tmr_startFrom(this, _delay, _period, staticTimer::fun_); }
 #else
 	Timer( FUN_t _state ): staticTimer(_state) {}
 #endif
@@ -875,13 +876,13 @@ struct startTimerUntil : public Timer
 
 namespace ThisTimer
 {
-	static inline void flipISR ( FUN_t  _state )
 #if OS_FUNCTIONAL
-	 { ((Timer *)WAIT.hdr.next)->Fun_ = _state;    tmr_flipISR (Timer::fun_); }
+	static inline void flipISR ( FUN_t _state ) { reinterpret_cast<staticTimer *>(WAIT.hdr.next)->Fun_ = _state;
+	                                              tmr_flipISR (staticTimer::fun_); }
 #else
-	                                             { tmr_flipISR (_state);      }
+	static inline void flipISR ( FUN_t _state ) { tmr_flipISR (_state); }
 #endif
-	static inline void delayISR( cnt_t  _delay ) { tmr_delayISR(_delay);      }
+	static inline void delayISR( cnt_t _delay ) { tmr_delayISR(_delay); }
 }
 
 #endif//__cplusplus
