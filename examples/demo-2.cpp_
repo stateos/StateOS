@@ -22,5 +22,5 @@ int main()
 	auto t4 = startTask(0, [&] { proc(led[3], SEC/8*3); });
 	auto t5 = startTask(0, [&] { proc(grn,    SEC/8*4); });
 
-	ThisTask::stop();
+	tsk_stop();
 }

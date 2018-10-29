@@ -6,9 +6,9 @@ auto tsk = Task(0, []{});
 
 int main()
 {
-	ThisTask::flip([]
+	tsk_flip([]
 	{
-		ThisTask::sleepNext(SEC);
+		tsk_sleepNext(SEC);
 		tsk.startFrom([]
 		{
 			led.tick();

@@ -25,5 +25,5 @@ int main()
 		}
 	});
 
-	ThisTask::sleep();
+	tsk_sleep();
 }

@@ -23,5 +23,5 @@ auto mas = startTask(0, []
 
 int main()
 {
-	ThisTask::stop();
+	tsk_stop();
 }
