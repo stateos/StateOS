@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    29.10.2018
+    @date    31.10.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -711,49 +711,6 @@ void tmr_delayISR( cnt_t delay ) { tmr_thisISR()->delay = delay; }
 
 /******************************************************************************
  *
- * Class             : staticTimer
- *
- * Description       : create and initialize a static timer object
- *
- * Constructor parameters
- *   state           : callback procedure
- *
- ******************************************************************************/
-
-struct staticTimer : public __tmr
-{
-	 staticTimer( void ):          __tmr _TMR_INIT(0) {}
-	 staticTimer( fun_t *_state ): __tmr _TMR_INIT(_state) {}
-	~staticTimer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
-
-	void kill         ( void )                                       {        tmr_reset        (this);                          }
-	void reset        ( void )                                       {        tmr_kill         (this);                          }
-	void start        ( cnt_t _delay, cnt_t _period )                {        tmr_start        (this, _delay, _period);         }
-	void startFor     ( cnt_t _delay )                               {        tmr_startFor     (this, _delay);                  }
-	void startPeriodic( cnt_t _period )                              {        tmr_startPeriodic(this,         _period);         }
-	void startFrom    ( cnt_t _delay, cnt_t _period, fun_t *_state ) {        tmr_startFrom    (this, _delay, _period, _state); }
-	void startNext    ( cnt_t _delay )                               {        tmr_startNext    (this, _delay);                  }
-	void startUntil   ( cnt_t _time )                                {        tmr_startUntil   (this, _time);                   }
-	void stop         ( void )                                       {        tmr_stop         (this);                          }
-
-	unsigned take     ( void )                                       { return tmr_take         (this);                          }
-	unsigned tryWait  ( void )                                       { return tmr_tryWait      (this);                          }
-	unsigned takeISR  ( void )                                       { return tmr_takeISR      (this);                          }
-	unsigned waitFor  ( cnt_t _delay )                               { return tmr_waitFor      (this, _delay);                  }
-	unsigned waitNext ( cnt_t _delay )                               { return tmr_waitNext     (this, _delay);                  }
-	unsigned waitUntil( cnt_t _time )                                { return tmr_waitUntil    (this, _time);                   }
-	unsigned wait     ( void )                                       { return tmr_wait         (this);                          }
-
-	bool     operator!( void )                                       { return __tmr::hdr.id == ID_STOPPED;                      }
-#if OS_FUNCTIONAL
-	static
-	void     fun_     ( void )                                       { reinterpret_cast<staticTimer *>(WAIT.hdr.next)->Fun_();  }
-	FUN_t    Fun_;
-#endif
-};
-
-/******************************************************************************
- *
  * Class             : Timer
  *
  * Description       : create and initialize a timer object
@@ -763,15 +720,44 @@ struct staticTimer : public __tmr
  *
  ******************************************************************************/
 
-struct Timer : public staticTimer
+struct Timer : public __tmr
 {
-	Timer( void ): staticTimer() {}
+	 Timer( void ): __tmr _TMR_INIT(0) {}
 #if OS_FUNCTIONAL
-	Timer( FUN_t _state ): staticTimer(staticTimer::fun_) { staticTimer::Fun_ = _state; }
-
-	void  startFrom( cnt_t _delay, cnt_t _period, FUN_t _state ) { staticTimer::Fun_ = _state; tmr_startFrom(this, _delay, _period, staticTimer::fun_); }
+	 Timer( FUN_t _state ): __tmr _TMR_INIT(fun_), Fun_(_state) {}
 #else
-	Timer( FUN_t _state ): staticTimer(_state) {}
+	 Timer( FUN_t _state ): __tmr _TMR_INIT(_state) {}
+#endif
+	~Timer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
+
+	void reset        ( void )                                      {        tmr_reset        (this);                          }
+	void kill         ( void )                                      {        tmr_kill         (this);                          }
+	void start        ( cnt_t _delay, cnt_t _period )               {        tmr_start        (this, _delay, _period);         }
+	void startFor     ( cnt_t _delay )                              {        tmr_startFor     (this, _delay);                  }
+	void startPeriodic( cnt_t _period )                             {        tmr_startPeriodic(this,         _period);         }
+#if OS_FUNCTIONAL
+	void startFrom    ( cnt_t _delay, cnt_t _period, FUN_t _state ) {        Fun_ = _state;
+	                                                                         tmr_startFrom    (this, _delay, _period, fun_);   }
+#else
+	void startFrom    ( cnt_t _delay, cnt_t _period, FUN_t _state ) {        tmr_startFrom    (this, _delay, _period, _state); }
+#endif
+	void startNext    ( cnt_t _delay )                              {        tmr_startNext    (this, _delay);                  }
+	void startUntil   ( cnt_t _time )                               {        tmr_startUntil   (this, _time);                   }
+	void stop         ( void )                                      {        tmr_stop         (this);                          }
+
+	unsigned take     ( void )                                      { return tmr_take         (this);                          }
+	unsigned tryWait  ( void )                                      { return tmr_tryWait      (this);                          }
+	unsigned takeISR  ( void )                                      { return tmr_takeISR      (this);                          }
+	unsigned waitFor  ( cnt_t _delay )                              { return tmr_waitFor      (this, _delay);                  }
+	unsigned waitNext ( cnt_t _delay )                              { return tmr_waitNext     (this, _delay);                  }
+	unsigned waitUntil( cnt_t _time )                               { return tmr_waitUntil    (this, _time);                   }
+	unsigned wait     ( void )                                      { return tmr_wait         (this);                          }
+
+	bool     operator!( void )                                      { return __tmr::hdr.id == ID_STOPPED;                      }
+#if OS_FUNCTIONAL
+	static
+	void     fun_     ( void )                                      { reinterpret_cast<Timer*>(WAIT.hdr.next)->Fun_();         }
+	FUN_t    Fun_;
 #endif
 };
 
@@ -877,8 +863,8 @@ struct startTimerUntil : public Timer
 namespace ThisTimer
 {
 #if OS_FUNCTIONAL
-	static inline void flipISR ( FUN_t _state ) { reinterpret_cast<staticTimer *>(WAIT.hdr.next)->Fun_ = _state;
-	                                              tmr_flipISR (staticTimer::fun_); }
+	static inline void flipISR ( FUN_t _state ) { reinterpret_cast<Timer*>(WAIT.hdr.next)->Fun_ = _state;
+	                                              tmr_flipISR (Timer::fun_); }
 #else
 	static inline void flipISR ( FUN_t _state ) { tmr_flipISR (_state); }
 #endif
