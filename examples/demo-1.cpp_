@@ -22,5 +22,5 @@ auto t5 = startTask(0, [] { proc(grn,    SEC/8*4); });
 
 int main()
 {
-	tsk_stop();
+	ThisTask::stop();
 }

@@ -7,7 +7,7 @@ int main()
 
 	for (;;)
 	{
-		tsk_delay(SEC);
+		ThisTask::delay(SEC);
 		led.tick();
 	}
 }

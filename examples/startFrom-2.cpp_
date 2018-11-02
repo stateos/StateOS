@@ -6,9 +6,9 @@ auto tsk = Task(0, []{});
 
 int main()
 {
-	tsk_flip([]
+	ThisTask::flip([]
 	{
-		tsk_sleepNext(SEC);
+		ThisTask::sleepNext(SEC);
 		tsk.startFrom([]
 		{
 			ThisTask::flip([]

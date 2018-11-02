@@ -8,5 +8,5 @@ auto mas = startTask(0, [] { ThisTask::sleepFor(SEC); sem.give(); });
 
 int main()
 {
-	tsk_stop();
+	ThisTask::stop();
 }

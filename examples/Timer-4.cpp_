@@ -23,5 +23,5 @@ auto tmr = Timer();
 int main()
 {
 	tmr.startFrom(SEC, SEC, proc1);
-	tsk_stop();
+	ThisTask::stop();
 }

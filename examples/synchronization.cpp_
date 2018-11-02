@@ -24,5 +24,5 @@ auto mas = startTask(0, [] { tickLoop(mas_sem, sla_sem); });
 
 int main()
 {
-	tsk_sleep();
+	ThisTask::sleep();
 }

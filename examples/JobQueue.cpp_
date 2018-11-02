@@ -8,5 +8,5 @@ auto tmr = startTimerPeriodic(SEC, [] { job.give([] { led.tick(); }); });
 
 int main()
 {
-	tsk_sleep();
+	ThisTask::sleep();
 }

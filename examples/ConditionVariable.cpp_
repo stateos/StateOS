@@ -29,5 +29,5 @@ int main()
 	sla.start();
 	mas.start();
 
-	tsk_stop();
+	ThisTask::stop();
 }
