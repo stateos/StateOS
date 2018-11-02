@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    29.08.2018
+    @date    02.11.2018
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -72,8 +72,6 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
-#ifdef  __cplusplus
-
 #ifndef OS_FUNCTIONAL
 
 #if   defined(__CC_ARM) || defined(__CSMC__) || defined(__ICCARM__)
@@ -89,8 +87,6 @@ extern "C" {
 #endif
 
 #endif//OS_FUNCTIONAL
-
-#endif
 
 /* -------------------------------------------------------------------------- */
 

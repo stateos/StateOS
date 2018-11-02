@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    31.10.2018
+    @date    02.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -67,6 +67,12 @@ struct __tsk
 	hdr_t    hdr;   // timer / task header
 
 	fun_t  * state; // task state (initial task function, doesn't have to be noreturn-type)
+#if OS_FUNCTIONAL
+	FUN_t    fun;   // function<void(void)> for internal use in c++ functions
+#define     _FUN_INIT(_state) _state, { 0 }
+#else
+#define     _FUN_INIT(_state) _state
+#endif
 	cnt_t    start; // inherited from timer
 	cnt_t    delay; // inherited from timer
 	cnt_t    slice;	// time slice
@@ -92,6 +98,12 @@ struct __tsk
 	struct {
 	unsigned sigset;// pending signals
 	act_t  * action;// signal handler
+#if OS_FUNCTIONAL
+	ACT_t    act;   // function<void(unsigned)> for internal use in c++ functions
+#define     _ACT_INIT() 0, { 0 }
+#else
+#define     _ACT_INIT() 0
+#endif
 	struct {
 	void   * sp;
 	tsk_t ** guard;
@@ -190,7 +202,7 @@ struct __tsk
  ******************************************************************************/
 
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _HDR_INIT(), _state, 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { 0, 0, { 0, 0 } }, { { 0 } }, _TSK_EXTRA }
+                       { _HDR_INIT(), _FUN_INIT(_state), 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { 0, _ACT_INIT(), { 0, 0 } }, { { 0 } }, _TSK_EXTRA }
 
 /******************************************************************************
  *
@@ -1232,7 +1244,7 @@ void cur_action( act_t *action ) { tsk_action(System.cur, action); }
 struct baseTask : public __tsk
 {
 #if OS_FUNCTIONAL
-	 baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, fun_, _stack, _size), Fun_(_state) {}
+	 baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, fun_, _stack, _size) { __tsk::fun = _state; }
 #else
 	 baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 #endif
@@ -1240,7 +1252,7 @@ struct baseTask : public __tsk
 
 	void     start    ( void )             {        tsk_start    (this);          }
 #if OS_FUNCTIONAL
-	void     startFrom( FUN_t    _state )  {        Fun_ = _state;
+	void     startFrom( FUN_t    _state )  {        __tsk::fun = _state;
 	                                                tsk_startFrom(this, fun_);    }
 #else
 	void     startFrom( FUN_t    _state )  {        tsk_startFrom(this, _state);  }
@@ -1257,7 +1269,7 @@ struct baseTask : public __tsk
 	void     give     ( unsigned _signo )  {        tsk_give     (this, _signo);  }
 	void     signal   ( unsigned _signo )  {        tsk_signal   (this, _signo);  }
 #if OS_FUNCTIONAL
-	void     action   ( ACT_t    _action ) {        Act_ = _action;
+	void     action   ( ACT_t    _action ) {        __tsk::sig.act = _action;
 	                                                tsk_action   (this, act_);    }
 #else
 	void     action   ( ACT_t    _action ) {        tsk_action   (this, _action); }
@@ -1265,11 +1277,9 @@ struct baseTask : public __tsk
 	bool     operator!( void )             { return __tsk::hdr.id == ID_STOPPED;  }
 #if OS_FUNCTIONAL
 	static
-	void     fun_     ( void )             { reinterpret_cast<baseTask*>(System.cur)->Fun_(); }
-	FUN_t    Fun_;
+	void     fun_     ( void )             {        tsk_this()->fun();            }
 	static
-	void     act_     ( unsigned _signo )  { reinterpret_cast<baseTask*>(System.cur)->Act_(_signo); }
-	ACT_t    Act_;
+	void     act_     ( unsigned _signo )  {        tsk_this()->sig.act(_signo);  }
 #endif
 };
 
@@ -1341,7 +1351,7 @@ namespace ThisTask
 	static inline void     yield     ( void )             {        tsk_yield     ();        }
 	static inline void     pass      ( void )             {        tsk_pass      ();        }
 #if OS_FUNCTIONAL
-	static inline void     flip      ( FUN_t    _state )  {        reinterpret_cast<baseTask*>(System.cur)->Fun_ = _state;
+	static inline void     flip      ( FUN_t    _state )  {        tsk_this()->fun = _state;
 	                                                               tsk_flip      (baseTask::fun_); }
 #else
 	static inline void     flip      ( FUN_t    _state )  {        tsk_flip      (_state);  }
@@ -1359,7 +1369,7 @@ namespace ThisTask
 	static inline void     give      ( unsigned _signo )  {        cur_give      (_signo);  }
 	static inline void     signal    ( unsigned _signo )  {        cur_signal    (_signo);  }
 #if OS_FUNCTIONAL
-	static inline void     action    ( ACT_t    _action ) {        reinterpret_cast<baseTask*>(System.cur)->Act_ = _action;
+	static inline void     action    ( ACT_t    _action ) {        tsk_this()->sig.act = _action;
 	                                                               cur_action    (baseTask::act_); }
 #else
 	static inline void     action    ( ACT_t    _action ) {        cur_action    (_action); }

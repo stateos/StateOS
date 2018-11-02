@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    31.10.2018
+    @date    02.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,6 +49,12 @@ struct __tmr
 	hdr_t    hdr;   // timer / task header
 
 	fun_t  * state; // callback procedure
+#if OS_FUNCTIONAL
+	FUN_t    fun;   // function<void(void)> for internal use in c++ functions
+#define     _FUN_INIT(_state) _state, { 0 }
+#else
+#define     _FUN_INIT(_state) _state
+#endif
 	cnt_t    start;
 	cnt_t    delay;
 	cnt_t    period;
@@ -70,7 +76,7 @@ struct __tmr
  *
  ******************************************************************************/
 
-#define               _TMR_INIT( _state ) { _HDR_INIT(), _state, 0, 0, 0 }
+#define               _TMR_INIT( _state ) { _HDR_INIT(), _FUN_INIT(_state), 0, 0, 0 }
 
 /******************************************************************************
  *
@@ -724,7 +730,7 @@ struct Timer : public __tmr
 {
 	 Timer( void ): __tmr _TMR_INIT(0) {}
 #if OS_FUNCTIONAL
-	 Timer( FUN_t _state ): __tmr _TMR_INIT(fun_), Fun_(_state) {}
+	 Timer( FUN_t _state ): __tmr _TMR_INIT(fun_) { __tmr::fun = _state; }
 #else
 	 Timer( FUN_t _state ): __tmr _TMR_INIT(_state) {}
 #endif
@@ -736,7 +742,7 @@ struct Timer : public __tmr
 	void startFor     ( cnt_t _delay )                              {        tmr_startFor     (this, _delay);                  }
 	void startPeriodic( cnt_t _period )                             {        tmr_startPeriodic(this,         _period);         }
 #if OS_FUNCTIONAL
-	void startFrom    ( cnt_t _delay, cnt_t _period, FUN_t _state ) {        Fun_ = _state;
+	void startFrom    ( cnt_t _delay, cnt_t _period, FUN_t _state ) {        __tmr::fun = _state;
 	                                                                         tmr_startFrom    (this, _delay, _period, fun_);   }
 #else
 	void startFrom    ( cnt_t _delay, cnt_t _period, FUN_t _state ) {        tmr_startFrom    (this, _delay, _period, _state); }
@@ -756,8 +762,7 @@ struct Timer : public __tmr
 	bool     operator!( void )                                      { return __tmr::hdr.id == ID_STOPPED;                      }
 #if OS_FUNCTIONAL
 	static
-	void     fun_     ( void )                                      { reinterpret_cast<Timer*>(WAIT.hdr.next)->Fun_();         }
-	FUN_t    Fun_;
+	void     fun_     ( void )                                      {        tmr_thisISR()->fun();                             }
 #endif
 };
 
@@ -863,7 +868,7 @@ struct startTimerUntil : public Timer
 namespace ThisTimer
 {
 #if OS_FUNCTIONAL
-	static inline void flipISR ( FUN_t _state ) { reinterpret_cast<Timer*>(WAIT.hdr.next)->Fun_ = _state;
+	static inline void flipISR ( FUN_t _state ) { tmr_thisISR()->fun = _state;
 	                                              tmr_flipISR (Timer::fun_); }
 #else
 	static inline void flipISR ( FUN_t _state ) { tmr_flipISR (_state); }
