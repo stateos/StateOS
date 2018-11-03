@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    27.10.2018
+    @date    03.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -300,6 +300,7 @@ void priv_tsk_reset( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	tsk->sig.sigset = 0;
+	tsk->sig.backup.sp = 0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -417,6 +418,7 @@ void tsk_flip( fun_t *state )
 
 	System.cur->state = state;
 
+	priv_tsk_reset(System.cur);
 	core_ctx_switch();
 	core_tsk_flip((void *)STK_CROP(System.cur->stack, System.cur->size));
 
