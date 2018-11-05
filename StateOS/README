@@ -39,6 +39,7 @@ Features:
 - removed ID_BLOCKED constant
 - removed ID_IDLE constant
 - added signal handler
+- changed c++ functional procedures
 ---------
 6.3
 - merged test branch

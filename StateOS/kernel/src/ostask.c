@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    03.11.2018
+    @date    05.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -600,6 +600,7 @@ void priv_sig_dispatch( tsk_t *tsk )
 
 		tsk->sp = (ctx_t *)tsk->sp - 1;
 		port_ctx_init(tsk->sp, priv_sig_deliver);
+		assert_ctx_integrity(tsk);
 
 		if (tsk->guard)
 			core_tsk_wakeup(tsk, 0);
