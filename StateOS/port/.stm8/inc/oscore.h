@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    02.11.2018
+    @date    04.11.2018
     @brief   StateOS port file for STM8 uC.
 
  ******************************************************************************
@@ -75,7 +75,7 @@ extern "C" {
 #ifndef OS_FUNCTIONAL
 #define OS_FUNCTIONAL         0 /* c++ functional library header not included */
 #elif   OS_FUNCTIONAL
-#error  c++ functional library not allowed for this compiler.
+#error  OS_FUNCTIONAL is an internal port definition!
 #endif//OS_FUNCTIONAL
 
 /* -------------------------------------------------------------------------- */

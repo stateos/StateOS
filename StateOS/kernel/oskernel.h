@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    02.11.2018
+    @date    04.11.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -62,8 +62,8 @@ typedef     void (* ACT_t)( unsigned );
 #else
 
 #if OS_FUNCTIONAL
-typedef     void  * FUN_t [ 4 ];
-typedef     void  * ACT_t [ 4 ];
+typedef     void  * FUN_t [ OS_FUNCTIONAL ];
+typedef     void  * ACT_t [ OS_FUNCTIONAL ];
 #endif
 
 #endif
