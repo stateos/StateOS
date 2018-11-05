@@ -53,7 +53,9 @@
 #if OS_FUNCTIONAL
 #include <functional>
 typedef std::function<void( void )>     FUN_t;
+static_assert(sizeof(FUN_t) == sizeof(void*)*(OS_FUNCTIONAL), "incorrect value of OS_FUNCTIONAL constant!");
 typedef std::function<void( unsigned )> ACT_t;
+static_assert(sizeof(ACT_t) == sizeof(void*)*(OS_FUNCTIONAL), "incorrect value of OS_FUNCTIONAL constant!");
 #else
 typedef     void (* FUN_t)( void );
 typedef     void (* ACT_t)( unsigned );
@@ -65,19 +67,6 @@ typedef     void (* ACT_t)( unsigned );
 typedef     void  * FUN_t [ OS_FUNCTIONAL ];
 typedef     void  * ACT_t [ OS_FUNCTIONAL ];
 #endif
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#if OS_FUNCTIONAL
-
-#define assert_functional() \
-        assert(sizeof(FUN_t) == sizeof(void *) * OS_FUNCTIONAL)
-
-#else
-
-#define assert_functional()
 
 #endif
 

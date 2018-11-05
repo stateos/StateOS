@@ -40,6 +40,7 @@ Features:
 - removed ID_IDLE constant
 - added signal handler
 - changed c++ functional procedures
+- updated assertions
 ---------
 6.3
 - merged test branch
