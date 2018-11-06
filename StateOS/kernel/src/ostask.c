@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    05.11.2018
+    @date    06.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -613,7 +613,9 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 {
 	unsigned sigset = SIGSET(signo);
 
+	assert_tsk_context();
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
 	assert(sigset);
 
 	sys_lock();
@@ -632,7 +634,9 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 void tsk_action( tsk_t *tsk, act_t *action )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
 	assert(tsk);
+	assert(tsk->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
