@@ -593,7 +593,6 @@ void priv_sig_dispatch( tsk_t *tsk )
 
 	if (tsk == System.cur)
 	{
-		assert_tsk_context();
 		priv_sig_handler(tsk);
 		return;
 	}
@@ -615,6 +614,7 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 {
 	unsigned sigset = SIGSET(signo);
 
+	assert_tsk_context();
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
 	assert(sigset);
@@ -635,6 +635,7 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 void tsk_action( tsk_t *tsk, act_t *action )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
 
