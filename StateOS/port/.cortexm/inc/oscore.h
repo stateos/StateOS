@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    06.11.2018
+    @date    09.11.2018
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -97,24 +97,42 @@ extern  stk_t               __initial_sp[];
 #define MAIN_TOP            __initial_sp
 
 /* -------------------------------------------------------------------------- */
-// task context
 
+// hardware context
+typedef struct __hwx hwx_t;
+
+struct __hwx
+{
+	unsigned r0, r1, r2, r3;
+	unsigned ip; // r12
+	unsigned lr; // r14
+	fun_t  * pc; // r15
+	unsigned cc; // psr
+};
+
+#define _HWX_INIT( pc ) { 0, 0, 0, 0, 0, 0, pc, 0x01000000 }
+
+// software context
+typedef struct __swx swx_t;
+
+struct __swx
+{
+	unsigned r4, r5, r6, r7, r8, r9, r10, r11;
+	unsigned lr;  // EXC_RETURN
+};
+
+#define _SWX_INIT() { 0, 0, 0, 0, 0, 0, 0, 0, 0xFFFFFFFD }
+
+// task context
 typedef struct __ctx ctx_t;
 
 struct __ctx
 {
-	// context saved by the software
-	unsigned r4, r5, r6, r7, r8, r9, r10, r11;
-	unsigned lr;  // EXC_RETURN
-	// context saved by the hardware
-	unsigned r0, r1, r2, r3;
-	unsigned r12; // ip
-	unsigned r14; // lr
-	fun_t  * pc;
-	unsigned psr;
+	swx_t    swx;
+	hwx_t    hwx;
 };
 
-#define _CTX_INIT( pc ) { 0, 0, 0, 0, 0, 0, 0, 0, 0xFFFFFFFD, 0, 0, 0, 0, 0, 0, pc, 0x01000000 }
+#define _CTX_INIT( pc ) { _SWX_INIT(), _HWX_INIT(pc) }
 
 /* -------------------------------------------------------------------------- */
 // init task context
@@ -122,9 +140,9 @@ struct __ctx
 __STATIC_INLINE
 void port_ctx_init( ctx_t *ctx, fun_t *pc )
 {
-	ctx->lr  = 0xFFFFFFFD; // EXC_RETURN: return from psp
-	ctx->pc  = pc;
-	ctx->psr = 0x01000000;
+	ctx->swx.lr = 0xFFFFFFFD; // EXC_RETURN: return from psp
+	ctx->hwx.pc = pc;
+	ctx->hwx.cc = 0x01000000;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -41,6 +41,7 @@ Features:
 - added signal handler
 - changed c++ functional procedures
 - updated assertions
+- modified context structures
 ---------
 6.3
 - merged test branch
