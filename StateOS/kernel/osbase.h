@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    25.10.2018
+    @date    10.11.2018
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -32,9 +32,16 @@
 #ifndef __STATEOSBASE_H
 #define __STATEOSBASE_H
 
+#ifndef   DEBUG
+#ifndef   NDEBUG
+#define   NDEBUG
+#endif // NDEBUG
+#endif // DEBUG
+
 #include <stdint.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <assert.h>
 #include "osport.h"
 
 #ifdef __cplusplus
@@ -78,12 +85,12 @@ typedef         void act_t(unsigned);       // signal action
 
 /* -------------------------------------------------------------------------- */
 
-#define E_SUCCESS  ( 0U )     // process was released as a result of taking the supervising object
-#define E_FAILURE  ( 0U-1 )   // process was released as a result of any failure
-#define E_STOPPED  ( 0U-2 )   // process was released as a result of reset the supervising object
-#define E_DELETED  ( 0U-3 )   // process was released as a result of deleting the supervising object
-#define E_TIMEOUT  ( 0U-4 )   // process was released as a result of the end of the timer countdown
-#define OWNERDEAD  ( 1U )     // previous owner has been killed
+#define E_SUCCESS  ( 0U )   // process was released as a result of taking the supervising object
+#define E_FAILURE  ( 0U-1 ) // process was released as a result of any failure
+#define E_STOPPED  ( 0U-2 ) // process was released as a result of reset the supervising object
+#define E_DELETED  ( 0U-3 ) // process was released as a result of deleting the supervising object
+#define E_TIMEOUT  ( 0U-4 ) // process was released as a result of the end of the timer countdown
+#define OWNERDEAD  ( 1U )   // previous owner has been killed
 
 /* -------------------------------------------------------------------------- */
 

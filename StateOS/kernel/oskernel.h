@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    05.11.2018
+    @date    10.11.2018
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -35,16 +35,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "oscore.h"
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef DEBUG
-#ifndef NDEBUG
-#define NDEBUG
-#endif//NDEBUG
-#endif//DEBUG
-
-#include <assert.h>
 
 /* -------------------------------------------------------------------------- */
 
