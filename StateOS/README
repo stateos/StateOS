@@ -42,6 +42,7 @@ Features:
 - changed c++ functional procedures
 - updated assertions
 - modified context structures
+- added dynamic tasks
 ---------
 6.3
 - merged test branch

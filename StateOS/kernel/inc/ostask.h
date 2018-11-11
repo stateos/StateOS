@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    02.11.2018
+    @date    11.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1301,6 +1301,47 @@ template<unsigned size_ = OS_STACK_SIZE>
 struct TaskT : public baseTask
 {
 	TaskT( const unsigned _prio, FUN_t _state ): baseTask(_prio, _state, stack_, size_) {}
+
+	static
+	TaskT<size_> *create( const unsigned _prio, FUN_t _state )
+	{
+		TaskT<size_> *tsk;
+
+		sys_lock();
+		{
+			tsk = new TaskT<size_>(_prio, _state);
+
+			if (tsk != nullptr)
+			{
+				tsk->__tsk::hdr.obj.res = tsk;
+				tsk->start();
+			}
+		}
+		sys_unlock();
+
+		return tsk;
+	}
+
+	static
+	TaskT<size_> *detached( const unsigned _prio, FUN_t _state )
+	{
+		TaskT<size_> *tsk;
+
+		sys_lock();
+		{
+			tsk = new TaskT<size_>(_prio, _state);
+
+			if (tsk != nullptr)
+			{
+				tsk->__tsk::hdr.obj.res = tsk;
+				tsk->__tsk::join = DETACHED;
+				tsk->start();
+			}
+		}
+		sys_unlock();
+
+		return tsk;
+	}
 
 	private:
 	stk_t stack_[ STK_SIZE(size_) ];
