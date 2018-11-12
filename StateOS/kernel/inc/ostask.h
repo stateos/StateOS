@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    11.11.2018
+    @date    12.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1303,7 +1303,7 @@ struct TaskT : public baseTask
 	TaskT( const unsigned _prio, FUN_t _state ): baseTask(_prio, _state, stack_, size_) {}
 
 	static
-	TaskT<size_> *create( const unsigned _prio, FUN_t _state, tsk_t *joinable = JOINABLE )
+	TaskT<size_> *create( const unsigned _prio, FUN_t _state, tsk_t *_join = JOINABLE )
 	{
 		TaskT<size_> *tsk;
 
@@ -1318,7 +1318,7 @@ struct TaskT : public baseTask
 			tsk_init(tsk, _prio, _state, tsk->stack_, size_);
 #endif
 			tsk->__tsk::hdr.obj.res = tsk;
-			tsk->__tsk::join = joinable;
+			tsk->__tsk::join = _join;
 		}
 		sys_unlock();
 
