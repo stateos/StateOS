@@ -1303,19 +1303,22 @@ struct TaskT : public baseTask
 	TaskT( const unsigned _prio, FUN_t _state ): baseTask(_prio, _state, stack_, size_) {}
 
 	static
-	TaskT<size_> *create( const unsigned _prio, FUN_t _state )
+	TaskT<size_> *create( const unsigned _prio, FUN_t _state, tsk_t *joinable = JOINABLE )
 	{
 		TaskT<size_> *tsk;
 
 		sys_lock();
 		{
-			tsk = new TaskT<size_>(_prio, _state);
-
-			if (tsk != nullptr)
-			{
-				tsk->__tsk::hdr.obj.res = tsk;
-				tsk->start();
-			}
+			tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
+			assert(tsk);
+#if OS_FUNCTIONAL
+			tsk_init(tsk, _prio, fun_, tsk->stack_, size_);
+			tsk->__tsk::fun = _state;
+#else
+			tsk_init(tsk, _prio, _state, tsk->stack_, size_);
+#endif
+			tsk->__tsk::hdr.obj.res = tsk;
+			tsk->__tsk::join = joinable;
 		}
 		sys_unlock();
 
@@ -1325,22 +1328,7 @@ struct TaskT : public baseTask
 	static
 	TaskT<size_> *detached( const unsigned _prio, FUN_t _state )
 	{
-		TaskT<size_> *tsk;
-
-		sys_lock();
-		{
-			tsk = new TaskT<size_>(_prio, _state);
-
-			if (tsk != nullptr)
-			{
-				tsk->__tsk::hdr.obj.res = tsk;
-				tsk->__tsk::join = DETACHED;
-				tsk->start();
-			}
-		}
-		sys_unlock();
-
-		return tsk;
+		return create(_prio, _state, DETACHED);
 	}
 
 	private:
