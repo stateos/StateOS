@@ -2,7 +2,7 @@
 
     @file    StateOS: oscriticalsection.h
     @author  Rajmund Szymanski
-    @date    01.10.2018
+    @date    12.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,6 +57,7 @@ lck_t core_set_lock( void )
 {
 	lck_t prv = port_get_lock();
 	port_set_lock();
+	port_set_sync();
 	return prv;
 }
 
@@ -79,6 +80,7 @@ lck_t core_clr_lock( void )
 {
 	lck_t prv = port_get_lock();
 	port_clr_lock();
+	port_set_sync();
 	return prv;
 }
 
@@ -100,6 +102,7 @@ lck_t core_clr_lock( void )
 __STATIC_INLINE
 void core_put_lock( lck_t lck )
 {
+	port_set_sync();
 	port_put_lock(lck);
 }
 
