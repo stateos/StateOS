@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    04.11.2018
+    @date    12.11.2018
     @brief   StateOS port file for STM8 uC.
 
  ******************************************************************************
@@ -157,19 +157,37 @@ bool port_isr_context( void )
 
 #if   defined(__CSMC__)
 
-#define _get_SP()    (void *)_asm("ldw x, sp")
-#define _set_SP(sp)  (void)  _asm("ldw sp, x", (void *)(sp))
+__STATIC_INLINE
+void *_get_SP( void )
+{
+	return (void*)_asm("ldw x, sp");
+}
 
-#define _get_CC()    (lck_t) _asm("push cc""\n""pop a")
-#define _set_CC(cc)  (void)  _asm("push a""\n""pop cc", (lck_t)(cc))
+__STATIC_INLINE
+void _set_SP( void *sp )
+{
+	_asm("ldw sp, x", sp);
+}
+
+__STATIC_INLINE
+lck_t _get_CC( void )
+{
+	return (lck_t)_asm("push cc""\n""pop a");
+}
+
+__STATIC_INLINE
+void _set_CC( lck_t lck )
+{
+	_asm("push a""\n""pop cc", lck);
+}
 
 #elif defined(__SDCC)
 
-void  * _get_SP( void );
-void    _set_SP( void *sp );
+void *_get_SP( void );
+void  _set_SP( void *sp );
 
-lck_t   _get_CC( void );
-void    _set_CC( lck_t cc );
+lck_t _get_CC( void );
+void  _set_CC( lck_t lck );
 
 #endif
 
@@ -184,13 +202,35 @@ void * port_get_sp( void )
 
 /* -------------------------------------------------------------------------- */
 
-#define port_get_lock()      _get_CC()
-#define port_put_lock(lck)   _set_CC(lck)
+__STATIC_INLINE
+lck_t port_get_lock( void )
+{
+	return _get_CC();
+}
 
-#define port_set_lock()       disableInterrupts()
-#define port_clr_lock()       enableInterrupts()
+__STATIC_INLINE
+void port_put_lock( lck_t lck )
+{
+	_set_CC(lck);
+}
 
-#define port_set_barrier()    nop()
+__STATIC_INLINE
+void port_set_lock( void )
+{
+	disableInterrupts();
+}
+
+__STATIC_INLINE
+void port_clr_lock( void )
+{
+	enableInterrupts();
+}
+
+__STATIC_INLINE
+void port_set_barrier( void )
+{
+	nop();
+}
 
 /* -------------------------------------------------------------------------- */
 

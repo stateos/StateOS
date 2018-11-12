@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    09.11.2018
+    @date    12.11.2018
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -189,32 +189,97 @@ void * port_get_sp( void )
 
 #if   defined(__CSMC__)
 
-#define __disable_irq()     __ASM("cpsid i")
-#define __enable_irq()      __ASM("cpsie i")
+__STATIC_INLINE
+void __disable_irq( void )
+{
+	__ASM("cpsid i");
+}
+
+__STATIC_INLINE
+void __enable_irq( void )
+{
+	__ASM("cpsie i");
+}
 
 #endif
 
 /* -------------------------------------------------------------------------- */
 
+__STATIC_INLINE
+void port_set_synchronization( void )
+{
+#if   defined(__ARMCC_VERSION)
+	__schedule_barrier();
+#elif defined(__GNUC__)
+	__ASM volatile ("" ::: "memory");
+#endif	
+}
+
+/* -------------------------------------------------------------------------- */
+
 #if OS_LOCK_LEVEL && (__CORTEX_M >= 3)
 
-#define port_get_lock()     __get_BASEPRI()
-#define port_put_lock(lck)  __set_BASEPRI(lck)
+__STATIC_INLINE
+lck_t port_get_lock( void )
+{
+	return __get_BASEPRI();
+}
 
-#define port_set_lock()     __set_BASEPRI((OS_LOCK_LEVEL)<<(8-__NVIC_PRIO_BITS))
-#define port_clr_lock()     __set_BASEPRI(0)
+__STATIC_INLINE
+void port_put_lock( lck_t lck )
+{
+	port_set_synchronization();
+	__set_BASEPRI(lck);
+}
+
+__STATIC_INLINE
+void port_set_lock( void )
+{
+	__set_BASEPRI((OS_LOCK_LEVEL) << (8 - (__NVIC_PRIO_BITS)));
+	port_set_synchronization();
+}
+
+__STATIC_INLINE
+void port_clr_lock( void )
+{
+	__set_BASEPRI(0);
+}
 
 #else
 
-#define port_get_lock()     __get_PRIMASK()
-#define port_put_lock(lck)  __set_PRIMASK(lck)
+__STATIC_INLINE
+lck_t port_get_lock( void )
+{
+	return __get_PRIMASK();
+}
 
-#define port_set_lock()     __disable_irq()
-#define port_clr_lock()     __enable_irq()
+__STATIC_INLINE
+void port_put_lock( lck_t lck )
+{
+	port_set_synchronization();
+	__set_PRIMASK(lck);
+}
+
+__STATIC_INLINE
+void port_set_lock( void )
+{
+	__disable_irq();
+	port_set_synchronization();
+}
+
+__STATIC_INLINE
+void port_clr_lock( void )
+{
+	__enable_irq();
+}
 
 #endif
 
-#define port_set_barrier()  __ISB()
+__STATIC_INLINE
+void port_set_barrier( void )
+{
+	__ISB();
+}
 
 /* -------------------------------------------------------------------------- */
 
