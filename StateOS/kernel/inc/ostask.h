@@ -1308,31 +1308,26 @@ struct TaskT : public baseTask
 	{
 		TaskT<size_> *tsk;
 
-		sys_lock();
-		{
-			tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-			assert(tsk);
-#if OS_FUNCTIONAL
-			tsk_init(tsk, _prio, fun_, tsk->stack_, size_);
-			tsk->__tsk::fun = _state;
-#else
-			tsk_init(tsk, _prio, _state, tsk->stack_, size_);
-#endif
-			tsk->__tsk::hdr.obj.res = tsk;
-			tsk->__tsk::join = _join;
-		}
-		sys_unlock();
+		tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
+		assert(tsk);
+
+		tsk->init(_prio, _state);
+		tsk->__tsk::hdr.obj.res = tsk;
+		tsk->__tsk::join = _join;
+		tsk->start();
 
 		return tsk;
 	}
 
 	static
-	TaskT<size_> *detached( const unsigned _prio, FUN_t _state )
-	{
-		return create(_prio, _state, DETACHED);
-	}
+	TaskT<size_> *detached( const unsigned _prio, FUN_t _state ) { return create(_prio, _state, DETACHED); }
 
 	private:
+#if OS_FUNCTIONAL
+	void init( const unsigned _prio, FUN_t _state ) { tsk_init(this, _prio, fun_, stack_, size_, false); __tsk::fun = _state; }
+#else
+	void init( const unsigned _prio, FUN_t _state ) { tsk_init(this, _prio, _state, stack_, size_, false); }
+#endif
 	stk_t stack_[ STK_SIZE(size_) ];
 };
 
