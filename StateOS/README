@@ -43,6 +43,7 @@ Features:
 - updated assertions
 - modified context structures
 - added dynamic tasks
+- updated tsk_init function
 ---------
 6.3
 - merged test branch

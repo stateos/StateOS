@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    12.11.2018
+    @date    13.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -621,6 +621,7 @@ tsk_t *cur_task( void ) { return System.cur; }
  *                     it will be executed into an infinite system-implemented loop
  *   stack           : base of task's private stack storage
  *   size            : size of task private stack (in bytes)
+ *   start           : start initialized task?
  *
  * Return            : task object
  *
@@ -628,7 +629,7 @@ tsk_t *cur_task( void ) { return System.cur; }
  *
  ******************************************************************************/
 
-void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size );
+void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size, bool start );
 
 /******************************************************************************
  *
