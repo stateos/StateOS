@@ -48,7 +48,7 @@ void customer()
 		get_haircut();
 	}
 
-	ThisTask::stop();
+	ThisTask::destroy();
 }		
 
 int main()
@@ -60,7 +60,7 @@ int main()
 
 	for (;;)
 	{
-		Task::detached(1, customer);
+		Task::create(1, customer);
 
 		cnt_t dly = rand() % DELAY;
 		ThisTask::delay(dly * MSEC);
