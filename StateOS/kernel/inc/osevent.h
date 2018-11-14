@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -199,7 +199,8 @@ void evt_kill( evt_t *evt ) { evt_reset(evt); }
 
 /******************************************************************************
  *
- * Name              : evt_delete
+ * Name              : evt_destroy
+ * Alias             : evt_delete
  *
  * Description       : reset the event object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -212,7 +213,10 @@ void evt_kill( evt_t *evt ) { evt_reset(evt); }
  *
  ******************************************************************************/
 
-void evt_delete( evt_t *evt );
+void evt_destroy( evt_t *evt );
+
+__STATIC_INLINE
+void evt_delete( evt_t *evt ) { evt_destroy(evt); }
 
 /******************************************************************************
  *
@@ -330,8 +334,12 @@ struct Event : public __evt
 	 Event( void ): __evt _EVT_INIT() {}
 	~Event( void ) { assert(__evt::obj.queue == nullptr); }
 
+	static
+	Event *create( void ) { return reinterpret_cast<Event *>(evt_create()); }
+
 	void     reset    ( void )                          {        evt_reset    (this);                 }
 	void     kill     ( void )                          {        evt_kill     (this);                 }
+	void     destroy  ( void )                          {        evt_destroy  (this);                 }
 	unsigned waitFor  ( unsigned*_event, cnt_t _delay ) { return evt_waitFor  (this, _event, _delay); }
 	unsigned waitFor  ( unsigned&_event, cnt_t _delay ) { return evt_waitFor  (this,&_event, _delay); }
 	unsigned waitUntil( unsigned*_event, cnt_t _time )  { return evt_waitUntil(this, _event, _time);  }
