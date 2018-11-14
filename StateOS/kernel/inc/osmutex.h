@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -280,7 +280,8 @@ void mtx_kill( mtx_t *mtx ) { mtx_reset(mtx); }
 
 /******************************************************************************
  *
- * Name              : mtx_delete
+ * Name              : mtx_destroy
+ * Alias             : mtx_delete
  *
  * Description       : reset the mutex object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -293,7 +294,10 @@ void mtx_kill( mtx_t *mtx ) { mtx_reset(mtx); }
  *
  ******************************************************************************/
 
-void mtx_delete( mtx_t *mtx );
+void mtx_destroy( mtx_t *mtx );
+
+__STATIC_INLINE
+void mtx_delete( mtx_t *mtx ) { mtx_destroy(mtx); }
 
 /******************************************************************************
  *
@@ -492,8 +496,12 @@ struct Mutex : public __mtx
 	 Mutex( const unsigned _mode, const unsigned _prio = 0 ): __mtx _MTX_INIT(_mode, _prio) {}
 	~Mutex( void ) { assert(__mtx::owner == nullptr); }
 
+	static
+	Mutex *create( const unsigned _mode, const unsigned _prio = 0 ) { return reinterpret_cast<Mutex *>(mtx_create(_mode, _prio)); }
+
 	void     reset    ( void )            {        mtx_reset    (this);         }
 	void     kill     ( void )            {        mtx_kill     (this);         }
+	void     destroy  ( void )            {        mtx_destroy  (this);         }
 	void     setPrio  ( unsigned _prio )  {        mtx_setPrio  (this, _prio);  }
 	void     prio     ( unsigned _prio )  {        mtx_prio     (this, _prio);  }
 	unsigned getPrio  ( void )            { return mtx_getPrio  (this);         }

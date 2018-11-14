@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -91,7 +91,7 @@ void mtx_reset( mtx_t *mtx )
 }
 
 /* -------------------------------------------------------------------------- */
-void mtx_delete( mtx_t *mtx )
+void mtx_destroy( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
