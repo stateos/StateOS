@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    17.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -105,7 +105,7 @@ void evq_reset( evq_t *evq )
 }
 
 /* -------------------------------------------------------------------------- */
-void evq_delete( evq_t *evq )
+void evq_destroy( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();

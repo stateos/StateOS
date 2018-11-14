@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    17.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -236,7 +236,8 @@ void evq_kill( evq_t *evq ) { evq_reset(evq); }
 
 /******************************************************************************
  *
- * Name              : evq_delete
+ * Name              : evq_destroy
+ * Alias             : evq_delete
  *
  * Description       : reset the event queue object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -249,7 +250,10 @@ void evq_kill( evq_t *evq ) { evq_reset(evq); }
  *
  ******************************************************************************/
 
-void evq_delete( evq_t *evq );
+void evq_destroy( evq_t *evq );
+
+__STATIC_INLINE
+void evq_delete( evq_t *evq ) { evq_destroy(evq); }
 
 /******************************************************************************
  *
@@ -499,8 +503,12 @@ struct EventQueueT : public __evq
 	 EventQueueT( void ): __evq _EVQ_INIT(limit_, data_) {}
 	~EventQueueT( void ) { assert(__evq::obj.queue == nullptr); }
 
+	static
+	EventQueueT<limit_> *create( void ) { return reinterpret_cast<EventQueueT<limit_> *>(evq_create(limit_)); }
+
 	void     reset    ( void )                         {        evq_reset    (this);                }
 	void     kill     ( void )                         {        evq_kill     (this);                }
+	void     destroy  ( void )                         {        evq_destroy  (this);                }
 	unsigned take     ( unsigned*_data )               { return evq_take     (this, _data);         }
 	unsigned take     ( unsigned&_data )               { return evq_take     (this,&_data);         }
 	unsigned tryWait  ( unsigned*_data )               { return evq_tryWait  (this, _data);         }
