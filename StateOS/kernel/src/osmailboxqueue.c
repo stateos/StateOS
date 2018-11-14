@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -108,7 +108,7 @@ void box_reset( box_t *box )
 }
 
 /* -------------------------------------------------------------------------- */
-void box_delete( box_t *box )
+void box_destroy( box_t *box )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();

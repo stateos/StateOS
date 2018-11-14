@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -246,7 +246,8 @@ void box_kill( box_t *box ) { box_reset(box); }
 
 /******************************************************************************
  *
- * Name              : box_delete
+ * Name              : box_destroy
+ * Alias             : box_delete
  *
  * Description       : reset the mailbox queue object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -259,7 +260,10 @@ void box_kill( box_t *box ) { box_reset(box); }
  *
  ******************************************************************************/
 
-void box_delete( box_t *box );
+void box_destroy( box_t *box );
+
+__STATIC_INLINE
+void box_delete( box_t *box ) { box_destroy(box); }
 
 /******************************************************************************
  *
@@ -548,8 +552,12 @@ struct MailBoxQueueT : public __box
 	 MailBoxQueueT( void ): __box _BOX_INIT(limit_, data_, size_) {}
 	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
+	static
+	MailBoxQueueT<limit_, size_> *create( void ) { return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_)); }
+
 	void     reset    ( void )                            {        box_reset    (this);                }
 	void     kill     ( void )                            {        box_kill     (this);                }
+	void     destroy  ( void )                            {        box_destroy  (this);                }
 	unsigned take     (       void *_data )               { return box_take     (this, _data);         }
 	unsigned tryWait  (       void *_data )               { return box_tryWait  (this, _data);         }
 	unsigned takeISR  (       void *_data )               { return box_takeISR  (this, _data);         }
