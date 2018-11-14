@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -203,7 +203,8 @@ void mut_kill( mut_t *mut ) { mut_reset(mut); }
 
 /******************************************************************************
  *
- * Name              : mut_delete
+ * Name              : mut_destroy
+ * Alias             : mut_delete
  *
  * Description       : reset the fast mutex object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -216,7 +217,10 @@ void mut_kill( mut_t *mut ) { mut_reset(mut); }
  *
  ******************************************************************************/
 
-void mut_delete( mut_t *mut );
+void mut_destroy( mut_t *mut );
+
+__STATIC_INLINE
+void mut_delete( mut_t *mut ) { mut_destroy(mut); }
 
 /******************************************************************************
  *
@@ -368,8 +372,12 @@ struct FastMutex : public __mut
 	 FastMutex( void ): __mut _MUT_INIT() {}
 	~FastMutex( void ) { assert(__mut::owner == nullptr); }
 
+	static
+	FastMutex *create( void ) { return reinterpret_cast<FastMutex *>(mut_create()); }
+
 	void     reset    ( void )         {        mut_reset    (this);         }
 	void     kill     ( void )         {        mut_kill     (this);         }
+	void     destroy  ( void )         {        mut_destroy  (this);         }
 	unsigned take     ( void )         { return mut_take     (this);         }
 	unsigned tryLock  ( void )         { return mut_tryLock  (this);         }
 	unsigned waitFor  ( cnt_t _delay ) { return mut_waitFor  (this, _delay); }
