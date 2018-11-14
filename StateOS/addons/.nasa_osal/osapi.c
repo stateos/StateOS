@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    13.11.2018
+    @date    14.11.2018
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -241,7 +241,7 @@ int32 OS_QueueDelete(uint32 queue_id)
 			status = OS_INVALID_POINTER;
 		else
 		{
-			box_delete(&rec->box);
+			box_destroy(&rec->box);
 			rec->used = 0;
 			status = OS_SUCCESS;
 		}
@@ -430,7 +430,7 @@ int32 OS_BinSemDelete(uint32 semaphore_id)
 			status = OS_INVALID_POINTER;
 		else
 		{
-			sem_delete(&rec->sem);
+			sem_destroy(&rec->sem);
 			rec->used = 0;
 			status = OS_SUCCESS;
 		}
@@ -647,7 +647,7 @@ int32 OS_CountSemDelete(uint32 semaphore_id)
 			status = OS_INVALID_POINTER;
 		else
 		{
-			sem_delete(&rec->sem);
+			sem_destroy(&rec->sem);
 			rec->used = 0;
 			status = OS_SUCCESS;
 		}
@@ -845,7 +845,7 @@ int32 OS_MutSemDelete(uint32 semaphore_id)
 			status = OS_INVALID_POINTER;
 		else
 		{
-			mtx_delete(&rec->mtx);
+			mtx_destroy(&rec->mtx);
 			rec->used = 0;
 			status = OS_SUCCESS;
 		}
@@ -1050,7 +1050,7 @@ int32 OS_TaskDelete(uint32 task_id)
 		{
 			if (rec->delete_handler)
 				rec->delete_handler();
-			tsk_delete(&rec->tsk);
+			tsk_destroy(&rec->tsk);
 			rec->used = 0;
 			status = OS_SUCCESS;
 		}
@@ -1520,7 +1520,7 @@ int32 OS_TimerDelete(uint32 timer_id)
 			status = OS_INVALID_POINTER;
 		else
 		{
-			tmr_delete(&rec->tmr);
+			tmr_destroy(&rec->tmr);
 			rec->used = 0;
 			status = OS_SUCCESS;
 		}
