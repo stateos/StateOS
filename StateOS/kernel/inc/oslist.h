@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -230,7 +230,8 @@ void lst_kill( lst_t *lst ) { lst_reset(lst); }
 
 /******************************************************************************
  *
- * Name              : lst_delete
+ * Name              : lst_destroy
+ * Alias             : lst_delete
  *
  * Description       : reset the list object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -243,7 +244,10 @@ void lst_kill( lst_t *lst ) { lst_reset(lst); }
  *
  ******************************************************************************/
 
-void lst_delete( lst_t *lst );
+void lst_destroy( lst_t *lst );
+
+__STATIC_INLINE
+void lst_delete( lst_t *lst ) { lst_destroy(lst); }
 
 /******************************************************************************
  *
@@ -394,8 +398,12 @@ struct ListTT : public __lst
 	 ListTT( void ): __lst _LST_INIT() {}
 	~ListTT( void ) { assert(__lst::obj.queue == nullptr); }
 
+	static
+	ListTT<T> *create( void ) { return reinterpret_cast<ListTT<T> *>(lst_create()); }
+
 	void     reset    ( void )                            {        lst_reset    (this);                                           }
 	void     kill     ( void )                            {        lst_kill     (this);                                           }
+	void     destroy  ( void )                            {        lst_destroy  (this);                                           }
 	unsigned take     (       T   **_data )               { return lst_take     (this, reinterpret_cast<void **>(_data));         }
 	unsigned tryWait  (       T   **_data )               { return lst_tryWait  (this, reinterpret_cast<void **>(_data));         }
 	unsigned takeISR  (       T   **_data )               { return lst_takeISR  (this, reinterpret_cast<void **>(_data));         }
