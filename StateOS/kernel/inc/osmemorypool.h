@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -264,7 +264,8 @@ void mem_kill( mem_t *mem ) { mem_reset(mem); }
 
 /******************************************************************************
  *
- * Name              : mem_delete
+ * Name              : mem_destroy
+ * Alias             : mem_delete
  *
  * Description       : reset the memory pool object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -277,7 +278,10 @@ void mem_kill( mem_t *mem ) { mem_reset(mem); }
  *
  ******************************************************************************/
 
-void mem_delete( mem_t *mem );
+void mem_destroy( mem_t *mem );
+
+__STATIC_INLINE
+void mem_delete( mem_t *mem ) { mem_destroy(mem); }
 
 /******************************************************************************
  *
@@ -433,8 +437,12 @@ struct MemoryPoolT : public __mem
 	 MemoryPoolT( void ): __mem _MEM_INIT(limit_, MEM_SIZE(size_), data_) { mem_bind(this); }
 	~MemoryPoolT( void ) { assert(__mem::lst.obj.queue == nullptr); }
 
+	static
+	MemoryPoolT<limit_, size_> *create( void ) { return reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_)); }
+
 	void     reset    ( void )                             {        mem_reset    (this);                }
 	void     kill     ( void )                             {        mem_kill     (this);                }
+	void     destroy  ( void )                             {        mem_destroy  (this);                }
 	unsigned take     (       void **_data )               { return mem_take     (this, _data);         }
 	unsigned tryWait  (       void **_data )               { return mem_tryWait  (this, _data);         }
 	unsigned takeISR  (       void **_data )               { return mem_takeISR  (this, _data);         }

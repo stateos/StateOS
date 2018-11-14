@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -130,7 +130,7 @@ void mem_reset( mem_t *mem )
 }
 
 /* -------------------------------------------------------------------------- */
-void mem_delete( mem_t *mem )
+void mem_destroy( mem_t *mem )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
