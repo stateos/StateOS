@@ -35,7 +35,7 @@
 #include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
-void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size, bool start )
+void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -56,11 +56,8 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 		tsk->stack = stack;
 		tsk->size  = size;
 
-		if (start)
-		{
-			core_ctx_init(tsk);
-			core_tsk_insert(tsk);
-		}
+		core_ctx_init(tsk);
+		core_tsk_insert(tsk);
 	}
 	sys_unlock();
 }
@@ -78,7 +75,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 	sys_lock();
 	{
 		tsk = sys_alloc(SEG_OVER(sizeof(tsk_t)) + size);
-		tsk_init(tsk, prio, state, (void *)((size_t)tsk + SEG_OVER(sizeof(tsk_t))), size, true);
+		tsk_init(tsk, prio, state, (void *)((size_t)tsk + SEG_OVER(sizeof(tsk_t))), size);
 		tsk->hdr.obj.res = tsk;
 	}
 	sys_unlock();
@@ -99,7 +96,7 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, unsigned size )
 	sys_lock();
 	{
 		tsk = sys_alloc(SEG_OVER(sizeof(tsk_t)) + size);
-		tsk_init(tsk, prio, state, (void *)((size_t)tsk + SEG_OVER(sizeof(tsk_t))), size, true);
+		tsk_init(tsk, prio, state, (void *)((size_t)tsk + SEG_OVER(sizeof(tsk_t))), size);
 		tsk->hdr.obj.res = tsk;
 		tsk->join = DETACHED;
 	}

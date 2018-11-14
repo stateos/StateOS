@@ -248,7 +248,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 
 	sys_lock();
 	{
-		tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, stack_mem, stack_size, true);
+		tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, stack_mem, stack_size);
 		if (attr->cb_mem    == NULL || attr->cb_size    == 0U) thread->tsk.hdr.obj.res = thread;
 		else
 		if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.hdr.obj.res = stack_mem;
