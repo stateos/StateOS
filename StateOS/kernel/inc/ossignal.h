@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    19.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -229,7 +229,8 @@ void sig_kill( sig_t *sig ) { sig_reset(sig); }
 
 /******************************************************************************
  *
- * Name              : sig_delete
+ * Name              : sig_destroy
+ * Alias             : sig_delete
  *
  * Description       : reset the signal object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -242,7 +243,10 @@ void sig_kill( sig_t *sig ) { sig_reset(sig); }
  *
  ******************************************************************************/
 
-void sig_delete( sig_t *sig );
+void sig_destroy( sig_t *sig );
+
+__STATIC_INLINE
+void sig_delete( sig_t *sig ) { sig_destroy(sig); }
 
 /******************************************************************************
  *
@@ -410,8 +414,12 @@ struct Signal : public __sig
 	 Signal( const unsigned _mask = 0 ): __sig _SIG_INIT(_mask) {}
 	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
+	static
+	Signal *create( const unsigned _mask = 0 ) { return reinterpret_cast<Signal *>(sig_create(_mask)); }
+
 	void     reset    ( void )                           {        sig_reset    (this);                  }
 	void     kill     ( void )                           {        sig_kill     (this);                  }
+	void     destroy  ( void )                           {        sig_destroy  (this);                  }
 	unsigned take     ( unsigned _sigset )               { return sig_take     (this, _sigset);         }
 	unsigned tryWait  ( unsigned _sigset )               { return sig_tryWait  (this, _sigset);         }
 	unsigned takeISR  ( unsigned _sigset )               { return sig_takeISR  (this, _sigset);         }

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    19.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -97,7 +97,7 @@ void sig_reset( sig_t *sig )
 }
 
 /* -------------------------------------------------------------------------- */
-void sig_delete( sig_t *sig )
+void sig_destroy( sig_t *sig )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
