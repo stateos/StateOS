@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    13.11.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -885,7 +885,8 @@ unsigned cur_kill( void ) { return cur_reset(); }
 
 /******************************************************************************
  *
- * Name              : tsk_delete
+ * Name              : tsk_destroy
+ * Alias             : tsk_delete
  *
  * Description       : reset the task object and free allocated resources
  *
@@ -900,11 +901,15 @@ unsigned cur_kill( void ) { return cur_reset(); }
  *
  ******************************************************************************/
 
-unsigned tsk_delete( tsk_t *tsk );
+unsigned tsk_destroy( tsk_t *tsk );
+
+__STATIC_INLINE
+unsigned tsk_delete( tsk_t *tsk ) { return tsk_destroy(tsk); }
 
 /******************************************************************************
  *
- * Name              : cur_delete
+ * Name              : cur_destroy
+ * Alias             : cur_delete
  *
  * Description       : reset the current task and free allocated resources
  *
@@ -919,7 +924,10 @@ unsigned tsk_delete( tsk_t *tsk );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned cur_delete( void ) { return tsk_delete(System.cur); }
+unsigned cur_destroy( void ) { return tsk_destroy(System.cur); }
+
+__STATIC_INLINE
+unsigned cur_delete( void ) { return cur_destroy(); }
 
 /******************************************************************************
  *
@@ -1260,8 +1268,9 @@ struct baseTask : public __tsk
 #endif
 	unsigned detach   ( void )             { return tsk_detach   (this);          }
 	unsigned join     ( void )             { return tsk_join     (this);          }
-	void     reset    ( void )             {        tsk_reset    (this);          }
-	void     kill     ( void )             {        tsk_kill     (this);          }
+	unsigned reset    ( void )             { return tsk_reset    (this);          }
+	unsigned kill     ( void )             { return tsk_kill     (this);          }
+	unsigned destroy  ( void )             { return tsk_destroy  (this);          }
 	unsigned prio     ( void )             { return __tsk::basic;                 }
 	unsigned getPrio  ( void )             { return __tsk::basic;                 }
 	unsigned suspend  ( void )             { return tsk_suspend  (this);          }
@@ -1304,30 +1313,44 @@ struct TaskT : public baseTask
 	TaskT( const unsigned _prio, FUN_t _state ): baseTask(_prio, _state, stack_, size_) {}
 
 	static
-	TaskT<size_> *create( const unsigned _prio, FUN_t _state, tsk_t *_join = JOINABLE )
+	TaskT<size_> *create( const unsigned _prio, FUN_t _state )
 	{
 		TaskT<size_> *tsk;
 
-		tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		assert(tsk);
-
-		tsk->init(_prio, _state);
-		tsk->__tsk::hdr.obj.res = tsk;
-		tsk->__tsk::join = _join;
-		tsk->start();
+		sys_lock();
+		{
+#if OS_FUNCTIONAL
+			tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, baseTask::fun_, size_));
+			tsk->__tsk::fun = _state;
+#else
+			tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
+#endif
+		}
+		sys_unlock();
 
 		return tsk;
 	}
 
 	static
-	TaskT<size_> *detached( const unsigned _prio, FUN_t _state ) { return create(_prio, _state, DETACHED); }
+	TaskT<size_> *detached( const unsigned _prio, FUN_t _state )
+	{
+		TaskT<size_> *tsk;
+
+		sys_lock();
+		{
+#if OS_FUNCTIONAL
+			tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, baseTask::fun_, size_));
+			tsk->__tsk::fun = _state;
+#else
+			tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
+#endif
+		}
+		sys_unlock();
+
+		return tsk;
+	}
 
 	private:
-#if OS_FUNCTIONAL
-	void init( const unsigned _prio, FUN_t _state ) { tsk_init(this, _prio, fun_, stack_, size_, false); __tsk::fun = _state; }
-#else
-	void init( const unsigned _prio, FUN_t _state ) { tsk_init(this, _prio, _state, stack_, size_, false); }
-#endif
 	stk_t stack_[ STK_SIZE(size_) ];
 };
 
@@ -1371,8 +1394,9 @@ namespace ThisTask
 {
 	static inline unsigned detach    ( void )             { return cur_detach    ();        }
 	static inline void     stop      ( void )             {        tsk_stop      ();        }
-	static inline void     reset     ( void )             {        cur_reset     ();        }
-	static inline void     kill      ( void )             {        cur_kill      ();        }
+	static inline unsigned reset     ( void )             { return cur_reset     ();        }
+	static inline unsigned kill      ( void )             { return cur_kill      ();        }
+	static inline unsigned destroy   ( void )             { return cur_destroy   ();        }
 	static inline void     yield     ( void )             {        tsk_yield     ();        }
 	static inline void     pass      ( void )             {        tsk_pass      ();        }
 #if OS_FUNCTIONAL
