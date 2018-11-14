@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    22.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -105,7 +105,7 @@ void msg_reset( msg_t *msg )
 }
 
 /* -------------------------------------------------------------------------- */
-void msg_delete( msg_t *msg )
+void msg_destroy( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();

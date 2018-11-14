@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -252,7 +252,8 @@ void msg_kill( msg_t *msg ) { msg_reset(msg); }
 
 /******************************************************************************
  *
- * Name              : msg_delete
+ * Name              : msg_destroy
+ * Alias             : msg_delete
  *
  * Description       : reset the message buffer object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -265,7 +266,10 @@ void msg_kill( msg_t *msg ) { msg_reset(msg); }
  *
  ******************************************************************************/
 
-void msg_delete( msg_t *msg );
+void msg_destroy( msg_t *msg );
+
+__STATIC_INLINE
+void msg_delete( msg_t *msg ) { msg_destroy(msg); }
 
 /******************************************************************************
  *
@@ -614,8 +618,12 @@ struct MessageBufferT : public __msg
 	 MessageBufferT( void ): __msg _MSG_INIT(limit_, data_) {}
 	~MessageBufferT( void ) { assert(__msg::obj.queue == nullptr); }
 
+	static
+	MessageBufferT<limit_> *create( void ) { return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_)); }
+
 	void     reset    ( void )                                            {        msg_reset    (this);                       }
 	void     kill     ( void )                                            {        msg_kill     (this);                       }
+	void     destroy  ( void )                                            {        msg_destroy  (this);                       }
 	unsigned take     (       void *_data, unsigned _size )               { return msg_take     (this, _data, _size);         }
 	unsigned tryWait  (       void *_data, unsigned _size )               { return msg_tryWait  (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return msg_takeISR  (this, _data, _size);         }
