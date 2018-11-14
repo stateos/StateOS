@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -233,7 +233,8 @@ void flg_kill( flg_t *flg ) { flg_reset(flg); }
 
 /******************************************************************************
  *
- * Name              : flg_delete
+ * Name              : flg_destroy
+ * Alias             : flg_delete
  *
  * Description       : reset the flag object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -246,7 +247,10 @@ void flg_kill( flg_t *flg ) { flg_reset(flg); }
  *
  ******************************************************************************/
 
-void flg_delete( flg_t *flg );
+void flg_destroy( flg_t *flg );
+
+__STATIC_INLINE
+void flg_delete( flg_t *flg ) { flg_destroy(flg); }
 
 /******************************************************************************
  *
@@ -462,8 +466,12 @@ struct Flag : public __flg
 	 Flag( const unsigned _init = 0 ): __flg _FLG_INIT(_init) {}
 	~Flag( void ) { assert(__flg::obj.queue == nullptr); }
 
+	static
+	Flag *create( const unsigned _init = 0 ) { return reinterpret_cast<Flag *>(flg_create(_init)); }
+
 	void     reset    ( void )                                      {        flg_reset    (this);                        }
 	void     kill     ( void )                                      {        flg_kill     (this);                        }
+	void     destroy  ( void )                                      {        flg_destroy  (this);                        }
 	unsigned take     ( unsigned _flags, char _mode = flgAll )      { return flg_take     (this, _flags, _mode);         }
 	unsigned tryWait  ( unsigned _flags, char _mode = flgAll )      { return flg_tryWait  (this, _flags, _mode);         }
 	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )      { return flg_takeISR  (this, _flags, _mode);         }

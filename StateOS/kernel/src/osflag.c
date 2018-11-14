@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -97,7 +97,7 @@ void flg_reset( flg_t *flg )
 }
 
 /* -------------------------------------------------------------------------- */
-void flg_delete( flg_t *flg )
+void flg_destroy( flg_t *flg )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
