@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    13.11.2018
+    @date    14.11.2018
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -421,7 +421,7 @@ osStatus_t osThreadTerminate (osThreadId_t thread_id)
 	if (thread_id == NULL)
 		return osErrorParameter;
 
-	tsk_delete(&thread->tsk);
+	tsk_destroy(&thread->tsk);
 
 	return osOK;
 }
@@ -684,7 +684,7 @@ osStatus_t osTimerDelete (osTimerId_t timer_id)
 	if (timer_id == NULL)
 		return osErrorParameter;
 
-	tmr_delete(&timer->tmr);
+	tmr_destroy(&timer->tmr);
 
 	return osOK;
 }
@@ -784,7 +784,7 @@ osStatus_t osEventFlagsDelete (osEventFlagsId_t ef_id)
 	if (ef_id == NULL)
 		return osErrorParameter;
 
-	flg_delete(&ef->flg);
+	flg_destroy(&ef->flg);
 
 	return osOK;
 }
@@ -915,7 +915,7 @@ osStatus_t osMutexDelete (osMutexId_t mutex_id)
 	if (mutex_id == NULL)
 		return osErrorParameter;
 
-	mtx_delete(&mutex->mtx);
+	mtx_destroy(&mutex->mtx);
 
 	return osOK;
 }
@@ -1019,7 +1019,7 @@ osStatus_t osSemaphoreDelete (osSemaphoreId_t semaphore_id)
 	if (semaphore_id == NULL)
 		return osErrorParameter;
 
-	sem_delete(&semaphore->sem);
+	sem_destroy(&semaphore->sem);
 
 	return osOK;
 }
@@ -1193,7 +1193,7 @@ osStatus_t osMemoryPoolDelete (osMemoryPoolId_t mp_id)
 	if (mp_id == NULL)
 		return osErrorParameter;
 
-	mem_delete(&mp->mem);
+	mem_destroy(&mp->mem);
 
 	return osOK;
 }
@@ -1383,7 +1383,7 @@ osStatus_t osMessageQueueDelete (osMessageQueueId_t mq_id)
 	if (mq_id == NULL)
 		return osErrorParameter;
 
-	box_delete(&mq->box);
+	box_destroy(&mq->box);
 
 	return osOK;
 }
