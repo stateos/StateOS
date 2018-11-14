@@ -44,7 +44,6 @@ Features:
 - modified context structures
 - added dynamic tasks
 - updated tsk_init function
-- added create/destroy functions to c++ wrapper
 ---------
 6.3
 - merged test branch
