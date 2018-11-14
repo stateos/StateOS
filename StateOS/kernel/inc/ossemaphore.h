@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -257,7 +257,8 @@ void sem_kill( sem_t *sem ) { sem_reset(sem); }
 
 /******************************************************************************
  *
- * Name              : sem_delete
+ * Name              : sem_destroy
+ * Alias             : dem_delete
  *
  * Description       : reset the semaphore object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -270,7 +271,10 @@ void sem_kill( sem_t *sem ) { sem_reset(sem); }
  *
  ******************************************************************************/
 
-void sem_delete( sem_t *sem );
+void sem_destroy( sem_t *sem );
+
+__STATIC_INLINE
+void sem_delete( sem_t *sem ) { sem_destroy(sem); }
 
 /******************************************************************************
  *
@@ -515,8 +519,12 @@ struct Semaphore : public __sem
 	 Semaphore( const unsigned _init, const unsigned _limit = semCounting ): __sem _SEM_INIT(_init, _limit) {}
 	~Semaphore( void ) { assert(__sem::obj.queue == nullptr); }
 
+	static
+	Semaphore *create( const unsigned _init, const unsigned _limit = semCounting ) { return reinterpret_cast<Semaphore *>(sem_create(_init, _limit)); }
+
 	void     reset    ( void )         {        sem_reset    (this);         }
 	void     kill     ( void )         {        sem_kill     (this);         }
+	void     destroy  ( void )         {        sem_destroy  (this);         }
 	unsigned take     ( void )         { return sem_take     (this);         }
 	unsigned tryWait  ( void )         { return sem_tryWait  (this);         }
 	unsigned takeISR  ( void )         { return sem_takeISR  (this);         }

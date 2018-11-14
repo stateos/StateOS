@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -98,7 +98,7 @@ void sem_reset( sem_t *sem )
 }
 
 /* -------------------------------------------------------------------------- */
-void sem_delete( sem_t *sem )
+void sem_destroy( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
