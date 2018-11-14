@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -98,7 +98,7 @@ void tmr_reset( tmr_t *tmr )
 }
 
 /* -------------------------------------------------------------------------- */
-void tmr_delete( tmr_t *tmr )
+void tmr_destroy( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();

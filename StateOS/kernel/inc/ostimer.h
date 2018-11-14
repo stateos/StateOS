@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    02.11.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -374,7 +374,8 @@ void tmr_kill( tmr_t *tmr ) { tmr_reset(tmr); }
 
 /******************************************************************************
  *
- * Name              : tmr_delete
+ * Name              : tmr_destroy
+ * Alias             : tmr_delete
  *
  * Description       : reset the timer object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -387,7 +388,10 @@ void tmr_kill( tmr_t *tmr ) { tmr_reset(tmr); }
  *
  ******************************************************************************/
 
-void tmr_delete( tmr_t *tmr );
+void tmr_destroy( tmr_t *tmr );
+
+__STATIC_INLINE
+void tmr_delete( tmr_t *tmr ) { tmr_destroy(tmr); }
 
 /******************************************************************************
  *
@@ -736,8 +740,22 @@ struct Timer : public __tmr
 #endif
 	~Timer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
 
+	static
+	Timer *create( FUN_t _state )
+	{
+		Timer *tmr;
+#if OS_FUNCTIONAL
+		tmr = reinterpret_cast<Timer *>(tmr_create(fun_));
+		tmr->__tmr::fun = _state;
+#else
+		tmr = reinterpret_cast<Timer *>(tmr_create(_state));
+#endif
+		return tmr;
+	}
+
 	void reset        ( void )                                      {        tmr_reset        (this);                          }
 	void kill         ( void )                                      {        tmr_kill         (this);                          }
+	void destroy      ( void )                                      {        tmr_destroy      (this);                          }
 	void start        ( cnt_t _delay, cnt_t _period )               {        tmr_start        (this, _delay, _period);         }
 	void startFor     ( cnt_t _delay )                              {        tmr_startFor     (this, _delay);                  }
 	void startPeriodic( cnt_t _period )                             {        tmr_startPeriodic(this,         _period);         }
