@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -105,7 +105,7 @@ void job_reset( job_t *job )
 }
 
 /* -------------------------------------------------------------------------- */
-void job_delete( job_t *job )
+void job_destroy( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
