@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -96,7 +96,7 @@ void bar_reset( bar_t *bar )
 }
 
 /* -------------------------------------------------------------------------- */
-void bar_delete( bar_t *bar )
+void bar_destroy( bar_t *bar )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();

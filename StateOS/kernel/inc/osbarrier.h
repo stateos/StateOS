@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -209,7 +209,8 @@ void bar_kill( bar_t *bar ) { bar_reset(bar); }
 
 /******************************************************************************
  *
- * Name              : bar_delete
+ * Name              : bar_destroy
+ * Alias             : bar_delete
  *
  * Description       : reset the barrier object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -222,7 +223,10 @@ void bar_kill( bar_t *bar ) { bar_reset(bar); }
  *
  ******************************************************************************/
 
-void bar_delete( bar_t *bar );
+void bar_destroy( bar_t *bar );
+
+__STATIC_INLINE
+void bar_delete( bar_t *bar ) { bar_destroy(bar); }
 
 /******************************************************************************
  *
@@ -315,8 +319,12 @@ struct Barrier : public __bar
 	 Barrier( const unsigned _limit ): __bar _BAR_INIT(_limit) {}
 	~Barrier( void ) { assert(__bar::obj.queue == nullptr); }
 
+	static
+	Barrier *create( const unsigned _limit ) { return reinterpret_cast<Barrier *>(bar_create(_limit)); }
+
 	void     reset    ( void )         {        bar_reset    (this);         }
 	void     kill     ( void )         {        bar_kill     (this);         }
+	void     destroy  ( void )         {        bar_destroy  (this);         }
 	unsigned waitFor  ( cnt_t _delay ) { return bar_waitFor  (this, _delay); }
 	unsigned waitUntil( cnt_t _time )  { return bar_waitUntil(this, _time);  }
 	unsigned wait     ( void )         { return bar_wait     (this);         }
