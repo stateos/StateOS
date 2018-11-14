@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    22.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -105,7 +105,7 @@ void stm_reset( stm_t *stm )
 }
 
 /* -------------------------------------------------------------------------- */
-void stm_delete( stm_t *stm )
+void stm_destroy( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();

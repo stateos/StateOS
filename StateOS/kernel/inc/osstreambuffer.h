@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -252,7 +252,8 @@ void stm_kill( stm_t *stm ) { stm_reset(stm); }
 
 /******************************************************************************
  *
- * Name              : stm_delete
+ * Name              : stm_destroy
+ * Alias             : stm_delete
  *
  * Description       : reset the stream buffer object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -265,7 +266,10 @@ void stm_kill( stm_t *stm ) { stm_reset(stm); }
  *
  ******************************************************************************/
 
-void stm_delete( stm_t *stm );
+void stm_destroy( stm_t *stm );
+
+__STATIC_INLINE
+void stm_delete( stm_t *stm ) { stm_destroy(stm); }
 
 /******************************************************************************
  *
@@ -589,8 +593,12 @@ struct StreamBufferT : public __stm
 	 StreamBufferT( void ): __stm _STM_INIT(limit_, data_) {}
 	~StreamBufferT( void ) { assert(__stm::obj.queue == nullptr); }
 
+	static
+	StreamBufferT<limit_> *create( void ) { return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_)); }
+
 	void     reset    ( void )                                            {        stm_reset    (this);                       }
 	void     kill     ( void )                                            {        stm_kill     (this);                       }
+	void     destroy  ( void )                                            {        stm_destroy  (this);                       }
 	unsigned take     (       void *_data, unsigned _size )               { return stm_take     (this, _data, _size);         }
 	unsigned tryWait  (       void *_data, unsigned _size )               { return stm_tryWait  (this, _data, _size);         }
 	unsigned takeISR  (       void *_data, unsigned _size )               { return stm_takeISR  (this, _data, _size);         }
