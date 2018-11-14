@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -206,7 +206,8 @@ void cnd_kill( cnd_t *cnd ) { cnd_reset(cnd); }
 
 /******************************************************************************
  *
- * Name              : cnd_delete
+ * Name              : cnd_destroy
+ * Alias             : cnd_delete
  *
  * Description       : reset the condition variable object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
@@ -219,7 +220,10 @@ void cnd_kill( cnd_t *cnd ) { cnd_reset(cnd); }
  *
  ******************************************************************************/
 
-void cnd_delete( cnd_t *cnd );
+void cnd_destroy( cnd_t *cnd );
+
+__STATIC_INLINE
+void cnd_delete( cnd_t *cnd ) { cnd_destroy(cnd); }
 
 /******************************************************************************
  *
@@ -384,8 +388,12 @@ struct ConditionVariable : public __cnd
 	 ConditionVariable( void ): __cnd _CND_INIT() {}
 	~ConditionVariable( void ) { assert(__cnd::obj.queue == nullptr); }
 
+	static
+	ConditionVariable *create( void ) { return reinterpret_cast<ConditionVariable *>(cnd_create()); }
+
 	void     reset    ( void )                      {        cnd_reset    (this);               }
 	void     kill     ( void )                      {        cnd_kill     (this);               }
+	void     destroy  ( void )                      {        cnd_destroy  (this);               }
 	unsigned waitFor  ( mtx_t *_mtx, cnt_t _delay ) { return cnd_waitFor  (this, _mtx, _delay); }
 	unsigned waitFor  ( mtx_t &_mtx, cnt_t _delay ) { return cnd_waitFor  (this,&_mtx, _delay); }
 	unsigned waitUntil( mtx_t *_mtx, cnt_t _time )  { return cnd_waitUntil(this, _mtx, _time);  }

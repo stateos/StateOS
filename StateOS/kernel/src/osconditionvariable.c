@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    16.10.2018
+    @date    14.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -92,7 +92,7 @@ void cnd_reset( cnd_t *cnd )
 }
 
 /* -------------------------------------------------------------------------- */
-void cnd_delete( cnd_t *cnd )
+void cnd_destroy( cnd_t *cnd )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
