@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    15.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -415,7 +415,11 @@ struct Signal : public __sig
 	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
 	static
-	Signal *create( const unsigned _mask = 0 ) { return reinterpret_cast<Signal *>(sig_create(_mask)); }
+	Signal *create( const unsigned _mask = 0 )
+	{
+		static_assert(SEG_OVER(sizeof(__sig)) >= sizeof(Signal), "unexpected error!");
+		return reinterpret_cast<Signal *>(sig_create(_mask));
+	}
 
 	void     reset    ( void )                           {        sig_reset    (this);                  }
 	void     kill     ( void )                           {        sig_kill     (this);                  }

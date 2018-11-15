@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    15.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -553,7 +553,11 @@ struct MailBoxQueueT : public __box
 	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	static
-	MailBoxQueueT<limit_, size_> *create( void ) { return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_)); }
+	MailBoxQueueT<limit_, size_> *create( void )
+	{
+		static_assert(SEG_OVER(sizeof(__box)) + SEG_OVER(limit_ * size_) >= sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
+		return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
+	}
 
 	void     reset    ( void )                            {        box_reset    (this);                }
 	void     kill     ( void )                            {        box_kill     (this);                }

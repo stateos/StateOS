@@ -1316,6 +1316,7 @@ struct TaskT : public baseTask
 	{
 		CriticalSection cs;
 		TaskT<size_> *tsk;
+		static_assert(SEG_OVER(sizeof(__tsk)) + SEG_OVER(size_) >= sizeof(TaskT<size_>), "unexpected error!");
 #if OS_FUNCTIONAL
 		tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, baseTask::fun_, size_));
 		tsk->__tsk::fun = _state;
@@ -1330,6 +1331,7 @@ struct TaskT : public baseTask
 	{
 		CriticalSection cs;
 		TaskT<size_> *tsk;
+		static_assert(SEG_OVER(sizeof(__tsk)) + SEG_OVER(size_) >= sizeof(TaskT<size_>), "unexpected error!");
 #if OS_FUNCTIONAL
 		tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, baseTask::fun_, size_));
 		tsk->__tsk::fun = _state;

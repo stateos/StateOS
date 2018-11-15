@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    15.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -320,7 +320,11 @@ struct Barrier : public __bar
 	~Barrier( void ) { assert(__bar::obj.queue == nullptr); }
 
 	static
-	Barrier *create( const unsigned _limit ) { return reinterpret_cast<Barrier *>(bar_create(_limit)); }
+	Barrier *create( const unsigned _limit )
+	{
+		static_assert(SEG_OVER(sizeof(__bar)) >= sizeof(Barrier), "unexpected error!");
+		return reinterpret_cast<Barrier *>(bar_create(_limit));
+	}
 
 	void     reset    ( void )         {        bar_reset    (this);         }
 	void     kill     ( void )         {        bar_kill     (this);         }

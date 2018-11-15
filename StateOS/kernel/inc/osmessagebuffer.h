@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    15.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -619,7 +619,11 @@ struct MessageBufferT : public __msg
 	~MessageBufferT( void ) { assert(__msg::obj.queue == nullptr); }
 
 	static
-	MessageBufferT<limit_> *create( void ) { return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_)); }
+	MessageBufferT<limit_> *create( void )
+	{
+		static_assert(SEG_OVER(sizeof(__msg)) + SEG_OVER(limit_) >= sizeof(MessageBufferT<limit_>), "unexpected error!");
+		return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_));
+	}
 
 	void     reset    ( void )                                            {        msg_reset    (this);                       }
 	void     kill     ( void )                                            {        msg_kill     (this);                       }

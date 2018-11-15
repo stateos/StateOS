@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    15.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -594,7 +594,11 @@ struct StreamBufferT : public __stm
 	~StreamBufferT( void ) { assert(__stm::obj.queue == nullptr); }
 
 	static
-	StreamBufferT<limit_> *create( void ) { return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_)); }
+	StreamBufferT<limit_> *create( void )
+	{
+		static_assert(SEG_OVER(sizeof(__stm)) + SEG_OVER(limit_) >= sizeof(StreamBufferT<limit_>), "unexpected error!");
+		return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));
+	}
 
 	void     reset    ( void )                                            {        stm_reset    (this);                       }
 	void     kill     ( void )                                            {        stm_kill     (this);                       }

@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    15.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -399,7 +399,11 @@ struct ListTT : public __lst
 	~ListTT( void ) { assert(__lst::obj.queue == nullptr); }
 
 	static
-	ListTT<T> *create( void ) { return reinterpret_cast<ListTT<T> *>(lst_create()); }
+	ListTT<T> *create( void )
+	{
+		static_assert(SEG_OVER(sizeof(__lst)) >= sizeof(ListTT<T>), "unexpected error!");
+		return reinterpret_cast<ListTT<T> *>(lst_create());
+	}
 
 	void     reset    ( void )                            {        lst_reset    (this);                                           }
 	void     kill     ( void )                            {        lst_kill     (this);                                           }

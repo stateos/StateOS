@@ -503,7 +503,11 @@ struct JobQueueT : public __box
 	~JobQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	static
-	JobQueueT<limit_> *create( void ) { return reinterpret_cast<JobQueueT<limit_> *>(box_create(limit_, sizeof(FUN_t))); }
+	JobQueueT<limit_> *create( void )
+	{
+		static_assert(SEG_OVER(sizeof(__box)) + SEG_OVER(limit_ * sizeof(FUN_t)) >= sizeof(JobQueueT<limit_>), "unexpected error!");
+		return reinterpret_cast<JobQueueT<limit_> *>(box_create(limit_, sizeof(FUN_t)));
+	}
 
 	void     reset    ( void )                     {                              box_reset    (this);                                                              }
 	void     kill     ( void )                     {                              box_kill     (this);                                                              }
@@ -541,7 +545,11 @@ struct JobQueueT : public __job
 	~JobQueueT( void ) { assert(__job::obj.queue == nullptr); }
 
 	static
-	JobQueueT<limit_> *create( void ) { return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_)); }
+	JobQueueT<limit_> *create( void )
+	{
+		static_assert(SEG_OVER(sizeof(__job)) + SEG_OVER(limit_ * sizeof(FUN_t)) >= sizeof(JobQueueT<limit_>), "unexpected error!");
+		return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_));
+	}
 
 	void     reset    ( void )                     {        job_reset    (this);               }
 	void     kill     ( void )                     {        job_kill     (this);               }
