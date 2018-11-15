@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    15.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1314,38 +1314,28 @@ struct TaskT : public baseTask
 	static
 	TaskT<size_> *create( const unsigned _prio, FUN_t _state )
 	{
+		CriticalSection cs;
 		TaskT<size_> *tsk;
-
-		sys_lock();
-		{
 #if OS_FUNCTIONAL
-			tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, baseTask::fun_, size_));
-			tsk->__tsk::fun = _state;
+		tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, baseTask::fun_, size_));
+		tsk->__tsk::fun = _state;
 #else
-			tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
+		tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
 #endif
-		}
-		sys_unlock();
-
 		return tsk;
 	}
 
 	static
 	TaskT<size_> *detached( const unsigned _prio, FUN_t _state )
 	{
+		CriticalSection cs;
 		TaskT<size_> *tsk;
-
-		sys_lock();
-		{
 #if OS_FUNCTIONAL
-			tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, baseTask::fun_, size_));
-			tsk->__tsk::fun = _state;
+		tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, baseTask::fun_, size_));
+		tsk->__tsk::fun = _state;
 #else
-			tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
+		tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
 #endif
-		}
-		sys_unlock();
-
 		return tsk;
 	}
 
