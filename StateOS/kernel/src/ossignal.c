@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    15.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -62,7 +62,7 @@ sig_t *sig_create( unsigned mask )
 
 	sys_lock();
 	{
-		sig = sys_alloc(sizeof(sig_t));
+		sig = sys_alloc(SEG_OVER(sizeof(sig_t)));
 		sig_init(sig, mask);
 		sig->obj.res = sig;
 	}
