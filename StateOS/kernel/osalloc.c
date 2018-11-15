@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    24.09.2018
+    @date    15.11.2018
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -49,9 +49,11 @@ void *sys_alloc( size_t size )
 	seg_t *mem;
 	seg_t *nxt;
 
-	assert(SEG_SIZE(size));
+	assert(size);
 
 	size = SEG_SIZE(size) + 1;
+
+	assert(size);
 
 	sys_lock();
 	{
