@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    15.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -543,31 +543,31 @@ struct JobQueueT : public __job
 	static
 	JobQueueT<limit_> *create( void ) { return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_)); }
 
-	void     reset    ( void )                      {        job_reset    (this);               }
-	void     kill     ( void )                      {        job_kill     (this);               }
-	void     destroy  ( void )                      {        job_destroy  (this);               }
-	unsigned waitFor  ( cnt_t  _delay )             { return job_waitFor  (this, _delay);       }
-	unsigned waitUntil( cnt_t  _time )              { return job_waitUntil(this, _time);        }
-	unsigned wait     ( void )                      { return job_wait     (this);               }
-	unsigned take     ( void )                      { return job_take     (this);               }
-	unsigned tryWait  ( void )                      { return job_tryWait  (this);               }
-	unsigned takeISR  ( void )                      { return job_takeISR  (this);               }
-	unsigned sendFor  ( fun_t *_fun, cnt_t _delay ) { return job_sendFor  (this, _fun, _delay); }
-	unsigned sendUntil( fun_t *_fun, cnt_t _time )  { return job_sendUntil(this, _fun, _time);  }
-	unsigned send     ( fun_t *_fun )               { return job_send     (this, _fun);         }
-	unsigned give     ( fun_t *_fun )               { return job_give     (this, _fun);         }
-	unsigned giveISR  ( fun_t *_fun )               { return job_giveISR  (this, _fun);         }
-	void     push     ( fun_t *_fun )               {        job_push     (this, _fun);         }
-	void     pushISR  ( fun_t *_fun )               {        job_pushISR  (this, _fun);         }
-	unsigned count    ( void )                      { return job_count    (this);               }
-	unsigned countISR ( void )                      { return job_countISR (this);               }
-	unsigned space    ( void )                      { return job_space    (this);               }
-	unsigned spaceISR ( void )                      { return job_spaceISR (this);               }
-	unsigned limit    ( void )                      { return job_limit    (this);               }
-	unsigned limitISR ( void )                      { return job_limitISR (this);               }
+	void     reset    ( void )                     {        job_reset    (this);               }
+	void     kill     ( void )                     {        job_kill     (this);               }
+	void     destroy  ( void )                     {        job_destroy  (this);               }
+	unsigned waitFor  ( cnt_t _delay )             { return job_waitFor  (this, _delay);       }
+	unsigned waitUntil( cnt_t _time )              { return job_waitUntil(this, _time);        }
+	unsigned wait     ( void )                     { return job_wait     (this);               }
+	unsigned take     ( void )                     { return job_take     (this);               }
+	unsigned tryWait  ( void )                     { return job_tryWait  (this);               }
+	unsigned takeISR  ( void )                     { return job_takeISR  (this);               }
+	unsigned sendFor  ( FUN_t _fun, cnt_t _delay ) { return job_sendFor  (this, _fun, _delay); }
+	unsigned sendUntil( FUN_t _fun, cnt_t _time )  { return job_sendUntil(this, _fun, _time);  }
+	unsigned send     ( FUN_t _fun )               { return job_send     (this, _fun);         }
+	unsigned give     ( FUN_t _fun )               { return job_give     (this, _fun);         }
+	unsigned giveISR  ( FUN_t _fun )               { return job_giveISR  (this, _fun);         }
+	void     push     ( FUN_t _fun )               {        job_push     (this, _fun);         }
+	void     pushISR  ( FUN_t _fun )               {        job_pushISR  (this, _fun);         }
+	unsigned count    ( void )                     { return job_count    (this);               }
+	unsigned countISR ( void )                     { return job_countISR (this);               }
+	unsigned space    ( void )                     { return job_space    (this);               }
+	unsigned spaceISR ( void )                     { return job_spaceISR (this);               }
+	unsigned limit    ( void )                     { return job_limit    (this);               }
+	unsigned limitISR ( void )                     { return job_limitISR (this);               }
 
 	private:
-	fun_t *data_[limit_];
+	FUN_t data_[limit_];
 };
 
 #endif
