@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    15.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -59,7 +59,7 @@ cnd_t *cnd_create( void )
 
 	sys_lock();
 	{
-		cnd = sys_alloc(sizeof(cnd_t));
+		cnd = sys_alloc(SEG_OVER(sizeof(cnd_t)));
 		cnd_init(cnd);
 		cnd->obj.res = cnd;
 	}
