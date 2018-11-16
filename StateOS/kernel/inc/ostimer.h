@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    15.11.2018
+    @date    16.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -744,7 +744,7 @@ struct Timer : public __tmr
 	Timer *create( FUN_t _state )
 	{
 		Timer *tmr;
-		static_assert(SEG_OVER(sizeof(__tmr)) >= sizeof(Timer), "unexpected error!");
+		static_assert(sizeof(__tmr) == sizeof(Timer), "unexpected error!");
 #if OS_FUNCTIONAL
 		tmr = reinterpret_cast<Timer *>(tmr_create(fun_));
 		tmr->__tmr::fun = _state;

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    15.11.2018
+    @date    16.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -60,6 +60,8 @@ struct __mem
 	unsigned size;  // size of memory object (in sizeof(que_t) units)
 	que_t  * data;  // pointer to memory pool buffer
 };
+
+struct __mem_data { mem_t mem; que_t data[]; };
 
 /******************************************************************************
  *
@@ -440,7 +442,7 @@ struct MemoryPoolT : public __mem
 	static
 	MemoryPoolT<limit_, size_> *create( void )
 	{
-		static_assert(SEG_OVER(sizeof(__mem)) + SEG_OVER(limit_ * (1 + MEM_SIZE(size_)) * sizeof(que_t)) >= sizeof(MemoryPoolT<limit_, size_>), "unexpected error!");
+		static_assert(sizeof(__mem_data) + limit_ * (1 + MEM_SIZE(size_)) * sizeof(que_t) == sizeof(MemoryPoolT<limit_, size_>), "unexpected error!");
 		return reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
 	}
 

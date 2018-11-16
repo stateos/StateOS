@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    16.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -66,7 +66,9 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t *tsk;
+	tsk_t  * tsk;
+	unsigned bufsize;
+	struct __tsk_data *tmp;
 
 	assert_tsk_context();
 	assert(state);
@@ -74,9 +76,11 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 
 	sys_lock();
 	{
-		tsk = sys_alloc(SEG_OVER(sizeof(tsk_t)) + size);
-		tsk_init(tsk, prio, state, (void *)((size_t)tsk + SEG_OVER(sizeof(tsk_t))), size);
-		tsk->hdr.obj.res = tsk;
+		bufsize = STK_SIZE(size) * sizeof(stk_t);
+		tmp = sys_alloc(sizeof(struct __tsk_data) + bufsize);
+		tsk = &tmp->tsk;
+		tsk_init(tsk, prio, state, tmp->data, bufsize);
+		tsk->hdr.obj.res = tmp;
 	}
 	sys_unlock();
 
@@ -89,15 +93,9 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, unsigned size )
 {
 	tsk_t *tsk;
 
-	assert_tsk_context();
-	assert(state);
-	assert(size);
-
 	sys_lock();
 	{
-		tsk = sys_alloc(SEG_OVER(sizeof(tsk_t)) + size);
-		tsk_init(tsk, prio, state, (void *)((size_t)tsk + SEG_OVER(sizeof(tsk_t))), size);
-		tsk->hdr.obj.res = tsk;
+		tsk = wrk_create(prio, state, size);
 		tsk->join = DETACHED;
 	}
 	sys_unlock();

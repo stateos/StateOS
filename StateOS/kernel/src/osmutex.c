@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    15.11.2018
+    @date    16.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -66,7 +66,7 @@ mtx_t *mtx_create( unsigned mode, unsigned prio )
 
 	sys_lock();
 	{
-		mtx = sys_alloc(SEG_OVER(sizeof(mtx_t)));
+		mtx = sys_alloc(sizeof(struct __mtx));
 		mtx_init(mtx, mode, prio);
 		mtx->obj.res = mtx;
 	}

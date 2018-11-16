@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    16.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -89,6 +89,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 {
 	mem_t  * mem;
 	unsigned bufsize;
+	struct __mem_data *tmp;
 
 	assert_tsk_context();
 	assert(limit);
@@ -97,9 +98,10 @@ mem_t *mem_create( unsigned limit, unsigned size )
 	sys_lock();
 	{
 		bufsize = limit * (1 + MEM_SIZE(size)) * sizeof(que_t);
-		mem = sys_alloc(SEG_OVER(sizeof(mem_t)) + bufsize);
-		mem_init(mem, size, (void *)((size_t)mem + SEG_OVER(sizeof(mem_t))), bufsize);
-		mem->lst.obj.res = mem;
+		tmp = sys_alloc(sizeof(struct __mem_data) + bufsize);
+		mem = &tmp->mem;
+		mem_init(mem, size, tmp->data, bufsize);
+		mem->lst.obj.res = tmp;
 	}
 	sys_unlock();
 

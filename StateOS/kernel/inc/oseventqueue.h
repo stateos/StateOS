@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    15.11.2018
+    @date    16.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,6 +57,8 @@ struct __evq
 	unsigned tail;  // first element to write into data buffer
 	unsigned*data;  // data buffer
 };
+
+struct __evq_data { evq_t evq; unsigned data[]; };
 
 /******************************************************************************
  *
@@ -506,7 +508,7 @@ struct EventQueueT : public __evq
 	static
 	EventQueueT<limit_> *create( void )
 	{
-		static_assert(SEG_OVER(sizeof(__evq)) + SEG_OVER(limit_ * sizeof(unsigned)) >= sizeof(EventQueueT<limit_>), "unexpected error!");
+		static_assert(sizeof(__evq_data) + limit_ * sizeof(unsigned) == sizeof(EventQueueT<limit_>), "unexpected error!");
 		return reinterpret_cast<EventQueueT<limit_> *>(evq_create(limit_));
 	}
 

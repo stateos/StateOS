@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    15.11.2018
+    @date    16.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,6 +57,8 @@ struct __msg
 	unsigned tail;  // inherited from stream buffer
 	char   * data;  // inherited from stream buffer
 };
+
+struct __msg_data { msg_t msg; char data[]; };
 
 /******************************************************************************
  *
@@ -621,7 +623,7 @@ struct MessageBufferT : public __msg
 	static
 	MessageBufferT<limit_> *create( void )
 	{
-		static_assert(SEG_OVER(sizeof(__msg)) + SEG_OVER(limit_) >= sizeof(MessageBufferT<limit_>), "unexpected error!");
+		static_assert(sizeof(__msg_data) + limit_ * sizeof(char) == sizeof(MessageBufferT<limit_>), "unexpected error!");
 		return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_));
 	}
 

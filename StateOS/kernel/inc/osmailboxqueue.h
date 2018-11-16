@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    15.11.2018
+    @date    16.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -59,6 +59,8 @@ struct __box
 
 	unsigned size;  // size of a single mail (in bytes)
 };
+
+struct __box_data { box_t box; char data[]; };
 
 /******************************************************************************
  *
@@ -555,7 +557,7 @@ struct MailBoxQueueT : public __box
 	static
 	MailBoxQueueT<limit_, size_> *create( void )
 	{
-		static_assert(SEG_OVER(sizeof(__box)) + SEG_OVER(limit_ * size_) >= sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
+		static_assert(sizeof(__box_data) + limit_ * size_ * sizeof(char) == sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
 		return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
 	}
 
