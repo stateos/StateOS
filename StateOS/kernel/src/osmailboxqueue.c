@@ -71,7 +71,7 @@ box_t *box_create( unsigned limit, unsigned size )
 
 	sys_lock();
 	{
-		bufsize = limit * size * sizeof(char);
+		bufsize = limit * size;
 		tmp = sys_alloc(sizeof(struct __box_data) + bufsize);
 		box = &tmp->box;
 		box_init(box, size, tmp->data, bufsize);

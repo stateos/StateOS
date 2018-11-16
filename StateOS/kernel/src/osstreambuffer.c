@@ -68,7 +68,7 @@ stm_t *stm_create( unsigned limit )
 
 	sys_lock();
 	{
-		bufsize = limit * sizeof(char);
+		bufsize = limit;
 		tmp = sys_alloc(sizeof(struct __stm_data) + bufsize);
 		stm = &tmp->stm;
 		stm_init(stm, tmp->data, bufsize);

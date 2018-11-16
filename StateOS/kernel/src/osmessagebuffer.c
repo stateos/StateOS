@@ -68,7 +68,7 @@ msg_t *msg_create( unsigned limit )
 
 	sys_lock();
 	{
-		bufsize = limit * sizeof(char);
+		bufsize = limit;
 		tmp = sys_alloc(sizeof(struct __msg_data) + bufsize);
 		msg = &tmp->msg;
 		msg_init(msg, tmp->data, bufsize);
