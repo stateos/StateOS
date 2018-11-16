@@ -58,8 +58,6 @@ struct __evq
 	unsigned*data;  // data buffer
 };
 
-struct __evq_data { evq_t evq; unsigned data[]; };
-
 /******************************************************************************
  *
  * Name              : _EVQ_INIT
@@ -508,7 +506,8 @@ struct EventQueueT : public __evq
 	static
 	EventQueueT<limit_> *create( void )
 	{
-		static_assert(sizeof(__evq_data) + limit_ * sizeof(unsigned) == sizeof(EventQueueT<limit_>), "unexpected error!");
+		struct __evq_data { evq_t evq; unsigned data[limit_]; };
+		static_assert(sizeof(__evq_data) == sizeof(EventQueueT<limit_>), "unexpected error!");
 		return reinterpret_cast<EventQueueT<limit_> *>(evq_create(limit_));
 	}
 

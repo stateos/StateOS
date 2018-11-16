@@ -89,7 +89,7 @@ mem_t *mem_create( unsigned limit, unsigned size )
 {
 	mem_t  * mem;
 	unsigned bufsize;
-	struct __mem_data *tmp;
+	struct __mem_data { mem_t mem; que_t data[]; } *tmp;
 
 	assert_tsk_context();
 	assert(limit);

@@ -51,8 +51,8 @@ void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
 		core_obj_init(&box->obj);
 
 		box->limit = (bufsize / size) * size;
-		box->data  = data;
 		box->size  = size;
+		box->data  = data;
 	}
 	sys_unlock();
 }
@@ -63,7 +63,7 @@ box_t *box_create( unsigned limit, unsigned size )
 {
 	box_t  * box;
 	unsigned bufsize;
-	struct __box_data *tmp;
+	struct __box_data { box_t box; char data[]; } *tmp;
 
 	assert_tsk_context();
 	assert(limit);

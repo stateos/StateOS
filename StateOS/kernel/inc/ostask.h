@@ -182,8 +182,6 @@ struct __tsk
 #endif
 };
 
-struct __tsk_data { tsk_t tsk; stk_t data[]; };
-
 /******************************************************************************
  *
  * Name              : _TSK_INIT
@@ -1318,7 +1316,8 @@ struct TaskT : public baseTask
 	{
 		CriticalSection cs;
 		TaskT<size_> *tsk;
-		static_assert(sizeof(__tsk_data) + STK_SIZE(size_) * sizeof(stk_t) == sizeof(TaskT<size_>), "unexpected error!");
+		struct __tsk_data { tsk_t tsk; stk_t data[STK_SIZE(size_)]; };
+		static_assert(sizeof(__tsk_data) == sizeof(TaskT<size_>), "unexpected error!");
 #if OS_FUNCTIONAL
 		tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, baseTask::fun_, size_));
 		tsk->__tsk::fun = _state;
@@ -1333,7 +1332,8 @@ struct TaskT : public baseTask
 	{
 		CriticalSection cs;
 		TaskT<size_> *tsk;
-		static_assert(sizeof(__tsk_data) + STK_SIZE(size_) * sizeof(stk_t) == sizeof(TaskT<size_>), "unexpected error!");
+		struct __tsk_data { tsk_t tsk; stk_t data[STK_SIZE(size_)]; };
+		static_assert(sizeof(__tsk_data) == sizeof(TaskT<size_>), "unexpected error!");
 #if OS_FUNCTIONAL
 		tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, baseTask::fun_, size_));
 		tsk->__tsk::fun = _state;

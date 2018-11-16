@@ -59,8 +59,6 @@ struct __job
 	fun_t ** data;  // data buffer
 };
 
-struct __job_data { job_t job; fun_t *data[]; };
-
 /******************************************************************************
  *
  * Name              : _JOB_INIT
@@ -501,13 +499,14 @@ void job_pushISR( job_t *job, fun_t *fun ) { job_push(job, fun); }
 template<unsigned limit_>
 struct JobQueueT : public __box
 {
-	 JobQueueT( void ): __box _BOX_INIT(limit_, reinterpret_cast<char *>(data_), sizeof(FUN_t)) {}
+	 JobQueueT( void ): __box _BOX_INIT(limit_, sizeof(FUN_t), reinterpret_cast<char *>(data_)) {}
 	~JobQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	static
 	JobQueueT<limit_> *create( void )
 	{
-		static_assert(sizeof(__box_data) + limit_ * sizeof(FUN_t) == sizeof(JobQueueT<limit_>), "unexpected error!");
+		struct __box_data { __box box; char data[limit_ * sizeof(FUN_t)]; };
+		static_assert(sizeof(__box_data) == sizeof(JobQueueT<limit_>), "unexpected error!");
 		return reinterpret_cast<JobQueueT<limit_> *>(box_create(limit_, sizeof(FUN_t)));
 	}
 
@@ -549,7 +548,8 @@ struct JobQueueT : public __job
 	static
 	JobQueueT<limit_> *create( void )
 	{
-		static_assert(sizeof(__job_data) + limit_ * sizeof(FUN_t) == sizeof(JobQueueT<limit_>), "unexpected error!");
+		struct __job_data { __job job; FUN_t data[limit_]; };
+		static_assert(sizeof(__job_data) == sizeof(JobQueueT<limit_>), "unexpected error!");
 		return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_));
 	}
 

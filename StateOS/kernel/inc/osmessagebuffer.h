@@ -58,8 +58,6 @@ struct __msg
 	char   * data;  // inherited from stream buffer
 };
 
-struct __msg_data { msg_t msg; char data[]; };
-
 /******************************************************************************
  *
  * Name              : _MSG_INIT
@@ -623,7 +621,8 @@ struct MessageBufferT : public __msg
 	static
 	MessageBufferT<limit_> *create( void )
 	{
-		static_assert(sizeof(__msg_data) + limit_ == sizeof(MessageBufferT<limit_>), "unexpected error!");
+		struct __msg_data { __msg msg; char data[limit_]; };
+		static_assert(sizeof(__msg_data) == sizeof(MessageBufferT<limit_>), "unexpected error!");
 		return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_));
 	}
 
@@ -676,7 +675,8 @@ struct MessageBufferTT : public MessageBufferT<limit_ * (sizeof(unsigned) + size
 	static
 	MessageBufferTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(__msg_data) + limit_ * (sizeof(unsigned) + sizeof(T)) == sizeof(MessageBufferTT<limit_, T>), "unexpected error!");
+		struct __msg_data { __msg msg; char data[limit_ * (sizeof(unsigned) + sizeof(T))]; };
+		static_assert(sizeof(__msg_data) == sizeof(MessageBufferTT<limit_, T>), "unexpected error!");
 		return reinterpret_cast<MessageBufferTT<limit_, T> *>(msg_create(limit_ * (sizeof(unsigned) + sizeof(T))));
 	}
 

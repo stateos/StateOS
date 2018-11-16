@@ -61,7 +61,7 @@ stm_t *stm_create( unsigned limit )
 {
 	stm_t  * stm;
 	unsigned bufsize;
-	struct __stm_data *tmp;
+	struct __stm_data { stm_t stm; char data[]; } *tmp;
 
 	assert_tsk_context();
 	assert(limit);

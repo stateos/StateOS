@@ -61,8 +61,6 @@ struct __mem
 	que_t  * data;  // pointer to memory pool buffer
 };
 
-struct __mem_data { mem_t mem; que_t data[]; };
-
 /******************************************************************************
  *
  * Name              : _MEM_INIT
@@ -442,7 +440,8 @@ struct MemoryPoolT : public __mem
 	static
 	MemoryPoolT<limit_, size_> *create( void )
 	{
-		static_assert(sizeof(__mem_data) + limit_ * (1 + MEM_SIZE(size_)) * sizeof(que_t) == sizeof(MemoryPoolT<limit_, size_>), "unexpected error!");
+		struct __mem_data { __mem mem; que_t data[limit_ * (1 + MEM_SIZE(size_))]; };
+		static_assert(sizeof(__mem_data) == sizeof(MemoryPoolT<limit_, size_>), "unexpected error!");
 		return reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
 	}
 
@@ -482,7 +481,8 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
 	static
 	MemoryPoolTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(__mem_data) + limit_ * (1 + MEM_SIZE(sizeof(T))) * sizeof(que_t) == sizeof(MemoryPoolTT<limit_, T>), "unexpected error!");
+		struct __mem_data { __mem mem; que_t data[limit_ * (1 + MEM_SIZE(sizeof(T)))]; };
+		static_assert(sizeof(__mem_data) == sizeof(MemoryPoolTT<limit_, T>), "unexpected error!");
 		return reinterpret_cast<MemoryPoolTT<limit_, T> *>(mem_create(limit_, sizeof(T)));
 	}
 

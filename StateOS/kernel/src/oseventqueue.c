@@ -61,7 +61,7 @@ evq_t *evq_create( unsigned limit )
 {
 	evq_t  * evq;
 	unsigned bufsize;
-	struct __evq_data *tmp;
+	struct __evq_data { evq_t evq; unsigned data[]; } *tmp;
 
 	assert_tsk_context();
 	assert(limit);

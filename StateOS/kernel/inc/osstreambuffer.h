@@ -58,8 +58,6 @@ struct __stm
 	char   * data;  // data buffer
 };
 
-struct __stm_data { stm_t stm; char data[]; };
-
 /******************************************************************************
  *
  * Name              : _STM_INIT
@@ -598,7 +596,8 @@ struct StreamBufferT : public __stm
 	static
 	StreamBufferT<limit_> *create( void )
 	{
-		static_assert(sizeof(__stm_data) + limit_ == sizeof(StreamBufferT<limit_>), "unexpected error!");
+		struct __stm_data { __stm stm; char data[limit_]; };
+		static_assert(sizeof(__stm_data) == sizeof(StreamBufferT<limit_>), "unexpected error!");
 		return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));
 	}
 
@@ -649,7 +648,8 @@ struct StreamBufferTT : public StreamBufferT<limit_ * sizeof(T)>
 	static
 	StreamBufferTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(__stm_data) + limit_ * sizeof(T) == sizeof(StreamBufferTT<limit_, T>), "unexpected error!");
+		struct __stm_data { __stm stm; char data[limit_ * sizeof(T)]; };
+		static_assert(sizeof(__stm_data) == sizeof(StreamBufferTT<limit_, T>), "unexpected error!");
 		return reinterpret_cast<StreamBufferTT<limit_, T> *>(stm_create(limit_ * sizeof(T)));
 	}
 

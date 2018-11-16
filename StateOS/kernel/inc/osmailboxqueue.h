@@ -50,17 +50,14 @@ struct __box
 {
 	obj_t    obj;   // object header
 
-	unsigned count; // inherited from stream buffer
-	unsigned limit; // inherited from stream buffer
-
-	unsigned head;  // inherited from stream buffer
-	unsigned tail;  // inherited from stream buffer
-	char   * data;  // inherited from stream buffer
-
+	unsigned count; // inherited from semaphore
+	unsigned limit; // inherited from semaphore
 	unsigned size;  // size of a single mail (in bytes)
-};
 
-struct __box_data { box_t box; char data[]; };
+	unsigned head;  // first element to read from data buffer
+	unsigned tail;  // first element to write into data buffer
+	char   * data;  // data buffer
+};
 
 /******************************************************************************
  *
@@ -70,8 +67,8 @@ struct __box_data { box_t box; char data[]; };
  *
  * Parameters
  *   limit           : size of a queue (max number of stored mails)
- *   data            : mailbox queue data buffer
  *   size            : size of a single mail (in bytes)
+ *   data            : mailbox queue data buffer
  *
  * Return            : mailbox queue object
  *
@@ -79,7 +76,7 @@ struct __box_data { box_t box; char data[]; };
  *
  ******************************************************************************/
 
-#define               _BOX_INIT( _limit, _data, _size ) { _OBJ_INIT(), 0, _limit * _size, 0, 0, _data, _size }
+#define               _BOX_INIT( _limit, _size, _data ) { _OBJ_INIT(), 0, _limit * _size, _size, 0, 0, _data }
 
 /******************************************************************************
  *
@@ -116,7 +113,7 @@ struct __box_data { box_t box; char data[]; };
 
 #define             OS_BOX( box, limit, size )                                \
                        char box##__buf[limit*size];                            \
-                       box_t box##__box = _BOX_INIT( limit, box##__buf, size ); \
+                       box_t box##__box = _BOX_INIT( limit, size, box##__buf ); \
                        box_id box = & box##__box
 
 /******************************************************************************
@@ -134,7 +131,7 @@ struct __box_data { box_t box; char data[]; };
 
 #define         static_BOX( box, limit, size )                                \
                 static char box##__buf[limit*size];                            \
-                static box_t box##__box = _BOX_INIT( limit, box##__buf, size ); \
+                static box_t box##__box = _BOX_INIT( limit, size, box##__buf ); \
                 static box_id box = & box##__box
 
 /******************************************************************************
@@ -155,7 +152,7 @@ struct __box_data { box_t box; char data[]; };
 
 #ifndef __cplusplus
 #define                BOX_INIT( limit, size ) \
-                      _BOX_INIT( limit, _BOX_DATA( limit, size ), size )
+                      _BOX_INIT( limit, size, _BOX_DATA( limit, size ) )
 #endif
 
 /******************************************************************************
@@ -551,13 +548,14 @@ unsigned box_spaceISR( box_t *box ) { return box_space(box); }
 template<unsigned limit_, unsigned size_>
 struct MailBoxQueueT : public __box
 {
-	 MailBoxQueueT( void ): __box _BOX_INIT(limit_, data_, size_) {}
+	 MailBoxQueueT( void ): __box _BOX_INIT(limit_, size_, data_) {}
 	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	static
 	MailBoxQueueT<limit_, size_> *create( void )
 	{
-		static_assert(sizeof(__box_data) + limit_ * size_ == sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
+		struct __box_data { __box box; char data[limit_ * size_]; };
+		static_assert(sizeof(__box_data) == sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
 		return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
 	}
 
@@ -608,7 +606,8 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
 	static
 	MailBoxQueueTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(__box_data) + limit_ * sizeof(T) == sizeof(MailBoxQueueTT<limit_, T>), "unexpected error!");
+		struct __box_data { __box box; char data[limit_ * sizeof(T)]; };
+		static_assert(sizeof(__box_data) == sizeof(MailBoxQueueTT<limit_, T>), "unexpected error!");
 		return reinterpret_cast<MailBoxQueueTT<limit_, T> *>(box_create(limit_, sizeof(T)));
 	}
 

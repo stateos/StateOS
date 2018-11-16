@@ -68,7 +68,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 {
 	tsk_t  * tsk;
 	unsigned bufsize;
-	struct __tsk_data *tmp;
+	struct __tsk_data { tsk_t tsk; stk_t data[]; } *tmp;
 
 	assert_tsk_context();
 	assert(state);

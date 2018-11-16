@@ -61,7 +61,7 @@ job_t *job_create( unsigned limit )
 {
 	job_t  * job;
 	unsigned bufsize;
-	struct __job_data *tmp;
+	struct __job_data { job_t job; fun_t *data[]; } *tmp;
 
 	assert_tsk_context();
 	assert(limit);

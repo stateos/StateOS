@@ -61,7 +61,7 @@ msg_t *msg_create( unsigned limit )
 {
 	msg_t  * msg;
 	unsigned bufsize;
-	struct __msg_data *tmp;
+	struct __msg_data { msg_t msg; char data[]; } *tmp;
 
 	assert_tsk_context();
 	assert(limit);
