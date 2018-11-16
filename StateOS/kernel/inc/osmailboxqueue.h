@@ -557,7 +557,7 @@ struct MailBoxQueueT : public __box
 	static
 	MailBoxQueueT<limit_, size_> *create( void )
 	{
-		static_assert(sizeof(__box_data) + limit_ * size_ * sizeof(char) == sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
+		static_assert(sizeof(__box_data) + limit_ * size_ == sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
 		return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
 	}
 
@@ -604,6 +604,14 @@ template<unsigned limit_, class T>
 struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
 {
 	MailBoxQueueTT( void ): MailBoxQueueT<limit_, sizeof(T)>() {}
+
+	static
+	MailBoxQueueTT<limit_, T> *create( void )
+	{
+		static_assert(sizeof(__box_data) + limit_ * sizeof(T) == sizeof(MailBoxQueueTT<limit_, T>), "unexpected error!");
+		return reinterpret_cast<MailBoxQueueTT<limit_, T> *>(box_create(limit_, sizeof(T)));
+	}
+
 };
 
 #endif//__cplusplus

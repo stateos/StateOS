@@ -623,7 +623,7 @@ struct MessageBufferT : public __msg
 	static
 	MessageBufferT<limit_> *create( void )
 	{
-		static_assert(sizeof(__msg_data) + limit_ * sizeof(char) == sizeof(MessageBufferT<limit_>), "unexpected error!");
+		static_assert(sizeof(__msg_data) + limit_ == sizeof(MessageBufferT<limit_>), "unexpected error!");
 		return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_));
 	}
 
@@ -669,9 +669,16 @@ struct MessageBufferT : public __msg
  ******************************************************************************/
 
 template<unsigned limit_, class T>
-struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T))>
+struct MessageBufferTT : public MessageBufferT<limit_ * (sizeof(unsigned) + sizeof(T))>
 {
-	MessageBufferTT( void ): MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T))>() {}
+	MessageBufferTT( void ): MessageBufferT<limit_ * (sizeof(unsigned) + sizeof(T))>() {}
+
+	static
+	MessageBufferTT<limit_, T> *create( void )
+	{
+		static_assert(sizeof(__msg_data) + limit_ * (sizeof(unsigned) + sizeof(T)) == sizeof(MessageBufferTT<limit_, T>), "unexpected error!");
+		return reinterpret_cast<MessageBufferTT<limit_, T> *>(msg_create(limit_ * (sizeof(unsigned) + sizeof(T))));
+	}
 
 	unsigned take     (       T *_data )               { return msg_take     (this, _data, sizeof(T));         }
 	unsigned tryWait  (       T *_data )               { return msg_tryWait  (this, _data, sizeof(T));         }

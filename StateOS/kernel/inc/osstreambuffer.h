@@ -598,7 +598,7 @@ struct StreamBufferT : public __stm
 	static
 	StreamBufferT<limit_> *create( void )
 	{
-		static_assert(sizeof(__stm_data) + limit_ * sizeof(char) == sizeof(StreamBufferT<limit_>), "unexpected error!");
+		static_assert(sizeof(__stm_data) + limit_ == sizeof(StreamBufferT<limit_>), "unexpected error!");
 		return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));
 	}
 
@@ -642,9 +642,16 @@ struct StreamBufferT : public __stm
  ******************************************************************************/
 
 template<unsigned limit_, class T>
-struct StreamBufferTT : public StreamBufferT<limit_*sizeof(T)>
+struct StreamBufferTT : public StreamBufferT<limit_ * sizeof(T)>
 {
-	StreamBufferTT( void ): StreamBufferT<limit_*sizeof(T)>() {}
+	StreamBufferTT( void ): StreamBufferT<limit_ * sizeof(T)>() {}
+
+	static
+	StreamBufferTT<limit_, T> *create( void )
+	{
+		static_assert(sizeof(__stm_data) + limit_ * sizeof(T) == sizeof(StreamBufferTT<limit_, T>), "unexpected error!");
+		return reinterpret_cast<StreamBufferTT<limit_, T> *>(stm_create(limit_ * sizeof(T)));
+	}
 
 	unsigned take     (       T *_data )               { return stm_take     (this, _data, sizeof(T));         }
 	unsigned tryWait  (       T *_data )               { return stm_tryWait  (this, _data, sizeof(T));         }

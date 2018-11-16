@@ -479,6 +479,13 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
 {
 	MemoryPoolTT( void ): MemoryPoolT<limit_, sizeof(T)>() {}
 
+	static
+	MemoryPoolTT<limit_, T> *create( void )
+	{
+		static_assert(sizeof(__mem_data) + limit_ * (1 + MEM_SIZE(sizeof(T))) * sizeof(que_t) == sizeof(MemoryPoolTT<limit_, T>), "unexpected error!");
+		return reinterpret_cast<MemoryPoolTT<limit_, T> *>(mem_create(limit_, sizeof(T)));
+	}
+
 	unsigned take     ( T **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data));         }
 	unsigned tryWait  ( T **_data )               { return mem_tryWait  (this, reinterpret_cast<void **>(_data));         }
 	unsigned takeISR  ( T **_data )               { return mem_takeISR  (this, reinterpret_cast<void **>(_data));         }
