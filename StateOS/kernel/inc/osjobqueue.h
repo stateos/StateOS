@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    16.11.2018
+    @date    17.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,6 +57,8 @@ struct __job
 	unsigned head;  // first element to read from data buffer
 	unsigned tail;  // first element to write into data buffer
 	fun_t ** data;  // data buffer
+
+	intptr_t :0;
 };
 
 /******************************************************************************
@@ -505,8 +507,7 @@ struct JobQueueT : public __box
 	static
 	JobQueueT<limit_> *create( void )
 	{
-		struct __box_data { __box box; char data[limit_ * sizeof(FUN_t)]; };
-		static_assert(sizeof(__box_data) == sizeof(JobQueueT<limit_>), "unexpected error!");
+		static_assert(sizeof(__box) + limit_ * sizeof(FUN_t) == sizeof(JobQueueT<limit_>), "unexpected error!");
 		return reinterpret_cast<JobQueueT<limit_> *>(box_create(limit_, sizeof(FUN_t)));
 	}
 
@@ -548,8 +549,7 @@ struct JobQueueT : public __job
 	static
 	JobQueueT<limit_> *create( void )
 	{
-		struct __job_data { __job job; FUN_t data[limit_]; };
-		static_assert(sizeof(__job_data) == sizeof(JobQueueT<limit_>), "unexpected error!");
+		static_assert(sizeof(__job) + limit_ * sizeof(FUN_t) == sizeof(JobQueueT<limit_>), "unexpected error!");
 		return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_));
 	}
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    16.11.2018
+    @date    17.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -63,7 +63,7 @@ bar_t *bar_create( unsigned limit )
 
 	sys_lock();
 	{
-		bar = sys_alloc(sizeof(struct __bar));
+		bar = sys_alloc(sizeof(bar_t));
 		bar_init(bar, limit);
 		bar->obj.res = bar;
 	}

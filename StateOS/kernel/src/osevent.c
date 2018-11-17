@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    16.11.2018
+    @date    17.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -58,7 +58,7 @@ evt_t *evt_create( void )
 
 	sys_lock();
 	{
-		evt = sys_alloc(sizeof(struct __evt));
+		evt = sys_alloc(sizeof(evt_t));
 		evt_init(evt);
 		evt->obj.res = evt;
 	}

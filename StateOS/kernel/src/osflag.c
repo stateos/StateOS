@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    16.11.2018
+    @date    17.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -62,7 +62,7 @@ flg_t *flg_create( unsigned init )
 
 	sys_lock();
 	{
-		flg = sys_alloc(sizeof(struct __flg));
+		flg = sys_alloc(sizeof(flg_t));
 		flg_init(flg, init);
 		flg->obj.res = flg;
 	}

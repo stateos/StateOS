@@ -44,7 +44,6 @@ Features:
 - modified context structures
 - added dynamic tasks
 - added create/destroy functions to c++ wrapper
-- used flexible array members
 ---------
 6.3
 - merged test branch

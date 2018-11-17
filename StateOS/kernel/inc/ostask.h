@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    16.11.2018
+    @date    17.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -180,6 +180,7 @@ struct __tsk
 #else
 	#define _TSK_EXTRA
 #endif
+	stk_t    :0;
 };
 
 /******************************************************************************
@@ -1316,8 +1317,7 @@ struct TaskT : public baseTask
 	{
 		CriticalSection cs;
 		TaskT<size_> *tsk;
-		struct __tsk_data { tsk_t tsk; stk_t data[STK_SIZE(size_)]; };
-		static_assert(sizeof(__tsk_data) == sizeof(TaskT<size_>), "unexpected error!");
+		static_assert(sizeof(__tsk) + STK_SIZE(size_) * sizeof(stk_t) == sizeof(TaskT<size_>), "unexpected error!");
 #if OS_FUNCTIONAL
 		tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, baseTask::fun_, size_));
 		tsk->__tsk::fun = _state;
@@ -1332,8 +1332,7 @@ struct TaskT : public baseTask
 	{
 		CriticalSection cs;
 		TaskT<size_> *tsk;
-		struct __tsk_data { tsk_t tsk; stk_t data[STK_SIZE(size_)]; };
-		static_assert(sizeof(__tsk_data) == sizeof(TaskT<size_>), "unexpected error!");
+		static_assert(sizeof(__tsk) + STK_SIZE(size_) * sizeof(stk_t) == sizeof(TaskT<size_>), "unexpected error!");
 #if OS_FUNCTIONAL
 		tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, baseTask::fun_, size_));
 		tsk->__tsk::fun = _state;

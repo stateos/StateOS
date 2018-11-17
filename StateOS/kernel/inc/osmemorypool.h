@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    16.11.2018
+    @date    17.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -59,6 +59,8 @@ struct __mem
 	unsigned limit; // size of a memory pool (max number of objects)
 	unsigned size;  // size of memory object (in sizeof(que_t) units)
 	que_t  * data;  // pointer to memory pool buffer
+
+	intptr_t :0;
 };
 
 /******************************************************************************
@@ -440,8 +442,7 @@ struct MemoryPoolT : public __mem
 	static
 	MemoryPoolT<limit_, size_> *create( void )
 	{
-		struct __mem_data { __mem mem; que_t data[limit_ * (1 + MEM_SIZE(size_))]; };
-		static_assert(sizeof(__mem_data) == sizeof(MemoryPoolT<limit_, size_>), "unexpected error!");
+		static_assert(sizeof(__mem) + limit_ * (1 + MEM_SIZE(size_)) * sizeof(que_t) == sizeof(MemoryPoolT<limit_, size_>), "unexpected error!");
 		return reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
 	}
 
@@ -481,8 +482,7 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
 	static
 	MemoryPoolTT<limit_, T> *create( void )
 	{
-		struct __mem_data { __mem mem; que_t data[limit_ * (1 + MEM_SIZE(sizeof(T)))]; };
-		static_assert(sizeof(__mem_data) == sizeof(MemoryPoolTT<limit_, T>), "unexpected error!");
+		static_assert(sizeof(__mem) + limit_ * (1 + MEM_SIZE(sizeof(T))) * sizeof(que_t) == sizeof(MemoryPoolTT<limit_, T>), "unexpected error!");
 		return reinterpret_cast<MemoryPoolTT<limit_, T> *>(mem_create(limit_, sizeof(T)));
 	}
 

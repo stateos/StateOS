@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    16.11.2018
+    @date    17.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -56,6 +56,8 @@ struct __stm
 	unsigned head;  // first element to read from data buffer
 	unsigned tail;  // first element to write into data buffer
 	char   * data;  // data buffer
+
+	char     :0;
 };
 
 /******************************************************************************
@@ -596,8 +598,7 @@ struct StreamBufferT : public __stm
 	static
 	StreamBufferT<limit_> *create( void )
 	{
-		struct __stm_data { __stm stm; char data[limit_]; };
-		static_assert(sizeof(__stm_data) == sizeof(StreamBufferT<limit_>), "unexpected error!");
+		static_assert(sizeof(__stm) + limit_ == sizeof(StreamBufferT<limit_>), "unexpected error!");
 		return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));
 	}
 
@@ -648,8 +649,7 @@ struct StreamBufferTT : public StreamBufferT<limit_ * sizeof(T)>
 	static
 	StreamBufferTT<limit_, T> *create( void )
 	{
-		struct __stm_data { __stm stm; char data[limit_ * sizeof(T)]; };
-		static_assert(sizeof(__stm_data) == sizeof(StreamBufferTT<limit_, T>), "unexpected error!");
+		static_assert(sizeof(__stm) + limit_ * sizeof(T) == sizeof(StreamBufferTT<limit_, T>), "unexpected error!");
 		return reinterpret_cast<StreamBufferTT<limit_, T> *>(stm_create(limit_ * sizeof(T)));
 	}
 
