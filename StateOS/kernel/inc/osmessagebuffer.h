@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    17.11.2018
+    @date    19.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -122,10 +122,10 @@ struct __msg
  *
  ******************************************************************************/
 
-#define             OS_MSG( msg, limit, ... )                                                 \
-                       char msg##__buf[_VA_MSG(limit, __VA_ARGS__)];                           \
-                       msg_t msg##__msg = _MSG_INIT( _VA_MSG(limit, __VA_ARGS__), msg##__buf ); \
-                       msg_id msg = & msg##__msg
+#define             OS_MSG( msg, limit, ... )                                                   \
+                       struct { msg_t msg; char buf[_VA_MSG(limit, __VA_ARGS__)]; } msg##__wrk = \
+                       { _MSG_INIT( _VA_MSG(limit, __VA_ARGS__), msg##__wrk.buf ), { 0 } };       \
+                       msg_id msg = & msg##__wrk.msg
 
 /******************************************************************************
  *
@@ -140,10 +140,10 @@ struct __msg
  *
  ******************************************************************************/
 
-#define         static_MSG( msg, limit, ... )                                                 \
-                static char msg##__buf[_VA_MSG(limit, __VA_ARGS__)];                           \
-                static msg_t msg##__msg = _MSG_INIT( _VA_MSG(limit, __VA_ARGS__), msg##__buf ); \
-                static msg_id msg = & msg##__msg
+#define         static_MSG( msg, limit, ... )                                                   \
+                static struct { msg_t msg; char buf[_VA_MSG(limit, __VA_ARGS__)]; } msg##__wrk = \
+                       { _MSG_INIT( _VA_MSG(limit, __VA_ARGS__), msg##__wrk.buf ), { 0 } };       \
+                static msg_id msg = & msg##__wrk.msg
 
 /******************************************************************************
  *

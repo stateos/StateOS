@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    17.11.2018
+    @date    19.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -122,10 +122,10 @@ struct __stm
  *
  ******************************************************************************/
 
-#define             OS_STM( stm, limit, ... )                                                 \
-                       char stm##__buf[_VA_STM(limit, __VA_ARGS__)];                           \
-                       stm_t stm##__stm = _STM_INIT( _VA_STM(limit, __VA_ARGS__), stm##__buf ); \
-                       stm_id stm = & stm##__stm
+#define             OS_STM( stm, limit, ... )                                                   \
+                       struct { stm_t stm; char buf[_VA_STM(limit, __VA_ARGS__)]; } stm##__wrk = \
+                       { _STM_INIT( _VA_STM(limit, __VA_ARGS__), stm##__wrk.buf ), { 0 } };       \
+                       stm_id stm = & stm##__wrk.stm
 
 /******************************************************************************
  *
@@ -140,10 +140,10 @@ struct __stm
  *
  ******************************************************************************/
 
-#define         static_STM( stm, limit, ... )                                                 \
-                static char stm##__buf[_VA_STM(limit, __VA_ARGS__)];                           \
-                static stm_t stm##__stm = _STM_INIT( _VA_STM(limit, __VA_ARGS__), stm##__buf ); \
-                static stm_id stm = & stm##__stm
+#define         static_STM( stm, limit, ... )                                                   \
+                static struct { stm_t stm; char buf[_VA_STM(limit, __VA_ARGS__)]; } stm##__wrk = \
+                       { _STM_INIT( _VA_STM(limit, __VA_ARGS__), stm##__wrk.buf ), { 0 } };       \
+                static stm_id stm = & stm##__wrk.stm
 
 /******************************************************************************
  *

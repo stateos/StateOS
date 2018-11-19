@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    17.11.2018
+    @date    19.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -275,10 +275,10 @@ struct __tsk
  *
  ******************************************************************************/
 
-#define             OS_WRK( tsk, prio, state, size )                                \
-                       stk_t tsk##__stk[STK_SIZE( size )];                           \
-                       tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk, size ); \
-                       tsk_id tsk = & tsk##__tsk
+#define             OS_WRK( tsk, prio, state, size )                                  \
+                       struct { tsk_t tsk; stk_t buf[STK_SIZE( size )]; } tsk##__wrk = \
+                       { _TSK_INIT( prio, state, tsk##__wrk.buf, size ), { 0 } };       \
+                       tsk_id tsk = & tsk##__wrk.tsk
 
 /******************************************************************************
  *
@@ -390,10 +390,10 @@ struct __tsk
  *
  ******************************************************************************/
 
-#define         static_WRK( tsk, prio, state, size )                                \
-                static stk_t tsk##__stk[STK_SIZE( size )];                           \
-                static tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk, size ); \
-                static tsk_id tsk = & tsk##__tsk
+#define         static_WRK( tsk, prio, state, size )                                  \
+                static struct { tsk_t tsk; stk_t buf[STK_SIZE( size )]; } tsk##__wrk = \
+                       { _TSK_INIT( prio, state, tsk##__wrk.buf, size ), { 0 } };       \
+                static tsk_id tsk = & tsk##__wrk.tsk
 
 /******************************************************************************
  *
