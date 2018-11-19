@@ -56,9 +56,16 @@ struct __evq
 	unsigned head;  // first element to read from data buffer
 	unsigned tail;  // first element to write into data buffer
 	unsigned*data;  // data buffer
-
-	unsigned :0;
 };
+
+#ifdef __cplusplus
+}
+template<unsigned limit_>
+struct evq_T { evq_t evq; unsigned buf[limit_]; };
+extern "C" {
+#else
+struct evq_T { evq_t evq; unsigned buf[]; };
+#endif
 
 /******************************************************************************
  *
@@ -508,7 +515,7 @@ struct EventQueueT : public __evq
 	static
 	EventQueueT<limit_> *create( void )
 	{
-		static_assert(sizeof(__evq) + limit_ * sizeof(unsigned) == sizeof(EventQueueT<limit_>), "unexpected error!");
+		static_assert(sizeof(evq_T<limit_>) == sizeof(EventQueueT<limit_>), "unexpected error!");
 		return reinterpret_cast<EventQueueT<limit_> *>(evq_create(limit_));
 	}
 

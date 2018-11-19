@@ -56,9 +56,16 @@ struct __msg
 	unsigned head;  // inherited from stream buffer
 	unsigned tail;  // inherited from stream buffer
 	char   * data;  // inherited from stream buffer
-
-	char     :0;
 };
+
+#ifdef __cplusplus
+}
+template<unsigned limit_>
+struct msg_T { msg_t msg; char buf[limit_]; };
+extern "C" {
+#else
+struct msg_T { msg_t msg; char buf[]; };
+#endif
 
 /******************************************************************************
  *
@@ -623,7 +630,7 @@ struct MessageBufferT : public __msg
 	static
 	MessageBufferT<limit_> *create( void )
 	{
-		static_assert(sizeof(__msg) + limit_ == sizeof(MessageBufferT<limit_>), "unexpected error!");
+		static_assert(sizeof(msg_T<limit_>) == sizeof(MessageBufferT<limit_>), "unexpected error!");
 		return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_));
 	}
 
@@ -676,7 +683,7 @@ struct MessageBufferTT : public MessageBufferT<limit_ * (sizeof(unsigned) + size
 	static
 	MessageBufferTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(__msg) + limit_ * (sizeof(unsigned) + sizeof(T)) == sizeof(MessageBufferTT<limit_, T>), "unexpected error!");
+		static_assert(sizeof(msg_T<limit_ * (sizeof(unsigned) + sizeof(T))>) == sizeof(MessageBufferTT<limit_, T>), "unexpected error!");
 		return reinterpret_cast<MessageBufferTT<limit_, T> *>(msg_create(limit_ * (sizeof(unsigned) + sizeof(T))));
 	}
 

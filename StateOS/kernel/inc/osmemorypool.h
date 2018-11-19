@@ -59,9 +59,16 @@ struct __mem
 	unsigned limit; // size of a memory pool (max number of objects)
 	unsigned size;  // size of memory object (in sizeof(que_t) units)
 	que_t  * data;  // pointer to memory pool buffer
-
-	intptr_t :0;
 };
+
+#ifdef __cplusplus
+}
+template<unsigned limit_, unsigned size_>
+struct mem_T { mem_t mem; que_t buf[limit_ * (1 + MEM_SIZE(size_))]; };
+extern "C" {
+#else
+struct mem_T { mem_t mem; que_t buf[]; };
+#endif
 
 /******************************************************************************
  *
@@ -442,7 +449,7 @@ struct MemoryPoolT : public __mem
 	static
 	MemoryPoolT<limit_, size_> *create( void )
 	{
-		static_assert(sizeof(__mem) + limit_ * (1 + MEM_SIZE(size_)) * sizeof(que_t) == sizeof(MemoryPoolT<limit_, size_>), "unexpected error!");
+		static_assert(sizeof(mem_T<limit_, size_>) == sizeof(MemoryPoolT<limit_, size_>), "unexpected error!");
 		return reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
 	}
 
@@ -482,7 +489,7 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
 	static
 	MemoryPoolTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(__mem) + limit_ * (1 + MEM_SIZE(sizeof(T))) * sizeof(que_t) == sizeof(MemoryPoolTT<limit_, T>), "unexpected error!");
+		static_assert(sizeof(mem_T<limit_, sizeof(T)>) == sizeof(MemoryPoolTT<limit_, T>), "unexpected error!");
 		return reinterpret_cast<MemoryPoolTT<limit_, T> *>(mem_create(limit_, sizeof(T)));
 	}
 

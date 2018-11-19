@@ -180,8 +180,16 @@ struct __tsk
 #else
 	#define _TSK_EXTRA
 #endif
-	stk_t    :0;
 };
+
+#ifdef __cplusplus
+}
+template<unsigned limit_>
+struct tsk_T { tsk_t tsk; stk_t buf[STK_SIZE(limit_)]; };
+extern "C" {
+#else
+struct tsk_T { tsk_t tsk; stk_t buf[]; };
+#endif
 
 /******************************************************************************
  *
@@ -1317,7 +1325,7 @@ struct TaskT : public baseTask
 	{
 		CriticalSection cs;
 		TaskT<size_> *tsk;
-		static_assert(sizeof(__tsk) + STK_SIZE(size_) * sizeof(stk_t) == sizeof(TaskT<size_>), "unexpected error!");
+		static_assert(sizeof(tsk_T<size_>) == sizeof(TaskT<size_>), "unexpected error!");
 #if OS_FUNCTIONAL
 		tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, baseTask::fun_, size_));
 		tsk->__tsk::fun = _state;
@@ -1332,7 +1340,7 @@ struct TaskT : public baseTask
 	{
 		CriticalSection cs;
 		TaskT<size_> *tsk;
-		static_assert(sizeof(__tsk) + STK_SIZE(size_) * sizeof(stk_t) == sizeof(TaskT<size_>), "unexpected error!");
+		static_assert(sizeof(tsk_T<size_>) == sizeof(TaskT<size_>), "unexpected error!");
 #if OS_FUNCTIONAL
 		tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, baseTask::fun_, size_));
 		tsk->__tsk::fun = _state;

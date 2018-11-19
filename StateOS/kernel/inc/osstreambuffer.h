@@ -56,9 +56,16 @@ struct __stm
 	unsigned head;  // first element to read from data buffer
 	unsigned tail;  // first element to write into data buffer
 	char   * data;  // data buffer
-
-	char     :0;
 };
+
+#ifdef __cplusplus
+}
+template<unsigned limit_>
+struct stm_T { stm_t stm; char buf[limit_]; };
+extern "C" {
+#else
+struct stm_T { stm_t stm; char buf[]; };
+#endif
 
 /******************************************************************************
  *
@@ -598,7 +605,7 @@ struct StreamBufferT : public __stm
 	static
 	StreamBufferT<limit_> *create( void )
 	{
-		static_assert(sizeof(__stm) + limit_ == sizeof(StreamBufferT<limit_>), "unexpected error!");
+		static_assert(sizeof(stm_T<limit_>) == sizeof(StreamBufferT<limit_>), "unexpected error!");
 		return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));
 	}
 
@@ -649,7 +656,7 @@ struct StreamBufferTT : public StreamBufferT<limit_ * sizeof(T)>
 	static
 	StreamBufferTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(__stm) + limit_ * sizeof(T) == sizeof(StreamBufferTT<limit_, T>), "unexpected error!");
+		static_assert(sizeof(stm_T<limit_ * sizeof(T)>) == sizeof(StreamBufferTT<limit_, T>), "unexpected error!");
 		return reinterpret_cast<StreamBufferTT<limit_, T> *>(stm_create(limit_ * sizeof(T)));
 	}
 

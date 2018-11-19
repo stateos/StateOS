@@ -57,9 +57,16 @@ struct __box
 	unsigned head;  // first element to read from data buffer
 	unsigned tail;  // first element to write into data buffer
 	char   * data;  // data buffer
-
-	char     :0;
 };
+
+#ifdef __cplusplus
+}
+template<unsigned limit_, unsigned size_>
+struct box_T { box_t box; char buf[limit_ * size_]; };
+extern "C" {
+#else
+struct box_T { box_t box; char buf[]; };
+#endif
 
 /******************************************************************************
  *
@@ -556,7 +563,7 @@ struct MailBoxQueueT : public __box
 	static
 	MailBoxQueueT<limit_, size_> *create( void )
 	{
-		static_assert(sizeof(__box) + limit_ * size_ == sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
+		static_assert(sizeof(box_T<limit_, size_>) == sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
 		return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
 	}
 
@@ -607,7 +614,7 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
 	static
 	MailBoxQueueTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(__box) + limit_ * sizeof(T) == sizeof(MailBoxQueueTT<limit_, T>), "unexpected error!");
+		static_assert(sizeof(box_T<limit_, sizeof(T)>) == sizeof(MailBoxQueueTT<limit_, T>), "unexpected error!");
 		return reinterpret_cast<MailBoxQueueTT<limit_, T> *>(box_create(limit_, sizeof(T)));
 	}
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    17.11.2018
+    @date    19.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -66,6 +66,8 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
+	struct
+	tsk_T  * tmp;
 	tsk_t  * tsk;
 	unsigned bufsize;
 
@@ -76,9 +78,10 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 	sys_lock();
 	{
 		bufsize = STK_SIZE(size) * sizeof(stk_t);
-		tsk = sys_alloc(sizeof(tsk_t) + bufsize);
-		tsk_init(tsk, prio, state, (void *)(tsk + 1), bufsize);
-		tsk->hdr.obj.res = tsk;
+		tmp = sys_alloc(sizeof(struct tsk_T) + bufsize);
+		tsk = &tmp->tsk;
+		tsk_init(tsk, prio, state, tmp->buf, bufsize);
+		tsk->hdr.obj.res = tmp;
 	}
 	sys_unlock();
 

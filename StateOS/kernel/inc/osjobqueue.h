@@ -57,9 +57,16 @@ struct __job
 	unsigned head;  // first element to read from data buffer
 	unsigned tail;  // first element to write into data buffer
 	fun_t ** data;  // data buffer
-
-	intptr_t :0;
 };
+
+#ifdef __cplusplus
+}
+template<unsigned limit_>
+struct job_T { job_t job; fun_t *buf[limit_]; };
+extern "C" {
+#else
+struct job_T { job_t job; fun_t *buf[]; };
+#endif
 
 /******************************************************************************
  *
@@ -507,7 +514,7 @@ struct JobQueueT : public __box
 	static
 	JobQueueT<limit_> *create( void )
 	{
-		static_assert(sizeof(__box) + limit_ * sizeof(FUN_t) == sizeof(JobQueueT<limit_>), "unexpected error!");
+		static_assert(sizeof(box_T<limit_, sizeof(FUN_t)>) == sizeof(JobQueueT<limit_>), "unexpected error!");
 		return reinterpret_cast<JobQueueT<limit_> *>(box_create(limit_, sizeof(FUN_t)));
 	}
 
@@ -549,7 +556,7 @@ struct JobQueueT : public __job
 	static
 	JobQueueT<limit_> *create( void )
 	{
-		static_assert(sizeof(__job) + limit_ * sizeof(FUN_t) == sizeof(JobQueueT<limit_>), "unexpected error!");
+		static_assert(sizeof(job_T<limit_>) == sizeof(JobQueueT<limit_>), "unexpected error!");
 		return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_));
 	}
 
