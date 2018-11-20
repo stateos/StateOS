@@ -34,10 +34,6 @@
 
 #include "oskernel.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /******************************************************************************
  *
  * Name              : message buffer
@@ -59,12 +55,14 @@ struct __msg
 };
 
 #ifdef __cplusplus
-}
 template<unsigned limit_>
 struct msg_T { msg_t msg; char buf[limit_]; };
-extern "C" {
 #else
 struct msg_T { msg_t msg; char buf[]; };
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /******************************************************************************

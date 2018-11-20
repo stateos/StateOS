@@ -34,10 +34,6 @@
 
 #include "oskernel.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /******************************************************************************
  *
  * Name              : mailbox queue
@@ -60,12 +56,14 @@ struct __box
 };
 
 #ifdef __cplusplus
-}
 template<unsigned limit_, unsigned size_>
 struct box_T { box_t box; char buf[limit_ * size_]; };
-extern "C" {
 #else
 struct box_T { box_t box; char buf[]; };
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /******************************************************************************

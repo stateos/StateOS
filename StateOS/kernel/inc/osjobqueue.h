@@ -35,10 +35,6 @@
 #include "oskernel.h"
 #include "osmailboxqueue.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /******************************************************************************
  *
  * Name              : job queue
@@ -60,12 +56,14 @@ struct __job
 };
 
 #ifdef __cplusplus
-}
 template<unsigned limit_>
 struct job_T { job_t job; fun_t *buf[limit_]; };
-extern "C" {
 #else
 struct job_T { job_t job; fun_t *buf[]; };
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /******************************************************************************

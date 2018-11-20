@@ -36,10 +36,6 @@
 #include "osmutex.h"
 #include "ostimer.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* -------------------------------------------------------------------------- */
 
 #define STK_SIZE( size ) \
@@ -183,12 +179,14 @@ struct __tsk
 };
 
 #ifdef __cplusplus
-}
 template<unsigned limit_>
 struct tsk_T { tsk_t tsk; stk_t buf[STK_SIZE(limit_)]; };
-extern "C" {
 #else
 struct tsk_T { tsk_t tsk; stk_t buf[]; };
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /******************************************************************************

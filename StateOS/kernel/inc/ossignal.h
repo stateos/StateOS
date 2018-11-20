@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    16.11.2018
+    @date    19.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -34,10 +34,6 @@
 
 #include "oskernel.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* -------------------------------------------------------------------------- */
 
 #define SIG_LIMIT     (sizeof(unsigned) * CHAR_BIT)
@@ -61,6 +57,10 @@ struct __sig
 	unsigned sigset;// pending signals
 	unsigned mask;  // protection mask
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /******************************************************************************
  *

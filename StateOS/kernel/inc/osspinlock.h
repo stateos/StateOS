@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    14.08.2018
+    @date    19.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -35,10 +35,6 @@
 #include "oskernel.h"
 #include "oscriticalsection.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /******************************************************************************
  *
  * Name              : spin lock
@@ -46,6 +42,10 @@ extern "C" {
  ******************************************************************************/
 
 typedef volatile unsigned spn_t, * const spn_id;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /******************************************************************************
  *

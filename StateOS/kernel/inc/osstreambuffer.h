@@ -34,10 +34,6 @@
 
 #include "oskernel.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /******************************************************************************
  *
  * Name              : stream buffer
@@ -59,12 +55,14 @@ struct __stm
 };
 
 #ifdef __cplusplus
-}
 template<unsigned limit_>
 struct stm_T { stm_t stm; char buf[limit_]; };
-extern "C" {
 #else
 struct stm_T { stm_t stm; char buf[]; };
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /******************************************************************************

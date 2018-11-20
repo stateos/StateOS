@@ -34,10 +34,6 @@
 
 #include "oskernel.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /******************************************************************************
  *
  * Name              : event queue
@@ -59,12 +55,14 @@ struct __evq
 };
 
 #ifdef __cplusplus
-}
 template<unsigned limit_>
 struct evq_T { evq_t evq; unsigned buf[limit_]; };
-extern "C" {
 #else
 struct evq_T { evq_t evq; unsigned buf[]; };
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /******************************************************************************

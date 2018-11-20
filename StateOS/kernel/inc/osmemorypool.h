@@ -35,10 +35,6 @@
 #include "oskernel.h"
 #include "oslist.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* -------------------------------------------------------------------------- */
 
 #define MEM_SIZE( size ) \
@@ -62,12 +58,14 @@ struct __mem
 };
 
 #ifdef __cplusplus
-}
 template<unsigned limit_, unsigned size_>
 struct mem_T { mem_t mem; que_t buf[limit_ * (1 + MEM_SIZE(size_))]; };
-extern "C" {
 #else
 struct mem_T { mem_t mem; que_t buf[]; };
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /******************************************************************************

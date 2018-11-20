@@ -2,7 +2,7 @@
 
     @file    StateOS: osonceflag.h
     @author  Rajmund Szymanski
-    @date    26.10.2018
+    @date    19.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -35,10 +35,6 @@
 #include "oskernel.h"
 #include "oscriticalsection.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /******************************************************************************
  *
  * Name              : once flag
@@ -47,6 +43,10 @@ extern "C" {
  ******************************************************************************/
 
 typedef uint_fast8_t one_t, * const one_id;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /******************************************************************************
  *

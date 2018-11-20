@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    16.11.2018
+    @date    19.11.2018
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,10 +33,6 @@
 #define __STATEOS_MTX_H
 
 #include "oskernel.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* -------------------------------------------------------------------------- */
 
@@ -83,6 +79,10 @@ struct __mtx
 	unsigned prio;  // mutex priority; unused if mtxPrioProtect protocol is not set
 	mtx_t  * list;  // list of mutexes held by owner
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /******************************************************************************
  *
