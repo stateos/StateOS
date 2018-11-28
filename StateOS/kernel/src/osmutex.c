@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    17.11.2018
+    @date    28.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,6 +35,17 @@
 #include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_mtx_init( mtx_t *mtx, unsigned mode, unsigned prio )
+/* -------------------------------------------------------------------------- */
+{
+	core_obj_init(&mtx->obj);
+
+	mtx->mode = mode;
+	mtx->prio = prio;
+}
+
+/* -------------------------------------------------------------------------- */
 void mtx_init( mtx_t *mtx, unsigned mode, unsigned prio )
 /* -------------------------------------------------------------------------- */
 {
@@ -47,11 +58,7 @@ void mtx_init( mtx_t *mtx, unsigned mode, unsigned prio )
 	sys_lock();
 	{
 		memset(mtx, 0, sizeof(mtx_t));
-
-		core_obj_init(&mtx->obj);
-
-		mtx->mode = mode;
-		mtx->prio = prio;
+		priv_mtx_init(mtx, mode, prio);
 	}
 	sys_unlock();
 }
@@ -67,7 +74,7 @@ mtx_t *mtx_create( unsigned mode, unsigned prio )
 	sys_lock();
 	{
 		mtx = sys_alloc(sizeof(mtx_t));
-		mtx_init(mtx, mode, prio);
+		priv_mtx_init(mtx, mode, prio);
 		mtx->obj.res = mtx;
 	}
 	sys_unlock();
