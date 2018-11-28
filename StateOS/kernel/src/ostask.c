@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    28.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,6 +35,23 @@
 #include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size )
+/* -------------------------------------------------------------------------- */
+{
+	core_hdr_init(&tsk->hdr);
+
+	tsk->prio  = prio;
+	tsk->basic = prio;
+	tsk->state = state;
+	tsk->stack = stack;
+	tsk->size  = size;
+
+	core_ctx_init(tsk);
+	core_tsk_insert(tsk);
+}
+
+/* -------------------------------------------------------------------------- */
 void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
@@ -47,17 +64,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 	sys_lock();
 	{
 		memset(tsk, 0, sizeof(tsk_t));
-
-		core_hdr_init(&tsk->hdr);
-
-		tsk->prio  = prio;
-		tsk->basic = prio;
-		tsk->state = state;
-		tsk->stack = stack;
-		tsk->size  = size;
-
-		core_ctx_init(tsk);
-		core_tsk_insert(tsk);
+		priv_tsk_init(tsk, prio, state, stack, size);
 	}
 	sys_unlock();
 }
@@ -79,9 +86,8 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 	{
 		bufsize = STK_SIZE(size) * sizeof(stk_t);
 		tmp = sys_alloc(sizeof(struct tsk_T) + bufsize);
-		tsk = &tmp->tsk;
-		tsk_init(tsk, prio, state, tmp->buf, bufsize);
-		tsk->hdr.obj.res = tmp;
+		priv_tsk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize);
+		tsk->hdr.obj.res = tsk;
 	}
 	sys_unlock();
 
