@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    28.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,6 +35,17 @@
 #include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_msg_init( msg_t *msg, void *data, unsigned bufsize )
+/* -------------------------------------------------------------------------- */
+{
+	core_obj_init(&msg->obj);
+
+	msg->limit = bufsize;
+	msg->data  = data;
+}
+
+/* -------------------------------------------------------------------------- */
 void msg_init( msg_t *msg, void *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
@@ -46,11 +57,7 @@ void msg_init( msg_t *msg, void *data, unsigned bufsize )
 	sys_lock();
 	{
 		memset(msg, 0, sizeof(msg_t));
-
-		core_obj_init(&msg->obj);
-
-		msg->limit = bufsize;
-		msg->data  = data;
+		priv_msg_init(msg, data, bufsize);
 	}
 	sys_unlock();
 }
@@ -71,9 +78,8 @@ msg_t *msg_create( unsigned limit )
 	{
 		bufsize = limit;
 		tmp = sys_alloc(sizeof(struct msg_T) + bufsize);
-		msg = &tmp->msg;
-		msg_init(msg, tmp->buf, bufsize);
-		msg->obj.res = tmp;
+		priv_msg_init(msg = &tmp->msg, tmp->buf, bufsize);
+		msg->obj.res = msg;
 	}
 	sys_unlock();
 
