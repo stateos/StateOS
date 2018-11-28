@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    28.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,6 +35,18 @@
 #include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
+/* -------------------------------------------------------------------------- */
+{
+	core_obj_init(&box->obj);
+
+	box->limit = (bufsize / size) * size;
+	box->size  = size;
+	box->data  = data;
+}
+
+/* -------------------------------------------------------------------------- */
 void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
@@ -47,12 +59,7 @@ void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
 	sys_lock();
 	{
 		memset(box, 0, sizeof(box_t));
-
-		core_obj_init(&box->obj);
-
-		box->limit = (bufsize / size) * size;
-		box->size  = size;
-		box->data  = data;
+		priv_box_init(box, size, data, bufsize);
 	}
 	sys_unlock();
 }
@@ -74,9 +81,8 @@ box_t *box_create( unsigned limit, unsigned size )
 	{
 		bufsize = limit * size;
 		tmp = sys_alloc(sizeof(struct box_T) + bufsize);
-		box = &tmp->box;
-		box_init(box, size, tmp->buf, bufsize);
-		box->obj.res = tmp;
+		priv_box_init(box = &tmp->box, size, tmp->buf, bufsize);
+		box->obj.res = box;
 	}
 	sys_unlock();
 
