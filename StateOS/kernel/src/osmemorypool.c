@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    28.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -59,6 +59,20 @@ void mem_bind( mem_t *mem )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize )
+/* -------------------------------------------------------------------------- */
+{
+	core_obj_init(&mem->lst.obj);
+
+	mem->limit = bufsize / (1 + MEM_SIZE(size)) / sizeof(que_t);
+	mem->size  = MEM_SIZE(size);
+	mem->data  = data;
+
+	mem_bind(mem);
+}
+
+/* -------------------------------------------------------------------------- */
 void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
@@ -71,14 +85,7 @@ void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize )
 	sys_lock();
 	{
 		memset(mem, 0, sizeof(mem_t));
-
-		core_obj_init(&mem->lst.obj);
-
-		mem->limit = bufsize / (1 + MEM_SIZE(size)) / sizeof(que_t);
-		mem->size  = MEM_SIZE(size);
-		mem->data  = data;
-
-		mem_bind(mem);
+		priv_mem_init(mem, size, data, bufsize);
 	}
 	sys_unlock();
 }
@@ -100,9 +107,8 @@ mem_t *mem_create( unsigned limit, unsigned size )
 	{
 		bufsize = limit * (1 + MEM_SIZE(size)) * sizeof(que_t);
 		tmp = sys_alloc(sizeof(struct mem_T) + bufsize);
-		mem = &tmp->mem;
-		mem_init(mem, size, tmp->buf, bufsize);
-		mem->lst.obj.res = tmp;
+		priv_mem_init(mem = &tmp->mem, size, tmp->buf, bufsize);
+		mem->lst.obj.res = mem;
 	}
 	sys_unlock();
 
