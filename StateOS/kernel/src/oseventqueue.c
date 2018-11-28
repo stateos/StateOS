@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    28.11.2018
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,6 +35,17 @@
 #include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_evq_init( evq_t *evq, unsigned *data, unsigned bufsize )
+/* -------------------------------------------------------------------------- */
+{
+	core_obj_init(&evq->obj);
+
+	evq->limit = bufsize / sizeof(unsigned);
+	evq->data  = data;
+}
+
+/* -------------------------------------------------------------------------- */
 void evq_init( evq_t *evq, unsigned *data, unsigned bufsize )
 /* -------------------------------------------------------------------------- */
 {
@@ -46,11 +57,7 @@ void evq_init( evq_t *evq, unsigned *data, unsigned bufsize )
 	sys_lock();
 	{
 		memset(evq, 0, sizeof(evq_t));
-
-		core_obj_init(&evq->obj);
-
-		evq->limit = bufsize / sizeof(unsigned);
-		evq->data  = data;
+		priv_evq_init(evq, data, bufsize);
 	}
 	sys_unlock();
 }
@@ -71,9 +78,8 @@ evq_t *evq_create( unsigned limit )
 	{
 		bufsize = limit * sizeof(unsigned);
 		tmp = sys_alloc(sizeof(struct evq_T) + bufsize);
-		evq = &tmp->evq;
-		evq_init(evq, tmp->buf, bufsize);
-		evq->obj.res = tmp;
+		priv_evq_init(evq = &tmp->evq, tmp->buf, bufsize);
+		evq->obj.res = evq;
 	}
 	sys_unlock();
 
