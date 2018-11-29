@@ -9,4 +9,4 @@ install:
   - arm-none-eabi-gcc --version
 
 script:
-  - bash ./.travis.sh
+  - make all GNUCC=arm-none-eabi- -f makefile.gnucc

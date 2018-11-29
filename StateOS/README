@@ -35,6 +35,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+6.5
+- added functional test
+---------
 6.4
 - removed ID_BLOCKED constant
 - removed ID_IDLE constant

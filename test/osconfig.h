@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    05.11.2018
+    @date    21.11.2018
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -65,12 +65,12 @@
 // OS_HEAP_SIZE == 0 => functions 'xxx_create' use 'malloc' provided with the compiler libraries
 // OS_HEAP_SIZE >  0 => functions 'xxx_create' allocate memory on a dedicated system heap, OS_HEAP_SIZE indicates size of the heap
 // default value: 0
-#define OS_HEAP_SIZE          0
+#define OS_HEAP_SIZE      16384
 
 // ----------------------------
 // default task stack size in bytes
 // default value: 256
-#define OS_STACK_SIZE       512
+#define OS_STACK_SIZE      1024
 
 // ----------------------------
 // idle task stack size in bytes
