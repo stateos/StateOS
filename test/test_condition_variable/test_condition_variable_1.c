@@ -13,7 +13,7 @@ static void proc1()
 static void proc2()
 {
 	unsigned event;
-	                                             assert_stopped(tsk1);
+	                                             assert_dead(tsk1);
 	        tsk_startFrom(tsk1, proc1);
 	event = mtx_wait(mtx1);                      assert_success(event);
 	event = cnd_wait(cnd1, mtx1);                assert_success(event);
@@ -28,7 +28,7 @@ static void test()
 	unsigned event;
 
 	event = mtx_wait(mtx1);                      assert_success(event);
-	                                             assert_stopped(tsk2);
+	                                             assert_dead(tsk2);
 	        tsk_startFrom(tsk2, proc2);
 	event = cnd_wait(cnd1, mtx1);                assert_success(event);
 	event = mtx_give(mtx1);                      assert_success(event);

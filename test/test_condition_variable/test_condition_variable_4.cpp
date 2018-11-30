@@ -39,7 +39,7 @@ static void test()
 }
 
 extern "C"
-void test_condition_variable_3()
+void test_condition_variable_4()
 {
 	int i;
 	TEST_Notify();

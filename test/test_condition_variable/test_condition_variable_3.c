@@ -1,11 +1,13 @@
 #include "test.h"
 
+static_CND(cnd3);
+
 static void proc1()
 {
 	unsigned event;
 
 	event = mtx_wait(mtx1);                      assert_success(event);
-	        cnd_give(cnd2, cndOne);
+	        cnd_give(cnd3, cndOne);
 	event = mtx_give(mtx1);                      assert_success(event);
 	        tsk_stop();
 }
@@ -16,8 +18,8 @@ static void proc2()
 	                                             assert_dead(tsk1);
 	        tsk_startFrom(tsk1, proc1);
 	event = mtx_wait(mtx1);                      assert_success(event);
-	event = cnd_wait(cnd2, mtx1);                assert_success(event);
-	        cnd_give(cnd2, cndOne);
+	event = cnd_wait(cnd3, mtx1);                assert_success(event);
+	        cnd_give(cnd3, cndOne);
 	event = mtx_give(mtx1);                      assert_success(event);
 	event = tsk_join(tsk1);                      assert_success(event);
 	        tsk_stop();
@@ -30,12 +32,12 @@ static void test()
 	event = mtx_wait(mtx1);                      assert_success(event);
 	                                             assert_dead(tsk2);
 	        tsk_startFrom(tsk2, proc2);
-	event = cnd_wait(cnd2, mtx1);                assert_success(event);
+	event = cnd_wait(cnd3, mtx1);                assert_success(event);
 	event = mtx_give(mtx1);                      assert_success(event);
 	event = tsk_join(tsk2);                      assert_success(event);
 }
 
-void test_condition_variable_2()
+void test_condition_variable_3()
 {
 	int i;
 	TEST_Notify();
