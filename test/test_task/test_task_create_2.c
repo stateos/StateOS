@@ -1,9 +1,9 @@
 #include "test.h"
 
-static_TSK_START(tsk6, 6) { tsk_stop(); }
-static_TSK_START(tsk7, 7) { tsk_stop(); }
-static_TSK_START(tsk8, 8) { tsk_stop(); }
-static_TSK_START(tsk9, 9) { tsk_stop(); }
+static_TSK_START(tsk6, 6)      { tsk_stop(); }
+static_TSK_START(tsk7, 7, 512) { tsk_stop(); }
+static_TSK_START(tsk8, 8, 256) { tsk_stop(); }
+static_TSK_START(tsk9, 9)      { tsk_stop(); }
 
 static void test()
 {

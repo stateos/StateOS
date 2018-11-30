@@ -9,9 +9,9 @@ static void test()
 {
 	unsigned event;
 
-	tsk_t *tsk6 = TSK_CREATE(6, proc);
+	tsk_t *tsk6 = TSK_CREATE(6, proc, 256);
 	tsk_id tsk7 = TSK_CREATE(7, proc);
-	tsk_t *tsk8 = TSK_CREATE(8, proc);
+	tsk_t *tsk8 = TSK_CREATE(8, proc, 512);
 	tsk_id tsk9 = TSK_CREATE(9, proc);
 
 	        tsk_start(tsk6);

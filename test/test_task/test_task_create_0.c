@@ -9,8 +9,8 @@ static void test()
 {
 	unsigned event;
 
-	tsk_t tsk6 = TSK_INIT(6, proc);
-	tsk_t tsk7 = TSK_INIT(7, proc);
+	tsk_t tsk6 = TSK_INIT(6, proc, 512);
+	tsk_t tsk7 = TSK_INIT(7, proc, 256);
 	tsk_t tsk8 = TSK_INIT(8, proc);
 	tsk_t tsk9 = TSK_INIT(9, proc);
 
