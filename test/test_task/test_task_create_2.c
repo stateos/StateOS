@@ -7,14 +7,14 @@ static_TSK_START(tsk9, 9) { tsk_stop(); }
 
 static void test()
 {
-	                                             assert_stopped(tsk6);
-	        tsk_start(tsk6);                     assert_stopped(tsk6);
-	                                             assert_stopped(tsk7);
-	        tsk_start(tsk7);                     assert_stopped(tsk7);
-	                                             assert_stopped(tsk8);
-	        tsk_start(tsk8);                     assert_stopped(tsk8);
-	                                             assert_stopped(tsk9);
-	        tsk_start(tsk9);                     assert_stopped(tsk9);
+	                                             assert_dead(tsk6);
+	        tsk_start(tsk6);                     assert_dead(tsk6);
+	                                             assert_dead(tsk7);
+	        tsk_start(tsk7);                     assert_dead(tsk7);
+	                                             assert_dead(tsk8);
+	        tsk_start(tsk8);                     assert_dead(tsk8);
+	                                             assert_dead(tsk9);
+	        tsk_start(tsk9);                     assert_dead(tsk9);
 }
 
 void test_task_create_2()
