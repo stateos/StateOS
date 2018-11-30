@@ -1,5 +1,7 @@
 #include "test.h"
 
+static_EVT(evt3);
+
 static unsigned sent = 0;
 static unsigned received = 0;
 
@@ -7,7 +9,7 @@ static void proc1()
 {
 	unsigned event;
 
- 	event = evt_wait(evt1, &received);           assert_success(event);
+ 	event = evt_wait(evt3, &received);           assert_success(event);
  	                                             assert(sent == received);
 	        tsk_stop();
 }
@@ -15,7 +17,7 @@ static void proc1()
 static void proc2()
 {
 	        sent = rand();
-	        evt_give(evt1, sent);
+	        evt_give(evt3, sent);
 	        tsk_stop();
 }
 
@@ -30,7 +32,7 @@ static void test()
 	event = tsk_join(tsk1);                      assert_success(event);
 }
 
-void test_event_1()
+void test_event_3()
 {
 	int i;
 	TEST_Notify();
