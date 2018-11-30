@@ -1,6 +1,6 @@
 #include "test.h"
 
-static_FLG(flg3, 7);
+static_FLG(flg3, ~0U);
 
 static void proc1()
 {
@@ -14,9 +14,9 @@ static void proc2()
 {
 	unsigned flags;
 
-	flags = flg_give(flg3, 2);                   assert(flags == 7);
-	flags = flg_give(flg3, 4);                   assert(flags == 7);
-	flags = flg_give(flg3, 1);                   assert(flags == 7);
+	flags = flg_give(flg3, 2);                   assert(flags == ~0U);
+	flags = flg_give(flg3, 4);                   assert(flags == ~0U);
+	flags = flg_give(flg3, 1);                   assert(flags == ~0U);
 	        tsk_stop();
 }
 
