@@ -1,9 +1,19 @@
 #include "test.h"
 
-static void proc4()
+static void proc5()
 {
 	unsigned event;
 
+	event = mtx_wait(mtx2);                      assert_failure(event);
+	        tsk_stop();
+}
+
+static void proc4()
+{
+	unsigned event;
+	                                             assert_dead(tsk5);
+	        tsk_startFrom(tsk5, proc5);
+	event = tsk_join(tsk5);                      assert_success(event);
 	event = mtx_wait(mtx2);                      assert_success(event);
 	event = tsk_kill(tsk3);                      assert_success(event);
 	event = mtx_give(mtx2);                      assert_success(event);
@@ -50,12 +60,12 @@ static void test()
 	event = tsk_join(tsk1);                      assert_success(event);
 }
 
-void test_mutex_4()
+void test_mutex_5()
 {
 	int i;
 	TEST_Notify();
-	mtx_init(mtx1, mtxPrioInherit, 0);
-	mtx_init(mtx2, mtxPrioInherit, 0);
+	mtx_init(mtx1, mtxPrioProtect, 4);
+	mtx_init(mtx2, mtxPrioProtect, 4);
 	for (i = 0; i < PASS; i++)
 		test();
 }

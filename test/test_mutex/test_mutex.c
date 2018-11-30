@@ -8,4 +8,5 @@ void test_mutex()
 	TEST_Add(test_mutex_2);
 	TEST_Add(test_mutex_3);
 	TEST_Add(test_mutex_4);
+	TEST_Add(test_mutex_5);
 }

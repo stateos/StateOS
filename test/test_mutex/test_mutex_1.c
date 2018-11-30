@@ -12,7 +12,7 @@ static void proc2()
 
 static void proc1()
 {
-	                                             assert_stopped(tsk2);
+	                                             assert_dead(tsk2);
 	        tsk_startFrom(tsk2, proc2);
 	                                             assert(!"test program cannot be caught here");
 }
@@ -22,7 +22,7 @@ static void test()
 	unsigned event;
 
 	event = mtx_wait(mtx1);                      assert_success(event);
-	                                             assert_stopped(tsk1);
+	                                             assert_dead(tsk1);
 	        tsk_startFrom(tsk1, proc1);
 	event = mtx_give(mtx1);                      assert_success(event);
 	event = tsk_join(tsk2);                      assert_success(event);
