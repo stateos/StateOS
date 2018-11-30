@@ -45,8 +45,8 @@ stm_id stm1 = STM_CREATE(sizeof(unsigned));
 OS_STM(stm2, sizeof(unsigned));
 
 msg_t  msg0 = MSG_INIT(1, sizeof(unsigned));
-msg_id msg1 = MSG_CREATE(2*sizeof(unsigned));
-OS_MSG(msg2, 2*sizeof(unsigned));
+msg_id msg1 = MSG_CREATE(1, sizeof(unsigned));
+OS_MSG(msg2, 1, sizeof(unsigned));
 
 box_t  box0 = BOX_INIT(1, sizeof(unsigned));
 box_id box1 = BOX_CREATE(1, sizeof(unsigned));
