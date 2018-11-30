@@ -1,5 +1,7 @@
 #include "test.h"
 
+static_EVQ(evq3, 1);
+
 static unsigned sent = 0;
 static unsigned received = 0;
 
@@ -7,7 +9,7 @@ static void proc1()
 {
 	unsigned event;
 
- 	event = evq_wait(evq2, &received);           assert_success(event);
+ 	event = evq_wait(evq3, &received);           assert_success(event);
  	                                             assert(sent == received);
 	        tsk_stop();
 }
@@ -17,7 +19,7 @@ static void proc2()
 	unsigned event;
 
 	        sent = rand();
-	event = evq_give(evq2, sent);                assert_success(event);
+	event = evq_give(evq3, sent);                assert_success(event);
 	        tsk_stop();
 }
 
@@ -32,7 +34,7 @@ static void test()
 	event = tsk_join(tsk1);                      assert_success(event);
 }
 
-void test_event_queue_2()
+void test_event_queue_3()
 {
 	int i;
 	TEST_Notify();
