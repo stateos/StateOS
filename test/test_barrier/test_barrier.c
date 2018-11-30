@@ -6,4 +6,5 @@ void test_barrier()
 	TEST_Add(test_barrier_0);
 	TEST_Add(test_barrier_1);
 	TEST_Add(test_barrier_2);
+	TEST_Add(test_barrier_3);
 }
