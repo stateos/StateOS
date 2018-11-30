@@ -1,7 +1,7 @@
 #include "test.h"
 
-#define       LOOP 3
-#define       SIZE 32
+#define       LOOP 7
+#define       SIZE 64
 
 static fun_t *test[SIZE];
 static int    count = 0;

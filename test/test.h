@@ -9,8 +9,13 @@
 
 #define assert_success(event)  do { (void)(event); assert((event) == E_SUCCESS); } while (0)
 #define assert_failure(event)  do { (void)(event); assert((event) == E_FAILURE); } while (0)
+#define assert_stopped(event)  do { (void)(event); assert((event) == E_STOPPED); } while (0)
+#define assert_deleted(event)  do { (void)(event); assert((event) == E_DELETED); } while (0)
+#define assert_timeout(event)  do { (void)(event); assert((event) == E_TIMEOUT); } while (0)
+#define assert_owndead(event)  do { (void)(event); assert((event) == OWNERDEAD); } while (0)
 
-#define assert_stopped(tsk)    do { (void)(tsk);   assert((tsk)->hdr.id == ID_STOPPED); } while (0)
+#define assert_dead(tsk)       do { (void)(tsk);   assert((tsk)->hdr.id == ID_STOPPED); } while (0)
+#define assert_ready(tsk)      do { (void)(tsk);   assert((tsk)->hdr.id == ID_READY);   } while (0)
 
 #ifdef  __cplusplus
 extern "C" {
