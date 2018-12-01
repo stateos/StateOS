@@ -1,5 +1,9 @@
 #include "test_resources.h"
 
+one_t  one0 = ONE_INIT();
+one_id one1 = ONE_CREATE();
+OS_ONE(one2);
+
 evt_t  evt0 = EVT_INIT();
 evt_id evt1 = EVT_CREATE();
 OS_EVT(evt2);

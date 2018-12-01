@@ -2,6 +2,10 @@
 
 #pragma once
 
+extern one_t  one0;
+extern one_id one1;
+extern one_id one2;
+
 extern evt_t  evt0;
 extern evt_id evt1;
 extern evt_id evt2;
