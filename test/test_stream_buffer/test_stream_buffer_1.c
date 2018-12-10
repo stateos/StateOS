@@ -1,42 +1,78 @@
 #include "test.h"
 
-static unsigned sent = 0;
-static unsigned received = 0;
+#define SIZE sizeof(unsigned)
 
-static void proc1()
+static_STM(stm3, SIZE);
+
+static unsigned sent;
+
+static void proc3()
 {
-	unsigned length;
+	unsigned bytes;
+	unsigned event;
 
- 	length = stm_wait(stm1, &received, sizeof(received));
- 	                                             assert(length == sizeof(received));
- 	                                             assert(sent == received);
+ 	bytes = stm_wait(stm3, &event, SIZE);        assert(bytes == SIZE);
+	                                             assert(event == sent);
+	event = stm_give(stm2, &event, SIZE);        assert_success(event);
 	        tsk_stop();
 }
 
 static void proc2()
 {
+	unsigned bytes;
 	unsigned event;
+		                                         assert_dead(tsk3);
+	        tsk_startFrom(tsk3, proc3);
+ 	bytes = stm_wait(stm2, &event, SIZE);        assert(bytes == SIZE);
+ 	                                             assert(event == sent);
+	event = stm_give(stm3, &event, SIZE);        assert_success(event);
+ 	bytes = stm_wait(stm2, &event, SIZE);        assert(bytes == SIZE);
+	                                             assert(event == sent);
+	event = stm_give(stm1, &event, SIZE);        assert_success(event);
+	event = tsk_join(tsk3);                      assert_success(event);
+	        tsk_stop();
+}
 
+static void proc1()
+{
+	unsigned bytes;
+	unsigned event;
+		                                         assert_dead(tsk2);
+	        tsk_startFrom(tsk2, proc2);
+ 	bytes = stm_wait(stm1, &event, SIZE);        assert(bytes == SIZE);
+ 	                                             assert(event == sent);
+	event = stm_give(stm2, &event, SIZE);        assert_success(event);
+ 	bytes = stm_wait(stm1, &event, SIZE);        assert(bytes == SIZE);
+ 	                                             assert(event == sent);
+	event = stm_give(&stm0, &event, SIZE);       assert_success(event);
+	event = tsk_join(tsk2);                      assert_success(event);
+	        tsk_stop();
+}
+
+static void proc0()
+{
+	unsigned bytes;
+	unsigned event;
+		                                         assert_dead(tsk1);
+	        tsk_startFrom(tsk1, proc1);
 	        sent = rand();
-	event = stm_give(stm1, &sent, sizeof(sent)); assert_success(event);
+	event = stm_give(stm1, &sent, SIZE);         assert_success(event);
+ 	bytes = stm_wait(&stm0, &event, SIZE);       assert(bytes == SIZE);
+ 	                                             assert(event == sent);
+	event = tsk_join(tsk1);                      assert_success(event);
 	        tsk_stop();
 }
 
 static void test()
 {
 	unsigned event;
-		                                         assert_dead(tsk1);
-	        tsk_startFrom(tsk1, proc1);
-		                                         assert_dead(tsk2);
-	        tsk_startFrom(tsk2, proc2);
-	event = tsk_join(tsk2);                      assert_success(event);
-	event = tsk_join(tsk1);                      assert_success(event);
+		                                         assert_dead(&tsk0);
+	        tsk_startFrom(&tsk0, proc0);
+	event = tsk_join(&tsk0);                     assert_success(event);
 }
 
 void test_stream_buffer_1()
 {
-	int i;
 	TEST_Notify();
-	for (i = 0; i < PASS; i++)
-		test();
+	TEST_Call();
 }
