@@ -21,7 +21,8 @@
 extern "C" {
 #endif
 
-void test_add(fun_t *fun);
+void test_add (fun_t *fun);
+void test_call(fun_t *fun);
 
 #ifdef  __cplusplus
 }
@@ -29,6 +30,7 @@ void test_add(fun_t *fun);
 
 #define TEST_Add(fun)          do { void fun (void); test_add(fun); } while (0)
 #define TEST_AddUnit(unit)     do { void unit(void); unit();        } while (0)
+#define TEST_Call()            do { test_call(test);                } while (0)
 
 #ifdef  DEBUG
 #ifdef  __CSMC__

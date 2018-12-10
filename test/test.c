@@ -1,8 +1,9 @@
 #include "test.h"
 
-#define       LOOP 7
+#define       LOOP 1
 #define       SIZE 64
 
+static cnt_t  summary = 0;
 static fun_t *test[SIZE];
 static int    count = 0;
 
@@ -10,6 +11,18 @@ void test_add(fun_t *fun)
 {
 	assert(count < SIZE);
 	test[count++] = fun;
+}
+
+void test_call(fun_t *fun)
+{
+	int i;
+	cnt_t t = sys_time();
+	for (i = 0; i < PASS; i++)
+		fun();
+	summary += t = sys_time() - t;
+#ifdef DEBUG
+	printf("%30u\n", (unsigned) t);
+#endif
 }
 
 static void test_init()
@@ -22,6 +35,9 @@ static void test_init()
 static void test_fini()
 {
 	TEST_Notify();
+#ifdef DEBUG
+	printf("%30u\n", (unsigned) summary);
+#endif
 	LEDs = 15;
 }
 
