@@ -31,8 +31,6 @@ static void test()
 
 void test_flag_1()
 {
-	int i;
 	TEST_Notify();
-	for (i = 0; i < PASS; i++)
-		test();
+	TEST_Call();
 }
