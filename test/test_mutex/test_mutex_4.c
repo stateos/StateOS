@@ -52,10 +52,8 @@ static void test()
 
 void test_mutex_4()
 {
-	int i;
 	TEST_Notify();
 	mtx_init(mtx1, mtxPrioInherit, 0);
 	mtx_init(mtx2, mtxPrioInherit, 0);
-	for (i = 0; i < PASS; i++)
-		test();
+	TEST_Call();
 }
