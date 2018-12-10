@@ -30,9 +30,7 @@ static void test()
 
 void test_mutex_0()
 {
-	int i;
 	TEST_Notify();
 	mtx_init(&mtx0, mtxPrioInherit, 0);
-	for (i = 0; i < PASS; i++)
-		test();
+	TEST_Call();
 }
