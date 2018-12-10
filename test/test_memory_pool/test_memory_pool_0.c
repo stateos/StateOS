@@ -38,9 +38,7 @@ static void test()
 
 void test_memory_pool_0()
 {
-	int i;
 	TEST_Notify();
 	mem_bind(&mem0);
-	for (i = 0; i < PASS; i++)
-		test();
+	TEST_Call();
 }
