@@ -62,10 +62,8 @@ static void test()
 
 void test_mutex_5()
 {
-	int i;
 	TEST_Notify();
 	mtx_init(mtx1, mtxPrioProtect, 4);
 	mtx_init(mtx2, mtxPrioProtect, 4);
-	for (i = 0; i < PASS; i++)
-		test();
+	TEST_Call();
 }
