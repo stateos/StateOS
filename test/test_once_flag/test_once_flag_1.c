@@ -2,7 +2,7 @@
 
 static_ONE(one3);
 
-static int counter = 0;
+static int counter;
 
 static void proc()
 {
@@ -44,7 +44,7 @@ static void proc0()
 	unsigned event;
 		                                         assert_dead(tsk1);
 	        tsk_startFrom(tsk1, proc1);
-	        one_call(&one0, proc);               assert(counter == 4);
+	        one_call(&one0, proc);               assert(counter == 1 || counter == 4);
 	event = tsk_join(tsk1);                      assert_success(event);
 	        tsk_stop();
 }
