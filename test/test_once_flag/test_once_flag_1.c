@@ -2,7 +2,7 @@
 
 static_ONE(one3);
 
-static int counter;
+static int counter = 0;
 
 static void proc()
 {
