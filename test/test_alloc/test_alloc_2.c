@@ -18,8 +18,8 @@ static void proc2()
 
 	event = sem_wait(sem);                       assert_success(event);
 	        sem_delete(sem);
-	sem = sem_create(0, semBinary);              assert(sem);
-	tsk = tsk_create(3, proc3);                  assert(tsk);
+	sem   = sem_create(0, semBinary);            assert(sem);
+	tsk   = tsk_create(3, proc3);                assert(tsk);
 	event = sem_give(sem);                       assert_success(event);
 	event = tsk_join(tsk);                       assert_success(event);
 	        tsk_stop();
@@ -32,8 +32,8 @@ static void proc1()
 
 	event = sem_wait(sem);                       assert_success(event);
 	        sem_delete(sem);
-	sem = sem_create(0, semBinary);              assert(sem);
-	tsk = tsk_create(2, proc2);                  assert(tsk);
+	sem   = sem_create(0, semBinary);            assert(sem);
+	tsk   = tsk_create(2, proc2);                assert(tsk);
 	event = sem_give(sem);                       assert_success(event);
 	event = tsk_join(tsk);                       assert_success(event);
 	        tsk_stop();
@@ -46,8 +46,8 @@ static void proc0()
 
 	event = sem_wait(sem);                       assert_success(event);
 	        sem_delete(sem);
-	sem = sem_create(0, semBinary);              assert(sem);
-	tsk = tsk_create(1, proc1);                  assert(tsk);
+	sem   = sem_create(0, semBinary);            assert(sem);
+	tsk   = tsk_create(1, proc1);                assert(tsk);
 	event = sem_give(sem);                       assert_success(event);
 	event = tsk_join(tsk);                       assert_success(event);
 	        tsk_stop();
