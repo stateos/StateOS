@@ -19,7 +19,7 @@ static void proc2()
 	unsigned received;
 	unsigned event;
 		                                         assert_dead(tsk3);
-	        tsk_startFrom(tsk3, proc3);
+	        tsk_startFrom(tsk3, proc3);          assert_ready(tsk3);
  	event = evt_wait(evt2, &received);           assert_success(event);
  	                                             assert(received == sent);
 	        evt_give(evt3, received);
@@ -32,7 +32,7 @@ static void proc1()
 	unsigned received;
 	unsigned event;
 		                                         assert_dead(tsk2);
-	        tsk_startFrom(tsk2, proc2);
+	        tsk_startFrom(tsk2, proc2);          assert_ready(tsk2);
  	event = evt_wait(evt1, &received);           assert_success(event);
  	                                             assert(received == sent);
 	        evt_give(evt2, received);
@@ -44,7 +44,7 @@ static void proc0()
 {
 	unsigned event;
 		                                         assert_dead(tsk1);
-	        tsk_startFrom(tsk1, proc1);
+	        tsk_startFrom(tsk1, proc1);          assert_ready(tsk1);
 	        sent = rand();
 	        evt_give(evt1, sent);
 	event = tsk_join(tsk1);                      assert_success(event);
