@@ -22,7 +22,7 @@ static void proc2()
 
 	event = mtx_wait(mtx2);                      assert_success(event);
 	                                             assert_dead(tsk3);
-	        tsk_startFrom(tsk3, proc3);
+	        tsk_startFrom(tsk3, proc3);          assert_ready(tsk3);
 	event = mtx_wait(mtx3);                      assert_success(event);
 	        cnd_give(cnd3, cndOne);
 	event = mtx_give(mtx3);                      assert_success(event);
@@ -42,7 +42,7 @@ static void proc1()
 
 	event = mtx_wait(mtx1);                      assert_success(event);
 	                                             assert_dead(tsk2);
-	        tsk_startFrom(tsk2, proc2);
+	        tsk_startFrom(tsk2, proc2);          assert_ready(tsk2);
 	event = mtx_wait(mtx2);                      assert_success(event);
 	        cnd_give(cnd2, cndOne);
 	event = mtx_give(mtx2);                      assert_success(event);
@@ -62,7 +62,7 @@ static void proc0()
 
 	event = mtx_wait(&mtx0);                     assert_success(event);
 	                                             assert_dead(tsk1);
-	        tsk_startFrom(tsk1, proc1);
+	        tsk_startFrom(tsk1, proc1);          assert_ready(tsk1);
 	event = mtx_wait(mtx1);                      assert_success(event);
 	        cnd_give(cnd1, cndOne);
 	event = mtx_give(mtx1);                      assert_success(event);
@@ -76,7 +76,7 @@ static void test()
 {
 	unsigned event;
 	                                             assert_dead(&tsk0);
-	        tsk_startFrom(&tsk0, proc0);
+	        tsk_startFrom(&tsk0, proc0);         assert_ready(&tsk0);
 	event = tsk_join(&tsk0);                     assert_success(event);
 }
 
