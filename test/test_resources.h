@@ -80,7 +80,9 @@ extern tsk_id tsk5;
 
 #ifdef  __cplusplus
 
-extern TaskT<1024> Tsk1;
-extern Task        Tsk2;
+extern Task        Tsk0;
+extern Task        Tsk1;
+extern TaskT<512>  Tsk2;
+extern TaskT<1024> Tsk3;
 
 #endif
