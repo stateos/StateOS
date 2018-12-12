@@ -16,11 +16,11 @@ static void proc3()
 static void proc2()
 {
 	unsigned event;
-		                                         assert_dead(tsk3);
-	        tsk_startFrom(tsk3, proc3);          assert_ready(tsk3);
+		                                         assert(!Tsk3);
+	        Tsk3.startFrom(proc3);               assert(!!Tsk3);
 	event = Bar2.wait();                         assert_success(event);
 	event = Bar3.wait();                         assert_success(event);
-	event = tsk_join(tsk3);                      assert_success(event);
+	event = Tsk3.join();                         assert_success(event);
 	        ThisTask::stop();
 }
 
