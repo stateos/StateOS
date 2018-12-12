@@ -22,7 +22,7 @@ static void proc1()
 	unsigned event;
 	tsk = sys_alloc(sizeof(tsk_t));              assert(tsk);
 	stk = malloc(OS_STACK_SIZE);                 assert(stk);
-	tsk_init(tsk, 2, proc2, stk, OS_STACK_SIZE);
+	tsk_init(tsk, 2, proc2, stk, OS_STACK_SIZE); assert_dead(tsk);
 	event = tsk_join(tsk);                       assert_success(event);
 	sys_free(tsk);
 	free(stk);
