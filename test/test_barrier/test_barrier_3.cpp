@@ -52,13 +52,13 @@ static void proc0()
 static void test()
 {
 	unsigned event;
-		                                         assert_dead(&tsk0);
-	        tsk_startFrom(&tsk0, proc0);         assert_ready(&tsk0);
+		                                         assert(!Tsk0);
+	        Tsk0.startFrom(proc0);               assert(!!Tsk0);
 	event = Bar0.wait();                         assert_success(event);
 	event = Bar1.wait();                         assert_success(event);
 	event = Bar2.wait();                         assert_success(event);
 	event = Bar3.wait();                         assert_success(event);
-	event = tsk_join(&tsk0);                     assert_success(event);
+	event = Tsk0.join();                         assert_success(event);
 }
 
 extern "C"
