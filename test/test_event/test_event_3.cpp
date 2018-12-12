@@ -1,5 +1,6 @@
 #include "test.h"
 
+static auto Evt0 = Event();
 static auto Evt1 = Event();
 static auto Evt2 = Event();
 static auto Evt3 = Event();
@@ -44,11 +45,13 @@ static void proc1()
 
 static void proc0()
 {
+	unsigned received;
 	unsigned event;
 		                                         assert(!Tsk1);
 	        Tsk1.startFrom(proc1);               assert(!!Tsk1);
-	        sent = rand();
-	        Evt1.give(sent);
+ 	event = Evt0.wait(&received);                assert_success(event);
+ 	                                             assert(received == sent);
+	        Evt1.give(received);
 	event = Tsk1.join();                         assert_success(event);
 	        ThisTask::stop();
 }
@@ -57,7 +60,10 @@ static void test()
 {
 	unsigned event;
 		                                         assert(!Tsk0);
-	        Tsk0.startFrom(proc0);
+	        Tsk0.startFrom(proc0);               assert(!!Tsk0);
+	        ThisTask::yield();
+	        ThisTask::yield();
+	        Evt0.give(sent = rand());
 	event = Tsk0.join();                         assert_success(event);
 }
 
