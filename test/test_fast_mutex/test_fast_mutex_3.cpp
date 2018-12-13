@@ -13,6 +13,7 @@ static void proc3()
 	event = Mut3.wait();                         assert_success(event);
 	event = Mut3.take();                         assert_failure(event);
 	event = Mut3.give();                         assert_success(event);
+	event = Mut3.give();                         assert_failure(event);
 	        ThisTask::stop();
 }
 
@@ -27,6 +28,7 @@ static void proc2()
 	        Tsk3.startFrom(proc3);               assert(!Tsk3);
 	event = Tsk3.join();                         assert_success(event);
 	event = Mut2.give();                         assert_success(event);
+	event = Mut2.give();                         assert_failure(event);
 	        ThisTask::stop();
 }
 
@@ -41,6 +43,7 @@ static void proc1()
 	        Tsk2.startFrom(proc2);               assert(!Tsk2);
 	event = Tsk2.join();                         assert_success(event);
 	event = Mut1.give();                         assert_success(event);
+	event = Mut1.give();                         assert_failure(event);
 	        ThisTask::stop();
 }
 
@@ -54,6 +57,7 @@ static void proc0()
 	        Tsk1.startFrom(proc1);               assert(!Tsk1);
 	event = Tsk1.join();                         assert_success(event);
 	event = Mut0.give();                         assert_success(event);
+	event = Mut0.give();                         assert_failure(event);
 	        ThisTask::stop();
 }
 
