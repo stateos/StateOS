@@ -30,10 +30,10 @@ static void proc2()
 	event = Mtx2.wait();                         assert_success(event);
 	                                             assert(!Tsk3);
 	        Tsk3.startFrom(proc3);               assert(!!Tsk3);
+	event = Cnd2.wait(Mtx2);                     assert_success(event);
 	event = Mtx3.wait();                         assert_success(event);
 	        Cnd3.give(cndOne);
 	event = Mtx3.give();                         assert_success(event);
-	event = Cnd2.wait(Mtx2);                     assert_success(event);
 	event = Cnd2.wait(Mtx2);                     assert_success(event);
 	event = Mtx1.wait();                         assert_success(event);
 	        Cnd1.give(cndOne);
@@ -50,10 +50,10 @@ static void proc1()
 	event = Mtx1.wait();                         assert_success(event);
 	                                             assert(!Tsk2);
 	        Tsk2.startFrom(proc2);               assert(!!Tsk2);
+	event = Cnd1.wait(Mtx1);                     assert_success(event);
 	event = Mtx2.wait();                         assert_success(event);
 	        Cnd2.give(cndOne);
 	event = Mtx2.give();                         assert_success(event);
-	event = Cnd1.wait(Mtx1);                     assert_success(event);
 	event = Cnd1.wait(Mtx1);                     assert_success(event);
 	event = Mtx0.wait();                         assert_success(event);
 	        Cnd0.give(cndOne);
@@ -70,6 +70,7 @@ static void proc0()
 	event = Mtx0.wait();                         assert_success(event);
 	                                             assert(!Tsk1);
 	        Tsk1.startFrom(proc1);               assert(!!Tsk1);
+	event = Cnd0.wait(Mtx0);                     assert_success(event);
 	event = Mtx1.wait();                         assert_success(event);
 	        Cnd1.give(cndOne);
 	event = Mtx1.give();                         assert_success(event);
@@ -84,6 +85,11 @@ static void test()
 	unsigned event;
 	                                             assert(!Tsk0);
 	        Tsk0.startFrom(proc0);               assert(!!Tsk0);
+	        ThisTask::yield();
+	        ThisTask::yield();
+	event = Mtx0.wait();                         assert_success(event);
+	        Cnd0.give(cndOne);
+	event = Mtx0.give();                         assert_success(event);
 	event = Tsk0.join();                         assert_success(event);
 }
 
