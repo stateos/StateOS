@@ -2,7 +2,7 @@
 
 void test_alloc()
 {
-	TEST_Notify();
+	UNIT_Notify();
 	TEST_Add(test_alloc_0);
 	TEST_Add(test_alloc_1);
 	TEST_Add(test_alloc_2);
