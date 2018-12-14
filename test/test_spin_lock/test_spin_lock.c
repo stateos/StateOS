@@ -2,5 +2,5 @@
 
 void test_spin_lock()
 {
-	TEST_Notify();
+	UNIT_Notify();
 }
