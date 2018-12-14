@@ -2,7 +2,7 @@
 
 void test_message_buffer()
 {
-	TEST_Notify();
+	UNIT_Notify();
 	TEST_Add(test_message_buffer_1);
 #ifndef __CSMC__
 	TEST_Add(test_message_buffer_2);
