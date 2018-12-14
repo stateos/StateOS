@@ -2,7 +2,7 @@
 
 void test_flag()
 {
-	TEST_Notify();
+	UNIT_Notify();
 	TEST_Add(test_flag_1);
 #ifndef __CSMC__
 	TEST_Add(test_flag_2);
