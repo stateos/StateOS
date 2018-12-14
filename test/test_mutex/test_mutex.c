@@ -2,7 +2,7 @@
 
 void test_mutex()
 {
-	TEST_Notify();
+	UNIT_Notify();
 	TEST_Add(test_mutex_1);
 	TEST_Add(test_mutex_2);
 	TEST_Add(test_mutex_3);
