@@ -2,7 +2,7 @@
 
 void test_stream_buffer()
 {
-	TEST_Notify();
+	UNIT_Notify();
 	TEST_Add(test_stream_buffer_1);
 #ifndef __CSMC__
 	TEST_Add(test_stream_buffer_2);
