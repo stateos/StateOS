@@ -27,10 +27,7 @@ void test_call(fun_t *fun)
 
 static void test_init()
 {
-	TEST_Notify();
-#ifdef DEBUG
-	puts("");
-#endif
+	UNIT_Notify();
 	LED_Init();
 	srand(0);
 }
