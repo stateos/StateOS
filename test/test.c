@@ -36,7 +36,7 @@ static void test_fini()
 {
 	TEST_Notify();
 #ifdef DEBUG
-	printf(", %u\n", (unsigned) summary);
+	printf(": %u\n", (unsigned) summary);
 #endif
 	LEDs = 15;
 }
