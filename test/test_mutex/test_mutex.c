@@ -8,5 +8,6 @@ void test_mutex()
 	TEST_Add(test_mutex_3);
 #ifndef __CSMC__
 	TEST_Add(test_mutex_4);
+	TEST_Add(test_mutex_5);
 #endif
 }
