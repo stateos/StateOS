@@ -1,6 +1,25 @@
 #include "test.h"
 
-static_MTX(mtx3, mtxErrorCheck);
+static_MTX(mtx3, mtxRobust);
+
+static void proc5()
+{
+	unsigned event;
+
+	event = mtx_wait(mtx3);                      assert_owndead(event);
+	event = mtx_give(mtx3);                      assert_success(event);
+	        tsk_stop();
+}
+
+static void proc4()
+{
+	unsigned event;
+
+	event = mtx_wait(mtx3);                      assert_success(event);
+	                                             assert_dead(tsk5);
+	        tsk_startFrom(tsk5, proc5);          assert_ready(tsk5);
+	event = mtx_wait(mtx1);                      assert(!"test program cannot be caught here");
+}
 
 static void proc3()
 {
@@ -8,9 +27,13 @@ static void proc3()
 
 	event = mtx_take(mtx2);                      assert_timeout(event);
 	event = mtx_wait(mtx3);                      assert_success(event);
-	event = mtx_take(mtx3);                      assert_failure(event);
+	event = mtx_take(mtx3);                      assert_timeout(event);
+	                                             assert_dead(tsk4);
+	        tsk_startFrom(tsk4, proc4);          assert_ready(tsk4);
 	event = mtx_give(mtx3);                      assert_success(event);
 	event = mtx_give(mtx3);                      assert_failure(event);
+	event = tsk_kill(tsk4);                      assert_success(event);
+	event = tsk_join(tsk5);                      assert_success(event);
 	        tsk_stop();
 }
 
