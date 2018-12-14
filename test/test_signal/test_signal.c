@@ -2,7 +2,7 @@
 
 void test_signal()
 {
-	TEST_Notify();
+	UNIT_Notify();
 	TEST_Add(test_signal_1);
 #ifndef __CSMC__
 	TEST_Add(test_signal_2);
