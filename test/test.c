@@ -21,13 +21,16 @@ void test_call(fun_t *fun)
 		fun();
 	summary += t = sys_time() - t;
 #ifdef DEBUG
-	printf("%30u\n", (unsigned) t);
+	printf(": %u\n", (unsigned) t);
 #endif
 }
 
 static void test_init()
 {
 	TEST_Notify();
+#ifdef DEBUG
+	puts("");
+#endif
 	LED_Init();
 	srand(0);
 }
@@ -36,7 +39,7 @@ static void test_fini()
 {
 	TEST_Notify();
 #ifdef DEBUG
-	printf("%30u\n", (unsigned) summary);
+	printf(", %u\n", (unsigned) summary);
 #endif
 	LEDs = 15;
 }
