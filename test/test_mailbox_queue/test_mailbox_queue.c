@@ -2,7 +2,7 @@
 
 void test_mailbox_queue()
 {
-	TEST_Notify();
+	UNIT_Notify();
 	TEST_Add(test_mailbox_queue_1);
 #ifndef __CSMC__
 	TEST_Add(test_mailbox_queue_2);
