@@ -84,5 +84,7 @@ extern Task        Tsk0;
 extern Task        Tsk1;
 extern TaskT<512>  Tsk2;
 extern TaskT<1024> Tsk3;
+extern Task        Tsk4;
+extern Task        Tsk5;
 
 #endif
