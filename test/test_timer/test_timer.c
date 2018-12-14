@@ -2,5 +2,5 @@
 
 void test_timer()
 {
-	TEST_Notify();
+	UNIT_Notify();
 }
