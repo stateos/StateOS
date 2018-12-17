@@ -13,8 +13,7 @@ static void proc4()
 static void proc3()
 {
 	                                             assert_dead(tsk4);
-	        tsk_startFrom(tsk4, proc4);
-	                                             assert(!"test program cannot be caught here");
+	        tsk_startFrom(tsk4, proc4);          assert(!"test program cannot be caught here");
 }
 
 static void proc2()
@@ -32,8 +31,7 @@ static void proc2()
 static void proc1()
 {
 	                                             assert_dead(tsk2);
-	        tsk_startFrom(tsk2, proc2);
-	                                             assert(!"test program cannot be caught here");
+	        tsk_startFrom(tsk2, proc2);          assert(!"test program cannot be caught here");
 }
 
 static void test()
