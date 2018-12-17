@@ -71,7 +71,7 @@ static void proc0()
 static void test()
 {
 	unsigned event;
-		                                         assert(!Tsk0);
+	                                             assert(!Tsk0);
 	        Tsk0.startFrom(proc0);               assert(!!Tsk0);
 	        ThisTask::yield();
 	        ThisTask::yield();
