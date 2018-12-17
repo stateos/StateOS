@@ -9,8 +9,8 @@ static void test()
 {
 	unsigned event;
 
-	tsk_t *tsk6 = wrk_create(6, proc, 256);
-	tsk_t *tsk7 = tsk_create(7, proc);
+	tsk_t *tsk6 = tsk_create(6, proc);
+	tsk_t *tsk7 = wrk_create(7, proc, 256);
 	tsk_t *tsk8 = wrk_create(8, proc, 512);
 	tsk_t *tsk9 = tsk_create(9, proc);
 
