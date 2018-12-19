@@ -1,7 +1,7 @@
 #include "test.h"
 
 #define       LOOP 1
-#define       SIZE 64
+#define       SIZE 66
 
 static cnt_t  summary = 0;
 static fun_t *test[SIZE];
@@ -21,13 +21,16 @@ void test_call(fun_t *fun)
 		fun();
 	summary += t = sys_time() - t;
 #ifdef DEBUG
-	printf(": %u\n", (unsigned) t);
+//	printf(": %u\n", (unsigned) t);
 #endif
 }
 
 static void test_init()
 {
-	UNIT_Notify();
+	TEST_Notify();
+#ifdef DEBUG
+//	printf(": %d / %d\n", count, SIZE);
+#endif
 	LED_Init();
 	srand(0);
 }
@@ -36,7 +39,7 @@ static void test_fini()
 {
 	TEST_Notify();
 #ifdef DEBUG
-	printf(": %u\n", (unsigned) summary);
+//	printf(": %u\n", (unsigned) summary);
 #endif
 	LEDs = 15;
 }

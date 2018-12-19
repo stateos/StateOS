@@ -75,7 +75,7 @@
 // ----------------------------
 // idle task stack size in bytes
 // default value: 128
-#define OS_IDLE_STACK       128
+#define OS_IDLE_STACK       256
 
 // ----------------------------
 // bit size of system timer counter

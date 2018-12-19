@@ -2,6 +2,10 @@
 
 #pragma once
 
+extern spn_t  spn0;
+extern spn_id spn1;
+extern spn_id spn2;
+
 extern one_t  one0;
 extern one_id one1;
 extern one_id one2;
@@ -69,7 +73,6 @@ extern job_id job2;
 extern tmr_t  tmr0;
 extern tmr_id tmr1;
 extern tmr_id tmr2;
-extern tmr_id tmr3;
 
 extern tsk_t  tsk0;
 extern tsk_id tsk1;

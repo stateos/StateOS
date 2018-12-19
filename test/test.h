@@ -35,10 +35,10 @@ void test_call(fun_t *fun);
 #ifdef  DEBUG
 #ifdef  __CSMC__
 #define UNIT_Notify()          puts(__FILE__)
-#define TEST_Notify()          printf(__FILE__)
+#define TEST_Notify()          puts(__FILE__)
 #else//!__CSMC__
 #define UNIT_Notify()          puts(__FUNCTION__)
-#define TEST_Notify()          printf(__FUNCTION__)
+#define TEST_Notify()          puts(__FUNCTION__)
 #endif//__CSMC__
 #else//!DEBUG
 #define UNIT_Notify()          LED_Tick()

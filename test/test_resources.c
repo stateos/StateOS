@@ -1,5 +1,9 @@
 #include "test_resources.h"
 
+spn_t  spn0 = SPN_INIT();
+spn_id spn1 = SPN_CREATE();
+OS_SPN(spn2);
+
 one_t  one0 = ONE_INIT();
 one_id one1 = ONE_CREATE();
 OS_ONE(one2);
@@ -67,7 +71,6 @@ OS_JOB(job2, 1);
 tmr_t  tmr0 = TMR_INIT(0);
 tmr_id tmr1 = TMR_CREATE(0);
 OS_TMR(tmr2, NULL);
-OS_TMR_DEF(tmr3) {}
 
 tsk_t  tsk0 = TSK_INIT(0, NULL);
 tsk_id tsk1 = TSK_CREATE(1, NULL);
