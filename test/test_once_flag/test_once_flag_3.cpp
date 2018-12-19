@@ -11,7 +11,7 @@ static void proc()
 {
 	CriticalSection cs;
 
-		    counter++;
+	        counter++;
 }
 
 static void proc3()
