@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     29.11.2018
+#date     24.12.2018
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -93,6 +93,8 @@ TXTS       := $(OBJS:.o=.txt)
 COMMON_F    = --target=arm-arm-none-eabi -mthumb -mcpu=cortex-m4
 ifneq ($(MAKECMDGOALS),qemu)
 COMMON_F   += -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffast-math
+else
+DEFS       += QEMU
 endif
 COMMON_F   += -O$(OPTF) -ffunction-sections -fdata-sections
 ifneq ($(filter USE_LTO,$(DEFS)),)

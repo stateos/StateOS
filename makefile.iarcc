@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     29.11.2018
+#date     24.12.2018
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -14,7 +14,7 @@ QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board 
 #----------------------------------------------------------#
 
 PROJECT    ?= $(notdir $(CURDIR))
-DEFS       ?= DEBUG USE_SEMIHOST
+DEFS       ?= DEBUG USE_SEMIHOST port_sys_init=__iar_init_core
 DIRS       ?=
 INCS       ?=
 LIBS       ?=
@@ -92,6 +92,8 @@ LSTS       := $(OBJS:.o=.lst)
 CORE_F     := --cpu Cortex-M4
 ifneq ($(MAKECMDGOALS),qemu)
 CORE_F     += --fpu VFPv4_sp
+else
+DEFS       += QEMU
 endif
 COMMON_F    = --thumb -O$(OPTF) -e --dependencies=m $*.d
 AS_FLAGS    = -S -s+ -w+

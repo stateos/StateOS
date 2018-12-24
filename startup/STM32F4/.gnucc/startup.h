@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     21.11.2017
+@date     21.12.2018
 @brief    Startup file header for gcc compiler.
 *******************************************************************************/
 
@@ -29,8 +29,6 @@ __WEAK      void software_init_hook( void );
 __NO_RETURN void             _start( void );
 
 #endif//USE_CRT
-
-__NO_RETURN __ALIAS(Fault_Handler) void _exit( int );
 
 /*******************************************************************************
  Symbols defined in linker script

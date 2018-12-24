@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     29.11.2018
+#date     24.12.2018
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -29,6 +29,7 @@ KEYS       += .csmcc .cortexm .stm32f4 *
 ifneq ($(MAKECMDGOALS),qemu)
 LIBS       += crtsi libfpulc libilc libm
 else
+DEFS       += QEMU
 LIBS       += crtsi libflc   libilc libm
 endif
 MODEL      := modlc

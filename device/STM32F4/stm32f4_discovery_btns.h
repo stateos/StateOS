@@ -1,13 +1,14 @@
 /******************************************************************************
  * @file    stm32f4_discovery_btns.h
  * @author  Rajmund Szymanski
- * @date    23.03.2017
+ * @date    24.12.2018
  * @brief   This file contains definitions for STM32F4-Discovery Kit.
  ******************************************************************************/
 
 #ifndef __STM32F4_DISCOVERY_BTNS_H
 #define __STM32F4_DISCOVERY_BTNS_H
 
+#include <stdbool.h>
 #include <stm32f4_io.h>
 
 #ifdef  __cplusplus
@@ -30,6 +31,16 @@ void BTN_Init( void )
 
 /* -------------------------------------------------------------------------- */
 
+// get user button state (PA0)
+
+static inline
+bool BTN_Get( void )
+{
+	return BTN;
+}
+
+/* -------------------------------------------------------------------------- */
+
 #ifdef  __cplusplus
 }
 #endif//__cplusplus
@@ -40,12 +51,11 @@ void BTN_Init( void )
 
 /* -------------------------------------------------------------------------- */
 
-class Button
+struct Button
 {
-public:
 	Button( void ) { BTN_Init(); }
 	
-	unsigned operator ()( void ) { return BTN; }
+	bool operator ()( void ) { return BTN_Get(); }
 };
 
 /* -------------------------------------------------------------------------- */

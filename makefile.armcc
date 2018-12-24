@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     29.11.2018
+#date     24.12.2018
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -95,6 +95,8 @@ TXTS       := $(OBJS:.o=.txt)
 CORE_F     := --cpu=cortex-m4
 ifneq ($(MAKECMDGOALS),qemu)
 CORE_F     += --fpu=fpv4-sp --apcs=/hardfp/interwork
+else
+DEFS       += QEMU
 endif
 COMMON_F    = --md --depend=$(@:.o=.d) # --feedback=$(FED)
 COMMON_F   += # --debug

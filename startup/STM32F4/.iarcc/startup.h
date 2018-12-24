@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     14.11.2017
+@date     09.08.2018
 @brief    Startup file header for iar c compiler.
 *******************************************************************************/
 
@@ -18,7 +18,6 @@
  Prototypes of external functions
 *******************************************************************************/
 
-__WEAK      void       port_sys_init( void );
 __NO_RETURN void __iar_program_start( void );
 
 /*******************************************************************************
@@ -28,8 +27,6 @@ __NO_RETURN void __iar_program_start( void );
 __STATIC_INLINE __NO_RETURN
 void __main( void )
 {
-	/* Call the os initialization procedure */
-	port_sys_init();
 	/* Call the application's entry point */
 	__iar_program_start();
 }

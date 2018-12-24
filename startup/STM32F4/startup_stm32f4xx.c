@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup_stm32f4xx.c
 @author   Rajmund Szymanski
-@date     19.07.2018
+@date     21.12.2018
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -37,6 +37,18 @@ extern char __initial_msp[];
 extern char __initial_sp [];
 
 /*******************************************************************************
+ Default _exit handler
+*******************************************************************************/
+
+__WEAK __NO_RETURN
+void _exit( int status )
+{
+	(void) status;
+	/* Go into an infinite loop */
+	for (;;);
+}
+
+/*******************************************************************************
  Default fault handler
 *******************************************************************************/
 
@@ -51,19 +63,7 @@ void Fault_Handler( void )
  Specific definitions for the compiler
 *******************************************************************************/
 
-#if   defined(__CC_ARM)
-#include "ARMCC/startup.h"
-#elif defined(__ARMCOMPILER_VERSION)
-#include "CLANG/startup.h"
-#elif defined(__GNUC__)
-#include "GNUCC/startup.h"
-#elif defined(__CSMC__)
-#include "CSMCC/startup.h"
-#elif defined(__ICCARM__)
-#include "IARCC/startup.h"
-#else
-#error Unknown compiler!
-#endif
+#include "startup.h"
 
 /*******************************************************************************
  Default reset handler
