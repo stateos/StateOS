@@ -9,7 +9,7 @@ static int    count = 0;
 
 void test_add(fun_t *fun)
 {
-	assert(count < SIZE);
+	ASSERT(count < SIZE);
 	test[count++] = fun;
 }
 

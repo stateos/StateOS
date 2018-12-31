@@ -19,7 +19,7 @@ static void give(Flag &Flg, unsigned bitfield, unsigned check)
 	{
 		flag = bitfield & (~bitfield + 1);
 		bitfield -= flag;
-		flags = Flg.give(flag);                  assert(flags == check);
+		flags = Flg.give(flag);                  ASSERT(flags == check);
 	}
 }
 
@@ -28,8 +28,8 @@ static void proc3()
 	unsigned flags;
 	unsigned event;
 
-	event = Flg3.wait(FLAG3, flgAll+flgProtect+flgIgnore); assert_success(event);
-	flags = Flg2.give(FLAG2);                    assert(flags == FLAG2);
+	event = Flg3.wait(FLAG3, flgAll+flgProtect+flgIgnore); ASSERT_success(event);
+	flags = Flg2.give(FLAG2);                    ASSERT(flags == FLAG2);
 	        ThisTask::stop();
 }
 
@@ -37,13 +37,13 @@ static void proc2()
 {
 	unsigned flags;
 	unsigned event;
-	                                             assert(!Tsk3);
-	        Tsk3.startFrom(proc3);               assert(!!Tsk3);
-	event = Flg2.wait(FLAG2, flgAll);            assert_success(event);
+	                                             ASSERT(!Tsk3);
+	        Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
+	event = Flg2.wait(FLAG2, flgAll);            ASSERT_success(event);
 	        give(Flg3, FLAG3, FLAG3);
-	event = Flg2.wait(FLAG2, flgAll);            assert_success(event);
-	flags = Flg1.give(FLAG1);                    assert(flags == FLAG1);
-	event = Tsk3.join();                         assert_success(event);
+	event = Flg2.wait(FLAG2, flgAll);            ASSERT_success(event);
+	flags = Flg1.give(FLAG1);                    ASSERT(flags == FLAG1);
+	event = Tsk3.join();                         ASSERT_success(event);
 	        ThisTask::stop();
 }
 
@@ -51,37 +51,37 @@ static void proc1()
 {
 	unsigned flags;
 	unsigned event;
-	                                             assert(!Tsk2);
-	        Tsk2.startFrom(proc2);               assert(!!Tsk2);
-	event = Flg1.wait(FLAG1, flgAll);            assert_success(event);
+	                                             ASSERT(!Tsk2);
+	        Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
+	event = Flg1.wait(FLAG1, flgAll);            ASSERT_success(event);
 	        give(Flg2, FLAG2, 0);
-	event = Flg1.wait(FLAG1, flgAll);            assert_success(event);
-	flags = Flg0.give(FLAG0);                    assert(flags == FLAG0);
-	event = Tsk2.join();                         assert_success(event);
+	event = Flg1.wait(FLAG1, flgAll);            ASSERT_success(event);
+	flags = Flg0.give(FLAG0);                    ASSERT(flags == FLAG0);
+	event = Tsk2.join();                         ASSERT_success(event);
 	        ThisTask::stop();
 }
 
 static void proc0()
 {
 	unsigned event;
-	                                             assert(!Tsk1);
-	        Tsk1.startFrom(proc1);               assert(!!Tsk1);
-	event = Flg0.wait(FLAG0, flgAll);            assert_success(event);
+	                                             ASSERT(!Tsk1);
+	        Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
+	event = Flg0.wait(FLAG0, flgAll);            ASSERT_success(event);
 	        give(Flg1, FLAG1, 0);
-	event = Flg0.wait(FLAG0, flgAll);            assert_success(event);
-	event = Tsk1.join();                         assert_success(event);
+	event = Flg0.wait(FLAG0, flgAll);            ASSERT_success(event);
+	event = Tsk1.join();                         ASSERT_success(event);
 	        ThisTask::stop();
 }
 
 static void test()
 {
 	unsigned event;
-	                                             assert(!Tsk0);
-	        Tsk0.startFrom(proc0);               assert(!!Tsk0);
+	                                             ASSERT(!Tsk0);
+	        Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
 	        ThisTask::yield();
 	        ThisTask::yield();
 	        give(Flg0, FLAG0, 0);
-	event = Tsk0.join();                         assert_success(event);
+	event = Tsk0.join();                         ASSERT_success(event);
 }
 
 extern "C"

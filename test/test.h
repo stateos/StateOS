@@ -7,15 +7,21 @@
 
 #define PASS                   1000
 
-#define assert_success(event)  do { (void)(event); assert((event) == E_SUCCESS); } while (0)
-#define assert_failure(event)  do { (void)(event); assert((event) == E_FAILURE); } while (0)
-#define assert_stopped(event)  do { (void)(event); assert((event) == E_STOPPED); } while (0)
-#define assert_deleted(event)  do { (void)(event); assert((event) == E_DELETED); } while (0)
-#define assert_timeout(event)  do { (void)(event); assert((event) == E_TIMEOUT); } while (0)
-#define assert_owndead(event)  do { (void)(event); assert((event) == OWNERDEAD); } while (0)
+#ifndef DEBUG
+#define ASSERT(event)          (void)(event)
+#else
+#define ASSERT(event)          assert(event)
+#endif
 
-#define assert_dead(tsk)       do { (void)(tsk);   assert((tsk)->hdr.id == ID_STOPPED); } while (0)
-#define assert_ready(tsk)      do { (void)(tsk);   assert((tsk)->hdr.id == ID_READY);   } while (0)
+#define ASSERT_success(event)  ASSERT((event) == E_SUCCESS)
+#define ASSERT_failure(event)  ASSERT((event) == E_FAILURE)
+#define ASSERT_stopped(event)  ASSERT((event) == E_STOPPED)
+#define ASSERT_deleted(event)  ASSERT((event) == E_DELETED)
+#define ASSERT_timeout(event)  ASSERT((event) == E_TIMEOUT)
+#define ASSERT_owndead(event)  ASSERT((event) == OWNERDEAD)
+
+#define ASSERT_dead(tsk)       ASSERT((tsk)->hdr.id == ID_STOPPED)
+#define ASSERT_ready(tsk)      ASSERT((tsk)->hdr.id == ID_READY)
 
 #ifdef  __cplusplus
 extern "C" {

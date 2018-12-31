@@ -23,19 +23,19 @@ static void test()
 	unsigned event;
 
 	        counter = 0;
-	event = tmr_wait(tmr4);                      assert_success(event);
-	event = tmr_wait(tmr5);                      assert_success(event);
-	event = tmr_wait(tmr6);                      assert_success(event);
-	event = tmr_wait(tmr7);                      assert_success(event);
+	event = tmr_wait(tmr4);                      ASSERT_success(event);
+	event = tmr_wait(tmr5);                      ASSERT_success(event);
+	event = tmr_wait(tmr6);                      ASSERT_success(event);
+	event = tmr_wait(tmr7);                      ASSERT_success(event);
 	        tmr_startFrom(tmr3, 3, 0, proc);
 	        tmr_startFrom(tmr2, 2, 0, proc);
 	        tmr_startFrom(tmr1, 1, 0, proc);
 	        tmr_startFrom(&tmr0, 0, 0, proc);
-	event = tmr_wait(&tmr0);                     assert_success(event);
-	event = tmr_wait(tmr1);                      assert_success(event);
-	event = tmr_wait(tmr2);                      assert_success(event);
-	event = tmr_wait(tmr3);                      assert_success(event);
-	                                             assert(counter == 4);
+	event = tmr_wait(&tmr0);                     ASSERT_success(event);
+	event = tmr_wait(tmr1);                      ASSERT_success(event);
+	event = tmr_wait(tmr2);                      ASSERT_success(event);
+	event = tmr_wait(tmr3);                      ASSERT_success(event);
+	                                             ASSERT(counter == 4);
 }
 
 extern "C"

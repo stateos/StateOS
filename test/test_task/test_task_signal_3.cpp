@@ -17,7 +17,7 @@ static void proc2()
 static void proc1()
 {
 	        ThisTask::action(action);
-	        ThisTask::suspend();                 assert(sent == received);
+	        ThisTask::suspend();                 ASSERT(sent == received);
 	        ThisTask::action(0);
 	        ThisTask::stop();
 }
@@ -25,13 +25,13 @@ static void proc1()
 static void test()
 {
 	unsigned event;
-		                                         assert(!Tsk1);
-	        Tsk1.startFrom(proc1);               assert(!!Tsk1);
-		                                         assert(!Tsk2);
-	        Tsk2.startFrom(proc2);               assert(!Tsk2);
-	event = Tsk2.join();                         assert_success(event);
-	event = Tsk1.resume();                       assert_success(event);
-	event = Tsk1.join();                         assert_success(event);
+		                                         ASSERT(!Tsk1);
+	        Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
+		                                         ASSERT(!Tsk2);
+	        Tsk2.startFrom(proc2);               ASSERT(!Tsk2);
+	event = Tsk2.join();                         ASSERT_success(event);
+	event = Tsk1.resume();                       ASSERT_success(event);
+	event = Tsk1.join();                         ASSERT_success(event);
 }
 
 extern "C"

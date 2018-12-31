@@ -6,8 +6,8 @@ static void proc5()
 {
 	unsigned event;
 
-	event = mtx_wait(mtx3);                      assert_owndead(event);
-	event = mtx_give(mtx3);                      assert_success(event);
+	event = mtx_wait(mtx3);                      ASSERT_owndead(event);
+	event = mtx_give(mtx3);                      ASSERT_success(event);
 	        tsk_stop();
 }
 
@@ -15,25 +15,25 @@ static void proc4()
 {
 	unsigned event;
 
-	event = mtx_wait(mtx3);                      assert_success(event);
-	                                             assert_dead(tsk5);
-	        tsk_startFrom(tsk5, proc5);          assert_ready(tsk5);
-	event = mtx_wait(mtx1);                      assert(!"test program cannot be caught here");
+	event = mtx_wait(mtx3);                      ASSERT_success(event);
+	                                             ASSERT_dead(tsk5);
+	        tsk_startFrom(tsk5, proc5);          ASSERT_ready(tsk5);
+	event = mtx_wait(mtx1);                      ASSERT(!"test program cannot be caught here");
 }
 
 static void proc3()
 {
 	unsigned event;
 
-	event = mtx_take(mtx2);                      assert_timeout(event);
-	event = mtx_wait(mtx3);                      assert_success(event);
-	event = mtx_take(mtx3);                      assert_timeout(event);
-	                                             assert_dead(tsk4);
-	        tsk_startFrom(tsk4, proc4);          assert_ready(tsk4);
-	event = mtx_give(mtx3);                      assert_success(event);
-	event = mtx_give(mtx3);                      assert_failure(event);
-	event = tsk_kill(tsk4);                      assert_success(event);
-	event = tsk_join(tsk5);                      assert_success(event);
+	event = mtx_take(mtx2);                      ASSERT_timeout(event);
+	event = mtx_wait(mtx3);                      ASSERT_success(event);
+	event = mtx_take(mtx3);                      ASSERT_timeout(event);
+	                                             ASSERT_dead(tsk4);
+	        tsk_startFrom(tsk4, proc4);          ASSERT_ready(tsk4);
+	event = mtx_give(mtx3);                      ASSERT_success(event);
+	event = mtx_give(mtx3);                      ASSERT_failure(event);
+	event = tsk_kill(tsk4);                      ASSERT_success(event);
+	event = tsk_join(tsk5);                      ASSERT_success(event);
 	        tsk_stop();
 }
 
@@ -41,14 +41,14 @@ static void proc2()
 {
 	unsigned event;
 
-	event = mtx_take(mtx1);                      assert_timeout(event);
-	event = mtx_wait(mtx2);                      assert_success(event);
-	event = mtx_take(mtx2);                      assert_success(event);
-	                                             assert_dead(tsk3);
-	        tsk_startFrom(tsk3, proc3);          assert_dead(tsk3);
-	event = tsk_join(tsk3);                      assert_success(event);
-	event = mtx_give(mtx2);                      assert_success(event);
-	event = mtx_give(mtx2);                      assert_success(event);
+	event = mtx_take(mtx1);                      ASSERT_timeout(event);
+	event = mtx_wait(mtx2);                      ASSERT_success(event);
+	event = mtx_take(mtx2);                      ASSERT_success(event);
+	                                             ASSERT_dead(tsk3);
+	        tsk_startFrom(tsk3, proc3);          ASSERT_dead(tsk3);
+	event = tsk_join(tsk3);                      ASSERT_success(event);
+	event = mtx_give(mtx2);                      ASSERT_success(event);
+	event = mtx_give(mtx2);                      ASSERT_success(event);
 	        tsk_stop();
 }
 
@@ -56,14 +56,14 @@ static void proc1()
 {
 	unsigned event;
 
-	event = mtx_take(&mtx0);                     assert_timeout(event);
-	event = mtx_wait(mtx1);                      assert_success(event);
-	event = mtx_take(mtx1);                      assert_failure(event);
-	                                             assert_dead(tsk2);
-	        tsk_startFrom(tsk2, proc2);          assert_dead(tsk2);
-	event = tsk_join(tsk2);                      assert_success(event);
-	event = mtx_give(mtx1);                      assert_success(event);
-	event = mtx_give(mtx1);                      assert_failure(event);
+	event = mtx_take(&mtx0);                     ASSERT_timeout(event);
+	event = mtx_wait(mtx1);                      ASSERT_success(event);
+	event = mtx_take(mtx1);                      ASSERT_failure(event);
+	                                             ASSERT_dead(tsk2);
+	        tsk_startFrom(tsk2, proc2);          ASSERT_dead(tsk2);
+	event = tsk_join(tsk2);                      ASSERT_success(event);
+	event = mtx_give(mtx1);                      ASSERT_success(event);
+	event = mtx_give(mtx1);                      ASSERT_failure(event);
 	        tsk_stop();
 }
 
@@ -71,22 +71,22 @@ static void proc0()
 {
 	unsigned event;
 
-	event = mtx_wait(&mtx0);                     assert_success(event);
-	event = mtx_take(&mtx0);                     assert_timeout(event);
-	                                             assert_dead(tsk1);
-	        tsk_startFrom(tsk1, proc1);          assert_dead(tsk1);
-	event = tsk_join(tsk1);                      assert_success(event);
-	event = mtx_give(&mtx0);                     assert_success(event);
-	event = mtx_give(&mtx0);                     assert_success(event);
+	event = mtx_wait(&mtx0);                     ASSERT_success(event);
+	event = mtx_take(&mtx0);                     ASSERT_timeout(event);
+	                                             ASSERT_dead(tsk1);
+	        tsk_startFrom(tsk1, proc1);          ASSERT_dead(tsk1);
+	event = tsk_join(tsk1);                      ASSERT_success(event);
+	event = mtx_give(&mtx0);                     ASSERT_success(event);
+	event = mtx_give(&mtx0);                     ASSERT_success(event);
 	        tsk_stop();
 }
 
 static void test()
 {
 	unsigned event;
-	                                             assert_dead(&tsk0);
+	                                             ASSERT_dead(&tsk0);
 	        tsk_startFrom(&tsk0, proc0);
-	event = tsk_join(&tsk0);                     assert_success(event);
+	event = tsk_join(&tsk0);                     ASSERT_success(event);
 }
 
 extern "C"
