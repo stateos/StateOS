@@ -37,6 +37,7 @@ Features:
 ---------
 6.5
 - added functional test
+- added support for stm32l1
 ---------
 6.4
 - removed ID_BLOCKED constant
