@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    29.10.2019
     @brief   StateOS port file for STM8S uC.
 
  ******************************************************************************
@@ -42,8 +42,11 @@ void port_sys_init( void )
 
 #if HW_TIMER_SIZE == 0
 
-	#define  CNT_(X)   ((X)>>0?(X)>>1?(X)>>2?(X)>>3?(X)>>4?(X)>>5?(X)>>6?(X)>>7?(X)>>8?(X)>>9?1/0:9:8:7:6:5:4:3:2:1:0)
+	#define  CNT_(X)   ((X)>>0?(X)>>1?(X)>>2?(X)>>3?(X)>>4?(X)>>5?(X)>>6?(X)>>7?(X)>>8?(X)>>9?-1:9:8:7:6:5:4:3:2:1:0)
 	#define  PSC_ CNT_ (((CPU_FREQUENCY)/(OS_FREQUENCY)-1)>>16)
+	#if      PSC_ < 0
+	#error Incorrect CPU_FREQUENCY / OS_FREQUENCY value!
+	#endif
 	#define  ARR_     ((((CPU_FREQUENCY)/(OS_FREQUENCY))>>PSC_)-1)
 
 /******************************************************************************
@@ -51,7 +54,7 @@ void port_sys_init( void )
  It must generate interrupts with frequency OS_FREQUENCY
 *******************************************************************************/
 
-	TIM3->PSCR  = PSC_;
+	TIM3->PSCR  = (uint8_t)(PSC_);
 	TIM3->ARRH  = (uint8_t)(ARR_ >> 8);
 	TIM3->ARRL  = (uint8_t)(ARR_);
 	TIM3->CCR1H = 0xFF;
@@ -69,8 +72,11 @@ void port_sys_init( void )
 	#error Incorrect OS_ROBIN frequency!
 	#endif
 
-	#define  CNT_(X)   ((X)>>0?(X)>>1?(X)>>2?(X)>>3?(X)>>4?(X)>>5?(X)>>6?(X)>>7?(X)>>8?(X)>>9?1/0:9:8:7:6:5:4:3:2:1:0)
+	#define  CNT_(X)   ((X)>>0?(X)>>1?(X)>>2?(X)>>3?(X)>>4?(X)>>5?(X)>>6?(X)>>7?(X)>>8?(X)>>9?-1:9:8:7:6:5:4:3:2:1:0)
 	#define  PSC_ CNT_  ((CPU_FREQUENCY)/(OS_FREQUENCY)-1)
+	#if      PSC_ < 0
+	#error Incorrect CPU_FREQUENCY / OS_FREQUENCY value!
+	#endif
 	#define  CCR_       ((OS_FREQUENCY)/(OS_ROBIN))
 
 /******************************************************************************
@@ -78,7 +84,7 @@ void port_sys_init( void )
  It must be rescaled to frequency OS_FREQUENCY
 *******************************************************************************/
 
-	TIM3->PSCR  = PSC_;
+	TIM3->PSCR  = (uint8_t)(PSC_);
 	TIM3->CCR1H = (uint8_t)(CCR_ >> 8);
 	TIM3->CCR1L = (uint8_t)(CCR_);
 	#if HW_TIMER_SIZE < OS_TIMER_SIZE
