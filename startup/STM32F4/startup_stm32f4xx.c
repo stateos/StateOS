@@ -1,12 +1,13 @@
 /*******************************************************************************
 @file     startup_stm32f4xx.c
 @author   Rajmund Szymanski
-@date     21.12.2018
+@date     12.11.2019
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
 *******************************************************************************/
 
+#define __PROGRAM_START
 #include <stm32f4xx.h>
 
 /*******************************************************************************
@@ -52,7 +53,7 @@ void _exit( int status )
  Default fault handler
 *******************************************************************************/
 
-__NO_RETURN
+static
 void Fault_Handler( void )
 {
 	/* Go into an infinite loop */
@@ -213,7 +214,7 @@ __VECTORS
 void (* const __vector_table[])(void) =
 {
 	/* Initial stack pointer */
-	(void(*)(void)) __initial_msp,
+	(void(*)(void)) (intptr_t) __initial_msp,
 
 	/* Core exceptions */
 	Reset_Handler,      /* Reset                                   */

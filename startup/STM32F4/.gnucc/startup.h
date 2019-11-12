@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     21.12.2018
+@date     12.11.2019
 @brief    Startup file header for gcc compiler.
 *******************************************************************************/
 
@@ -54,13 +54,13 @@ extern void(*   __fini_array_end  [])();
 *******************************************************************************/
 
 __STATIC_INLINE
-void __startup_memcpy( unsigned *dst_, unsigned *end_, unsigned *src_ )
+void __startup_memcpy( unsigned *dst_, unsigned *end_, unsigned const *src_ )
 {
 	while (dst_ < end_) *dst_++ = *src_++;
 }
 
 __STATIC_INLINE
-void __startup_memset( unsigned *dst_, unsigned *end_, unsigned val_ )
+void __startup_memset( unsigned *dst_, unsigned *end_, unsigned const val_ )
 {
 	while (dst_ < end_) *dst_++ = val_;
 }

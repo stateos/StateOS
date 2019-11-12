@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    14.11.2018
+    @date    12.11.2019
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -1074,7 +1074,7 @@ int32 OS_TaskInstallDeleteHandler(void *function_pointer)
 			status = OS_INVALID_POINTER;
 		else
 		{
-			rec->delete_handler = (void(*)(void)) function_pointer;
+			rec->delete_handler = (void(*)(void)) (intptr_t) function_pointer;
 			status = OS_SUCCESS;
 		}
 	}
