@@ -1,11 +1,11 @@
 /**************************************************************************//**
  * @file     cmsis_armcc.h
  * @brief    CMSIS compiler ARMCC (Arm Compiler 5) header file
- * @version  V5.0.4
- * @date     10. January 2018
+ * @version  V5.1.1
+ * @date     30. July 2019
  ******************************************************************************/
 /*
- * Copyright (c) 2009-2018 Arm Limited. All rights reserved.
+ * Copyright (c) 2009-2019 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -47,6 +47,10 @@
   /* __ARM_ARCH_8M_BASE__  not applicable */
   /* __ARM_ARCH_8M_MAIN__  not applicable */
 
+/* CMSIS compiler control DSP macros */
+#if ((defined (__ARM_ARCH_7EM__) && (__ARM_ARCH_7EM__ == 1))     )
+  #define __ARM_FEATURE_DSP         1
+#endif
 
 /* CMSIS compiler specific defines */
 #ifndef   __ASM
@@ -99,6 +103,31 @@
 #endif
 #ifndef   __RESTRICT
   #define __RESTRICT                             __restrict
+#endif
+#ifndef   __COMPILER_BARRIER
+  #define __COMPILER_BARRIER()                   __memory_changed()
+#endif
+
+/* #########################  Startup and Lowlevel Init  ######################## */
+
+#ifndef __PROGRAM_START
+#define __PROGRAM_START           __main
+#endif
+
+#ifndef __INITIAL_SP
+#define __INITIAL_SP              Image$$ARM_LIB_STACK$$ZI$$Limit
+#endif
+
+#ifndef __STACK_LIMIT
+#define __STACK_LIMIT             Image$$ARM_LIB_STACK$$ZI$$Base
+#endif
+
+#ifndef __VECTOR_TABLE
+#define __VECTOR_TABLE            __Vectors
+#endif
+
+#ifndef __VECTOR_TABLE_ATTRIBUTE
+#define __VECTOR_TABLE_ATTRIBUTE  __attribute((used, section("RESET")))
 #endif
 
 /* ###########################  Core Function Access  ########################### */
@@ -415,33 +444,21 @@ __STATIC_INLINE void __set_FPSCR(uint32_t fpscr)
            so that all instructions following the ISB are fetched from cache or memory,
            after the instruction has been completed.
  */
-#define __ISB() do {\
-                   __schedule_barrier();\
-                   __isb(0xF);\
-                   __schedule_barrier();\
-                } while (0U)
+#define __ISB()                           __isb(0xF)
 
 /**
   \brief   Data Synchronization Barrier
   \details Acts as a special kind of Data Memory Barrier.
            It completes when all explicit memory accesses before this instruction complete.
  */
-#define __DSB() do {\
-                   __schedule_barrier();\
-                   __dsb(0xF);\
-                   __schedule_barrier();\
-                } while (0U)
+#define __DSB()                           __dsb(0xF)
 
 /**
   \brief   Data Memory Barrier
   \details Ensures the apparent order of the explicit memory operations before
            and after the instruction, without ensuring their completion.
  */
-#define __DMB() do {\
-                   __schedule_barrier();\
-                   __dmb(0xF);\
-                   __schedule_barrier();\
-                } while (0U)
+#define __DMB()                           __dmb(0xF)
 
                   
 /**

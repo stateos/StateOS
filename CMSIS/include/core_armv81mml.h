@@ -1,11 +1,11 @@
 /**************************************************************************//**
- * @file     core_armv8mml.h
- * @brief    CMSIS Armv8-M Mainline Core Peripheral Access Layer Header File
- * @version  V5.2.1
- * @date     21. August 2019
+ * @file     core_armv81mml.h
+ * @brief    CMSIS Armv8.1-M Mainline Core Peripheral Access Layer Header File
+ * @version  V1.2.0
+ * @date     21. October 2019
  ******************************************************************************/
 /*
- * Copyright (c) 2009-2019 Arm Limited. All rights reserved.
+ * Copyright (c) 2018-2019 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -28,8 +28,8 @@
   #pragma clang system_header   /* treat file as system include file */
 #endif
 
-#ifndef __CORE_ARMV8MML_H_GENERIC
-#define __CORE_ARMV8MML_H_GENERIC
+#ifndef __CORE_ARMV81MML_H_GENERIC
+#define __CORE_ARMV81MML_H_GENERIC
 
 #include <stdint.h>
 
@@ -56,25 +56,25 @@
  *                 CMSIS definitions
  ******************************************************************************/
 /**
-  \ingroup Cortex_ARMv8MML
+  \ingroup Cortex_ARMV81MML
   @{
  */
 
 #include "cmsis_version.h"
-
-/*  CMSIS Armv8MML definitions */
-#define __ARMv8MML_CMSIS_VERSION_MAIN  (__CM_CMSIS_VERSION_MAIN)                   /*!< \deprecated [31:16] CMSIS HAL main version */
-#define __ARMv8MML_CMSIS_VERSION_SUB   (__CM_CMSIS_VERSION_SUB)                    /*!< \deprecated [15:0]  CMSIS HAL sub version */
-#define __ARMv8MML_CMSIS_VERSION       ((__ARMv8MML_CMSIS_VERSION_MAIN << 16U) | \
-                                         __ARMv8MML_CMSIS_VERSION_SUB           )  /*!< \deprecated CMSIS HAL version number */
+ 
+#define __ARM_ARCH_8M_MAIN__    1  // patching for now
+/*  CMSIS ARMV81MML definitions */
+#define __ARMv81MML_CMSIS_VERSION_MAIN  (__CM_CMSIS_VERSION_MAIN)                   /*!< \deprecated [31:16] CMSIS HAL main version */
+#define __ARMv81MML_CMSIS_VERSION_SUB   (__CM_CMSIS_VERSION_SUB)                    /*!< \deprecated [15:0]  CMSIS HAL sub version */
+#define __ARMv81MML_CMSIS_VERSION       ((__ARMv81MML_CMSIS_VERSION_MAIN << 16U) | \
+                                         __ARMv81MML_CMSIS_VERSION_SUB           )  /*!< \deprecated CMSIS HAL version number */
 
 #define __CORTEX_M                     (81U)                                       /*!< Cortex-M Core */
 
-/** __FPU_USED indicates whether an FPU is used or not.
-    For this, __FPU_PRESENT has to be checked prior to making use of FPU specific registers and functions.
-*/
 #if defined ( __CC_ARM )
-  #if defined __TARGET_FPU_VFP
+  #error Legacy Arm Compiler does not support Armv8.1-M target architecture.
+#elif defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+  #if defined __ARM_FP
     #if defined (__FPU_PRESENT) && (__FPU_PRESENT == 1U)
       #define __FPU_USED       1U
     #else
@@ -90,33 +90,21 @@
       #define __DSP_USED       1U
     #else
       #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
-      #define __DSP_USED         0U
+      #define __DSP_USED         0U    
     #endif
   #else
     #define __DSP_USED         0U
   #endif
-
-#elif defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
-  #if defined __ARM_FP
-    #if defined (__FPU_PRESENT) && (__FPU_PRESENT == 1U)
-      #define __FPU_USED       1U
+  
+  #if defined(__ARM_FEATURE_MVE)
+    #if defined(__MVE_PRESENT) && (__MVE_PRESENT == 1U)
+      #define __MVE_USED       1U
     #else
-      #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
-      #define __FPU_USED       0U
+      #error "Compiler generates MVE instructions for a devices without MVE extensions (check __MVE_PRESENT)"
+      #define __MVE_USED         0U    
     #endif
   #else
-    #define __FPU_USED         0U
-  #endif
-
-  #if defined(__ARM_FEATURE_DSP)
-    #if defined(__DSP_PRESENT) && (__DSP_PRESENT == 1U)
-      #define __DSP_USED       1U
-    #else
-      #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
-      #define __DSP_USED         0U
-    #endif
-  #else
-    #define __DSP_USED         0U
+    #define __MVE_USED         0U
   #endif
 
 #elif defined ( __GNUC__ )
@@ -130,18 +118,29 @@
   #else
     #define __FPU_USED         0U
   #endif
-
+  
   #if defined(__ARM_FEATURE_DSP)
     #if defined(__DSP_PRESENT) && (__DSP_PRESENT == 1U)
       #define __DSP_USED       1U
     #else
       #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
-      #define __DSP_USED         0U
+      #define __DSP_USED         0U    
     #endif
   #else
     #define __DSP_USED         0U
   #endif
-
+    
+  #if defined(__ARM_FEATURE_MVE)
+    #if defined(__MVE_PRESENT) && (__MVE_PRESENT == 1U)
+      #define __MVE_USED       1U
+    #else
+      #error "Compiler generates MVE instructions for a devices without MVE extensions (check __MVE_PRESENT)"
+      #define __MVE_USED         0U    
+    #endif
+  #else
+    #define __MVE_USED         0U
+  #endif
+  
 #elif defined ( __ICCARM__ )
   #if defined __ARMVFP__
     #if defined (__FPU_PRESENT) && (__FPU_PRESENT == 1U)
@@ -159,12 +158,23 @@
       #define __DSP_USED       1U
     #else
       #error "Compiler generates DSP (SIMD) instructions for a devices without DSP extensions (check __DSP_PRESENT)"
-      #define __DSP_USED         0U
+      #define __DSP_USED         0U    
     #endif
   #else
     #define __DSP_USED         0U
   #endif
 
+  #if defined(__ARM_FEATURE_MVE)
+    #if defined(__MVE_PRESENT) && (__MVE_PRESENT == 1U)
+      #define __MVE_USED       1U
+    #else
+      #error "Compiler generates MVE instructions for a devices without MVE extensions (check __MVE_PRESENT)"
+      #define __MVE_USED         0U    
+    #endif
+  #else
+    #define __MVE_USED         0U
+  #endif
+  
 #elif defined ( __TI_ARM__ )
   #if defined __TI_VFP_SUPPORT__
     #if defined (__FPU_PRESENT) && (__FPU_PRESENT == 1U)
@@ -210,12 +220,12 @@
 }
 #endif
 
-#endif /* __CORE_ARMV8MML_H_GENERIC */
+#endif /* __CORE_ARMV81MML_H_GENERIC */
 
 #ifndef __CMSIS_GENERIC
 
-#ifndef __CORE_ARMV8MML_H_DEPENDANT
-#define __CORE_ARMV8MML_H_DEPENDANT
+#ifndef __CORE_ARMV81MML_H_DEPENDANT
+#define __CORE_ARMV81MML_H_DEPENDANT
 
 #ifdef __cplusplus
  extern "C" {
@@ -223,9 +233,9 @@
 
 /* check device defines and use defaults */
 #if defined __CHECK_DEVICE_DEFINES
-  #ifndef __ARMv8MML_REV
-    #define __ARMv8MML_REV               0x0000U
-    #warning "__ARMv8MML_REV not defined in device header file; using default!"
+  #ifndef __ARMv81MML_REV
+    #define __ARMv81MML_REV               0x0000U
+    #warning "__ARMv81MML_REV not defined in device header file; using default!"
   #endif
 
   #ifndef __FPU_PRESENT
@@ -246,6 +256,11 @@
   #ifndef __DSP_PRESENT
     #define __DSP_PRESENT             0U
     #warning "__DSP_PRESENT not defined in device header file; using default!"
+  #endif
+
+  #ifndef __MVE_PRESENT
+    #define __MVE_PRESENT             0U
+    #warning "__MVE_PRESENT not defined in device header file; using default!"
   #endif
 
   #ifndef __NVIC_PRIO_BITS
@@ -280,7 +295,7 @@
 #define     __OM     volatile            /*! Defines 'write only' structure member permissions */
 #define     __IOM    volatile            /*! Defines 'read / write' structure member permissions */
 
-/*@} end of group ARMv8MML */
+/*@} end of group ARMv81MML */
 
 
 
@@ -523,7 +538,8 @@ typedef struct
   __IOM uint32_t NSACR;                  /*!< Offset: 0x08C (R/W)  Non-Secure Access Control Register */
         uint32_t RESERVED3[92U];
   __OM  uint32_t STIR;                   /*!< Offset: 0x200 ( /W)  Software Triggered Interrupt Register */
-        uint32_t RESERVED4[15U];
+  __IOM uint32_t RFSR;                   /*!< Offset: 0x204 (R/W)  RAS Fault Status Register */
+        uint32_t RESERVED4[14U];
   __IM  uint32_t MVFR0;                  /*!< Offset: 0x240 (R/ )  Media and VFP Feature Register 0 */
   __IM  uint32_t MVFR1;                  /*!< Offset: 0x244 (R/ )  Media and VFP Feature Register 1 */
   __IM  uint32_t MVFR2;                  /*!< Offset: 0x248 (R/ )  Media and VFP Feature Register 2 */
@@ -538,6 +554,7 @@ typedef struct
   __OM  uint32_t DCCSW;                  /*!< Offset: 0x26C ( /W)  D-Cache Clean by Set-way */
   __OM  uint32_t DCCIMVAC;               /*!< Offset: 0x270 ( /W)  D-Cache Clean and Invalidate by MVA to PoC */
   __OM  uint32_t DCCISW;                 /*!< Offset: 0x274 ( /W)  D-Cache Clean and Invalidate by Set-way */
+  __OM  uint32_t BPIALL;                 /*!< Offset: 0x278 ( /W)  Branch Predictor Invalidate All */
 } SCB_Type;
 
 /* SCB CPUID Register Definitions */
@@ -619,6 +636,12 @@ typedef struct
 #define SCB_AIRCR_PRIGROUP_Pos              8U                                            /*!< SCB AIRCR: PRIGROUP Position */
 #define SCB_AIRCR_PRIGROUP_Msk             (7UL << SCB_AIRCR_PRIGROUP_Pos)                /*!< SCB AIRCR: PRIGROUP Mask */
 
+#define SCB_AIRCR_IESB_Pos                  5U                                            /*!< SCB AIRCR: Implicit ESB Enable Position */
+#define SCB_AIRCR_IESB_Msk                 (1UL << SCB_AIRCR_IESB_Pos)                    /*!< SCB AIRCR: Implicit ESB Enable Mask */
+
+#define SCB_AIRCR_DIT_Pos                   4U                                            /*!< SCB AIRCR: Data Independent Timing Position */
+#define SCB_AIRCR_DIT_Msk                  (1UL << SCB_AIRCR_DIT_Pos)                     /*!< SCB AIRCR: Data Independent Timing Mask */
+
 #define SCB_AIRCR_SYSRESETREQS_Pos          3U                                            /*!< SCB AIRCR: SYSRESETREQS Position */
 #define SCB_AIRCR_SYSRESETREQS_Msk         (1UL << SCB_AIRCR_SYSRESETREQS_Pos)            /*!< SCB AIRCR: SYSRESETREQS Mask */
 
@@ -642,6 +665,12 @@ typedef struct
 #define SCB_SCR_SLEEPONEXIT_Msk            (1UL << SCB_SCR_SLEEPONEXIT_Pos)               /*!< SCB SCR: SLEEPONEXIT Mask */
 
 /* SCB Configuration Control Register Definitions */
+#define SCB_CCR_TRD_Pos                    20U                                            /*!< SCB CCR: TRD Position */
+#define SCB_CCR_TRD_Msk                    (1UL << SCB_CCR_TRD_Pos)                       /*!< SCB CCR: TRD Mask */
+
+#define SCB_CCR_LOB_Pos                    19U                                            /*!< SCB CCR: LOB Position */
+#define SCB_CCR_LOB_Msk                    (1UL << SCB_CCR_LOB_Pos)                       /*!< SCB CCR: LOB Mask */
+
 #define SCB_CCR_BP_Pos                     18U                                            /*!< SCB CCR: BP Position */
 #define SCB_CCR_BP_Msk                     (1UL << SCB_CCR_BP_Pos)                        /*!< SCB CCR: BP Mask */
 
@@ -811,6 +840,9 @@ typedef struct
 #define SCB_HFSR_VECTTBL_Msk               (1UL << SCB_HFSR_VECTTBL_Pos)                  /*!< SCB HFSR: VECTTBL Mask */
 
 /* SCB Debug Fault Status Register Definitions */
+#define SCB_DFSR_PMU_Pos                    5U                                            /*!< SCB DFSR: PMU Position */
+#define SCB_DFSR_PMU_Msk                   (1UL << SCB_DFSR_PMU_Pos)                      /*!< SCB DFSR: PMU Mask */
+
 #define SCB_DFSR_EXTERNAL_Pos               4U                                            /*!< SCB DFSR: EXTERNAL Position */
 #define SCB_DFSR_EXTERNAL_Msk              (1UL << SCB_DFSR_EXTERNAL_Pos)                 /*!< SCB DFSR: EXTERNAL Mask */
 
@@ -858,6 +890,9 @@ typedef struct
 #define SCB_NSACR_CP0_Msk                  (1UL /*<< SCB_NSACR_CP0_Pos*/)                 /*!< SCB NSACR: CP0 Mask */
 
 /* SCB Debug Feature Register 0 Definitions */
+#define SCB_ID_DFR_UDE_Pos                 28U                                            /*!< SCB ID_DFR: UDE Position */
+#define SCB_ID_DFR_UDE_Msk                 (0xFUL << SCB_ID_DFR_UDE_Pos)                  /*!< SCB ID_DFR: UDE Mask */
+
 #define SCB_ID_DFR_MProfDbg_Pos            20U                                            /*!< SCB ID_DFR: MProfDbg Position */
 #define SCB_ID_DFR_MProfDbg_Msk            (0xFUL << SCB_ID_DFR_MProfDbg_Pos)             /*!< SCB ID_DFR: MProfDbg Mask */
 
@@ -916,6 +951,16 @@ typedef struct
 /* SCB Software Triggered Interrupt Register Definitions */
 #define SCB_STIR_INTID_Pos                  0U                                            /*!< SCB STIR: INTID Position */
 #define SCB_STIR_INTID_Msk                 (0x1FFUL /*<< SCB_STIR_INTID_Pos*/)            /*!< SCB STIR: INTID Mask */
+
+/* SCB RAS Fault Status Register Definitions */
+#define SCB_RFSR_V_Pos                     31U                                            /*!< SCB RFSR: V Position */
+#define SCB_RFSR_V_Msk                     (1UL << SCB_RFSR_V_Pos)                        /*!< SCB RFSR: V Mask */
+
+#define SCB_RFSR_IS_Pos                    16U                                            /*!< SCB RFSR: IS Position */
+#define SCB_RFSR_IS_Msk                    (0x7FFFUL << SCB_RFSR_IS_Pos)                  /*!< SCB RFSR: IS Mask */
+
+#define SCB_RFSR_UET_Pos                    0U                                            /*!< SCB RFSR: UET Position */
+#define SCB_RFSR_UET_Msk                   (3UL /*<< SCB_RFSR_UET_Pos*/)                  /*!< SCB RFSR: UET Mask */
 
 /* SCB D-Cache Invalidate by Set-way Register Definitions */
 #define SCB_DCISW_WAY_Pos                  30U                                            /*!< SCB DCISW: Way Position */
@@ -1048,7 +1093,8 @@ typedef struct
   __IM  uint32_t LSR;                    /*!< Offset: 0xFB4 (R/ )  ITM Lock Status Register */
         uint32_t RESERVED5[1U];
   __IM  uint32_t DEVARCH;                /*!< Offset: 0xFBC (R/ )  ITM Device Architecture Register */
-        uint32_t RESERVED6[4U];
+        uint32_t RESERVED6[3U];
+  __IM  uint32_t DEVTYPE;                /*!< Offset: 0xFCC (R/ )  ITM Device Type Register */
   __IM  uint32_t PID4;                   /*!< Offset: 0xFD0 (R/ )  ITM Peripheral Identification Register #4 */
   __IM  uint32_t PID5;                   /*!< Offset: 0xFD4 (R/ )  ITM Peripheral Identification Register #5 */
   __IM  uint32_t PID6;                   /*!< Offset: 0xFD8 (R/ )  ITM Peripheral Identification Register #6 */
@@ -1479,6 +1525,9 @@ typedef struct
 #define MPU_RLAR_LIMIT_Pos                  5U                                            /*!< MPU RLAR: LIMIT Position */
 #define MPU_RLAR_LIMIT_Msk                 (0x7FFFFFFUL << MPU_RLAR_LIMIT_Pos)            /*!< MPU RLAR: LIMIT Mask */
 
+#define MPU_RLAR_PXN_Pos                    4U                                            /*!< MPU RLAR: PXN Position */
+#define MPU_RLAR_PXN_Msk                   (1UL << MPU_RLAR_PXN_Pos)                      /*!< MPU RLAR: PXN Mask */
+
 #define MPU_RLAR_AttrIndx_Pos               1U                                            /*!< MPU RLAR: AttrIndx Position */
 #define MPU_RLAR_AttrIndx_Msk              (7UL << MPU_RLAR_AttrIndx_Pos)                 /*!< MPU RLAR: AttrIndx Mask */
 
@@ -1692,6 +1741,12 @@ typedef struct
 #define FPU_FPDSCR_RMode_Pos               22U                                            /*!< FPDSCR: RMode bit Position */
 #define FPU_FPDSCR_RMode_Msk               (3UL << FPU_FPDSCR_RMode_Pos)                  /*!< FPDSCR: RMode bit Mask */
 
+#define FPU_FPDSCR_FZ16_Pos                19U                                            /*!< FPDSCR: FZ16 bit Position */
+#define FPU_FPDSCR_FZ16_Msk                (1UL << FPU_FPDSCR_FZ16_Pos)                   /*!< FPDSCR: FZ16 bit Mask */
+
+#define FPU_FPDSCR_LTPSIZE_Pos             16U                                            /*!< FPDSCR: LTPSIZE bit Position */
+#define FPU_FPDSCR_LTPSIZE_Msk             (7UL << FPU_FPDSCR_LTPSIZE_Pos)                /*!< FPDSCR: LTPSIZE bit Mask */
+
 /* Media and FP Feature Register 0 Definitions */
 #define FPU_MVFR0_FPRound_Pos              28U                                            /*!< MVFR0: FPRound bits Position */
 #define FPU_MVFR0_FPRound_Msk              (0xFUL << FPU_MVFR0_FPRound_Pos)               /*!< MVFR0: FPRound bits Mask */
@@ -1717,6 +1772,12 @@ typedef struct
 
 #define FPU_MVFR1_FPHP_Pos                 24U                                            /*!< MVFR1: FPHP bits Position */
 #define FPU_MVFR1_FPHP_Msk                 (0xFUL << FPU_MVFR1_FPHP_Pos)                  /*!< MVFR1: FPHP bits Mask */
+
+#define FPU_MVFR1_FP16_Pos                 20U                                            /*!< MVFR1: FP16 bits Position */
+#define FPU_MVFR1_FP16_Msk                 (0xFUL << FPU_MVFR1_FP16_Pos)                  /*!< MVFR1: FP16 bits Mask */
+
+#define FPU_MVFR1_MVE_Pos                   8U                                            /*!< MVFR1: MVE bits Position */
+#define FPU_MVFR1_MVE_Msk                  (0xFUL << FPU_MVFR1_MVE_Pos)                   /*!< MVFR1: MVE bits Mask */
 
 #define FPU_MVFR1_FPDNaN_Pos                4U                                            /*!< MVFR1: FPDNaN bits Position */
 #define FPU_MVFR1_FPDNaN_Msk               (0xFUL << FPU_MVFR1_FPDNaN_Pos)                /*!< MVFR1: FPDNaN bits Mask */
@@ -1747,7 +1808,7 @@ typedef struct
   __OM  uint32_t DCRSR;                  /*!< Offset: 0x004 ( /W)  Debug Core Register Selector Register */
   __IOM uint32_t DCRDR;                  /*!< Offset: 0x008 (R/W)  Debug Core Register Data Register */
   __IOM uint32_t DEMCR;                  /*!< Offset: 0x00C (R/W)  Debug Exception and Monitor Control Register */
-        uint32_t RESERVED4[1U];
+  __OM  uint32_t DSCEMCR;                /*!< Offset: 0x010 ( /W)  Debug Set Clear Exception and Monitor Control Register */
   __IOM uint32_t DAUTHCTRL;              /*!< Offset: 0x014 (R/W)  Debug Authentication Control Register */
   __IOM uint32_t DSCSR;                  /*!< Offset: 0x018 (R/W)  Debug Security Control and Status Register */
 } CoreDebug_Type;
@@ -1765,6 +1826,15 @@ typedef struct
 #define CoreDebug_DHCSR_S_RETIRE_ST_Pos    24U                                            /*!< CoreDebug DHCSR: S_RETIRE_ST Position */
 #define CoreDebug_DHCSR_S_RETIRE_ST_Msk    (1UL << CoreDebug_DHCSR_S_RETIRE_ST_Pos)       /*!< CoreDebug DHCSR: S_RETIRE_ST Mask */
 
+#define CoreDebug_DHCSR_S_FPD_Pos          23U                                            /*!< CoreDebug DHCSR: S_FPD Position */
+#define CoreDebug_DHCSR_S_FPD_Msk          (1UL << CoreDebug_DHCSR_S_FPD_Pos)           /*!< CoreDebug DHCSR: S_FPD Mask */
+
+#define CoreDebug_DHCSR_S_SUIDE_Pos        22U                                            /*!< CoreDebug DHCSR: S_SUIDE Position */
+#define CoreDebug_DHCSR_S_SUIDE_Msk        (1UL << CoreDebug_DHCSR_S_SUIDE_Pos)           /*!< CoreDebug DHCSR: S_SUIDE Mask */
+
+#define CoreDebug_DHCSR_S_NSUIDE_Pos       21U                                            /*!< CoreDebug DHCSR: S_NSUIDE Position */
+#define CoreDebug_DHCSR_S_NSUIDE_Msk       (1UL << CoreDebug_DHCSR_S_NSUIDE_Pos)          /*!< CoreDebug DHCSR: S_NSUIDE Mask */
+
 #define CoreDebug_DHCSR_S_SDE_Pos          20U                                            /*!< CoreDebug DHCSR: S_SDE Position */
 #define CoreDebug_DHCSR_S_SDE_Msk          (1UL << CoreDebug_DHCSR_S_SDE_Pos)             /*!< CoreDebug DHCSR: S_SDE Mask */
 
@@ -1779,6 +1849,9 @@ typedef struct
 
 #define CoreDebug_DHCSR_S_REGRDY_Pos       16U                                            /*!< CoreDebug DHCSR: S_REGRDY Position */
 #define CoreDebug_DHCSR_S_REGRDY_Msk       (1UL << CoreDebug_DHCSR_S_REGRDY_Pos)          /*!< CoreDebug DHCSR: S_REGRDY Mask */
+
+#define CoreDebug_DHCSR_C_PMOV_Pos          6U                                            /*!< CoreDebug DHCSR: C_PMOV Position */
+#define CoreDebug_DHCSR_C_PMOV_Msk         (1UL << CoreDebug_DHCSR_C_PMOV_Pos)            /*!< CoreDebug DHCSR: C_PMOV Mask */
 
 #define CoreDebug_DHCSR_C_SNAPSTALL_Pos     5U                                            /*!< CoreDebug DHCSR: C_SNAPSTALL Position */
 #define CoreDebug_DHCSR_C_SNAPSTALL_Msk    (1UL << CoreDebug_DHCSR_C_SNAPSTALL_Pos)       /*!< CoreDebug DHCSR: C_SNAPSTALL Mask */
@@ -1856,6 +1929,15 @@ typedef struct
 #define CoreDebug_DSCEMCR_SET_MON_PEND_Msk (1UL << CoreDebug_DSCEMCR_SET_MON_PEND_Pos)    /*!< CoreDebug DSCEMCR: SET_MON_PEND, Mask */
 
 /* Debug Authentication Control Register Definitions */
+#define CoreDebug_DAUTHCTRL_UIDEN_Pos      10U                                            /*!< CoreDebug DAUTHCTRL: UIDEN, Position */
+#define CoreDebug_DAUTHCTRL_UIDEN_Msk      (1UL << CoreDebug_DAUTHCTRL_UIDEN_Pos)         /*!< CoreDebug DAUTHCTRL: UIDEN, Mask */
+
+#define CoreDebug_DAUTHCTRL_UIDAPEN_Pos     9U                                            /*!< CoreDebug DAUTHCTRL: UIDAPEN, Position */
+#define CoreDebug_DAUTHCTRL_UIDAPEN_Msk    (1UL << CoreDebug_DAUTHCTRL_UIDAPEN_Pos)       /*!< CoreDebug DAUTHCTRL: UIDAPEN, Mask */
+
+#define CoreDebug_DAUTHCTRL_FSDMA_Pos       8U                                            /*!< CoreDebug DAUTHCTRL: FSDMA, Position */
+#define CoreDebug_DAUTHCTRL_FSDMA_Msk      (1UL << CoreDebug_DAUTHCTRL_FSDMA_Pos)         /*!< CoreDebug DAUTHCTRL: FSDMA, Mask */
+
 #define CoreDebug_DAUTHCTRL_INTSPNIDEN_Pos  3U                                            /*!< CoreDebug DAUTHCTRL: INTSPNIDEN, Position */
 #define CoreDebug_DAUTHCTRL_INTSPNIDEN_Msk (1UL << CoreDebug_DAUTHCTRL_INTSPNIDEN_Pos)    /*!< CoreDebug DAUTHCTRL: INTSPNIDEN, Mask */
 
@@ -2658,11 +2740,11 @@ __STATIC_INLINE uint32_t SCB_GetFPUType(void)
   uint32_t mvfr0;
 
   mvfr0 = FPU->MVFR0;
-  if      ((mvfr0 & (FPU_MVFR0_Single_precision_Msk | FPU_MVFR0_Double_precision_Msk)) == 0x220U)
+  if      ((mvfr0 & (FPU_MVFR0_FPSP_Msk | FPU_MVFR0_FPDP_Msk)) == 0x220U)
   {
     return 2U;           /* Double + Single precision FPU */
   }
-  else if ((mvfr0 & (FPU_MVFR0_Single_precision_Msk | FPU_MVFR0_Double_precision_Msk)) == 0x020U)
+  else if ((mvfr0 & (FPU_MVFR0_FPSP_Msk | FPU_MVFR0_FPDP_Msk)) == 0x020U)
   {
     return 1U;           /* Single precision FPU */
   }
@@ -2870,6 +2952,6 @@ __STATIC_INLINE int32_t ITM_CheckChar (void)
 }
 #endif
 
-#endif /* __CORE_ARMV8MML_H_DEPENDANT */
+#endif /* __CORE_ARMV81MML_H_DEPENDANT */
 
 #endif /* __CMSIS_GENERIC */
