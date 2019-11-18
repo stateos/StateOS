@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    10.11.2018
+    @date    18.11.2019
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -120,7 +120,7 @@ __STATIC_INLINE
 void core_ctx_switchNow( void )
 {
 	core_ctx_switch();
-	port_clr_lock(); port_set_barrier();
+	port_clr_lock(); __ISB();
 }
 
 // system infinite loop procedure for the current process

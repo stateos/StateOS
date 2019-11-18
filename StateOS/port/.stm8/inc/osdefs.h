@@ -2,7 +2,7 @@
 
     @file    StateOS: osdefs.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    18.11.2019
     @brief   StateOS port file for STM8 uC.
 
  ******************************************************************************
@@ -53,6 +53,12 @@
 #endif
 #ifndef __WFI
 #define __WFI                 wfi
+#endif
+#ifndef __ISB
+#define __ISB                 nop
+#endif
+#ifndef __COMPILER_BARRIER
+#define __COMPILER_BARRIER()
 #endif
 
 /* -------------------------------------------------------------------------- */

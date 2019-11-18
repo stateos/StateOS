@@ -39,6 +39,7 @@ Features:
 - added functional test
 - added support for stm32l1
 - updated stm8s port file
+- updated port definitions
 ---------
 6.4
 - removed ID_BLOCKED constant

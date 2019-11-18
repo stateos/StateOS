@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    05.11.2018
+    @date    18.11.2019
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,7 @@ static
 void priv_ctx_switchNow( void )
 {
 	port_ctx_switch();
-	port_clr_lock(); port_set_barrier();
+	port_clr_lock(); __ISB();
 	port_set_lock();
 }
 
