@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    19.11.2019
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -81,7 +81,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define               _FLG_INIT( init ) { _OBJ_INIT(), init }
+#define               _FLG_INIT( _init ) { _OBJ_INIT(), _init }
 
 /******************************************************************************
  *
