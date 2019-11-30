@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    30.11.2019
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -45,7 +45,7 @@
          ALIGNED( size, stk_t )
 
 #define STK_CROP( base, size ) \
-         LIMITED( (size_t)base + size, stk_t )
+         LIMITED( (intptr_t)base + size, stk_t )
 
 /* -------------------------------------------------------------------------- */
 
