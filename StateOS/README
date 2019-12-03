@@ -40,7 +40,6 @@ Features:
 - added support for stm32l1
 - updated stm8s port file
 - updated port definitions
-- added tsk_exit alias
 ---------
 6.4
 - removed ID_BLOCKED constant
