@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    03.12.2019
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -45,7 +45,7 @@
          ALIGNED( size, stk_t )
 
 #define STK_CROP( base, size ) \
-         LIMITED( (size_t)base + size, stk_t )
+         LIMITED( (intptr_t)base + size, stk_t )
 
 /* -------------------------------------------------------------------------- */
 
@@ -827,6 +827,7 @@ unsigned tsk_join( tsk_t *tsk );
 /******************************************************************************
  *
  * Name              : tsk_stop
+ * Alias             : tsk_exit
  *
  * Description       : stop current task and remove it from READY queue
  *                     function doesn't destroy the stack storage
@@ -842,6 +843,9 @@ unsigned tsk_join( tsk_t *tsk );
 
 __NO_RETURN
 void tsk_stop( void );
+
+__STATIC_INLINE
+void tsk_exit( void ) { tsk_stop(); }
 
 /******************************************************************************
  *
@@ -1392,6 +1396,7 @@ namespace ThisTask
 {
 	static inline unsigned detach    ( void )             { return cur_detach    ();        }
 	static inline void     stop      ( void )             {        tsk_stop      ();        }
+	static inline void     exit      ( void )             {        tsk_exit      ();        }
 	static inline unsigned reset     ( void )             { return cur_reset     ();        }
 	static inline unsigned kill      ( void )             { return cur_kill      ();        }
 	static inline unsigned destroy   ( void )             { return cur_destroy   ();        }
