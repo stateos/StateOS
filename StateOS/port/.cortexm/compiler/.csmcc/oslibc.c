@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    09.12.2019
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -28,8 +28,6 @@
    IN THE SOFTWARE.
 
  ******************************************************************************/
-
-#if defined(__CSMC__)
 
 #include "oskernel.h"
 #include "inc/oscriticalsection.h"
@@ -57,5 +55,3 @@ void *sbreak( int size )
 }
 
 /* -------------------------------------------------------------------------- */
-
-#endif // __CSMC__

@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    09.12.2019
     @brief   StateOS port file for STM8 uC.
 
  ******************************************************************************
@@ -29,8 +29,6 @@
 
  ******************************************************************************/
 
-#if defined(__SDCC)
-
 #include "oskernel.h"
 
 /* -------------------------------------------------------------------------- */
@@ -39,13 +37,23 @@ void *_get_SP( void ) __naked
 {
 	__asm
 
+#ifdef __SDCC_MODEL_LARGE
+	pop    a
+#endif
 	popw   y
 	ldw    x, sp
 	pushw  y
+#ifdef __SDCC_MODEL_LARGE
+	push   a
+	retf
+#else
 	ret
+#endif
 
 	__endasm;
 }
+
+/* -------------------------------------------------------------------------- */
 
 void _set_SP( void *sp ) __naked
 {
@@ -53,12 +61,20 @@ void _set_SP( void *sp ) __naked
 
 	__asm
 
+#ifdef __SDCC_MODEL_LARGE
+	pop    a
+#endif
 	popw   y
 	popw   x
 	ldw    sp, x
 	pushw  x
 	pushw  y
+#ifdef __SDCC_MODEL_LARGE
+	push   a
+	retf
+#else
 	ret
+#endif
 
 	__endasm;
 }
@@ -71,10 +87,16 @@ lck_t _get_CC( void ) __naked
 
 	push   cc
 	pop    a
+#ifdef __SDCC_MODEL_LARGE
+	retf
+#else
 	ret
+#endif
 
 	__endasm;
 }
+
+/* -------------------------------------------------------------------------- */
 
 void _set_CC( lck_t cc ) __naked
 {
@@ -82,10 +104,18 @@ void _set_CC( lck_t cc ) __naked
 
 	__asm
 
+#ifdef __SDCC_MODEL_LARGE
+	ld     a, (4, sp)
+#else
 	ld     a, (3, sp)
+#endif
 	push   a
 	pop    cc
+#ifdef __SDCC_MODEL_LARGE
+	retf
+#else
 	ret
+#endif
 
 	__endasm;
 }
@@ -99,5 +129,3 @@ void core_tsk_flip( void *sp )
 }
 
 /* -------------------------------------------------------------------------- */
-
-#endif // __SDCC
