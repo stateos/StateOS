@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    06.12.2019
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -104,7 +104,7 @@ extern "C" {
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define               _MEM_DATA( _limit, _size ) (que_t[_limit * (1 + _size)]){ { 0 } }
+#define               _MEM_DATA( _limit, _size ) (que_t[_limit * (1 + _size)]){ { NULL } }
 #endif
 
 /******************************************************************************
@@ -122,7 +122,7 @@ extern "C" {
 
 #define             OS_MEM( mem, limit, size )                                                    \
                        struct { mem_t mem; que_t buf[limit * (1 + MEM_SIZE(size))]; } mem##__wrk = \
-                       { _MEM_INIT( limit, MEM_SIZE(size), mem##__wrk.buf ), { { 0 } } };           \
+                       { _MEM_INIT( limit, MEM_SIZE(size), mem##__wrk.buf ), { { NULL } } };        \
                        mem_id mem = & mem##__wrk.mem
 
 /******************************************************************************
@@ -140,7 +140,7 @@ extern "C" {
 
 #define         static_MEM( mem, limit, size )                                                    \
                 static struct { mem_t mem; que_t buf[limit * (1 + MEM_SIZE(size))]; } mem##__wrk = \
-                       { _MEM_INIT( limit, MEM_SIZE(size), mem##__wrk.buf ), { { 0 } } };           \
+                       { _MEM_INIT( limit, MEM_SIZE(size), mem##__wrk.buf ), { { NULL } } };        \
                 static mem_id mem = & mem##__wrk.mem
 
 /******************************************************************************

@@ -2,8 +2,8 @@
 
     @file    StateOS: osdefs.h
     @author  Rajmund Szymanski
-    @date    18.11.2019
-    @brief   StateOS port file for STM8 uC.
+    @date    06.12.2019
+    @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
 
@@ -34,31 +34,8 @@
 
 /* -------------------------------------------------------------------------- */
 
-#if   defined(__SDCC)
-
-#ifndef __NO_RETURN
-#define __NO_RETURN          _Noreturn
-#endif
-
-#endif
-
 #ifndef __CONSTRUCTOR
-#define __CONSTRUCTOR
-#endif
-#ifndef __NO_RETURN
-#define __NO_RETURN
-#endif
-#ifndef __STATIC_INLINE
-#define __STATIC_INLINE       static inline
-#endif
-#ifndef __WFI
-#define __WFI                 wfi
-#endif
-#ifndef __ISB
-#define __ISB                 nop
-#endif
-#ifndef __COMPILER_BARRIER
-#define __COMPILER_BARRIER()
+#define __CONSTRUCTOR       __attribute__((constructor))
 #endif
 
 /* -------------------------------------------------------------------------- */

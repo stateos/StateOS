@@ -2,8 +2,8 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    18.11.2019
-    @brief   StateOS port file for STM8 uC.
+    @date    06.12.2019
+    @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
 
@@ -47,7 +47,7 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 #ifndef OS_STACK_SIZE
-#define OS_STACK_SIZE       128 /* default task stack size in bytes           */
+#define OS_STACK_SIZE       256 /* default task stack size in bytes           */
 #endif
 
 #ifndef OS_IDLE_STACK
@@ -60,8 +60,8 @@ extern "C" {
 #define OS_LOCK_LEVEL         0 /* critical section blocks all interrupts     */
 #endif
 
-#if     OS_LOCK_LEVEL > 0
-#error  osconfig.h: Incorrect OS_LOCK_LEVEL value! Must be 0.
+#if     OS_LOCK_LEVEL >= (1<<__NVIC_PRIO_BITS)
+#error  osconfig.h: Incorrect OS_LOCK_LEVEL value! Must be less then (1<<__NVIC_PRIO_BITS).
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -73,59 +73,58 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 #ifndef OS_FUNCTIONAL
-#define OS_FUNCTIONAL         0 /* c++ functional library header not included */
+#define OS_FUNCTIONAL         6
 #elif   OS_FUNCTIONAL
 #error  OS_FUNCTIONAL is an internal port definition!
 #endif//OS_FUNCTIONAL
 
 /* -------------------------------------------------------------------------- */
 
-typedef uint8_t               lck_t;
-typedef uint8_t               stk_t;
+typedef uint32_t              lck_t;
+typedef uint64_t              stk_t;
 
 /* -------------------------------------------------------------------------- */
 
-#if   defined(__CSMC__)
-extern  stk_t                _stack[];
-#define MAIN_TOP             _stack+1
-#endif
+extern  stk_t               __initial_sp[];
+#define MAIN_TOP            __initial_sp
 
 /* -------------------------------------------------------------------------- */
+
+// hardware context
+typedef struct __hwx hwx_t;
+
+struct __hwx
+{
+	unsigned r0, r1, r2, r3;
+	unsigned ip; // r12
+	unsigned lr; // r14
+	fun_t  * pc; // r15
+	unsigned cc; // psr
+};
+
+#define _HWX_INIT( pc ) { 0, 0, 0, 0, 0, 0, pc, 0x01000000 }
+
+// software context
+typedef struct __swx swx_t;
+
+struct __swx
+{
+	unsigned r4, r5, r6, r7, r8, r9, r10, r11;
+	unsigned lr;  // EXC_RETURN
+};
+
+#define _SWX_INIT() { 0, 0, 0, 0, 0, 0, 0, 0, 0xFFFFFFFD }
+
 // task context
-
 typedef struct __ctx ctx_t;
 
 struct __ctx
 {
-	char     dummy; // sp is a pointer to the first free byte on the stack
-	// context saved by the software
-#if   defined(__CSMC__)
-	char     r[10]; // c_lreg[4], c_y[3], c_x[3]
-#endif
-	// context saved by the hardware
-	char     cc;
-	char     a;
-	unsigned x;
-	unsigned y;
-#if   defined(__SDCC)
-#if  !defined(__SDCC_MODEL_LARGE)
-	char     far;   // hardware saves pc as a far pointer (3 bytes)
-#endif
-#else
-	FAR
-#endif
-	fun_t  * pc;
+	swx_t    swx;
+	hwx_t    hwx;
 };
 
-#if   defined(__SDCC)
-#if  !defined(__SDCC_MODEL_LARGE)
-#define _CTX_INIT( pc ) { 0, 0x20, 0, 0, 0, 0, pc }
-#else
-#define _CTX_INIT( pc ) { 0, 0x20, 0, 0, 0, pc }
-#endif
-#else
-#define _CTX_INIT( pc ) { 0, { 0 }, 0x20, 0, 0, 0, (FAR fun_t *) pc }
-#endif
+#define _CTX_INIT( pc ) { _SWX_INIT(), _HWX_INIT(pc) }
 
 /* -------------------------------------------------------------------------- */
 // init task context
@@ -133,15 +132,9 @@ struct __ctx
 __STATIC_INLINE
 void port_ctx_init( ctx_t *ctx, fun_t *pc )
 {
-	ctx->cc = 0x20;
-#if   defined(__SDCC)
-#if  !defined(__SDCC_MODEL_LARGE)
-	ctx->far = 0;
-#endif
-	ctx->pc = pc;
-#else
-	ctx->pc = (FAR fun_t *) pc;
-#endif
+	ctx->swx.lr = 0xFFFFFFFD; // EXC_RETURN: return from psp
+	ctx->hwx.pc = pc;
+	ctx->hwx.cc = 0x01000000;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -150,46 +143,21 @@ void port_ctx_init( ctx_t *ctx, fun_t *pc )
 __STATIC_INLINE
 bool port_isr_context( void )
 {
-	return false;
+	return (__get_IPSR() != 0U);
 }
 
 /* -------------------------------------------------------------------------- */
-
-#if   defined(__CSMC__)
-
-__STATIC_INLINE
-void *_get_SP( void )
-{
-	return (void*)_asm("ldw x, sp");
-}
+// are interrupts masked?
 
 __STATIC_INLINE
-void _set_SP( void *sp )
+bool port_isr_masked( void )
 {
-	_asm("ldw sp, x", sp);
-}
-
-__STATIC_INLINE
-lck_t _get_CC( void )
-{
-	return (lck_t)_asm("push cc""\n""pop a");
-}
-
-__STATIC_INLINE
-void _set_CC( lck_t lck )
-{
-	_asm("push a""\n""pop cc", lck);
-}
-
-#elif defined(__SDCC)
-
-void *_get_SP( void );
-void  _set_SP( void *sp );
-
-lck_t _get_CC( void );
-void  _set_CC( lck_t lck );
-
+#if __CORTEX_M >= 3
+	return (__get_PRIMASK() != 0U) || (__get_BASEPRI() != 0U);
+#else
+	return (__get_PRIMASK() != 0U);
 #endif
+}
 
 /* -------------------------------------------------------------------------- */
 // get current stack pointer
@@ -197,34 +165,81 @@ void  _set_CC( lck_t lck );
 __STATIC_INLINE
 void * port_get_sp( void )
 {
-	return _get_SP();
+	return (void *) __get_PSP();
 }
 
 /* -------------------------------------------------------------------------- */
 
+#if OS_LOCK_LEVEL && (__CORTEX_M >= 3)
+
 __STATIC_INLINE
 lck_t port_get_lock( void )
 {
-	return _get_CC();
+	return __get_BASEPRI();
 }
 
 __STATIC_INLINE
 void port_put_lock( lck_t lck )
 {
-	_set_CC(lck);
+	__set_BASEPRI(lck);
 }
 
 __STATIC_INLINE
 void port_set_lock( void )
 {
-	disableInterrupts();
+	__set_BASEPRI((OS_LOCK_LEVEL) << (8 - (__NVIC_PRIO_BITS)));
 }
 
 __STATIC_INLINE
 void port_clr_lock( void )
 {
-	enableInterrupts();
+	__set_BASEPRI(0);
 }
+
+#else
+
+__STATIC_INLINE
+lck_t port_get_lock( void )
+{
+	return __get_PRIMASK();
+}
+
+__STATIC_INLINE
+void port_put_lock( lck_t lck )
+{
+	__set_PRIMASK(lck);
+}
+
+__STATIC_INLINE
+void port_set_lock( void )
+{
+	__disable_irq();
+}
+
+__STATIC_INLINE
+void port_clr_lock( void )
+{
+	__enable_irq();
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#ifndef OS_MULTICORE
+#if __CORTEX_M > 0
+#define OS_MULTICORE
+
+__STATIC_INLINE
+void port_spn_lock( volatile unsigned *lock )
+{
+    while (__LDREXW((volatile uint32_t *)lock) || __STREXW(1, (volatile uint32_t *)lock));
+}
+
+#endif
+#else
+#error  OS_MULTICORE is an internal port definition!
+#endif//OS_MULTICORE
 
 /* -------------------------------------------------------------------------- */
 

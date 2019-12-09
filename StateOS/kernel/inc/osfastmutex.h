@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    06.12.2019
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -69,7 +69,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define               _MUT_INIT() { _OBJ_INIT(), 0 }
+#define               _MUT_INIT() { _OBJ_INIT(), NULL }
 
 /******************************************************************************
  *

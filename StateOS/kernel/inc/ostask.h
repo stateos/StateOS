@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    03.12.2019
+    @date    06.12.2019
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -45,7 +45,7 @@
          ALIGNED( size, stk_t )
 
 #define STK_CROP( base, size ) \
-         LIMITED( (intptr_t)base + size, stk_t )
+         LIMITED( (intptr_t)base + (intptr_t)size, stk_t )
 
 /* -------------------------------------------------------------------------- */
 
@@ -65,9 +65,13 @@ struct __tsk
 	fun_t  * state; // task state (initial task function, doesn't have to be noreturn-type)
 #if OS_FUNCTIONAL
 	FUN_t    fun;   // function<void(void)> for internal use in c++ functions
-#define     _FUN_INIT(_state) _state, { 0 }
+#ifdef     __cplusplus
+#define     _FUN_INIT(_state) (fun_t*)_state, { FUN_t() }
 #else
-#define     _FUN_INIT(_state) _state
+#define     _FUN_INIT(_state) (fun_t*)_state, { NULL }
+#endif
+#else
+#define     _FUN_INIT(_state) (fun_t*)_state
 #endif
 	cnt_t    start; // inherited from timer
 	cnt_t    delay; // inherited from timer
@@ -96,9 +100,13 @@ struct __tsk
 	act_t  * action;// signal handler
 #if OS_FUNCTIONAL
 	ACT_t    act;   // function<void(unsigned)> for internal use in c++ functions
-#define     _ACT_INIT() 0, { 0 }
+#ifdef     __cplusplus
+#define     _ACT_INIT() NULL, { ACT_t() }
 #else
-#define     _ACT_INIT() 0
+#define     _ACT_INIT() NULL, { NULL }
+#endif
+#else
+#define     _ACT_INIT() NULL
 #endif
 	struct {
 	void   * sp;
@@ -209,7 +217,8 @@ extern "C" {
  ******************************************************************************/
 
 #define               _TSK_INIT( _prio, _state, _stack, _size ) \
-                       { _HDR_INIT(), _FUN_INIT(_state), 0, 0, 0, 0, _stack, _size, 0, _prio, _prio, 0, 0, 0, { 0, 0 }, { 0, _ACT_INIT(), { 0, 0 } }, { { 0 } }, _TSK_EXTRA }
+                       { _HDR_INIT(), _FUN_INIT(_state), 0, 0, 0, NULL, _stack, _size, NULL, _prio, _prio, NULL, NULL, 0, \
+                       { NULL, NULL }, { 0, _ACT_INIT(), { NULL, NULL } }, { { NULL } }, _TSK_EXTRA }
 
 /******************************************************************************
  *

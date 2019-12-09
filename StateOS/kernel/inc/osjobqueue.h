@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    06.12.2019
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -100,7 +100,7 @@ extern "C" {
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define               _JOB_DATA( _limit ) (fun_t *[_limit]){ 0 }
+#define               _JOB_DATA( _limit ) (fun_t *[_limit]){ NULL }
 #endif
 
 /******************************************************************************
@@ -117,7 +117,7 @@ extern "C" {
 
 #define             OS_JOB( job, limit )                                    \
                        struct { job_t job; fun_t *buf[limit]; } job##__wrk = \
-                       { _JOB_INIT( limit, job##__wrk.buf ), { 0 } };         \
+                       { _JOB_INIT( limit, job##__wrk.buf ), { NULL } };      \
                        job_id job = & job##__wrk.job
 
 /******************************************************************************
@@ -134,7 +134,7 @@ extern "C" {
 
 #define         static_JOB( job, limit )                                    \
                 static struct { job_t job; fun_t *buf[limit]; } job##__wrk = \
-                       { _JOB_INIT( limit, job##__wrk.buf ), { 0 } };         \
+                       { _JOB_INIT( limit, job##__wrk.buf ), { NULL } };      \
                 static job_id job = & job##__wrk.job
 
 /******************************************************************************

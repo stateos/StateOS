@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    18.11.2019
+    @date    06.12.2019
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -73,15 +73,7 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 #ifndef OS_FUNCTIONAL
-
-#if   defined(__ARMCOMPILER_VERSION)
-#define OS_FUNCTIONAL         6
-#elif defined(__GNUC__)
-#define OS_FUNCTIONAL         4
-#else
 #define OS_FUNCTIONAL         0 /* c++ functional library header not included */
-#endif
-
 #elif   OS_FUNCTIONAL
 #error  OS_FUNCTIONAL is an internal port definition!
 #endif//OS_FUNCTIONAL
@@ -178,8 +170,6 @@ void * port_get_sp( void )
 
 /* -------------------------------------------------------------------------- */
 
-#if   defined(__CSMC__)
-
 __STATIC_INLINE
 void __disable_irq( void )
 {
@@ -191,8 +181,6 @@ void __enable_irq( void )
 {
 	__ASM("cpsie i");
 }
-
-#endif
 
 /* -------------------------------------------------------------------------- */
 

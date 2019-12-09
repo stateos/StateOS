@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    19.11.2018
+    @date    06.12.2019
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -103,7 +103,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define               _MTX_INIT( _mode, _prio ) { _OBJ_INIT(), 0, _mode, 0, _prio, 0 }
+#define               _MTX_INIT( _mode, _prio ) { _OBJ_INIT(), NULL, _mode, 0, _prio, NULL }
 
 /******************************************************************************
  *
