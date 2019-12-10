@@ -98,7 +98,7 @@ COMMON_F   += -O$(OPTF) -ffunction-sections -fdata-sections
 ifneq ($(filter USE_LTO,$(DEFS)),)
 COMMON_F   += -flto
 endif
-COMMON_F   += -Wall -Wextra -Wshadow # -Wpedantic
+COMMON_F   += -Wall -Wextra -Wshadow -Wpedantic
 COMMON_F   += -MD -MP
 COMMON_F   += # -Wa,-amhls=$(@:.o=.lst)
 ifneq ($(filter DEBUG,$(DEFS)),)
@@ -107,7 +107,7 @@ endif
 
 AS_FLAGS    =
 C_FLAGS     =
-CXX_FLAGS   = -fno-rtti -fno-exceptions -fno-use-cxa-atexit # -Wzero-as-null-pointer-constant
+CXX_FLAGS   = -fno-rtti -fno-exceptions -fno-use-cxa-atexit -Wzero-as-null-pointer-constant
 LD_FLAGS    = -Wl,-T$(SCRIPT),-Map=$(MAP),--cref,--no-warn-mismatch,--gc-sections
 ifneq ($(filter main_stack_size%,$(DEFS)),)
 LD_FLAGS   += -Wl,--defsym=$(filter main_stack_size%,$(DEFS))

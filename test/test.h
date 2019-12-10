@@ -43,8 +43,8 @@ void test_call(fun_t *fun);
 #define UNIT_Notify()          puts(__FILE__)
 #define TEST_Notify()          puts(__FILE__)
 #else//!__CSMC__
-#define UNIT_Notify()          puts(__FUNCTION__)
-#define TEST_Notify()          puts(__FUNCTION__)
+#define UNIT_Notify()          puts(__func__)
+#define TEST_Notify()          puts(__func__)
 #endif//__CSMC__
 #else//!DEBUG
 #define UNIT_Notify()          LED_Tick()
