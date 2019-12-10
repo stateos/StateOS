@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     24.12.2018
+#date     03.12.2019
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -29,7 +29,6 @@ KEYS       += .csmcc .cortexm .stm32f4 *
 ifneq ($(MAKECMDGOALS),qemu)
 LIBS       += crtsi libfpulc libilc libm
 else
-DEFS       += QEMU
 LIBS       += crtsi libflc   libilc libm
 endif
 MODEL      := modlc
@@ -96,11 +95,13 @@ TXTS       := $(OBJS:.o=.la)
 
 AS_FLAGS   := #-ax
 AS_FLAGS   += -l -ep
-C_FLAGS    := #+debug
 C_FLAGS    += #+strict +warn
 C_FLAGS    += +$(MODEL) -pc99 -l -pad
 ifneq ($(MAKECMDGOALS),qemu)
 C_FLAGS    += +fpu
+endif
+ifneq ($(filter DEBUG,$(DEFS)),)
+C_FLAGS    := +debug
 endif
 LD_FLAGS   := -m $(MAP) -p
 

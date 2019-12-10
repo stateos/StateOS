@@ -18,7 +18,7 @@ static void proc1()
 {
 	        ThisTask::action(action);
 	        ThisTask::suspend();                 ASSERT(sent == received);
-	        ThisTask::action(0);
+	        ThisTask::action(NULL);
 	        ThisTask::stop();
 }
 

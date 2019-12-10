@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     24.12.2018
+#date     03.12.2019
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -14,7 +14,7 @@ QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board 
 #----------------------------------------------------------#
 
 PROJECT    ?= $(notdir $(CURDIR))
-DEFS       ?= DEBUG USE_SEMIHOST port_sys_init=__iar_init_core
+DEFS       ?= DEBUG USE_SEMIHOST
 DIRS       ?=
 INCS       ?=
 LIBS       ?=
@@ -34,7 +34,6 @@ CC         := $(IARCC)iccarm
 CXX        := $(IARCC)iccarm
 COPY       := $(IARCC)ielftool
 DUMP       := $(GNUCC)objdump
-#DUMP       := $(IARCC)ielfdumparm
 SIZE       := $(GNUCC)size
 LD         := $(IARCC)ilinkarm
 AR         := $(IARCC)iarchive
@@ -89,11 +88,10 @@ LSTS       := $(OBJS:.o=.lst)
 
 #----------------------------------------------------------#
 
-CORE_F     := --cpu Cortex-M4
 ifneq ($(MAKECMDGOALS),qemu)
-CORE_F     += --fpu VFPv4_sp
+CORE_F     := --cpu Cortex-M4 --fpu VFPv4_sp
 else
-DEFS       += QEMU
+CORE_F     := --cpu Cortex-M4
 endif
 COMMON_F    = --thumb -O$(OPTF) -e --dependencies=m $*.d
 AS_FLAGS    = -S -s+ -w+
@@ -194,7 +192,6 @@ $(HEX) : $(ELF)
 $(LSS) : $(ELF)
 	$(info Creating extended listing: $(LSS))
 	$(DUMP) --demangle -S $< > $@
-#	$(DUMP) --all $< -o $@
 
 print_size :
 	$(info Size of modules:)

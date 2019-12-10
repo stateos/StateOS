@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    stm32f4_io.h
  * @author  Rajmund Szymanski
- * @date    03.05.2017
+ * @date    18.10.2018
  * @brief   This file contains macro definitions for the STM32F4XX GPIO ports.
  ******************************************************************************/
 
@@ -109,8 +109,8 @@ struct __gpio_config
 #define GPIO_AF_TIM12     _VAL2FLD(GPIO_AF, 9)  /* TIM12 Alternate Function mapping */
 #define GPIO_AF_TIM13     _VAL2FLD(GPIO_AF, 9)  /* TIM13 Alternate Function mapping */
 #define GPIO_AF_TIM14     _VAL2FLD(GPIO_AF, 9)  /* TIM14 Alternate Function mapping */
-#define GPIO_AF9_I2C2     _VAL2FLD(GPIO_AF, 9)  /* I2C2 Alternate Function mapping (Only for STM32F401xx Devices) */
-#define GPIO_AF9_I2C3     _VAL2FLD(GPIO_AF, 9)  /* I2C3 Alternate Function mapping (Only for STM32F401xx Devices) */
+#define GPIO_AF9_I2C2     _VAL2FLD(GPIO_AF, 9)  /* I2C2 Alternate Function mapping */
+#define GPIO_AF9_I2C3     _VAL2FLD(GPIO_AF, 9)  /* I2C3 Alternate Function mapping */
 #define GPIO_AF_OTG_FS    _VAL2FLD(GPIO_AF,10)  /* OTG_FS Alternate Function mapping */
 #define GPIO_AF_OTG_HS    _VAL2FLD(GPIO_AF,10)  /* OTG_HS Alternate Function mapping */
 #define GPIO_AF_ETH       _VAL2FLD(GPIO_AF,11)  /* ETHERNET Alternate Function mapping */
@@ -190,7 +190,7 @@ struct __gpio_config
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+__STATIC_FORCEINLINE
 uint32_t __stretch( uint32_t pins )
 {
 	return 
@@ -214,7 +214,7 @@ uint32_t __stretch( uint32_t pins )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+__STATIC_FORCEINLINE
 void __pinini( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	uint32_t high;
@@ -237,7 +237,7 @@ void __pinini( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+__STATIC_FORCEINLINE
 void __pincfg( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	uint32_t high;
@@ -263,7 +263,7 @@ void __pincfg( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+__STATIC_FORCEINLINE
 void __pinlck( GPIO_TypeDef *gpio, uint32_t pins )
 {
 	gpio->LCKR    = pins | 0x00010000;
@@ -275,10 +275,10 @@ void __pinlck( GPIO_TypeDef *gpio, uint32_t pins )
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+__STATIC_FORCEINLINE
 void GPIO_Init( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
-	BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; __DSB();
+	RCC->AHB1ENR |= 1U << GPIO_PORT(gpio); RCC->AHB1ENR;
 
 	__pinini(gpio, pins, cfg);
 }
@@ -288,14 +288,14 @@ void GPIO_Init( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 static inline
 void GPIO_Config( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
-	BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; __DSB();
+	RCC->AHB1ENR |= 1U << GPIO_PORT(gpio); RCC->AHB1ENR;
 
 	__pincfg(gpio, pins, cfg);
 }
 
 /* -------------------------------------------------------------------------- */
 
-static inline
+__STATIC_FORCEINLINE
 void GPIO_Lock( GPIO_TypeDef *gpio, uint32_t pins )
 {
 	__pinlck(gpio, pins);
@@ -317,7 +317,7 @@ template<const unsigned gpio>
 class PortT
 {
 public:
-	PortT( void ) { BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; }
+	PortT( void ) { RCC->AHB1ENR |= 1U << GPIO_PORT(gpio); RCC->AHB1ENR; }
 	
 	void init  ( const unsigned pins, const unsigned cfg ) { __pinini((GPIO_TypeDef *)gpio, pins, cfg); }
 	void config( const unsigned pins, const unsigned cfg ) { __pincfg((GPIO_TypeDef *)gpio, pins, cfg); }
@@ -365,7 +365,7 @@ template<const unsigned gpio, const unsigned pin>
 class PinT
 {
 public:
-	PinT( void ) { BITBAND(RCC->AHB1ENR)[GPIO_PORT(gpio)] = 1; }
+	PinT( void ) { RCC->AHB1ENR |= 1U << GPIO_PORT(gpio); RCC->AHB1ENR; }
 
 	void init  ( const unsigned cfg ) { __pinini((GPIO_TypeDef *)gpio, 1 << pin, cfg); }
 	void config( const unsigned cfg ) { __pincfg((GPIO_TypeDef *)gpio, 1 << pin, cfg); }

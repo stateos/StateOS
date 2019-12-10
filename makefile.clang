@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     12.11.2019
+#date     03.12.2019
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -33,7 +33,7 @@ AS         := $(CLANG)armclang -x assembler-with-cpp
 CC         := $(CLANG)armclang
 CXX        := $(CLANG)armclang
 COPY       := $(CLANG)fromelf
-DUMP       := $(CLANG)fromelf
+DUMP       := $(GNUCC)objdump
 SIZE       := $(GNUCC)size
 LD         := $(CLANG)armlink
 AR         := $(CLANG)armar
@@ -90,11 +90,11 @@ TXTS       := $(OBJS:.o=.txt)
 
 #----------------------------------------------------------#
 
-COMMON_F    = --target=arm-arm-none-eabi -mthumb -mcpu=cortex-m4
+COMMON_F    = --target=arm-arm-none-eabi -mthumb
 ifneq ($(MAKECMDGOALS),qemu)
-COMMON_F   += -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffast-math
+COMMON_F   += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffast-math
 else
-DEFS       += QEMU
+COMMON_F   += -mcpu=cortex-m3
 endif
 COMMON_F   += -O$(OPTF) -ffunction-sections -fdata-sections
 ifneq ($(filter USE_LTO,$(DEFS)),)
@@ -102,11 +102,13 @@ COMMON_F   += -flto
 endif
 COMMON_F   += -Wall -Wextra -Wshadow # -Wpedantic
 COMMON_F   += -MD -MP
-COMMON_F   += # --debug
+ifneq ($(filter DEBUG,$(DEFS)),)
+COMMON_F   += --debug
+endif
 
 AS_FLAGS    =
 C_FLAGS     =
-CXX_FLAGS   = -fno-rtti -fno-exceptions # -fno-use-cxa-atexit
+CXX_FLAGS   = -fno-rtti -fno-exceptions # -Wzero-as-null-pointer-constant # -fno-use-cxa-atexit
 LD_FLAGS    = --strict --scatter=$(SCRIPT) --symbols --list_mapping_symbols
 LD_FLAGS   += --map --info common,sizes,summarysizes,totals,veneers,unused --list=$(MAP) # --callgraph
 ifneq ($(filter USE_LTO,$(DEFS)),)
@@ -217,7 +219,7 @@ $(HEX) : $(ELF)
 
 $(LSS) : $(ELF)
 	$(info Creating extended listing: $(LSS))
-	$(DUMP) $< --text -c -z --output $@
+	$(DUMP) --demangle -S $< > $@
 
 print_size :
 	$(info Size of modules:)

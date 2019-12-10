@@ -18,7 +18,7 @@ static void proc1()
 {
 	        cur_action(action);
 	        cur_suspend();	                     ASSERT(sent == received);
-	        cur_action(0);
+	        cur_action(NULL);
 	        tsk_stop();
 }
 
