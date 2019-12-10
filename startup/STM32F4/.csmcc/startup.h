@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     14.11.2017
+@date     10.12.2019
 @brief    Startup file header for cosmic c compiler.
 *******************************************************************************/
 
@@ -11,15 +11,16 @@
  Additional definitions
 *******************************************************************************/
 
-#define __ALIAS(function)  __WEAK
-#define __VECTORS \#pragma section const { vectors }
+#define __ALIAS(function) __WEAK
+#define __VECTORS         \#pragma section const { vectors }
+#define __CAST(sp)        (void(*)(void))(intptr_t)(sp)
 
 /*******************************************************************************
  Prototypes of external functions
 *******************************************************************************/
 
-__WEAK      void port_sys_init( void );
-__NO_RETURN void        _stext( void );
+__WEAK      void  _init( void );
+__NO_RETURN void _stext( void );
 
 /*******************************************************************************
  Default reset procedures
@@ -29,7 +30,7 @@ __STATIC_INLINE
 void __main( void )
 {
 	/* Call the os initialization procedure */
-	port_sys_init();
+	_init();
 	/* Call the application's entry point */
 	_stext();
 }

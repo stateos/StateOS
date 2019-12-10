@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     19.07.2018
+@date     10.12.2019
 @brief    Startup file header for armcc compiler.
 *******************************************************************************/
 
@@ -56,6 +56,7 @@ __initial_sp    EQU     __initial_msp
 
 #define __ALIAS(function) __attribute__ ((weak, alias(#function)))
 #define __VECTORS         __attribute__ ((used, section(".vectors")))
+#define __CAST(sp)        (void(*)(void))(sp)
 
 /*******************************************************************************
  Prototypes of external functions

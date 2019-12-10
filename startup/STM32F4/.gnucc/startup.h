@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     12.11.2019
+@date     10.12.2019
 @brief    Startup file header for gcc compiler.
 *******************************************************************************/
 
@@ -13,6 +13,7 @@
 
 #define __ALIAS(function) __attribute__ ((weak, alias(#function)))
 #define __VECTORS         __attribute__ ((used, section(".vectors")))
+#define __CAST(sp)        (void(*)(void))(intptr_t)(sp)
 
 /*******************************************************************************
  Prototypes of external functions
