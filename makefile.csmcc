@@ -7,7 +7,7 @@
 
 CSMCC      := c:/sys/cosmic/cxstm32/
 GNUCC      := c:/sys/gcc/arm/bin/arm-none-eabi-
-OPENOCD    := c:/sys/tools/openocd/bin-x64/openocd
+OPENOCD    := c:/sys/tools/openocd/bin/openocd
 STLINK     := c:/sys/tools/st-link/st-link_cli -Q -c SWD UR
 QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
 
@@ -95,13 +95,13 @@ TXTS       := $(OBJS:.o=.la)
 
 AS_FLAGS   := #-ax
 AS_FLAGS   += -l -ep
-C_FLAGS    += #+strict +warn
+C_FLAGS    := #+strict +warn
 C_FLAGS    += +$(MODEL) -pc99 -l -pad
 ifneq ($(MAKECMDGOALS),qemu)
 C_FLAGS    += +fpu
 endif
 ifneq ($(filter DEBUG,$(DEFS)),)
-C_FLAGS    := +debug
+C_FLAGS    += +debug
 endif
 LD_FLAGS   := -m $(MAP) -p
 
