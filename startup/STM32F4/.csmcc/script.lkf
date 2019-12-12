@@ -1,7 +1,7 @@
 #***********************************************************
 # file     stm32f4xx.lkf
 # author   Rajmund Szymanski
-# date     19.07.2018
+# date     11.12.2019
 # brief    Link command file for STM32F407VG device with 1024KB FLASH and 192KB RAM
 #***********************************************************
 
@@ -33,7 +33,7 @@
 +seg .bss     -a .data                 -r2 -n .bss
 +seg .heap    -a .bss                  -r3 -n .heap
 # segment stack:
-+seg .stack   -e __RAM_start+__RAM_size    -n .stack
++seg .stack   -e __RAM_end                 -n .stack
 # segment bkp:
 +seg .bkp     -b __BKP_start -m __BKP_size -n .bkp
 

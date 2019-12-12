@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     stm32f4xx.sct
 @author   Rajmund Szymanski
-@date     18.05.2016
+@date     11.12.2019
 @brief    Scatter file for STM32F407VG device with 1024KB FLASH and 192KB RAM
 *******************************************************************************/
 
@@ -9,7 +9,7 @@ FLASH 0x08000000 0x00100000
 {
 	ROM +0
 	{
-		*(.vectors, +FIRST)
+		*(RESET, +FIRST)
 		*(InRoot$$Sections)
 		.ANY(+RO)
 	}

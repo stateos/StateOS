@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     10.12.2019
+@date     11.12.2019
 @brief    Startup file header for armcc compiler.
 *******************************************************************************/
 
@@ -55,7 +55,7 @@ __initial_sp    EQU     __initial_msp
 *******************************************************************************/
 
 #define __ALIAS(function) __attribute__ ((weak, alias(#function)))
-#define __VECTORS         __attribute__ ((used, section(".vectors")))
+#define __VECTORS         __attribute__ ((used, section("RESET")))
 #define __CAST(sp)        (void(*)(void))(sp)
 
 /*******************************************************************************

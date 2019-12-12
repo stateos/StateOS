@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup_stm32f4xx.c
 @author   Rajmund Szymanski
-@date     10.12.2019
+@date     11.12.2019
 @brief    STM32F4xx startup file.
           After reset the Cortex-M4 processor is in thread mode,
           priority is privileged, and the stack is set to main.
@@ -210,8 +210,7 @@ __ALIAS(Fault_Handler) void FMPI2C1_ER_IRQHandler         (void);
  Vector table for STM32F4xx (Cortex-M4F)
 *******************************************************************************/
 
-__VECTORS
-void (* const __vector_table[])(void) =
+void (* const __VECTOR_TABLE[])(void) __VECTOR_TABLE_ATTRIBUTE =
 {
 	/* Initial stack pointer */
 	__CAST(__initial_msp),

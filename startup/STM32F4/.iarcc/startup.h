@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     10.12.2019
+@date     11.12.2019
 @brief    Startup file header for iar c compiler.
 *******************************************************************************/
 
@@ -12,7 +12,7 @@
 *******************************************************************************/
 
 #define __ALIAS(function) __attribute__ ((weak, alias(#function)))
-#define __VECTORS         __attribute__ ((used, section(".vectors")))
+#define __VECTORS         __attribute__ ((used, section(".intvec")))
 #define __CAST(sp)        (void(*)(void))(intptr_t)(sp)
 
 /*******************************************************************************

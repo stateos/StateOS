@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     10.12.2019
+@date     11.12.2019
 @brief    Startup file header for cosmic c compiler.
 *******************************************************************************/
 
@@ -12,8 +12,15 @@
 *******************************************************************************/
 
 #define __ALIAS(function) __WEAK
-#define __VECTORS         \#pragma section const { vectors }
-#define __CAST(sp)        (void(*)(void))(intptr_t)(sp)
+#define __CAST(sp)        (void(*)(void))(sp)
+
+#ifndef __VECTOR_TABLE
+#define __VECTOR_TABLE            _Vectors
+#endif
+
+#ifndef __VECTOR_TABLE_ATTRIBUTE
+#define __VECTOR_TABLE_ATTRIBUTE  _Pragma("section const { vectors }")
+#endif
 
 /*******************************************************************************
  Prototypes of external functions
@@ -29,7 +36,7 @@ __NO_RETURN void _stext( void );
 __STATIC_INLINE
 void __main( void )
 {
-	/* Call the os initialization procedure */
+	/* Call the low level initialization procedure */
 	_init();
 	/* Call the application's entry point */
 	_stext();
