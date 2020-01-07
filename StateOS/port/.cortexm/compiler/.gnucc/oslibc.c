@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    09.12.2019
+    @date    03.01.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -35,14 +35,15 @@
 
 /* -------------------------------------------------------------------------- */
 
-static unsigned LCK = 0;
+static lck_t    LCK = 0;
 static unsigned CNT = 0;
 
 /* -------------------------------------------------------------------------- */
 
+__USED
 void __malloc_lock()
 {
-	unsigned lock;
+	lck_t lock;
 
 	assert(CNT+1);
 
@@ -54,6 +55,7 @@ void __malloc_lock()
 
 /* -------------------------------------------------------------------------- */
 
+__USED
 void __malloc_unlock()
 {
 	assert(CNT);
@@ -64,6 +66,7 @@ void __malloc_unlock()
 
 /* -------------------------------------------------------------------------- */
 
+__USED
 caddr_t _sbrk_r( struct _reent *reent, size_t size )
 {
 	extern char __heap_start[];

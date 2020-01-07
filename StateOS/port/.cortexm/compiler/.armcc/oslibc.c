@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    09.12.2019
+    @date    03.01.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 
 #if !defined(__MICROLIB)
 
-__attribute__((used))
+__USED
 void *__user_perthread_libspace( void )
 {
 	return &System.cur->libspace;  /* provide separate libspace for each task */
@@ -44,34 +44,37 @@ void *__user_perthread_libspace( void )
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__((used))
-int _mutex_initialize( unsigned *mutex )
+__USED
+int _mutex_initialize( lck_t *mutex )
 {
-	return (int) mutex;
+	(void) mutex;
+
+	return 1;
 }
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__((used))
-void _mutex_acquire( unsigned *mutex )
+__USED
+void _mutex_acquire( lck_t *mutex )
 {
-	unsigned lock = port_get_lock();
+	lck_t lock = port_get_lock();
 	port_set_lock();
 	*mutex = lock;
 }
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__((used))
-void _mutex_release( unsigned *mutex )
+__USED
+void _mutex_release( lck_t *mutex )
 {
-	port_put_lock(*mutex);
+	lck_t lock = *mutex;
+	port_put_lock(lock);
 }
 
 /* -------------------------------------------------------------------------- */
 
-__attribute__((used))
-void _mutex_free( unsigned *mutex )
+__USED
+void _mutex_free( lck_t *mutex )
 {
 	(void) mutex;
 }
