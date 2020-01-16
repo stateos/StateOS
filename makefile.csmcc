@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     03.12.2019
+#date     16.01.2020
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -93,17 +93,16 @@ TXTS       := $(OBJS:.o=.la)
 
 #----------------------------------------------------------#
 
-AS_FLAGS   := #-ax
-AS_FLAGS   += -l -ep
-C_FLAGS    := #+strict +warn
-C_FLAGS    += +$(MODEL) -pc99 -l -pad
-ifneq ($(MAKECMDGOALS),qemu)
-C_FLAGS    += +fpu
-endif
+AS_FLAGS   := -l -ep #-ax
+C_FLAGS    := +$(MODEL) -pc99 -l -pad # +warn # +strict
+C_FLAGS    += $(if $(filter qemu,$(MAKECMDGOALS)),,+fpu)
+LD_FLAGS   := -m $(MAP) -p
+
+#----------------------------------------------------------#
+
 ifneq ($(filter DEBUG,$(DEFS)),)
 C_FLAGS    += +debug
 endif
-LD_FLAGS   := -m $(MAP) -p
 
 #----------------------------------------------------------#
 
@@ -185,7 +184,7 @@ $(HEX) : $(CXM)
 	$(info Creating HEX image: $(HEX))
 	$(DUMP) -o $@ $<
 
-print_elf_size :
+print_elf_size : $(ELF)
 	$(info Size of target file:)
 	$(SIZE) -B $(ELF)
 

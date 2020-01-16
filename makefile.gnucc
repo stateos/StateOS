@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     03.12.2019
+#date     16.01.2020
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -88,22 +88,12 @@ LSTS       := $(OBJS:.o=.lst)
 
 #----------------------------------------------------------#
 
-COMMON_F    = -mthumb
-ifneq ($(MAKECMDGOALS),qemu)
-COMMON_F   += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffast-math
-else
-COMMON_F   += -mcpu=cortex-m4
-endif
+COMMON_F    = -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -ffast-math
+COMMON_F   += -mfloat-abi=$(if $(filter qemu,$(MAKECMDGOALS)),soft,hard)
 COMMON_F   += -O$(OPTF) -ffunction-sections -fdata-sections
-ifneq ($(filter USE_LTO,$(DEFS)),)
-COMMON_F   += -flto
-endif
 COMMON_F   += -Wall -Wextra -Wshadow -Wpedantic
 COMMON_F   += -MD -MP
 COMMON_F   += # -Wa,-amhls=$(@:.o=.lst)
-ifneq ($(filter DEBUG,$(DEFS)),)
-COMMON_F   += -g -ggdb
-endif
 
 AS_FLAGS    =
 C_FLAGS     =
@@ -134,6 +124,12 @@ LD_FLAGS   += --specs=nosys.specs
 endif
 ifneq ($(filter USE_SEMIHOST,$(DEFS)),)
 LD_FLAGS   += --specs=rdimon.specs
+endif
+ifneq ($(filter USE_LTO,$(DEFS)),)
+COMMON_F   += -flto
+endif
+ifneq ($(filter DEBUG,$(DEFS)),)
+COMMON_F   += -g -ggdb
 endif
 
 #----------------------------------------------------------#
@@ -219,11 +215,11 @@ $(LSS) : $(ELF)
 	$(info Creating extended listing: $(LSS))
 	$(DUMP) --demangle -S $< > $@
 
-print_size :
+print_size : $(OBJS_ALL)
 	$(info Size of modules:)
 	$(SIZE) -B -t --common $(OBJS_ALL)
 
-print_elf_size : # print_size
+print_elf_size : $(ELF)
 	$(info Size of target file:)
 	$(SIZE) -B $(ELF)
 

@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     03.12.2019
+#date     16.01.2020
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -88,24 +88,32 @@ LSTS       := $(OBJS:.o=.lst)
 
 #----------------------------------------------------------#
 
-ifneq ($(MAKECMDGOALS),qemu)
-CORE_F     := --cpu Cortex-M4 --fpu VFPv4_sp
-else
-CORE_F     := --cpu Cortex-M4
-endif
+CORE_F     := --cpu=cortex-m4.fp.sp
+CORE_F     += $(if $(filter qemu,$(MAKECMDGOALS)),--fpu=soft,)
+
 COMMON_F    = --thumb -O$(OPTF) -e --dependencies=m $*.d
+
 AS_FLAGS    = -S -s+ -w+
 C_FLAGS     = --silent
 CXX_FLAGS   = --silent --enable_restrict --c++ --no_rtti --no_exceptions
 LD_FLAGS    = --silent --config $(SCRIPT) --map $(MAP) --no_exceptions
-ifneq ($(filter USE_SEMIHOST,$(DEFS)),)
-LD_FLAGS   += --semihosting
-endif
 ifneq ($(filter main_stack_size%,$(DEFS)),)
 LD_FLAGS   += --config_def $(filter main_stack_size%,$(DEFS))
 endif
 ifneq ($(filter proc_stack_size%,$(DEFS)),)
 LD_FLAGS   += --config_def $(filter proc_stack_size%,$(DEFS))
+endif
+
+#----------------------------------------------------------#
+
+ifneq ($(strip $(CXX_SRCS)),)
+DEFS       += __USES_CXX
+endif
+ifneq ($(filter USE_SEMIHOST,$(DEFS)),)
+LD_FLAGS   += --semihosting
+endif
+ifneq ($(filter DEBUG,$(DEFS)),)
+COMMON_F   += --debug
 endif
 
 #----------------------------------------------------------#
@@ -193,11 +201,11 @@ $(LSS) : $(ELF)
 	$(info Creating extended listing: $(LSS))
 	$(DUMP) --demangle -S $< > $@
 
-print_size :
+print_size : $(OBJS_ALL)
 	$(info Size of modules:)
 	$(SIZE) -B -t --common $(OBJS_ALL)
 
-print_elf_size : # print_size
+print_elf_size : $(ELF)
 	$(info Size of target file:)
 	$(SIZE) -B $(ELF)
 

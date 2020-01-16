@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     03.12.2019
+#date     16.01.2020
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -92,15 +92,9 @@ TXTS       := $(OBJS:.o=.txt)
 
 #----------------------------------------------------------#
 
-ifneq ($(MAKECMDGOALS),qemu)
-CORE_F     := --cpu=cortex-m4.fp --apcs=/hardfp/interwork
-else
-CORE_F     := --cpu=cortex-m4
-endif
-COMMON_F    = --md --depend=$(@:.o=.d) # --feedback=$(FED)
-ifneq ($(filter DEBUG,$(DEFS)),)
-COMMON_F   += --debug
-endif
+COMMON_F    = --thumb --cpu=cortex-m4.fp.sp
+COMMON_F   += $(if $(filter qemu,$(MAKECMDGOALS)),--fpu=softvfp,)
+COMMON_F   += --md --depend=$(@:.o=.d) # --feedback=$(FED)
 
 OPTIM_F    := -O$(OPTF) --split_sections --interleave
 
@@ -117,6 +111,9 @@ DEFS       += __USES_CXX
 endif
 ifneq ($(filter __MICROLIB,$(DEFS)),)
 LD_FLAGS   += --library_type=microlib
+endif
+ifneq ($(filter DEBUG,$(DEFS)),)
+COMMON_F   += --debug
 endif
 
 #----------------------------------------------------------#
@@ -146,10 +143,9 @@ AS_FLAGS   += # $(foreach d,$(DEFS),$(if $(findstring =,$d),--pd="$(subst =, SET
 AS_FLAGS   += --cpreproc --cpreproc_opts=$(call clist,$(DEFS_F) $(INC_DIRS_F))
 LD_FLAGS   += $(DEFS_F:%=--pd=%) $(INC_DIRS_F:%=--pd=%)
 
-AS_FLAGS   += $(CORE_F) $(COMMON_F)
-C_FLAGS    += $(CORE_F) $(COMMON_F) $(DEFS_F) $(INC_DIRS_F) $(OPTIM_F)
-CXX_FLAGS  += $(CORE_F) $(COMMON_F) $(DEFS_F) $(INC_DIRS_F) $(OPTIM_F)
-LD_FLAGS   += $(CORE_F)
+AS_FLAGS   += $(COMMON_F)
+C_FLAGS    += $(COMMON_F) $(DEFS_F) $(INC_DIRS_F) $(OPTIM_F)
+CXX_FLAGS  += $(COMMON_F) $(DEFS_F) $(INC_DIRS_F) $(OPTIM_F)
 
 #----------------------------------------------------------#
 
@@ -219,11 +215,11 @@ $(LSS) : $(ELF)
 	$(info Creating extended listing: $(LSS))
 	$(DUMP) $< --text -c -z --output $@
 
-print_size :
+print_size : $(OBJS_ALL)
 	$(info Size of modules:)
 	$(SIZE) -B -t --common $(OBJS_ALL)
 
-print_elf_size : # print_size
+print_elf_size : $(ELF)
 	$(info Size of target file:)
 	$(SIZE) -B $(ELF)
 
