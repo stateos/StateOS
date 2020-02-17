@@ -1,7 +1,7 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     16.01.2020
+#date     17.02.2020
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
@@ -88,8 +88,8 @@ LSTS       := $(OBJS:.o=.lst)
 
 #----------------------------------------------------------#
 
-CORE_F     := --cpu=cortex-m4.fp.sp
-CORE_F     += $(if $(filter qemu,$(MAKECMDGOALS)),--fpu=soft,)
+CORE_F     := --cpu cortex-m4
+CORE_F     += $(if $(filter qemu,$(MAKECMDGOALS)),,--fpu vfpv4_sp)
 
 COMMON_F    = --thumb -O$(OPTF) -e --dependencies=m $*.d
 
