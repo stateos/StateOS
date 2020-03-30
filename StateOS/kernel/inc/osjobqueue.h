@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    30.03.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -492,6 +492,62 @@ void job_pushISR( job_t *job, fun_t *fun ) { job_push(job, fun); }
 
 /******************************************************************************
  *
+ * Class             : baseJobQueueT<>
+ *
+ * Description       : create and initialize a base job queue object
+ *
+ * Constructor parameters
+ *   limit           : size of a queue (max number of stored job procedures)
+ *
+ ******************************************************************************/
+
+template<unsigned limit_>
+struct baseJobQueueT : public __job
+{
+	 baseJobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
+	~baseJobQueueT( void ) { assert(__job::obj.queue == nullptr); }
+
+	baseJobQueueT( baseJobQueueT&& ) = default;
+	baseJobQueueT( const baseJobQueueT& ) = delete;
+	baseJobQueueT& operator=( baseJobQueueT&& ) = delete;
+	const baseJobQueueT& operator=( const baseJobQueueT& ) = delete;
+
+	static
+	baseJobQueueT<limit_> *create( void )
+	{
+		static_assert(sizeof(job_T<limit_>) == sizeof(baseJobQueueT<limit_>), "unexpected error!");
+		return reinterpret_cast<baseJobQueueT<limit_> *>(job_create(limit_));
+	}
+
+	void     reset    ( void )                      {        job_reset    (this);               }
+	void     kill     ( void )                      {        job_kill     (this);               }
+	void     destroy  ( void )                      {        job_destroy  (this);               }
+	unsigned waitFor  ( cnt_t _delay )              { return job_waitFor  (this, _delay);       }
+	unsigned waitUntil( cnt_t _time )               { return job_waitUntil(this, _time);        }
+	unsigned wait     ( void )                      { return job_wait     (this);               }
+	unsigned take     ( void )                      { return job_take     (this);               }
+	unsigned tryWait  ( void )                      { return job_tryWait  (this);               }
+	unsigned takeISR  ( void )                      { return job_takeISR  (this);               }
+	unsigned sendFor  ( fun_t *_fun, cnt_t _delay ) { return job_sendFor  (this, _fun, _delay); }
+	unsigned sendUntil( fun_t *_fun, cnt_t _time )  { return job_sendUntil(this, _fun, _time);  }
+	unsigned send     ( fun_t *_fun )               { return job_send     (this, _fun);         }
+	unsigned give     ( fun_t *_fun )               { return job_give     (this, _fun);         }
+	unsigned giveISR  ( fun_t *_fun )               { return job_giveISR  (this, _fun);         }
+	void     push     ( fun_t *_fun )               {        job_push     (this, _fun);         }
+	void     pushISR  ( fun_t *_fun )               {        job_pushISR  (this, _fun);         }
+	unsigned count    ( void )                      { return job_count    (this);               }
+	unsigned countISR ( void )                      { return job_countISR (this);               }
+	unsigned space    ( void )                      { return job_space    (this);               }
+	unsigned spaceISR ( void )                      { return job_spaceISR (this);               }
+	unsigned limit    ( void )                      { return job_limit    (this);               }
+	unsigned limitISR ( void )                      { return job_limitISR (this);               }
+
+	private:
+	fun_t *data_[limit_];
+};
+
+/******************************************************************************
+ *
  * Class             : JobQueueT<>
  *
  * Description       : create and initialize a job queue object
@@ -551,48 +607,9 @@ struct JobQueueT : public __box
 #else
 
 template<unsigned limit_>
-struct JobQueueT : public __job
+struct JobQueueT : public baseJobQueueT<limit_>
 {
-	 JobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
-	~JobQueueT( void ) { assert(__job::obj.queue == nullptr); }
-
-	JobQueueT( JobQueueT&& ) = default;
-	JobQueueT( const JobQueueT& ) = delete;
-	JobQueueT& operator=( JobQueueT&& ) = delete;
-	const JobQueueT& operator=( const JobQueueT& ) = delete;
-
-	static
-	JobQueueT<limit_> *create( void )
-	{
-		static_assert(sizeof(job_T<limit_>) == sizeof(JobQueueT<limit_>), "unexpected error!");
-		return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_));
-	}
-
-	void     reset    ( void )                     {        job_reset    (this);               }
-	void     kill     ( void )                     {        job_kill     (this);               }
-	void     destroy  ( void )                     {        job_destroy  (this);               }
-	unsigned waitFor  ( cnt_t _delay )             { return job_waitFor  (this, _delay);       }
-	unsigned waitUntil( cnt_t _time )              { return job_waitUntil(this, _time);        }
-	unsigned wait     ( void )                     { return job_wait     (this);               }
-	unsigned take     ( void )                     { return job_take     (this);               }
-	unsigned tryWait  ( void )                     { return job_tryWait  (this);               }
-	unsigned takeISR  ( void )                     { return job_takeISR  (this);               }
-	unsigned sendFor  ( FUN_t _fun, cnt_t _delay ) { return job_sendFor  (this, _fun, _delay); }
-	unsigned sendUntil( FUN_t _fun, cnt_t _time )  { return job_sendUntil(this, _fun, _time);  }
-	unsigned send     ( FUN_t _fun )               { return job_send     (this, _fun);         }
-	unsigned give     ( FUN_t _fun )               { return job_give     (this, _fun);         }
-	unsigned giveISR  ( FUN_t _fun )               { return job_giveISR  (this, _fun);         }
-	void     push     ( FUN_t _fun )               {        job_push     (this, _fun);         }
-	void     pushISR  ( FUN_t _fun )               {        job_pushISR  (this, _fun);         }
-	unsigned count    ( void )                     { return job_count    (this);               }
-	unsigned countISR ( void )                     { return job_countISR (this);               }
-	unsigned space    ( void )                     { return job_space    (this);               }
-	unsigned spaceISR ( void )                     { return job_spaceISR (this);               }
-	unsigned limit    ( void )                     { return job_limit    (this);               }
-	unsigned limitISR ( void )                     { return job_limitISR (this);               }
-
-	private:
-	FUN_t data_[limit_];
+	JobQueueT( void ): baseJobQueueT<limit_>() {}
 };
 
 #endif
