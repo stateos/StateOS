@@ -32,7 +32,7 @@
 #ifndef __STATEOS
 
 #define __STATEOS_MAJOR       6
-#define __STATEOS_MINOR       5
+#define __STATEOS_MINOR       6
 #define __STATEOS_BUILD       0
 
 #define __STATEOS       ((((__STATEOS_MAJOR)&0xFFUL)<<24)|(((__STATEOS_MINOR)&0xFFUL)<<16)|((__STATEOS_BUILD)&0xFFFFUL))

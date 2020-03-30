@@ -35,6 +35,9 @@ Features:
 - all documentation is contained within the source files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+6.6
+- updated os version
+---------
 6.5
 - added functional test
 - added support for stm32l1
