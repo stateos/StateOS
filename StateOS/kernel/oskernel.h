@@ -2,12 +2,12 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    18.11.2019
+    @date    29.03.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
 
-   Copyright (c) 2018 Rajmund Szymanski. All rights reserved.
+   Copyright (c) 2018-2020 Rajmund Szymanski. All rights reserved.
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to

@@ -2,12 +2,12 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    16.07.2018
+    @date    29.03.2020
     @brief   StateOS port definitions for LM4F uC.
 
  ******************************************************************************
 
-   Copyright (c) 2018 Rajmund Szymanski. All rights reserved.
+   Copyright (c) 2018-2020 Rajmund Szymanski. All rights reserved.
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
