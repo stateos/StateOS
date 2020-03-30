@@ -398,6 +398,11 @@ struct ListTT : public __lst
 	 ListTT( void ): __lst _LST_INIT() {}
 	~ListTT( void ) { assert(__lst::obj.queue == nullptr); }
 
+	ListTT( ListTT&& ) = default;
+	ListTT( const ListTT& ) = delete;
+	ListTT& operator=( ListTT&& ) = delete;
+	const ListTT& operator=( const ListTT& ) = delete;
+
 	static
 	ListTT<T> *create( void )
 	{

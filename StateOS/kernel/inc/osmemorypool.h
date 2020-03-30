@@ -444,6 +444,11 @@ struct MemoryPoolT : public __mem
 	 MemoryPoolT( void ): __mem _MEM_INIT(limit_, MEM_SIZE(size_), data_) { mem_bind(this); }
 	~MemoryPoolT( void ) { assert(__mem::lst.obj.queue == nullptr); }
 
+	MemoryPoolT( MemoryPoolT&& ) = default;
+	MemoryPoolT( const MemoryPoolT& ) = delete;
+	MemoryPoolT& operator=( MemoryPoolT&& ) = delete;
+	const MemoryPoolT& operator=( const MemoryPoolT& ) = delete;
+
 	static
 	MemoryPoolT<limit_, size_> *create( void )
 	{

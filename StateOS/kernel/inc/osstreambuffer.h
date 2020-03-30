@@ -600,6 +600,11 @@ struct StreamBufferT : public __stm
 	 StreamBufferT( void ): __stm _STM_INIT(limit_, data_) {}
 	~StreamBufferT( void ) { assert(__stm::obj.queue == nullptr); }
 
+	StreamBufferT( StreamBufferT&& ) = default;
+	StreamBufferT( const StreamBufferT& ) = delete;
+	StreamBufferT& operator=( StreamBufferT&& ) = delete;
+	const StreamBufferT& operator=( const StreamBufferT& ) = delete;
+
 	static
 	StreamBufferT<limit_> *create( void )
 	{

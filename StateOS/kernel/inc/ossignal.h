@@ -414,6 +414,11 @@ struct Signal : public __sig
 	 Signal( const unsigned _mask = 0 ): __sig _SIG_INIT(_mask) {}
 	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
+	Signal( Signal&& ) = default;
+	Signal( const Signal& ) = delete;
+	Signal& operator=( Signal&& ) = delete;
+	const Signal& operator=( const Signal& ) = delete;
+
 	static
 	Signal *create( const unsigned _mask = 0 )
 	{

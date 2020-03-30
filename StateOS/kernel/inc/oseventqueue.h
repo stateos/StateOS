@@ -510,6 +510,11 @@ struct EventQueueT : public __evq
 	 EventQueueT( void ): __evq _EVQ_INIT(limit_, data_) {}
 	~EventQueueT( void ) { assert(__evq::obj.queue == nullptr); }
 
+	EventQueueT( EventQueueT&& ) = default;
+	EventQueueT( const EventQueueT& ) = delete;
+	EventQueueT& operator=( EventQueueT&& ) = delete;
+	const EventQueueT& operator=( const EventQueueT& ) = delete;
+
 	static
 	EventQueueT<limit_> *create( void )
 	{

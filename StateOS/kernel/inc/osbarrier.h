@@ -319,6 +319,11 @@ struct Barrier : public __bar
 	 Barrier( const unsigned _limit ): __bar _BAR_INIT(_limit) {}
 	~Barrier( void ) { assert(__bar::obj.queue == nullptr); }
 
+	Barrier( Barrier&& ) = default;
+	Barrier( const Barrier& ) = delete;
+	Barrier& operator=( Barrier&& ) = delete;
+	const Barrier& operator=( const Barrier& ) = delete;
+
 	static
 	Barrier *create( const unsigned _limit )
 	{

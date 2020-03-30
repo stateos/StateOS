@@ -334,6 +334,11 @@ struct Event : public __evt
 	 Event( void ): __evt _EVT_INIT() {}
 	~Event( void ) { assert(__evt::obj.queue == nullptr); }
 
+	Event( Event&& ) = default;
+	Event( const Event& ) = delete;
+	Event& operator=( Event&& ) = delete;
+	const Event& operator=( const Event& ) = delete;
+
 	static
 	Event *create( void )
 	{

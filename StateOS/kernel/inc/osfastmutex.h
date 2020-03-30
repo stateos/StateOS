@@ -372,6 +372,11 @@ struct FastMutex : public __mut
 	 FastMutex( void ): __mut _MUT_INIT() {}
 	~FastMutex( void ) { assert(__mut::owner == nullptr); }
 
+	FastMutex( FastMutex&& ) = default;
+	FastMutex( const FastMutex& ) = delete;
+	FastMutex& operator=( FastMutex&& ) = delete;
+	const FastMutex& operator=( const FastMutex& ) = delete;
+
 	static
 	FastMutex *create( void )
 	{

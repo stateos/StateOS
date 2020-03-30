@@ -509,6 +509,11 @@ struct JobQueueT : public __box
 	 JobQueueT( void ): __box _BOX_INIT(limit_, sizeof(FUN_t), reinterpret_cast<char *>(data_)) {}
 	~JobQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
+	JobQueueT( JobQueueT&& ) = default;
+	JobQueueT( const JobQueueT& ) = delete;
+	JobQueueT& operator=( JobQueueT&& ) = delete;
+	const JobQueueT& operator=( const JobQueueT& ) = delete;
+
 	static
 	JobQueueT<limit_> *create( void )
 	{
@@ -550,6 +555,11 @@ struct JobQueueT : public __job
 {
 	 JobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
 	~JobQueueT( void ) { assert(__job::obj.queue == nullptr); }
+
+	JobQueueT( JobQueueT&& ) = default;
+	JobQueueT( const JobQueueT& ) = delete;
+	JobQueueT& operator=( JobQueueT&& ) = delete;
+	const JobQueueT& operator=( const JobQueueT& ) = delete;
 
 	static
 	JobQueueT<limit_> *create( void )

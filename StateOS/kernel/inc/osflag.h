@@ -466,6 +466,11 @@ struct Flag : public __flg
 	 Flag( const unsigned _init = 0 ): __flg _FLG_INIT(_init) {}
 	~Flag( void ) { assert(__flg::obj.queue == nullptr); }
 
+	Flag( Flag&& ) = default;
+	Flag( const Flag& ) = delete;
+	Flag& operator=( Flag&& ) = delete;
+	const Flag& operator=( const Flag& ) = delete;
+
 	static
 	Flag *create( const unsigned _init = 0 )
 	{

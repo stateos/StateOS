@@ -1278,6 +1278,11 @@ struct baseTask : public __tsk
 #endif
 	~baseTask( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
+	baseTask( baseTask&& ) = default;
+	baseTask( const baseTask& ) = delete;
+	baseTask& operator=( baseTask&& ) = delete;
+	const baseTask& operator=( const baseTask& ) = delete;
+
 	void     start    ( void )             {        tsk_start    (this);          }
 #if OS_FUNCTIONAL
 	void     startFrom( FUN_t    _state )  {        __tsk::fun = _state;

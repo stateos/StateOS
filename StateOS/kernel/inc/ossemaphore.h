@@ -519,6 +519,11 @@ struct Semaphore : public __sem
 	 Semaphore( const unsigned _init, const unsigned _limit = semCounting ): __sem _SEM_INIT(_init, _limit) {}
 	~Semaphore( void ) { assert(__sem::obj.queue == nullptr); }
 
+	Semaphore( Semaphore&& ) = default;
+	Semaphore( const Semaphore& ) = delete;
+	Semaphore& operator=( Semaphore&& ) = delete;
+	const Semaphore& operator=( const Semaphore& ) = delete;
+
 	static
 	Semaphore *create( const unsigned _init, const unsigned _limit = semCounting )
 	{

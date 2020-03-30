@@ -496,6 +496,11 @@ struct Mutex : public __mtx
 	 Mutex( const unsigned _mode, const unsigned _prio = 0 ): __mtx _MTX_INIT(_mode, _prio) {}
 	~Mutex( void ) { assert(__mtx::owner == nullptr); }
 
+	Mutex( Mutex&& ) = default;
+	Mutex( const Mutex& ) = delete;
+	Mutex& operator=( Mutex&& ) = delete;
+	const Mutex& operator=( const Mutex& ) = delete;
+
 	static
 	Mutex *create( const unsigned _mode, const unsigned _prio = 0 )
 	{

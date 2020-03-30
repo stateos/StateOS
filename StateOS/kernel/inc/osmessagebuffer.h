@@ -625,6 +625,11 @@ struct MessageBufferT : public __msg
 	 MessageBufferT( void ): __msg _MSG_INIT(limit_, data_) {}
 	~MessageBufferT( void ) { assert(__msg::obj.queue == nullptr); }
 
+	MessageBufferT( MessageBufferT&& ) = default;
+	MessageBufferT( const MessageBufferT& ) = delete;
+	MessageBufferT& operator=( MessageBufferT&& ) = delete;
+	const MessageBufferT& operator=( const MessageBufferT& ) = delete;
+
 	static
 	MessageBufferT<limit_> *create( void )
 	{

@@ -194,6 +194,7 @@ void one_call( one_t *one, fun_t *fun );
 struct OnceFlag
 {
 	OnceFlag( void ): flg_(_ONE_INIT()) {}
+
 #if OS_FUNCTIONAL
 	void call( FUN_t fun ) { one_t flag; sys_lock(); flag = flg_; flg_ = 1; sys_unlock(); if (flag == 0) fun(); }
 #else

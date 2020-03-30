@@ -558,6 +558,11 @@ struct MailBoxQueueT : public __box
 	 MailBoxQueueT( void ): __box _BOX_INIT(limit_, size_, data_) {}
 	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
+	MailBoxQueueT( MailBoxQueueT&& ) = default;
+	MailBoxQueueT( const MailBoxQueueT& ) = delete;
+	MailBoxQueueT& operator=( MailBoxQueueT&& ) = delete;
+	const MailBoxQueueT& operator=( const MailBoxQueueT& ) = delete;
+
 	static
 	MailBoxQueueT<limit_, size_> *create( void )
 	{

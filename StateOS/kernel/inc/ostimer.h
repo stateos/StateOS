@@ -744,6 +744,11 @@ struct Timer : public __tmr
 #endif
 	~Timer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
 
+	Timer( Timer&& ) = default;
+	Timer( const Timer& ) = delete;
+	Timer& operator=( Timer&& ) = delete;
+	const Timer& operator=( const Timer& ) = delete;
+
 	static
 	Timer *create( FUN_t _state )
 	{
