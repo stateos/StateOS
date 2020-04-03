@@ -39,6 +39,7 @@ Features:
 - updated os version
 - updated license
 - updated c++ constructors
+- updated JobQueueT class
 ---------
 6.5
 - added functional test
