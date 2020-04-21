@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -447,7 +447,7 @@ struct MemoryPoolT : public __mem
 	MemoryPoolT( MemoryPoolT&& ) = default;
 	MemoryPoolT( const MemoryPoolT& ) = delete;
 	MemoryPoolT& operator=( MemoryPoolT&& ) = delete;
-	const MemoryPoolT& operator=( const MemoryPoolT& ) = delete;
+	MemoryPoolT& operator=( const MemoryPoolT& ) = delete;
 
 	static
 	MemoryPoolT<limit_, size_> *create( void )

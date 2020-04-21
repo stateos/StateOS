@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -499,7 +499,7 @@ struct Mutex : public __mtx
 	Mutex( Mutex&& ) = default;
 	Mutex( const Mutex& ) = delete;
 	Mutex& operator=( Mutex&& ) = delete;
-	const Mutex& operator=( const Mutex& ) = delete;
+	Mutex& operator=( const Mutex& ) = delete;
 
 	static
 	Mutex *create( const unsigned _mode, const unsigned _prio = 0 )

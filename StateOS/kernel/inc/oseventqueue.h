@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -513,7 +513,7 @@ struct EventQueueT : public __evq
 	EventQueueT( EventQueueT&& ) = default;
 	EventQueueT( const EventQueueT& ) = delete;
 	EventQueueT& operator=( EventQueueT&& ) = delete;
-	const EventQueueT& operator=( const EventQueueT& ) = delete;
+	EventQueueT& operator=( const EventQueueT& ) = delete;
 
 	static
 	EventQueueT<limit_> *create( void )

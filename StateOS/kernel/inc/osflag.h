@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -469,7 +469,7 @@ struct Flag : public __flg
 	Flag( Flag&& ) = default;
 	Flag( const Flag& ) = delete;
 	Flag& operator=( Flag&& ) = delete;
-	const Flag& operator=( const Flag& ) = delete;
+	Flag& operator=( const Flag& ) = delete;
 
 	static
 	Flag *create( const unsigned _init = 0 )

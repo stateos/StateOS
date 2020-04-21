@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -375,7 +375,7 @@ struct FastMutex : public __mut
 	FastMutex( FastMutex&& ) = default;
 	FastMutex( const FastMutex& ) = delete;
 	FastMutex& operator=( FastMutex&& ) = delete;
-	const FastMutex& operator=( const FastMutex& ) = delete;
+	FastMutex& operator=( const FastMutex& ) = delete;
 
 	static
 	FastMutex *create( void )

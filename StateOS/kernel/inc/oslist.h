@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -401,7 +401,7 @@ struct ListTT : public __lst
 	ListTT( ListTT&& ) = default;
 	ListTT( const ListTT& ) = delete;
 	ListTT& operator=( ListTT&& ) = delete;
-	const ListTT& operator=( const ListTT& ) = delete;
+	ListTT& operator=( const ListTT& ) = delete;
 
 	static
 	ListTT<T> *create( void )

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -417,7 +417,7 @@ struct Signal : public __sig
 	Signal( Signal&& ) = default;
 	Signal( const Signal& ) = delete;
 	Signal& operator=( Signal&& ) = delete;
-	const Signal& operator=( const Signal& ) = delete;
+	Signal& operator=( const Signal& ) = delete;
 
 	static
 	Signal *create( const unsigned _mask = 0 )

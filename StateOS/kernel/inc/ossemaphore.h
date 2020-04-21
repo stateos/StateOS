@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -522,7 +522,7 @@ struct Semaphore : public __sem
 	Semaphore( Semaphore&& ) = default;
 	Semaphore( const Semaphore& ) = delete;
 	Semaphore& operator=( Semaphore&& ) = delete;
-	const Semaphore& operator=( const Semaphore& ) = delete;
+	Semaphore& operator=( const Semaphore& ) = delete;
 
 	static
 	Semaphore *create( const unsigned _init, const unsigned _limit = semCounting )

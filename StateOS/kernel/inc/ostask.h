@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1281,7 +1281,7 @@ struct baseTask : public __tsk
 	baseTask( baseTask&& ) = default;
 	baseTask( const baseTask& ) = delete;
 	baseTask& operator=( baseTask&& ) = delete;
-	const baseTask& operator=( const baseTask& ) = delete;
+	baseTask& operator=( const baseTask& ) = delete;
 
 	void     start    ( void )             {        tsk_start    (this);          }
 #if OS_FUNCTIONAL

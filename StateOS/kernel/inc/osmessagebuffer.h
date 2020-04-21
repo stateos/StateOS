@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -628,7 +628,7 @@ struct MessageBufferT : public __msg
 	MessageBufferT( MessageBufferT&& ) = default;
 	MessageBufferT( const MessageBufferT& ) = delete;
 	MessageBufferT& operator=( MessageBufferT&& ) = delete;
-	const MessageBufferT& operator=( const MessageBufferT& ) = delete;
+	MessageBufferT& operator=( const MessageBufferT& ) = delete;
 
 	static
 	MessageBufferT<limit_> *create( void )

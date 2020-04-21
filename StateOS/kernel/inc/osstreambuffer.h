@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -603,7 +603,7 @@ struct StreamBufferT : public __stm
 	StreamBufferT( StreamBufferT&& ) = default;
 	StreamBufferT( const StreamBufferT& ) = delete;
 	StreamBufferT& operator=( StreamBufferT&& ) = delete;
-	const StreamBufferT& operator=( const StreamBufferT& ) = delete;
+	StreamBufferT& operator=( const StreamBufferT& ) = delete;
 
 	static
 	StreamBufferT<limit_> *create( void )

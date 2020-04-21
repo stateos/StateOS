@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -337,7 +337,7 @@ struct Event : public __evt
 	Event( Event&& ) = default;
 	Event( const Event& ) = delete;
 	Event& operator=( Event&& ) = delete;
-	const Event& operator=( const Event& ) = delete;
+	Event& operator=( const Event& ) = delete;
 
 	static
 	Event *create( void )

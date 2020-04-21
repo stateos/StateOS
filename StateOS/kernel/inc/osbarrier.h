@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -322,7 +322,7 @@ struct Barrier : public __bar
 	Barrier( Barrier&& ) = default;
 	Barrier( const Barrier& ) = delete;
 	Barrier& operator=( Barrier&& ) = delete;
-	const Barrier& operator=( const Barrier& ) = delete;
+	Barrier& operator=( const Barrier& ) = delete;
 
 	static
 	Barrier *create( const unsigned _limit )

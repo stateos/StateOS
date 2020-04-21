@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    03.04.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -512,7 +512,7 @@ struct baseJobQueueT : public __job
 	baseJobQueueT( baseJobQueueT&& ) = default;
 	baseJobQueueT( const baseJobQueueT& ) = delete;
 	baseJobQueueT& operator=( baseJobQueueT&& ) = delete;
-	const baseJobQueueT& operator=( const baseJobQueueT& ) = delete;
+	baseJobQueueT& operator=( const baseJobQueueT& ) = delete;
 
 	static
 	baseJobQueueT<limit_> *create( void )
@@ -570,7 +570,7 @@ struct JobQueueT : public __box
 	JobQueueT( JobQueueT&& ) = default;
 	JobQueueT( const JobQueueT& ) = delete;
 	JobQueueT& operator=( JobQueueT&& ) = delete;
-	const JobQueueT& operator=( const JobQueueT& ) = delete;
+	JobQueueT& operator=( const JobQueueT& ) = delete;
 
 	static
 	JobQueueT<limit_> *create( void )

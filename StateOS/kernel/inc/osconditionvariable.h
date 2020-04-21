@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    21.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -391,7 +391,7 @@ struct ConditionVariable : public __cnd
 	ConditionVariable( ConditionVariable&& ) = default;
 	ConditionVariable( const ConditionVariable& ) = delete;
 	ConditionVariable& operator=( ConditionVariable&& ) = delete;
-	const ConditionVariable& operator=( const ConditionVariable& ) = delete;
+	ConditionVariable& operator=( const ConditionVariable& ) = delete;
 
 	static
 	ConditionVariable *create( void )
