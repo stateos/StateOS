@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -395,13 +395,14 @@ void lst_giveISR( lst_t *lst, const void *data ) { lst_give(lst, data); }
 template<class T>
 struct ListTT : public __lst
 {
-	 ListTT( void ): __lst _LST_INIT() {}
-	~ListTT( void ) { assert(__lst::obj.queue == nullptr); }
+	ListTT( void ): __lst _LST_INIT() {}
 
 	ListTT( ListTT&& ) = default;
 	ListTT( const ListTT& ) = delete;
 	ListTT& operator=( ListTT&& ) = delete;
 	ListTT& operator=( const ListTT& ) = delete;
+
+	~ListTT( void ) { assert(__lst::obj.queue == nullptr); }
 
 	static
 	ListTT<T> *create( void )
@@ -423,9 +424,15 @@ struct ListTT : public __lst
 	void     giveISR  ( const void *_data )               {        lst_giveISR  (this,                           _data);          }
 };
 
-/* -------------------------------------------------------------------------- */
+/******************************************************************************
+ *
+ * Class             : List
+ *
+ * Description       : create and initialize a list object
+ *
+ ******************************************************************************/
 
-typedef ListTT<void> List;
+using List = ListTT<void>;
 
 #endif//__cplusplus
 

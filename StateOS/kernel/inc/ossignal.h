@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -411,13 +411,14 @@ void sig_clearISR( sig_t *sig, unsigned signo ) { sig_clear(sig, signo); }
 
 struct Signal : public __sig
 {
-	 Signal( const unsigned _mask = 0 ): __sig _SIG_INIT(_mask) {}
-	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
+	Signal( const unsigned _mask = 0 ): __sig _SIG_INIT(_mask) {}
 
 	Signal( Signal&& ) = default;
 	Signal( const Signal& ) = delete;
 	Signal& operator=( Signal&& ) = delete;
 	Signal& operator=( const Signal& ) = delete;
+
+	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
 	static
 	Signal *create( const unsigned _mask = 0 )

@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -385,13 +385,14 @@ void cnd_notifyAll( cnd_t *cnd ) { cnd_give(cnd, true); }
 
 struct ConditionVariable : public __cnd
 {
-	 ConditionVariable( void ): __cnd _CND_INIT() {}
-	~ConditionVariable( void ) { assert(__cnd::obj.queue == nullptr); }
+	ConditionVariable( void ): __cnd _CND_INIT() {}
 
 	ConditionVariable( ConditionVariable&& ) = default;
 	ConditionVariable( const ConditionVariable& ) = delete;
 	ConditionVariable& operator=( ConditionVariable&& ) = delete;
 	ConditionVariable& operator=( const ConditionVariable& ) = delete;
+
+	~ConditionVariable( void ) { assert(__cnd::obj.queue == nullptr); }
 
 	static
 	ConditionVariable *create( void )

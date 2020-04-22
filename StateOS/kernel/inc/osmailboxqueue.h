@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -555,13 +555,14 @@ unsigned box_spaceISR( box_t *box ) { return box_space(box); }
 template<unsigned limit_, unsigned size_>
 struct MailBoxQueueT : public __box
 {
-	 MailBoxQueueT( void ): __box _BOX_INIT(limit_, size_, data_) {}
-	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
+	MailBoxQueueT( void ): __box _BOX_INIT(limit_, size_, data_) {}
 
 	MailBoxQueueT( MailBoxQueueT&& ) = default;
 	MailBoxQueueT( const MailBoxQueueT& ) = delete;
 	MailBoxQueueT& operator=( MailBoxQueueT&& ) = delete;
 	MailBoxQueueT& operator=( const MailBoxQueueT& ) = delete;
+
+	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	static
 	MailBoxQueueT<limit_, size_> *create( void )
@@ -612,7 +613,7 @@ struct MailBoxQueueT : public __box
 template<unsigned limit_, class T>
 struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
 {
-	MailBoxQueueTT( void ): MailBoxQueueT<limit_, sizeof(T)>() {}
+	using MailBoxQueueT<limit_, sizeof(T)>::MailBoxQueueT;
 
 	static
 	MailBoxQueueTT<limit_, T> *create( void )

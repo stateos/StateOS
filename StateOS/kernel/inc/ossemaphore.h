@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -516,13 +516,14 @@ unsigned sem_getValue( sem_t *sem );
 
 struct Semaphore : public __sem
 {
-	 Semaphore( const unsigned _init, const unsigned _limit = semCounting ): __sem _SEM_INIT(_init, _limit) {}
-	~Semaphore( void ) { assert(__sem::obj.queue == nullptr); }
+	Semaphore( const unsigned _init, const unsigned _limit = semCounting ): __sem _SEM_INIT(_init, _limit) {}
 
 	Semaphore( Semaphore&& ) = default;
 	Semaphore( const Semaphore& ) = delete;
 	Semaphore& operator=( Semaphore&& ) = delete;
 	Semaphore& operator=( const Semaphore& ) = delete;
+
+	~Semaphore( void ) { assert(__sem::obj.queue == nullptr); }
 
 	static
 	Semaphore *create( const unsigned _init, const unsigned _limit = semCounting )

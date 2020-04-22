@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -441,13 +441,14 @@ void mem_giveISR( mem_t *mem, const void *data ) { lst_giveISR(&mem->lst, data);
 template<unsigned limit_, unsigned size_>
 struct MemoryPoolT : public __mem
 {
-	 MemoryPoolT( void ): __mem _MEM_INIT(limit_, MEM_SIZE(size_), data_) { mem_bind(this); }
-	~MemoryPoolT( void ) { assert(__mem::lst.obj.queue == nullptr); }
+	MemoryPoolT( void ): __mem _MEM_INIT(limit_, MEM_SIZE(size_), data_) { mem_bind(this); }
 
 	MemoryPoolT( MemoryPoolT&& ) = default;
 	MemoryPoolT( const MemoryPoolT& ) = delete;
 	MemoryPoolT& operator=( MemoryPoolT&& ) = delete;
 	MemoryPoolT& operator=( const MemoryPoolT& ) = delete;
+
+	~MemoryPoolT( void ) { assert(__mem::lst.obj.queue == nullptr); }
 
 	static
 	MemoryPoolT<limit_, size_> *create( void )
@@ -487,7 +488,7 @@ struct MemoryPoolT : public __mem
 template<unsigned limit_, class T>
 struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
 {
-	MemoryPoolTT( void ): MemoryPoolT<limit_, sizeof(T)>() {}
+	using MemoryPoolT<limit_, sizeof(T)>::MemoryPoolT;
 
 	static
 	MemoryPoolTT<limit_, T> *create( void )

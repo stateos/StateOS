@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -597,13 +597,14 @@ unsigned stm_limitISR( stm_t *stm ) { return stm_limit(stm); }
 template<unsigned limit_>
 struct StreamBufferT : public __stm
 {
-	 StreamBufferT( void ): __stm _STM_INIT(limit_, data_) {}
-	~StreamBufferT( void ) { assert(__stm::obj.queue == nullptr); }
+	StreamBufferT( void ): __stm _STM_INIT(limit_, data_) {}
 
 	StreamBufferT( StreamBufferT&& ) = default;
 	StreamBufferT( const StreamBufferT& ) = delete;
 	StreamBufferT& operator=( StreamBufferT&& ) = delete;
 	StreamBufferT& operator=( const StreamBufferT& ) = delete;
+
+	~StreamBufferT( void ) { assert(__stm::obj.queue == nullptr); }
 
 	static
 	StreamBufferT<limit_> *create( void )
@@ -652,9 +653,9 @@ struct StreamBufferT : public __stm
  ******************************************************************************/
 
 template<unsigned limit_, class T>
-struct StreamBufferTT : public StreamBufferT<limit_ * sizeof(T)>
+struct StreamBufferTT : public StreamBufferT<limit_*sizeof(T)>
 {
-	StreamBufferTT( void ): StreamBufferT<limit_ * sizeof(T)>() {}
+	using StreamBufferT<limit_*sizeof(T)>::StreamBufferT;
 
 	static
 	StreamBufferTT<limit_, T> *create( void )

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -507,13 +507,14 @@ void evq_pushISR( evq_t *evq, unsigned data ) { evq_push(evq, data); }
 template<unsigned limit_>
 struct EventQueueT : public __evq
 {
-	 EventQueueT( void ): __evq _EVQ_INIT(limit_, data_) {}
-	~EventQueueT( void ) { assert(__evq::obj.queue == nullptr); }
+	EventQueueT( void ): __evq _EVQ_INIT(limit_, data_) {}
 
 	EventQueueT( EventQueueT&& ) = default;
 	EventQueueT( const EventQueueT& ) = delete;
 	EventQueueT& operator=( EventQueueT&& ) = delete;
 	EventQueueT& operator=( const EventQueueT& ) = delete;
+
+	~EventQueueT( void ) { assert(__evq::obj.queue == nullptr); }
 
 	static
 	EventQueueT<limit_> *create( void )

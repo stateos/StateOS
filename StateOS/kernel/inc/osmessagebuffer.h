@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -622,13 +622,14 @@ unsigned msg_sizeISR( msg_t *msg ) { return msg_size(msg); }
 template<unsigned limit_>
 struct MessageBufferT : public __msg
 {
-	 MessageBufferT( void ): __msg _MSG_INIT(limit_, data_) {}
-	~MessageBufferT( void ) { assert(__msg::obj.queue == nullptr); }
+	MessageBufferT( void ): __msg _MSG_INIT(limit_, data_) {}
 
 	MessageBufferT( MessageBufferT&& ) = default;
 	MessageBufferT( const MessageBufferT& ) = delete;
 	MessageBufferT& operator=( MessageBufferT&& ) = delete;
 	MessageBufferT& operator=( const MessageBufferT& ) = delete;
+
+	~MessageBufferT( void ) { assert(__msg::obj.queue == nullptr); }
 
 	static
 	MessageBufferT<limit_> *create( void )
@@ -679,9 +680,9 @@ struct MessageBufferT : public __msg
  ******************************************************************************/
 
 template<unsigned limit_, class T>
-struct MessageBufferTT : public MessageBufferT<limit_ * (sizeof(unsigned) + sizeof(T))>
+struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T))>
 {
-	MessageBufferTT( void ): MessageBufferT<limit_ * (sizeof(unsigned) + sizeof(T))>() {}
+	using MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T))>::MessageBufferT;
 
 	static
 	MessageBufferTT<limit_, T> *create( void )

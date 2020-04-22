@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1272,16 +1272,16 @@ void cur_action( act_t *action ) { tsk_action(System.cur, action); }
 struct baseTask : public __tsk
 {
 #if OS_FUNCTIONAL
-	 baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, fun_, _stack, _size) { __tsk::fun = _state; }
+	baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, fun_, _stack, _size) { __tsk::fun = _state; }
 #else
-	 baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
+	baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 #endif
-	~baseTask( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
-
 	baseTask( baseTask&& ) = default;
 	baseTask( const baseTask& ) = delete;
 	baseTask& operator=( baseTask&& ) = delete;
 	baseTask& operator=( const baseTask& ) = delete;
+
+	~baseTask( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
 	void     start    ( void )             {        tsk_start    (this);          }
 #if OS_FUNCTIONAL
@@ -1372,7 +1372,7 @@ struct TaskT : public baseTask
 
 /* -------------------------------------------------------------------------- */
 
-typedef TaskT<OS_STACK_SIZE> Task;
+using Task = TaskT<OS_STACK_SIZE>;
 
 /******************************************************************************
  *
@@ -1396,7 +1396,7 @@ struct startTaskT : public TaskT<size_>
 
 /* -------------------------------------------------------------------------- */
 
-typedef startTaskT<OS_STACK_SIZE> startTask;
+using startTask = startTaskT<OS_STACK_SIZE>;
 
 /******************************************************************************
  *

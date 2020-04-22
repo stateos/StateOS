@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -463,13 +463,14 @@ unsigned flg_getISR( flg_t *flg ) { return flg_get(flg); }
 
 struct Flag : public __flg
 {
-	 Flag( const unsigned _init = 0 ): __flg _FLG_INIT(_init) {}
-	~Flag( void ) { assert(__flg::obj.queue == nullptr); }
+	Flag( const unsigned _init = 0 ): __flg _FLG_INIT(_init) {}
 
 	Flag( Flag&& ) = default;
 	Flag( const Flag& ) = delete;
 	Flag& operator=( Flag&& ) = delete;
 	Flag& operator=( const Flag& ) = delete;
+
+	~Flag( void ) { assert(__flg::obj.queue == nullptr); }
 
 	static
 	Flag *create( const unsigned _init = 0 )

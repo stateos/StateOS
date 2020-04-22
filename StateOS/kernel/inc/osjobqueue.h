@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    21.04.2020
+    @date    22.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -564,13 +564,14 @@ struct baseJobQueueT : public __job
 template<unsigned limit_>
 struct JobQueueT : public __box
 {
-	 JobQueueT( void ): __box _BOX_INIT(limit_, sizeof(FUN_t), reinterpret_cast<char *>(data_)) {}
-	~JobQueueT( void ) { assert(__box::obj.queue == nullptr); }
+	JobQueueT( void ): __box _BOX_INIT(limit_, sizeof(FUN_t), reinterpret_cast<char *>(data_)) {}
 
 	JobQueueT( JobQueueT&& ) = default;
 	JobQueueT( const JobQueueT& ) = delete;
 	JobQueueT& operator=( JobQueueT&& ) = delete;
 	JobQueueT& operator=( const JobQueueT& ) = delete;
+
+	~JobQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
 	static
 	JobQueueT<limit_> *create( void )
@@ -609,10 +610,7 @@ struct JobQueueT : public __box
 #else
 
 template<unsigned limit_>
-struct JobQueueT : public baseJobQueueT<limit_>
-{
-	JobQueueT( void ): baseJobQueueT<limit_>() {}
-};
+using JobQueueT = baseJobQueueT<limit_>;
 
 #endif
 
