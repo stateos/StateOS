@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    25.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size )
+void priv_tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	core_hdr_init(&tsk->hdr);
@@ -52,7 +52,7 @@ void priv_tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsig
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size )
+void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -70,13 +70,13 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
 }
 
 /* -------------------------------------------------------------------------- */
-tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
+tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	struct
 	tsk_T  * tmp;
 	tsk_t  * tsk;
-	unsigned bufsize;
+	size_t   bufsize;
 
 	assert_tsk_context();
 	assert(state);
@@ -95,7 +95,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-tsk_t *wrk_detached( unsigned prio, fun_t *state, unsigned size )
+tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;

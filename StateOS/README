@@ -36,6 +36,7 @@ Features:
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
 6.6
+- added baseStack class
 - updated os version
 - updated license
 - updated c++ constructors

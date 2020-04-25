@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    22.04.2020
+    @date    25.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -79,7 +79,7 @@ struct __tsk
 
 	tsk_t ** back;  // previous object in the BLOCKED queue
 	stk_t  * stack; // base of stack
-	unsigned size;  // size of stack (in bytes)
+	size_t   size;  // size of stack (in bytes)
 	void   * sp;    // current stack pointer
 
 	unsigned basic; // basic priority
@@ -187,7 +187,7 @@ struct __tsk
 };
 
 #ifdef __cplusplus
-template<unsigned limit_>
+template<size_t limit_>
 struct tsk_T { tsk_t tsk; stk_t buf[STK_SIZE(limit_)]; };
 #else
 struct tsk_T { tsk_t tsk; stk_t buf[]; };
@@ -644,7 +644,7 @@ tsk_t *cur_task( void ) { return System.cur; }
  *
  ******************************************************************************/
 
-void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned size );
+void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size );
 
 /******************************************************************************
  *
@@ -666,10 +666,10 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, unsigned s
  *
  ******************************************************************************/
 
-tsk_t *wrk_create( unsigned prio, fun_t *state, unsigned size );
+tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size );
 
 __STATIC_INLINE
-tsk_t *wrk_new( unsigned prio, fun_t *state, unsigned size ) { return wrk_create(prio, state, size); }
+tsk_t *wrk_new( unsigned prio, fun_t *state, size_t size ) { return wrk_create(prio, state, size); }
 
 /******************************************************************************
  *
@@ -690,7 +690,7 @@ tsk_t *wrk_new( unsigned prio, fun_t *state, unsigned size ) { return wrk_create
  *
  ******************************************************************************/
 
-tsk_t *wrk_detached( unsigned prio, fun_t *state, unsigned size );
+tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size );
 
 /******************************************************************************
  *
@@ -1254,6 +1254,26 @@ void cur_action( act_t *action ) { tsk_action(System.cur, action); }
 
 /******************************************************************************
  *
+ * Class             : baseStack
+ *
+ * Description       : create base class for stack storage object
+ *
+ * Constructor parameters
+ *   size            : size of stack (in bytes)
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+template<size_t size_ = OS_STACK_SIZE>
+struct baseStack
+{
+	protected:
+	stk_t stack_[ STK_SIZE(size_) ];
+};
+
+/******************************************************************************
+ *
  * Class             : baseTask
  *
  * Description       : create and initialize base class for task objects
@@ -1272,9 +1292,9 @@ void cur_action( act_t *action ) { tsk_action(System.cur, action); }
 struct baseTask : public __tsk
 {
 #if OS_FUNCTIONAL
-	baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, fun_, _stack, _size) { __tsk::fun = _state; }
+	baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const size_t _size ): __tsk _TSK_INIT(_prio, fun_, _stack, _size) { __tsk::fun = _state; }
 #else
-	baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const unsigned _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
+	baseTask( const unsigned _prio, FUN_t _state, stk_t * const _stack, const size_t _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 #endif
 	baseTask( baseTask&& ) = default;
 	baseTask( const baseTask& ) = delete;
@@ -1331,10 +1351,10 @@ struct baseTask : public __tsk
  *
  ******************************************************************************/
 
-template<unsigned size_ = OS_STACK_SIZE>
-struct TaskT : public baseTask
+template<size_t size_ = OS_STACK_SIZE>
+struct TaskT : public baseTask, public baseStack<size_>
 {
-	TaskT( const unsigned _prio, FUN_t _state ): baseTask(_prio, _state, stack_, size_) {}
+	TaskT( const unsigned _prio, FUN_t _state ): baseTask(_prio, _state, baseStack<size_>::stack_, size_) {}
 
 	static
 	TaskT<size_> *create( const unsigned _prio, FUN_t _state )
@@ -1365,9 +1385,6 @@ struct TaskT : public baseTask
 #endif
 		return tsk;
 	}
-
-	private:
-	stk_t stack_[ STK_SIZE(size_) ];
 };
 
 /* -------------------------------------------------------------------------- */
@@ -1388,7 +1405,7 @@ using Task = TaskT<OS_STACK_SIZE>;
  *
  ******************************************************************************/
 
-template<unsigned size_ = OS_STACK_SIZE>
+template<size_t size_ = OS_STACK_SIZE>
 struct startTaskT : public TaskT<size_>
 {
 	startTaskT( const unsigned _prio, FUN_t _state ): TaskT<size_>(_prio, _state) { port_sys_init(); tsk_start(this); }
