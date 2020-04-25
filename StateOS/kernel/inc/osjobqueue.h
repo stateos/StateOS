@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    22.04.2020
+    @date    25.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -524,8 +524,8 @@ struct baseJobQueueT : public __job
 	void     reset    ( void )                      {        job_reset    (this);               }
 	void     kill     ( void )                      {        job_kill     (this);               }
 	void     destroy  ( void )                      {        job_destroy  (this);               }
-	unsigned waitFor  ( cnt_t _delay )              { return job_waitFor  (this, _delay);       }
-	unsigned waitUntil( cnt_t _time )               { return job_waitUntil(this, _time);        }
+	unsigned waitFor  ( cnt_t  _delay )             { return job_waitFor  (this, _delay);       }
+	unsigned waitUntil( cnt_t  _time )              { return job_waitUntil(this, _time);        }
 	unsigned wait     ( void )                      { return job_wait     (this);               }
 	unsigned take     ( void )                      { return job_take     (this);               }
 	unsigned tryWait  ( void )                      { return job_tryWait  (this);               }
@@ -580,28 +580,28 @@ struct JobQueueT : public __box
 		return reinterpret_cast<JobQueueT<limit_> *>(box_create(limit_, sizeof(FUN_t)));
 	}
 
-	void     reset    ( void )                     {                              box_reset    (this);                                                              }
-	void     kill     ( void )                     {                              box_kill     (this);                                                              }
-	void     destroy  ( void )                     {                              box_destroy  (this);                                                              }
-	unsigned take     ( void )                     { FUN_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned tryWait  ( void )                     { FUN_t _fun; unsigned event = box_tryWait  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned takeISR  ( void )                     { FUN_t _fun; unsigned event = box_takeISR  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned waitFor  ( cnt_t _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
-	unsigned waitUntil( cnt_t _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
-	unsigned wait     ( void )                     { FUN_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned give     ( FUN_t _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
-	unsigned giveISR  ( FUN_t _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
-	unsigned sendFor  ( FUN_t _fun, cnt_t _delay ) {             unsigned event = box_sendFor  (this, &_fun, _delay);                                 return event; }
-	unsigned sendUntil( FUN_t _fun, cnt_t _time )  {             unsigned event = box_sendUntil(this, &_fun, _time);                                  return event; }
-	unsigned send     ( FUN_t _fun )               {             unsigned event = box_send     (this, &_fun);                                         return event; }
-	void     push     ( FUN_t _fun )               {                              box_push     (this, &_fun);                                                       }
-	void     pushISR  ( FUN_t _fun )               {                              box_pushISR  (this, &_fun);                                                       }
-	unsigned count    ( void )                     {             unsigned count = box_count    (this);                                                return count; }
-	unsigned countISR ( void )                     {             unsigned count = box_countISR (this);                                                return count; }
-	unsigned space    ( void )                     {             unsigned space = box_space    (this);                                                return space; }
-	unsigned spaceISR ( void )                     {             unsigned space = box_spaceISR (this);                                                return space; }
-	unsigned limit    ( void )                     {             unsigned limit = box_limit    (this);                                                return limit; }
-	unsigned limitISR ( void )                     {             unsigned limit = box_limitISR (this);                                                return limit; }
+	void     reset    ( void )                      {                              box_reset    (this);                                                              }
+	void     kill     ( void )                      {                              box_kill     (this);                                                              }
+	void     destroy  ( void )                      {                              box_destroy  (this);                                                              }
+	unsigned take     ( void )                      { FUN_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned tryWait  ( void )                      { FUN_t _fun; unsigned event = box_tryWait  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned takeISR  ( void )                      { FUN_t _fun; unsigned event = box_takeISR  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned waitFor  ( cnt_t  _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
+	unsigned waitUntil( cnt_t  _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
+	unsigned wait     ( void )                      { FUN_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned give     ( Fun_t  _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
+	unsigned giveISR  ( Fun_t  _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
+	unsigned sendFor  ( Fun_t  _fun, cnt_t _delay ) {             unsigned event = box_sendFor  (this, &_fun, _delay);                                 return event; }
+	unsigned sendUntil( Fun_t  _fun, cnt_t _time )  {             unsigned event = box_sendUntil(this, &_fun, _time);                                  return event; }
+	unsigned send     ( Fun_t  _fun )               {             unsigned event = box_send     (this, &_fun);                                         return event; }
+	void     push     ( Fun_t  _fun )               {                              box_push     (this, &_fun);                                                       }
+	void     pushISR  ( Fun_t  _fun )               {                              box_pushISR  (this, &_fun);                                                       }
+	unsigned count    ( void )                      {             unsigned count = box_count    (this);                                                return count; }
+	unsigned countISR ( void )                      {             unsigned count = box_countISR (this);                                                return count; }
+	unsigned space    ( void )                      {             unsigned space = box_space    (this);                                                return space; }
+	unsigned spaceISR ( void )                      {             unsigned space = box_spaceISR (this);                                                return space; }
+	unsigned limit    ( void )                      {             unsigned limit = box_limit    (this);                                                return limit; }
+	unsigned limitISR ( void )                      {             unsigned limit = box_limitISR (this);                                                return limit; }
 
 	private:
 	FUN_t data_[limit_];

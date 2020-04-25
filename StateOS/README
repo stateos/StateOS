@@ -36,11 +36,13 @@ Features:
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
 6.6
-- added baseStack class
 - updated os version
 - updated license
 - updated c++ constructors
 - updated JobQueueT class
+- added baseStack class
+- added baseTimer class
+- updated usage of std::function
 ---------
 6.5
 - added functional test

@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    25.04.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -39,24 +39,31 @@
 /* -------------------------------------------------------------------------- */
 
 #ifdef  __cplusplus
-
 #if OS_FUNCTIONAL
+
 #include <functional>
-typedef std::function<void( void )>     FUN_t;
+using FUN_t = std::function<void( void )>;
 static_assert(sizeof(FUN_t) == sizeof(void*)*(OS_FUNCTIONAL), "incorrect value of OS_FUNCTIONAL constant!");
-typedef std::function<void( unsigned )> ACT_t;
+using ACT_t = std::function<void( unsigned )>;
 static_assert(sizeof(ACT_t) == sizeof(void*)*(OS_FUNCTIONAL), "incorrect value of OS_FUNCTIONAL constant!");
-#else
-typedef     void (* FUN_t)( void );
-typedef     void (* ACT_t)( unsigned );
-#endif
+
+typedef FUN_t&& Fun_t;
+typedef ACT_t&& Act_t;
+
+template<typename T>
+static inline T&& forward(T&& fun) { return std::forward<T>(fun); }
+template<typename T>
+static inline T&& forward(T&  fun) { return std::forward<T>(fun); }
 
 #else
 
-#if OS_FUNCTIONAL
-typedef     void  * FUN_t [ OS_FUNCTIONAL ];
-typedef     void  * ACT_t [ OS_FUNCTIONAL ];
+typedef fun_t * Fun_t;
+typedef act_t * Act_t;
+
 #endif
+
+template<typename T>
+static inline T * forward(T*  fun) { return fun; }
 
 #endif
 
