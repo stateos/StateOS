@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    25.04.2020
+    @date    26.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1304,12 +1304,6 @@ struct baseTask : public __tsk
 #else
 	baseTask( const unsigned _prio, Fun_t _state, stk_t * const _stack, const size_t _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 #endif
-	baseTask( baseTask&& ) = default;
-	baseTask( const baseTask& ) = delete;
-	baseTask& operator=( baseTask&& ) = delete;
-	baseTask& operator=( const baseTask& ) = delete;
-
-	~baseTask( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
 	void     start    ( void )             {        tsk_start    (this);          }
 #if OS_FUNCTIONAL
@@ -1363,6 +1357,13 @@ template<size_t size_ = OS_STACK_SIZE>
 struct TaskT : public baseTask, public baseStack<size_>
 {
 	TaskT( const unsigned _prio, Fun_t _state ): baseTask(_prio, forward(_state), baseStack<size_>::stack_, size_) {}
+
+	TaskT( TaskT<size_>&& ) = default;
+	TaskT( const TaskT<size_>& ) = delete;
+	TaskT<size_>& operator=( TaskT<size_>&& ) = delete;
+	TaskT<size_>& operator=( const TaskT<size_>& ) = delete;
+
+	~TaskT( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
 	static
 	TaskT<size_> *create( const unsigned _prio, Fun_t _state )
