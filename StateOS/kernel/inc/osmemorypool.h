@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    22.04.2020
+    @date    26.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -488,7 +488,7 @@ struct MemoryPoolT : public __mem
 template<unsigned limit_, class T>
 struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
 {
-	using MemoryPoolT<limit_, sizeof(T)>::MemoryPoolT;
+	MemoryPoolTT( void ): MemoryPoolT<limit_, sizeof(T)>() {}
 
 	static
 	MemoryPoolTT<limit_, T> *create( void )

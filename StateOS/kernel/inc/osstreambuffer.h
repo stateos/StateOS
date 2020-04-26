@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    22.04.2020
+    @date    26.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -655,7 +655,7 @@ struct StreamBufferT : public __stm
 template<unsigned limit_, class T>
 struct StreamBufferTT : public StreamBufferT<limit_*sizeof(T)>
 {
-	using StreamBufferT<limit_*sizeof(T)>::StreamBufferT;
+	StreamBufferTT( void ): StreamBufferT<limit_*sizeof(T)>() {}
 
 	static
 	StreamBufferTT<limit_, T> *create( void )

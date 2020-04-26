@@ -43,6 +43,7 @@ Features:
 - added baseStack class
 - added baseTimer class
 - updated usage of std::function
+- fixed errors reported by the armcc v5 compiler
 ---------
 6.5
 - added functional test

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    22.04.2020
+    @date    26.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -613,7 +613,7 @@ struct MailBoxQueueT : public __box
 template<unsigned limit_, class T>
 struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
 {
-	using MailBoxQueueT<limit_, sizeof(T)>::MailBoxQueueT;
+	MailBoxQueueTT( void ): MailBoxQueueT<limit_, sizeof(T)>() {}
 
 	static
 	MailBoxQueueTT<limit_, T> *create( void )
