@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    22.04.2020
+    @date    27.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -528,8 +528,15 @@ struct Semaphore : public __sem
 	static
 	Semaphore *create( const unsigned _init, const unsigned _limit = semCounting )
 	{
+		Semaphore *sem;
+#if OS_FUNCTIONAL
+		sem = new Semaphore(_init, _limit);
+#else
 		static_assert(sizeof(__sem) == sizeof(Semaphore), "unexpected error!");
-		return reinterpret_cast<Semaphore *>(sem_create(_init, _limit));
+		sem = reinterpret_cast<Semaphore *>(sem_create(_init, _limit));
+#endif
+		assert(sem);
+		return sem;
 	}
 
 	void     reset    ( void )         {        sem_reset    (this);         }

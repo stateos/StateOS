@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    22.04.2020
+    @date    27.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -475,8 +475,15 @@ struct Flag : public __flg
 	static
 	Flag *create( const unsigned _init = 0 )
 	{
+		Flag *flg;
+#if OS_FUNCTIONAL
+		flg = new Flag(_init);
+#else
 		static_assert(sizeof(__flg) == sizeof(Flag), "unexpected error!");
-		return reinterpret_cast<Flag *>(flg_create(_init));
+		flg = reinterpret_cast<Flag *>(flg_create(_init));
+#endif
+		assert(flg);
+		return flg;
 	}
 
 	void     reset    ( void )                                      {        flg_reset    (this);                        }

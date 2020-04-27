@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    26.04.2020
+    @date    27.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -609,8 +609,15 @@ struct StreamBufferT : public __stm
 	static
 	StreamBufferT<limit_> *create( void )
 	{
+		StreamBufferT<limit_> *stm;
+#if OS_FUNCTIONAL
+		stm = new StreamBufferT<limit_>();
+#else
 		static_assert(sizeof(stm_T<limit_>) == sizeof(StreamBufferT<limit_>), "unexpected error!");
-		return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));
+		stm = reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));
+#endif
+		assert(stm);
+		return stm;
 	}
 
 	void     reset    ( void )                                            {        stm_reset    (this);                       }
@@ -660,8 +667,15 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(T)>
 	static
 	StreamBufferTT<limit_, T> *create( void )
 	{
+		StreamBufferTT<limit_, T> *stm;
+#if OS_FUNCTIONAL
+		stm = new StreamBufferTT<limit_, T>();
+#else
 		static_assert(sizeof(stm_T<limit_ * sizeof(T)>) == sizeof(StreamBufferTT<limit_, T>), "unexpected error!");
-		return reinterpret_cast<StreamBufferTT<limit_, T> *>(stm_create(limit_ * sizeof(T)));
+		stm = reinterpret_cast<StreamBufferTT<limit_, T> *>(stm_create(limit_ * sizeof(T)));
+#endif
+		assert(stm);
+		return stm;
 	}
 
 	unsigned take     (       T *_data )               { return stm_take     (this, _data, sizeof(T));         }

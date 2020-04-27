@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    22.04.2020
+    @date    27.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -397,8 +397,15 @@ struct ConditionVariable : public __cnd
 	static
 	ConditionVariable *create( void )
 	{
+		ConditionVariable *cnd;
+#if OS_FUNCTIONAL
+		cnd = new ConditionVariable();
+#else
 		static_assert(sizeof(__cnd) == sizeof(ConditionVariable), "unexpected error!");
-		return reinterpret_cast<ConditionVariable *>(cnd_create());
+		cnd = reinterpret_cast<ConditionVariable *>(cnd_create());
+#endif
+		assert(cnd);
+		return cnd;
 	}
 
 	void     reset    ( void )                      {        cnd_reset    (this);               }

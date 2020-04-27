@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    26.04.2020
+    @date    27.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -634,8 +634,15 @@ struct MessageBufferT : public __msg
 	static
 	MessageBufferT<limit_> *create( void )
 	{
+		MessageBufferT<limit_> *msg;
+#if OS_FUNCTIONAL
+		msg = new MessageBufferT<limit_>();
+#else
 		static_assert(sizeof(msg_T<limit_>) == sizeof(MessageBufferT<limit_>), "unexpected error!");
-		return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_));
+		msg = reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_));
+#endif
+		assert(msg);
+		return msg;
 	}
 
 	void     reset    ( void )                                            {        msg_reset    (this);                       }
@@ -687,8 +694,15 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T
 	static
 	MessageBufferTT<limit_, T> *create( void )
 	{
+		MessageBufferTT<limit_, T> *msg;
+#if OS_FUNCTIONAL
+		msg = new MessageBufferTT<limit_, T>();
+#else
 		static_assert(sizeof(msg_T<limit_ * (sizeof(unsigned) + sizeof(T))>) == sizeof(MessageBufferTT<limit_, T>), "unexpected error!");
-		return reinterpret_cast<MessageBufferTT<limit_, T> *>(msg_create(limit_ * (sizeof(unsigned) + sizeof(T))));
+		msg = reinterpret_cast<MessageBufferTT<limit_, T> *>(msg_create(limit_ * (sizeof(unsigned) + sizeof(T))));
+#endif
+		assert(msg);
+		return msg;
 	}
 
 	unsigned take     (       T *_data )               { return msg_take     (this, _data, sizeof(T));         }

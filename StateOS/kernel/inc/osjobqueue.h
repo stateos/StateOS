@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    25.04.2020
+    @date    27.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -517,8 +517,15 @@ struct baseJobQueueT : public __job
 	static
 	baseJobQueueT<limit_> *create( void )
 	{
+		baseJobQueueT<limit_> *job;
+#if OS_FUNCTIONAL
+		job = new baseJobQueueT<limit_>();
+#else
 		static_assert(sizeof(job_T<limit_>) == sizeof(baseJobQueueT<limit_>), "unexpected error!");
-		return reinterpret_cast<baseJobQueueT<limit_> *>(job_create(limit_));
+		job = reinterpret_cast<baseJobQueueT<limit_> *>(job_create(limit_));
+#endif
+		assert(job);
+		return job;
 	}
 
 	void     reset    ( void )                      {        job_reset    (this);               }
@@ -564,7 +571,7 @@ struct baseJobQueueT : public __job
 template<unsigned limit_>
 struct JobQueueT : public __box
 {
-	JobQueueT( void ): __box _BOX_INIT(limit_, sizeof(FUN_t), reinterpret_cast<char *>(data_)) {}
+	JobQueueT( void ): __box _BOX_INIT(limit_, sizeof(Fun_t), reinterpret_cast<char *>(data_)) {}
 
 	JobQueueT( JobQueueT&& ) = default;
 	JobQueueT( const JobQueueT& ) = delete;
@@ -576,19 +583,21 @@ struct JobQueueT : public __box
 	static
 	JobQueueT<limit_> *create( void )
 	{
-		static_assert(sizeof(box_T<limit_, sizeof(FUN_t)>) == sizeof(JobQueueT<limit_>), "unexpected error!");
-		return reinterpret_cast<JobQueueT<limit_> *>(box_create(limit_, sizeof(FUN_t)));
+		JobQueueT<limit_> *job;
+		job = new JobQueueT<limit_>();
+		assert(job);
+		return job;
 	}
 
 	void     reset    ( void )                      {                              box_reset    (this);                                                              }
 	void     kill     ( void )                      {                              box_kill     (this);                                                              }
 	void     destroy  ( void )                      {                              box_destroy  (this);                                                              }
-	unsigned take     ( void )                      { FUN_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned tryWait  ( void )                      { FUN_t _fun; unsigned event = box_tryWait  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned takeISR  ( void )                      { FUN_t _fun; unsigned event = box_takeISR  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned waitFor  ( cnt_t  _delay )             { FUN_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
-	unsigned waitUntil( cnt_t  _time )              { FUN_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
-	unsigned wait     ( void )                      { FUN_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned take     ( void )                      { Fun_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned tryWait  ( void )                      { Fun_t _fun; unsigned event = box_tryWait  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned takeISR  ( void )                      { Fun_t _fun; unsigned event = box_takeISR  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
+	unsigned waitFor  ( cnt_t  _delay )             { Fun_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
+	unsigned waitUntil( cnt_t  _time )              { Fun_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
+	unsigned wait     ( void )                      { Fun_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
 	unsigned give     ( Fun_t  _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
 	unsigned giveISR  ( Fun_t  _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
 	unsigned sendFor  ( Fun_t  _fun, cnt_t _delay ) {             unsigned event = box_sendFor  (this, &_fun, _delay);                                 return event; }
@@ -604,7 +613,7 @@ struct JobQueueT : public __box
 	unsigned limitISR ( void )                      {             unsigned limit = box_limitISR (this);                                                return limit; }
 
 	private:
-	FUN_t data_[limit_];
+	Fun_t data_[limit_];
 };
 
 #else
