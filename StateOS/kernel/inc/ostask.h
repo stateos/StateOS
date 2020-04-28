@@ -623,7 +623,7 @@ tsk_t *cur_task( void ) { return System.cur; }
  *   stack           : base of task's private stack storage
  *   size            : size of task private stack (in bytes)
  *
- * Return            : task object
+ * Return            : none
  *
  * Note              : use only in thread mode
  *
@@ -645,7 +645,7 @@ void tsk_make( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
  *   stack           : base of task's private stack storage
  *   size            : size of task private stack (in bytes)
  *
- * Return            : task object
+ * Return            : none
  *
  * Note              : use only in thread mode
  *
