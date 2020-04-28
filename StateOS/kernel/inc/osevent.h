@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    27.04.2020
+    @date    28.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -340,18 +340,11 @@ struct Event : public __evt
 
 	~Event( void ) { assert(__evt::obj.queue == nullptr); }
 
-	static
+	static // create dynamic object with manageable resources
 	Event *create( void )
 	{
-		Event *evt;
-#if OS_FUNCTIONAL
-		evt = new Event();
-#else
 		static_assert(sizeof(__evt) == sizeof(Event), "unexpected error!");
-		evt = reinterpret_cast<Event *>(evt_create());
-#endif
-		assert(evt);
-		return evt;
+		return reinterpret_cast<Event *>(evt_create());
 	}
 
 	void     reset    ( void )                          {        evt_reset    (this);                 }

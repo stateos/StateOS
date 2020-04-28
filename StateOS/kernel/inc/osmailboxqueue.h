@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    27.04.2020
+    @date    28.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -564,18 +564,11 @@ struct MailBoxQueueT : public __box
 
 	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
-	static
+	static // create dynamic object with manageable resources
 	MailBoxQueueT<limit_, size_> *create( void )
 	{
-		MailBoxQueueT<limit_, size_> *box;
-#if OS_FUNCTIONAL
-		box = new MailBoxQueueT<limit_, size_>();
-#else
 		static_assert(sizeof(box_T<limit_, size_>) == sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
-		box = reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
-#endif
-		assert(box);
-		return box;
+		return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
 	}
 
 	void     reset    ( void )                            {        box_reset    (this);                }
@@ -622,18 +615,11 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
 {
 	MailBoxQueueTT( void ): MailBoxQueueT<limit_, sizeof(T)>() {}
 
-	static
+	static // create dynamic object with manageable resources
 	MailBoxQueueTT<limit_, T> *create( void )
 	{
-		MailBoxQueueTT<limit_, T> *box;
-#if OS_FUNCTIONAL
-		box = new MailBoxQueueTT<limit_, T>();
-#else
 		static_assert(sizeof(box_T<limit_, sizeof(T)>) == sizeof(MailBoxQueueTT<limit_, T>), "unexpected error!");
-		box = reinterpret_cast<MailBoxQueueTT<limit_, T> *>(box_create(limit_, sizeof(T)));
-#endif
-		assert(box);
-		return box;
+		return reinterpret_cast<MailBoxQueueTT<limit_, T> *>(box_create(limit_, sizeof(T)));
 	}
 };
 

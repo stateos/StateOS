@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    27.04.2020
+    @date    28.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -525,18 +525,11 @@ struct Semaphore : public __sem
 
 	~Semaphore( void ) { assert(__sem::obj.queue == nullptr); }
 
-	static
+	static // create dynamic object with manageable resources
 	Semaphore *create( const unsigned _init, const unsigned _limit = semCounting )
 	{
-		Semaphore *sem;
-#if OS_FUNCTIONAL
-		sem = new Semaphore(_init, _limit);
-#else
 		static_assert(sizeof(__sem) == sizeof(Semaphore), "unexpected error!");
-		sem = reinterpret_cast<Semaphore *>(sem_create(_init, _limit));
-#endif
-		assert(sem);
-		return sem;
+		return reinterpret_cast<Semaphore *>(sem_create(_init, _limit));
 	}
 
 	void     reset    ( void )         {        sem_reset    (this);         }
@@ -571,6 +564,13 @@ struct Semaphore : public __sem
 struct BinarySemaphore : public Semaphore
 {
 	BinarySemaphore( const unsigned _init = 0 ): Semaphore(_init, semBinary) {}
+
+	static // create dynamic object with manageable resources
+	BinarySemaphore *create( const unsigned _init = 0 )
+	{
+		static_assert(sizeof(__sem) == sizeof(BinarySemaphore), "unexpected error!");
+		return reinterpret_cast<BinarySemaphore *>(sem_create(_init, semBinary));
+	}
 };
 
 /******************************************************************************
@@ -587,6 +587,13 @@ struct BinarySemaphore : public Semaphore
 struct CountingSemaphore : public Semaphore
 {
 	CountingSemaphore( const unsigned _init = 0 ): Semaphore(_init, semCounting) {}
+
+	static // create dynamic object with manageable resources
+	CountingSemaphore *create( const unsigned _init = 0 )
+	{
+		static_assert(sizeof(__sem) == sizeof(CountingSemaphore), "unexpected error!");
+		return reinterpret_cast<CountingSemaphore *>(sem_create(_init, semCounting));
+	}
 };
 
 #endif//__cplusplus

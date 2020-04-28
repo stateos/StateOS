@@ -14,34 +14,18 @@ static void test()
 	auto Tsk8 = TaskT<512>::create(8, proc);
 	auto Tsk9 = Task::create(9, proc);
 
-	                                             ASSERT(!*Tsk6);
-	        Tsk6->start();                       ASSERT(!*Tsk6);
+	        Tsk6->start();
 	event = Tsk6->join();                        ASSERT_success(event);
-	                                             ASSERT(OS_FUNCTIONAL || Tsk6->__tsk::hdr.obj.res == RELEASED);
-#if OS_FUNCTIONAL
-	        delete Tsk6;
-#endif
-	                                             ASSERT(!*Tsk7);
-	        Tsk7->start();                       ASSERT(!*Tsk7);
+	                                             ASSERT(Tsk6->__tsk::hdr.obj.res == RELEASED);
+	        Tsk7->start();
 	event = Tsk7->join();                        ASSERT_success(event);
-	                                             ASSERT(OS_FUNCTIONAL || Tsk7->__tsk::hdr.obj.res == RELEASED);
-#if OS_FUNCTIONAL
-	        delete Tsk7;
-#endif
-	                                             ASSERT(!*Tsk8);
-	        Tsk8->start();                       ASSERT(!*Tsk8);
+	                                             ASSERT(Tsk7->__tsk::hdr.obj.res == RELEASED);
+	        Tsk8->start();
 	event = Tsk8->join();                        ASSERT_success(event);
-	                                             ASSERT(OS_FUNCTIONAL || Tsk8->__tsk::hdr.obj.res == RELEASED);
-#if OS_FUNCTIONAL
-	        delete Tsk8;
-#endif
-	                                             ASSERT(!*Tsk9);
-	        Tsk9->start();                       ASSERT(!*Tsk9);
+	                                             ASSERT(Tsk8->__tsk::hdr.obj.res == RELEASED);
+	        Tsk9->start();
 	event = Tsk9->join();                        ASSERT_success(event);
-	                                             ASSERT(OS_FUNCTIONAL || Tsk9->__tsk::hdr.obj.res == RELEASED);
-#if OS_FUNCTIONAL
-	        delete Tsk9;
-#endif
+	                                             ASSERT(Tsk9->__tsk::hdr.obj.res == RELEASED);
 }
 
 extern "C"

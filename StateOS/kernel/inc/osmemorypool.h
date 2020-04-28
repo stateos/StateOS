@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    27.04.2020
+    @date    28.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -450,18 +450,11 @@ struct MemoryPoolT : public __mem
 
 	~MemoryPoolT( void ) { assert(__mem::lst.obj.queue == nullptr); }
 
-	static
+	static // create dynamic object with manageable resources
 	MemoryPoolT<limit_, size_> *create( void )
 	{
-		MemoryPoolT<limit_, size_> *mem;
-#if OS_FUNCTIONAL
-		mem = new MemoryPoolT<limit_, size_>();
-#else
 		static_assert(sizeof(mem_T<limit_, size_>) == sizeof(MemoryPoolT<limit_, size_>), "unexpected error!");
-		mem = reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
-#endif
-		assert(mem);
-		return mem;
+		return reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
 	}
 
 	void     reset    ( void )                             {        mem_reset    (this);                }
@@ -497,18 +490,11 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
 {
 	MemoryPoolTT( void ): MemoryPoolT<limit_, sizeof(T)>() {}
 
-	static
+	static // create dynamic object with manageable resources
 	MemoryPoolTT<limit_, T> *create( void )
 	{
-		MemoryPoolTT<limit_, T> *mem;
-#if OS_FUNCTIONAL
-		mem = new MemoryPoolTT<limit_, T>();
-#else
 		static_assert(sizeof(mem_T<limit_, sizeof(T)>) == sizeof(MemoryPoolTT<limit_, T>), "unexpected error!");
-		mem = reinterpret_cast<MemoryPoolTT<limit_, T> *>(mem_create(limit_, sizeof(T)));
-#endif
-		assert(mem);
-		return mem;
+		return reinterpret_cast<MemoryPoolTT<limit_, T> *>(mem_create(limit_, sizeof(T)));
 	}
 
 	unsigned take     ( T **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data));         }

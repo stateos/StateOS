@@ -45,6 +45,7 @@ Features:
 - updated usage of std::function
 - fixed errors reported by the armcc v5 compiler
 - simplified c++ constructors
+- updated c++ create functions
 ---------
 6.5
 - added functional test

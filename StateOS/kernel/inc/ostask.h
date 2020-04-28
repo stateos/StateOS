@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    27.04.2020
+    @date    28.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -167,8 +167,13 @@ struct __tsk
 };
 
 #ifdef __cplusplus
+#if OS_FUNCTIONAL
+template<size_t limit_>
+struct tsk_T { tsk_t tsk; stk_t buf[STK_SIZE(limit_)]; Fun_t fun; Act_t act; };
+#else
 template<size_t limit_>
 struct tsk_T { tsk_t tsk; stk_t buf[STK_SIZE(limit_)]; };
+#endif
 #else
 struct tsk_T { tsk_t tsk; stk_t buf[]; };
 #endif
@@ -603,6 +608,28 @@ tsk_t *tsk_this( void ) { return System.cur; }
 
 __STATIC_INLINE
 tsk_t *cur_task( void ) { return System.cur; }
+
+/******************************************************************************
+ *
+ * Name              : tsk_make
+ *
+ * Description       : initialize complete work area for task object
+ *
+ * Parameters
+ *   tsk             : pointer to task object
+ *   prio            : initial task priority (any unsigned int value)
+ *   state           : task state (initial task function) doesn't have to be noreturn-type
+ *                     it will be executed into an infinite system-implemented loop
+ *   stack           : base of task's private stack storage
+ *   size            : size of task private stack (in bytes)
+ *
+ * Return            : task object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+void tsk_make( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size );
 
 /******************************************************************************
  *
@@ -1248,7 +1275,6 @@ void cur_action( act_t *action ) { tsk_action(System.cur, action); }
 template<size_t size_ = OS_STACK_SIZE>
 struct baseStack
 {
-	protected:
 	stk_t stack_[ STK_SIZE(size_) ];
 };
 
@@ -1330,7 +1356,7 @@ struct baseTask : public __tsk
 
 template<size_t size_ = OS_STACK_SIZE>
 struct TaskT : public baseTask, public baseStack<size_>
-{
+{	// create undetachable task
 #if OS_FUNCTIONAL
 	TaskT( const unsigned _prio, const Fun_t&& _state ): baseTask(_prio, _state, baseStack<size_>::stack_, size_) {}
 	TaskT( const unsigned _prio, const Fun_t&  _state ): baseTask(_prio, _state, baseStack<size_>::stack_, size_) {}
@@ -1345,34 +1371,26 @@ struct TaskT : public baseTask, public baseStack<size_>
 
 	~TaskT( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
-	static
+	static // create dynamic detachable task
 	TaskT<size_> *create( const unsigned _prio, Fun_t _state )
 	{
-		TaskT<size_> *tsk;
-#if OS_FUNCTIONAL
-		tsk = new TaskT<size_>(_prio, _state);
-		tsk->start();
-#else
 		static_assert(sizeof(tsk_T<size_>) == sizeof(TaskT<size_>), "unexpected error!");
-		tsk = reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
+		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
+#if OS_FUNCTIONAL
+		tsk_make(tsk, _prio, fun_, tsk->stack_, size_);
+		tsk->fun = _state;
+#else
+		tsk_make(tsk, _prio, _state, tsk->stack_, size_);
 #endif
-		assert(tsk);
+		tsk->__tsk::hdr.obj.res = tsk;
 		return tsk;
 	}
 
-	static
+	static // create dynamic detached task
 	TaskT<size_> *detached( const unsigned _prio, Fun_t _state )
 	{
-		TaskT<size_> *tsk;
-#if OS_FUNCTIONAL
-		(void) _prio;
-		(void) _state;
-		tsk = nullptr; // cannot create detachable task - to do
-#else
-		static_assert(sizeof(tsk_T<size_>) == sizeof(TaskT<size_>), "unexpected error!");
-		tsk = reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
-#endif
-		assert(tsk);
+		auto tsk = create(_prio, _state);
+		tsk->__tsk::join = DETACHED;
 		return tsk;
 	}
 };
@@ -1397,13 +1415,29 @@ using Task = TaskT<OS_STACK_SIZE>;
 
 template<size_t size_ = OS_STACK_SIZE>
 struct startTaskT : public TaskT<size_>
-{
+{	// create and run undetachable task
 #if OS_FUNCTIONAL
 	startTaskT( const unsigned _prio, const Fun_t&& _state ): TaskT<size_>(_prio, _state) { port_sys_init(); tsk_start(this); }
 	startTaskT( const unsigned _prio, const Fun_t&  _state ): TaskT<size_>(_prio, _state) { port_sys_init(); tsk_start(this); }
 #else
 	startTaskT( const unsigned _prio, const Fun_t   _state ): TaskT<size_>(_prio, _state) { port_sys_init(); tsk_start(this); }
 #endif
+
+	static // create and run dynamic detachable task
+	startTaskT<size_> *create( const unsigned _prio, Fun_t _state )
+	{
+		auto tsk = TaskT<size_>::create(_prio, _state);
+		tsk->start();
+		return reinterpret_cast<startTaskT<size_> *>(tsk);
+	}
+
+	static // create and run dynamic detached task
+	startTaskT<size_> *detached( const unsigned _prio, Fun_t _state )
+	{
+		auto tsk = TaskT<size_>::detached(_prio, _state);
+		tsk->start();
+		return reinterpret_cast<startTaskT<size_> *>(tsk);
+	}
 };
 
 /* -------------------------------------------------------------------------- */

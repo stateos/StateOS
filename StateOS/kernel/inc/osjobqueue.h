@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    27.04.2020
+    @date    28.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -506,26 +506,20 @@ void job_pushISR( job_t *job, fun_t *fun ) { job_push(job, fun); }
 template<unsigned limit_>
 struct baseJobQueueT : public __job
 {
-	 baseJobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
-	~baseJobQueueT( void ) { assert(__job::obj.queue == nullptr); }
+	baseJobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
 
 	baseJobQueueT( baseJobQueueT&& ) = default;
 	baseJobQueueT( const baseJobQueueT& ) = delete;
 	baseJobQueueT& operator=( baseJobQueueT&& ) = delete;
 	baseJobQueueT& operator=( const baseJobQueueT& ) = delete;
 
-	static
+	~baseJobQueueT( void ) { assert(__job::obj.queue == nullptr); }
+
+	static // create dynamic object with manageable resources
 	baseJobQueueT<limit_> *create( void )
 	{
-		baseJobQueueT<limit_> *job;
-#if OS_FUNCTIONAL
-		job = new baseJobQueueT<limit_>();
-#else
 		static_assert(sizeof(job_T<limit_>) == sizeof(baseJobQueueT<limit_>), "unexpected error!");
-		job = reinterpret_cast<baseJobQueueT<limit_> *>(job_create(limit_));
-#endif
-		assert(job);
-		return job;
+		return reinterpret_cast<baseJobQueueT<limit_> *>(job_create(limit_));
 	}
 
 	void     reset    ( void )                      {        job_reset    (this);               }
@@ -580,13 +574,11 @@ struct JobQueueT : public __box
 
 	~JobQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
-	static
+	static // create dynamic object with manageable resources
 	JobQueueT<limit_> *create( void )
 	{
-		JobQueueT<limit_> *job;
-		job = new JobQueueT<limit_>();
-		assert(job);
-		return job;
+		static_assert(sizeof(box_T<limit_, sizeof(Fun_t)>) == sizeof(JobQueueT<limit_>), "unexpected error!");
+		return reinterpret_cast<JobQueueT<limit_> *>(box_create(limit_, sizeof(Fun_t)));
 	}
 
 	void     reset    ( void )                      {                              box_reset    (this);                                                              }

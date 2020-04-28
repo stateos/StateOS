@@ -17,8 +17,6 @@ void test_task()
 	TEST_Add(test_task_create_4);
 	TEST_Add(test_task_create_5);
 	TEST_Add(test_task_create_6);
-#if OS_FUNCTIONAL == 0
 	TEST_Add(test_task_create_7);
-#endif
 #endif
 }

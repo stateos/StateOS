@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    27.04.2020
+    @date    28.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -49,6 +49,16 @@ struct __tmr
 	cnt_t    delay;
 	cnt_t    period;
 };
+
+#ifdef __cplusplus
+#if OS_FUNCTIONAL
+struct tmr_T { tmr_t tmr; Fun_t fun; };
+#else
+struct tmr_T { tmr_t tmr; };
+#endif
+#else
+struct tmr_T { tmr_t tmr; };
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -797,17 +807,28 @@ struct Timer : public baseTimer
 
 	~Timer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
 
-	static
+	static // create dynamic timer with manageable resources
+	Timer *create( void )
+	{
+		static_assert(sizeof(tmr_T) == sizeof(Timer), "unexpected error!");
+		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
+		tmr_init(tmr, NULL);
+		tmr->__tmr::hdr.obj.res = tmr;
+		return tmr;
+	}
+
+	static // create dynamic timer with manageable resources
 	Timer *create( Fun_t _state )
 	{
-		Timer *tmr;
+		static_assert(sizeof(tmr_T) == sizeof(Timer), "unexpected error!");
+		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 #if OS_FUNCTIONAL
-		tmr = new Timer(_state);
+		tmr_init(tmr, fun_);
+		tmr->fun = _state;
 #else
-		static_assert(sizeof(__tmr) == sizeof(Timer), "unexpected error!");
-		tmr = reinterpret_cast<Timer *>(tmr_create(_state));
+		tmr_init(tmr, _state);
 #endif
-		assert(tmr);
+		tmr->__tmr::hdr.obj.res = tmr;
 		return tmr;
 	}
 };
@@ -841,6 +862,22 @@ struct startTimer : public Timer
 #else
 	startTimer( const cnt_t _delay, const cnt_t _period, const Fun_t   _state ): Timer(_state) { tmr_start(this, _delay, _period); }
 #endif
+
+	static // create and run dynamic timer with manageable resources
+	startTimer *create( cnt_t _delay, cnt_t _period )
+	{
+		auto tmr = Timer::create();
+		tmr->start(_delay, _period);
+		return reinterpret_cast<startTimer *>(tmr);
+	}
+
+	static // create and run dynamic timer with manageable resources
+	startTimer *create( cnt_t _delay, cnt_t _period, Fun_t _state )
+	{
+		auto tmr = Timer::create(_state);
+		tmr->start(_delay, _period);
+		return reinterpret_cast<startTimer *>(tmr);
+	}
 };
 
 /******************************************************************************
@@ -868,6 +905,20 @@ struct startTimerFor : public startTimer
 #else
 	startTimerFor( const cnt_t _delay, const Fun_t   _state ): startTimer(_delay, 0, _state) {}
 #endif
+
+	static // create and run dynamic timer with manageable resources
+	startTimerFor *create( cnt_t _delay )
+	{
+		auto tmr = startTimer::create(_delay, 0);
+		return reinterpret_cast<startTimerFor *>(tmr);
+	}
+
+	static // create and run dynamic timer with manageable resources
+	startTimerFor *create( cnt_t _delay, Fun_t _state )
+	{
+		auto tmr = startTimer::create(_delay, 0, _state);
+		return reinterpret_cast<startTimerFor *>(tmr);
+	}
 };
 
 /******************************************************************************
@@ -896,6 +947,20 @@ struct startTimerPeriodic : public startTimer
 #else
 	startTimerPeriodic( const cnt_t _period, const Fun_t   _state ): startTimer(_period, _period, _state) {}
 #endif
+
+	static // create and run dynamic timer with manageable resources
+	startTimerPeriodic *create( cnt_t _period )
+	{
+		auto tmr = startTimer::create(_period, _period);
+		return reinterpret_cast<startTimerPeriodic *>(tmr);
+	}
+
+	static // create and run dynamic timer with manageable resources
+	startTimerPeriodic *create( cnt_t _period, Fun_t _state )
+	{
+		auto tmr = startTimer::create(_period, _period, _state);
+		return reinterpret_cast<startTimerPeriodic *>(tmr);
+	}
 };
 
 /******************************************************************************
@@ -921,6 +986,22 @@ struct startTimerUntil : public Timer
 #else
 	startTimerUntil( const cnt_t _time, const Fun_t   _state ): Timer(_state) { tmr_startUntil(this, _time); }
 #endif
+
+	static // create and run dynamic timer with manageable resources
+	startTimerUntil *create( cnt_t _time )
+	{
+		auto tmr = Timer::create();
+		tmr->startUntil(_time);
+		return reinterpret_cast<startTimerUntil *>(tmr);
+	}
+
+	static // create and run dynamic timer with manageable resources
+	startTimerUntil *create( cnt_t _time, Fun_t _state )
+	{
+		auto tmr = Timer::create(_state);
+		tmr->startUntil(_time);
+		return reinterpret_cast<startTimerUntil *>(tmr);
+	}
 };
 
 /******************************************************************************

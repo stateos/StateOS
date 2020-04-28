@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    27.04.2020
+    @date    28.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -516,18 +516,11 @@ struct EventQueueT : public __evq
 
 	~EventQueueT( void ) { assert(__evq::obj.queue == nullptr); }
 
-	static
+	static // create dynamic object with manageable resources
 	EventQueueT<limit_> *create( void )
 	{
-		EventQueueT<limit_> *evq;
-#if OS_FUNCTIONAL
-		evq = new EventQueueT<limit_>();
-#else
 		static_assert(sizeof(evq_T<limit_>) == sizeof(EventQueueT<limit_>), "unexpected error!");
-		evq = reinterpret_cast<EventQueueT<limit_> *>(evq_create(limit_));
-#endif
-		assert(evq);
-		return evq;
+		return reinterpret_cast<EventQueueT<limit_> *>(evq_create(limit_));
 	}
 
 	void     reset    ( void )                         {        evq_reset    (this);                }

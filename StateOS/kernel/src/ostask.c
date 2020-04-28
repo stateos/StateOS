@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    25.04.2020
+    @date    28.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -46,9 +46,23 @@ void priv_tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_
 	tsk->state = state;
 	tsk->stack = stack;
 	tsk->size  = size;
+}
 
-	core_ctx_init(tsk);
-	core_tsk_insert(tsk);
+/* -------------------------------------------------------------------------- */
+void tsk_make( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size )
+/* -------------------------------------------------------------------------- */
+{
+	assert_tsk_context();
+	assert(tsk);
+	assert(state);
+	assert(stack);
+	assert(size);
+
+	sys_lock();
+	{
+		priv_tsk_init(tsk, prio, state, stack, size);
+	}
+	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -65,6 +79,9 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
 	{
 		memset(tsk, 0, sizeof(tsk_t));
 		priv_tsk_init(tsk, prio, state, stack, size);
+
+		core_ctx_init(tsk);
+		core_tsk_insert(tsk);
 	}
 	sys_unlock();
 }
@@ -88,6 +105,9 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size )
 		tmp = sys_alloc(sizeof(struct tsk_T) + bufsize);
 		priv_tsk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize);
 		tsk->hdr.obj.res = tsk;
+
+		core_ctx_init(tsk);
+		core_tsk_insert(tsk);
 	}
 	sys_unlock();
 
