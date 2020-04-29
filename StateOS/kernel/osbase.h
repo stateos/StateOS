@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -120,9 +120,9 @@ typedef struct __obj
 /* -------------------------------------------------------------------------- */
 
 __STATIC_INLINE
-void core_obj_init( obj_t *obj )
+void core_obj_init( obj_t *obj, void *res )
 {
-	(void) obj;
+	obj->res = res;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -143,9 +143,9 @@ typedef struct __hdr
 /* -------------------------------------------------------------------------- */
 
 __STATIC_INLINE
-void core_hdr_init( hdr_t *hdr )
+void core_hdr_init( hdr_t *hdr, void *res )
 {
-	core_obj_init(&hdr->obj);
+	core_obj_init(&hdr->obj, res);
 
 	hdr->id = ID_STOPPED;
 }

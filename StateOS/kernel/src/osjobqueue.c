@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,10 +36,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_job_init( job_t *job, fun_t **data, unsigned bufsize )
+void priv_job_init( job_t *job, fun_t **data, unsigned bufsize, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_obj_init(&job->obj);
+	memset(job, 0, sizeof(job_t));
+
+	core_obj_init(&job->obj, res);
 
 	job->limit = bufsize / sizeof(fun_t *);
 	job->data  = data;
@@ -56,8 +58,7 @@ void job_init( job_t *job, fun_t **data, unsigned bufsize )
 
 	sys_lock();
 	{
-		memset(job, 0, sizeof(job_t));
-		priv_job_init(job, data, bufsize);
+		priv_job_init(job, data, bufsize, NULL);
 	}
 	sys_unlock();
 }
@@ -78,8 +79,7 @@ job_t *job_create( unsigned limit )
 	{
 		bufsize = limit * sizeof(fun_t *);
 		tmp = sys_alloc(sizeof(struct job_T) + bufsize);
-		priv_job_init(job = &tmp->job, tmp->buf, bufsize);
-		job->obj.res = job;
+		priv_job_init(job = &tmp->job, tmp->buf, bufsize, tmp);
 	}
 	sys_unlock();
 

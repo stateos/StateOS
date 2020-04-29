@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -90,6 +90,18 @@ static void local_timer_handler( void )
 		}
 	}
 	sys_unlockISR();
+}
+
+/* -------------------------------------------------------------------------- */
+/*
+** Memory allocation and clear API
+*/
+
+static void *OS_Alloc(size_t size)
+{
+	void *mem = sys_alloc(size);
+	memset(mem, 0, size);
+	return mem;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -205,7 +217,7 @@ int32 OS_QueueCreate(uint32 *queue_id, const char *queue_name, uint32 queue_dept
 					status = OS_ERR_NO_FREE_IDS;
 				else
 				{
-					data = sys_alloc(queue_depth * data_size);
+					data = OS_Alloc(queue_depth * data_size);
 
 					if (!data)
 						status = OS_ERROR;
@@ -1010,7 +1022,7 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 					if (!stack)
 					{
 						if (!stack_size) stack_size = OS_STACK_SIZE;
-						stack = sys_alloc(stack_size);
+						stack = OS_Alloc(stack_size);
 					}
 					if (!stack)
 						status = OS_ERROR;

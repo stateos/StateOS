@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,10 +35,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_sem_init( sem_t *sem, unsigned init, unsigned limit )
+void priv_sem_init( sem_t *sem, unsigned init, unsigned limit, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_obj_init(&sem->obj);
+	memset(sem, 0, sizeof(sem_t));
+
+	core_obj_init(&sem->obj, res);
 
 	sem->count = init;
 	sem->limit = limit;
@@ -54,8 +56,7 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit )
 
 	sys_lock();
 	{
-		memset(sem, 0, sizeof(sem_t));
-		priv_sem_init(sem, init, limit);
+		priv_sem_init(sem, init, limit, NULL);
 	}
 	sys_unlock();
 }
@@ -71,8 +72,7 @@ sem_t *sem_create( unsigned init, unsigned limit )
 	sys_lock();
 	{
 		sem = sys_alloc(sizeof(sem_t));
-		priv_sem_init(sem, init, limit);
-		sem->obj.res = sem;
+		priv_sem_init(sem, init, limit, sem);
 	}
 	sys_unlock();
 

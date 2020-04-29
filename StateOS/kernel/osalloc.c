@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -79,7 +79,6 @@ void *sys_alloc( size_t size )
 				nxt->owner = nxt;
 			}
 
-			mem = memset(mem, 0, size * sizeof(seg_t));
 			mem->next = nxt;
 			mem = mem + 1;
 		//	memory segment has been successfully allocated
@@ -114,35 +113,6 @@ void sys_free( void *base )
 		}
 	}
 	sys_unlock();
-}
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#if OS_HEAP_SIZE == 0
-
-void *sys_alloc( size_t size )
-{
-	void *mem;
-
-	assert(size);
-
-	mem = malloc(size);
-
-	if (mem)
-		mem = memset(mem, 0, size);
-
-	assert(mem);
-
-	return mem;
-}
-
-/* -------------------------------------------------------------------------- */
-
-void sys_free( void *base )
-{
-	free(base);
 }
 
 #endif

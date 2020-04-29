@@ -36,10 +36,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size )
+void priv_tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_hdr_init(&tsk->hdr);
+	memset(tsk, 0, sizeof(tsk_t));
+
+	core_hdr_init(&tsk->hdr, res);
 
 	tsk->prio  = prio;
 	tsk->basic = prio;
@@ -60,8 +62,7 @@ void wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
 
 	sys_lock();
 	{
-		memset(tsk, 0, sizeof(tsk_t));
-		priv_tsk_init(tsk, prio, state, stack, size);
+		priv_tsk_init(tsk, prio, state, stack, size, NULL);
 	}
 	sys_unlock();
 }
@@ -91,8 +92,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size )
 	{
 		bufsize = STK_SIZE(size) * sizeof(stk_t);
 		tmp = sys_alloc(sizeof(struct tsk_T) + bufsize);
-		priv_tsk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize);
-		tsk->hdr.obj.res = tsk;
+		priv_tsk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize, tmp);
 
 		tsk_start(tsk);
 	}

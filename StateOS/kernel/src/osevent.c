@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,10 +36,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_evt_init( evt_t *evt )
+void priv_evt_init( evt_t *evt, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_obj_init(&evt->obj);
+	memset(evt, 0, sizeof(evt_t));
+
+	core_obj_init(&evt->obj, res);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -51,8 +53,7 @@ void evt_init( evt_t *evt )
 
 	sys_lock();
 	{
-		memset(evt, 0, sizeof(evt_t));
-		priv_evt_init(evt);
+		priv_evt_init(evt, NULL);
 	}
 	sys_unlock();
 }
@@ -68,8 +69,7 @@ evt_t *evt_create( void )
 	sys_lock();
 	{
 		evt = sys_alloc(sizeof(evt_t));
-		priv_evt_init(evt);
-		evt->obj.res = evt;
+		priv_evt_init(evt, evt);
 	}
 	sys_unlock();
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,10 +36,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_evq_init( evq_t *evq, unsigned *data, unsigned bufsize )
+void priv_evq_init( evq_t *evq, unsigned *data, unsigned bufsize, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_obj_init(&evq->obj);
+	memset(evq, 0, sizeof(evq_t));
+
+	core_obj_init(&evq->obj, res);
 
 	evq->limit = bufsize / sizeof(unsigned);
 	evq->data  = data;
@@ -56,8 +58,7 @@ void evq_init( evq_t *evq, unsigned *data, unsigned bufsize )
 
 	sys_lock();
 	{
-		memset(evq, 0, sizeof(evq_t));
-		priv_evq_init(evq, data, bufsize);
+		priv_evq_init(evq, data, bufsize, NULL);
 	}
 	sys_unlock();
 }
@@ -78,8 +79,7 @@ evq_t *evq_create( unsigned limit )
 	{
 		bufsize = limit * sizeof(unsigned);
 		tmp = sys_alloc(sizeof(struct evq_T) + bufsize);
-		priv_evq_init(evq = &tmp->evq, tmp->buf, bufsize);
-		evq->obj.res = evq;
+		priv_evq_init(evq = &tmp->evq, tmp->buf, bufsize, tmp);
 	}
 	sys_unlock();
 

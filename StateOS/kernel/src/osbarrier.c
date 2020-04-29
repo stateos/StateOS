@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,10 +35,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_bar_init( bar_t *bar, unsigned limit )
+void priv_bar_init( bar_t *bar, unsigned limit, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_obj_init(&bar->obj);
+	memset(bar, 0, sizeof(bar_t));
+
+	core_obj_init(&bar->obj, res);
 
 	bar->limit = limit;
 }
@@ -53,8 +55,7 @@ void bar_init( bar_t *bar, unsigned limit )
 
 	sys_lock();
 	{
-		memset(bar, 0, sizeof(bar_t));
-		priv_bar_init(bar, limit);
+		priv_bar_init(bar, limit, NULL);
 	}
 	sys_unlock();
 }
@@ -71,8 +72,7 @@ bar_t *bar_create( unsigned limit )
 	sys_lock();
 	{
 		bar = sys_alloc(sizeof(bar_t));
-		priv_bar_init(bar, limit);
-		bar->obj.res = bar;
+		priv_bar_init(bar, limit, bar);
 	}
 	sys_unlock();
 

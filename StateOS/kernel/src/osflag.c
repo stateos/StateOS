@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,10 +36,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_flg_init( flg_t *flg, unsigned init )
+void priv_flg_init( flg_t *flg, unsigned init, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_obj_init(&flg->obj);
+	memset(flg, 0, sizeof(flg_t));
+
+	core_obj_init(&flg->obj, res);
 
 	flg->flags = init;
 }
@@ -53,8 +55,7 @@ void flg_init( flg_t *flg, unsigned init )
 
 	sys_lock();
 	{
-		memset(flg, 0, sizeof(flg_t));
-		priv_flg_init(flg, init);
+		priv_flg_init(flg, init, NULL);
 	}
 	sys_unlock();
 }
@@ -70,8 +71,7 @@ flg_t *flg_create( unsigned init )
 	sys_lock();
 	{
 		flg = sys_alloc(sizeof(flg_t));
-		priv_flg_init(flg, init);
-		flg->obj.res = flg;
+		priv_flg_init(flg, init, flg);
 	}
 	sys_unlock();
 

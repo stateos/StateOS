@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,10 +35,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_cnd_init( cnd_t *cnd )
+void priv_cnd_init( cnd_t *cnd, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_obj_init(&cnd->obj);
+	memset(cnd, 0, sizeof(cnd_t));
+
+	core_obj_init(&cnd->obj, res);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -50,8 +52,7 @@ void cnd_init( cnd_t *cnd )
 
 	sys_lock();
 	{
-		memset(cnd, 0, sizeof(cnd_t));
-		priv_cnd_init(cnd);
+		priv_cnd_init(cnd, NULL);
 	}
 	sys_unlock();
 }
@@ -67,8 +68,7 @@ cnd_t *cnd_create( void )
 	sys_lock();
 	{
 		cnd = sys_alloc(sizeof(cnd_t));
-		priv_cnd_init(cnd);
-		cnd->obj.res = cnd;
+		priv_cnd_init(cnd, cnd);
 	}
 	sys_unlock();
 

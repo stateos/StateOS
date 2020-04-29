@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -76,7 +76,19 @@ struct __seg
  *
  ******************************************************************************/
 
+#if OS_HEAP_SIZE == 0
+__STATIC_INLINE
+void *sys_alloc( size_t size )
+{
+	void *mem;
+	assert(size);
+	mem = malloc(size);
+	assert(mem);
+	return mem;
+}
+#else
 void *sys_alloc( size_t size );
+#endif
 
 /******************************************************************************
  *
@@ -93,7 +105,15 @@ void *sys_alloc( size_t size );
  *
  ******************************************************************************/
 
+#if OS_HEAP_SIZE == 0
+__STATIC_INLINE
+void sys_free( void *base )
+{
+	free(base);
+}
+#else
 void sys_free( void *ptr );
+#endif
 
 /******************************************************************************
  *

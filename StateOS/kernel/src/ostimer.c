@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,10 +35,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_tmr_init( tmr_t *tmr, fun_t *state )
+void priv_tmr_init( tmr_t *tmr, fun_t *state, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_hdr_init(&tmr->hdr);
+	memset(tmr, 0, sizeof(tmr_t));
+
+	core_hdr_init(&tmr->hdr, res);
 
 	tmr->state = state;
 }
@@ -52,8 +54,7 @@ void tmr_init( tmr_t *tmr, fun_t *state )
 
 	sys_lock();
 	{
-		memset(tmr, 0, sizeof(tmr_t));
-		priv_tmr_init(tmr, state);
+		priv_tmr_init(tmr, state, NULL);
 	}
 	sys_unlock();
 }
@@ -69,8 +70,7 @@ tmr_t *tmr_create( fun_t *state )
 	sys_lock();
 	{
 		tmr = sys_alloc(sizeof(tmr_t));
-		priv_tmr_init(tmr, state);
-		tmr->hdr.obj.res = tmr;
+		priv_tmr_init(tmr, state, tmr);
 	}
 	sys_unlock();
 

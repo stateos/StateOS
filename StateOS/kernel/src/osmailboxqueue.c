@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,10 +36,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
+void priv_box_init( box_t *box, unsigned size, void *data, unsigned bufsize, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_obj_init(&box->obj);
+	memset(box, 0, sizeof(box_t));
+
+	core_obj_init(&box->obj, res);
 
 	box->limit = (bufsize / size) * size;
 	box->size  = size;
@@ -58,8 +60,7 @@ void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
 
 	sys_lock();
 	{
-		memset(box, 0, sizeof(box_t));
-		priv_box_init(box, size, data, bufsize);
+		priv_box_init(box, size, data, bufsize, NULL);
 	}
 	sys_unlock();
 }
@@ -81,8 +82,7 @@ box_t *box_create( unsigned limit, unsigned size )
 	{
 		bufsize = limit * size;
 		tmp = sys_alloc(sizeof(struct box_T) + bufsize);
-		priv_box_init(box = &tmp->box, size, tmp->buf, bufsize);
-		box->obj.res = box;
+		priv_box_init(box = &tmp->box, size, tmp->buf, bufsize, tmp);
 	}
 	sys_unlock();
 

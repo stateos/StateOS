@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,10 +36,12 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_lst_init( lst_t *lst )
+void priv_lst_init( lst_t *lst, void *res )
 /* -------------------------------------------------------------------------- */
 {
-	core_obj_init(&lst->obj);
+	memset(lst, 0, sizeof(lst_t));
+
+	core_obj_init(&lst->obj, res);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -51,8 +53,7 @@ void lst_init( lst_t *lst )
 
 	sys_lock();
 	{
-		memset(lst, 0, sizeof(lst_t));
-		priv_lst_init(lst);
+		priv_lst_init(lst, NULL);
 	}
 	sys_unlock();
 }
@@ -68,8 +69,7 @@ lst_t *lst_create( void )
 	sys_lock();
 	{
 		lst = sys_alloc(sizeof(lst_t));
-		priv_lst_init(lst);
-		lst->obj.res = lst;
+		priv_lst_init(lst, lst);
 	}
 	sys_unlock();
 
