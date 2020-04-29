@@ -801,6 +801,7 @@ struct Timer : public baseTimer
 	Timer *create( void )
 	{
 #if OS_FUNCTIONAL
+		CriticalSection _;
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 		tmr_init(tmr, NULL);
 		tmr->__tmr::hdr.obj.res = tmr;
@@ -815,6 +816,7 @@ struct Timer : public baseTimer
 	Timer *create( Fun_t _state )
 	{
 #if OS_FUNCTIONAL
+		CriticalSection _;
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 		tmr_init(tmr, fun_);
 		tmr->fun = _state;

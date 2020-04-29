@@ -1374,6 +1374,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	static // create dynamic detachable task
 	TaskT<size_> *create( const unsigned _prio, Fun_t _state )
 	{
+		CriticalSection _;
 		static_assert(sizeof(tsk_T<size_>) == sizeof(TaskT<size_>), "unexpected error!");
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
 #if OS_FUNCTIONAL
