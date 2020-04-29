@@ -79,7 +79,8 @@ void *sys_alloc( size_t size )
 				nxt->owner = nxt;
 			}
 
-			mem->next = nxt;
+			mem->next  = nxt;
+			mem->owner = NULL;
 			mem = mem + 1;
 		//	memory segment has been successfully allocated
 			break;
