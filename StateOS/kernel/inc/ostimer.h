@@ -51,16 +51,6 @@ struct __tmr
 };
 
 #ifdef __cplusplus
-#if OS_FUNCTIONAL
-struct tmr_T { tmr_t tmr; Fun_t fun; };
-#else
-struct tmr_T { tmr_t tmr; };
-#endif
-#else
-struct tmr_T { tmr_t tmr; };
-#endif
-
-#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -810,26 +800,30 @@ struct Timer : public baseTimer
 	static // create dynamic timer with manageable resources
 	Timer *create( void )
 	{
-		static_assert(sizeof(tmr_T) == sizeof(Timer), "unexpected error!");
+#if OS_FUNCTIONAL
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 		tmr_init(tmr, NULL);
 		tmr->__tmr::hdr.obj.res = tmr;
 		return tmr;
+#else
+		static_assert(sizeof(__tmr) == sizeof(Timer), "unexpected error!");
+		return reinterpret_cast<Timer *>(tmr_create(NULL));
+#endif
 	}
 
 	static // create dynamic timer with manageable resources
 	Timer *create( Fun_t _state )
 	{
-		static_assert(sizeof(tmr_T) == sizeof(Timer), "unexpected error!");
-		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 #if OS_FUNCTIONAL
+		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 		tmr_init(tmr, fun_);
 		tmr->fun = _state;
-#else
-		tmr_init(tmr, _state);
-#endif
 		tmr->__tmr::hdr.obj.res = tmr;
 		return tmr;
+#else
+		static_assert(sizeof(__tmr) == sizeof(Timer), "unexpected error!");
+		return reinterpret_cast<Timer *>(tmr_create(_state));
+#endif
 	}
 };
 
