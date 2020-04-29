@@ -46,6 +46,7 @@ Features:
 - fixed errors reported by the armcc v5 compiler
 - simplified c++ constructors
 - updated c++ create functions
+- added wrk_init function
 ---------
 6.5
 - added functional test

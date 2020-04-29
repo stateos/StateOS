@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    29.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -611,7 +611,7 @@ tsk_t *cur_task( void ) { return System.cur; }
 
 /******************************************************************************
  *
- * Name              : tsk_make
+ * Name              : wrk_init
  *
  * Description       : initialize complete work area for task object
  *
@@ -629,7 +629,7 @@ tsk_t *cur_task( void ) { return System.cur; }
  *
  ******************************************************************************/
 
-void tsk_make( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size );
+void wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size );
 
 /******************************************************************************
  *
@@ -1377,10 +1377,10 @@ struct TaskT : public baseTask, public baseStack<size_>
 		static_assert(sizeof(tsk_T<size_>) == sizeof(TaskT<size_>), "unexpected error!");
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
 #if OS_FUNCTIONAL
-		tsk_make(tsk, _prio, fun_, tsk->stack_, size_);
+		wrk_init(tsk, _prio, fun_, tsk->stack_, size_);
 		tsk->fun = _state;
 #else
-		tsk_make(tsk, _prio, _state, tsk->stack_, size_);
+		wrk_init(tsk, _prio, _state, tsk->stack_, size_);
 #endif
 		tsk->__tsk::hdr.obj.res = tsk;
 		return tsk;
