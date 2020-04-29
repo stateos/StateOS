@@ -94,10 +94,10 @@ void *sys_alloc( size_t size )
 
 /* -------------------------------------------------------------------------- */
 
-void sys_free( void *base )
+void sys_free( void *ptr )
 {
 	seg_t *mem;
-	seg_t *seg = (seg_t *)base - 1;
+	seg_t *seg = (seg_t *)ptr - 1;
 
 	sys_lock();
 	{

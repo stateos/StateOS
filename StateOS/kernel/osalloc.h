@@ -107,9 +107,9 @@ void *sys_alloc( size_t size );
 
 #if OS_HEAP_SIZE == 0
 __STATIC_INLINE
-void sys_free( void *base )
+void sys_free( void *ptr )
 {
-	free(base);
+	free(ptr);
 }
 #else
 void sys_free( void *ptr );
@@ -122,7 +122,7 @@ void sys_free( void *ptr );
  * Description       : frees given resources
  *
  * Parameters
- *   ptr             : pointer to a pointer to a resources
+ *   res             : pointer to a pointer to resources
  *
  * Return            : true if any resources have been released, otherwise false
  *
