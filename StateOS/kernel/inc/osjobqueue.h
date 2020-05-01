@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    01.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -492,34 +492,32 @@ void job_pushISR( job_t *job, fun_t *fun ) { job_push(job, fun); }
 
 /******************************************************************************
  *
- * Class             : baseJobQueueT<>
+ * Class             : JobQueueT<>
  *
- * Description       : create and initialize a base job queue object
+ * Description       : create and initialize a job queue object
  *
  * Constructor parameters
  *   limit           : size of a queue (max number of stored job procedures)
  *
- * Note              : for internal use
- *
  ******************************************************************************/
 
 template<unsigned limit_>
-struct baseJobQueueT : public __job
+struct JobQueueT : public __job
 {
-	baseJobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
+	JobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
 
-	baseJobQueueT( baseJobQueueT&& ) = default;
-	baseJobQueueT( const baseJobQueueT& ) = delete;
-	baseJobQueueT& operator=( baseJobQueueT&& ) = delete;
-	baseJobQueueT& operator=( const baseJobQueueT& ) = delete;
+	JobQueueT( JobQueueT&& ) = default;
+	JobQueueT( const JobQueueT& ) = delete;
+	JobQueueT& operator=( JobQueueT&& ) = delete;
+	JobQueueT& operator=( const JobQueueT& ) = delete;
 
-	~baseJobQueueT( void ) { assert(__job::obj.queue == nullptr); }
+	~JobQueueT( void ) { assert(__job::obj.queue == nullptr); }
 
 	static // create dynamic object with manageable resources
-	baseJobQueueT<limit_> *create( void )
+	JobQueueT<limit_> *create( void )
 	{
-		static_assert(sizeof(job_T<limit_>) == sizeof(baseJobQueueT<limit_>), "unexpected error!");
-		return reinterpret_cast<baseJobQueueT<limit_> *>(job_create(limit_));
+		static_assert(sizeof(job_T<limit_>) == sizeof(JobQueueT<limit_>), "unexpected error!");
+		return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_));
 	}
 
 	void     reset    ( void )                      {        job_reset    (this);               }
@@ -548,72 +546,6 @@ struct baseJobQueueT : public __job
 	private:
 	fun_t *data_[limit_];
 };
-
-/******************************************************************************
- *
- * Class             : JobQueueT<>
- *
- * Description       : create and initialize a job queue object
- *
- * Constructor parameters
- *   limit           : size of a queue (max number of stored job procedures)
- *
- ******************************************************************************/
-
-#if OS_FUNCTIONAL
-
-template<unsigned limit_>
-struct JobQueueT : public __box
-{
-	JobQueueT( void ): __box _BOX_INIT(limit_, sizeof(Fun_t), reinterpret_cast<char *>(data_)) {}
-
-	JobQueueT( JobQueueT&& ) = default;
-	JobQueueT( const JobQueueT& ) = delete;
-	JobQueueT& operator=( JobQueueT&& ) = delete;
-	JobQueueT& operator=( const JobQueueT& ) = delete;
-
-	~JobQueueT( void ) { assert(__box::obj.queue == nullptr); }
-
-	static // create dynamic object with manageable resources
-	JobQueueT<limit_> *create( void )
-	{
-		static_assert(sizeof(box_T<limit_, sizeof(Fun_t)>) == sizeof(JobQueueT<limit_>), "unexpected error!");
-		return reinterpret_cast<JobQueueT<limit_> *>(box_create(limit_, sizeof(Fun_t)));
-	}
-
-	void     reset    ( void )                      {                              box_reset    (this);                                                              }
-	void     kill     ( void )                      {                              box_kill     (this);                                                              }
-	void     destroy  ( void )                      {                              box_destroy  (this);                                                              }
-	unsigned take     ( void )                      { Fun_t _fun; unsigned event = box_take     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned tryWait  ( void )                      { Fun_t _fun; unsigned event = box_tryWait  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned takeISR  ( void )                      { Fun_t _fun; unsigned event = box_takeISR  (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned waitFor  ( cnt_t  _delay )             { Fun_t _fun; unsigned event = box_waitFor  (this, &_fun, _delay); if (event == E_SUCCESS) _fun(); return event; }
-	unsigned waitUntil( cnt_t  _time )              { Fun_t _fun; unsigned event = box_waitUntil(this, &_fun, _time);  if (event == E_SUCCESS) _fun(); return event; }
-	unsigned wait     ( void )                      { Fun_t _fun; unsigned event = box_wait     (this, &_fun);         if (event == E_SUCCESS) _fun(); return event; }
-	unsigned give     ( Fun_t  _fun )               {             unsigned event = box_give     (this, &_fun);                                         return event; }
-	unsigned giveISR  ( Fun_t  _fun )               {             unsigned event = box_giveISR  (this, &_fun);                                         return event; }
-	unsigned sendFor  ( Fun_t  _fun, cnt_t _delay ) {             unsigned event = box_sendFor  (this, &_fun, _delay);                                 return event; }
-	unsigned sendUntil( Fun_t  _fun, cnt_t _time )  {             unsigned event = box_sendUntil(this, &_fun, _time);                                  return event; }
-	unsigned send     ( Fun_t  _fun )               {             unsigned event = box_send     (this, &_fun);                                         return event; }
-	void     push     ( Fun_t  _fun )               {                              box_push     (this, &_fun);                                                       }
-	void     pushISR  ( Fun_t  _fun )               {                              box_pushISR  (this, &_fun);                                                       }
-	unsigned count    ( void )                      {             unsigned count = box_count    (this);                                                return count; }
-	unsigned countISR ( void )                      {             unsigned count = box_countISR (this);                                                return count; }
-	unsigned space    ( void )                      {             unsigned space = box_space    (this);                                                return space; }
-	unsigned spaceISR ( void )                      {             unsigned space = box_spaceISR (this);                                                return space; }
-	unsigned limit    ( void )                      {             unsigned limit = box_limit    (this);                                                return limit; }
-	unsigned limitISR ( void )                      {             unsigned limit = box_limitISR (this);                                                return limit; }
-
-	private:
-	Fun_t data_[limit_];
-};
-
-#else
-
-template<unsigned limit_>
-using JobQueueT = baseJobQueueT<limit_>;
-
-#endif
 
 #endif//__cplusplus
 
