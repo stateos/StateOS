@@ -147,6 +147,31 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size )
 }
 
 /* -------------------------------------------------------------------------- */
+tsk_t *tsk_createEx( unsigned prio, fun_t *state, size_t size, tsk_t *joinable )
+/* -------------------------------------------------------------------------- */
+{
+	struct
+	tsk_T *tmp;
+	tsk_t *tsk;
+	size_t bufsize;
+
+	assert_tsk_context();
+	assert(state);
+	assert(size);
+	assert(joinable == JOINABLE || joinable == DETACHED);
+
+	sys_lock();
+	{
+		bufsize = STK_OVER(size);
+		tmp = sys_alloc(sizeof(struct tsk_T) + STK_OVER(OS_FUNCTIONAL * 2) + bufsize);
+		priv_wrk_init(tsk = &tmp->tsk, prio, state, &tmp->buf[STK_SIZE(OS_FUNCTIONAL * 2)], bufsize, tmp, joinable);
+	}
+	sys_unlock();
+
+	return tsk;
+}
+
+/* -------------------------------------------------------------------------- */
 void tsk_start( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {

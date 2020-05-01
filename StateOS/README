@@ -51,6 +51,7 @@ Features:
 - added sys_clean function
 - added sys_heap function
 - added tmr_createEx function
+- added tsk_createEx function
 ---------
 6.5
 - added functional test

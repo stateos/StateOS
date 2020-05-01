@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    01.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -611,31 +611,10 @@ tsk_t *cur_task( void ) { return System.cur; }
 
 /******************************************************************************
  *
- * Name              : wrk_init
- *
- * Description       : initialize complete work area for task object
- *
- * Parameters
- *   tsk             : pointer to task object
- *   prio            : initial task priority (any unsigned int value)
- *   state           : task state (initial task function) doesn't have to be noreturn-type
- *                     it will be executed into an infinite system-implemented loop
- *   stack           : base of task's private stack storage
- *   size            : size of task private stack (in bytes)
- *
- * Return            : none
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-void wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size );
-
-/******************************************************************************
- *
  * Name              : tsk_init
  *
- * Description       : initialize complete work area for task object and start the task
+ * Description       : initialize complete work area for task object
+ *                     and start the task
  *
  * Parameters
  *   tsk             : pointer to task object
@@ -658,7 +637,8 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
  * Name              : wrk_create
  * Alias             : wrk_new
  *
- * Description       : create and initialize complete work area for task object and start the task
+ * Description       : create and initialize complete work area for task object
+ *                     and start the task
  *
  * Parameters
  *   prio            : initial task priority (any unsigned int value)
@@ -682,7 +662,8 @@ tsk_t *wrk_new( unsigned prio, fun_t *state, size_t size ) { return wrk_create(p
  *
  * Name              : wrk_detached
  *
- * Description       : create and initialize complete work area for detached task object and start the task
+ * Description       : create and initialize complete work area for detached task object
+ *                     and start the task
  *
  * Parameters
  *   prio            : initial task priority (any unsigned int value)
@@ -704,7 +685,8 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size );
  * Name              : tsk_create
  * Alias             : tsk_new
  *
- * Description       : create and initialize complete work area for task object with default stack size
+ * Description       : create and initialize a new task object with default stack size
+ *                     and start the task
  *
  * Parameters
  *   prio            : initial task priority (any unsigned int value)
@@ -728,7 +710,8 @@ tsk_t *tsk_new   ( unsigned prio, fun_t *state ) { return wrk_create(prio, state
  *
  * Name              : tsk_detached
  *
- * Description       : create and initialize complete work area for detached task object with default stack size
+ * Description       : create and initialize a new detached task object with default stack size
+ *                     and start the task
  *
  * Parameters
  *   prio            : initial task priority (any unsigned int value)
@@ -744,6 +727,28 @@ tsk_t *tsk_new   ( unsigned prio, fun_t *state ) { return wrk_create(prio, state
 
 __STATIC_INLINE
 tsk_t *tsk_detached( unsigned prio, fun_t *state ) { return wrk_detached(prio, state, OS_STACK_SIZE); }
+
+/******************************************************************************
+ *
+ * Name              : tsk_createEx
+ *
+ * Description       : create and initialize a new c++ Task<> object
+ *
+ * Parameters
+ *   prio            : initial task priority (any unsigned int value)
+ *   state           : task state (initial task function) doesn't have to be noreturn-type
+ *                     it will be executed into an infinite system-implemented loop
+ *   size            : size of task private stack (in bytes)
+ *   joinable        : JOINABLE / DETACHED
+ *
+ * Return            : pointer to task object (task successfully created)
+ *   0               : task not created (not enough free memory)
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+tsk_t *tsk_createEx( unsigned prio, fun_t *state, size_t size, tsk_t *joinable );
 
 /******************************************************************************
  *
