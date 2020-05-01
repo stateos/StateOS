@@ -51,6 +51,16 @@ struct __tmr
 };
 
 #ifdef __cplusplus
+#if OS_FUNCTIONAL
+struct tmr_T { tmr_t tmr; Fun_t fun; };
+#else
+struct tmr_T { tmr_t tmr; };
+#endif
+#else
+struct tmr_T { tmr_t tmr; };
+#endif
+
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -748,42 +758,45 @@ void tmr_delayISR( cnt_t delay ) { tmr_thisISR()->delay = delay; }
 
 struct baseTimer : public __tmr
 {
-	baseTimer( void ):                 __tmr _TMR_INIT(NULL) {}
+	baseTimer( void ):           __tmr _TMR_INIT(NULL) {}
 #if OS_FUNCTIONAL
-	baseTimer( const Fun_t&& _state ): __tmr _TMR_INIT(fun_), fun(_state) {}
-	baseTimer( const Fun_t&  _state ): __tmr _TMR_INIT(fun_), fun(_state) {}
+	template<class T>
+	baseTimer( const T _state ): __tmr _TMR_INIT(fun_), fun(_state) {}
 #else
-	baseTimer( const Fun_t   _state ): __tmr _TMR_INIT(_state) {}
+	template<class T>
+	baseTimer( const T _state ): __tmr _TMR_INIT(_state) {}
 #endif
 
-	void reset        ( void )                                      {        tmr_reset        (this);                          }
-	void kill         ( void )                                      {        tmr_kill         (this);                          }
-	void destroy      ( void )                                      {        tmr_destroy      (this);                          }
-	void start        ( cnt_t _delay, cnt_t _period )               {        tmr_start        (this, _delay, _period);         }
-	void startFor     ( cnt_t _delay )                              {        tmr_startFor     (this, _delay);                  }
-	void startPeriodic( cnt_t _period )                             {        tmr_startPeriodic(this,         _period);         }
+	void reset        ( void )                                        {        tmr_reset        (this);                          }
+	void kill         ( void )                                        {        tmr_kill         (this);                          }
+	void destroy      ( void )                                        {        tmr_destroy      (this);                          }
+	void start        ( cnt_t _delay, cnt_t _period )                 {        tmr_start        (this, _delay, _period);         }
+	void startFor     ( cnt_t _delay )                                {        tmr_startFor     (this, _delay);                  }
+	void startPeriodic( cnt_t _period )                               {        tmr_startPeriodic(this,         _period);         }
 #if OS_FUNCTIONAL
-	void startFrom    ( cnt_t _delay, cnt_t _period, Fun_t _state ) {        fun = _state;
-	                                                                         tmr_startFrom    (this, _delay, _period, fun_);   }
+	template<class T>
+	void startFrom    ( cnt_t _delay, cnt_t _period, const T _state ) {        fun = _state;
+	                                                                           tmr_startFrom    (this, _delay, _period, fun_);   }
 #else
-	void startFrom    ( cnt_t _delay, cnt_t _period, Fun_t _state ) {        tmr_startFrom    (this, _delay, _period, _state); }
+	template<class T>
+	void startFrom    ( cnt_t _delay, cnt_t _period, const T _state ) {        tmr_startFrom    (this, _delay, _period, _state); }
 #endif
-	void startNext    ( cnt_t _delay )                              {        tmr_startNext    (this, _delay);                  }
-	void startUntil   ( cnt_t _time )                               {        tmr_startUntil   (this, _time);                   }
-	void stop         ( void )                                      {        tmr_stop         (this);                          }
+	void startNext    ( cnt_t _delay )                                {        tmr_startNext    (this, _delay);                  }
+	void startUntil   ( cnt_t _time )                                 {        tmr_startUntil   (this, _time);                   }
+	void stop         ( void )                                        {        tmr_stop         (this);                          }
 
-	unsigned take     ( void )                                      { return tmr_take         (this);                          }
-	unsigned tryWait  ( void )                                      { return tmr_tryWait      (this);                          }
-	unsigned takeISR  ( void )                                      { return tmr_takeISR      (this);                          }
-	unsigned waitFor  ( cnt_t _delay )                              { return tmr_waitFor      (this, _delay);                  }
-	unsigned waitNext ( cnt_t _delay )                              { return tmr_waitNext     (this, _delay);                  }
-	unsigned waitUntil( cnt_t _time )                               { return tmr_waitUntil    (this, _time);                   }
-	unsigned wait     ( void )                                      { return tmr_wait         (this);                          }
+	unsigned take     ( void )                                        { return tmr_take         (this);                          }
+	unsigned tryWait  ( void )                                        { return tmr_tryWait      (this);                          }
+	unsigned takeISR  ( void )                                        { return tmr_takeISR      (this);                          }
+	unsigned waitFor  ( cnt_t _delay )                                { return tmr_waitFor      (this, _delay);                  }
+	unsigned waitNext ( cnt_t _delay )                                { return tmr_waitNext     (this, _delay);                  }
+	unsigned waitUntil( cnt_t _time )                                 { return tmr_waitUntil    (this, _time);                   }
+	unsigned wait     ( void )                                        { return tmr_wait         (this);                          }
 
-	bool     operator!( void )                                      { return __tmr::hdr.id == ID_STOPPED;                      }
+	bool     operator!( void )                                        { return __tmr::hdr.id == ID_STOPPED;                      }
 #if OS_FUNCTIONAL
 	static
-	void     fun_     ( void )                                      {        reinterpret_cast<baseTimer*>(tmr_thisISR())->fun(); }
+	void     fun_     ( void )                                        { reinterpret_cast<baseTimer*>(tmr_thisISR())->fun();      }
 	Fun_t    fun;
 #endif
 };
@@ -801,13 +814,9 @@ struct baseTimer : public __tmr
 
 struct Timer : public baseTimer
 {
-	Timer( void ):                 baseTimer() {}
-#if OS_FUNCTIONAL
-	Timer( const Fun_t&& _state ): baseTimer(_state) {}
-	Timer( const Fun_t&  _state ): baseTimer(_state) {}
-#else
-	Timer( const Fun_t   _state ): baseTimer(_state) {}
-#endif
+	Timer( void ):           baseTimer() {}
+	template<class T>
+	Timer( const T _state ): baseTimer(_state) {}
 
 	Timer( Timer&& ) = default;
 	Timer( const Timer& ) = delete;
@@ -819,32 +828,22 @@ struct Timer : public baseTimer
 	static // create dynamic timer with manageable resources
 	Timer *create( void )
 	{
-#if OS_FUNCTIONAL
-		CriticalSection _;
-		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
-		tmr_init(tmr, NULL);
-		tmr->__tmr::hdr.obj.res = tmr;
-		return tmr;
-#else
-		static_assert(sizeof(__tmr) == sizeof(Timer), "unexpected error!");
-		return reinterpret_cast<Timer *>(tmr_create(NULL));
-#endif
+		static_assert(sizeof(tmr_T) == sizeof(Timer), "unexpected error!");
+		return reinterpret_cast<Timer *>(tmr_createEx(NULL));
 	}
 
+	template<class T>
 	static // create dynamic timer with manageable resources
-	Timer *create( Fun_t _state )
+	Timer *create( const T _state )
 	{
+		static_assert(sizeof(tmr_T) == sizeof(Timer), "unexpected error!");
 #if OS_FUNCTIONAL
-		CriticalSection _;
-		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
-		tmr_init(tmr, fun_);
-		tmr->fun = _state;
-		tmr->__tmr::hdr.obj.res = tmr;
-		return tmr;
-#else
-		static_assert(sizeof(__tmr) == sizeof(Timer), "unexpected error!");
-		return reinterpret_cast<Timer *>(tmr_create(_state));
+		static_assert(std::is_trivially_copyable<decltype(_state)>::value, "unsupported function!");
+//		auto tmr = reinterpret_cast<Timer *>(tmr_createEx(fun_));
+//		tmr->fun = _state;
+//		return tmr;
 #endif
+		return reinterpret_cast<Timer *>(tmr_createEx(_state));
 	}
 };
 
@@ -870,28 +869,25 @@ struct Timer : public baseTimer
 
 struct startTimer : public Timer
 {
-	startTimer( const cnt_t _delay, const cnt_t _period ):                       Timer()       { tmr_start(this, _delay, _period); }
-#if OS_FUNCTIONAL
-	startTimer( const cnt_t _delay, const cnt_t _period, const Fun_t&& _state ): Timer(_state) { tmr_start(this, _delay, _period); }
-	startTimer( const cnt_t _delay, const cnt_t _period, const Fun_t&  _state ): Timer(_state) { tmr_start(this, _delay, _period); }
-#else
-	startTimer( const cnt_t _delay, const cnt_t _period, const Fun_t   _state ): Timer(_state) { tmr_start(this, _delay, _period); }
-#endif
+	startTimer( const cnt_t _delay, const cnt_t _period ):                 Timer()       { tmr_start(this, _delay, _period); }
+	template<class T>
+	startTimer( const cnt_t _delay, const cnt_t _period, const T _state ): Timer(_state) { tmr_start(this, _delay, _period); }
 
 	static // create and run dynamic timer with manageable resources
 	startTimer *create( cnt_t _delay, cnt_t _period )
 	{
-		auto tmr = Timer::create();
+		auto tmr = reinterpret_cast<startTimer *>(Timer::create());
 		tmr->start(_delay, _period);
-		return reinterpret_cast<startTimer *>(tmr);
+		return tmr;
 	}
 
+	template<class T>
 	static // create and run dynamic timer with manageable resources
-	startTimer *create( cnt_t _delay, cnt_t _period, Fun_t _state )
+	startTimer *create( cnt_t _delay, cnt_t _period, const T _state )
 	{
-		auto tmr = Timer::create(_state);
+		auto tmr = reinterpret_cast<startTimer *>(Timer::create(_state));
 		tmr->start(_delay, _period);
-		return reinterpret_cast<startTimer *>(tmr);
+		return tmr;
 	}
 };
 
@@ -913,26 +909,21 @@ struct startTimer : public Timer
 
 struct startTimerFor : public startTimer
 {
-	startTimerFor( const cnt_t _delay ):                       startTimer(_delay, 0) {}
-#if OS_FUNCTIONAL
-	startTimerFor( const cnt_t _delay, const Fun_t&& _state ): startTimer(_delay, 0, _state) {}
-	startTimerFor( const cnt_t _delay, const Fun_t&  _state ): startTimer(_delay, 0, _state) {}
-#else
-	startTimerFor( const cnt_t _delay, const Fun_t   _state ): startTimer(_delay, 0, _state) {}
-#endif
+	startTimerFor( const cnt_t _delay ):                 startTimer(_delay, 0) {}
+	template<class T>
+	startTimerFor( const cnt_t _delay, const T _state ): startTimer(_delay, 0, _state) {}
 
 	static // create and run dynamic timer with manageable resources
 	startTimerFor *create( cnt_t _delay )
 	{
-		auto tmr = startTimer::create(_delay, 0);
-		return reinterpret_cast<startTimerFor *>(tmr);
+		return reinterpret_cast<startTimerFor *>(startTimer::create(_delay, 0));
 	}
 
+	template<class T>
 	static // create and run dynamic timer with manageable resources
-	startTimerFor *create( cnt_t _delay, Fun_t _state )
+	startTimerFor *create( cnt_t _delay, const T _state )
 	{
-		auto tmr = startTimer::create(_delay, 0, _state);
-		return reinterpret_cast<startTimerFor *>(tmr);
+		return reinterpret_cast<startTimerFor *>(startTimer::create(_delay, 0, _state));
 	}
 };
 
@@ -955,26 +946,21 @@ struct startTimerFor : public startTimer
 
 struct startTimerPeriodic : public startTimer
 {
-	startTimerPeriodic( const cnt_t _period ):                       startTimer(_period, _period) {}
-#if OS_FUNCTIONAL
-	startTimerPeriodic( const cnt_t _period, const Fun_t&& _state ): startTimer(_period, _period, _state) {}
-	startTimerPeriodic( const cnt_t _period, const Fun_t&  _state ): startTimer(_period, _period, _state) {}
-#else
-	startTimerPeriodic( const cnt_t _period, const Fun_t   _state ): startTimer(_period, _period, _state) {}
-#endif
+	startTimerPeriodic( const cnt_t _period ):                 startTimer(_period, _period) {}
+	template<class T>
+	startTimerPeriodic( const cnt_t _period, const T _state ): startTimer(_period, _period, _state) {}
 
 	static // create and run dynamic timer with manageable resources
 	startTimerPeriodic *create( cnt_t _period )
 	{
-		auto tmr = startTimer::create(_period, _period);
-		return reinterpret_cast<startTimerPeriodic *>(tmr);
+		return reinterpret_cast<startTimerPeriodic *>(startTimer::create(_period, _period));
 	}
 
+	template<class T>
 	static // create and run dynamic timer with manageable resources
-	startTimerPeriodic *create( cnt_t _period, Fun_t _state )
+	startTimerPeriodic *create( cnt_t _period, const T _state )
 	{
-		auto tmr = startTimer::create(_period, _period, _state);
-		return reinterpret_cast<startTimerPeriodic *>(tmr);
+		return reinterpret_cast<startTimerPeriodic *>(startTimer::create(_period, _period, _state));
 	}
 };
 
@@ -994,28 +980,25 @@ struct startTimerPeriodic : public startTimer
 
 struct startTimerUntil : public Timer
 {
-	startTimerUntil( const cnt_t _time ):                       Timer()       { tmr_startUntil(this, _time); }
-#if OS_FUNCTIONAL
-	startTimerUntil( const cnt_t _time, const Fun_t&& _state ): Timer(_state) { tmr_startUntil(this, _time); }
-	startTimerUntil( const cnt_t _time, const Fun_t&  _state ): Timer(_state) { tmr_startUntil(this, _time); }
-#else
-	startTimerUntil( const cnt_t _time, const Fun_t   _state ): Timer(_state) { tmr_startUntil(this, _time); }
-#endif
+	startTimerUntil( const cnt_t _time ):                 Timer()       { tmr_startUntil(this, _time); }
+	template<class T>
+	startTimerUntil( const cnt_t _time, const T _state ): Timer(_state) { tmr_startUntil(this, _time); }
 
 	static // create and run dynamic timer with manageable resources
 	startTimerUntil *create( cnt_t _time )
 	{
-		auto tmr = Timer::create();
+		auto tmr = reinterpret_cast<startTimerUntil *>(Timer::create());
 		tmr->startUntil(_time);
-		return reinterpret_cast<startTimerUntil *>(tmr);
+		return tmr;
 	}
 
+	template<class T>
 	static // create and run dynamic timer with manageable resources
-	startTimerUntil *create( cnt_t _time, Fun_t _state )
+	startTimerUntil *create( cnt_t _time, const T _state )
 	{
-		auto tmr = Timer::create(_state);
+		auto tmr = reinterpret_cast<startTimerUntil *>(Timer::create(_state));
 		tmr->startUntil(_time);
-		return reinterpret_cast<startTimerUntil *>(tmr);
+		return tmr;
 	}
 };
 
@@ -1030,12 +1013,14 @@ struct startTimerUntil : public Timer
 namespace ThisTimer
 {
 #if OS_FUNCTIONAL
-	static inline void flipISR ( Fun_t _state ) { reinterpret_cast<baseTimer*>(tmr_thisISR())->fun = _state;
-	                                              tmr_flipISR (baseTimer::fun_); }
+	template<class T>
+	static inline void flipISR ( const T _state ) { reinterpret_cast<baseTimer*>(tmr_thisISR())->fun = _state;
+	                                                tmr_flipISR (baseTimer::fun_); }
 #else
-	static inline void flipISR ( Fun_t _state ) { tmr_flipISR (_state); }
+	template<class T>
+	static inline void flipISR ( const T _state ) { tmr_flipISR (_state); }
 #endif
-	static inline void delayISR( cnt_t _delay ) { tmr_delayISR(_delay); }
+	static inline void delayISR( cnt_t   _delay ) { tmr_delayISR(_delay); }
 }
 
 #endif//__cplusplus
