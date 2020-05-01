@@ -78,6 +78,26 @@ tmr_t *tmr_create( fun_t *state )
 }
 
 /* -------------------------------------------------------------------------- */
+tmr_t *tmr_createEx( fun_t *state )
+/* -------------------------------------------------------------------------- */
+{
+	struct
+	tmr_T *tmp;
+	tmr_t *tmr;
+
+	assert_tsk_context();
+
+	sys_lock();
+	{
+		tmp = sys_alloc(sizeof(struct tmr_T) + OS_FUNCTIONAL);
+		priv_tmr_init(tmr = &tmp->tmr, state, tmp);
+	}
+	sys_unlock();
+
+	return tmr;
+}
+
+/* -------------------------------------------------------------------------- */
 static
 void priv_tmr_reset( tmr_t *tmr, unsigned event )
 /* -------------------------------------------------------------------------- */

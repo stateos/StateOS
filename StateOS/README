@@ -50,6 +50,7 @@ Features:
 - now sys_alloc don't clear allocated memory
 - added sys_clean function
 - added sys_heap function
+- added tmr_createEx function
 ---------
 6.5
 - added functional test

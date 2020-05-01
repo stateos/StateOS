@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    01.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -297,7 +297,7 @@ extern "C" {
  *
  * Return            : current timer object
  *
- * Note              : use only in timer callback procedure
+ * Note              : use only in timer's callback procedure
  *
  ******************************************************************************/
 
@@ -345,6 +345,25 @@ tmr_t *tmr_create( fun_t *state );
 
 __STATIC_INLINE
 tmr_t *tmr_new( fun_t *state ) { return tmr_create(state); }
+
+/******************************************************************************
+ *
+ * Name              : tmr_createEx
+ *
+ * Description       : create and initialize a new c++ Timer object
+ *
+ * Parameters
+ *   state           : callback procedure
+ *                     0: no callback
+ *
+ * Return            : pointer to timer object (timer successfully created)
+ *   0               : timer not created (not enough free memory)
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+tmr_t *tmr_createEx( fun_t *state );
 
 /******************************************************************************
  *
@@ -679,7 +698,7 @@ unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
  *
  * Return            : none
  *
- * Note              : use only in timer callback procedure
+ * Note              : use only in timer's callback procedure
  *
  ******************************************************************************/
 
@@ -699,7 +718,7 @@ void tmr_flipISR( fun_t *proc ) { tmr_thisISR()->state = proc; }
  *
  * Return            : none
  *
- * Note              : use only in timer callback procedure
+ * Note              : use only in timer's callback procedure
  *
  ******************************************************************************/
 
