@@ -261,6 +261,14 @@ void core_mtx_reset( mtx_t *mtx, unsigned event );
 
 /* -------------------------------------------------------------------------- */
 
+// idle default procedure
+void tsk_idle( void );
+
+// garbage collection procedure
+void tsk_destructor( void );
+
+/* -------------------------------------------------------------------------- */
+
 // return current system time in tick-less mode
 #if HW_TIMER_SIZE < OS_TIMER_SIZE // because of CSMCC
 cnt_t port_sys_time( void );
@@ -289,12 +297,6 @@ void core_sys_tick( void )
 #endif
 }
 #endif
-
-// default handler of idle process
-void idle_tsk_default( void );
-
-// destructor handler of idle process
-void idle_tsk_destructor( void );
 
 /* -------------------------------------------------------------------------- */
 

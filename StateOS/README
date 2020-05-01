@@ -48,6 +48,7 @@ Features:
 - updated c++ create functions
 - added wrk_init function
 - now sys_alloc don't clear allocated memory
+- added sys_clean function
 ---------
 6.5
 - added functional test

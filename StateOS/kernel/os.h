@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    30.04.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -108,6 +108,23 @@ cnt_t sys_time( void );
 
 __STATIC_INLINE
 cnt_t sys_timeISR( void ) { return sys_time(); }
+
+/******************************************************************************
+ *
+ * Name              : sys_clean
+ *
+ * Description       : call garbage collection
+ *
+ * Parameters        : none
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+void sys_clean( void ) { assert_tsk_context(); tsk_destructor(); }
 
 #ifdef __cplusplus
 }
