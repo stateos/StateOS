@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    27.04.2020
+    @date    30.04.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -44,6 +44,8 @@
 #include <functional>
 using Fun_t = std::function<void( void )>;
 using Act_t = std::function<void( unsigned )>;
+static_assert(sizeof(Fun_t) == (OS_FUNCTIONAL), "incorrect value of OS_FUNCTIONAL constant!");
+static_assert(sizeof(Act_t) == (OS_FUNCTIONAL), "incorrect value of OS_FUNCTIONAL constant!");
 #else
 using Fun_t = fun_t *;
 using Act_t = act_t *;
