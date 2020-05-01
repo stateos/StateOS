@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    30.04.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -114,6 +114,34 @@ void sys_free( void *ptr )
 		}
 	}
 	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+
+size_t sys_heap( void )
+{
+	size_t size = 0;
+	seg_t *mem;
+	seg_t *nxt;
+
+	sys_lock();
+	{
+		for (mem = Heap; mem; mem = mem->next)
+		{
+			if (mem->owner != mem)
+		//	memory segment has already been allocated
+				continue;
+
+			while (nxt = mem->next, nxt->owner)
+		//	it is possible to merge adjacent free memory segments
+				mem->next = nxt->next;
+
+			size += nxt - mem;
+		}
+	}
+	sys_unlock();
+
+	return size * sizeof(seg_t);
 }
 
 #endif
