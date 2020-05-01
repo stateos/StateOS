@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    01.05.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size, void *res, tsk_t *joinable )
+void priv_tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size, void *res )
 /* -------------------------------------------------------------------------- */
 {
 	memset(tsk, 0, sizeof(tsk_t));
@@ -48,24 +48,6 @@ void priv_wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_
 	tsk->state = state;
 	tsk->stack = stack;
 	tsk->size  = size;
-	tsk->join  = joinable;
-}
-
-/* -------------------------------------------------------------------------- */
-static
-tsk_t *priv_wrk_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinable )
-/* -------------------------------------------------------------------------- */
-{
-	struct
-	tsk_T *tmp;
-	tsk_t *tsk;
-	size_t bufsize;
-
-	bufsize = STK_SIZE(size) * sizeof(stk_t);
-	tmp = sys_alloc(sizeof(struct tsk_T) + bufsize);
-	priv_wrk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize, tmp, joinable);
-
-	return tsk;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -80,7 +62,7 @@ void wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
 
 	sys_lock();
 	{
-		priv_wrk_init(tsk, prio, state, stack, size, NULL, JOINABLE);
+		priv_tsk_init(tsk, prio, state, stack, size, NULL);
 	}
 	sys_unlock();
 }
@@ -89,26 +71,18 @@ void wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
 void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	assert_tsk_context();
-	assert(tsk);
-	assert(state);
-	assert(stack);
-	assert(size);
-
-	sys_lock();
-	{
-		priv_wrk_init(tsk, prio, state, stack, size, NULL, JOINABLE);
-		core_ctx_init(tsk);
-		core_tsk_insert(tsk);
-	}
-	sys_unlock();
+	wrk_init(tsk, prio, state, stack, size);
+	tsk_start(tsk);
 }
 
 /* -------------------------------------------------------------------------- */
 tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t *tsk;
+	struct
+	tsk_T  * tmp;
+	tsk_t  * tsk;
+	size_t   bufsize;
 
 	assert_tsk_context();
 	assert(state);
@@ -116,9 +90,11 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size )
 
 	sys_lock();
 	{
-		tsk = priv_wrk_create(prio, state, size, JOINABLE);
-		core_ctx_init(tsk);
-		core_tsk_insert(tsk);
+		bufsize = STK_SIZE(size) * sizeof(stk_t);
+		tmp = sys_alloc(sizeof(struct tsk_T) + bufsize);
+		priv_tsk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize, tmp);
+
+		tsk_start(tsk);
 	}
 	sys_unlock();
 
@@ -131,15 +107,10 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size )
 {
 	tsk_t *tsk;
 
-	assert_tsk_context();
-	assert(state);
-	assert(size);
-
 	sys_lock();
 	{
-		tsk = priv_wrk_create(prio, state, size, DETACHED);
-		core_ctx_init(tsk);
-		core_tsk_insert(tsk);
+		tsk = wrk_create(prio, state, size);
+		tsk->join = DETACHED;
 	}
 	sys_unlock();
 
@@ -289,14 +260,14 @@ void priv_tsk_stop( tsk_t *tsk )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_idle( void )
+void idle_tsk_default( void )
 /* -------------------------------------------------------------------------- */
 {
 	__WFI();
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_destructor( void )
+void idle_tsk_destructor( void )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
@@ -317,7 +288,7 @@ void tsk_destructor( void )
 			core_res_free(&tsk->hdr.obj.res);          // release resources
 		}
 
-		IDLE.state = tsk_idle;                         // use idle default procedure
+		IDLE.state = idle_tsk_default;                 // use default handler for idle process
 	}
 	sys_unlock();
 }
@@ -327,9 +298,9 @@ static
 void priv_tsk_destroy( void )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_destructor();                        // destroy all tasks waiting for destruction
+	idle_tsk_destructor();                   // destroy all tasks waiting for destruction
 
-	IDLE.state = tsk_destructor;             // use garbage collection procedure
+	IDLE.state = idle_tsk_destructor;        // use destructor handler for idle process
 	core_tsk_waitFor(&System.des, INFINITE); // wait for destruction
 
 	assert(!"system cannot return here");

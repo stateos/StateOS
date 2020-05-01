@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    30.04.2020
+    @date    29.04.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
