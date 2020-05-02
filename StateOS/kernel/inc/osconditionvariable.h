@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -397,8 +397,10 @@ struct ConditionVariable : public __cnd
 	static // create dynamic object with manageable resources
 	ConditionVariable *create( void )
 	{
-		static_assert(sizeof(__cnd) == sizeof(ConditionVariable), "unexpected error!");
-		return reinterpret_cast<ConditionVariable *>(cnd_create());
+		auto cnd = reinterpret_cast<ConditionVariable *>(sys_alloc(sizeof(ConditionVariable)));
+		new (cnd) ConditionVariable();
+		cnd->__cnd::obj.res = cnd;
+		return cnd;
 	}
 
 	void     reset    ( void )                      {        cnd_reset    (this);               }

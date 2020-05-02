@@ -45,13 +45,12 @@ Features:
 - updated usage of std::function
 - fixed errors reported by the armcc v5 compiler
 - simplified c++ constructors
-- updated c++ create functions
 - added wrk_init function
 - now sys_alloc don't clear allocated memory
 - added sys_clean function
 - added sys_heap function
-- added tmr_createEx function
-- added tsk_createEx function
+- updated c++ create functions
+- updated c++ wrapper
 ---------
 6.5
 - added functional test

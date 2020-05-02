@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    02.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -67,10 +67,9 @@ void stm_init( stm_t *stm, void *data, unsigned bufsize )
 stm_t *stm_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	struct
-	stm_T  * tmp;
-	stm_t  * stm;
-	unsigned bufsize;
+	struct stm_T { stm_t stm; char buf[]; } *tmp;
+	stm_t *stm;
+	size_t bufsize;
 
 	assert_tsk_context();
 	assert(limit);

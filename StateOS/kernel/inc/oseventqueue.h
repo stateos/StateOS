@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,13 +53,6 @@ struct __evq
 	unsigned tail;  // first element to write into data buffer
 	unsigned*data;  // data buffer
 };
-
-#ifdef __cplusplus
-template<unsigned limit_>
-struct evq_T { evq_t evq; unsigned buf[limit_]; };
-#else
-struct evq_T { evq_t evq; unsigned buf[]; };
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -519,8 +512,10 @@ struct EventQueueT : public __evq
 	static // create dynamic object with manageable resources
 	EventQueueT<limit_> *create( void )
 	{
-		static_assert(sizeof(evq_T<limit_>) == sizeof(EventQueueT<limit_>), "unexpected error!");
-		return reinterpret_cast<EventQueueT<limit_> *>(evq_create(limit_));
+		auto evq = reinterpret_cast<EventQueueT<limit_> *>(sys_alloc(sizeof(EventQueueT<limit_>)));
+		new (evq) EventQueueT<limit_>();
+		evq->__evq::obj.res = evq;
+		return evq;
 	}
 
 	void     reset    ( void )                         {        evq_reset    (this);                }

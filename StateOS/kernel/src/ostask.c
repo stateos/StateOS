@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    01.05.2020
+    @date    02.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -56,8 +56,7 @@ static
 tsk_t *priv_wrk_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinable )
 /* -------------------------------------------------------------------------- */
 {
-	struct
-	tsk_T *tmp;
+	struct tsk_T { tsk_t tsk; stk_t buf[]; } *tmp;
 	tsk_t *tsk;
 	size_t bufsize;
 
@@ -140,31 +139,6 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size )
 		tsk = priv_wrk_create(prio, state, size, DETACHED);
 		core_ctx_init(tsk);
 		core_tsk_insert(tsk);
-	}
-	sys_unlock();
-
-	return tsk;
-}
-
-/* -------------------------------------------------------------------------- */
-tsk_t *tsk_createEx( unsigned prio, fun_t *state, size_t size, tsk_t *joinable )
-/* -------------------------------------------------------------------------- */
-{
-	struct
-	tsk_T *tmp;
-	tsk_t *tsk;
-	size_t bufsize;
-
-	assert_tsk_context();
-	assert(state);
-	assert(size);
-	assert(joinable == JOINABLE || joinable == DETACHED);
-
-	sys_lock();
-	{
-		bufsize = STK_OVER(size);
-		tmp = sys_alloc(sizeof(struct tsk_T) + STK_OVER(OS_FUNCTIONAL * 2) + bufsize);
-		priv_wrk_init(tsk = &tmp->tsk, prio, state, &tmp->buf[STK_SIZE(OS_FUNCTIONAL * 2)], bufsize, tmp, joinable);
 	}
 	sys_unlock();
 

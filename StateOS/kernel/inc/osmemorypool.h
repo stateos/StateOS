@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -56,13 +56,6 @@ struct __mem
 	unsigned size;  // size of memory object (in sizeof(que_t) units)
 	que_t  * data;  // pointer to memory pool buffer
 };
-
-#ifdef __cplusplus
-template<unsigned limit_, unsigned size_>
-struct mem_T { mem_t mem; que_t buf[limit_ * (1 + MEM_SIZE(size_))]; };
-#else
-struct mem_T { mem_t mem; que_t buf[]; };
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -453,8 +446,10 @@ struct MemoryPoolT : public __mem
 	static // create dynamic object with manageable resources
 	MemoryPoolT<limit_, size_> *create( void )
 	{
-		static_assert(sizeof(mem_T<limit_, size_>) == sizeof(MemoryPoolT<limit_, size_>), "unexpected error!");
-		return reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
+		auto mem = reinterpret_cast<MemoryPoolT<limit_, size_> *>(sys_alloc(sizeof(MemoryPoolT<limit_, size_>)));
+		new (mem) MemoryPoolT<limit_, size_>();
+		mem->__mem::lst.obj.res = mem;
+		return mem;
 	}
 
 	void     reset    ( void )                             {        mem_reset    (this);                }
@@ -493,8 +488,7 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
 	static // create dynamic object with manageable resources
 	MemoryPoolTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(mem_T<limit_, sizeof(T)>) == sizeof(MemoryPoolTT<limit_, T>), "unexpected error!");
-		return reinterpret_cast<MemoryPoolTT<limit_, T> *>(mem_create(limit_, sizeof(T)));
+		return reinterpret_cast<MemoryPoolTT<limit_, T> *>(MemoryPoolT<limit_, sizeof(T)>::create());
 	}
 
 	unsigned take     ( T **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data));         }

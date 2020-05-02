@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -407,8 +407,10 @@ struct ListTT : public __lst
 	static // create dynamic object with manageable resources
 	ListTT<T> *create( void )
 	{
-		static_assert(sizeof(__lst) == sizeof(ListTT<T>), "unexpected error!");
-		return reinterpret_cast<ListTT<T> *>(lst_create());
+		auto lst = reinterpret_cast<ListTT<T> *>(sys_alloc(sizeof(ListTT<T>)));
+		new (lst) ListTT<T>();
+		lst->__lst::obj.res = lst;
+		return lst;
 	}
 
 	void     reset    ( void )                            {        lst_reset    (this);                                           }

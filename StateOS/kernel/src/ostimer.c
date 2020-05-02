@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    30.04.2020
+    @date    02.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -71,26 +71,6 @@ tmr_t *tmr_create( fun_t *state )
 	{
 		tmr = sys_alloc(sizeof(tmr_t));
 		priv_tmr_init(tmr, state, tmr);
-	}
-	sys_unlock();
-
-	return tmr;
-}
-
-/* -------------------------------------------------------------------------- */
-tmr_t *tmr_createEx( fun_t *state )
-/* -------------------------------------------------------------------------- */
-{
-	struct
-	tmr_T *tmp;
-	tmr_t *tmr;
-
-	assert_tsk_context();
-
-	sys_lock();
-	{
-		tmp = sys_alloc(sizeof(struct tmr_T) + OS_FUNCTIONAL);
-		priv_tmr_init(tmr = &tmp->tmr, state, tmp);
 	}
 	sys_unlock();
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -270,11 +270,11 @@ void spn_init( spn_t *spn ) { *spn = 0; }
 
 struct SpinLock : private CriticalSection
 {
-	 SpinLock( spn_id _spn ): spn(_spn) { core_spn_lock  (spn); }
-	~SpinLock( void )                   { core_spn_unlock(spn); }
+	 SpinLock( spn_id _spn ): spn_(_spn) { core_spn_lock  (spn_); }
+	~SpinLock( void )                    { core_spn_unlock(spn_); }
 
 	private:
-	spn_id spn;
+	spn_id spn_;
 };
 
 #endif//__cplusplus

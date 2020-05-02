@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    01.05.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -54,13 +54,6 @@ struct __job
 	unsigned tail;  // first element to write into data buffer
 	fun_t ** data;  // data buffer
 };
-
-#ifdef __cplusplus
-template<unsigned limit_>
-struct job_T { job_t job; fun_t *buf[limit_]; };
-#else
-struct job_T { job_t job; fun_t *buf[]; };
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -516,8 +509,10 @@ struct JobQueueT : public __job
 	static // create dynamic object with manageable resources
 	JobQueueT<limit_> *create( void )
 	{
-		static_assert(sizeof(job_T<limit_>) == sizeof(JobQueueT<limit_>), "unexpected error!");
-		return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_));
+		auto job = reinterpret_cast<JobQueueT<limit_> *>(sys_alloc(sizeof(JobQueueT<limit_>)));
+		new (job) JobQueueT<limit_>();
+		job->__job::obj.res = job;
+		return job;
 	}
 
 	void     reset    ( void )                      {        job_reset    (this);               }

@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    02.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -67,10 +67,9 @@ void job_init( job_t *job, fun_t **data, unsigned bufsize )
 job_t *job_create( unsigned limit )
 /* -------------------------------------------------------------------------- */
 {
-	struct
-	job_T  * tmp;
-	job_t  * job;
-	unsigned bufsize;
+	struct job_T { job_t job; fun_t *buf[]; } *tmp;
+	job_t *job;
+	size_t bufsize;
 
 	assert_tsk_context();
 	assert(limit);

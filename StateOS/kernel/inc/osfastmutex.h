@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -381,8 +381,10 @@ struct FastMutex : public __mut
 	static // create dynamic object with manageable resources
 	FastMutex *create( void )
 	{
-		static_assert(sizeof(__mut) == sizeof(FastMutex), "unexpected error!");
-		return reinterpret_cast<FastMutex *>(mut_create());
+		auto mut = reinterpret_cast<FastMutex *>(sys_alloc(sizeof(FastMutex)));
+		new (mut) FastMutex();
+		mut->__mut::obj.res = mut;
+		return mut;
 	}
 
 	void     reset    ( void )         {        mut_reset    (this);         }

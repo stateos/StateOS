@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -505,8 +505,10 @@ struct Mutex : public __mtx
 	static // create dynamic object with manageable resources
 	Mutex *create( const unsigned _mode, const unsigned _prio = 0 )
 	{
-		static_assert(sizeof(__mtx) == sizeof(Mutex), "unexpected error!");
-		return reinterpret_cast<Mutex *>(mtx_create(_mode, _prio));
+		auto mtx = reinterpret_cast<Mutex *>(sys_alloc(sizeof(Mutex)));
+		new (mtx) Mutex(_mode, _prio);
+		mtx->__mtx::obj.res = mtx;
+		return mtx;
 	}
 
 	void     reset    ( void )            {        mtx_reset    (this);         }

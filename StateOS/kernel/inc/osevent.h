@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -343,8 +343,10 @@ struct Event : public __evt
 	static // create dynamic object with manageable resources
 	Event *create( void )
 	{
-		static_assert(sizeof(__evt) == sizeof(Event), "unexpected error!");
-		return reinterpret_cast<Event *>(evt_create());
+		auto evt = reinterpret_cast<Event *>(sys_alloc(sizeof(Event)));
+		new (evt) Event();
+		evt->__evt::obj.res = evt;
+		return evt;
 	}
 
 	void     reset    ( void )                          {        evt_reset    (this);                 }

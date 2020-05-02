@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    02.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -69,10 +69,9 @@ void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
 box_t *box_create( unsigned limit, unsigned size )
 /* -------------------------------------------------------------------------- */
 {
-	struct
-	box_T  * tmp;
-	box_t  * box;
-	unsigned bufsize;
+	struct box_T { box_t box; char buf[]; } *tmp;
+	box_t *box;
+	size_t bufsize;
 
 	assert_tsk_context();
 	assert(limit);

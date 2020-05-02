@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -53,13 +53,6 @@ struct __stm
 	unsigned tail;  // first element to write into data buffer
 	char   * data;  // data buffer
 };
-
-#ifdef __cplusplus
-template<unsigned limit_>
-struct stm_T { stm_t stm; char buf[limit_]; };
-#else
-struct stm_T { stm_t stm; char buf[]; };
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -609,8 +602,10 @@ struct StreamBufferT : public __stm
 	static // create dynamic object with manageable resources
 	StreamBufferT<limit_> *create( void )
 	{
-		static_assert(sizeof(stm_T<limit_>) == sizeof(StreamBufferT<limit_>), "unexpected error!");
-		return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));
+		auto stm = reinterpret_cast<StreamBufferT<limit_> *>(sys_alloc(sizeof(StreamBufferT<limit_>)));
+		new (stm) StreamBufferT<limit_>();
+		stm->__stm::obj.res = stm;
+		return stm;
 	}
 
 	void     reset    ( void )                                            {        stm_reset    (this);                       }
@@ -660,8 +655,7 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(T)>
 	static // create dynamic object with manageable resources
 	StreamBufferTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(stm_T<limit_ * sizeof(T)>) == sizeof(StreamBufferTT<limit_, T>), "unexpected error!");
-		return reinterpret_cast<StreamBufferTT<limit_, T> *>(stm_create(limit_ * sizeof(T)));
+		return reinterpret_cast<StreamBufferTT<limit_, T> *>(StreamBufferT<limit_*sizeof(T)>::create());
 	}
 
 	unsigned take     (       T *_data )               { return stm_take     (this, _data, sizeof(T));         }

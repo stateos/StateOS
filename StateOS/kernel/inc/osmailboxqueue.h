@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -54,13 +54,6 @@ struct __box
 	unsigned tail;  // first element to write into data buffer
 	char   * data;  // data buffer
 };
-
-#ifdef __cplusplus
-template<unsigned limit_, unsigned size_>
-struct box_T { box_t box; char buf[limit_ * size_]; };
-#else
-struct box_T { box_t box; char buf[]; };
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -567,8 +560,10 @@ struct MailBoxQueueT : public __box
 	static // create dynamic object with manageable resources
 	MailBoxQueueT<limit_, size_> *create( void )
 	{
-		static_assert(sizeof(box_T<limit_, size_>) == sizeof(MailBoxQueueT<limit_, size_>), "unexpected error!");
-		return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
+		auto box = reinterpret_cast<MailBoxQueueT<limit_, size_> *>(sys_alloc(sizeof(MailBoxQueueT<limit_, size_>)));
+		new (box) MailBoxQueueT<limit_, size_>();
+		box->__box::obj.res = box;
+		return box;
 	}
 
 	void     reset    ( void )                            {        box_reset    (this);                }
@@ -618,8 +613,7 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
 	static // create dynamic object with manageable resources
 	MailBoxQueueTT<limit_, T> *create( void )
 	{
-		static_assert(sizeof(box_T<limit_, sizeof(T)>) == sizeof(MailBoxQueueTT<limit_, T>), "unexpected error!");
-		return reinterpret_cast<MailBoxQueueTT<limit_, T> *>(box_create(limit_, sizeof(T)));
+		return reinterpret_cast<MailBoxQueueTT<limit_, T> *>(MailBoxQueueT<limit_, sizeof(T)>::create());
 	}
 };
 

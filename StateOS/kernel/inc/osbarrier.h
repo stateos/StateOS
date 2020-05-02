@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    28.04.2020
+    @date    02.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -328,8 +328,10 @@ struct Barrier : public __bar
 	static // create dynamic object with manageable resources
 	Barrier *create( const unsigned _limit )
 	{
-		static_assert(sizeof(__bar) == sizeof(Barrier), "unexpected error!");
-		return reinterpret_cast<Barrier *>(bar_create(_limit));
+		auto bar = reinterpret_cast<Barrier *>(sys_alloc(sizeof(Barrier)));
+		new (bar) Barrier(_limit);
+		bar->__bar::obj.res = bar;
+		return bar;
 	}
 
 	void     reset    ( void )         {        bar_reset    (this);         }
