@@ -23,6 +23,8 @@
 #define ASSERT_dead(tsk)       ASSERT((tsk)->hdr.id == ID_STOPPED)
 #define ASSERT_ready(tsk)      ASSERT((tsk)->hdr.id == ID_READY)
 
+#define ASSERT_heap()          ASSERT(sys_heap() == SEG_OVER(OS_HEAP_SIZE))
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -40,13 +42,13 @@ void test_call(fun_t *fun);
 
 #ifdef  DEBUG
 #ifdef  __CSMC__
-#define UNIT_Notify()          puts(__FILE__)
-#define TEST_Notify()          puts(__FILE__)
+#define UNIT_Notify()          do { LED_Tick(); puts(__FILE__); } while (0)
+#define TEST_Notify()          do { LED_Tick(); puts(__FILE__); } while (0)
 #else//!__CSMC__
-#define UNIT_Notify()          puts(__func__)
-#define TEST_Notify()          puts(__func__)
+#define UNIT_Notify()          do { LED_Tick(); puts(__func__); } while (0)
+#define TEST_Notify()          do { LED_Tick(); puts(__func__); } while (0)
 #endif//__CSMC__
 #else//!DEBUG
-#define UNIT_Notify()          LED_Tick()
-#define TEST_Notify()          LED_Tick()
+#define UNIT_Notify()          do { LED_Tick(); } while (0)
+#define TEST_Notify()          do { LED_Tick(); } while (0)
 #endif//DEBUG

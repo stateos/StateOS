@@ -73,7 +73,9 @@ int main()
 	for (i = 0; i < count * LOOP; i++)
 	{
 		test[i      % count]();
+		ASSERT_heap();
 		test[rand() % count]();
+		ASSERT_heap();
 	}
 
 	test_fini();
