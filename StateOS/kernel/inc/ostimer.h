@@ -734,7 +734,7 @@ struct baseTimer : public __tmr
 	template<class T>
 	baseTimer( const T _state )
 #if OS_FUNCTIONAL
-		: __tmr _TMR_INIT(fun_), fun(_state) {}
+		: __tmr _TMR_INIT(_state == nullptr ? NULL : fun_), fun(_state) {}
 #else
 		: __tmr _TMR_INIT(_state) {}
 #endif
@@ -762,7 +762,7 @@ struct baseTimer : public __tmr
 	{
 #if OS_FUNCTIONAL
 		new (&fun) Fun_t(_state);
-		tmr_startFrom(this, _delay, _period, fun_);
+		tmr_startFrom(this, _delay, _period, _state == nullptr ? NULL : fun_);
 #else
 		tmr_startFrom(this, _delay, _period, _state);
 #endif
@@ -991,7 +991,7 @@ namespace ThisTimer
 	{
 #if OS_FUNCTIONAL
 		new (&reinterpret_cast<baseTimer*>(tmr_thisISR())->fun) Fun_t(_state);
-		tmr_flipISR(baseTimer::fun_);
+		tmr_flipISR(_state == nullptr ? NULL : baseTimer::fun_);
 #else
 		tmr_flipISR(_state);
 #endif
