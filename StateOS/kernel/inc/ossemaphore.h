@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    03.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -528,10 +528,14 @@ struct Semaphore : public __sem
 	static // create dynamic object with manageable resources
 	Semaphore *create( const unsigned _init, const unsigned _limit = semCounting )
 	{
+#if OS_FUNCTIONAL
 		auto sem = reinterpret_cast<Semaphore *>(sys_alloc(sizeof(Semaphore)));
 		new (sem) Semaphore(_init, _limit);
 		sem->__sem::obj.res = sem;
 		return sem;
+#else
+		return reinterpret_cast<Semaphore *>(sem_create(_init, _limit));
+#endif
 	}
 
 	void     reset    ( void )         {        sem_reset    (this);         }

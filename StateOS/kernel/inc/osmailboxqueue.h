@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    03.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -560,10 +560,14 @@ struct MailBoxQueueT : public __box
 	static // create dynamic object with manageable resources
 	MailBoxQueueT<limit_, size_> *create( void )
 	{
+#if OS_FUNCTIONAL
 		auto box = reinterpret_cast<MailBoxQueueT<limit_, size_> *>(sys_alloc(sizeof(MailBoxQueueT<limit_, size_>)));
 		new (box) MailBoxQueueT<limit_, size_>();
 		box->__box::obj.res = box;
 		return box;
+#else
+		return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
+#endif
 	}
 
 	void     reset    ( void )                            {        box_reset    (this);                }

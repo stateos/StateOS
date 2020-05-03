@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    03.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -627,10 +627,14 @@ struct MessageBufferT : public __msg
 	static // create dynamic object with manageable resources
 	MessageBufferT<limit_> *create( void )
 	{
+#if OS_FUNCTIONAL
 		auto msg = reinterpret_cast<MessageBufferT<limit_> *>(sys_alloc(sizeof(MessageBufferT<limit_>)));
 		new (msg) MessageBufferT<limit_>();
 		msg->__msg::obj.res = msg;
 		return msg;
+#else
+		return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_));
+#endif
 	}
 
 	void     reset    ( void )                                            {        msg_reset    (this);                       }

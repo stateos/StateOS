@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    03.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -139,6 +139,27 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size )
 		tsk = priv_wrk_create(prio, state, size, DETACHED);
 		core_ctx_init(tsk);
 		core_tsk_insert(tsk);
+	}
+	sys_unlock();
+
+	return tsk;
+}
+
+
+/* -------------------------------------------------------------------------- */
+tsk_t *thd_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinable )
+/* -------------------------------------------------------------------------- */
+{
+	tsk_t *tsk;
+
+	assert_tsk_context();
+	assert(state);
+	assert(size);
+	assert(joinable == JOINABLE || joinable == DETACHED);
+
+	sys_lock();
+	{
+		tsk = priv_wrk_create(prio, state, size, joinable);
 	}
 	sys_unlock();
 

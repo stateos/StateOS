@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    03.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -509,10 +509,14 @@ struct JobQueueT : public __job
 	static // create dynamic object with manageable resources
 	JobQueueT<limit_> *create( void )
 	{
+#if OS_FUNCTIONAL
 		auto job = reinterpret_cast<JobQueueT<limit_> *>(sys_alloc(sizeof(JobQueueT<limit_>)));
 		new (job) JobQueueT<limit_>();
 		job->__job::obj.res = job;
 		return job;
+#else
+		return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_));
+#endif
 	}
 
 	void     reset    ( void )                      {        job_reset    (this);               }

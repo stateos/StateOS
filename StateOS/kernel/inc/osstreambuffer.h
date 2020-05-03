@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    03.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -602,10 +602,14 @@ struct StreamBufferT : public __stm
 	static // create dynamic object with manageable resources
 	StreamBufferT<limit_> *create( void )
 	{
+#if OS_FUNCTIONAL
 		auto stm = reinterpret_cast<StreamBufferT<limit_> *>(sys_alloc(sizeof(StreamBufferT<limit_>)));
 		new (stm) StreamBufferT<limit_>();
 		stm->__stm::obj.res = stm;
 		return stm;
+#else
+		return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));
+#endif
 	}
 
 	void     reset    ( void )                                            {        stm_reset    (this);                       }

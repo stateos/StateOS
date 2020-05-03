@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    03.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -446,10 +446,14 @@ struct MemoryPoolT : public __mem
 	static // create dynamic object with manageable resources
 	MemoryPoolT<limit_, size_> *create( void )
 	{
+#if OS_FUNCTIONAL
 		auto mem = reinterpret_cast<MemoryPoolT<limit_, size_> *>(sys_alloc(sizeof(MemoryPoolT<limit_, size_>)));
 		new (mem) MemoryPoolT<limit_, size_>();
 		mem->__mem::lst.obj.res = mem;
 		return mem;
+#else
+		return reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
+#endif
 	}
 
 	void     reset    ( void )                             {        mem_reset    (this);                }

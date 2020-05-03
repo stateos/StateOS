@@ -718,6 +718,29 @@ tsk_t *tsk_detached( unsigned prio, fun_t *state ) { return wrk_detached(prio, s
 
 /******************************************************************************
  *
+ * Name              : thd_create
+ *
+ * Description       : create and initialize complete work area for task object
+ *                     with defined state: JOINABLE / DETACHED (don't start the task)
+ *
+ * Parameters
+ *   prio            : initial task priority (any unsigned int value)
+ *   state           : task state (initial task function) doesn't have to be noreturn-type
+ *                     it will be executed into an infinite system-implemented loop
+ *   size            : size of task private stack (in bytes)
+ *   joinable        : JOINABLE / DETACHED
+ *
+ * Return            : pointer to task object (task successfully created)
+ *   0               : task not created (not enough free memory)
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+tsk_t *thd_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinable );
+
+/******************************************************************************
+ *
  * Name              : tsk_start
  *
  * Description       : start previously defined/created/stopped task object
@@ -1268,15 +1291,21 @@ struct baseStack
 
 struct baseTask : public __tsk
 {
-	template<class T>
-	baseTask( const unsigned _prio, const T _state, stk_t * const _stack, const size_t _size )
 #if OS_FUNCTIONAL
-		: __tsk _TSK_INIT(_prio, fun_, _stack, _size), fun(_state) {}
+	template<class T>
+	baseTask( const unsigned _prio, const T _state, stk_t * const _stack, const size_t _size ) : __tsk _TSK_INIT(_prio, fun_, _stack, _size), fun(_state) {}
 #else
-		: __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
+	baseTask( const unsigned _prio, Fun_t   _state, stk_t * const _stack, const size_t _size ) : __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 #endif
 
 	void     start    ( void )             {        tsk_start    (this);          }
+#if OS_FUNCTIONAL
+	template<class T>
+	void     startFrom( const T  _state )  {        new (&fun) Fun_t(_state);
+	                                                tsk_startFrom(this, fun_);    }
+#else
+	void     startFrom( Fun_t    _state )  {        tsk_startFrom(this, _state);  }
+#endif
 	unsigned detach   ( void )             { return tsk_detach   (this);          }
 	unsigned join     ( void )             { return tsk_join     (this);          }
 	unsigned reset    ( void )             { return tsk_reset    (this);          }
@@ -1289,37 +1318,21 @@ struct baseTask : public __tsk
 	unsigned resumeISR( void )             { return tsk_resumeISR(this);          }
 	void     give     ( unsigned _signo )  {        tsk_give     (this, _signo);  }
 	void     signal   ( unsigned _signo )  {        tsk_signal   (this, _signo);  }
+#if OS_FUNCTIONAL
+	template<class T>
+	void     action   ( const T  _action ) {        new (&act) Act_t(_action);
+	                                                tsk_action   (this, act_);    }
+#else
+	void     action   ( Act_t    _action ) {        tsk_action   (this, _action); }
+#endif
 	bool     operator!( void )             { return __tsk::hdr.id == ID_STOPPED;  }
 
-	template<class T>
-	void startFrom( const T  _state )
-	{
-#if OS_FUNCTIONAL
-		new (&fun) Fun_t(_state);
-        tsk_startFrom(this, fun_);
-#else
-		tsk_startFrom(this, _state);
-#endif
-	}
-
-	template<class T>
-	void action( const T  _action )
-	{
-#if OS_FUNCTIONAL
-		new (&act) Act_t(_action);
-		tsk_action(this, act_);
-#else
-		tsk_action(this, _action);
-#endif
-	}
-
 #if OS_FUNCTIONAL
 	static
-	void     fun_( void )            { reinterpret_cast<baseTask*>(tsk_this())->fun(); }
+	void     fun_     ( void )             {        reinterpret_cast<baseTask *>(tsk_this())->fun(); }
 	Fun_t    fun;
-
 	static
-	void     act_( unsigned _signo ) { reinterpret_cast<baseTask*>(tsk_this())->act(_signo); }
+	void     act_     ( unsigned _signo )  {        reinterpret_cast<baseTask *>(tsk_this())->act(_signo); }
 	Act_t    act;
 #endif
 };
@@ -1342,7 +1355,7 @@ template<size_t size_ = OS_STACK_SIZE>
 struct TaskT : public baseTask, public baseStack<size_>
 {	// create undetachable task
 	template<class T>
-	TaskT( const unsigned _prio, const T _state ): baseTask(_prio, _state, baseStack<size_>::stack_, size_) {}
+	TaskT( const unsigned _prio, const T _state ) : baseTask(_prio, _state, baseStack<size_>::stack_, size_) {}
 
 	TaskT( TaskT<size_>&& ) = default;
 	TaskT( const TaskT<size_>& ) = delete;
@@ -1355,22 +1368,30 @@ struct TaskT : public baseTask, public baseStack<size_>
 	static // create dynamic detachable task
 	TaskT<size_> *create( const unsigned _prio, const T _state )
 	{
+#if OS_FUNCTIONAL
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
 		new (tsk) TaskT<size_>(_prio, _state);
 		tsk->__tsk::hdr.obj.res = tsk;
 		tsk->__tsk::join = JOINABLE;
 		return tsk;
+#else
+		return reinterpret_cast<TaskT<size_> *>(thd_create(_prio, _state, size_, JOINABLE));
+#endif
 	}
 
 	template<class T>
 	static // create dynamic detached task
 	TaskT<size_> *detached( const unsigned _prio, const T _state )
 	{
+#if OS_FUNCTIONAL
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
 		new (tsk) TaskT<size_>(_prio, _state);
 		tsk->__tsk::hdr.obj.res = tsk;
 		tsk->__tsk::join = DETACHED;
 		return tsk;
+#else
+		return reinterpret_cast<TaskT<size_> *>(thd_create(_prio, _state, size_, DETACHED));
+#endif
 	}
 };
 
@@ -1396,7 +1417,7 @@ template<size_t size_ = OS_STACK_SIZE>
 struct startTaskT : public TaskT<size_>
 {	// create and run undetachable task
 	template<class T>
-	startTaskT( const unsigned _prio, const T _state ): TaskT<size_>(_prio, _state) { port_sys_init(); tsk_start(this); }
+	startTaskT( const unsigned _prio, const T _state ) : TaskT<size_>(_prio, _state) { port_sys_init(); tsk_start(this); }
 
 	template<class T>
 	static // create and run dynamic detachable task
@@ -1439,6 +1460,13 @@ namespace ThisTask
 	static inline unsigned destroy   ( void )             { return cur_destroy   ();        }
 	static inline void     yield     ( void )             {        tsk_yield     ();        }
 	static inline void     pass      ( void )             {        tsk_pass      ();        }
+#if OS_FUNCTIONAL
+	template<class T>
+	static inline void     flip      ( const T  _state )  {        new (&reinterpret_cast<baseTask *>(tsk_this())->fun) Fun_t(_state);
+	                                                               tsk_flip      (baseTask::fun_); }
+#else
+	static inline void     flip      ( Fun_t    _state )  {        tsk_flip      (_state);  }
+#endif
 	static inline void     setPrio   ( unsigned _prio )   {        tsk_setPrio   (_prio);   }
 	static inline void     prio      ( unsigned _prio )   {        tsk_prio      (_prio);   }
 	static inline unsigned getPrio   ( void )             { return tsk_getPrio   ();        }
@@ -1451,28 +1479,13 @@ namespace ThisTask
 	static inline void     suspend   ( void )             {        cur_suspend   ();        }
 	static inline void     give      ( unsigned _signo )  {        cur_give      (_signo);  }
 	static inline void     signal    ( unsigned _signo )  {        cur_signal    (_signo);  }
-
-	template<class T>
-	static inline void flip( const T _state )
-	{
 #if OS_FUNCTIONAL
-		new (&reinterpret_cast<baseTask*>(tsk_this())->fun) Fun_t(_state);
-		tsk_flip(baseTask::fun_);
-#else
-		tsk_flip(_state);
-#endif
-	}
-
 	template<class T>
-	static inline void action( const T _action )
-	{
-#if OS_FUNCTIONAL
-		new (&reinterpret_cast<baseTask*>(tsk_this())->act) Act_t(_action);
-		cur_action(baseTask::act_);
+	static inline void     action    ( const T  _action ) {        new (&reinterpret_cast<baseTask *>(tsk_this())->act) Act_t(_action);
+	                                                               cur_action    (baseTask::act_); }
 #else
-		cur_action(_action);
+	static inline void     action    ( Act_t    _action ) {        cur_action    (_action); }
 #endif
-	}
 }
 
 #endif//__cplusplus
