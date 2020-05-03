@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    03.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1356,7 +1356,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	TaskT<size_> *create( const unsigned _prio, const T _state )
 	{
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		new (tsk) TaskT<size_>(_prio, std::forward<Fun_t>(_state));
+		new (tsk) TaskT<size_>(_prio, _state);
 		tsk->__tsk::hdr.obj.res = tsk;
 		tsk->__tsk::join = JOINABLE;
 		return tsk;
@@ -1367,7 +1367,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	TaskT<size_> *detached( const unsigned _prio, const T _state )
 	{
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		new (tsk) TaskT<size_>(_prio, std::forward<Fun_t>(_state));
+		new (tsk) TaskT<size_>(_prio, _state);
 		tsk->__tsk::hdr.obj.res = tsk;
 		tsk->__tsk::join = DETACHED;
 		return tsk;
