@@ -2,7 +2,7 @@
 
     @file    StateOS: osonceflag.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    04.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -199,7 +199,7 @@ struct OnceFlag
 	template<class T>
 	void call( const T _fun ) { one_t flag = 1; sys_lock(); std::swap(flag, flg_); sys_unlock(); if (flag == 0) _fun(); }
 #else
-	void call( Fun_t   _fun ) { one_call(&flg_, _fun); }
+	void call( fun_t * _fun ) { one_call(&flg_, _fun); }
 #endif
 
 	private:

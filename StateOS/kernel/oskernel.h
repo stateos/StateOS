@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    04.05.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -44,9 +44,6 @@
 #include <functional>
 using Fun_t = std::function<void( void )>;
 using Act_t = std::function<void( unsigned )>;
-#else
-using Fun_t = fun_t *;
-using Act_t = act_t *;
 #endif
 
 #endif

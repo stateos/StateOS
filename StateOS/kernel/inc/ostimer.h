@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    04.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -736,7 +736,7 @@ struct baseTimer : public __tmr
 	template<class T>
 	baseTimer( const T _state ): __tmr _TMR_INIT(fun_), fun(_state) {}
 #else
-	baseTimer( Fun_t   _state ): __tmr _TMR_INIT(_state) {}
+	baseTimer( fun_t * _state ): __tmr _TMR_INIT(_state) {}
 #endif
 
 	void reset        ( void )                                        {        tmr_reset        (this);                  }
@@ -753,7 +753,7 @@ struct baseTimer : public __tmr
 	void startFrom    ( cnt_t _delay, cnt_t _period, const T _state ) {        new (&fun) Fun_t(_state);
 	                                                                           tmr_startFrom    (this, _delay, _period, fun_); }
 #else
-	void startFrom    ( cnt_t _delay, cnt_t _period, Fun_t   _state ) {        tmr_startFrom    (this, _delay, _period, _state); }
+	void startFrom    ( cnt_t _delay, cnt_t _period, fun_t * _state ) {        tmr_startFrom    (this, _delay, _period, _state); }
 #endif
 	void stop         ( void )                                        {        tmr_stop         (this);                  }
 	unsigned take     ( void )                                        { return tmr_take         (this);                  }
@@ -1000,7 +1000,7 @@ namespace ThisTimer
 	static inline void flipISR ( const T _state ) { new (&reinterpret_cast<baseTimer *>(tmr_thisISR())->fun) Fun_t(_state);
 	                                                tmr_flipISR (baseTimer::fun_); }
 #else
-	static inline void flipISR ( Fun_t   _state ) { tmr_flipISR (_state); }
+	static inline void flipISR ( fun_t * _state ) { tmr_flipISR (_state); }
 #endif
 	static inline void delayISR( cnt_t   _delay ) { tmr_delayISR(_delay); }
 }
