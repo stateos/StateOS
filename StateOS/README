@@ -48,9 +48,9 @@ Features:
 - added wrk_init function
 - now sys_alloc don't clear allocated memory
 - added sys_clean function
-- added sys_heap function
 - updated c++ create functions
 - updated c++ wrapper
+- added sys_heapSize function
 ---------
 6.5
 - added functional test

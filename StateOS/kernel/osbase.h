@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    04.05.2020
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -43,6 +43,10 @@
 #include <stdbool.h>
 #include <assert.h>
 #include "osport.h"
+
+/* -------------------------------------------------------------------------- *
+ *                              FOR INTERNAL USE                              *
+ * -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
 extern "C" {

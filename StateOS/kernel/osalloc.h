@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    30.04.2020
+    @date    04.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -117,7 +117,7 @@ void sys_free( void *ptr );
 
 /******************************************************************************
  *
- * Name              : sys_heap
+ * Name              : sys_heapSize
  *
  * Description       : get total size of free heap memory
  *
@@ -132,12 +132,12 @@ void sys_free( void *ptr );
 
 #if OS_HEAP_SIZE == 0
 __STATIC_INLINE
-size_t sys_heap( void )
+size_t sys_heapSize( void )
 {
 	return 0;
 }
 #else
-size_t sys_heap( void );
+size_t sys_heapSize( void );
 #endif
 
 /******************************************************************************

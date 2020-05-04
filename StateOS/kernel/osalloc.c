@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    30.04.2020
+    @date    04.05.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -118,11 +118,13 @@ void sys_free( void *ptr )
 
 /* -------------------------------------------------------------------------- */
 
-size_t sys_heap( void )
+size_t sys_heapSize( void )
 {
 	size_t size = 0;
 	seg_t *mem;
 	seg_t *nxt;
+
+	assert_tsk_context(); 
 
 	sys_lock();
 	{
