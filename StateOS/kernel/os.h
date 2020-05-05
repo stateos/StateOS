@@ -109,23 +109,6 @@ cnt_t sys_time( void );
 __STATIC_INLINE
 cnt_t sys_timeISR( void ) { return sys_time(); }
 
-/******************************************************************************
- *
- * Name              : sys_clean
- *
- * Description       : call garbage collection
- *
- * Parameters        : none
- *
- * Return            : none
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-__STATIC_INLINE
-void sys_clean( void ) { tsk_destructor(); }
-
 #ifdef __cplusplus
 }
 #endif

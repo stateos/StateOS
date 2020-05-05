@@ -47,7 +47,6 @@ Features:
 - simplified c++ constructors
 - added wrk_init function
 - now sys_alloc don't clear allocated memory
-- added sys_clean function
 - updated c++ create functions
 - updated c++ wrapper
 - added sys_heapSize function
