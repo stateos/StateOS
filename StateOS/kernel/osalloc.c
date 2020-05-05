@@ -61,7 +61,7 @@ void *sys_alloc( size_t size )
 
 	sys_lock();
 	{
-		// call garbage collection procedure
+		//	call garbage collection procedure
 		core_tsk_destructor();
 
 		for (mem = Heap; mem; mem = mem->next)
@@ -111,7 +111,7 @@ void *sys_alloc( size_t size )
 
 	sys_lock();
 	{
-		// call garbage collection procedure
+		//	call garbage collection procedure
 		core_tsk_destructor();
 	}
 	sys_unlock();
@@ -138,7 +138,7 @@ void sys_free( void *ptr )
 
 	sys_lock();
 	{
-		// call garbage collection procedure
+		//	call garbage collection procedure
 		core_tsk_destructor();
 
 		for (mem = Heap; mem; mem = mem->next)
@@ -163,7 +163,7 @@ void sys_free( void *ptr )
 
 	sys_lock();
 	{
-		// call garbage collection procedure
+		//	call garbage collection procedure
 		core_tsk_destructor();
 	}
 	sys_unlock();
@@ -187,7 +187,7 @@ size_t sys_heapSize( void )
 
 	sys_lock();
 	{
-		// call garbage collection procedure
+		//	call garbage collection procedure
 		core_tsk_destructor();
 
 		for (mem = Heap; mem; mem = mem->next)
@@ -216,7 +216,7 @@ size_t sys_heapSize( void )
 
 	sys_lock();
 	{
-		// call garbage collection procedure
+		//	call garbage collection procedure
 		core_tsk_destructor();
 	}
 	sys_unlock();
