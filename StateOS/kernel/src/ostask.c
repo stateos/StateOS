@@ -316,37 +316,28 @@ void tsk_idle( void )
 }
 
 /* -------------------------------------------------------------------------- */
-static
-void priv_tsk_destructor( void )
+void tsk_destructor( void )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
 
-	while (System.des)
-	{
-		tsk = System.des;                          // task waiting for destruction
-
-		if (tsk->join != DETACHED)                 // task not detached
-		{
-			priv_mtx_remove(tsk);                  // release all owned robust mutexes
-			core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task
-		}
-
-		priv_tsk_stop(tsk);                        // remove task from all queues
-		core_res_free(&tsk->hdr.obj.res);          // release resources
-	}
-}
-
-/* -------------------------------------------------------------------------- */
-void tsk_destructor( void )
-/* -------------------------------------------------------------------------- */
-{
 	assert_tsk_context();
 
 	sys_lock();
 	{
-		priv_tsk_destructor();
-		IDLE.state = tsk_idle;               // use idle default procedure
+		while (System.des)
+		{
+			tsk = System.des;                          // task waiting for destruction
+
+			if (tsk->join != DETACHED)                 // task not detached
+			{
+				priv_mtx_remove(tsk);                  // release all owned robust mutexes
+				core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task
+			}
+
+			priv_tsk_stop(tsk);                        // remove task from all queues
+			core_res_free(&tsk->hdr.obj.res);          // release resources
+		}
 	}
 	sys_unlock();
 }
@@ -356,10 +347,7 @@ static
 void priv_tsk_destroy( void )
 /* -------------------------------------------------------------------------- */
 {
-	priv_tsk_destructor();                   // destroy all tasks waiting for destruction
-
-	IDLE.state = tsk_destructor;             // use garbage collection procedure
-	core_tsk_waitFor(&System.des, INFINITE); // wait for destruction
+	core_tsk_waitFor(&System.des, INFINITE);           // wait for destruction
 
 	assert(!"system cannot return here");
 }

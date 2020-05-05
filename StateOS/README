@@ -51,6 +51,7 @@ Features:
 - updated c++ create functions
 - updated c++ wrapper
 - added sys_heapSize function
+- task destructor is called in alloc / free functions
 ---------
 6.5
 - added functional test

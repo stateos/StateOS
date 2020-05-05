@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    04.05.2020
+    @date    05.05.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,11 @@ static
 seg_t Heap[SEG_SIZE(OS_HEAP_SIZE)+1] =
   { { Heap+SEG_SIZE(OS_HEAP_SIZE), Heap } };
 
+#endif
+
 /* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
 
 void *sys_alloc( size_t size )
 {
@@ -50,9 +54,12 @@ void *sys_alloc( size_t size )
 	seg_t *nxt;
 
 	assert(size);
+	assert_tsk_context();
+
+	// call garbage collection procedure
+	tsk_destructor();
 
 	size = SEG_SIZE(size) + 1;
-
 	assert(size);
 
 	sys_lock();
@@ -93,12 +100,40 @@ void *sys_alloc( size_t size )
 	return mem;
 }
 
+#else
+
+void *sys_alloc( size_t size )
+{
+	void *mem;
+
+	assert(size);
+	assert_tsk_context();
+
+	// call garbage collection procedure
+	tsk_destructor();
+
+	mem = malloc(size);
+
+	assert(mem);
+
+	return mem;
+}
+
+#endif
+
 /* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
 
 void sys_free( void *ptr )
 {
 	seg_t *mem;
 	seg_t *seg = (seg_t *)ptr - 1;
+
+	assert_tsk_context();
+
+	// call garbage collection procedure
+	tsk_destructor();
 
 	sys_lock();
 	{
@@ -116,15 +151,34 @@ void sys_free( void *ptr )
 	sys_unlock();
 }
 
+#else
+
+void sys_free( void *ptr )
+{
+	assert_tsk_context();
+
+	// call garbage collection procedure
+	tsk_destructor();
+
+	free(ptr);
+}
+
+#endif
+
 /* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
 
 size_t sys_heapSize( void )
 {
-	size_t size = 0;
 	seg_t *mem;
 	seg_t *nxt;
+	size_t size = 0;
 
 	assert_tsk_context(); 
+
+	// call garbage collection procedure
+	tsk_destructor();
 
 	sys_lock();
 	{
@@ -144,6 +198,18 @@ size_t sys_heapSize( void )
 	sys_unlock();
 
 	return size * sizeof(seg_t);
+}
+
+#else
+
+size_t sys_heapSize( void )
+{
+	assert_tsk_context(); 
+
+	// call garbage collection procedure
+	tsk_destructor();
+
+	return 0;
 }
 
 #endif
