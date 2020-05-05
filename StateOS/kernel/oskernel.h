@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    04.05.2020
+    @date    05.05.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -258,11 +258,8 @@ void core_mtx_reset( mtx_t *mtx, unsigned event );
 
 /* -------------------------------------------------------------------------- */
 
-// idle default procedure
-void tsk_idle( void );
-
 // garbage collection procedure
-void tsk_destructor( void );
+void core_tsk_destructor( void );
 
 /* -------------------------------------------------------------------------- */
 

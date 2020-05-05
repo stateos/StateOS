@@ -56,14 +56,14 @@ void *sys_alloc( size_t size )
 	assert(size);
 	assert_tsk_context();
 
-	// call garbage collection procedure
-	tsk_destructor();
-
 	size = SEG_SIZE(size) + 1;
 	assert(size);
 
 	sys_lock();
 	{
+		// call garbage collection procedure
+		core_tsk_destructor();
+
 		for (mem = Heap; mem; mem = mem->next)
 		{
 			if (mem->owner != mem)
@@ -109,8 +109,12 @@ void *sys_alloc( size_t size )
 	assert(size);
 	assert_tsk_context();
 
-	// call garbage collection procedure
-	tsk_destructor();
+	sys_lock();
+	{
+		// call garbage collection procedure
+		core_tsk_destructor();
+	}
+	sys_unlock();
 
 	mem = malloc(size);
 
@@ -132,11 +136,11 @@ void sys_free( void *ptr )
 
 	assert_tsk_context();
 
-	// call garbage collection procedure
-	tsk_destructor();
-
 	sys_lock();
 	{
+		// call garbage collection procedure
+		core_tsk_destructor();
+
 		for (mem = Heap; mem; mem = mem->next)
 		{
 			if (mem != seg)
@@ -157,8 +161,12 @@ void sys_free( void *ptr )
 {
 	assert_tsk_context();
 
-	// call garbage collection procedure
-	tsk_destructor();
+	sys_lock();
+	{
+		// call garbage collection procedure
+		core_tsk_destructor();
+	}
+	sys_unlock();
 
 	free(ptr);
 }
@@ -177,11 +185,11 @@ size_t sys_heapSize( void )
 
 	assert_tsk_context(); 
 
-	// call garbage collection procedure
-	tsk_destructor();
-
 	sys_lock();
 	{
+		// call garbage collection procedure
+		core_tsk_destructor();
+
 		for (mem = Heap; mem; mem = mem->next)
 		{
 			if (mem->owner != mem)
@@ -206,8 +214,12 @@ size_t sys_heapSize( void )
 {
 	assert_tsk_context(); 
 
-	// call garbage collection procedure
-	tsk_destructor();
+	sys_lock();
+	{
+		// call garbage collection procedure
+		core_tsk_destructor();
+	}
+	sys_unlock();
 
 	return 0;
 }

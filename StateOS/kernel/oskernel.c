@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    30.04.2020
+    @date    05.05.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -36,6 +36,14 @@
 
 /* -------------------------------------------------------------------------- */
 // SYSTEM INTERNAL SERVICES
+/* -------------------------------------------------------------------------- */
+
+static
+void priv_tsk_idle( void )
+{
+	__WFI();
+}
+
 /* -------------------------------------------------------------------------- */
 
 static
@@ -214,7 +222,7 @@ static  union  { stk_t STK[STK_SIZE(OS_IDLE_STACK)];
 #define IDLE_SP  (void *)(&IDLE_STACK.CTX.ctx)
 
 tsk_t MAIN = { .hdr={ .prev=&IDLE, .next=&IDLE, .id=ID_READY }, .stack=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { .hdr={ .prev=&MAIN, .next=&MAIN, .id=ID_READY }, .state=tsk_idle, .stack=IDLE_STK, .size=OS_IDLE_STACK, .sp=IDLE_SP }; // idle task and tasks queue
+tsk_t IDLE = { .hdr={ .prev=&MAIN, .next=&MAIN, .id=ID_READY }, .state=priv_tsk_idle, .stack=IDLE_STK, .size=OS_IDLE_STACK, .sp=IDLE_SP }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */

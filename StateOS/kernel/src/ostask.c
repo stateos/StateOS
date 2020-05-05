@@ -309,37 +309,24 @@ void priv_tsk_stop( tsk_t *tsk )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_idle( void )
-/* -------------------------------------------------------------------------- */
-{
-	__WFI();
-}
-
-/* -------------------------------------------------------------------------- */
-void tsk_destructor( void )
+void core_tsk_destructor( void )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
 
-	assert_tsk_context();
-
-	sys_lock();
+	while (System.des)
 	{
-		while (System.des)
+		tsk = System.des;                          // task waiting for destruction
+
+		if (tsk->join != DETACHED)                 // task not detached
 		{
-			tsk = System.des;                          // task waiting for destruction
-
-			if (tsk->join != DETACHED)                 // task not detached
-			{
-				priv_mtx_remove(tsk);                  // release all owned robust mutexes
-				core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task
-			}
-
-			priv_tsk_stop(tsk);                        // remove task from all queues
-			core_res_free(&tsk->hdr.obj.res);          // release resources
+			priv_mtx_remove(tsk);                  // release all owned robust mutexes
+			core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task
 		}
+
+		priv_tsk_stop(tsk);                        // remove task from all queues
+		core_res_free(&tsk->hdr.obj.res);          // release resources
 	}
-	sys_unlock();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -347,7 +334,7 @@ static
 void priv_tsk_destroy( void )
 /* -------------------------------------------------------------------------- */
 {
-	core_tsk_waitFor(&System.des, INFINITE);           // wait for destruction
+	core_tsk_waitFor(&System.des, INFINITE);       // wait for destruction
 
 	assert(!"system cannot return here");
 }
