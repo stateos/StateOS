@@ -42,11 +42,11 @@ void test_call(fun_t *fun);
 
 #ifdef  DEBUG
 #ifdef  __CSMC__
-#define UNIT_Notify()          do { LED_Tick(); puts(__FILE__); } while (0)
-#define TEST_Notify()          do { LED_Tick(); puts(__FILE__); } while (0)
+#define UNIT_Notify()          do { puts(__FILE__); } while (0)
+#define TEST_Notify()          do { puts(__FILE__); } while (0)
 #else//!__CSMC__
-#define UNIT_Notify()          do { LED_Tick(); puts(__func__); } while (0)
-#define TEST_Notify()          do { LED_Tick(); puts(__func__); } while (0)
+#define UNIT_Notify()          do { puts(__func__); } while (0)
+#define TEST_Notify()          do { puts(__func__); } while (0)
 #endif//__CSMC__
 #else//!DEBUG
 #define UNIT_Notify()          do { LED_Tick(); } while (0)

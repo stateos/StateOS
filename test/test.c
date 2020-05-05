@@ -30,8 +30,9 @@ static void test_init()
 	TEST_Notify();
 #ifdef DEBUG
 //	printf(": %d / %d\n", count, SIZE);
-#endif
+#else
 	LED_Init();
+#endif
 	srand(0);
 }
 
@@ -40,8 +41,9 @@ static void test_fini()
 	TEST_Notify();
 #ifdef DEBUG
 //	printf(": %u\n", (unsigned) summary);
-#endif
+#else
 	LEDs = 15;
+#endif
 }
 
 int main()
@@ -70,10 +72,12 @@ int main()
 	TEST_AddUnit(test_timer);
 	TEST_AddUnit(test_task);
 
-	for (i = 0; i < count * LOOP; i++)
+	for (i = 0; i < count * LOOP * 2; i += 2)
 	{
+		printf("%3d%% ", (i + 1) * 50 / count / LOOP);
 		test[i      % count]();
 		ASSERT_heap();
+		printf("%3d%% ", (i + 2) * 50 / count / LOOP);
 		test[rand() % count]();
 		ASSERT_heap();
 	}
