@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    05.05.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -179,15 +179,6 @@ uint32_t osKernelGetSysTimerFreq (void)
 
 /* -------------------------------------------------------------------------- */
 
-static void *osAlloc (size_t size)
-{
-	void *mem = sys_alloc(size);
-	memset(mem, 0, size);
-	return mem;
-}
-
-/* -------------------------------------------------------------------------- */
-
 static void thread_handler (void)
 {
 	void *tmp = tsk_this(); // because of COSMIC compiler
@@ -234,7 +225,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	if (thread == NULL && stack_mem == NULL)
 	{
 		stack_size = osThreadStackSize(stack_size);
-		thread = osAlloc(SEG_OVER(osThreadCbSize) + stack_size);
+		thread = sys_alloc(SEG_OVER(osThreadCbSize) + stack_size);
 		stack_mem = (void *)((size_t)thread + SEG_OVER(osThreadCbSize));
 		if (thread == NULL)
 			return NULL;
@@ -242,7 +233,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	else
 	if (thread == NULL)
 	{
-		thread = osAlloc(osThreadCbSize);
+		thread = sys_alloc(osThreadCbSize);
 		if (thread == NULL)
 			return NULL;
 	}
@@ -250,7 +241,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	if (stack_mem == NULL)
 	{
 		stack_size = osThreadStackSize(stack_size);
-		stack_mem = osAlloc(stack_size);
+		stack_mem = sys_alloc(stack_size);
 		if (stack_mem == NULL)
 			return NULL;
 	}
@@ -617,7 +608,7 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 
 	if (timer == NULL)
 	{
-		timer = osAlloc(osTimerCbSize);
+		timer = sys_alloc(osTimerCbSize);
 		if (timer == NULL)
 			return NULL;
 	}
@@ -720,7 +711,7 @@ osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 
 	if (ef == NULL)
 	{
-		ef = osAlloc(osEventFlagsCbSize);
+		ef = sys_alloc(osEventFlagsCbSize);
 		if (ef == NULL)
 			return NULL;
 	}
@@ -845,7 +836,7 @@ osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 
 	if (mutex == NULL)
 	{
-		mutex = osAlloc(osMutexCbSize);
+		mutex = sys_alloc(osMutexCbSize);
 		if (mutex == NULL)
 			return NULL;
 	}
@@ -951,7 +942,7 @@ osSemaphoreId_t osSemaphoreNew (uint32_t max_count, uint32_t initial_count, cons
 
 	if (semaphore == NULL)
 	{
-		semaphore = osAlloc(osSemaphoreCbSize);
+		semaphore = sys_alloc(osSemaphoreCbSize);
 		if (semaphore == NULL)
 			return NULL;
 	}
@@ -1064,7 +1055,7 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 
 	if (mp == NULL && data == NULL)
 	{
-		mp = osAlloc(SEG_OVER(osMemoryPoolCbSize) + size);
+		mp = sys_alloc(SEG_OVER(osMemoryPoolCbSize) + size);
 		data = (void *)((size_t)mp + SEG_OVER(osMemoryPoolCbSize));
 		if (mp == NULL)
 			return NULL;
@@ -1072,14 +1063,14 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 	else
 	if (mp == NULL)
 	{
-		mp = osAlloc(osMemoryPoolCbSize);
+		mp = sys_alloc(osMemoryPoolCbSize);
 		if (mp == NULL)
 			return NULL;
 	}
 	else
 	if (data == NULL)
 	{
-		data = osAlloc(size);
+		data = sys_alloc(size);
 		if (data == NULL)
 			return NULL;
 	}
@@ -1238,7 +1229,7 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 
 	if (mq == NULL && data == NULL)
 	{
-		mq = osAlloc(SEG_OVER(osMessageQueueCbSize) + size);
+		mq = sys_alloc(SEG_OVER(osMessageQueueCbSize) + size);
 		data = (void *)((size_t)mq + SEG_OVER(osMessageQueueCbSize));
 		if (mq == NULL)
 			return NULL;
@@ -1246,14 +1237,14 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 	else
 	if (mq == NULL)
 	{
-		mq = osAlloc(osMessageQueueCbSize);
+		mq = sys_alloc(osMessageQueueCbSize);
 		if (mq == NULL)
 			return NULL;
 	}
 	else
 	if (data == NULL)
 	{
-		data = osAlloc(size);
+		data = sys_alloc(size);
 		if (data == NULL)
 			return NULL;
 	}
