@@ -16,17 +16,15 @@ static void test()
 
 	        Tsk6->start();                       ASSERT_dead(Tsk6);
 	event = Tsk6->join();                        ASSERT_success(event);
-	                                             ASSERT(Tsk6->__tsk::hdr.obj.res == RELEASED);
+
 	        Tsk7->start();                       ASSERT_ready(Tsk7);
-	                                             ASSERT(Tsk7->__tsk::hdr.obj.res != RELEASED);
+	event = Tsk7->join();                        ASSERT_failure(event);
 
 	        Tsk8->start();                       ASSERT_ready(Tsk8);
-	                                             ASSERT(Tsk8->__tsk::hdr.obj.res != RELEASED);
+	event = Tsk8->join();                        ASSERT_failure(event);
 
 	        Tsk9->start();                       ASSERT_dead(Tsk9);
 	event = Tsk9->join();                        ASSERT_success(event);
-	                                             ASSERT(Tsk9->__tsk::hdr.obj.res == RELEASED);
-	        sys_clean();
 }
 
 extern "C"

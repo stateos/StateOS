@@ -7,16 +7,19 @@ static void proc()
 
 static void test()
 {
-	tsk_t *tsk6 = wrk_detached(6, proc, 512);    ASSERT(tsk6->hdr.obj.res == tsk6);
-	tsk_t *tsk7 = tsk_detached(7, proc);         ASSERT(tsk7->hdr.obj.res == tsk7);
-	tsk_t *tsk8 = wrk_detached(8, proc, 512);    ASSERT(tsk8->hdr.obj.res == tsk8);
-	tsk_t *tsk9 = tsk_detached(9, proc);         ASSERT(tsk9->hdr.obj.res == tsk9);
+	unsigned event;
 
-	        sys_clean();
-	                                             ASSERT(tsk6->hdr.obj.res == RELEASED);
-	                                             ASSERT(tsk7->hdr.obj.res == RELEASED);
-	                                             ASSERT(tsk8->hdr.obj.res == RELEASED);
-	                                             ASSERT(tsk9->hdr.obj.res == RELEASED);
+	tsk_t *tsk6 = wrk_detached(6, proc, 512);    ASSERT(tsk6 && tsk6->hdr.obj.res == tsk6);
+	event = tsk_join(tsk6);                      ASSERT_failure(event);
+
+	tsk_t *tsk7 = tsk_detached(7, proc);         ASSERT(tsk7 && tsk7->hdr.obj.res == tsk7);
+	event = tsk_join(tsk7);                      ASSERT_failure(event);
+
+	tsk_t *tsk8 = wrk_detached(8, proc, 512);    ASSERT(tsk8 && tsk8->hdr.obj.res == tsk8);
+	event = tsk_join(tsk8);                      ASSERT_failure(event);
+
+	tsk_t *tsk9 = tsk_detached(9, proc);         ASSERT(tsk9 && tsk9->hdr.obj.res == tsk9);
+	event = tsk_join(tsk9);                      ASSERT_failure(event);
 }
 
 extern "C"
