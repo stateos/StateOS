@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    04.05.2020
+    @date    05.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -189,8 +189,8 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define               _TSK_INIT( _prio, _state, _stack, _size )                                               \
-                       { _HDR_INIT(), _state, 0, 0, 0, NULL, _stack, _size, NULL, _prio, _prio, NULL, NULL, 0, \
+#define               _TSK_INIT( _prio, _state, _stack, _size )                                                   \
+                       { _HDR_INIT(), _state, 0, 0, 0, NULL, _stack, _size, NULL, _prio, _prio, JOINABLE, NULL, 0, \
                        { NULL, NULL }, { 0, NULL, { NULL, NULL } }, { { NULL } }, _TSK_EXTRA }
 
 /******************************************************************************
