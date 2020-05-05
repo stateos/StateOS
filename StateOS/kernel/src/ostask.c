@@ -341,6 +341,8 @@ void priv_tsk_destructor( void )
 void tsk_destructor( void )
 /* -------------------------------------------------------------------------- */
 {
+	assert_tsk_context();
+
 	sys_lock();
 	{
 		priv_tsk_destructor();

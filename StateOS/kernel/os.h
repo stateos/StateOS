@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    30.04.2020
+    @date    05.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -124,7 +124,7 @@ cnt_t sys_timeISR( void ) { return sys_time(); }
  ******************************************************************************/
 
 __STATIC_INLINE
-void sys_clean( void ) { assert_tsk_context(); tsk_destructor(); }
+void sys_clean( void ) { tsk_destructor(); }
 
 #ifdef __cplusplus
 }
