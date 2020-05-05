@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    05.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -316,28 +316,35 @@ void tsk_idle( void )
 }
 
 /* -------------------------------------------------------------------------- */
-void tsk_destructor( void )
+static
+void priv_tsk_destructor( void )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
 
-	sys_lock();
+	while (System.des)
 	{
-		while (System.des)
+		tsk = System.des;                          // task waiting for destruction
+
+		if (tsk->join != DETACHED)                 // task not detached
 		{
-			tsk = System.des;                          // task waiting for destruction
-
-			if (tsk->join != DETACHED)                 // task not detached
-			{
-				priv_mtx_remove(tsk);                  // release all owned robust mutexes
-				core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task
-			}
-
-			priv_tsk_stop(tsk);                        // remove task from all queues
-			core_res_free(&tsk->hdr.obj.res);          // release resources
+			priv_mtx_remove(tsk);                  // release all owned robust mutexes
+			core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task
 		}
 
-		IDLE.state = tsk_idle;                         // use idle default procedure
+		priv_tsk_stop(tsk);                        // remove task from all queues
+		core_res_free(&tsk->hdr.obj.res);          // release resources
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+void tsk_destructor( void )
+/* -------------------------------------------------------------------------- */
+{
+	sys_lock();
+	{
+		priv_tsk_destructor();
+		IDLE.state = tsk_idle;               // use idle default procedure
 	}
 	sys_unlock();
 }
@@ -347,7 +354,7 @@ static
 void priv_tsk_destroy( void )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_destructor();                        // destroy all tasks waiting for destruction
+	priv_tsk_destructor();                   // destroy all tasks waiting for destruction
 
 	IDLE.state = tsk_destructor;             // use garbage collection procedure
 	core_tsk_waitFor(&System.des, INFINITE); // wait for destruction
