@@ -112,36 +112,12 @@ void sys_free( void *ptr );
 
 size_t sys_heapSize( void );
 
-/******************************************************************************
- *
- * Name              : core_res_free
- *
- * Description       : frees given resources
- *
- * Parameters
- *   res             : pointer to a pointer to resources
- *
- * Return            : true if any resources have been released, otherwise false
- *
- * Note              : for internal use
- *
- ******************************************************************************/
-
-__STATIC_INLINE
-void core_res_free( void **res )
-{
-	void *tmp;
-
-	if (*res != NULL && *res != RELEASED)
-	{
-		tmp = *res;
-		*res = RELEASED;
-		sys_free(tmp);
-	}
-}
+/* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
 }
 #endif
+
+/* -------------------------------------------------------------------------- */
 
 #endif//__STATEOSALLOC_H

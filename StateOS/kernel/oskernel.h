@@ -258,6 +258,9 @@ void core_mtx_reset( mtx_t *mtx, unsigned event );
 
 /* -------------------------------------------------------------------------- */
 
+// frees given resources
+void core_res_free( void **res );
+
 // garbage collection procedure
 void core_tsk_destructor( void );
 

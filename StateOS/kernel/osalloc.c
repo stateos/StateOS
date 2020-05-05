@@ -227,3 +227,17 @@ size_t sys_heapSize( void )
 #endif
 
 /* -------------------------------------------------------------------------- */
+
+void core_res_free( void **res )
+{
+	void *tmp;
+
+	if (*res != NULL && *res != RELEASED)
+	{
+		tmp = *res;
+		*res = RELEASED;
+		sys_free(tmp);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
