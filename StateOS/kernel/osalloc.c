@@ -70,15 +70,15 @@ void *sys_alloc( size_t size )
 		//	memory segment has already been allocated
 				continue;
 
-			while (nxt = mem->next, nxt->owner)
+			while (nxt = mem->next, nxt->owner == nxt)
 		//	it is possible to merge adjacent free memory segments
 				mem->next = nxt->next;
 
-			if (nxt < mem + size)
+			if (mem + size > nxt)
 		//	memory segment is too small
 				continue;
 
-			if (nxt > mem + size)
+			if (mem + size < nxt)
 		//	memory segment is larger than required
 			{
 				nxt = mem + size;
@@ -87,7 +87,7 @@ void *sys_alloc( size_t size )
 			}
 
 			mem->next  = nxt;
-			mem->owner = NULL;
+			mem->owner = nxt;
 			mem = mem + 1;
 		//	memory segment has been successfully allocated
 			break;
@@ -196,7 +196,7 @@ size_t sys_heapSize( void )
 		//	memory segment has already been allocated
 				continue;
 
-			while (nxt = mem->next, nxt->owner)
+			while (nxt = mem->next, nxt->owner == nxt)
 		//	it is possible to merge adjacent free memory segments
 				mem->next = nxt->next;
 
