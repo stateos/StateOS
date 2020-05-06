@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    06.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -108,7 +108,7 @@ void mtx_destroy( mtx_t *mtx )
 	sys_lock();
 	{
 		core_mtx_reset(mtx, mtx->obj.res ? E_DELETED : E_STOPPED);
-		core_res_free(&mtx->obj.res);
+		core_res_free(&mtx->obj);
 	}
 	sys_unlock();
 }

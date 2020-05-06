@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    06.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -123,7 +123,7 @@ void msg_destroy( msg_t *msg )
 	sys_lock();
 	{
 		priv_msg_reset(msg, msg->obj.res ? E_DELETED : E_STOPPED);
-		core_res_free(&msg->obj.res);
+		core_res_free(&msg->obj);
 	}
 	sys_unlock();
 }

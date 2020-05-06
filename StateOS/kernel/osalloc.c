@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    05.05.2020
+    @date    06.05.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -228,15 +228,12 @@ size_t sys_heapSize( void )
 
 /* -------------------------------------------------------------------------- */
 
-void core_res_free( void **res )
+void core_res_free( obj_t *obj )
 {
-	void *tmp;
-
-	if (*res != NULL && *res != RELEASED)
+	if (obj->res != NULL && obj->res != RELEASED)
 	{
-		tmp = *res;
-		*res = RELEASED;
-		sys_free(tmp);
+		sys_free(obj->res);
+		obj->res = RELEASED;
 	}
 }
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    06.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -113,7 +113,7 @@ void bar_destroy( bar_t *bar )
 	sys_lock();
 	{
 		priv_bar_reset(bar, bar->obj.res ? E_DELETED : E_STOPPED);
-		core_res_free(&bar->obj.res);
+		core_res_free(&bar->obj);
 	}
 	sys_unlock();
 }

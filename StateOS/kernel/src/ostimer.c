@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    06.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -115,7 +115,7 @@ void tmr_destroy( tmr_t *tmr )
 	sys_lock();
 	{
 		priv_tmr_reset(tmr, tmr->hdr.obj.res ? E_DELETED : E_STOPPED);
-		core_res_free(&tmr->hdr.obj.res);
+		core_res_free(&tmr->hdr.obj);
 	}
 	sys_unlock();
 }

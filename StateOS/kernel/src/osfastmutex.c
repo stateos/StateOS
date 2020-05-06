@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    06.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -109,7 +109,7 @@ void mut_destroy( mut_t *mut )
 	sys_lock();
 	{
 		priv_mut_reset(mut, mut->obj.res ? E_DELETED : E_STOPPED);
-		core_res_free(&mut->obj.res);
+		core_res_free(&mut->obj);
 	}
 	sys_unlock();
 }

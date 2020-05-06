@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    06.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -123,7 +123,7 @@ void evq_destroy( evq_t *evq )
 	sys_lock();
 	{
 		priv_evq_reset(evq, evq->obj.res ? E_DELETED : E_STOPPED);
-		core_res_free(&evq->obj.res);
+		core_res_free(&evq->obj);
 	}
 	sys_unlock();
 }

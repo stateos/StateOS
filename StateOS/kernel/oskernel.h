@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    05.05.2020
+    @date    06.05.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -258,8 +258,8 @@ void core_mtx_reset( mtx_t *mtx, unsigned event );
 
 /* -------------------------------------------------------------------------- */
 
-// frees given resources
-void core_res_free( void **res );
+// frees resources of given object
+void core_res_free( obj_t *obj );
 
 // garbage collection procedure
 void core_tsk_destructor( void );

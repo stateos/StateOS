@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    06.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -115,7 +115,7 @@ void sem_destroy( sem_t *sem )
 	sys_lock();
 	{
 		priv_sem_reset(sem, sem->obj.res ? E_DELETED : E_STOPPED);
-		core_res_free(&sem->obj.res);
+		core_res_free(&sem->obj);
 	}
 	sys_unlock();
 }

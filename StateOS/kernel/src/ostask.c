@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    05.05.2020
+    @date    06.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -226,7 +226,7 @@ unsigned tsk_detach( tsk_t *tsk )
 		else
 		if (tsk->hdr.id == ID_STOPPED)             // task is already inactive
 		{
-			core_res_free(&tsk->hdr.obj.res);      // release resources
+			core_res_free(&tsk->hdr.obj);          // release resources
 			event = E_SUCCESS;
 		}
 		else                                       // task is active and can be detached
@@ -265,7 +265,7 @@ unsigned tsk_join( tsk_t *tsk )
 		if (event != E_FAILURE &&                           // task has not been detached
 		    event != E_DELETED &&                           // task has not been deleted
 		    tsk->hdr.id == ID_STOPPED)                      // task is still inactive
-			core_res_free(&tsk->hdr.obj.res);               // release resources
+			core_res_free(&tsk->hdr.obj);                   // release resources
 	}
 	sys_unlock();
 
@@ -325,7 +325,7 @@ void core_tsk_destructor( void )
 		}
 
 		priv_tsk_stop(tsk);                        // remove task from all queues
-		core_res_free(&tsk->hdr.obj.res);          // release resources
+		core_res_free(&tsk->hdr.obj);              // release resources
 	}
 }
 
@@ -430,7 +430,7 @@ unsigned tsk_destroy( tsk_t *tsk )
 				priv_tsk_stop(tsk);                    // remove task from all queues     
 			}
 
-			core_res_free(&tsk->hdr.obj.res);          // release resources
+			core_res_free(&tsk->hdr.obj);              // release resources
 			event = E_SUCCESS;
 		}
 	}

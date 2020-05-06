@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    06.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -114,7 +114,7 @@ void flg_destroy( flg_t *flg )
 	sys_lock();
 	{
 		priv_flg_reset(flg, flg->obj.res ? E_DELETED : E_STOPPED);
-		core_res_free(&flg->obj.res);
+		core_res_free(&flg->obj);
 	}
 	sys_unlock();
 }

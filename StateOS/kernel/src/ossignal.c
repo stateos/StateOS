@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    29.04.2020
+    @date    06.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -114,7 +114,7 @@ void sig_destroy( sig_t *sig )
 	sys_lock();
 	{
 		priv_sig_reset(sig, sig->obj.res ? E_DELETED : E_STOPPED);
-		core_res_free(&sig->obj.res);
+		core_res_free(&sig->obj);
 	}
 	sys_unlock();
 }
