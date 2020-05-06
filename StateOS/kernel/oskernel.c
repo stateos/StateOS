@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    05.05.2020
+    @date    06.05.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -405,7 +405,7 @@ unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time )
 	cur->start = core_sys_time();
 	cur->delay = time - cur->start;
 
-	if (cur->delay - 1 > ((CNT_MAX)>>1))
+	if (cur->delay - 1 > (CNT_MAX / 2))
 		return E_TIMEOUT;
 
 	return core_tsk_wait(cur, que, true);

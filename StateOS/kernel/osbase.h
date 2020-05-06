@@ -60,6 +60,16 @@ extern "C" {
 
 /* -------------------------------------------------------------------------- */
 
+#ifndef UINT16_MAX
+#define UINT16_MAX        0xFFFFU
+#endif
+#ifndef UINT32_MAX
+#define UINT32_MAX        0xFFFFFFFFUL
+#endif
+#ifndef UINT64_MAX
+#define UINT64_MAX        0xFFFFFFFFFFFFFFFFULL
+#endif
+
 #if     OS_TIMER_SIZE == 16
 typedef uint16_t     cnt_t;
 #define CNT_MAX  UINT16_MAX

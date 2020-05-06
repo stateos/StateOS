@@ -198,7 +198,7 @@ void tmr_startUntil( tmr_t *tmr, cnt_t time )
 	{
 		tmr->start = core_sys_time();
 		tmr->delay = time - tmr->start;
-		if (tmr->delay > ((CNT_MAX)>>1))
+		if (tmr->delay > (CNT_MAX / 2))
 			tmr->delay = 0;
 		tmr->period = 0;
 
