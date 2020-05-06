@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    05.05.2020
+    @date    06.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -839,9 +839,11 @@ unsigned tsk_join( tsk_t *tsk );
  * Name              : tsk_stop
  * Alias             : tsk_exit
  *
- * Description       : stop current task and remove it from READY queue
- *                     function doesn't destroy the stack storage
- *                     all allocated resources remain intact until restarting the task
+ * Description       : stop the current task and remove it from READY queue
+ *                     detached task is destroyed, otherwise
+ *                     function doesn't destroy the stack storage,
+ *                     and all allocated resources will remain intact until
+ *                     joining, destroying or restarting the task
  *
  * Parameters        : none
  *
