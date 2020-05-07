@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    06.05.2020
+    @date    07.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -82,7 +82,7 @@ static
 void priv_tmr_reset( tmr_t *tmr, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
-	if (tmr->hdr.id == ID_TIMER)
+	if (tmr->hdr.id != ID_STOPPED)
 	{
 		core_all_wakeup(tmr->hdr.obj.queue, event);
 		core_tmr_remove(tmr);
@@ -125,7 +125,7 @@ static
 void priv_tmr_start( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
-	if (tmr->hdr.id == ID_TIMER)
+	if (tmr->hdr.id != ID_STOPPED)
 		core_tmr_remove(tmr);
 	core_tmr_insert(tmr);
 }

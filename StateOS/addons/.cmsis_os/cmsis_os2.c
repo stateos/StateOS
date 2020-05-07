@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    05.05.2020
+    @date    07.05.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -672,7 +672,7 @@ uint32_t osTimerIsRunning (osTimerId_t timer_id)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (timer_id == NULL))
 		return 0U;
 
-	return (timer->tmr.hdr.id == ID_TIMER);
+	return (timer->tmr.hdr.id != ID_STOPPED);
 }
 
 osStatus_t osTimerDelete (osTimerId_t timer_id)
