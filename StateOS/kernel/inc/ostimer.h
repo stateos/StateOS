@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    04.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -887,23 +887,27 @@ struct startTimer : public Timer
  *
  ******************************************************************************/
 
-struct startTimerFor : public startTimer
+struct startTimerFor : public Timer
 {
-	startTimerFor( const cnt_t _delay ):                 startTimer(_delay, 0) {}
+	startTimerFor( const cnt_t _delay ):                 Timer()       { tmr_startFor(this, _delay); }
 	template<class T>
-	startTimerFor( const cnt_t _delay, const T _state ): startTimer(_delay, 0, _state) {}
+	startTimerFor( const cnt_t _delay, const T _state ): Timer(_state) { tmr_startFor(this, _delay); }
 
 	static // create and run dynamic timer with manageable resources
 	startTimerFor *create( cnt_t _delay )
 	{
-		return reinterpret_cast<startTimerFor *>(startTimer::create(_delay, 0));
+		auto tmr = reinterpret_cast<startTimerFor *>(Timer::create());
+		tmr->startFor(_delay);
+		return tmr;
 	}
 
 	template<class T>
 	static // create and run dynamic timer with manageable resources
 	startTimerFor *create( cnt_t _delay, const T _state )
 	{
-		return reinterpret_cast<startTimerFor *>(startTimer::create(_delay, 0, _state));
+		auto tmr = reinterpret_cast<startTimerFor *>(Timer::create(_state));
+		tmr->startFor(_delay);
+		return tmr;
 	}
 };
 
@@ -925,23 +929,27 @@ struct startTimerFor : public startTimer
  *
  ******************************************************************************/
 
-struct startTimerPeriodic : public startTimer
+struct startTimerPeriodic : public Timer
 {
-	startTimerPeriodic( const cnt_t _period ):                 startTimer(_period, _period) {}
+	startTimerPeriodic( const cnt_t _period ):                 Timer()       { tmr_startPeriodic(this, _period); }
 	template<class T>
-	startTimerPeriodic( const cnt_t _period, const T _state ): startTimer(_period, _period, _state) {}
+	startTimerPeriodic( const cnt_t _period, const T _state ): Timer(_state) { tmr_startPeriodic(this, _period); }
 
 	static // create and run dynamic timer with manageable resources
 	startTimerPeriodic *create( cnt_t _period )
 	{
-		return reinterpret_cast<startTimerPeriodic *>(startTimer::create(_period, _period));
+		auto tmr = reinterpret_cast<startTimerPeriodic *>(Timer::create());
+		tmr->startPeriodic(_period);
+		return tmr;
 	}
 
 	template<class T>
 	static // create and run dynamic timer with manageable resources
 	startTimerPeriodic *create( cnt_t _period, const T _state )
 	{
-		return reinterpret_cast<startTimerPeriodic *>(startTimer::create(_period, _period, _state));
+		auto tmr = reinterpret_cast<startTimerPeriodic *>(Timer::create(_state));
+		tmr->startPeriodic(_period);
+		return tmr;
 	}
 };
 
