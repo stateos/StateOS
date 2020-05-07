@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -171,8 +171,7 @@ void cnd_init( cnd_t *cnd );
  *
  * Parameters        : none
  *
- * Return            : pointer to condition variable object (condition variable successfully created)
- *   0               : condition variable not created (not enough free memory)
+ * Return            : pointer to condition variable object
  *
  * Note              : use only in thread mode
  *
@@ -394,8 +393,22 @@ struct ConditionVariable : public __cnd
 
 	~ConditionVariable( void ) { assert(__cnd::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	ConditionVariable *create( void )
+/******************************************************************************
+ *
+ * Name              : ConditionVariable::Create
+ *
+ * Description       : create and initialize dynamic object with manageable resources
+ *
+ * Parameters        : none
+ *
+ * Return            : pointer to ConditionVariable object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	ConditionVariable *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto cnd = reinterpret_cast<ConditionVariable *>(sys_alloc(sizeof(ConditionVariable)));

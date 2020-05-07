@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -229,8 +229,7 @@ void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize );
  *   limit           : size of a buffer (max number of objects)
  *   size            : size of memory object (in bytes)
  *
- * Return            : pointer to memory pool object (memory pool successfully created)
- *   0               : memory pool not created (not enough free memory)
+ * Return            : pointer to memory pool object
  *
  * Note              : use only in thread mode
  *
@@ -443,8 +442,24 @@ struct MemoryPoolT : public __mem
 
 	~MemoryPoolT( void ) { assert(__mem::lst.obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	MemoryPoolT<limit_, size_> *create( void )
+/******************************************************************************
+ *
+ * Name              : MemoryPoolT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : size of a buffer (max number of objects)
+ *   size            : size of memory object (in bytes)
+ *
+ * Return            : pointer to MemoryPoolT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	MemoryPoolT<limit_, size_> *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto mem = reinterpret_cast<MemoryPoolT<limit_, size_> *>(sys_alloc(sizeof(MemoryPoolT<limit_, size_>)));
@@ -489,10 +504,26 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
 {
 	MemoryPoolTT( void ): MemoryPoolT<limit_, sizeof(T)>() {}
 
-	static // create dynamic object with manageable resources
-	MemoryPoolTT<limit_, T> *create( void )
+/******************************************************************************
+ *
+ * Name              : MemoryPoolTT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : size of a buffer (max number of objects)
+ *   T               : class of a memory object
+ *
+ * Return            : pointer to MemoryPoolTT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	MemoryPoolTT<limit_, T> *Create( void )
 	{
-		return reinterpret_cast<MemoryPoolTT<limit_, T> *>(MemoryPoolT<limit_, sizeof(T)>::create());
+		return reinterpret_cast<MemoryPoolTT<limit_, T> *>(MemoryPoolT<limit_, sizeof(T)>::Create());
 	}
 
 	unsigned take     ( T **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data));         }

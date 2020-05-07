@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -245,8 +245,7 @@ void mtx_init( mtx_t *mtx, unsigned mode, unsigned prio );
  *                     robustness: mtxStalled or mtxRobust
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
- * Return            : pointer to mutex object (mutex successfully created)
- *   0               : mutex not created (not enough free memory)
+ * Return            : pointer to mutex object
  *
  * Note              : use only in thread mode
  *
@@ -502,8 +501,27 @@ struct Mutex : public __mtx
 
 	~Mutex( void ) { assert(__mtx::owner == nullptr); }
 
-	static // create dynamic object with manageable resources
-	Mutex *create( const unsigned _mode, const unsigned _prio = 0 )
+/******************************************************************************
+ *
+ * Name              : Mutex::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   mode            : mutex mode (mutex type + mutex protocol + mutex robustness)
+ *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
+ *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
+ *                     robustness: mtxStalled or mtxRobust
+ *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
+ *
+ * Return            : pointer to Mutex object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	Mutex *Create( const unsigned _mode, const unsigned _prio = 0 )
 	{
 #if OS_FUNCTIONAL
 		auto mtx = reinterpret_cast<Mutex *>(sys_alloc(sizeof(Mutex)));

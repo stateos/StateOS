@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -174,8 +174,7 @@ void bar_init( bar_t *bar, unsigned limit );
  * Parameters
  *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object
  *
- * Return            : pointer to barrier object (barrier successfully created)
- *   0               : barrier not created (not enough free memory)
+ * Return            : pointer to barrier object
  *
  * Note              : use only in thread mode
  *
@@ -325,8 +324,23 @@ struct Barrier : public __bar
 
 	~Barrier( void ) { assert(__bar::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	Barrier *create( const unsigned _limit )
+/******************************************************************************
+ *
+ * Name              : Barrier::Create
+ *
+ * Description       : create and initialize dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object
+ *
+ * Return            : pointer to Barrier object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	Barrier *Create( const unsigned _limit )
 	{
 #if OS_FUNCTIONAL
 		auto bar = reinterpret_cast<Barrier *>(sys_alloc(sizeof(Barrier)));

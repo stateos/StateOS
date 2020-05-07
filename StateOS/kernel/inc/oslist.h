@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -195,8 +195,7 @@ void lst_init( lst_t *lst );
  *
  * Parameters        : none
  *
- * Return            : pointer to list object (list successfully created)
- *   0               : list not created (not enough free memory)
+ * Return            : pointer to list object
  *
  * Note              : use only in thread mode
  *
@@ -404,8 +403,23 @@ struct ListTT : public __lst
 
 	~ListTT( void ) { assert(__lst::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	ListTT<T> *create( void )
+/******************************************************************************
+ *
+ * Name              : ListTT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   T               : class of a list object
+ *
+ * Return            : pointer to ListTT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	ListTT<T> *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto lst = reinterpret_cast<ListTT<T> *>(sys_alloc(sizeof(ListTT<T>)));

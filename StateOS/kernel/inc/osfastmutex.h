@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -168,8 +168,7 @@ void mut_init( mut_t *mut );
  *
  * Parameters        : none
  *
- * Return            : pointer to fast mutex object (fast mutex successfully created)
- *   0               : fast mutex not created (not enough free memory)
+ * Return            : pointer to fast mutex object
  *
  * Note              : use only in thread mode
  *
@@ -378,8 +377,22 @@ struct FastMutex : public __mut
 
 	~FastMutex( void ) { assert(__mut::owner == nullptr); }
 
-	static // create dynamic object with manageable resources
-	FastMutex *create( void )
+/******************************************************************************
+ *
+ * Name              : FastMutex::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters        : none
+ *
+ * Return            : pointer to FastMutex object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	FastMutex *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto mut = reinterpret_cast<FastMutex *>(sys_alloc(sizeof(FastMutex)));

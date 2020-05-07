@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -198,8 +198,7 @@ void flg_init( flg_t *flg, unsigned init );
  * Parameters
  *   init            : initial value of flag
  *
- * Return            : pointer to flag object (flag successfully created)
- *   0               : flag not created (not enough free memory)
+ * Return            : pointer to flag object
  *
  * Note              : use only in thread mode
  *
@@ -472,8 +471,23 @@ struct Flag : public __flg
 
 	~Flag( void ) { assert(__flg::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	Flag *create( const unsigned _init = 0 )
+/******************************************************************************
+ *
+ * Name              : Flag::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   init            : initial value of flag
+ *
+ * Return            : pointer to Flag object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	Flag *Create( const unsigned _init = 0 )
 	{
 #if OS_FUNCTIONAL
 		auto flg = reinterpret_cast<Flag *>(sys_alloc(sizeof(Flag)));

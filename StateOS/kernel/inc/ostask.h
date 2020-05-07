@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    06.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -634,8 +634,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
  *                     it will be executed into an infinite system-implemented loop
  *   size            : size of task private stack (in bytes)
  *
- * Return            : pointer to task object (task successfully created)
- *   0               : task not created (not enough free memory)
+ * Return            : pointer to task object
  *
  * Note              : use only in thread mode
  *
@@ -659,8 +658,7 @@ tsk_t *wrk_new( unsigned prio, fun_t *state, size_t size ) { return wrk_create(p
  *                     it will be executed into an infinite system-implemented loop
  *   size            : size of task private stack (in bytes)
  *
- * Return            : pointer to task object (task successfully created)
- *   0               : task not created (not enough free memory)
+ * Return            : pointer to task object
  *
  * Note              : use only in thread mode
  *
@@ -681,8 +679,7 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size );
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
  *
- * Return            : pointer to task object (task successfully created)
- *   0               : task not created (not enough free memory)
+ * Return            : pointer to task object
  *
  * Note              : use only in thread mode
  *
@@ -706,8 +703,7 @@ tsk_t *tsk_new   ( unsigned prio, fun_t *state ) { return wrk_create(prio, state
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
  *
- * Return            : pointer to task object (task successfully created)
- *   0               : task not created (not enough free memory)
+ * Return            : pointer to task object
  *
  * Note              : use only in thread mode
  *
@@ -730,8 +726,7 @@ tsk_t *tsk_detached( unsigned prio, fun_t *state ) { return wrk_detached(prio, s
  *   size            : size of task private stack (in bytes)
  *   joinable        : JOINABLE / DETACHED
  *
- * Return            : pointer to task object (task successfully created)
- *   0               : task not created (not enough free memory)
+ * Return            : pointer to task object
  *
  * Note              : for internal use
  *
@@ -1355,7 +1350,7 @@ struct baseTask : public __tsk
 
 template<size_t size_ = OS_STACK_SIZE>
 struct TaskT : public baseTask, public baseStack<size_>
-{	// create undetachable task
+{
 	template<class T>
 	TaskT( const unsigned _prio, const T _state ) : baseTask(_prio, _state, baseStack<size_>::stack_, size_) {}
 
@@ -1366,46 +1361,11 @@ struct TaskT : public baseTask, public baseStack<size_>
 
 	~TaskT( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
-	template<class T>
-	static // create dynamic detachable task
-	TaskT<size_> *create( const unsigned _prio, const T _state )
-	{
-#if OS_FUNCTIONAL
-		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		new (tsk) TaskT<size_>(_prio, _state);
-		tsk->__tsk::hdr.obj.res = tsk;
-		tsk->__tsk::join = JOINABLE;
-		return tsk;
-#else
-		return reinterpret_cast<TaskT<size_> *>(thd_create(_prio, _state, size_, JOINABLE));
-#endif
-	}
-
-	template<class T>
-	static // create dynamic detached task
-	TaskT<size_> *detached( const unsigned _prio, const T _state )
-	{
-#if OS_FUNCTIONAL
-		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		new (tsk) TaskT<size_>(_prio, _state);
-		tsk->__tsk::hdr.obj.res = tsk;
-		tsk->__tsk::join = DETACHED;
-		return tsk;
-#else
-		return reinterpret_cast<TaskT<size_> *>(thd_create(_prio, _state, size_, DETACHED));
-#endif
-	}
-};
-
-/* -------------------------------------------------------------------------- */
-
-using Task = TaskT<OS_STACK_SIZE>;
-
 /******************************************************************************
  *
- * Class             : startTaskT<>
+ * Name              : TaskT<>::Start
  *
- * Description       : create and initialize complete work area for autorun task object
+ * Description       : create, initialize and start static undetachable task
  *
  * Constructor parameters
  *   size            : size of task private stack (in bytes)
@@ -1413,36 +1373,92 @@ using Task = TaskT<OS_STACK_SIZE>;
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
  *
+ * Return            : Task<> object
+ *
  ******************************************************************************/
 
-template<size_t size_ = OS_STACK_SIZE>
-struct startTaskT : public TaskT<size_>
-{	// create and run undetachable task
 	template<class T>
-	startTaskT( const unsigned _prio, const T _state ) : TaskT<size_>(_prio, _state) { port_sys_init(); tsk_start(this); }
-
-	template<class T>
-	static // create and run dynamic detachable task
-	startTaskT<size_> *create( const unsigned _prio, const T _state )
+	static
+	TaskT<size_> Start( const unsigned _prio, const T _state )
 	{
-		auto tsk = reinterpret_cast<startTaskT<size_> *>(TaskT<size_>::create(_prio, _state));
-		tsk->start();
+		TaskT<size_> tsk { _prio, _state };
+		tsk.start();
 		return tsk;
 	}
 
+/******************************************************************************
+ *
+ * Name              : TaskT<>::Create
+ *
+ * Description       : create, initialize and start dynamic detachable task
+ *                     with manageable resources
+ *
+ * Constructor parameters
+ *   size            : size of task private stack (in bytes)
+ *   prio            : initial task priority (any unsigned int value)
+ *   state           : task state (initial task function) doesn't have to be noreturn-type
+ *                     it will be executed into an infinite system-implemented loop
+ *
+ * Return            : pointer to Task<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
 	template<class T>
-	static // create and run dynamic detached task
-	startTaskT<size_> *detached( const unsigned _prio, const T _state )
+	static
+	TaskT<size_> *Create( const unsigned _prio, const T _state )
 	{
-		auto tsk = reinterpret_cast<startTaskT<size_> *>(TaskT<size_>::detached(_prio, _state));
+#if OS_FUNCTIONAL
+		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
+		new (tsk) TaskT<size_>(_prio, _state);
+		tsk->__tsk::hdr.obj.res = tsk;
 		tsk->start();
 		return tsk;
+#else
+		return reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
+#endif
+	}
+
+/******************************************************************************
+ *
+ * Name              : TaskT<>::Detached
+ *
+ * Description       : create, initialize and start dynamic detached task
+ *                     with manageable resources
+ *
+ * Constructor parameters
+ *   size            : size of task private stack (in bytes)
+ *   prio            : initial task priority (any unsigned int value)
+ *   state           : task state (initial task function) doesn't have to be noreturn-type
+ *                     it will be executed into an infinite system-implemented loop
+ *
+ * Return            : pointer to Task<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	template<class T>
+	static
+	TaskT<size_> *Detached( const unsigned _prio, const T _state )
+	{
+#if OS_FUNCTIONAL
+		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
+		new (tsk) TaskT<size_>(_prio, _state);
+		tsk->__tsk::hdr.obj.res = tsk;
+		tsk->__tsk::join = DETACHED;
+		tsk->start();
+		return tsk;
+#else
+		return reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
+#endif
 	}
 };
 
 /* -------------------------------------------------------------------------- */
 
-using startTask = startTaskT<OS_STACK_SIZE>;
+using Task = TaskT<OS_STACK_SIZE>;
 
 /******************************************************************************
  *

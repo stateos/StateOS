@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -201,8 +201,7 @@ void evq_init( evq_t *evq, unsigned *data, unsigned bufsize );
  * Parameters
  *   limit           : size of a queue (max number of stored events)
  *
- * Return            : pointer to event queue object (event queue successfully created)
- *   0               : event queue not created (not enough free memory)
+ * Return            : pointer to event queue object
  *
  * Note              : use only in thread mode
  *
@@ -509,8 +508,23 @@ struct EventQueueT : public __evq
 
 	~EventQueueT( void ) { assert(__evq::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	EventQueueT<limit_> *create( void )
+/******************************************************************************
+ *
+ * Name              : EventQueueT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : size of a queue (max number of stored events)
+ *
+ * Return            : pointer to EventQueueT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	EventQueueT<limit_> *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto evq = reinterpret_cast<EventQueueT<limit_> *>(sys_alloc(sizeof(EventQueueT<limit_>)));

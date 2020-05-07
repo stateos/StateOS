@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -217,8 +217,7 @@ void msg_init( msg_t *msg, void *data, unsigned bufsize );
  * Parameters
  *   limit           : size of a buffer (max number of stored bytes)
  *
- * Return            : pointer to message buffer object (message buffer successfully created)
- *   0               : message buffer not created (not enough free memory)
+ * Return            : pointer to message buffer object
  *
  * Note              : use only in thread mode
  *
@@ -624,8 +623,23 @@ struct MessageBufferT : public __msg
 
 	~MessageBufferT( void ) { assert(__msg::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	MessageBufferT<limit_> *create( void )
+/******************************************************************************
+ *
+ * Name              : MessageBufferT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : size of a buffer (max number of stored bytes)
+ *
+ * Return            : pointer to MessageBufferT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	MessageBufferT<limit_> *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto msg = reinterpret_cast<MessageBufferT<limit_> *>(sys_alloc(sizeof(MessageBufferT<limit_>)));
@@ -683,10 +697,26 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T
 {
 	MessageBufferTT( void ): MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T))>() {}
 
-	static // create dynamic object with manageable resources
-	MessageBufferTT<limit_, T> *create( void )
+/******************************************************************************
+ *
+ * Name              : MessageBufferTT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : size of a buffer (max number of stored objects)
+ *   T               : class of an object
+ *
+ * Return            : pointer to MessageBufferTT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	MessageBufferTT<limit_, T> *Create( void )
 	{
-		return reinterpret_cast<MessageBufferTT<limit_, T> *>(MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T))>::create());
+		return reinterpret_cast<MessageBufferTT<limit_, T> *>(MessageBufferT<limit_*(sizeof(unsigned)+sizeof(T))>::Create());
 	}
 
 	unsigned take     (       T *_data )               { return msg_take     (this, _data, sizeof(T));         }

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -210,8 +210,7 @@ void box_init( box_t *box, unsigned size, void *data, unsigned bufsize );
  *   limit           : size of a queue (max number of stored mails)
  *   size            : size of a single mail (in bytes)
  *
- * Return            : pointer to mailbox queue object (mailbox queue successfully created)
- *   0               : mailbox queue not created (not enough free memory)
+ * Return            : pointer to mailbox queue object
  *
  * Note              : use only in thread mode
  *
@@ -557,8 +556,24 @@ struct MailBoxQueueT : public __box
 
 	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	MailBoxQueueT<limit_, size_> *create( void )
+/******************************************************************************
+ *
+ * Name              : MailBoxQueueT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : size of a queue (max number of stored mails)
+ *   size            : size of a single mail (in bytes)
+ *
+ * Return            : pointer to MailBoxQueueT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	MailBoxQueueT<limit_, size_> *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto box = reinterpret_cast<MailBoxQueueT<limit_, size_> *>(sys_alloc(sizeof(MailBoxQueueT<limit_, size_>)));
@@ -614,10 +629,26 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
 {
 	MailBoxQueueTT( void ): MailBoxQueueT<limit_, sizeof(T)>() {}
 
-	static // create dynamic object with manageable resources
-	MailBoxQueueTT<limit_, T> *create( void )
+/******************************************************************************
+ *
+ * Name              : MailBoxQueueTT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : size of a queue (max number of stored mails)
+ *   T               : class of a single mail
+ *
+ * Return            : pointer to MailBoxQueueTT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	MailBoxQueueTT<limit_, T> *Create( void )
 	{
-		return reinterpret_cast<MailBoxQueueTT<limit_, T> *>(MailBoxQueueT<limit_, sizeof(T)>::create());
+		return reinterpret_cast<MailBoxQueueTT<limit_, T> *>(MailBoxQueueT<limit_, sizeof(T)>::Create());
 	}
 };
 

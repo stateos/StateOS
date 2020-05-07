@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -194,8 +194,7 @@ void sig_init( sig_t *sig, unsigned mask );
  * Parameters
  *   mask            : protection mask of signal object
  *
- * Return            : pointer to signal object (signal successfully created)
- *   0               : signal not created (not enough free memory)
+ * Return            : pointer to signal object
  *
  * Note              : use only in thread mode
  *
@@ -420,8 +419,23 @@ struct Signal : public __sig
 
 	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	Signal *create( const unsigned _mask = 0 )
+/******************************************************************************
+ *
+ * Name              : Signal::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   mask            : protection mask of signal object
+ *
+ * Return            : pointer to Signal object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	Signal *Create( const unsigned _mask = 0 )
 	{
 #if OS_FUNCTIONAL
 		auto sig = reinterpret_cast<Signal *>(sys_alloc(sizeof(Signal)));

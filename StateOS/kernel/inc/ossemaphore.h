@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -222,8 +222,7 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit );
  *                     semCounting: counting semaphore
  *                     otherwise: limited semaphore
  *
- * Return            : pointer to semaphore object (semaphore successfully created)
- *   0               : semaphore not created (not enough free memory)
+ * Return            : pointer to semaphore object
  *
  * Note              : use only in thread mode
  *
@@ -525,8 +524,61 @@ struct Semaphore : public __sem
 
 	~Semaphore( void ) { assert(__sem::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	Semaphore *create( const unsigned _init, const unsigned _limit = semCounting )
+/******************************************************************************
+ *
+ * Name              : Semaphore::Binary
+ *
+ * Description       : create and initialize static binary semaphore
+ *
+ * Parameters
+ *   init            : initial value of semaphore counter
+ *
+ * Return            : Semaphore object
+ *
+ ******************************************************************************/
+
+	static
+	Semaphore Binary( const unsigned _init = 0 )
+	{
+		return { _init, semBinary };
+	}
+
+/******************************************************************************
+ *
+ * Name              : Semaphore::Counting
+ *
+ * Description       : create and initialize static counting semaphore
+ *
+ * Parameters
+ *   init            : initial value of semaphore counter
+ *
+ * Return            : Semaphore object
+ *
+ ******************************************************************************/
+
+	static
+	Semaphore Counting( const unsigned _init = 0 )
+	{
+		return { _init, semCounting };
+	}
+
+/******************************************************************************
+ *
+ * Name              : Semaphore::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   init            : initial value of semaphore counter
+ *
+ * Return            : pointer to Semaphore object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	Semaphore *Create( const unsigned _init, const unsigned _limit = semCounting )
 	{
 #if OS_FUNCTIONAL
 		auto sem = reinterpret_cast<Semaphore *>(sys_alloc(sizeof(Semaphore)));
@@ -554,50 +606,6 @@ struct Semaphore : public __sem
 	unsigned sendUntil( cnt_t _time )  { return sem_sendUntil(this, _time);  }
 	unsigned send     ( void )         { return sem_send     (this);         }
 	unsigned getValue ( void )         { return sem_getValue (this);         }
-};
-
-/******************************************************************************
- *
- * Class             : BinarySemaphore
- *
- * Description       : create and initialize a binary semaphore object
- *
- * Constructor parameters
- *   init            : initial value of semaphore counter
- *
- ******************************************************************************/
-
-struct BinarySemaphore : public Semaphore
-{
-	BinarySemaphore( const unsigned _init = 0 ): Semaphore(_init, semBinary) {}
-
-	static // create dynamic object with manageable resources
-	BinarySemaphore *create( const unsigned _init = 0 )
-	{
-		return reinterpret_cast<BinarySemaphore *>(Semaphore::create(_init, semBinary));
-	}
-};
-
-/******************************************************************************
- *
- * Class             : CountingSemaphore
- *
- * Description       : create and initialize a counting semaphore object
- *
- * Constructor parameters
- *   init            : initial value of semaphore counter
- *
- ******************************************************************************/
-
-struct CountingSemaphore : public Semaphore
-{
-	CountingSemaphore( const unsigned _init = 0 ): Semaphore(_init, semCounting) {}
-
-	static // create dynamic object with manageable resources
-	CountingSemaphore *create( const unsigned _init = 0 )
-	{
-		return reinterpret_cast<CountingSemaphore *>(Semaphore::create(_init, semCounting));
-	}
 };
 
 #endif//__cplusplus

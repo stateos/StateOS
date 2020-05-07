@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -202,8 +202,7 @@ void job_init( job_t *job, fun_t **data, unsigned bufsize );
  * Parameters
  *   limit           : size of a queue (max number of stored job procedures)
  *
- * Return            : pointer to job queue object (job queue successfully created)
- *   0               : job queue not created (not enough free memory)
+ * Return            : pointer to job queue object
  *
  * Note              : use only in thread mode
  *
@@ -506,8 +505,23 @@ struct JobQueueT : public __job
 
 	~JobQueueT( void ) { assert(__job::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	JobQueueT<limit_> *create( void )
+/******************************************************************************
+ *
+ * Name              : JobQueueT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : size of a queue (max number of stored job procedures)
+ *
+ * Return            : pointer to JobQueueT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	JobQueueT<limit_> *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto job = reinterpret_cast<JobQueueT<limit_> *>(sys_alloc(sizeof(JobQueueT<limit_>)));

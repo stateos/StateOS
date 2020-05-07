@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -217,8 +217,7 @@ void stm_init( stm_t *stm, void *data, unsigned bufsize );
  * Parameters
  *   limit           : size of a buffer (max number of stored bytes)
  *
- * Return            : pointer to stream buffer object (stream buffer successfully created)
- *   0               : stream buffer not created (not enough free memory)
+ * Return            : pointer to stream buffer object
  *
  * Note              : use only in thread mode
  *
@@ -599,8 +598,23 @@ struct StreamBufferT : public __stm
 
 	~StreamBufferT( void ) { assert(__stm::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	StreamBufferT<limit_> *create( void )
+/******************************************************************************
+ *
+ * Name              : StreamBufferT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : size of a buffer (max number of stored bytes)
+ *
+ * Return            : pointer to StreamBufferT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	StreamBufferT<limit_> *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto stm = reinterpret_cast<StreamBufferT<limit_> *>(sys_alloc(sizeof(StreamBufferT<limit_>)));
@@ -656,10 +670,26 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(T)>
 {
 	StreamBufferTT( void ): StreamBufferT<limit_*sizeof(T)>() {}
 
-	static // create dynamic object with manageable resources
-	StreamBufferTT<limit_, T> *create( void )
+/******************************************************************************
+ *
+ * Name              : StreamBufferTT<>::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters
+ *   limit           : size of a buffer (max number of stored objects)
+ *   T               : class of an object
+ *
+ * Return            : pointer to StreamBufferTT<> object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	StreamBufferTT<limit_, T> *Create( void )
 	{
-		return reinterpret_cast<StreamBufferTT<limit_, T> *>(StreamBufferT<limit_*sizeof(T)>::create());
+		return reinterpret_cast<StreamBufferTT<limit_, T> *>(StreamBufferT<limit_*sizeof(T)>::Create());
 	}
 
 	unsigned take     (       T *_data )               { return stm_take     (this, _data, sizeof(T));         }

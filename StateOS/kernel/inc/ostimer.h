@@ -334,8 +334,7 @@ void tmr_init( tmr_t *tmr, fun_t *state );
  *   state           : callback procedure
  *                     NULL: no callback
  *
- * Return            : pointer to timer object (timer successfully created)
- *   0               : timer not created (not enough free memory)
+ * Return            : pointer to timer object
  *
  * Note              : use only in thread mode
  *
@@ -780,7 +779,7 @@ struct baseTimer : public __tmr
  *
  * Constructor parameters
  *   state           : callback procedure
- *                     nullptr: no callback
+ *                     none / nullptr: no callback
  *
  ******************************************************************************/
 
@@ -797,8 +796,171 @@ struct Timer : public baseTimer
 
 	~Timer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
 
-	static // create dynamic timer with manageable resources
-	Timer *create( void )
+/******************************************************************************
+ *
+ * Name              : Timer::Start
+ *
+ * Description       : create and initialize static timer object
+ *                     and start periodic timer for given duration of time
+ *                     when the timer has finished the countdown, the callback procedure is launched
+ *                     do this periodically
+ *
+ * Parameters
+ *   delay           : duration of time (maximum number of ticks to countdown) for first expiration
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   period          : duration of time (maximum number of ticks to countdown) for all next expirations
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   state           : callback procedure
+ *                     none / nullptr: no callback
+ *
+ * Return            : Timer object
+ *
+ ******************************************************************************/
+
+	static
+	Timer Start( const cnt_t _delay, const cnt_t _period )
+	{
+		Timer tmr {};
+		tmr.start(_delay, _period);
+		return tmr;
+	}
+	
+	template<class T>
+	static
+	Timer Start( const cnt_t _delay, const cnt_t _period, const T _state )
+	{
+		Timer tmr { _state };
+		tmr.start(_delay, _period);
+		return tmr;
+	}
+
+/******************************************************************************
+ *
+ * Name              : Timer::StartFor
+ *
+ * Description       : create and initialize static timer object
+ *                     and start one-shot timer for given duration of time
+ *                     when the timer has finished the countdown, the callback procedure is launched
+ *
+ * Parameters
+ *   delay           : duration of time (maximum number of ticks to countdown)
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   state           : callback procedure
+ *                     none / nullptr: no callback
+ *
+ * Return            : Timer object
+ *
+ ******************************************************************************/
+
+	static
+	Timer StartFor( const cnt_t _delay )
+	{
+		Timer tmr {};
+		tmr.startFor(_delay);
+		return tmr;
+	}
+	
+	template<class T>
+	static
+	Timer StartFor( const cnt_t _delay, const T _state )
+	{
+		Timer tmr { _state };
+		tmr.startFor(_delay);
+		return tmr;
+	}
+
+/******************************************************************************
+ *
+ * Name              : Timer::StartPeriodic
+ *
+ * Description       : create and initialize static timer object
+ *                     and start periodic timer for given duration of time
+ *                     when the timer has finished the countdown, the callback procedure is launched
+ *                     do this periodically
+ *
+ * Parameters
+ *   period          : duration of time (maximum number of ticks to countdown)
+ *                     IMMEDIATE: don't countdown
+ *                     INFINITE:  countdown indefinitely
+ *   state           : callback procedure
+ *                     none / nullptr: no callback
+ *
+ * Return            : Timer object
+ *
+ ******************************************************************************/
+
+	static
+	Timer StartPeriodic( const cnt_t _period )
+	{
+		Timer tmr {};
+		tmr.startPeriodic(_period);
+		return tmr;
+	}
+	
+	template<class T>
+	static
+	Timer StartPeriodic( const cnt_t _period, const T _state )
+	{
+		Timer tmr { _state };
+		tmr.startPeriodic(_period);
+		return tmr;
+	}
+
+/******************************************************************************
+ *
+ * Name              : Timer::StartUntil
+ *
+ * Description       : create and initialize static timer object
+ *                     and start one-shot timer until given timepoint
+ *                     when the timer has finished the countdown, the callback procedure is launched
+ *
+ * Constructor parameters
+ *   time            : timepoint value
+ *   state           : callback procedure
+ *                     none / nullptr: no callback
+ *
+ * Return            : Timer object
+ *
+ ******************************************************************************/
+
+	static
+	Timer StartUntil( const cnt_t _time )
+	{
+		Timer tmr {};
+		tmr.startUntil(_time);
+		return tmr;
+	}
+	
+	template<class T>
+	static
+	Timer StartUntil( const cnt_t _time, const T _state )
+	{
+		Timer tmr { _state };
+		tmr.startUntil(_time);
+		return tmr;
+	}
+
+/******************************************************************************
+ *
+ * Name              : Timer::Create
+ *
+ * Description       : create and initialize dynamic timer with manageable resources
+ *
+ * Constructor parameters
+ *   state           : callback procedure
+ *                     none / nullptr: no callback
+ *
+ * Return            : pointer to Timer object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	Timer *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
@@ -811,8 +973,8 @@ struct Timer : public baseTimer
 	}
 
 	template<class T>
-	static // create dynamic timer with manageable resources
-	Timer *create( const T _state )
+	static
+	Timer *Create( const T _state )
 	{
 #if OS_FUNCTIONAL
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
@@ -822,173 +984,6 @@ struct Timer : public baseTimer
 #else
 		return reinterpret_cast<Timer *>(tmr_create(_state));
 #endif
-	}
-};
-
-/******************************************************************************
- *
- * Class             : startTimer
- *
- * Description       : create and initialize a timer object
- *                     and start periodic timer for given duration of time
- *                     when the timer has finished the countdown, the callback procedure is launched
- *                     do this periodically
- *
- * Constructor parameters
- *   delay           : duration of time (maximum number of ticks to countdown) for first expiration
- *                     IMMEDIATE: don't countdown
- *                     INFINITE:  countdown indefinitely
- *   period          : duration of time (maximum number of ticks to countdown) for all next expirations
- *                     IMMEDIATE: don't countdown
- *                     INFINITE:  countdown indefinitely
- *   state           : callback procedure
- *                     nullptr: no callback
- *
- ******************************************************************************/
-
-struct startTimer : public Timer
-{
-	startTimer( const cnt_t _delay, const cnt_t _period ):                 Timer()       { tmr_start(this, _delay, _period); }
-	template<class T>
-	startTimer( const cnt_t _delay, const cnt_t _period, const T _state ): Timer(_state) { tmr_start(this, _delay, _period); }
-
-	static // create and run dynamic timer with manageable resources
-	startTimer *create( cnt_t _delay, cnt_t _period )
-	{
-		auto tmr = reinterpret_cast<startTimer *>(Timer::create());
-		tmr->start(_delay, _period);
-		return tmr;
-	}
-
-	template<class T>
-	static // create and run dynamic timer with manageable resources
-	startTimer *create( cnt_t _delay, cnt_t _period, const T _state )
-	{
-		auto tmr = reinterpret_cast<startTimer *>(Timer::create(_state));
-		tmr->start(_delay, _period);
-		return tmr;
-	}
-};
-
-/******************************************************************************
- *
- * Class             : startTimerFor
- *
- * Description       : create and initialize a timer object
- *                     and start one-shot timer for given duration of time
- *                     when the timer has finished the countdown, the callback procedure is launched
- *
- * Constructor parameters
- *   delay           : duration of time (maximum number of ticks to countdown)
- *                     IMMEDIATE: don't countdown
- *                     INFINITE:  countdown indefinitely
- *   state           : callback procedure
- *                     nullptr: no callback
- *
- ******************************************************************************/
-
-struct startTimerFor : public Timer
-{
-	startTimerFor( const cnt_t _delay ):                 Timer()       { tmr_startFor(this, _delay); }
-	template<class T>
-	startTimerFor( const cnt_t _delay, const T _state ): Timer(_state) { tmr_startFor(this, _delay); }
-
-	static // create and run dynamic timer with manageable resources
-	startTimerFor *create( cnt_t _delay )
-	{
-		auto tmr = reinterpret_cast<startTimerFor *>(Timer::create());
-		tmr->startFor(_delay);
-		return tmr;
-	}
-
-	template<class T>
-	static // create and run dynamic timer with manageable resources
-	startTimerFor *create( cnt_t _delay, const T _state )
-	{
-		auto tmr = reinterpret_cast<startTimerFor *>(Timer::create(_state));
-		tmr->startFor(_delay);
-		return tmr;
-	}
-};
-
-/******************************************************************************
- *
- * Class             : startTimerPeriodic
- *
- * Description       : create and initialize a timer object
- *                     and start periodic timer for given duration of time
- *                     when the timer has finished the countdown, the callback procedure is launched
- *                     do this periodically
- *
- * Constructor parameters
- *   period          : duration of time (maximum number of ticks to countdown)
- *                     IMMEDIATE: don't countdown
- *                     INFINITE:  countdown indefinitely
- *   state           : callback procedure
- *                     nullptr: no callback
- *
- ******************************************************************************/
-
-struct startTimerPeriodic : public Timer
-{
-	startTimerPeriodic( const cnt_t _period ):                 Timer()       { tmr_startPeriodic(this, _period); }
-	template<class T>
-	startTimerPeriodic( const cnt_t _period, const T _state ): Timer(_state) { tmr_startPeriodic(this, _period); }
-
-	static // create and run dynamic timer with manageable resources
-	startTimerPeriodic *create( cnt_t _period )
-	{
-		auto tmr = reinterpret_cast<startTimerPeriodic *>(Timer::create());
-		tmr->startPeriodic(_period);
-		return tmr;
-	}
-
-	template<class T>
-	static // create and run dynamic timer with manageable resources
-	startTimerPeriodic *create( cnt_t _period, const T _state )
-	{
-		auto tmr = reinterpret_cast<startTimerPeriodic *>(Timer::create(_state));
-		tmr->startPeriodic(_period);
-		return tmr;
-	}
-};
-
-/******************************************************************************
- *
- * Class             : startTimerUntil
- *
- * Description       : create and initialize a timer object
- *                     and start one-shot timer until given timepoint
- *                     when the timer has finished the countdown, the callback procedure is launched
- *
- * Constructor parameters
- *   time            : timepoint value
- *   state           : callback procedure
- *                     nullptr: no callback
- *
- ******************************************************************************/
-
-struct startTimerUntil : public Timer
-{
-	startTimerUntil( const cnt_t _time ):                 Timer()       { tmr_startUntil(this, _time); }
-	template<class T>
-	startTimerUntil( const cnt_t _time, const T _state ): Timer(_state) { tmr_startUntil(this, _time); }
-
-	static // create and run dynamic timer with manageable resources
-	startTimerUntil *create( cnt_t _time )
-	{
-		auto tmr = reinterpret_cast<startTimerUntil *>(Timer::create());
-		tmr->startUntil(_time);
-		return tmr;
-	}
-
-	template<class T>
-	static // create and run dynamic timer with manageable resources
-	startTimerUntil *create( cnt_t _time, const T _state )
-	{
-		auto tmr = reinterpret_cast<startTimerUntil *>(Timer::create(_state));
-		tmr->startUntil(_time);
-		return tmr;
 	}
 };
 

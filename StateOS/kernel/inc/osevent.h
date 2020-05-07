@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    03.05.2020
+    @date    07.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -164,8 +164,7 @@ void evt_init( evt_t *evt );
  *
  * Parameters        : none
  *
- * Return            : pointer to event object (event successfully created)
- *   0               : event not created (not enough free memory)
+ * Return            : pointer to event object
  *
  * Note              : use only in thread mode
  *
@@ -340,8 +339,22 @@ struct Event : public __evt
 
 	~Event( void ) { assert(__evt::obj.queue == nullptr); }
 
-	static // create dynamic object with manageable resources
-	Event *create( void )
+/******************************************************************************
+ *
+ * Name              : Event::Create
+ *
+ * Description       : create dynamic object with manageable resources
+ *
+ * Parameters        : none
+ *
+ * Return            : pointer to Event object
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+	static
+	Event *Create( void )
 	{
 #if OS_FUNCTIONAL
 		auto evt = reinterpret_cast<Event *>(sys_alloc(sizeof(Event)));
