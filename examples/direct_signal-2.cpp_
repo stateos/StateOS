@@ -5,7 +5,7 @@ int main()
 {
 	auto led = Led();
 
-	auto sla = startTask(0, [&]
+	auto sla = Task::Start(0, [&]
 	{
 		ThisTask::action([&](unsigned signo)
 		{
@@ -18,7 +18,7 @@ int main()
 		ThisTask::suspend();
 	});
 
-	auto mas = startTask(0, [&]
+	auto mas = Task::Start(0, [&]
 	{
 		unsigned x = 0;
 

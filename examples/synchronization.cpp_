@@ -19,8 +19,8 @@ void tickLoop(Semaphore &own, Semaphore &another)
 auto sla_sem = Semaphore(0);
 auto mas_sem = Semaphore(1);
 
-auto sla = startTask(0, [] { tickLoop(sla_sem, mas_sem); });
-auto mas = startTask(0, [] { tickLoop(mas_sem, sla_sem); });
+auto sla = Task::Start(0, [] { tickLoop(sla_sem, mas_sem); });
+auto mas = Task::Start(0, [] { tickLoop(mas_sem, sla_sem); });
 
 int main()
 {

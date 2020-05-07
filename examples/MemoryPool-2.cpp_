@@ -25,7 +25,7 @@ void master()
 
 	for (;;)
 	{
-		sla = TaskT<512>::detached(0, slave);
+		sla = TaskT<512>::Detached(0, slave);
 		ThisTask::delay(SEC);
 
 		mem->wait(&p);
@@ -37,9 +37,9 @@ void master()
 
 int main()
 {
-	lst = ListTT<unsigned>::create();
-	mem = MemoryPoolTT<1, unsigned>::create();
-	mas = TaskT<768>::create(0, master);
+	lst = ListTT<unsigned>::Create();
+	mem = MemoryPoolTT<1, unsigned>::Create();
+	mas = TaskT<768>::Create(0, master);
 
 	ThisTask::stop();
 }

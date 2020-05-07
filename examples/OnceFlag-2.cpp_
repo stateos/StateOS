@@ -6,7 +6,7 @@ int main()
 	auto led = Led();
 	auto one = OnceFlag();
 
-	startTask::create(0, [&]
+	Task::Create(0, [&]
 	{
 		for (;;)
 		{

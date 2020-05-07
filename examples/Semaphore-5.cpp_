@@ -4,9 +4,9 @@
 auto led = Led();
 auto sem = Semaphore(0);
 
-struct slaTask : public startTask
+struct slaTask : public Task
 {
-	slaTask(): startTask(0, run) {}
+	slaTask(): Task(0, run) { start(); }
 
 	private:
 	static void run()
@@ -16,9 +16,9 @@ struct slaTask : public startTask
 	}
 };
 	
-struct masTask : public startTask
+struct masTask : public Task
 {
-	masTask(): startTask(0, run) {}
+	masTask(): Task(0, run) { start(); }
 
 	private:
 	static void run()

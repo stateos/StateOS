@@ -2,7 +2,7 @@
 #include <os.h>
 
 auto led = Led();
-auto tmr = startTimerPeriodic(SEC, [] { led.tick(); });
+auto tmr = Timer::StartPeriodic(SEC, [] { led.tick(); });
 
 int main()
 {
