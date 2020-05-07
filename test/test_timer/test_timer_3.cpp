@@ -5,10 +5,10 @@ static auto Tmr1 = Timer(nullptr);
 static auto Tmr2 = Timer(nullptr);
 static auto Tmr3 = Timer(nullptr);
 
-static auto Tmr4 = startTimer(4, 0, []{});
-static auto Tmr5 = startTimer(5, 0, []{});
-static auto Tmr6 = startTimer(6, 0, []{});
-static auto Tmr7 = startTimer(7, 0, []{});
+static auto Tmr4 = Timer::Start(4, 0, []{});
+static auto Tmr5 = Timer::Start(5, 0, []{});
+static auto Tmr6 = Timer::Start(6, 0, []{});
+static auto Tmr7 = Timer::Start(7, 0, []{});
 
 static int counter;
 
