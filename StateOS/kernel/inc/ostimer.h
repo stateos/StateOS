@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    08.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -766,7 +766,7 @@ struct baseTimer : public __tmr
 
 #if OS_FUNCTIONAL
 	static
-	void     fun_     ( void )                                        {        reinterpret_cast<baseTimer *>(tmr_thisISR())->fun(); }
+	void     fun_     ( void )                                        {        static_cast<baseTimer *>(tmr_thisISR())->fun(); }
 	Fun_t    fun;
 #endif
 };
@@ -794,6 +794,7 @@ struct Timer : public baseTimer
 	Timer& operator=( Timer&& ) = delete;
 	Timer& operator=( const Timer& ) = delete;
 
+	virtual
 	~Timer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
 
 /******************************************************************************
@@ -997,10 +998,12 @@ struct Timer : public baseTimer
 
 namespace ThisTimer
 {
+	template<class T = baseTimer>
+	static inline T  * current ( void )           { return static_cast<T *>(tmr_thisISR()); }
 #if OS_FUNCTIONAL
 	static inline void flipISR ( std::nullptr_t ) { tmr_flipISR (NULL);   }
 	template<class T>
-	static inline void flipISR ( const T _state ) { new (&reinterpret_cast<baseTimer *>(tmr_thisISR())->fun) Fun_t(_state);
+	static inline void flipISR ( const T _state ) { new (&ThisTimer::current()->fun) Fun_t(_state);
 	                                                tmr_flipISR (baseTimer::fun_); }
 #else
 	static inline void flipISR ( fun_t * _state ) { tmr_flipISR (_state); }

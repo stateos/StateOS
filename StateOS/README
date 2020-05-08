@@ -52,6 +52,7 @@ Features:
 - added sys_heapSize function
 - task destructor is called in alloc / free functions
 - rebuilded c++ static functions
+- added virtual destructors
 ---------
 6.5
 - added functional test
