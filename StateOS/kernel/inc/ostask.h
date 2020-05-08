@@ -1364,15 +1364,49 @@ struct TaskT : public baseTask, public baseStack<size_>
 
 /******************************************************************************
  *
- * Name              : TaskT<>::Start
+ * Name              : TaskT<>::Make
  *
- * Description       : create, initialize and start static undetachable task
+ * Description       : create and initialize task object
  *
  * Parameters
  *   size            : size of task private stack (in bytes)
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
+ *   args            : arguments for state function
+ *
+ * Return            : TaskT<> object
+ *
+ ******************************************************************************/
+
+	template<class T>
+	static
+	TaskT<size_> Make( const unsigned _prio, const T _state )
+	{
+		return { _prio, _state };
+	}
+
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	static
+	TaskT<size_> Make( const unsigned _prio, F&& _state, A&&... _args )
+	{
+		return { _prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
+	}
+#endif
+
+/******************************************************************************
+ *
+ * Name              : TaskT<>::Start
+ *
+ * Description       : create, initialize and start task object
+ *
+ * Parameters
+ *   size            : size of task private stack (in bytes)
+ *   prio            : initial task priority (any unsigned int value)
+ *   state           : task state (initial task function) doesn't have to be noreturn-type
+ *                     it will be executed into an infinite system-implemented loop
+ *   args            : arguments for state function
  *
  * Return            : TaskT<> object
  *
@@ -1387,6 +1421,17 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return tsk;
 	}
 
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	static
+	TaskT<size_> Start( const unsigned _prio, F&& _state, A&&... _args )
+	{
+		TaskT<size_> tsk { _prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
+		tsk.start();
+		return tsk;
+	}
+#endif
+
 /******************************************************************************
  *
  * Name              : TaskT<>::Create
@@ -1399,6 +1444,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
+ *   args            : arguments for state function
  *
  * Return            : pointer to TaskT<> object
  *
@@ -1421,6 +1467,19 @@ struct TaskT : public baseTask, public baseStack<size_>
 #endif
 	}
 
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	static
+	TaskT<size_> *Create( const unsigned _prio, F&& _state, A&&... _args )
+	{
+		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
+		new (tsk) TaskT<size_>(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+		tsk->__tsk::hdr.obj.res = tsk;
+		tsk->start();
+		return tsk;
+	}
+#endif
+
 /******************************************************************************
  *
  * Name              : TaskT<>::Detached
@@ -1433,6 +1492,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
+ *   args            : arguments for state function
  *
  * Return            : pointer to TaskT<> object
  *
@@ -1455,6 +1515,21 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
 #endif
 	}
+
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	static
+	TaskT<size_> *Detached( const unsigned _prio, F&& _state, A&&... _args )
+	{
+		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
+		new (tsk) TaskT<size_>(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+		tsk->__tsk::hdr.obj.res = tsk;
+		tsk->__tsk::join = DETACHED;
+		tsk->start();
+		return tsk;
+	}
+#endif
+
 };
 
 /* -------------------------------------------------------------------------- */

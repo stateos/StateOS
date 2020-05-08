@@ -54,6 +54,7 @@ Features:
 - rebuilded c++ static functions
 - added virtual destructors
 - added several static functions to the Timer class
+- added several static functions to the Task class
 ---------
 6.5
 - added functional test
