@@ -1,0 +1,35 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+void slave( Semaphore &sem )
+{
+	Led led;
+
+	for (;;)
+	{
+		sem.wait();
+		led.tick();
+	}
+}
+
+void master( Semaphore &sem )
+{
+	for (;;)
+	{
+		ThisTask::sleepFor(SEC);
+		sem.give();
+	}
+}
+
+int main()
+{
+	auto sem = Semaphore::Binary();
+
+	auto sla = Task(0, slave,  std::ref(sem));
+	auto mas = Task(0, master, std::ref(sem));
+
+	sla.start();
+	mas.start();
+
+	ThisTask::sleep();
+}
