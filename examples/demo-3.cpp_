@@ -16,11 +16,11 @@ int main()
 	auto led = Led();
 	auto grn = GreenLed();
 
-	Task::Create(0, [&] { proc(led[0], SEC/8*0); });
-	Task::Create(0, [&] { proc(led[1], SEC/8*1); });
-	Task::Create(0, [&] { proc(led[2], SEC/8*2); });
-	Task::Create(0, [&] { proc(led[3], SEC/8*3); });
-	Task::Create(0, [&] { proc(grn,    SEC/8*4); });
+	auto t1 = Task::Start(0, proc, std::ref(led[0]), SEC/8*0);
+	auto t2 = Task::Start(0, proc, std::ref(led[1]), SEC/8*1);
+	auto t3 = Task::Start(0, proc, std::ref(led[2]), SEC/8*2);
+	auto t4 = Task::Start(0, proc, std::ref(led[3]), SEC/8*3);
+	auto t5 = Task::Start(0, proc, std::ref(grn),    SEC/8*4);
 
 	ThisTask::stop();
 }
