@@ -799,6 +799,43 @@ struct Timer : public baseTimer
 
 /******************************************************************************
  *
+ * Name              : Timer::Make
+ *
+ * Description       : create and initialize static timer object
+ *
+ * Parameters
+ *   state           : callback procedure
+ *                     none / nullptr: no callback
+ *   args            : arguments for callback procedure
+ *
+ * Return            : Timer object
+ *
+ ******************************************************************************/
+
+	static
+	Timer Make( void )
+	{
+		return {};
+	}
+	
+	template<class T>
+	static
+	Timer Make( const T _state )
+	{
+		return { _state };
+	}
+
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	static
+	Timer Make( F&& _state, A&&... _args )
+	{
+		return { std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
+	}
+#endif
+
+/******************************************************************************
+ *
  * Name              : Timer::Start
  *
  * Description       : create and initialize static timer object
@@ -815,6 +852,7 @@ struct Timer : public baseTimer
  *                     INFINITE:  countdown indefinitely
  *   state           : callback procedure
  *                     none / nullptr: no callback
+ *   args            : arguments for callback procedure
  *
  * Return            : Timer object
  *
@@ -837,6 +875,17 @@ struct Timer : public baseTimer
 		return tmr;
 	}
 
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	static
+	Timer Start( const cnt_t _delay, const cnt_t _period, F&& _state, A&&... _args )
+	{
+		Timer tmr { std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
+		tmr.start(_delay, _period);
+		return tmr;
+	}
+#endif
+
 /******************************************************************************
  *
  * Name              : Timer::StartFor
@@ -851,6 +900,7 @@ struct Timer : public baseTimer
  *                     INFINITE:  countdown indefinitely
  *   state           : callback procedure
  *                     none / nullptr: no callback
+ *   args            : arguments for callback procedure
  *
  * Return            : Timer object
  *
@@ -873,6 +923,17 @@ struct Timer : public baseTimer
 		return tmr;
 	}
 
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	static
+	Timer StartFor( const cnt_t _delay, F&& _state, A&&... _args )
+	{
+		Timer tmr { std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
+		tmr.startFor(_delay);
+		return tmr;
+	}
+#endif
+
 /******************************************************************************
  *
  * Name              : Timer::StartPeriodic
@@ -888,6 +949,7 @@ struct Timer : public baseTimer
  *                     INFINITE:  countdown indefinitely
  *   state           : callback procedure
  *                     none / nullptr: no callback
+ *   args            : arguments for callback procedure
  *
  * Return            : Timer object
  *
@@ -910,6 +972,17 @@ struct Timer : public baseTimer
 		return tmr;
 	}
 
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	static
+	Timer StartPeriodic( const cnt_t _period, F&& _state, A&&... _args )
+	{
+		Timer tmr { std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
+		tmr.startPeriodic(_period);
+		return tmr;
+	}
+#endif
+
 /******************************************************************************
  *
  * Name              : Timer::StartUntil
@@ -922,6 +995,7 @@ struct Timer : public baseTimer
  *   time            : timepoint value
  *   state           : callback procedure
  *                     none / nullptr: no callback
+ *   args            : arguments for callback procedure
  *
  * Return            : Timer object
  *
@@ -944,6 +1018,17 @@ struct Timer : public baseTimer
 		return tmr;
 	}
 
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	static
+	Timer StartUntil( const cnt_t _time, F&& _state, A&&... _args )
+	{
+		Timer tmr { std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
+		tmr.startUntil(_time);
+		return tmr;
+	}
+#endif
+
 /******************************************************************************
  *
  * Name              : Timer::Create
@@ -953,6 +1038,7 @@ struct Timer : public baseTimer
  * Parameters
  *   state           : callback procedure
  *                     none / nullptr: no callback
+ *   args            : arguments for callback procedure
  *
  * Return            : pointer to Timer object
  *
@@ -986,6 +1072,18 @@ struct Timer : public baseTimer
 		return reinterpret_cast<Timer *>(tmr_create(_state));
 #endif
 	}
+
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	static
+	Timer *Create( F&& _state, A&&... _args )
+	{
+		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
+		new (tmr) Timer(std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+		tmr->__tmr::hdr.obj.res = tmr;
+		return tmr;
+	}
+#endif
 };
 
 /******************************************************************************

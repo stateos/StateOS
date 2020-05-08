@@ -53,6 +53,7 @@ Features:
 - task destructor is called in alloc / free functions
 - rebuilded c++ static functions
 - added virtual destructors
+- added several static functions to the Timer class
 ---------
 6.5
 - added functional test
