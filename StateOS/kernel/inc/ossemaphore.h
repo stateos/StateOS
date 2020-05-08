@@ -36,7 +36,7 @@
 
 /* -------------------------------------------------------------------------- */
 
-#define semDirect    ( 0U )   // direct semaphore
+#define semDirect    ( 0U )   // direct semaphore (producer can't free the semaphore, it can post the semaphore only to the pending task)
 #define semBinary    ( 1U )   // binary semaphore
 #define semCounting  ( 0U-1 ) // counting semaphore
 #define semDefault     semCounting
@@ -71,6 +71,7 @@ extern "C" {
  * Parameters
  *   init            : initial value of semaphore counter
  *   limit           : maximum value of semaphore counter
+ *                     semDirect: direct semaphore
  *                     semBinary: binary semaphore
  *                     semCounting: counting semaphore
  *                     otherwise: limited semaphore
@@ -105,6 +106,7 @@ extern "C" {
  *   sem             : name of a pointer to semaphore object
  *   init            : initial value of semaphore counter
  *   limit           : (optional) maximum value of semaphore counter
+ *                     semDirect: direct semaphore
  *                     semBinary: binary semaphore
  *                     semCounting: counting semaphore (default)
  *                     otherwise: limited semaphore
@@ -125,6 +127,7 @@ extern "C" {
  *   sem             : name of a pointer to semaphore object
  *   init            : initial value of semaphore counter
  *   limit           : (optional) maximum value of semaphore counter
+ *                     semDirect: direct semaphore
  *                     semBinary: binary semaphore
  *                     semCounting: counting semaphore (default)
  *                     otherwise: limited semaphore
@@ -144,6 +147,7 @@ extern "C" {
  * Parameters
  *   init            : initial value of semaphore counter
  *   limit           : (optional) maximum value of semaphore counter
+ *                     semDirect: direct semaphore
  *                     semBinary: binary semaphore
  *                     semCounting: counting semaphore (default)
  *                     otherwise: limited semaphore
@@ -169,6 +173,7 @@ extern "C" {
  * Parameters
  *   init            : initial value of semaphore counter
  *   limit           : (optional) maximum value of semaphore counter
+ *                     semDirect: direct semaphore
  *                     semBinary: binary semaphore
  *                     semCounting: counting semaphore (default)
  *                     otherwise: limited semaphore
@@ -196,6 +201,7 @@ extern "C" {
  *   sem             : pointer to semaphore object
  *   init            : initial value of semaphore counter
  *   limit           : maximum value of semaphore counter
+ *                     semDirect: direct semaphore
  *                     semBinary: binary semaphore
  *                     semCounting: counting semaphore
  *                     otherwise: limited semaphore
@@ -218,6 +224,7 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit );
  * Parameters
  *   init            : initial value of semaphore counter
  *   limit           : maximum value of semaphore counter
+ *                     semDirect: direct semaphore
  *                     semBinary: binary semaphore
  *                     semCounting: counting semaphore
  *                     otherwise: limited semaphore
@@ -507,6 +514,7 @@ unsigned sem_getValue( sem_t *sem );
  * Constructor parameters
  *   init            : initial value of semaphore counter
  *   limit           : maximum value of semaphore counter
+ *                     semDirect: direct semaphore
  *                     semBinary: binary semaphore
  *                     semCounting: counting semaphore (default)
  *                     otherwise: limited semaphore
@@ -523,6 +531,25 @@ struct Semaphore : public __sem
 	Semaphore& operator=( const Semaphore& ) = delete;
 
 	~Semaphore( void ) { assert(__sem::obj.queue == nullptr); }
+
+/******************************************************************************
+ *
+ * Name              : Semaphore::Direct
+ *
+ * Description       : create and initialize static direct semaphore
+ *
+ * Parameters
+ *   init            : initial value of semaphore counter
+ *
+ * Return            : Semaphore object
+ *
+ ******************************************************************************/
+
+	static
+	Semaphore Direct( const unsigned _init = 0 )
+	{
+		return { _init, semDirect };
+	}
 
 /******************************************************************************
  *
