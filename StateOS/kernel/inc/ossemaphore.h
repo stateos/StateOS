@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    08.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -36,9 +36,9 @@
 
 /* -------------------------------------------------------------------------- */
 
-#define semDirect    ( 0U )     // direct semaphore
-#define semBinary    ( 1U )     // binary semaphore
-#define semCounting  ( 0U-1 )   // counting semaphore
+#define semDirect    ( 0U )   // direct semaphore
+#define semBinary    ( 1U )   // binary semaphore
+#define semCounting  ( 0U-1 ) // counting semaphore
 #define semDefault     semCounting
 
 /******************************************************************************
@@ -515,7 +515,7 @@ unsigned sem_getValue( sem_t *sem );
 
 struct Semaphore : public __sem
 {
-	Semaphore( const unsigned _init, const unsigned _limit = semCounting ): __sem _SEM_INIT(_init, _limit) {}
+	Semaphore( const unsigned _init, const unsigned _limit = semDefault ): __sem _SEM_INIT(_init, _limit) {}
 
 	Semaphore( Semaphore&& ) = default;
 	Semaphore( const Semaphore& ) = delete;
@@ -578,7 +578,7 @@ struct Semaphore : public __sem
  ******************************************************************************/
 
 	static
-	Semaphore *Create( const unsigned _init, const unsigned _limit = semCounting )
+	Semaphore *Create( const unsigned _init, const unsigned _limit = semDefault )
 	{
 #if OS_FUNCTIONAL
 		auto sem = reinterpret_cast<Semaphore *>(sys_alloc(sizeof(Semaphore)));
