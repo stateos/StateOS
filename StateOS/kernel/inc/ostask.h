@@ -1368,7 +1368,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *
  * Description       : create, initialize and start static undetachable task
  *
- * Constructor parameters
+ * Parameters
  *   size            : size of task private stack (in bytes)
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
@@ -1394,7 +1394,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  * Description       : create, initialize and start dynamic detachable task
  *                     with manageable resources
  *
- * Constructor parameters
+ * Parameters
  *   size            : size of task private stack (in bytes)
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
@@ -1428,7 +1428,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  * Description       : create, initialize and start dynamic detached task
  *                     with manageable resources
  *
- * Constructor parameters
+ * Parameters
  *   size            : size of task private stack (in bytes)
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
