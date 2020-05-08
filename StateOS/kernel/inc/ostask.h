@@ -1366,7 +1366,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *
  * Name              : TaskT<>::Make
  *
- * Description       : create and initialize task object
+ * Description       : create and initialize static undetachable task
  *
  * Parameters
  *   size            : size of task private stack (in bytes)
@@ -1399,7 +1399,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *
  * Name              : TaskT<>::Start
  *
- * Description       : create, initialize and start task object
+ * Description       : create, initialize and start static undetachable task
  *
  * Parameters
  *   size            : size of task private stack (in bytes)
