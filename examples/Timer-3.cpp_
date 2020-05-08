@@ -4,6 +4,6 @@
 int main()
 {
 	auto led = Led();
-	auto tmr = Timer::StartPeriodic(SEC, [&] { led.tick(); });
+	auto tmr = Timer::StartPeriodic(SEC, [&]{ led.tick(); });
 	ThisTask::sleep();
 }

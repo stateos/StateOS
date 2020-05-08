@@ -5,8 +5,8 @@ int main()
 {
 	auto led = Led();
 	auto sem = Semaphore::Binary();
-	           Task::Create(0, [&] { sem.wait(); led.tick(); });
-	auto mas = Task::Create(0, [&] { ThisTask::sleepFor(SEC); sem.give(); });
+	           Task::Create(0, [&]{ sem.wait(); led.tick(); });
+	auto mas = Task::Create(0, [&]{ ThisTask::sleepFor(SEC); sem.give(); });
 	mas->reset();
 	auto tmp = std::move(*mas);
 	tmp.start();
