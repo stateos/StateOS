@@ -599,6 +599,28 @@ tsk_t *cur_task( void ) { return System.cur; }
 
 /******************************************************************************
  *
+ * Name              : wrk_init
+ *
+ * Description       : initialize complete work area for task object
+ *
+ * Parameters
+ *   tsk             : pointer to task object
+ *   prio            : initial task priority (any unsigned int value)
+ *   state           : task state (initial task function) doesn't have to be noreturn-type
+ *                     it will be executed into an infinite system-implemented loop
+ *   stack           : base of task's private stack storage
+ *   size            : size of task private stack (in bytes)
+ *
+ * Return            : none
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+void wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size );
+
+/******************************************************************************
+ *
  * Name              : tsk_init
  *
  * Description       : initialize complete work area for task object
