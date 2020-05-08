@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    08.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1373,7 +1373,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
  *
- * Return            : Task<> object
+ * Return            : TaskT<> object
  *
  ******************************************************************************/
 
@@ -1399,7 +1399,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
  *
- * Return            : pointer to Task<> object
+ * Return            : pointer to TaskT<> object
  *
  * Note              : use only in thread mode
  *
@@ -1433,7 +1433,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
  *
- * Return            : pointer to Task<> object
+ * Return            : pointer to TaskT<> object
  *
  * Note              : use only in thread mode
  *
