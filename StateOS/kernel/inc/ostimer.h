@@ -785,9 +785,13 @@ struct baseTimer : public __tmr
 
 struct Timer : public baseTimer
 {
-	Timer( void ):           baseTimer() {}
+	Timer( void ):                     baseTimer() {}
 	template<class T>
-	Timer( const T _state ): baseTimer(_state) {}
+	Timer( const T _state ):           baseTimer(_state) {}
+#if OS_FUNCTIONAL
+	template<typename F, typename... A>
+	Timer( F&& _state, A&&... _args ): baseTimer(std::bind(std::forward<F>(_state), std::forward<A>(_args)...)) {}
+#endif
 
 	Timer( Timer&& ) = default;
 	Timer( const Timer& ) = delete;
