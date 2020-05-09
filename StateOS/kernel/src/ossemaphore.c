@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    06.05.2020
+    @date    09.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -242,6 +242,7 @@ unsigned sem_sendFor( sem_t *sem, cnt_t delay )
 
 	assert_tsk_context();
 	assert(sem);
+	assert(sem->limit);
 	assert(sem->obj.res!=RELEASED);
 
 	sys_lock();
@@ -264,6 +265,7 @@ unsigned sem_sendUntil( sem_t *sem, cnt_t time )
 
 	assert_tsk_context();
 	assert(sem);
+	assert(sem->limit);
 	assert(sem->obj.res!=RELEASED);
 
 	sys_lock();
