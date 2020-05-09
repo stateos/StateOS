@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    09.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
