@@ -2,7 +2,7 @@
 
     @file    StateOS: osonceflag.h
     @author  Rajmund Szymanski
-    @date    08.05.2020
+    @date    09.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -52,7 +52,7 @@ extern "C" {
  *
  * Name              : _ONE_INIT
  *
- * Description       : create and initialize a once flag object
+ * Description       : once flag state after initialization
  *
  * Parameters        : none
  *
@@ -63,6 +63,22 @@ extern "C" {
  ******************************************************************************/
 
 #define               _ONE_INIT()   0
+
+/******************************************************************************
+ *
+ * Name              : _ONE_DONE
+ *
+ * Description       : once flag state after use
+ *
+ * Parameters        : none
+ *
+ * Return            : once flag object
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+#define               _ONE_DONE()   1
 
 /******************************************************************************
  *
@@ -193,15 +209,40 @@ void one_call( one_t *one, fun_t *fun );
 
 struct OnceFlag
 {
-	OnceFlag( void ): flg_(_ONE_INIT()) {}
+	OnceFlag( void ): flg_{_ONE_INIT()} {}
+
+	OnceFlag( OnceFlag&& ) = default;
+	OnceFlag( const OnceFlag& ) = delete;
+	OnceFlag& operator=( OnceFlag&& ) = delete;
+	OnceFlag& operator=( const OnceFlag& ) = delete;
 
 #if OS_FUNCTIONAL
 	template<class T>
-	void call( const T _fun ) { one_t flag = 1; sys_lock(); std::swap(flag, flg_); sys_unlock(); if (flag == 0) _fun(); }
+	void call( const T _fun )
+	{
+		one_t flag;
+
+		{
+			CriticalSection cri;
+
+			flag = flg_;
+			flg_ = _ONE_DONE();
+		}
+
+		if (flag == _ONE_INIT())
+			_fun();
+	}
+
 	template<typename F, typename... A>
-	void call( F&& _state, A&&... _args ) { call(std::bind(std::forward<F>(_state), std::forward<A>(_args)...)); }
+	void call( F&& _state, A&&... _args )
+	{
+		call(std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+	}
 #else
-	void call( fun_t * _fun ) { one_call(&flg_, _fun); }
+	void call( fun_t * _fun )
+	{
+		one_call(&flg_, _fun);
+	}
 #endif
 
 	private:

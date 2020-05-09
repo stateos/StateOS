@@ -2,7 +2,7 @@
 
     @file    StateOS: osonceflag.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    09.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -44,11 +44,11 @@ void one_call( one_t *one, fun_t *fun )
 	sys_lock();
 	{
 		flag = *one;
-		*one = 1;
+		*one = _ONE_DONE();
 	}
 	sys_unlock();
 
-	if (flag == 0)
+	if (flag == _ONE_INIT())
 		fun();
 }
 
