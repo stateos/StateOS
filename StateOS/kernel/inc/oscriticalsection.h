@@ -2,7 +2,7 @@
 
     @file    StateOS: oscriticalsection.h
     @author  Rajmund Szymanski
-    @date    02.05.2020
+    @date    09.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -192,7 +192,12 @@ lck_t core_get_lock( void )
 struct CriticalSection
 {
 	 CriticalSection( void ) { lck_ = core_set_lock(); }
-	~CriticalSection( void ) { core_put_lock(lck_);    }
+	~CriticalSection( void ) { core_put_lock(lck_); }
+
+	CriticalSection( CriticalSection&& ) = delete;
+	CriticalSection( const CriticalSection& ) = delete;
+	CriticalSection& operator=( CriticalSection&& ) = delete;
+	CriticalSection& operator=( const CriticalSection& ) = delete;
 
 	private:
 	lck_t lck_;
