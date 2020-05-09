@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    08.05.2020
+    @date    09.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -733,7 +733,7 @@ struct baseTimer : public __tmr
 #if OS_FUNCTIONAL
 	baseTimer( std::nullptr_t ): __tmr _TMR_INIT(NULL) {}
 	template<class T>
-	baseTimer( const T _state ): __tmr _TMR_INIT(fun_), fun(_state) {}
+	baseTimer( const T _state ): __tmr _TMR_INIT(fun_), fun{_state} {}
 #else
 	baseTimer( fun_t * _state ): __tmr _TMR_INIT(_state) {}
 #endif
@@ -785,12 +785,12 @@ struct baseTimer : public __tmr
 
 struct Timer : public baseTimer
 {
-	Timer( void ):                     baseTimer() {}
+	Timer( void ):                     baseTimer{} {}
 	template<class T>
-	Timer( const T _state ):           baseTimer(_state) {}
+	Timer( const T _state ):           baseTimer{_state} {}
 #if OS_FUNCTIONAL
 	template<typename F, typename... A>
-	Timer( F&& _state, A&&... _args ): baseTimer(std::bind(std::forward<F>(_state), std::forward<A>(_args)...)) {}
+	Timer( F&& _state, A&&... _args ): baseTimer{std::bind(std::forward<F>(_state), std::forward<A>(_args)...)} {}
 #endif
 
 	Timer( Timer&& ) = default;
