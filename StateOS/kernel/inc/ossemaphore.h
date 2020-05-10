@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    08.05.2020
+    @date    10.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -394,7 +394,6 @@ unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully unlocked
- *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
  *   E_TIMEOUT       : semaphore object can't be unlocked immediately, try again
  *
  * Note              : may be used both in thread and handler mode
@@ -408,79 +407,6 @@ unsigned sem_post( sem_t *sem ) { return sem_give(sem); }
 
 __STATIC_INLINE
 unsigned sem_giveISR( sem_t *sem ) { return sem_give(sem); }
-
-/******************************************************************************
- *
- * Name              : sem_sendFor
- *
- * Description       : try to unlock the semaphore object,
- *                     wait for given duration of time if the semaphore object can't be unlocked immediately
- *
- * Parameters
- *   sem             : pointer to semaphore object
- *   delay           : duration of time (maximum number of ticks to wait for unlock the semaphore object)
- *                     IMMEDIATE: don't wait if the semaphore object can't be unlocked immediately
- *                     INFINITE:  wait indefinitely until the semaphore object has been unlocked
- *
- * Return
- *   E_SUCCESS       : semaphore object was successfully unlocked
- *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
- *   E_STOPPED       : semaphore object was reseted before the specified timeout expired
- *   E_DELETED       : semaphore object was deleted before the specified timeout expired
- *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned sem_sendFor( sem_t *sem, cnt_t delay );
-
-/******************************************************************************
- *
- * Name              : sem_sendUntil
- *
- * Description       : try to unlock the semaphore object,
- *                     wait until given timepoint if the semaphore object can't be unlocked immediately
- *
- * Parameters
- *   sem             : pointer to semaphore object
- *   time            : timepoint value
- *
- * Return
- *   E_SUCCESS       : semaphore object was successfully unlocked
- *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
- *   E_STOPPED       : semaphore object was reseted before the specified timeout expired
- *   E_DELETED       : semaphore object was deleted before the specified timeout expired
- *   E_TIMEOUT       : semaphore object was not unlocked before the specified timeout expired
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-unsigned sem_sendUntil( sem_t *sem, cnt_t time );
-
-/******************************************************************************
- *
- * Name              : sem_send
- *
- * Description       : try to unlock the semaphore object,
- *                     wait indefinitely if the semaphore object can't be unlocked immediately
- *
- * Parameters
- *   sem             : pointer to semaphore object
- *
- * Return
- *   E_SUCCESS       : semaphore object was successfully unlocked
- *   E_FAILURE       : semaphore object can't be unlocked immediately and waiting is not possible
- *   E_STOPPED       : semaphore object was reseted
- *   E_DELETED       : semaphore object was deleted
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-__STATIC_INLINE
-unsigned sem_send( sem_t *sem ) { return sem_sendFor(sem, INFINITE); }
 
 /******************************************************************************
  *
@@ -523,7 +449,7 @@ unsigned sem_getValue( sem_t *sem );
 
 struct Semaphore : public __sem
 {
-	Semaphore( const unsigned _init, const unsigned _limit = semDefault ): __sem _SEM_INIT(_init, _limit) {}
+	Semaphore( const unsigned _init, const unsigned _limit = semDefault ): __sem _SEM_INIT(_init, _limit) { assert(_init<=_limit); }
 
 	Semaphore( Semaphore&& ) = default;
 	Semaphore( const Semaphore& ) = delete;
@@ -538,17 +464,16 @@ struct Semaphore : public __sem
  *
  * Description       : create and initialize static direct semaphore
  *
- * Parameters
- *   init            : initial value of semaphore counter
+ * Parameters        : none
  *
  * Return            : Semaphore object
  *
  ******************************************************************************/
 
 	static
-	Semaphore Direct( const unsigned _init = 0 )
+	Semaphore Direct( void )
 	{
-		return { _init, semDirect };
+		return { 0, semDirect };
 	}
 
 /******************************************************************************
@@ -629,9 +554,6 @@ struct Semaphore : public __sem
 	unsigned give     ( void )         { return sem_give     (this);         }
 	unsigned post     ( void )         { return sem_post     (this);         }
 	unsigned giveISR  ( void )         { return sem_giveISR  (this);         }
-	unsigned sendFor  ( cnt_t _delay ) { return sem_sendFor  (this, _delay); }
-	unsigned sendUntil( cnt_t _time )  { return sem_sendUntil(this, _time);  }
-	unsigned send     ( void )         { return sem_send     (this);         }
 	unsigned getValue ( void )         { return sem_getValue (this);         }
 };
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    09.05.2020
+    @date    10.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -125,15 +125,11 @@ static
 unsigned priv_sem_take( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	if (sem->count > 0)
-	{
-		if (core_one_wakeup(sem->obj.queue, E_SUCCESS) == 0)
-			sem->count--;
+	if (sem->count == 0)
+		return E_TIMEOUT;
 
-		return E_SUCCESS;
-	}
-
-	return E_TIMEOUT;
+	sem->count--;
+	return E_SUCCESS;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -144,6 +140,7 @@ unsigned sem_take( sem_t *sem )
 
 	assert(sem);
 	assert(sem->obj.res!=RELEASED);
+	assert(sem->count<=sem->limit);
 
 	sys_lock();
 	{
@@ -163,6 +160,7 @@ unsigned sem_waitFor( sem_t *sem, cnt_t delay )
 	assert_tsk_context();
 	assert(sem);
 	assert(sem->obj.res!=RELEASED);
+	assert(sem->count<=sem->limit);
 
 	sys_lock();
 	{
@@ -185,6 +183,7 @@ unsigned sem_waitUntil( sem_t *sem, cnt_t time )
 	assert_tsk_context();
 	assert(sem);
 	assert(sem->obj.res!=RELEASED);
+	assert(sem->count<=sem->limit);
 
 	sys_lock();
 	{
@@ -203,14 +202,11 @@ static
 unsigned priv_sem_give( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	if (sem->count > sem->limit - 1)
-		return E_TIMEOUT;
-
 	if (core_one_wakeup(sem->obj.queue, E_SUCCESS) != 0)
 		return E_SUCCESS;
 
-	if (sem->limit == 0)
-		return E_FAILURE;
+	if (sem->count >= sem->limit)
+		return E_TIMEOUT;
 
 	sem->count++;
 	return E_SUCCESS;
@@ -224,56 +220,11 @@ unsigned sem_give( sem_t *sem )
 
 	assert(sem);
 	assert(sem->obj.res!=RELEASED);
+	assert(sem->count<=sem->limit);
 
 	sys_lock();
 	{
 		event = priv_sem_give(sem);
-	}
-	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned sem_sendFor( sem_t *sem, cnt_t delay )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert_tsk_context();
-	assert(sem);
-	assert(sem->limit);
-	assert(sem->obj.res!=RELEASED);
-
-	sys_lock();
-	{
-		event = priv_sem_give(sem);
-
-		if (event == E_TIMEOUT)
-			event = core_tsk_waitFor(&sem->obj.queue, delay);
-	}
-	sys_unlock();
-
-	return event;
-}
-
-/* -------------------------------------------------------------------------- */
-unsigned sem_sendUntil( sem_t *sem, cnt_t time )
-/* -------------------------------------------------------------------------- */
-{
-	unsigned event;
-
-	assert_tsk_context();
-	assert(sem);
-	assert(sem->limit);
-	assert(sem->obj.res!=RELEASED);
-
-	sys_lock();
-	{
-		event = priv_sem_give(sem);
-
-		if (event == E_TIMEOUT)
-			event = core_tsk_waitUntil(&sem->obj.queue, time);
 	}
 	sys_unlock();
 

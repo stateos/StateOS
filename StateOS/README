@@ -57,6 +57,7 @@ Features:
 - added several static functions to the Task class
 - added constructor with function arguments to the Timer class
 - added constructor with function arguments to the Task class
+- updated semaphore (removed send functions)
 ---------
 6.5
 - added functional test
