@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    10.05.2020
+    @date    11.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -264,7 +264,7 @@ void sem_kill( sem_t *sem ) { sem_reset(sem); }
 /******************************************************************************
  *
  * Name              : sem_destroy
- * Alias             : dem_delete
+ * Alias             : sem_delete
  *
  * Description       : reset the semaphore object, wake up all waiting tasks with 'E_DELETED' event value and free allocated resource
  *
