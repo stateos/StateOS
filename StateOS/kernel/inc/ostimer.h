@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    09.05.2020
+    @date    11.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -798,7 +798,7 @@ struct Timer : public baseTimer
 	Timer& operator=( Timer&& ) = delete;
 	Timer& operator=( const Timer& ) = delete;
 
-	virtual
+	__VIRTUAL
 	~Timer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
 
 /******************************************************************************
