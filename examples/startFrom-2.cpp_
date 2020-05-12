@@ -14,7 +14,7 @@ int main()
 			ThisTask::flip([]
 			{
 				led.tick();
-				tsk_stop();
+				ThisTask::stop();
 			});
 		});
 		tsk.join();

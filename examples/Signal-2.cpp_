@@ -29,8 +29,8 @@ void master()
 
 int main()
 {
-	auto sla = Task::Start(0, slave);
-	auto mas = Task::Start(0, master);
+	Task::Create(0, slave);
+	Task::Create(0, master);
 
 	ThisTask::sleep();
 }
