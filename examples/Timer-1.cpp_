@@ -1,14 +1,14 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-Led led;
+Led led = {};
 
 void proc()
 {
 	led.tick();
 }
 
-Timer tmr(proc);
+Timer tmr = {proc};
 
 int main()
 {
