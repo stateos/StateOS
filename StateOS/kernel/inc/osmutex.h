@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    12.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -56,7 +56,7 @@
 /////// inconsistency of robust mutex
 #define mtxInconsistent 32U // inconsistent mutex
 
-#define mtxMASK       ( mtxTypeMASK + mtxPrioMASK + mtxRobust + mtxInconsistent )
+#define mtxMASK       ( mtxTypeMASK | mtxPrioMASK | mtxRobust | mtxInconsistent )
 
 /* -------------------------------------------------------------------------- */
 
