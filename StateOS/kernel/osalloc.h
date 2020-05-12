@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    11.05.2020
+    @date    12.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -57,7 +57,7 @@ typedef struct __seg seg_t;
 struct __seg
 {
 	seg_t  * next;  // next memory block
-	seg_t  * owner; // owner of memory block
+	seg_t  * owner; // owner of memory block (used as free / occupied flag)
 };
 
 /******************************************************************************

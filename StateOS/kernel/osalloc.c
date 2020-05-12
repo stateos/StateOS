@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    06.05.2020
+    @date    12.05.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -56,7 +56,7 @@ void *sys_alloc( size_t size )
 	assert(size);
 	assert_tsk_context();
 
-	size = SEG_SIZE(size) + 1;
+	size = SEG_SIZE(size + sizeof(seg_t));
 	assert(size);
 
 	sys_lock();
@@ -66,11 +66,11 @@ void *sys_alloc( size_t size )
 
 		for (mem = Heap; mem; mem = mem->next)
 		{
-			if (mem->owner != mem)
+			if (mem->owner == NULL)
 		//	memory segment has already been allocated
 				continue;
 
-			while (nxt = mem->next, nxt->owner == nxt)
+			while (nxt = mem->next, nxt->owner != NULL)
 		//	it is possible to merge adjacent free memory segments
 				mem->next = nxt->next;
 
@@ -79,17 +79,17 @@ void *sys_alloc( size_t size )
 				continue;
 
 			if (mem + size < nxt)
-		//	memory segment is larger than required
 			{
+		//	memory segment is larger than required
 				nxt = mem + size;
 				nxt->next  = mem->next;
 				nxt->owner = nxt;
+				mem->next  = nxt;
 			}
 
-			mem->next  = nxt;
-			mem->owner = nxt;
+		//	memory segment can be allocated
+			mem->owner = NULL;
 			mem = mem + 1;
-		//	memory segment has been successfully allocated
 			break;
 		}
 	}
@@ -147,8 +147,8 @@ void sys_free( void *ptr )
 		//	this is not the memory segment we are looking for
 				continue;
 
+		//	memory segment can be released
 			mem->owner = mem;
-		//	memory segment has been successfully released
 			break;
 		}
 	}
@@ -192,11 +192,11 @@ size_t sys_heapSize( void )
 
 		for (mem = Heap; mem; mem = mem->next)
 		{
-			if (mem->owner != mem)
+			if (mem->owner == NULL)
 		//	memory segment has already been allocated
 				continue;
 
-			while (nxt = mem->next, nxt->owner == nxt)
+			while (nxt = mem->next, nxt->owner != NULL)
 		//	it is possible to merge adjacent free memory segments
 				mem->next = nxt->next;
 
