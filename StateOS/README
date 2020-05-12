@@ -52,7 +52,6 @@ Features:
 - added sys_heapSize function
 - task destructor is called in alloc / free functions
 - rebuilded c++ static functions
-- added virtual destructors
 - added several static functions to the Timer class
 - added several static functions to the Task class
 - added constructor with function arguments to the Timer class

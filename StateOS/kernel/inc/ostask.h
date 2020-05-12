@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    11.05.2020
+    @date    12.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1385,7 +1385,6 @@ struct TaskT : public baseTask, public baseStack<size_>
 	TaskT<size_>& operator=( TaskT<size_>&& ) = delete;
 	TaskT<size_>& operator=( const TaskT<size_>& ) = delete;
 
-	__VIRTUAL
 	~TaskT( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
 /******************************************************************************
