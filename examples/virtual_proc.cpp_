@@ -21,7 +21,7 @@ struct myTask : public Task
 struct slaTask : public myTask
 {
 	virtual
-	void main()
+	void main() override
 	{
 		sem.wait();
 		led.tick();
@@ -31,7 +31,7 @@ struct slaTask : public myTask
 struct masTask : public myTask
 {
 	virtual
-	void main()
+	void main() override
 	{
 		ThisTask::sleepFor(SEC);
 		sem.give();
