@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    14.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #define __STATEOS_EVT_H
 
 #include "oskernel.h"
+#include "osclock.h"
 
 /******************************************************************************
  *
@@ -366,17 +367,21 @@ struct Event : public __evt
 #endif
 	}
 
-	void     reset    ( void )                          {        evt_reset    (this);                 }
-	void     kill     ( void )                          {        evt_kill     (this);                 }
-	void     destroy  ( void )                          {        evt_destroy  (this);                 }
-	unsigned waitFor  ( unsigned*_event, cnt_t _delay ) { return evt_waitFor  (this, _event, _delay); }
-	unsigned waitFor  ( unsigned&_event, cnt_t _delay ) { return evt_waitFor  (this,&_event, _delay); }
-	unsigned waitUntil( unsigned*_event, cnt_t _time )  { return evt_waitUntil(this, _event, _time);  }
-	unsigned waitUntil( unsigned&_event, cnt_t _time )  { return evt_waitUntil(this,&_event, _time);  }
-	unsigned wait     ( unsigned*_event )               { return evt_wait     (this, _event);         }
-	unsigned wait     ( unsigned&_event )               { return evt_wait     (this,&_event);         }
-	void     give     ( unsigned _event )               {        evt_give     (this, _event);         }
-	void     giveISR  ( unsigned _event )               {        evt_giveISR  (this, _event);         }
+	void     reset    ( void )                             {        evt_reset    (this); }
+	void     kill     ( void )                             {        evt_kill     (this); }
+	void     destroy  ( void )                             {        evt_destroy  (this); }
+	template<typename T>
+	unsigned waitFor  ( unsigned *_event, const T _delay ) { return evt_waitFor  (this,  _event, Clock::count(_delay)); }
+	template<typename T>
+	unsigned waitFor  ( unsigned &_event, const T _delay ) { return evt_waitFor  (this, &_event, Clock::count(_delay)); }
+	template<typename T>
+	unsigned waitUntil( unsigned *_event, const T _time )  { return evt_waitUntil(this,  _event, Clock::count(_time)); }
+	template<typename T>
+	unsigned waitUntil( unsigned &_event, const T _time )  { return evt_waitUntil(this, &_event, Clock::count(_time)); }
+	unsigned wait     ( unsigned *_event )                 { return evt_wait     (this,  _event); }
+	unsigned wait     ( unsigned &_event )                 { return evt_wait     (this, &_event); }
+	void     give     ( unsigned  _event )                 {        evt_give     (this,  _event); }
+	void     giveISR  ( unsigned  _event )                 {        evt_giveISR  (this,  _event); }
 };
 
 #endif//__cplusplus
