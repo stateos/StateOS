@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    14.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #define __STATEOS_BAR_H
 
 #include "oskernel.h"
+#include "osclock.h"
 
 /******************************************************************************
  *
@@ -352,12 +353,14 @@ struct Barrier : public __bar
 #endif
 	}
 
-	void     reset    ( void )         {        bar_reset    (this);         }
-	void     kill     ( void )         {        bar_kill     (this);         }
-	void     destroy  ( void )         {        bar_destroy  (this);         }
-	unsigned waitFor  ( cnt_t _delay ) { return bar_waitFor  (this, _delay); }
-	unsigned waitUntil( cnt_t _time )  { return bar_waitUntil(this, _time);  }
-	unsigned wait     ( void )         { return bar_wait     (this);         }
+	void     reset    ( void )           {        bar_reset    (this); }
+	void     kill     ( void )           {        bar_kill     (this); }
+	void     destroy  ( void )           {        bar_destroy  (this); }
+	template<typename T>
+	unsigned waitFor  ( const T _delay ) { return bar_waitFor  (this, Clock::count(_delay)); }
+	template<typename T>
+	unsigned waitUntil( const T _time )  { return bar_waitUntil(this, Clock::count(_time)); }
+	unsigned wait     ( void )           { return bar_wait     (this); }
 };
 
 #endif//__cplusplus
