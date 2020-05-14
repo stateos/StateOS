@@ -38,6 +38,7 @@ Features:
 6.7
 - updated os version
 - implementation of steady clock
+- updated Timer class
 ---------
 6.6
 - updated os version
