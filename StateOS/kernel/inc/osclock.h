@@ -88,6 +88,15 @@ struct Clock
 
 	static
 	time_point now() { return time_point(duration(sys_time())); }
+
+	static constexpr
+	rep count( const rep t )                         { return t; }
+	static constexpr
+	rep count( const duration t )                    { return t.count(); }
+	static constexpr
+	rep count( const time_point t )                  { return t.time_since_epoch().count(); }
+	template<typename R, typename P> static constexpr
+	rep count( const std::chrono::duration<R, P> t ) { return std::chrono::duration_cast<duration>(t).count(); }
 };
 
 #endif//__cplusplus
