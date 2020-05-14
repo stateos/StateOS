@@ -625,14 +625,14 @@ struct MailBoxQueueT : public __box
  *
  * Constructor parameters
  *   limit           : size of a queue (max number of stored mails)
- *   T               : class of a single mail
+ *   C               : class of a single mail
  *
  ******************************************************************************/
 
-template<unsigned limit_, class T>
-struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
+template<unsigned limit_, class C>
+struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(C)>
 {
-	MailBoxQueueTT( void ): MailBoxQueueT<limit_, sizeof(T)>() {}
+	MailBoxQueueTT( void ): MailBoxQueueT<limit_, sizeof(C)>() {}
 
 /******************************************************************************
  *
@@ -642,7 +642,7 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
  *
  * Parameters
  *   limit           : size of a queue (max number of stored mails)
- *   T               : class of a single mail
+ *   C               : class of a single mail
  *
  * Return            : pointer to MailBoxQueueTT<> object
  *
@@ -651,9 +651,9 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(T)>
  ******************************************************************************/
 
 	static
-	MailBoxQueueTT<limit_, T> *Create( void )
+	MailBoxQueueTT<limit_, C> *Create( void )
 	{
-		return reinterpret_cast<MailBoxQueueTT<limit_, T> *>(MailBoxQueueT<limit_, sizeof(T)>::Create());
+		return reinterpret_cast<MailBoxQueueTT<limit_, C> *>(MailBoxQueueT<limit_, sizeof(C)>::Create());
 	}
 };
 
