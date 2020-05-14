@@ -395,7 +395,7 @@ struct FastMutex : public __mut
 	static
 	FastMutex *Create( void )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto mut = reinterpret_cast<FastMutex *>(sys_alloc(sizeof(FastMutex)));
 		new (mut) FastMutex();
 		mut->__mut::obj.res = mut;

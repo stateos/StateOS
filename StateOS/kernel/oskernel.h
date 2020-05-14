@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    12.05.2020
+    @date    14.05.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,11 @@
 
 #ifdef  __cplusplus
 
-#if OS_FUNCTIONAL
+#if __cplusplus < 201103
+#error This version of c++ compiler is unsupported!
+#endif
+
+#if __cplusplus >= 201402
 #include <functional>
 using Fun_t = std::function<void( void )>;
 using Act_t = std::function<void( unsigned )>;

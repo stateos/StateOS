@@ -527,7 +527,7 @@ struct EventQueueT : public __evq
 	static
 	EventQueueT<limit_> *Create( void )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto evq = reinterpret_cast<EventQueueT<limit_> *>(sys_alloc(sizeof(EventQueueT<limit_>)));
 		new (evq) EventQueueT<limit_>();
 		evq->__evq::obj.res = evq;

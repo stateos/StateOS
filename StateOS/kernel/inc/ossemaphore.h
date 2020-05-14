@@ -533,7 +533,7 @@ struct Semaphore : public __sem
 	static
 	Semaphore *Create( const unsigned _init, const unsigned _limit = semDefault )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto sem = reinterpret_cast<Semaphore *>(sys_alloc(sizeof(Semaphore)));
 		new (sem) Semaphore(_init, _limit);
 		sem->__sem::obj.res = sem;

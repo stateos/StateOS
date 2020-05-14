@@ -422,13 +422,13 @@ struct ListTT : public __lst
 	static
 	ListTT<C> *Create( void )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto lst = reinterpret_cast<ListTT<C> *>(sys_alloc(sizeof(ListTT<C>)));
 		new (lst) ListTT<C>();
 		lst->__lst::obj.res = lst;
 		return lst;
 #else
-		return reinterpret_cast<ListTT<L> *>(lst_create());
+		return reinterpret_cast<ListTT<C> *>(lst_create());
 #endif
 	}
 

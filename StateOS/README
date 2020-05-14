@@ -41,6 +41,7 @@ Features:
 - updated Timer class
 - updated Task class
 - updated other classes
+- removed unused OS_FUNCTIONAL definition
 ---------
 6.6
 - updated os version

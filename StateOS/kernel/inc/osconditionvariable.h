@@ -411,7 +411,7 @@ struct ConditionVariable : public __cnd
 	static
 	ConditionVariable *Create( void )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto cnd = reinterpret_cast<ConditionVariable *>(sys_alloc(sizeof(ConditionVariable)));
 		new (cnd) ConditionVariable();
 		cnd->__cnd::obj.res = cnd;

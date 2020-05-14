@@ -66,7 +66,9 @@ cnt_t sys_timeISR( void ) { return sys_time(); }
 
 #ifdef __cplusplus
 
+#if __cplusplus >= 201402
 #include <chrono>
+#endif
 
 /******************************************************************************
  *
@@ -78,6 +80,7 @@ cnt_t sys_timeISR( void ) { return sys_time(); }
 
 struct Clock
 {
+#if __cplusplus >= 201402
 	using rep        = cnt_t;
 	using period     = std::ratio<1, OS_FREQUENCY>;
 	using duration   = std::chrono::duration<rep, period>;
@@ -97,6 +100,10 @@ struct Clock
 	rep count( const time_point t )                  { return t.time_since_epoch().count(); }
 	template<typename R, typename P> static constexpr
 	rep count( const std::chrono::duration<R, P> t ) { return std::chrono::duration_cast<duration>(t).count(); }
+#else
+	static constexpr
+	cnt_t count( const cnt_t t )                     { return t; }
+#endif
 };
 
 #endif//__cplusplus

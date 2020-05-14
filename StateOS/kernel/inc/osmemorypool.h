@@ -462,7 +462,7 @@ struct MemoryPoolT : public __mem
 	static
 	MemoryPoolT<limit_, size_> *Create( void )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto mem = reinterpret_cast<MemoryPoolT<limit_, size_> *>(sys_alloc(sizeof(MemoryPoolT<limit_, size_>)));
 		new (mem) MemoryPoolT<limit_, size_>();
 		mem->__mem::lst.obj.res = mem;

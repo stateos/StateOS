@@ -524,7 +524,7 @@ struct Mutex : public __mtx
 	static
 	Mutex *Create( const unsigned _mode, const unsigned _prio = 0 )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto mtx = reinterpret_cast<Mutex *>(sys_alloc(sizeof(Mutex)));
 		new (mtx) Mutex(_mode, _prio);
 		mtx->__mtx::obj.res = mtx;

@@ -343,7 +343,7 @@ struct Barrier : public __bar
 	static
 	Barrier *Create( const unsigned _limit )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto bar = reinterpret_cast<Barrier *>(sys_alloc(sizeof(Barrier)));
 		new (bar) Barrier(_limit);
 		bar->__bar::obj.res = bar;

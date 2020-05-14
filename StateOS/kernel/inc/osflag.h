@@ -490,7 +490,7 @@ struct Flag : public __flg
 	static
 	Flag *Create( const unsigned _init = 0 )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto flg = reinterpret_cast<Flag *>(sys_alloc(sizeof(Flag)));
 		new (flg) Flag(_init);
 		flg->__flg::obj.res = flg;

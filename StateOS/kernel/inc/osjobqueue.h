@@ -523,7 +523,7 @@ struct JobQueueT : public __job
 	static
 	JobQueueT<limit_> *Create( void )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto job = reinterpret_cast<JobQueueT<limit_> *>(sys_alloc(sizeof(JobQueueT<limit_>)));
 		new (job) JobQueueT<limit_>();
 		job->__job::obj.res = job;

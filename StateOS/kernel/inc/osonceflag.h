@@ -2,7 +2,7 @@
 
     @file    StateOS: osonceflag.h
     @author  Rajmund Szymanski
-    @date    09.05.2020
+    @date    14.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -216,7 +216,7 @@ struct OnceFlag
 	OnceFlag& operator=( OnceFlag&& ) = delete;
 	OnceFlag& operator=( const OnceFlag& ) = delete;
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<class T>
 	void call( const T _fun )
 	{

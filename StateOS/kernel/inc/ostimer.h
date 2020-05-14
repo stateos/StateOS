@@ -731,7 +731,7 @@ void tmr_delayISR( cnt_t delay ) { tmr_thisISR()->delay = delay; }
 struct baseTimer : public __tmr
 {
 	baseTimer( void ):           __tmr _TMR_INIT(NULL) {}
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	baseTimer( std::nullptr_t ): __tmr _TMR_INIT(NULL) {}
 	template<class F>
 	baseTimer( const F _state ): __tmr _TMR_INIT(fun_), fun{_state} {}
@@ -752,7 +752,7 @@ struct baseTimer : public __tmr
 	void startNext    ( const T _delay )                                  {        tmr_startNext    (this, Clock::count(_delay)); }
 	template<typename T>
 	void startUntil   ( const T _time )                                   {        tmr_startUntil   (this, Clock::count(_time)); }
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename T>
 	void startFrom    ( const T _delay, const T _period, std::nullptr_t ) {        tmr_startFrom    (this, Clock::count(_delay), Clock::count(_period), NULL); }
 	template<typename T, class F>
@@ -775,7 +775,7 @@ struct baseTimer : public __tmr
 	unsigned wait     ( void )                                            { return tmr_wait         (this); }
 	bool     operator!( void )                                            { return __tmr::hdr.id == ID_STOPPED; }
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	static
 	void     fun_     ( void )                                            {        static_cast<baseTimer *>(tmr_thisISR())->fun(); }
 	Fun_t    fun;
@@ -799,7 +799,7 @@ struct Timer : public baseTimer
 	Timer( void ):                     baseTimer{} {}
 	template<class F>
 	Timer( const F _state ):           baseTimer{_state} {}
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename F, typename... A>
 	Timer( F&& _state, A&&... _args ): baseTimer{std::bind(std::forward<F>(_state), std::forward<A>(_args)...)} {}
 #endif
@@ -838,7 +838,7 @@ struct Timer : public baseTimer
 		return { _state };
 	}
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	Timer Make( F&& _state, A&&... _args )
 	{
@@ -886,7 +886,7 @@ struct Timer : public baseTimer
 		return tmr;
 	}
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename T, typename F, typename... A> static
 	Timer Start( const T _delay, const T _period, F&& _state, A&&... _args )
 	{
@@ -932,7 +932,7 @@ struct Timer : public baseTimer
 		return tmr;
 	}
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename T, typename F, typename... A> static
 	Timer StartFor( const T _delay, F&& _state, A&&... _args )
 	{
@@ -979,7 +979,7 @@ struct Timer : public baseTimer
 		return tmr;
 	}
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename T, typename F, typename... A> static
 	Timer StartPeriodic( const T _period, F&& _state, A&&... _args )
 	{
@@ -1023,7 +1023,7 @@ struct Timer : public baseTimer
 		return tmr;
 	}
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename T, typename F, typename... A> static
 	Timer StartUntil( const T _time, F&& _state, A&&... _args )
 	{
@@ -1053,7 +1053,7 @@ struct Timer : public baseTimer
 	static
 	Timer *Create( void )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 		new (tmr) Timer();
 		tmr->__tmr::hdr.obj.res = tmr;
@@ -1066,7 +1066,7 @@ struct Timer : public baseTimer
 	template<class F> static
 	Timer *Create( const F _state )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 		new (tmr) Timer(_state);
 		tmr->__tmr::hdr.obj.res = tmr;
@@ -1076,7 +1076,7 @@ struct Timer : public baseTimer
 #endif
 	}
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	Timer *Create( F&& _state, A&&... _args )
 	{
@@ -1100,7 +1100,7 @@ namespace ThisTimer
 {
 	template<class T = baseTimer>
 	static inline T  * current ( void )           { return static_cast<T *>(tmr_thisISR()); }
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	static inline void flipISR ( std::nullptr_t ) { tmr_flipISR (NULL); }
 	template<class F>
 	static inline void flipISR ( const F _state ) { new (&ThisTimer::current()->fun) Fun_t(_state);

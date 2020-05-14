@@ -1311,7 +1311,7 @@ struct baseStack
 
 struct baseTask : public __tsk
 {
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<class F>
 	baseTask( const unsigned _prio, const F _state, stk_t * const _stack, const size_t _size ) : __tsk _TSK_INIT(_prio, fun_, _stack, _size), fun{_state} {}
 #else
@@ -1319,7 +1319,7 @@ struct baseTask : public __tsk
 #endif
 
 	void     start    ( void )             {        tsk_start    (this); }
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<class F>
 	void     startFrom( const F  _state )  {        new (&fun) Fun_t(_state);
 	                                                tsk_startFrom(this, fun_); }
@@ -1338,7 +1338,7 @@ struct baseTask : public __tsk
 	unsigned resumeISR( void )             { return tsk_resumeISR(this); }
 	void     give     ( unsigned _signo )  {        tsk_give     (this, _signo); }
 	void     signal   ( unsigned _signo )  {        tsk_signal   (this, _signo); }
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<class F>
 	void     action   ( const F  _action ) {        new (&act) Act_t(_action);
 	                                                tsk_action   (this, act_); }
@@ -1347,7 +1347,7 @@ struct baseTask : public __tsk
 #endif
 	bool     operator!( void )             { return __tsk::hdr.id == ID_STOPPED; }
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	static
 	void     fun_     ( void )             {        static_cast<baseTask *>(tsk_this())->fun(); }
 	Fun_t    fun;
@@ -1376,7 +1376,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 {
 	template<class F>
 	TaskT( const unsigned _prio, const F _state ):           baseTask{_prio, _state, baseStack<size_>::stack_, size_} {}
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename F, typename... A>
 	TaskT( const unsigned _prio, F&& _state, A&&... _args ): baseTask{_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...), baseStack<size_>::stack_, size_} {}
 #endif
@@ -1411,7 +1411,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return { _prio, _state };
 	}
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	TaskT<size_> Make( const unsigned _prio, F&& _state, A&&... _args )
 	{
@@ -1444,7 +1444,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return tsk;
 	}
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	TaskT<size_> Start( const unsigned _prio, F&& _state, A&&... _args )
 	{
@@ -1477,7 +1477,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	template<class F> static
 	TaskT<size_> *Create( const unsigned _prio, const F _state )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
 		new (tsk) TaskT<size_>(_prio, _state);
 		tsk->__tsk::hdr.obj.res = tsk;
@@ -1488,7 +1488,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 #endif
 	}
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	TaskT<size_> *Create( const unsigned _prio, F&& _state, A&&... _args )
 	{
@@ -1523,7 +1523,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	template<class F> static
 	TaskT<size_> *Detached( const unsigned _prio, const F _state )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
 		new (tsk) TaskT<size_>(_prio, _state);
 		tsk->__tsk::hdr.obj.res = tsk;
@@ -1535,7 +1535,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 #endif
 	}
 
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	TaskT<size_> *Detached( const unsigned _prio, F&& _state, A&&... _args )
 	{
@@ -1580,7 +1580,7 @@ namespace ThisTask
 	static inline unsigned destroy   ( void )             { return cur_destroy   (); }
 	static inline void     yield     ( void )             {        tsk_yield     (); }
 	static inline void     pass      ( void )             {        tsk_pass      (); }
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<class F>
 	static inline void     flip      ( const F  _state )  {        new (&ThisTask::current()->fun) Fun_t(_state);
 	                                                               tsk_flip      (baseTask::fun_); }
@@ -1603,7 +1603,7 @@ namespace ThisTask
 	static inline void     suspend   ( void )             {        cur_suspend   (); }
 	static inline void     give      ( unsigned _signo )  {        cur_give      (_signo); }
 	static inline void     signal    ( unsigned _signo )  {        cur_signal    (_signo); }
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 	template<class F>
 	static inline void     action    ( const F  _action ) {        new (&ThisTask::current()->act) Act_t(_action);
 	                                                               cur_action    (baseTask::act_); }

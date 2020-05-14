@@ -357,7 +357,7 @@ struct Event : public __evt
 	static
 	Event *Create( void )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto evt = reinterpret_cast<Event *>(sys_alloc(sizeof(Event)));
 		new (evt) Event();
 		evt->__evt::obj.res = evt;

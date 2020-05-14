@@ -576,7 +576,7 @@ struct MailBoxQueueT : public __box
 	static
 	MailBoxQueueT<limit_, size_> *Create( void )
 	{
-#if OS_FUNCTIONAL
+#if __cplusplus >= 201402
 		auto box = reinterpret_cast<MailBoxQueueT<limit_, size_> *>(sys_alloc(sizeof(MailBoxQueueT<limit_, size_>)));
 		new (box) MailBoxQueueT<limit_, size_>();
 		box->__box::obj.res = box;
