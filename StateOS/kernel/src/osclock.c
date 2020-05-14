@@ -1,8 +1,8 @@
 /******************************************************************************
 
-    @file    StateOS: os.c
+    @file    StateOS: osclock.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    13.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -29,7 +29,7 @@
 
  ******************************************************************************/
 
-#include "oskernel.h"
+#include "inc/osclock.h"
 #include "inc/oscriticalsection.h"
 
 /* -------------------------------------------------------------------------- */
