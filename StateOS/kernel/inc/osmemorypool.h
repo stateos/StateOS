@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    14.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #define __STATEOS_MEM_H
 
 #include "oskernel.h"
+#include "osclock.h"
 #include "oslist.h"
 
 /* -------------------------------------------------------------------------- */
@@ -471,17 +472,19 @@ struct MemoryPoolT : public __mem
 #endif
 	}
 
-	void     reset    ( void )                             {        mem_reset    (this);                }
-	void     kill     ( void )                             {        mem_kill     (this);                }
-	void     destroy  ( void )                             {        mem_destroy  (this);                }
-	unsigned take     (       void **_data )               { return mem_take     (this, _data);         }
-	unsigned tryWait  (       void **_data )               { return mem_tryWait  (this, _data);         }
-	unsigned takeISR  (       void **_data )               { return mem_takeISR  (this, _data);         }
-	unsigned waitFor  (       void **_data, cnt_t _delay ) { return mem_waitFor  (this, _data, _delay); }
-	unsigned waitUntil(       void **_data, cnt_t _time )  { return mem_waitUntil(this, _data, _time);  }
-	unsigned wait     (       void **_data )               { return mem_wait     (this, _data);         }
-	void     give     ( const void  *_data )               {        mem_give     (this, _data);         }
-	void     giveISR  ( const void  *_data )               {        mem_giveISR  (this, _data);         }
+	void     reset    ( void )                               {        mem_reset    (this); }
+	void     kill     ( void )                               {        mem_kill     (this); }
+	void     destroy  ( void )                               {        mem_destroy  (this); }
+	unsigned take     (       void **_data )                 { return mem_take     (this, _data); }
+	unsigned tryWait  (       void **_data )                 { return mem_tryWait  (this, _data); }
+	unsigned takeISR  (       void **_data )                 { return mem_takeISR  (this, _data); }
+	template<typename T>
+	unsigned waitFor  (       void **_data, const T _delay ) { return mem_waitFor  (this, _data, Clock::count(_delay)); }
+	template<typename T>
+	unsigned waitUntil(       void **_data, const T _time )  { return mem_waitUntil(this, _data, Clock::count(_time)); }
+	unsigned wait     (       void **_data )                 { return mem_wait     (this, _data); }
+	void     give     ( const void  *_data )                 {        mem_give     (this, _data); }
+	void     giveISR  ( const void  *_data )                 {        mem_giveISR  (this, _data); }
 
 	private:
 	que_t data_[limit_ * (1 + MEM_SIZE(size_))];
@@ -495,14 +498,14 @@ struct MemoryPoolT : public __mem
  *
  * Constructor parameters
  *   limit           : size of a buffer (max number of objects)
- *   T               : class of a memory object
+ *   C               : class of a memory object
  *
  ******************************************************************************/
 
-template<unsigned limit_, class T>
-struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
+template<unsigned limit_, class C>
+struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
 {
-	MemoryPoolTT( void ): MemoryPoolT<limit_, sizeof(T)>() {}
+	MemoryPoolTT( void ): MemoryPoolT<limit_, sizeof(C)>() {}
 
 /******************************************************************************
  *
@@ -512,7 +515,7 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
  *
  * Parameters
  *   limit           : size of a buffer (max number of objects)
- *   T               : class of a memory object
+ *   C               : class of a memory object
  *
  * Return            : pointer to MemoryPoolTT<> object
  *
@@ -521,17 +524,19 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(T)>
  ******************************************************************************/
 
 	static
-	MemoryPoolTT<limit_, T> *Create( void )
+	MemoryPoolTT<limit_, C> *Create( void )
 	{
-		return reinterpret_cast<MemoryPoolTT<limit_, T> *>(MemoryPoolT<limit_, sizeof(T)>::Create());
+		return reinterpret_cast<MemoryPoolTT<limit_, C> *>(MemoryPoolT<limit_, sizeof(C)>::Create());
 	}
 
-	unsigned take     ( T **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data));         }
-	unsigned tryWait  ( T **_data )               { return mem_tryWait  (this, reinterpret_cast<void **>(_data));         }
-	unsigned takeISR  ( T **_data )               { return mem_takeISR  (this, reinterpret_cast<void **>(_data));         }
-	unsigned waitFor  ( T **_data, cnt_t _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), _delay); }
-	unsigned waitUntil( T **_data, cnt_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
-	unsigned wait     ( T **_data )               { return mem_wait     (this, reinterpret_cast<void **>(_data));         }
+	unsigned take     ( C **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data)); }
+	unsigned tryWait  ( C **_data )               { return mem_tryWait  (this, reinterpret_cast<void **>(_data)); }
+	unsigned takeISR  ( C **_data )               { return mem_takeISR  (this, reinterpret_cast<void **>(_data)); }
+	template<typename T>
+	unsigned waitFor  ( C **_data, cnt_t _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
+	template<typename T>
+	unsigned waitUntil( C **_data, cnt_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), Clock::count(_time)); }
+	unsigned wait     ( C **_data )               { return mem_wait     (this, reinterpret_cast<void **>(_data)); }
 };
 
 #endif//__cplusplus
