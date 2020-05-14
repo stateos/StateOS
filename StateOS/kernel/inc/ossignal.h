@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    14.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #define __STATEOS_SIG_H
 
 #include "oskernel.h"
+#include "osclock.h"
 
 /* -------------------------------------------------------------------------- */
 
@@ -447,20 +448,22 @@ struct Signal : public __sig
 #endif
 	}
 
-	void     reset    ( void )                           {        sig_reset    (this);                  }
-	void     kill     ( void )                           {        sig_kill     (this);                  }
-	void     destroy  ( void )                           {        sig_destroy  (this);                  }
-	unsigned take     ( unsigned _sigset )               { return sig_take     (this, _sigset);         }
-	unsigned tryWait  ( unsigned _sigset )               { return sig_tryWait  (this, _sigset);         }
-	unsigned takeISR  ( unsigned _sigset )               { return sig_takeISR  (this, _sigset);         }
-	unsigned waitFor  ( unsigned _sigset, cnt_t _delay ) { return sig_waitFor  (this, _sigset, _delay); }
-	unsigned waitUntil( unsigned _sigset, cnt_t _time )  { return sig_waitUntil(this, _sigset, _time);  }
-	unsigned wait     ( unsigned _sigset )               { return sig_wait     (this, _sigset);         }
-	void     give     ( unsigned _signo )                {        sig_give     (this, _signo);          }
-	void     set      ( unsigned _signo )                {        sig_set      (this, _signo);          }
-	void     giveISR  ( unsigned _signo )                {        sig_giveISR  (this, _signo);          }
-	void     clear    ( unsigned _signo )                {        sig_clear    (this, _signo);          }
-	void     clearISR ( unsigned _signo )                {        sig_clearISR (this, _signo);          }
+	void     reset    ( void )                             {        sig_reset    (this); }
+	void     kill     ( void )                             {        sig_kill     (this); }
+	void     destroy  ( void )                             {        sig_destroy  (this); }
+	unsigned take     ( unsigned _sigset )                 { return sig_take     (this, _sigset); }
+	unsigned tryWait  ( unsigned _sigset )                 { return sig_tryWait  (this, _sigset); }
+	unsigned takeISR  ( unsigned _sigset )                 { return sig_takeISR  (this, _sigset); }
+	template<typename T>
+	unsigned waitFor  ( unsigned _sigset, const T _delay ) { return sig_waitFor  (this, _sigset, Clock::count(_delay)); }
+	template<typename T>
+	unsigned waitUntil( unsigned _sigset, const T _time )  { return sig_waitUntil(this, _sigset, Clock::count(_time)); }
+	unsigned wait     ( unsigned _sigset )                 { return sig_wait     (this, _sigset); }
+	void     give     ( unsigned _signo )                  {        sig_give     (this, _signo); }
+	void     set      ( unsigned _signo )                  {        sig_set      (this, _signo); }
+	void     giveISR  ( unsigned _signo )                  {        sig_giveISR  (this, _signo); }
+	void     clear    ( unsigned _signo )                  {        sig_clear    (this, _signo); }
+	void     clearISR ( unsigned _signo )                  {        sig_clearISR (this, _signo); }
 };
 
 #endif//__cplusplus
