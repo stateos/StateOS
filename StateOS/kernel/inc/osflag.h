@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    14.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #define __STATEOS_FLG_H
 
 #include "oskernel.h"
+#include "osclock.h"
 
 /* -------------------------------------------------------------------------- */
 
@@ -499,22 +500,24 @@ struct Flag : public __flg
 #endif
 	}
 
-	void     reset    ( void )                                      {        flg_reset    (this);                        }
-	void     kill     ( void )                                      {        flg_kill     (this);                        }
-	void     destroy  ( void )                                      {        flg_destroy  (this);                        }
-	unsigned take     ( unsigned _flags, char _mode = flgAll )      { return flg_take     (this, _flags, _mode);         }
-	unsigned tryWait  ( unsigned _flags, char _mode = flgAll )      { return flg_tryWait  (this, _flags, _mode);         }
-	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )      { return flg_takeISR  (this, _flags, _mode);         }
-	unsigned waitFor  ( unsigned _flags, char _mode, cnt_t _delay ) { return flg_waitFor  (this, _flags, _mode, _delay); }
-	unsigned waitUntil( unsigned _flags, char _mode, cnt_t _time )  { return flg_waitUntil(this, _flags, _mode, _time);  }
-	unsigned wait     ( unsigned _flags, char _mode = flgAll )      { return flg_wait     (this, _flags, _mode);         }
-	unsigned give     ( unsigned _flags )                           { return flg_give     (this, _flags);                }
-	unsigned set      ( unsigned _flags )                           { return flg_set      (this, _flags);                }
-	unsigned giveISR  ( unsigned _flags )                           { return flg_giveISR  (this, _flags);                }
-	unsigned clear    ( unsigned _flags )                           { return flg_clear    (this, _flags);                }
-	unsigned clearISR ( unsigned _flags )                           { return flg_clearISR (this, _flags);                }
-	unsigned get      ( void )                                      { return flg_get      (this);                        }
-	unsigned getISR   ( void )                                      { return flg_getISR   (this);                        }
+	void     reset    ( void )                                        {        flg_reset    (this); }
+	void     kill     ( void )                                        {        flg_kill     (this); }
+	void     destroy  ( void )                                        {        flg_destroy  (this); }
+	unsigned take     ( unsigned _flags, char _mode = flgAll )        { return flg_take     (this, _flags, _mode); }
+	unsigned tryWait  ( unsigned _flags, char _mode = flgAll )        { return flg_tryWait  (this, _flags, _mode); }
+	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )        { return flg_takeISR  (this, _flags, _mode); }
+	template<typename T>
+	unsigned waitFor  ( unsigned _flags, char _mode, const T _delay ) { return flg_waitFor  (this, _flags, _mode, Clock::count(_delay)); }
+	template<typename T>
+	unsigned waitUntil( unsigned _flags, char _mode, const T _time )  { return flg_waitUntil(this, _flags, _mode, Clock::count(_time)); }
+	unsigned wait     ( unsigned _flags, char _mode = flgAll )        { return flg_wait     (this, _flags, _mode); }
+	unsigned give     ( unsigned _flags )                             { return flg_give     (this, _flags); }
+	unsigned set      ( unsigned _flags )                             { return flg_set      (this, _flags); }
+	unsigned giveISR  ( unsigned _flags )                             { return flg_giveISR  (this, _flags); }
+	unsigned clear    ( unsigned _flags )                             { return flg_clear    (this, _flags); }
+	unsigned clearISR ( unsigned _flags )                             { return flg_clearISR (this, _flags); }
+	unsigned get      ( void )                                        { return flg_get      (this); }
+	unsigned getISR   ( void )                                        { return flg_getISR   (this); }
 };
 
 #endif//__cplusplus
