@@ -1,12 +1,12 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-void proc( unsigned &led, cnt_t timePoint )
+void proc( unsigned &led, Clock::time_point timePoint )
 {
 	ThisTask::sleepUntil(timePoint);
 	for (;;)
 	{
-		ThisTask::sleepNext(SEC/2);
+		ThisTask::sleepNext(std::chrono::milliseconds{500});
 		led++;
 	}
 }
@@ -15,12 +15,13 @@ int main()
 {
 	auto led = Led();
 	auto grn = GreenLed();
+	auto now = Clock::now();
 
-	auto t1 = Task::Start(0, proc, std::ref(led[0]), SEC/8*0);
-	auto t2 = Task::Start(0, proc, std::ref(led[1]), SEC/8*1);
-	auto t3 = Task::Start(0, proc, std::ref(led[2]), SEC/8*2);
-	auto t4 = Task::Start(0, proc, std::ref(led[3]), SEC/8*3);
-	auto t5 = Task::Start(0, proc, std::ref(grn),    SEC/8*4);
+	auto t1 = Task::Start(0, proc, std::ref(led[0]), now + std::chrono::milliseconds{  0});
+	auto t2 = Task::Start(0, proc, std::ref(led[1]), now + std::chrono::milliseconds{125});
+	auto t3 = Task::Start(0, proc, std::ref(led[2]), now + std::chrono::milliseconds{250});
+	auto t4 = Task::Start(0, proc, std::ref(led[3]), now + std::chrono::milliseconds{375});
+	auto t5 = Task::Start(0, proc, std::ref(grn),    now + std::chrono::milliseconds{500});
 
 	ThisTask::stop();
 }
