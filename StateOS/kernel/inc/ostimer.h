@@ -33,6 +33,7 @@
 #define __STATEOS_TMR_H
 
 #include "oskernel.h"
+#include "osclock.h"
 
 /******************************************************************************
  *
