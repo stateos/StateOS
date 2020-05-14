@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    14.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #define __STATEOS_LST_H
 
 #include "oskernel.h"
+#include "osclock.h"
 
 /******************************************************************************
  *
@@ -387,11 +388,11 @@ void lst_giveISR( lst_t *lst, const void *data ) { lst_give(lst, data); }
  * Description       : create and initialize a list object
  *
  * Constructor parameters
- *   T               : class of a list object
+ *   C               : class of a list object
  *
  ******************************************************************************/
 
-template<class T>
+template<class C>
 struct ListTT : public __lst
 {
 	ListTT( void ): __lst _LST_INIT() {}
@@ -410,7 +411,7 @@ struct ListTT : public __lst
  * Description       : create dynamic object with manageable resources
  *
  * Parameters
- *   T               : class of a list object
+ *   C               : class of a list object
  *
  * Return            : pointer to ListTT<> object
  *
@@ -419,29 +420,31 @@ struct ListTT : public __lst
  ******************************************************************************/
 
 	static
-	ListTT<T> *Create( void )
+	ListTT<C> *Create( void )
 	{
 #if OS_FUNCTIONAL
-		auto lst = reinterpret_cast<ListTT<T> *>(sys_alloc(sizeof(ListTT<T>)));
-		new (lst) ListTT<T>();
+		auto lst = reinterpret_cast<ListTT<C> *>(sys_alloc(sizeof(ListTT<C>)));
+		new (lst) ListTT<C>();
 		lst->__lst::obj.res = lst;
 		return lst;
 #else
-		return reinterpret_cast<ListTT<T> *>(lst_create());
+		return reinterpret_cast<ListTT<L> *>(lst_create());
 #endif
 	}
 
-	void     reset    ( void )                            {        lst_reset    (this);                                           }
-	void     kill     ( void )                            {        lst_kill     (this);                                           }
-	void     destroy  ( void )                            {        lst_destroy  (this);                                           }
-	unsigned take     (       T   **_data )               { return lst_take     (this, reinterpret_cast<void **>(_data));         }
-	unsigned tryWait  (       T   **_data )               { return lst_tryWait  (this, reinterpret_cast<void **>(_data));         }
-	unsigned takeISR  (       T   **_data )               { return lst_takeISR  (this, reinterpret_cast<void **>(_data));         }
-	unsigned waitFor  (       T   **_data, cnt_t _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), _delay); }
-	unsigned waitUntil(       T   **_data, cnt_t _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), _time);  }
-	unsigned wait     (       T   **_data )               { return lst_wait     (this, reinterpret_cast<void **>(_data));         }
-	void     give     ( const void *_data )               {        lst_give     (this,                           _data);          }
-	void     giveISR  ( const void *_data )               {        lst_giveISR  (this,                           _data);          }
+	void     reset    ( void )                              {        lst_reset    (this); }
+	void     kill     ( void )                              {        lst_kill     (this); }
+	void     destroy  ( void )                              {        lst_destroy  (this); }
+	unsigned take     (       C   **_data )                 { return lst_take     (this, reinterpret_cast<void **>(_data)); }
+	unsigned tryWait  (       C   **_data )                 { return lst_tryWait  (this, reinterpret_cast<void **>(_data)); }
+	unsigned takeISR  (       C   **_data )                 { return lst_takeISR  (this, reinterpret_cast<void **>(_data)); }
+	template<typename T>
+	unsigned waitFor  (       C   **_data, const T _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
+	template<typename T>
+	unsigned waitUntil(       C   **_data, const T _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), Clock::count(_time)); }
+	unsigned wait     (       C   **_data )                 { return lst_wait     (this, reinterpret_cast<void **>(_data)); }
+	void     give     ( const void *_data )                 {        lst_give     (this,                           _data); }
+	void     giveISR  ( const void *_data )                 {        lst_giveISR  (this,                           _data); }
 };
 
 /******************************************************************************
