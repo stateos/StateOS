@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    13.05.2020
+    @date    14.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1311,16 +1311,16 @@ struct baseStack
 struct baseTask : public __tsk
 {
 #if OS_FUNCTIONAL
-	template<class T>
-	baseTask( const unsigned _prio, const T _state, stk_t * const _stack, const size_t _size ) : __tsk _TSK_INIT(_prio, fun_, _stack, _size), fun{_state} {}
+	template<class F>
+	baseTask( const unsigned _prio, const F _state, stk_t * const _stack, const size_t _size ) : __tsk _TSK_INIT(_prio, fun_, _stack, _size), fun{_state} {}
 #else
 	baseTask( const unsigned _prio, fun_t * _state, stk_t * const _stack, const size_t _size ) : __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 #endif
 
 	void     start    ( void )             {        tsk_start    (this);          }
 #if OS_FUNCTIONAL
-	template<class T>
-	void     startFrom( const T  _state )  {        new (&fun) Fun_t(_state);
+	template<class F>
+	void     startFrom( const F  _state )  {        new (&fun) Fun_t(_state);
 	                                                tsk_startFrom(this, fun_);    }
 #else
 	void     startFrom( fun_t *  _state )  {        tsk_startFrom(this, _state);  }
@@ -1338,8 +1338,8 @@ struct baseTask : public __tsk
 	void     give     ( unsigned _signo )  {        tsk_give     (this, _signo);  }
 	void     signal   ( unsigned _signo )  {        tsk_signal   (this, _signo);  }
 #if OS_FUNCTIONAL
-	template<class T>
-	void     action   ( const T  _action ) {        new (&act) Act_t(_action);
+	template<class F>
+	void     action   ( const F  _action ) {        new (&act) Act_t(_action);
 	                                                tsk_action   (this, act_);    }
 #else
 	void     action   ( act_t *  _action ) {        tsk_action   (this, _action); }
@@ -1373,8 +1373,8 @@ struct baseTask : public __tsk
 template<size_t size_>
 struct TaskT : public baseTask, public baseStack<size_>
 {
-	template<class T>
-	TaskT( const unsigned _prio, const T _state ):           baseTask{_prio, _state, baseStack<size_>::stack_, size_} {}
+	template<class F>
+	TaskT( const unsigned _prio, const F _state ):           baseTask{_prio, _state, baseStack<size_>::stack_, size_} {}
 #if OS_FUNCTIONAL
 	template<typename F, typename... A>
 	TaskT( const unsigned _prio, F&& _state, A&&... _args ): baseTask{_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...), baseStack<size_>::stack_, size_} {}
@@ -1404,16 +1404,14 @@ struct TaskT : public baseTask, public baseStack<size_>
  *
  ******************************************************************************/
 
-	template<class T>
-	static
-	TaskT<size_> Make( const unsigned _prio, const T _state )
+	template<class F> static
+	TaskT<size_> Make( const unsigned _prio, const F _state )
 	{
 		return { _prio, _state };
 	}
 
 #if OS_FUNCTIONAL
-	template<typename F, typename... A>
-	static
+	template<typename F, typename... A> static
 	TaskT<size_> Make( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		return { _prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
@@ -1437,9 +1435,8 @@ struct TaskT : public baseTask, public baseStack<size_>
  *
  ******************************************************************************/
 
-	template<class T>
-	static
-	TaskT<size_> Start( const unsigned _prio, const T _state )
+	template<class F> static
+	TaskT<size_> Start( const unsigned _prio, const F _state )
 	{
 		TaskT<size_> tsk { _prio, _state };
 		tsk.start();
@@ -1447,8 +1444,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	}
 
 #if OS_FUNCTIONAL
-	template<typename F, typename... A>
-	static
+	template<typename F, typename... A> static
 	TaskT<size_> Start( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		TaskT<size_> tsk { _prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
@@ -1477,9 +1473,8 @@ struct TaskT : public baseTask, public baseStack<size_>
  *
  ******************************************************************************/
 
-	template<class T>
-	static
-	TaskT<size_> *Create( const unsigned _prio, const T _state )
+	template<class F> static
+	TaskT<size_> *Create( const unsigned _prio, const F _state )
 	{
 #if OS_FUNCTIONAL
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
@@ -1493,8 +1488,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	}
 
 #if OS_FUNCTIONAL
-	template<typename F, typename... A>
-	static
+	template<typename F, typename... A> static
 	TaskT<size_> *Create( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
@@ -1525,9 +1519,8 @@ struct TaskT : public baseTask, public baseStack<size_>
  *
  ******************************************************************************/
 
-	template<class T>
-	static
-	TaskT<size_> *Detached( const unsigned _prio, const T _state )
+	template<class F> static
+	TaskT<size_> *Detached( const unsigned _prio, const F _state )
 	{
 #if OS_FUNCTIONAL
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
@@ -1542,8 +1535,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	}
 
 #if OS_FUNCTIONAL
-	template<typename F, typename... A>
-	static
+	template<typename F, typename... A> static
 	TaskT<size_> *Detached( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
@@ -1588,8 +1580,8 @@ namespace ThisTask
 	static inline void     yield     ( void )             {        tsk_yield     ();        }
 	static inline void     pass      ( void )             {        tsk_pass      ();        }
 #if OS_FUNCTIONAL
-	template<class T>
-	static inline void     flip      ( const T  _state )  {        new (&ThisTask::current()->fun) Fun_t(_state);
+	template<class F>
+	static inline void     flip      ( const F  _state )  {        new (&ThisTask::current()->fun) Fun_t(_state);
 	                                                               tsk_flip      (baseTask::fun_); }
 #else
 	static inline void     flip      ( fun_t *  _state )  {        tsk_flip      (_state);  }
@@ -1598,17 +1590,21 @@ namespace ThisTask
 	static inline void     prio      ( unsigned _prio )   {        tsk_prio      (_prio);   }
 	static inline unsigned getPrio   ( void )             { return tsk_getPrio   ();        }
 	static inline unsigned prio      ( void )             { return tsk_getPrio   ();        }
-	static inline void     sleepFor  ( cnt_t    _delay )  {        tsk_sleepFor  (_delay);  }
-	static inline void     sleepNext ( cnt_t    _delay )  {        tsk_sleepNext (_delay);  }
-	static inline void     sleepUntil( cnt_t    _time )   {        tsk_sleepUntil(_time);   }
+	template<typename T>
+	static inline void     sleepFor  ( const T  _delay )  {        tsk_sleepFor  (Clock::count(_delay)); }
+	template<typename T>
+	static inline void     sleepNext ( const T  _delay )  {        tsk_sleepNext (Clock::count(_delay)); }
+	template<typename T>
+	static inline void     sleepUntil( const T  _time )   {        tsk_sleepUntil(Clock::count(_time)); }
 	static inline void     sleep     ( void )             {        tsk_sleep     ();        }
-	static inline void     delay     ( cnt_t    _delay )  {        tsk_delay     (_delay);  }
+	template<typename T>
+	static inline void     delay     ( const T  _delay )  {        tsk_delay     (Clock::count(_delay)); }
 	static inline void     suspend   ( void )             {        cur_suspend   ();        }
 	static inline void     give      ( unsigned _signo )  {        cur_give      (_signo);  }
 	static inline void     signal    ( unsigned _signo )  {        cur_signal    (_signo);  }
 #if OS_FUNCTIONAL
-	template<class T>
-	static inline void     action    ( const T  _action ) {        new (&ThisTask::current()->act) Act_t(_action);
+	template<class F>
+	static inline void     action    ( const F  _action ) {        new (&ThisTask::current()->act) Act_t(_action);
 	                                                               cur_action    (baseTask::act_); }
 #else
 	static inline void     action    ( act_t *  _action ) {        cur_action    (_action); }

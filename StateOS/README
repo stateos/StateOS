@@ -39,6 +39,7 @@ Features:
 - updated os version
 - implementation of steady clock
 - updated Timer class
+- updated Task class
 ---------
 6.6
 - updated os version
