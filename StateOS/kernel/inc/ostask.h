@@ -1318,34 +1318,34 @@ struct baseTask : public __tsk
 	baseTask( const unsigned _prio, fun_t * _state, stk_t * const _stack, const size_t _size ) : __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 #endif
 
-	void     start    ( void )             {        tsk_start    (this);          }
+	void     start    ( void )             {        tsk_start    (this); }
 #if OS_FUNCTIONAL
 	template<class F>
 	void     startFrom( const F  _state )  {        new (&fun) Fun_t(_state);
-	                                                tsk_startFrom(this, fun_);    }
+	                                                tsk_startFrom(this, fun_); }
 #else
-	void     startFrom( fun_t *  _state )  {        tsk_startFrom(this, _state);  }
+	void     startFrom( fun_t *  _state )  {        tsk_startFrom(this, _state); }
 #endif
-	unsigned detach   ( void )             { return tsk_detach   (this);          }
-	unsigned join     ( void )             { return tsk_join     (this);          }
-	unsigned reset    ( void )             { return tsk_reset    (this);          }
-	unsigned kill     ( void )             { return tsk_kill     (this);          }
-	unsigned destroy  ( void )             { return tsk_destroy  (this);          }
-	unsigned prio     ( void )             { return __tsk::basic;                 }
-	unsigned getPrio  ( void )             { return __tsk::basic;                 }
-	unsigned suspend  ( void )             { return tsk_suspend  (this);          }
-	unsigned resume   ( void )             { return tsk_resume   (this);          }
-	unsigned resumeISR( void )             { return tsk_resumeISR(this);          }
-	void     give     ( unsigned _signo )  {        tsk_give     (this, _signo);  }
-	void     signal   ( unsigned _signo )  {        tsk_signal   (this, _signo);  }
+	unsigned detach   ( void )             { return tsk_detach   (this); }
+	unsigned join     ( void )             { return tsk_join     (this); }
+	unsigned reset    ( void )             { return tsk_reset    (this); }
+	unsigned kill     ( void )             { return tsk_kill     (this); }
+	unsigned destroy  ( void )             { return tsk_destroy  (this); }
+	unsigned prio     ( void )             { return __tsk::basic; }
+	unsigned getPrio  ( void )             { return __tsk::basic; }
+	unsigned suspend  ( void )             { return tsk_suspend  (this); }
+	unsigned resume   ( void )             { return tsk_resume   (this); }
+	unsigned resumeISR( void )             { return tsk_resumeISR(this); }
+	void     give     ( unsigned _signo )  {        tsk_give     (this, _signo); }
+	void     signal   ( unsigned _signo )  {        tsk_signal   (this, _signo); }
 #if OS_FUNCTIONAL
 	template<class F>
 	void     action   ( const F  _action ) {        new (&act) Act_t(_action);
-	                                                tsk_action   (this, act_);    }
+	                                                tsk_action   (this, act_); }
 #else
 	void     action   ( act_t *  _action ) {        tsk_action   (this, _action); }
 #endif
-	bool     operator!( void )             { return __tsk::hdr.id == ID_STOPPED;  }
+	bool     operator!( void )             { return __tsk::hdr.id == ID_STOPPED; }
 
 #if OS_FUNCTIONAL
 	static
@@ -1572,37 +1572,37 @@ namespace ThisTask
 {
 	template<class T = baseTask>
 	static inline T  *     current   ( void )             { return static_cast<T *>(tsk_this()); }
-	static inline unsigned detach    ( void )             { return cur_detach    ();        }
-	static inline void     stop      ( void )             {        tsk_stop      ();        }
-	static inline void     exit      ( void )             {        tsk_exit      ();        }
-	static inline unsigned reset     ( void )             { return cur_reset     ();        }
-	static inline unsigned kill      ( void )             { return cur_kill      ();        }
-	static inline unsigned destroy   ( void )             { return cur_destroy   ();        }
-	static inline void     yield     ( void )             {        tsk_yield     ();        }
-	static inline void     pass      ( void )             {        tsk_pass      ();        }
+	static inline unsigned detach    ( void )             { return cur_detach    (); }
+	static inline void     stop      ( void )             {        tsk_stop      (); }
+	static inline void     exit      ( void )             {        tsk_exit      (); }
+	static inline unsigned reset     ( void )             { return cur_reset     (); }
+	static inline unsigned kill      ( void )             { return cur_kill      (); }
+	static inline unsigned destroy   ( void )             { return cur_destroy   (); }
+	static inline void     yield     ( void )             {        tsk_yield     (); }
+	static inline void     pass      ( void )             {        tsk_pass      (); }
 #if OS_FUNCTIONAL
 	template<class F>
 	static inline void     flip      ( const F  _state )  {        new (&ThisTask::current()->fun) Fun_t(_state);
 	                                                               tsk_flip      (baseTask::fun_); }
 #else
-	static inline void     flip      ( fun_t *  _state )  {        tsk_flip      (_state);  }
+	static inline void     flip      ( fun_t *  _state )  {        tsk_flip      (_state); }
 #endif
-	static inline void     setPrio   ( unsigned _prio )   {        tsk_setPrio   (_prio);   }
-	static inline void     prio      ( unsigned _prio )   {        tsk_prio      (_prio);   }
-	static inline unsigned getPrio   ( void )             { return tsk_getPrio   ();        }
-	static inline unsigned prio      ( void )             { return tsk_getPrio   ();        }
+	static inline void     setPrio   ( unsigned _prio )   {        tsk_setPrio   (_prio); }
+	static inline void     prio      ( unsigned _prio )   {        tsk_prio      (_prio); }
+	static inline unsigned getPrio   ( void )             { return tsk_getPrio   (); }
+	static inline unsigned prio      ( void )             { return tsk_getPrio   (); }
 	template<typename T>
 	static inline void     sleepFor  ( const T  _delay )  {        tsk_sleepFor  (Clock::count(_delay)); }
 	template<typename T>
 	static inline void     sleepNext ( const T  _delay )  {        tsk_sleepNext (Clock::count(_delay)); }
 	template<typename T>
 	static inline void     sleepUntil( const T  _time )   {        tsk_sleepUntil(Clock::count(_time)); }
-	static inline void     sleep     ( void )             {        tsk_sleep     ();        }
+	static inline void     sleep     ( void )             {        tsk_sleep     (); }
 	template<typename T>
 	static inline void     delay     ( const T  _delay )  {        tsk_delay     (Clock::count(_delay)); }
-	static inline void     suspend   ( void )             {        cur_suspend   ();        }
-	static inline void     give      ( unsigned _signo )  {        cur_give      (_signo);  }
-	static inline void     signal    ( unsigned _signo )  {        cur_signal    (_signo);  }
+	static inline void     suspend   ( void )             {        cur_suspend   (); }
+	static inline void     give      ( unsigned _signo )  {        cur_give      (_signo); }
+	static inline void     signal    ( unsigned _signo )  {        cur_signal    (_signo); }
 #if OS_FUNCTIONAL
 	template<class F>
 	static inline void     action    ( const F  _action ) {        new (&ThisTask::current()->act) Act_t(_action);

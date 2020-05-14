@@ -739,9 +739,9 @@ struct baseTimer : public __tmr
 	baseTimer( fun_t * _state ): __tmr _TMR_INIT(_state) {}
 #endif
 
-	void reset        ( void )                                            {        tmr_reset        (this);                  }
-	void kill         ( void )                                            {        tmr_kill         (this);                  }
-	void destroy      ( void )                                            {        tmr_destroy      (this);                  }
+	void reset        ( void )                                            {        tmr_reset        (this); }
+	void kill         ( void )                                            {        tmr_kill         (this); }
+	void destroy      ( void )                                            {        tmr_destroy      (this); }
 	template<typename T>
 	void start        ( const T _delay, const T _period )                 {        tmr_start        (this, Clock::count(_delay), Clock::count(_period)); }
 	template<typename T>
@@ -762,18 +762,18 @@ struct baseTimer : public __tmr
 	template<typename T>
 	void startFrom    ( const T _delay, const T _period, fun_t * _state ) {        tmr_startFrom    (this, Clock::count(_delay), Clock::count(_period), _state); }
 #endif
-	void stop         ( void )                                            {        tmr_stop         (this);                  }
-	unsigned take     ( void )                                            { return tmr_take         (this);                  }
-	unsigned tryWait  ( void )                                            { return tmr_tryWait      (this);                  }
-	unsigned takeISR  ( void )                                            { return tmr_takeISR      (this);                  }
+	void stop         ( void )                                            {        tmr_stop         (this); }
+	unsigned take     ( void )                                            { return tmr_take         (this); }
+	unsigned tryWait  ( void )                                            { return tmr_tryWait      (this); }
+	unsigned takeISR  ( void )                                            { return tmr_takeISR      (this); }
 	template<typename T>
 	unsigned waitFor  ( const T _delay )                                  { return tmr_waitFor      (this, Clock::count(_delay)); }
 	template<typename T>
 	unsigned waitNext ( const T _delay )                                  { return tmr_waitNext     (this, Clock::count(_delay)); }
 	template<typename T>
 	unsigned waitUntil( const T _time )                                   { return tmr_waitUntil    (this, Clock::count(_time)); }
-	unsigned wait     ( void )                                            { return tmr_wait         (this);                  }
-	bool     operator!( void )                                            { return __tmr::hdr.id == ID_STOPPED;              }
+	unsigned wait     ( void )                                            { return tmr_wait         (this); }
+	bool     operator!( void )                                            { return __tmr::hdr.id == ID_STOPPED; }
 
 #if OS_FUNCTIONAL
 	static

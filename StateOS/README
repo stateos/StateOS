@@ -40,6 +40,7 @@ Features:
 - implementation of steady clock
 - updated Timer class
 - updated Task class
+- updated other classes
 ---------
 6.6
 - updated os version
