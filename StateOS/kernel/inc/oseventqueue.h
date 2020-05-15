@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    15.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -477,6 +477,69 @@ void evq_push( evq_t *evq, unsigned data );
 
 __STATIC_INLINE
 void evq_pushISR( evq_t *evq, unsigned data ) { evq_push(evq, data); }
+
+/******************************************************************************
+ *
+ * Name              : evq_count
+ * ISR alias         : evq_countISR
+ *
+ * Description       : return the amount of data contained in the event queue
+ *
+ * Parameters
+ *   evq             : pointer to event queue object
+ *
+ * Return            : amount of data contained in the event queue
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned evq_count( evq_t *evq );
+
+__STATIC_INLINE
+unsigned evq_countISR( evq_t *evq ) { return evq_count(evq); }
+
+/******************************************************************************
+ *
+ * Name              : evq_space
+ * ISR alias         : evq_spaceISR
+ *
+ * Description       : return the amount of free space in the event queue
+ *
+ * Parameters
+ *   evq             : pointer to event queue object
+ *
+ * Return            : amount of free space in the event queue
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned evq_space( evq_t *evq );
+
+__STATIC_INLINE
+unsigned evq_spaceISR( evq_t *evq ) { return evq_space(evq); }
+
+/******************************************************************************
+ *
+ * Name              : evq_limit
+ * ISR alias         : evq_limitISR
+ *
+ * Description       : return the size of the event queue
+ *
+ * Parameters
+ *   evq             : pointer to event queue object
+ *
+ * Return            : size of the event queue
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned evq_limit( evq_t *evq );
+
+__STATIC_INLINE
+unsigned evq_limitISR( evq_t *evq ) { return evq_limit(evq); }
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    15.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -473,6 +473,69 @@ void job_push( job_t *job, fun_t *fun );
 
 __STATIC_INLINE
 void job_pushISR( job_t *job, fun_t *fun ) { job_push(job, fun); }
+
+/******************************************************************************
+ *
+ * Name              : job_count
+ * ISR alias         : job_countISR
+ *
+ * Description       : return the amount of data contained in the job queue
+ *
+ * Parameters
+ *   job             : pointer to job queue object
+ *
+ * Return            : amount of data contained in the job queue
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned job_count( job_t *job );
+
+__STATIC_INLINE
+unsigned job_countISR( job_t *job ) { return job_count(job); }
+
+/******************************************************************************
+ *
+ * Name              : job_space
+ * ISR alias         : job_spaceISR
+ *
+ * Description       : return the amount of free space in the job queue
+ *
+ * Parameters
+ *   job             : pointer to job queue object
+ *
+ * Return            : amount of free space in the job queue
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned job_space( job_t *job );
+
+__STATIC_INLINE
+unsigned job_spaceISR( job_t *job ) { return job_space(job); }
+
+/******************************************************************************
+ *
+ * Name              : job_limit
+ * ISR alias         : job_limitISR
+ *
+ * Description       : return the size of the job queue
+ *
+ * Parameters
+ *   job             : pointer to job queue object
+ *
+ * Return            : size of the job queue
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned job_limit( job_t *job );
+
+__STATIC_INLINE
+unsigned job_limitISR( job_t *job ) { return job_limit(job); }
 
 #ifdef __cplusplus
 }

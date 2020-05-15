@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    15.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -499,6 +499,8 @@ void box_pushISR( box_t *box, const void *data ) { box_push(box, data); }
  *
  * Return            : amount of data contained in the mailbox queue
  *
+ * Note              : may be used both in thread and handler mode
+ *
  ******************************************************************************/
 
 unsigned box_count( box_t *box );
@@ -518,12 +520,35 @@ unsigned box_countISR( box_t *box ) { return box_count(box); }
  *
  * Return            : amount of free space in the mailbox queue
  *
+ * Note              : may be used both in thread and handler mode
+ *
  ******************************************************************************/
 
 unsigned box_space( box_t *box );
 
 __STATIC_INLINE
 unsigned box_spaceISR( box_t *box ) { return box_space(box); }
+
+/******************************************************************************
+ *
+ * Name              : box_limit
+ * ISR alias         : box_limitISR
+ *
+ * Description       : return the size of the mailbox queue
+ *
+ * Parameters
+ *   box             : pointer to mailbox queue object
+ *
+ * Return            : size of the mailbox queue
+ *
+ * Note              : may be used both in thread and handler mode
+ *
+ ******************************************************************************/
+
+unsigned box_limit( box_t *box );
+
+__STATIC_INLINE
+unsigned box_limitISR( box_t *box ) { return box_limit(box); }
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
 
     @file    StateOS: osclock.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    15.05.2020
     @brief   This file implements steady clock for StateOS.
 
  ******************************************************************************
@@ -80,8 +80,8 @@ cnt_t sys_timeISR( void ) { return sys_time(); }
 
 struct Clock
 {
-#if __cplusplus >= 201402
 	using rep        = cnt_t;
+#if __cplusplus >= 201402
 	using period     = std::ratio<1, OS_FREQUENCY>;
 	using duration   = std::chrono::duration<rep, period>;
 	using time_point = std::chrono::time_point<Clock>;
@@ -93,17 +93,14 @@ struct Clock
 	time_point now() { return time_point(duration(sys_time())); }
 
 	static constexpr
-	rep count( const rep t )                         { return t; }
-	static constexpr
 	rep count( const duration t )                    { return t.count(); }
 	static constexpr
 	rep count( const time_point t )                  { return t.time_since_epoch().count(); }
 	template<typename R, typename P> static constexpr
 	rep count( const std::chrono::duration<R, P> t ) { return std::chrono::duration_cast<duration>(t).count(); }
-#else
-	static constexpr
-	cnt_t count( const cnt_t t )                     { return t; }
 #endif
+	static constexpr
+	rep count( const rep t )                         { return t; }
 };
 
 #endif//__cplusplus
