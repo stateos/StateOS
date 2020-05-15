@@ -7,21 +7,23 @@ OS_CND(cnd);
 void slave()
 {
 	mtx_wait(mtx);
-	cnd_wait(cnd, mtx);
-	LED_Tick();
-	mtx_give(mtx);
+	for (;;)
+	{
+		cnd_wait(cnd, mtx);
+		LED_Tick();
+	}
 }
 
 void master()
 {
-	tsk_delay(SEC);
 	mtx_wait(mtx);
+	tsk_delay(SEC);
 	cnd_give(cnd, cndOne);
 	mtx_give(mtx);
 }
 
-OS_TSK(sla, 0, slave);
-OS_TSK(mas, 0, master);
+OS_TSK(sla, 1, slave);
+OS_TSK(mas, 1, master);
 
 int main()
 {
@@ -29,5 +31,6 @@ int main()
 
 	tsk_start(sla);
 	tsk_start(mas);
+
 	tsk_stop();
 }
