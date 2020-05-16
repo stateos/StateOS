@@ -1,0 +1,19 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+using namespace std::chrono_literals;
+
+int main()
+{
+	auto led = Led();
+	auto sem = Semaphore::Binary();
+	for (;;)
+	{
+		auto tsk0 = Task(2, [&]{ led.tick(); sem.wait(); ThisTask::exit(); });
+		tsk0.start();
+		auto tsk1 = Task::Start(1, [&]{ led.tick(); ThisTask::suspend(); });
+		Task::Start(0, [&]{ led.tick(); sem.post(); ThisTask::exit(); });
+		tsk1.reset();
+		ThisTask::sleepNext(1s);
+	}
+}
