@@ -1547,7 +1547,6 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return tsk;
 	}
 #endif
-
 };
 
 /******************************************************************************
