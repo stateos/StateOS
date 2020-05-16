@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -552,7 +552,7 @@ struct Semaphore : public __sem
 	template<typename T>
 	unsigned waitFor  ( const T _delay ) { return sem_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )  { return sem_waitUntil(this, Clock::count(_time)); }
+	unsigned waitUntil( const T _time )  { return sem_waitUntil(this, Clock::until(_time)); }
 	unsigned wait     ( void )           { return sem_wait     (this); }
 	unsigned give     ( void )           { return sem_give     (this); }
 	unsigned post     ( void )           { return sem_post     (this); }

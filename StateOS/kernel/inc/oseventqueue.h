@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    15.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -614,9 +614,9 @@ struct EventQueueT : public __evq
 	template<typename T>
 	unsigned waitFor  ( unsigned &_data, const T _delay ) { return evq_waitFor  (this, &_data, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( unsigned *_data, const T _time )  { return evq_waitUntil(this,  _data, Clock::count(_time)); }
+	unsigned waitUntil( unsigned *_data, const T _time )  { return evq_waitUntil(this,  _data, Clock::until(_time)); }
 	template<typename T>
-	unsigned waitUntil( unsigned &_data, const T _time )  { return evq_waitUntil(this, &_data, Clock::count(_time)); }
+	unsigned waitUntil( unsigned &_data, const T _time )  { return evq_waitUntil(this, &_data, Clock::until(_time)); }
 	unsigned wait     ( unsigned *_data )                 { return evq_wait     (this,  _data); }
 	unsigned wait     ( unsigned &_data )                 { return evq_wait     (this, &_data); }
 	unsigned give     ( unsigned  _data )                 { return evq_give     (this,  _data); }
@@ -624,7 +624,7 @@ struct EventQueueT : public __evq
 	template<typename T>
 	unsigned sendFor  ( unsigned  _data, const T _delay ) { return evq_sendFor  (this,  _data, Clock::count(_delay)); }
 	template<typename T>
-	unsigned sendUntil( unsigned  _data, const T _time )  { return evq_sendUntil(this,  _data, Clock::count(_time)); }
+	unsigned sendUntil( unsigned  _data, const T _time )  { return evq_sendUntil(this,  _data, Clock::until(_time)); }
 	unsigned send     ( unsigned  _data )                 { return evq_send     (this,  _data); }
 	void     push     ( unsigned  _data )                 {        evq_push     (this,  _data); }
 	void     pushISR  ( unsigned  _data )                 {        evq_pushISR  (this,  _data); }

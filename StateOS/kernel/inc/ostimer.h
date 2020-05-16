@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    15.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -751,7 +751,7 @@ struct baseTimer : public __tmr
 	template<typename T>
 	void startNext    ( const T _delay )                                  {        tmr_startNext    (this, Clock::count(_delay)); }
 	template<typename T>
-	void startUntil   ( const T _time )                                   {        tmr_startUntil   (this, Clock::count(_time)); }
+	void startUntil   ( const T _time )                                   {        tmr_startUntil   (this, Clock::until(_time)); }
 #if __cplusplus >= 201402
 	template<typename T>
 	void startFrom    ( const T _delay, const T _period, std::nullptr_t ) {        tmr_startFrom    (this, Clock::count(_delay), Clock::count(_period), nullptr); }
@@ -771,7 +771,7 @@ struct baseTimer : public __tmr
 	template<typename T>
 	unsigned waitNext ( const T _delay )                                  { return tmr_waitNext     (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )                                   { return tmr_waitUntil    (this, Clock::count(_time)); }
+	unsigned waitUntil( const T _time )                                   { return tmr_waitUntil    (this, Clock::until(_time)); }
 	unsigned wait     ( void )                                            { return tmr_wait         (this); }
 	bool     operator!( void )                                            { return __tmr::hdr.id == ID_STOPPED; }
 

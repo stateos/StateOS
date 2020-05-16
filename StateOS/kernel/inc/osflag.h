@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -509,7 +509,7 @@ struct Flag : public __flg
 	template<typename T>
 	unsigned waitFor  ( unsigned _flags, char _mode, const T _delay ) { return flg_waitFor  (this, _flags, _mode, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( unsigned _flags, char _mode, const T _time )  { return flg_waitUntil(this, _flags, _mode, Clock::count(_time)); }
+	unsigned waitUntil( unsigned _flags, char _mode, const T _time )  { return flg_waitUntil(this, _flags, _mode, Clock::until(_time)); }
 	unsigned wait     ( unsigned _flags, char _mode = flgAll )        { return flg_wait     (this, _flags, _mode); }
 	unsigned give     ( unsigned _flags )                             { return flg_give     (this, _flags); }
 	unsigned set      ( unsigned _flags )                             { return flg_set      (this, _flags); }

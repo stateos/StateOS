@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -481,7 +481,7 @@ struct MemoryPoolT : public __mem
 	template<typename T>
 	unsigned waitFor  (       void **_data, const T _delay ) { return mem_waitFor  (this, _data, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil(       void **_data, const T _time )  { return mem_waitUntil(this, _data, Clock::count(_time)); }
+	unsigned waitUntil(       void **_data, const T _time )  { return mem_waitUntil(this, _data, Clock::until(_time)); }
 	unsigned wait     (       void **_data )                 { return mem_wait     (this, _data); }
 	void     give     ( const void  *_data )                 {        mem_give     (this, _data); }
 	void     giveISR  ( const void  *_data )                 {        mem_giveISR  (this, _data); }
@@ -535,7 +535,7 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
 	template<typename T>
 	unsigned waitFor  ( C **_data, cnt_t _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( C **_data, cnt_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), Clock::count(_time)); }
+	unsigned waitUntil( C **_data, cnt_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
 	unsigned wait     ( C **_data )               { return mem_wait     (this, reinterpret_cast<void **>(_data)); }
 };
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -457,7 +457,7 @@ struct Signal : public __sig
 	template<typename T>
 	unsigned waitFor  ( unsigned _sigset, const T _delay ) { return sig_waitFor  (this, _sigset, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( unsigned _sigset, const T _time )  { return sig_waitUntil(this, _sigset, Clock::count(_time)); }
+	unsigned waitUntil( unsigned _sigset, const T _time )  { return sig_waitUntil(this, _sigset, Clock::until(_time)); }
 	unsigned wait     ( unsigned _sigset )                 { return sig_wait     (this, _sigset); }
 	void     give     ( unsigned _signo )                  {        sig_give     (this, _signo); }
 	void     set      ( unsigned _signo )                  {        sig_set      (this, _signo); }

@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -429,9 +429,9 @@ struct ConditionVariable : public __cnd
 	template<typename T>
 	unsigned waitFor  ( mtx_t &_mtx, const T _delay ) { return cnd_waitFor  (this, &_mtx, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( mtx_t *_mtx, const T _time )  { return cnd_waitUntil(this,  _mtx, Clock::count(_time)); }
+	unsigned waitUntil( mtx_t *_mtx, const T _time )  { return cnd_waitUntil(this,  _mtx, Clock::until(_time)); }
 	template<typename T>
-	unsigned waitUntil( mtx_t &_mtx, const T _time )  { return cnd_waitUntil(this, &_mtx, Clock::count(_time)); }
+	unsigned waitUntil( mtx_t &_mtx, const T _time )  { return cnd_waitUntil(this, &_mtx, Clock::until(_time)); }
 	unsigned wait     ( mtx_t *_mtx )                 { return cnd_wait     (this,  _mtx); }
 	unsigned wait     ( mtx_t &_mtx )                 { return cnd_wait     (this, &_mtx); }
 	void     give     ( bool   _all = cndAll )        {        cnd_give     (this,  _all); }

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -546,7 +546,7 @@ struct Mutex : public __mtx
 	template<typename T>
 	unsigned waitFor  ( const T _delay ) { return mtx_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )  { return mtx_waitUntil(this, Clock::count(_time)); }
+	unsigned waitUntil( const T _time )  { return mtx_waitUntil(this, Clock::until(_time)); }
 	unsigned wait     ( void )           { return mtx_wait     (this); }
 	unsigned lock     ( void )           { return mtx_lock     (this); }
 	unsigned give     ( void )           { return mtx_give     (this); }

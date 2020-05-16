@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -375,9 +375,9 @@ struct Event : public __evt
 	template<typename T>
 	unsigned waitFor  ( unsigned &_event, const T _delay ) { return evt_waitFor  (this, &_event, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( unsigned *_event, const T _time )  { return evt_waitUntil(this,  _event, Clock::count(_time)); }
+	unsigned waitUntil( unsigned *_event, const T _time )  { return evt_waitUntil(this,  _event, Clock::until(_time)); }
 	template<typename T>
-	unsigned waitUntil( unsigned &_event, const T _time )  { return evt_waitUntil(this, &_event, Clock::count(_time)); }
+	unsigned waitUntil( unsigned &_event, const T _time )  { return evt_waitUntil(this, &_event, Clock::until(_time)); }
 	unsigned wait     ( unsigned *_event )                 { return evt_wait     (this,  _event); }
 	unsigned wait     ( unsigned &_event )                 { return evt_wait     (this, &_event); }
 	void     give     ( unsigned  _event )                 {        evt_give     (this,  _event); }

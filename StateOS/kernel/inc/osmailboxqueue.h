@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    15.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -620,14 +620,14 @@ struct MailBoxQueueT : public __box
 	template<typename T>
 	unsigned waitFor  (       void *_data, const T _delay ) { return box_waitFor  (this, _data, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil(       void *_data, const T _time )  { return box_waitUntil(this, _data, Clock::count(_time)); }
+	unsigned waitUntil(       void *_data, const T _time )  { return box_waitUntil(this, _data, Clock::until(_time)); }
 	unsigned wait     (       void *_data )                 { return box_wait     (this, _data); }
 	unsigned give     ( const void *_data )                 { return box_give     (this, _data); }
 	unsigned giveISR  ( const void *_data )                 { return box_giveISR  (this, _data); }
 	template<typename T>
 	unsigned sendFor  ( const void *_data, const T _delay ) { return box_sendFor  (this, _data, Clock::count(_delay)); }
 	template<typename T>
-	unsigned sendUntil( const void *_data, const T _time )  { return box_sendUntil(this, _data, Clock::count(_time)); }
+	unsigned sendUntil( const void *_data, const T _time )  { return box_sendUntil(this, _data, Clock::until(_time)); }
 	unsigned send     ( const void *_data )                 { return box_send     (this, _data); }
 	void     push     ( const void *_data )                 {        box_push     (this, _data); }
 	void     pushISR  ( const void *_data )                 {        box_pushISR  (this, _data); }

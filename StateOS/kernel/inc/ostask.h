@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    16.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1595,7 +1595,7 @@ namespace ThisTask
 	template<typename T>
 	static inline void     sleepNext ( const T  _delay )  {        tsk_sleepNext (Clock::count(_delay)); }
 	template<typename T>
-	static inline void     sleepUntil( const T  _time )   {        tsk_sleepUntil(Clock::count(_time)); }
+	static inline void     sleepUntil( const T  _time )   {        tsk_sleepUntil(Clock::until(_time)); }
 	static inline void     sleep     ( void )             {        tsk_sleep     (); }
 	template<typename T>
 	static inline void     delay     ( const T  _delay )  {        tsk_delay     (Clock::count(_delay)); }
