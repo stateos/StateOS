@@ -9,11 +9,14 @@ int main()
 	auto sem = Semaphore::Binary();
 	for (;;)
 	{
-		auto tsk0 = Task(2, [&]{ led.tick(); sem.wait(); ThisTask::exit(); });
+		auto tsk0 = Task::Make (2, [&]{ led.tick(); sem.wait(); ThisTask::exit(); });
 		tsk0.start();
 		auto tsk1 = Task::Start(1, [&]{ led.tick(); ThisTask::suspend(); });
-		Task::Start(0, [&]{ led.tick(); sem.post(); ThisTask::exit(); });
+		auto tsk2 = Task::Start(0, [&]{ led.tick(); sem.post(); ThisTask::exit(); });
+		auto tsk3 = Task(0, [&]{ led.tick(); ThisTask::exit(); });
 		tsk1.reset();
+		tsk3.start();
+		led.tick();
 		ThisTask::sleepNext(1s);
 	}
 }

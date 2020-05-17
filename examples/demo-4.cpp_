@@ -1,12 +1,14 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-void proc( unsigned &led, Clock::time_point timePoint )
+using namespace std::chrono_literals;
+
+void proc( unsigned &led, Clock::duration start )
 {
-	ThisTask::sleepUntil(timePoint);
+	ThisTask::sleepUntil(Clock::time_point(start));
 	for (;;)
 	{
-		ThisTask::sleepNext(std::chrono::milliseconds{500});
+		ThisTask::sleepNext(500ms);
 		led++;
 	}
 }
@@ -15,13 +17,12 @@ int main()
 {
 	auto led = Led();
 	auto grn = GreenLed();
-	auto now = Clock::now();
 
-	Task::Create(0, [&]{ proc(led[0], now + std::chrono::milliseconds{  0}); });
-	Task::Create(0, [&]{ proc(led[1], now + std::chrono::milliseconds{125}); });
-	Task::Create(0, [&]{ proc(led[2], now + std::chrono::milliseconds{250}); });
-	Task::Create(0, [&]{ proc(led[3], now + std::chrono::milliseconds{375}); });
-	Task::Create(0, [&]{ proc(grn,    now + std::chrono::milliseconds{500}); });
+	Task::Create(0, [&]{ proc(led[0],   0ms); });
+	Task::Create(0, [&]{ proc(led[1], 125ms); });
+	Task::Create(0, [&]{ proc(led[2], 250ms); });
+	Task::Create(0, [&]{ proc(led[3], 375ms); });
+	Task::Create(0, [&]{ proc(grn,    500ms); });
 
 	ThisTask::stop();
 }
