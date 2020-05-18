@@ -783,7 +783,33 @@ struct baseTimer : public __tmr
 	void     fun_     ( void )                                            {        current()->fun(); }
 	Fun_t    fun;
 #endif
+
+/******************************************************************************
+ *
+ * Class             : [base]Timer::This
+ *
+ * Description       : provide set of functions for current timer
+ *
+ ******************************************************************************/
+
+	struct This
+	{
+#if __cplusplus >= 201402
+		static
+		void flipISR ( std::nullptr_t ) { tmr_flipISR (nullptr); }
+		template<class F> static
+		void flipISR ( const F _state ) { new (&current()->fun) Fun_t(_state);
+		                                  tmr_flipISR (baseTimer::fun_); }
+#else
+		static
+		void flipISR ( fun_t * _state ) { tmr_flipISR (_state); }
+#endif
+		template<typename T> static
+		void delayISR( const T _delay ) { tmr_delayISR(Clock::count(_delay)); }
+	};
 };
+
+using ThisTimer = baseTimer::This;
 
 /******************************************************************************
  *
@@ -1090,28 +1116,6 @@ struct Timer : public baseTimer
 	}
 #endif
 };
-
-/******************************************************************************
- *
- * Namespace         : ThisTimer
- *
- * Description       : provide set of functions for current timer
- *
- ******************************************************************************/
-
-namespace ThisTimer
-{
-#if __cplusplus >= 201402
-	static inline void flipISR ( std::nullptr_t ) { tmr_flipISR (nullptr); }
-	template<class F>
-	static inline void flipISR ( const F _state ) { new (&baseTimer::current()->fun) Fun_t(_state);
-	                                                tmr_flipISR (baseTimer::fun_); }
-#else
-	static inline void flipISR ( fun_t * _state ) { tmr_flipISR (_state); }
-#endif
-	template<typename T>
-	static inline void delayISR( const T _delay ) { tmr_delayISR(Clock::count(_delay)); }
-}
 
 #endif//__cplusplus
 
