@@ -23,7 +23,7 @@ struct masTask : public Task
 	private:
 	static void run()
 	{
-		ThisTask::sleepFor(SEC);
+		This::sleepFor(SEC);
 		sem.give();
 	}
 };
@@ -33,5 +33,5 @@ auto mas = masTask();
 
 int main()
 {
-	ThisTask::sleep();
+	Task::This::sleep();
 }

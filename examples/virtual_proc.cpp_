@@ -33,7 +33,7 @@ struct masTask : public myTask
 	virtual
 	void main() override
 	{
-		ThisTask::sleepFor(SEC);
+		This::sleepFor(SEC);
 		sem.give();
 	}
 };
@@ -43,5 +43,5 @@ auto mas = masTask();
 
 int main()
 {
-	ThisTask::sleep();
+	Task::This::sleep();
 }

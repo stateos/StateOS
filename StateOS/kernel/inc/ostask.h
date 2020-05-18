@@ -1358,7 +1358,77 @@ struct baseTask : public __tsk
 	void     act_     ( unsigned _signo )  {        current()->act(_signo); }
 	Act_t    act;
 #endif
+
+/******************************************************************************
+ *
+ * Class             : [base]Task::This
+ *
+ * Description       : provide set of functions for current task
+ *
+ ******************************************************************************/
+
+	struct This
+	{
+		static
+		unsigned detach    ( void )             { return cur_detach    (); }
+		static
+		void     stop      ( void )             {        tsk_stop      (); }
+		static
+		void     exit      ( void )             {        tsk_exit      (); }
+		static
+		unsigned reset     ( void )             { return cur_reset     (); }
+		static
+		unsigned kill      ( void )             { return cur_kill      (); }
+		static
+		unsigned destroy   ( void )             { return cur_destroy   (); }
+		static
+		void     yield     ( void )             {        tsk_yield     (); }
+		static
+		void     pass      ( void )             {        tsk_pass      (); }
+#if __cplusplus >= 201402
+		template<class F> static
+		void     flip      ( const F  _state )  {        new (&current()->fun) Fun_t(_state);
+		                                                 tsk_flip      (baseTask::fun_); }
+#else
+		static
+		void     flip      ( fun_t *  _state )  {        tsk_flip      (_state); }
+#endif
+		static
+		void     setPrio   ( unsigned _prio )   {        tsk_setPrio   (_prio); }
+		static
+		void     prio      ( unsigned _prio )   {        tsk_prio      (_prio); }
+		static
+		unsigned getPrio   ( void )             { return tsk_getPrio   (); }
+		static
+		unsigned prio      ( void )             { return tsk_getPrio   (); }
+		template<typename T> static
+		void     sleepFor  ( const T  _delay )  {        tsk_sleepFor  (Clock::count(_delay)); }
+		template<typename T> static
+		void     sleepNext ( const T  _delay )  {        tsk_sleepNext (Clock::count(_delay)); }
+		template<typename T> static
+		void     sleepUntil( const T  _time )   {        tsk_sleepUntil(Clock::until(_time)); }
+		static
+		void     sleep     ( void )             {        tsk_sleep     (); }
+		template<typename T> static
+		void     delay     ( const T  _delay )  {        tsk_delay     (Clock::count(_delay)); }
+		static
+		void     suspend   ( void )             {        cur_suspend   (); }
+		static
+		void     give      ( unsigned _signo )  {        cur_give      (_signo); }
+		static
+		void     signal    ( unsigned _signo )  {        cur_signal    (_signo); }
+#if __cplusplus >= 201402
+		template<class F> static
+		void     action    ( const F  _action ) {        new (&current()->act) Act_t(_action);
+		                                                 cur_action    (baseTask::act_); }
+#else
+		static
+		void     action    ( act_t *  _action ) {        cur_action    (_action); }
+#endif
+	};
 };
+
+using ThisTask = baseTask::This;
 
 /******************************************************************************
  *
@@ -1557,60 +1627,11 @@ struct TaskT : public baseTask, public baseStack<size_>
  * Class             : Task
  *
  * Description       : create and initialize complete work area for task object
+ *                     with default stack size
  *
  ******************************************************************************/
 
 using Task = TaskT<OS_STACK_SIZE>;
-
-/******************************************************************************
- *
- * Namespace         : ThisTask
- *
- * Description       : provide set of functions for current task
- *
- ******************************************************************************/
-
-namespace ThisTask
-{
-	static inline unsigned detach    ( void )             { return cur_detach    (); }
-	static inline void     stop      ( void )             {        tsk_stop      (); }
-	static inline void     exit      ( void )             {        tsk_exit      (); }
-	static inline unsigned reset     ( void )             { return cur_reset     (); }
-	static inline unsigned kill      ( void )             { return cur_kill      (); }
-	static inline unsigned destroy   ( void )             { return cur_destroy   (); }
-	static inline void     yield     ( void )             {        tsk_yield     (); }
-	static inline void     pass      ( void )             {        tsk_pass      (); }
-#if __cplusplus >= 201402
-	template<class F>
-	static inline void     flip      ( const F  _state )  {        new (&baseTask::current()->fun) Fun_t(_state);
-	                                                               tsk_flip      (baseTask::fun_); }
-#else
-	static inline void     flip      ( fun_t *  _state )  {        tsk_flip      (_state); }
-#endif
-	static inline void     setPrio   ( unsigned _prio )   {        tsk_setPrio   (_prio); }
-	static inline void     prio      ( unsigned _prio )   {        tsk_prio      (_prio); }
-	static inline unsigned getPrio   ( void )             { return tsk_getPrio   (); }
-	static inline unsigned prio      ( void )             { return tsk_getPrio   (); }
-	template<typename T>
-	static inline void     sleepFor  ( const T  _delay )  {        tsk_sleepFor  (Clock::count(_delay)); }
-	template<typename T>
-	static inline void     sleepNext ( const T  _delay )  {        tsk_sleepNext (Clock::count(_delay)); }
-	template<typename T>
-	static inline void     sleepUntil( const T  _time )   {        tsk_sleepUntil(Clock::until(_time)); }
-	static inline void     sleep     ( void )             {        tsk_sleep     (); }
-	template<typename T>
-	static inline void     delay     ( const T  _delay )  {        tsk_delay     (Clock::count(_delay)); }
-	static inline void     suspend   ( void )             {        cur_suspend   (); }
-	static inline void     give      ( unsigned _signo )  {        cur_give      (_signo); }
-	static inline void     signal    ( unsigned _signo )  {        cur_signal    (_signo); }
-#if __cplusplus >= 201402
-	template<class F>
-	static inline void     action    ( const F  _action ) {        new (&baseTask::current()->act) Act_t(_action);
-	                                                               cur_action    (baseTask::act_); }
-#else
-	static inline void     action    ( act_t *  _action ) {        cur_action    (_action); }
-#endif
-}
 
 #endif//__cplusplus
 
