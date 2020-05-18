@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    16.05.2020
+    @date    18.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -534,23 +534,23 @@ struct Mutex : public __mtx
 #endif
 	}
 
-	void     reset    ( void )           {        mtx_reset    (this); }
-	void     kill     ( void )           {        mtx_kill     (this); }
-	void     destroy  ( void )           {        mtx_destroy  (this); }
-	void     setPrio  ( unsigned _prio ) {        mtx_setPrio  (this, _prio); }
-	void     prio     ( unsigned _prio ) {        mtx_prio     (this, _prio); }
-	unsigned getPrio  ( void )           { return mtx_getPrio  (this); }
-	unsigned prio     ( void )           { return mtx_getPrio  (this); }
-	unsigned take     ( void )           { return mtx_take     (this); }
-	unsigned tryLock  ( void )           { return mtx_tryLock  (this); }
+	void reset    ( void )           {        mtx_reset    (this); }
+	void kill     ( void )           {        mtx_kill     (this); }
+	void destroy  ( void )           {        mtx_destroy  (this); }
+	void setPrio  ( unsigned _prio ) {        mtx_setPrio  (this, _prio); }
+	void prio     ( unsigned _prio ) {        mtx_prio     (this, _prio); }
+	auto getPrio  ( void )           { return mtx_getPrio  (this); }
+	auto prio     ( void )           { return mtx_getPrio  (this); }
+	auto take     ( void )           { return mtx_take     (this); }
+	auto tryLock  ( void )           { return mtx_tryLock  (this); }
 	template<typename T>
-	unsigned waitFor  ( const T _delay ) { return mtx_waitFor  (this, Clock::count(_delay)); }
+	auto waitFor  ( const T _delay ) { return mtx_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )  { return mtx_waitUntil(this, Clock::until(_time)); }
-	unsigned wait     ( void )           { return mtx_wait     (this); }
-	unsigned lock     ( void )           { return mtx_lock     (this); }
-	unsigned give     ( void )           { return mtx_give     (this); }
-	unsigned unlock   ( void )           { return mtx_unlock   (this); }
+	auto waitUntil( const T _time )  { return mtx_waitUntil(this, Clock::until(_time)); }
+	auto wait     ( void )           { return mtx_wait     (this); }
+	auto lock     ( void )           { return mtx_lock     (this); }
+	auto give     ( void )           { return mtx_give     (this); }
+	auto unlock   ( void )           { return mtx_unlock   (this); }
 };
 
 #endif//__cplusplus

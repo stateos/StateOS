@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    16.05.2020
+    @date    18.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -543,21 +543,21 @@ struct Semaphore : public __sem
 #endif
 	}
 
-	void     reset    ( void )           {        sem_reset    (this); }
-	void     kill     ( void )           {        sem_kill     (this); }
-	void     destroy  ( void )           {        sem_destroy  (this); }
-	unsigned take     ( void )           { return sem_take     (this); }
-	unsigned tryWait  ( void )           { return sem_tryWait  (this); }
-	unsigned takeISR  ( void )           { return sem_takeISR  (this); }
+	void reset    ( void )           {        sem_reset    (this); }
+	void kill     ( void )           {        sem_kill     (this); }
+	void destroy  ( void )           {        sem_destroy  (this); }
+	auto take     ( void )           { return sem_take     (this); }
+	auto tryWait  ( void )           { return sem_tryWait  (this); }
+	auto takeISR  ( void )           { return sem_takeISR  (this); }
 	template<typename T>
-	unsigned waitFor  ( const T _delay ) { return sem_waitFor  (this, Clock::count(_delay)); }
+	auto waitFor  ( const T _delay ) { return sem_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )  { return sem_waitUntil(this, Clock::until(_time)); }
-	unsigned wait     ( void )           { return sem_wait     (this); }
-	unsigned give     ( void )           { return sem_give     (this); }
-	unsigned post     ( void )           { return sem_post     (this); }
-	unsigned giveISR  ( void )           { return sem_giveISR  (this); }
-	unsigned getValue ( void )           { return sem_getValue (this); }
+	auto waitUntil( const T _time )  { return sem_waitUntil(this, Clock::until(_time)); }
+	auto wait     ( void )           { return sem_wait     (this); }
+	auto give     ( void )           { return sem_give     (this); }
+	auto post     ( void )           { return sem_post     (this); }
+	auto giveISR  ( void )           { return sem_giveISR  (this); }
+	auto getValue ( void )           { return sem_getValue (this); }
 };
 
 #endif//__cplusplus

@@ -763,25 +763,25 @@ struct baseTimer : public __tmr
 	void startFrom    ( const T _delay, const T _period, fun_t * _state ) {        tmr_startFrom    (this, Clock::count(_delay), Clock::count(_period), _state); }
 #endif
 	void stop         ( void )                                            {        tmr_stop         (this); }
-	unsigned take     ( void )                                            { return tmr_take         (this); }
-	unsigned tryWait  ( void )                                            { return tmr_tryWait      (this); }
-	unsigned takeISR  ( void )                                            { return tmr_takeISR      (this); }
+	auto take         ( void )                                            { return tmr_take         (this); }
+	auto tryWait      ( void )                                            { return tmr_tryWait      (this); }
+	auto takeISR      ( void )                                            { return tmr_takeISR      (this); }
 	template<typename T>
-	unsigned waitFor  ( const T _delay )                                  { return tmr_waitFor      (this, Clock::count(_delay)); }
+	auto waitFor      ( const T _delay )                                  { return tmr_waitFor      (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitNext ( const T _delay )                                  { return tmr_waitNext     (this, Clock::count(_delay)); }
+	auto waitNext     ( const T _delay )                                  { return tmr_waitNext     (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )                                   { return tmr_waitUntil    (this, Clock::until(_time)); }
-	unsigned wait     ( void )                                            { return tmr_wait         (this); }
-	bool     operator!( void )                                            { return __tmr::hdr.id == ID_STOPPED; }
+	auto waitUntil    ( const T _time )                                   { return tmr_waitUntil    (this, Clock::until(_time)); }
+	auto wait         ( void )                                            { return tmr_wait         (this); }
+	bool operator!    ( void )                                            { return __tmr::hdr.id == ID_STOPPED; }
 
 	template<class T = baseTimer> static
-	T      * current  ( void )                                            { return static_cast<T *>(tmr_thisISR()); }
+	auto current      ( void )                                            { return static_cast<T *>(tmr_thisISR()); }
 
 #if __cplusplus >= 201402
 	static
-	void     fun_     ( void )                                            {        current()->fun(); }
-	Fun_t    fun;
+	void fun_         ( void )                                            {        current()->fun(); }
+	Fun_t fun;
 #endif
 
 /******************************************************************************

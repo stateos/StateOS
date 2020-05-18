@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    16.05.2020
+    @date    18.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -448,22 +448,22 @@ struct Signal : public __sig
 #endif
 	}
 
-	void     reset    ( void )                             {        sig_reset    (this); }
-	void     kill     ( void )                             {        sig_kill     (this); }
-	void     destroy  ( void )                             {        sig_destroy  (this); }
-	unsigned take     ( unsigned _sigset )                 { return sig_take     (this, _sigset); }
-	unsigned tryWait  ( unsigned _sigset )                 { return sig_tryWait  (this, _sigset); }
-	unsigned takeISR  ( unsigned _sigset )                 { return sig_takeISR  (this, _sigset); }
+	void reset    ( void )                             {        sig_reset    (this); }
+	void kill     ( void )                             {        sig_kill     (this); }
+	void destroy  ( void )                             {        sig_destroy  (this); }
+	auto take     ( unsigned _sigset )                 { return sig_take     (this, _sigset); }
+	auto tryWait  ( unsigned _sigset )                 { return sig_tryWait  (this, _sigset); }
+	auto takeISR  ( unsigned _sigset )                 { return sig_takeISR  (this, _sigset); }
 	template<typename T>
-	unsigned waitFor  ( unsigned _sigset, const T _delay ) { return sig_waitFor  (this, _sigset, Clock::count(_delay)); }
+	auto waitFor  ( unsigned _sigset, const T _delay ) { return sig_waitFor  (this, _sigset, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( unsigned _sigset, const T _time )  { return sig_waitUntil(this, _sigset, Clock::until(_time)); }
-	unsigned wait     ( unsigned _sigset )                 { return sig_wait     (this, _sigset); }
-	void     give     ( unsigned _signo )                  {        sig_give     (this, _signo); }
-	void     set      ( unsigned _signo )                  {        sig_set      (this, _signo); }
-	void     giveISR  ( unsigned _signo )                  {        sig_giveISR  (this, _signo); }
-	void     clear    ( unsigned _signo )                  {        sig_clear    (this, _signo); }
-	void     clearISR ( unsigned _signo )                  {        sig_clearISR (this, _signo); }
+	auto waitUntil( unsigned _sigset, const T _time )  { return sig_waitUntil(this, _sigset, Clock::until(_time)); }
+	auto wait     ( unsigned _sigset )                 { return sig_wait     (this, _sigset); }
+	void give     ( unsigned _signo )                  {        sig_give     (this, _signo); }
+	void set      ( unsigned _signo )                  {        sig_set      (this, _signo); }
+	void giveISR  ( unsigned _signo )                  {        sig_giveISR  (this, _signo); }
+	void clear    ( unsigned _signo )                  {        sig_clear    (this, _signo); }
+	void clearISR ( unsigned _signo )                  {        sig_clearISR (this, _signo); }
 };
 
 #endif//__cplusplus
