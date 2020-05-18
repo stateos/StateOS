@@ -1326,16 +1326,16 @@ struct baseTask : public __tsk
 #else
 	void startFrom( fun_t *  _state )  {        tsk_startFrom(this, _state); }
 #endif
-	auto detach   ( void )             { return tsk_detach   (this); }
-	auto join     ( void )             { return tsk_join     (this); }
-	auto reset    ( void )             { return tsk_reset    (this); }
-	auto kill     ( void )             { return tsk_kill     (this); }
-	auto destroy  ( void )             { return tsk_destroy  (this); }
-	auto prio     ( void )             { return __tsk::basic; }
-	auto getPrio  ( void )             { return __tsk::basic; }
-	auto suspend  ( void )             { return tsk_suspend  (this); }
-	auto resume   ( void )             { return tsk_resume   (this); }
-	auto resumeISR( void )             { return tsk_resumeISR(this); }
+	uint detach   ( void )             { return tsk_detach   (this); }
+	uint join     ( void )             { return tsk_join     (this); }
+	uint reset    ( void )             { return tsk_reset    (this); }
+	uint kill     ( void )             { return tsk_kill     (this); }
+	uint destroy  ( void )             { return tsk_destroy  (this); }
+	uint prio     ( void )             { return __tsk::basic; }
+	uint getPrio  ( void )             { return __tsk::basic; }
+	uint suspend  ( void )             { return tsk_suspend  (this); }
+	uint resume   ( void )             { return tsk_resume   (this); }
+	uint resumeISR( void )             { return tsk_resumeISR(this); }
 	void give     ( unsigned _signo )  {        tsk_give     (this, _signo); }
 	void signal   ( unsigned _signo )  {        tsk_signal   (this, _signo); }
 #if __cplusplus >= 201402
@@ -1348,7 +1348,7 @@ struct baseTask : public __tsk
 	bool operator!( void )             { return __tsk::hdr.id == ID_STOPPED; }
 
 	template<class T = baseTask> static
-	auto current  ( void )             { return static_cast<T *>(tsk_this()); }
+	T *  current  ( void )             { return static_cast<T *>(tsk_this()); }
 
 #if __cplusplus >= 201402
 	static
@@ -1370,17 +1370,17 @@ struct baseTask : public __tsk
 	struct Current
 	{
 		static
-		auto detach    ( void )             { return cur_detach    (); }
+		uint detach    ( void )             { return cur_detach    (); }
 		static
 		void stop      ( void )             {        tsk_stop      (); }
 		static
 		void exit      ( void )             {        tsk_exit      (); }
 		static
-		auto reset     ( void )             { return cur_reset     (); }
+		uint reset     ( void )             { return cur_reset     (); }
 		static
-		auto kill      ( void )             { return cur_kill      (); }
+		uint kill      ( void )             { return cur_kill      (); }
 		static
-		auto destroy   ( void )             { return cur_destroy   (); }
+		uint destroy   ( void )             { return cur_destroy   (); }
 		static
 		void yield     ( void )             {        tsk_yield     (); }
 		static
@@ -1398,9 +1398,9 @@ struct baseTask : public __tsk
 		static
 		void prio      ( unsigned _prio )   {        tsk_prio      (_prio); }
 		static
-		auto getPrio   ( void )             { return tsk_getPrio   (); }
+		uint getPrio   ( void )             { return tsk_getPrio   (); }
 		static
-		auto prio      ( void )             { return tsk_getPrio   (); }
+		uint prio      ( void )             { return tsk_getPrio   (); }
 		template<typename T> static
 		void sleepFor  ( const T  _delay )  {        tsk_sleepFor  (Clock::count(_delay)); }
 		template<typename T> static

@@ -451,14 +451,14 @@ struct Signal : public __sig
 	void reset    ( void )                             {        sig_reset    (this); }
 	void kill     ( void )                             {        sig_kill     (this); }
 	void destroy  ( void )                             {        sig_destroy  (this); }
-	auto take     ( unsigned _sigset )                 { return sig_take     (this, _sigset); }
-	auto tryWait  ( unsigned _sigset )                 { return sig_tryWait  (this, _sigset); }
-	auto takeISR  ( unsigned _sigset )                 { return sig_takeISR  (this, _sigset); }
+	uint take     ( unsigned _sigset )                 { return sig_take     (this, _sigset); }
+	uint tryWait  ( unsigned _sigset )                 { return sig_tryWait  (this, _sigset); }
+	uint takeISR  ( unsigned _sigset )                 { return sig_takeISR  (this, _sigset); }
 	template<typename T>
-	auto waitFor  ( unsigned _sigset, const T _delay ) { return sig_waitFor  (this, _sigset, Clock::count(_delay)); }
+	uint waitFor  ( unsigned _sigset, const T _delay ) { return sig_waitFor  (this, _sigset, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil( unsigned _sigset, const T _time )  { return sig_waitUntil(this, _sigset, Clock::until(_time)); }
-	auto wait     ( unsigned _sigset )                 { return sig_wait     (this, _sigset); }
+	uint waitUntil( unsigned _sigset, const T _time )  { return sig_waitUntil(this, _sigset, Clock::until(_time)); }
+	uint wait     ( unsigned _sigset )                 { return sig_wait     (this, _sigset); }
 	void give     ( unsigned _signo )                  {        sig_give     (this, _signo); }
 	void set      ( unsigned _signo )                  {        sig_set      (this, _signo); }
 	void giveISR  ( unsigned _signo )                  {        sig_giveISR  (this, _signo); }

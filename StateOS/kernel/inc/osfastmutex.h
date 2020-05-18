@@ -408,16 +408,16 @@ struct FastMutex : public __mut
 	void reset    ( void )           {        mut_reset    (this); }
 	void kill     ( void )           {        mut_kill     (this); }
 	void destroy  ( void )           {        mut_destroy  (this); }
-	auto take     ( void )           { return mut_take     (this); }
-	auto tryLock  ( void )           { return mut_tryLock  (this); }
+	uint take     ( void )           { return mut_take     (this); }
+	uint tryLock  ( void )           { return mut_tryLock  (this); }
 	template<typename T>
-	auto waitFor  ( const T _delay ) { return mut_waitFor  (this, Clock::count(_delay)); }
+	uint waitFor  ( const T _delay ) { return mut_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil( const T _time )  { return mut_waitUntil(this, Clock::until(_time)); }
-	auto wait     ( void )           { return mut_wait     (this); }
-	auto lock     ( void )           { return mut_lock     (this); }
-	auto give     ( void )           { return mut_give     (this); }
-	auto unlock   ( void )           { return mut_unlock   (this); }
+	uint waitUntil( const T _time )  { return mut_waitUntil(this, Clock::until(_time)); }
+	uint wait     ( void )           { return mut_wait     (this); }
+	uint lock     ( void )           { return mut_lock     (this); }
+	uint give     ( void )           { return mut_give     (this); }
+	uint unlock   ( void )           { return mut_unlock   (this); }
 };
 
 #endif//__cplusplus

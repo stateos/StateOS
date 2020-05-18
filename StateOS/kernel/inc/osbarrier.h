@@ -357,10 +357,10 @@ struct Barrier : public __bar
 	void kill     ( void )           {        bar_kill     (this); }
 	void destroy  ( void )           {        bar_destroy  (this); }
 	template<typename T>
-	auto waitFor  ( const T _delay ) { return bar_waitFor  (this, Clock::count(_delay)); }
+	uint waitFor  ( const T _delay ) { return bar_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil( const T _time )  { return bar_waitUntil(this, Clock::until(_time)); }
-	auto wait     ( void )           { return bar_wait     (this); }
+	uint waitUntil( const T _time )  { return bar_waitUntil(this, Clock::until(_time)); }
+	uint wait     ( void )           { return bar_wait     (this); }
 };
 
 #endif//__cplusplus

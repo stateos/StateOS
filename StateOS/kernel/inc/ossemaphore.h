@@ -546,18 +546,18 @@ struct Semaphore : public __sem
 	void reset    ( void )           {        sem_reset    (this); }
 	void kill     ( void )           {        sem_kill     (this); }
 	void destroy  ( void )           {        sem_destroy  (this); }
-	auto take     ( void )           { return sem_take     (this); }
-	auto tryWait  ( void )           { return sem_tryWait  (this); }
-	auto takeISR  ( void )           { return sem_takeISR  (this); }
+	uint take     ( void )           { return sem_take     (this); }
+	uint tryWait  ( void )           { return sem_tryWait  (this); }
+	uint takeISR  ( void )           { return sem_takeISR  (this); }
 	template<typename T>
-	auto waitFor  ( const T _delay ) { return sem_waitFor  (this, Clock::count(_delay)); }
+	uint waitFor  ( const T _delay ) { return sem_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil( const T _time )  { return sem_waitUntil(this, Clock::until(_time)); }
-	auto wait     ( void )           { return sem_wait     (this); }
-	auto give     ( void )           { return sem_give     (this); }
-	auto post     ( void )           { return sem_post     (this); }
-	auto giveISR  ( void )           { return sem_giveISR  (this); }
-	auto getValue ( void )           { return sem_getValue (this); }
+	uint waitUntil( const T _time )  { return sem_waitUntil(this, Clock::until(_time)); }
+	uint wait     ( void )           { return sem_wait     (this); }
+	uint give     ( void )           { return sem_give     (this); }
+	uint post     ( void )           { return sem_post     (this); }
+	uint giveISR  ( void )           { return sem_giveISR  (this); }
+	uint getValue ( void )           { return sem_getValue (this); }
 };
 
 #endif//__cplusplus

@@ -435,14 +435,14 @@ struct ListTT : public __lst
 	void reset    ( void )                              {        lst_reset    (this); }
 	void kill     ( void )                              {        lst_kill     (this); }
 	void destroy  ( void )                              {        lst_destroy  (this); }
-	auto take     (       C   **_data )                 { return lst_take     (this, reinterpret_cast<void **>(_data)); }
-	auto tryWait  (       C   **_data )                 { return lst_tryWait  (this, reinterpret_cast<void **>(_data)); }
-	auto takeISR  (       C   **_data )                 { return lst_takeISR  (this, reinterpret_cast<void **>(_data)); }
+	uint take     (       C   **_data )                 { return lst_take     (this, reinterpret_cast<void **>(_data)); }
+	uint tryWait  (       C   **_data )                 { return lst_tryWait  (this, reinterpret_cast<void **>(_data)); }
+	uint takeISR  (       C   **_data )                 { return lst_takeISR  (this, reinterpret_cast<void **>(_data)); }
 	template<typename T>
-	auto waitFor  (       C   **_data, const T _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
+	uint waitFor  (       C   **_data, const T _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil(       C   **_data, const T _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
-	auto wait     (       C   **_data )                 { return lst_wait     (this, reinterpret_cast<void **>(_data)); }
+	uint waitUntil(       C   **_data, const T _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
+	uint wait     (       C   **_data )                 { return lst_wait     (this, reinterpret_cast<void **>(_data)); }
 	void give     ( const void *_data )                 {        lst_give     (this,                           _data); }
 	void giveISR  ( const void *_data )                 {        lst_giveISR  (this,                           _data); }
 };

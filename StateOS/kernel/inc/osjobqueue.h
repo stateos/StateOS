@@ -600,28 +600,28 @@ struct JobQueueT : public __job
 	void kill     ( void )                        {        job_kill     (this); }
 	void destroy  ( void )                        {        job_destroy  (this); }
 	template<typename T>
-	auto waitFor  ( const T _delay )              { return job_waitFor  (this, Clock::count(_delay)); }
+	uint waitFor  ( const T _delay )              { return job_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil( const T _time )               { return job_waitUntil(this, Clock::until(_time)); }
-	auto wait     ( void )                        { return job_wait     (this); }
-	auto take     ( void )                        { return job_take     (this); }
-	auto tryWait  ( void )                        { return job_tryWait  (this); }
-	auto takeISR  ( void )                        { return job_takeISR  (this); }
+	uint waitUntil( const T _time )               { return job_waitUntil(this, Clock::until(_time)); }
+	uint wait     ( void )                        { return job_wait     (this); }
+	uint take     ( void )                        { return job_take     (this); }
+	uint tryWait  ( void )                        { return job_tryWait  (this); }
+	uint takeISR  ( void )                        { return job_takeISR  (this); }
 	template<typename T>
-	auto sendFor  ( fun_t *_fun, const T _delay ) { return job_sendFor  (this, _fun, Clock::count(_delay)); }
+	uint sendFor  ( fun_t *_fun, const T _delay ) { return job_sendFor  (this, _fun, Clock::count(_delay)); }
 	template<typename T>
-	auto sendUntil( fun_t *_fun, const T _time )  { return job_sendUntil(this, _fun, Clock::until(_time)); }
-	auto send     ( fun_t *_fun )                 { return job_send     (this, _fun); }
-	auto give     ( fun_t *_fun )                 { return job_give     (this, _fun); }
-	auto giveISR  ( fun_t *_fun )                 { return job_giveISR  (this, _fun); }
+	uint sendUntil( fun_t *_fun, const T _time )  { return job_sendUntil(this, _fun, Clock::until(_time)); }
+	uint send     ( fun_t *_fun )                 { return job_send     (this, _fun); }
+	uint give     ( fun_t *_fun )                 { return job_give     (this, _fun); }
+	uint giveISR  ( fun_t *_fun )                 { return job_giveISR  (this, _fun); }
 	void push     ( fun_t *_fun )                 {        job_push     (this, _fun); }
 	void pushISR  ( fun_t *_fun )                 {        job_pushISR  (this, _fun); }
-	auto count    ( void )                        { return job_count    (this); }
-	auto countISR ( void )                        { return job_countISR (this); }
-	auto space    ( void )                        { return job_space    (this); }
-	auto spaceISR ( void )                        { return job_spaceISR (this); }
-	auto limit    ( void )                        { return job_limit    (this); }
-	auto limitISR ( void )                        { return job_limitISR (this); }
+	uint count    ( void )                        { return job_count    (this); }
+	uint countISR ( void )                        { return job_countISR (this); }
+	uint space    ( void )                        { return job_space    (this); }
+	uint spaceISR ( void )                        { return job_spaceISR (this); }
+	uint limit    ( void )                        { return job_limit    (this); }
+	uint limitISR ( void )                        { return job_limitISR (this); }
 
 	private:
 	fun_t *data_[limit_];

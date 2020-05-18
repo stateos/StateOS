@@ -475,14 +475,14 @@ struct MemoryPoolT : public __mem
 	void reset    ( void )                               {        mem_reset    (this); }
 	void kill     ( void )                               {        mem_kill     (this); }
 	void destroy  ( void )                               {        mem_destroy  (this); }
-	auto take     (       void **_data )                 { return mem_take     (this, _data); }
-	auto tryWait  (       void **_data )                 { return mem_tryWait  (this, _data); }
-	auto takeISR  (       void **_data )                 { return mem_takeISR  (this, _data); }
+	uint take     (       void **_data )                 { return mem_take     (this, _data); }
+	uint tryWait  (       void **_data )                 { return mem_tryWait  (this, _data); }
+	uint takeISR  (       void **_data )                 { return mem_takeISR  (this, _data); }
 	template<typename T>
-	auto waitFor  (       void **_data, const T _delay ) { return mem_waitFor  (this, _data, Clock::count(_delay)); }
+	uint waitFor  (       void **_data, const T _delay ) { return mem_waitFor  (this, _data, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil(       void **_data, const T _time )  { return mem_waitUntil(this, _data, Clock::until(_time)); }
-	auto wait     (       void **_data )                 { return mem_wait     (this, _data); }
+	uint waitUntil(       void **_data, const T _time )  { return mem_waitUntil(this, _data, Clock::until(_time)); }
+	uint wait     (       void **_data )                 { return mem_wait     (this, _data); }
 	void give     ( const void  *_data )                 {        mem_give     (this, _data); }
 	void giveISR  ( const void  *_data )                 {        mem_giveISR  (this, _data); }
 
@@ -529,14 +529,14 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
 		return reinterpret_cast<MemoryPoolTT<limit_, C> *>(MemoryPoolT<limit_, sizeof(C)>::Create());
 	}
 
-	auto take     ( C **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data)); }
-	auto tryWait  ( C **_data )               { return mem_tryWait  (this, reinterpret_cast<void **>(_data)); }
-	auto takeISR  ( C **_data )               { return mem_takeISR  (this, reinterpret_cast<void **>(_data)); }
+	uint take     ( C **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data)); }
+	uint tryWait  ( C **_data )               { return mem_tryWait  (this, reinterpret_cast<void **>(_data)); }
+	uint takeISR  ( C **_data )               { return mem_takeISR  (this, reinterpret_cast<void **>(_data)); }
 	template<typename T>
-	auto waitFor  ( C **_data, cnt_t _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
+	uint waitFor  ( C **_data, cnt_t _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil( C **_data, cnt_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
-	auto wait     ( C **_data )               { return mem_wait     (this, reinterpret_cast<void **>(_data)); }
+	uint waitUntil( C **_data, cnt_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
+	uint wait     ( C **_data )               { return mem_wait     (this, reinterpret_cast<void **>(_data)); }
 };
 
 #endif//__cplusplus

@@ -503,21 +503,21 @@ struct Flag : public __flg
 	void reset    ( void )                                        {        flg_reset    (this); }
 	void kill     ( void )                                        {        flg_kill     (this); }
 	void destroy  ( void )                                        {        flg_destroy  (this); }
-	auto take     ( unsigned _flags, char _mode = flgAll )        { return flg_take     (this, _flags, _mode); }
-	auto tryWait  ( unsigned _flags, char _mode = flgAll )        { return flg_tryWait  (this, _flags, _mode); }
-	auto takeISR  ( unsigned _flags, char _mode = flgAll )        { return flg_takeISR  (this, _flags, _mode); }
+	uint take     ( unsigned _flags, char _mode = flgAll )        { return flg_take     (this, _flags, _mode); }
+	uint tryWait  ( unsigned _flags, char _mode = flgAll )        { return flg_tryWait  (this, _flags, _mode); }
+	uint takeISR  ( unsigned _flags, char _mode = flgAll )        { return flg_takeISR  (this, _flags, _mode); }
 	template<typename T>
-	auto waitFor  ( unsigned _flags, char _mode, const T _delay ) { return flg_waitFor  (this, _flags, _mode, Clock::count(_delay)); }
+	uint waitFor  ( unsigned _flags, char _mode, const T _delay ) { return flg_waitFor  (this, _flags, _mode, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil( unsigned _flags, char _mode, const T _time )  { return flg_waitUntil(this, _flags, _mode, Clock::until(_time)); }
-	auto wait     ( unsigned _flags, char _mode = flgAll )        { return flg_wait     (this, _flags, _mode); }
-	auto give     ( unsigned _flags )                             { return flg_give     (this, _flags); }
-	auto set      ( unsigned _flags )                             { return flg_set      (this, _flags); }
-	auto giveISR  ( unsigned _flags )                             { return flg_giveISR  (this, _flags); }
-	auto clear    ( unsigned _flags )                             { return flg_clear    (this, _flags); }
-	auto clearISR ( unsigned _flags )                             { return flg_clearISR (this, _flags); }
-	auto get      ( void )                                        { return flg_get      (this); }
-	auto getISR   ( void )                                        { return flg_getISR   (this); }
+	uint waitUntil( unsigned _flags, char _mode, const T _time )  { return flg_waitUntil(this, _flags, _mode, Clock::until(_time)); }
+	uint wait     ( unsigned _flags, char _mode = flgAll )        { return flg_wait     (this, _flags, _mode); }
+	uint give     ( unsigned _flags )                             { return flg_give     (this, _flags); }
+	uint set      ( unsigned _flags )                             { return flg_set      (this, _flags); }
+	uint giveISR  ( unsigned _flags )                             { return flg_giveISR  (this, _flags); }
+	uint clear    ( unsigned _flags )                             { return flg_clear    (this, _flags); }
+	uint clearISR ( unsigned _flags )                             { return flg_clearISR (this, _flags); }
+	uint get      ( void )                                        { return flg_get      (this); }
+	uint getISR   ( void )                                        { return flg_getISR   (this); }
 };
 
 #endif//__cplusplus

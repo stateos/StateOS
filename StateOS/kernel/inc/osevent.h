@@ -371,15 +371,15 @@ struct Event : public __evt
 	void kill     ( void )                             {        evt_kill     (this); }
 	void destroy  ( void )                             {        evt_destroy  (this); }
 	template<typename T>
-	auto waitFor  ( unsigned *_event, const T _delay ) { return evt_waitFor  (this,  _event, Clock::count(_delay)); }
+	uint waitFor  ( unsigned *_event, const T _delay ) { return evt_waitFor  (this,  _event, Clock::count(_delay)); }
 	template<typename T>
-	auto waitFor  ( unsigned &_event, const T _delay ) { return evt_waitFor  (this, &_event, Clock::count(_delay)); }
+	uint waitFor  ( unsigned &_event, const T _delay ) { return evt_waitFor  (this, &_event, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil( unsigned *_event, const T _time )  { return evt_waitUntil(this,  _event, Clock::until(_time)); }
+	uint waitUntil( unsigned *_event, const T _time )  { return evt_waitUntil(this,  _event, Clock::until(_time)); }
 	template<typename T>
-	auto waitUntil( unsigned &_event, const T _time )  { return evt_waitUntil(this, &_event, Clock::until(_time)); }
-	auto wait     ( unsigned *_event )                 { return evt_wait     (this,  _event); }
-	auto wait     ( unsigned &_event )                 { return evt_wait     (this, &_event); }
+	uint waitUntil( unsigned &_event, const T _time )  { return evt_waitUntil(this, &_event, Clock::until(_time)); }
+	uint wait     ( unsigned *_event )                 { return evt_wait     (this,  _event); }
+	uint wait     ( unsigned &_event )                 { return evt_wait     (this, &_event); }
 	void give     ( unsigned  _event )                 {        evt_give     (this,  _event); }
 	void giveISR  ( unsigned  _event )                 {        evt_giveISR  (this,  _event); }
 };

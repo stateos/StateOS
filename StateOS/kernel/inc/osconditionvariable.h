@@ -425,15 +425,15 @@ struct ConditionVariable : public __cnd
 	void kill     ( void )                        {        cnd_kill     (this); }
 	void destroy  ( void )                        {        cnd_destroy  (this); }
 	template<typename T>
-	auto waitFor  ( mtx_t *_mtx, const T _delay ) { return cnd_waitFor  (this,  _mtx, Clock::count(_delay)); }
+	uint waitFor  ( mtx_t *_mtx, const T _delay ) { return cnd_waitFor  (this,  _mtx, Clock::count(_delay)); }
 	template<typename T>
-	auto waitFor  ( mtx_t &_mtx, const T _delay ) { return cnd_waitFor  (this, &_mtx, Clock::count(_delay)); }
+	uint waitFor  ( mtx_t &_mtx, const T _delay ) { return cnd_waitFor  (this, &_mtx, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil( mtx_t *_mtx, const T _time )  { return cnd_waitUntil(this,  _mtx, Clock::until(_time)); }
+	uint waitUntil( mtx_t *_mtx, const T _time )  { return cnd_waitUntil(this,  _mtx, Clock::until(_time)); }
 	template<typename T>
-	auto waitUntil( mtx_t &_mtx, const T _time )  { return cnd_waitUntil(this, &_mtx, Clock::until(_time)); }
-	auto wait     ( mtx_t *_mtx )                 { return cnd_wait     (this,  _mtx); }
-	auto wait     ( mtx_t &_mtx )                 { return cnd_wait     (this, &_mtx); }
+	uint waitUntil( mtx_t &_mtx, const T _time )  { return cnd_waitUntil(this, &_mtx, Clock::until(_time)); }
+	uint wait     ( mtx_t *_mtx )                 { return cnd_wait     (this,  _mtx); }
+	uint wait     ( mtx_t &_mtx )                 { return cnd_wait     (this, &_mtx); }
 	void give     ( bool   _all = cndAll )        {        cnd_give     (this,  _all); }
 	void giveISR  ( bool   _all = cndAll )        {        cnd_giveISR  (this,  _all); }
 	void notifyOne( void )                        {        cnd_notifyOne(this); }

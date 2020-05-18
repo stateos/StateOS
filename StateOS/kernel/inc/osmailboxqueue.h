@@ -614,29 +614,29 @@ struct MailBoxQueueT : public __box
 	void reset    (       void )                        {        box_reset    (this); }
 	void kill     (       void )                        {        box_kill     (this); }
 	void destroy  (       void )                        {        box_destroy  (this); }
-	auto take     (       void *_data )                 { return box_take     (this, _data); }
-	auto tryWait  (       void *_data )                 { return box_tryWait  (this, _data); }
-	auto takeISR  (       void *_data )                 { return box_takeISR  (this, _data); }
+	uint take     (       void *_data )                 { return box_take     (this, _data); }
+	uint tryWait  (       void *_data )                 { return box_tryWait  (this, _data); }
+	uint takeISR  (       void *_data )                 { return box_takeISR  (this, _data); }
 	template<typename T>
-	auto waitFor  (       void *_data, const T _delay ) { return box_waitFor  (this, _data, Clock::count(_delay)); }
+	uint waitFor  (       void *_data, const T _delay ) { return box_waitFor  (this, _data, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil(       void *_data, const T _time )  { return box_waitUntil(this, _data, Clock::until(_time)); }
-	auto wait     (       void *_data )                 { return box_wait     (this, _data); }
-	auto give     ( const void *_data )                 { return box_give     (this, _data); }
-	auto giveISR  ( const void *_data )                 { return box_giveISR  (this, _data); }
+	uint waitUntil(       void *_data, const T _time )  { return box_waitUntil(this, _data, Clock::until(_time)); }
+	uint wait     (       void *_data )                 { return box_wait     (this, _data); }
+	uint give     ( const void *_data )                 { return box_give     (this, _data); }
+	uint giveISR  ( const void *_data )                 { return box_giveISR  (this, _data); }
 	template<typename T>
-	auto sendFor  ( const void *_data, const T _delay ) { return box_sendFor  (this, _data, Clock::count(_delay)); }
+	uint sendFor  ( const void *_data, const T _delay ) { return box_sendFor  (this, _data, Clock::count(_delay)); }
 	template<typename T>
-	auto sendUntil( const void *_data, const T _time )  { return box_sendUntil(this, _data, Clock::until(_time)); }
-	auto send     ( const void *_data )                 { return box_send     (this, _data); }
+	uint sendUntil( const void *_data, const T _time )  { return box_sendUntil(this, _data, Clock::until(_time)); }
+	uint send     ( const void *_data )                 { return box_send     (this, _data); }
 	void push     ( const void *_data )                 {        box_push     (this, _data); }
 	void pushISR  ( const void *_data )                 {        box_pushISR  (this, _data); }
-	auto count    (       void )                        { return box_count    (this); }
-	auto countISR (       void )                        { return box_countISR (this); }
-	auto space    (       void )                        { return box_space    (this); }
-	auto spaceISR (       void )                        { return box_spaceISR (this); }
-	auto limit    (       void )                        { return box_limit    (this); }
-	auto limitISR (       void )                        { return box_limitISR (this); }
+	uint count    (       void )                        { return box_count    (this); }
+	uint countISR (       void )                        { return box_countISR (this); }
+	uint space    (       void )                        { return box_space    (this); }
+	uint spaceISR (       void )                        { return box_spaceISR (this); }
+	uint limit    (       void )                        { return box_limit    (this); }
+	uint limitISR (       void )                        { return box_limitISR (this); }
 
 	private:
 	char data_[limit_ * size_];

@@ -655,31 +655,31 @@ struct MessageBufferT : public __msg
 	void reset    ( void )                                              {        msg_reset    (this); }
 	void kill     ( void )                                              {        msg_kill     (this); }
 	void destroy  ( void )                                              {        msg_destroy  (this); }
-	auto take     (       void *_data, unsigned _size )                 { return msg_take     (this, _data, _size); }
-	auto tryWait  (       void *_data, unsigned _size )                 { return msg_tryWait  (this, _data, _size); }
-	auto takeISR  (       void *_data, unsigned _size )                 { return msg_takeISR  (this, _data, _size); }
+	uint take     (       void *_data, unsigned _size )                 { return msg_take     (this, _data, _size); }
+	uint tryWait  (       void *_data, unsigned _size )                 { return msg_tryWait  (this, _data, _size); }
+	uint takeISR  (       void *_data, unsigned _size )                 { return msg_takeISR  (this, _data, _size); }
 	template<typename T>
-	auto waitFor  (       void *_data, unsigned _size, const T _delay ) { return msg_waitFor  (this, _data, _size, Clock::count(_delay)); }
+	uint waitFor  (       void *_data, unsigned _size, const T _delay ) { return msg_waitFor  (this, _data, _size, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil(       void *_data, unsigned _size, const T _time )  { return msg_waitUntil(this, _data, _size, Clock::until(_time)); }
-	auto wait     (       void *_data, unsigned _size )                 { return msg_wait     (this, _data, _size); }
-	auto give     ( const void *_data, unsigned _size )                 { return msg_give     (this, _data, _size); }
-	auto giveISR  ( const void *_data, unsigned _size )                 { return msg_giveISR  (this, _data, _size); }
+	uint waitUntil(       void *_data, unsigned _size, const T _time )  { return msg_waitUntil(this, _data, _size, Clock::until(_time)); }
+	uint wait     (       void *_data, unsigned _size )                 { return msg_wait     (this, _data, _size); }
+	uint give     ( const void *_data, unsigned _size )                 { return msg_give     (this, _data, _size); }
+	uint giveISR  ( const void *_data, unsigned _size )                 { return msg_giveISR  (this, _data, _size); }
 	template<typename T>
-	auto sendFor  ( const void *_data, unsigned _size, const T _delay ) { return msg_sendFor  (this, _data, _size, Clock::count(_delay)); }
+	uint sendFor  ( const void *_data, unsigned _size, const T _delay ) { return msg_sendFor  (this, _data, _size, Clock::count(_delay)); }
 	template<typename T>
-	auto sendUntil( const void *_data, unsigned _size, const T _time )  { return msg_sendUntil(this, _data, _size, Clock::until(_time)); }
-	auto send     ( const void *_data, unsigned _size )                 { return msg_send     (this, _data, _size); }
-	auto push     ( const void *_data, unsigned _size )                 { return msg_push     (this, _data, _size); }
-	auto pushISR  ( const void *_data, unsigned _size )                 { return msg_pushISR  (this, _data, _size); }
-	auto count    ( void )                                              { return msg_count    (this); }
-	auto countISR ( void )                                              { return msg_countISR (this); }
-	auto space    ( void )                                              { return msg_space    (this); }
-	auto spaceISR ( void )                                              { return msg_spaceISR (this); }
-	auto limit    ( void )                                              { return msg_limit    (this); }
-	auto limitISR ( void )                                              { return msg_limitISR (this); }
-	auto size     ( void )                                              { return msg_size     (this); }
-	auto sizeISR  ( void )                                              { return msg_sizeISR  (this); }
+	uint sendUntil( const void *_data, unsigned _size, const T _time )  { return msg_sendUntil(this, _data, _size, Clock::until(_time)); }
+	uint send     ( const void *_data, unsigned _size )                 { return msg_send     (this, _data, _size); }
+	uint push     ( const void *_data, unsigned _size )                 { return msg_push     (this, _data, _size); }
+	uint pushISR  ( const void *_data, unsigned _size )                 { return msg_pushISR  (this, _data, _size); }
+	uint count    ( void )                                              { return msg_count    (this); }
+	uint countISR ( void )                                              { return msg_countISR (this); }
+	uint space    ( void )                                              { return msg_space    (this); }
+	uint spaceISR ( void )                                              { return msg_spaceISR (this); }
+	uint limit    ( void )                                              { return msg_limit    (this); }
+	uint limitISR ( void )                                              { return msg_limitISR (this); }
+	uint size     ( void )                                              { return msg_size     (this); }
+	uint sizeISR  ( void )                                              { return msg_sizeISR  (this); }
 
 	private:
 	char data_[limit_];
@@ -724,23 +724,23 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C
 		return reinterpret_cast<MessageBufferTT<limit_, C> *>(MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>::Create());
 	}
 
-	auto take     (       C *_data )                 { return msg_take     (this, _data, sizeof(C)); }
-	auto tryWait  (       C *_data )                 { return msg_tryWait  (this, _data, sizeof(C)); }
-	auto takeISR  (       C *_data )                 { return msg_takeISR  (this, _data, sizeof(C)); }
+	uint take     (       C *_data )                 { return msg_take     (this, _data, sizeof(C)); }
+	uint tryWait  (       C *_data )                 { return msg_tryWait  (this, _data, sizeof(C)); }
+	uint takeISR  (       C *_data )                 { return msg_takeISR  (this, _data, sizeof(C)); }
 	template<typename T>
-	auto waitFor  (       C *_data, const T _delay ) { return msg_waitFor  (this, _data, sizeof(C), Clock::count(_delay)); }
+	uint waitFor  (       C *_data, const T _delay ) { return msg_waitFor  (this, _data, sizeof(C), Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil(       C *_data, const T _time )  { return msg_waitUntil(this, _data, sizeof(C), Clock::until(_time)); }
-	auto wait     (       C *_data )                 { return msg_wait     (this, _data, sizeof(C)); }
-	auto give     ( const C *_data )                 { return msg_give     (this, _data, sizeof(C)); }
-	auto giveISR  ( const C *_data )                 { return msg_giveISR  (this, _data, sizeof(C)); }
+	uint waitUntil(       C *_data, const T _time )  { return msg_waitUntil(this, _data, sizeof(C), Clock::until(_time)); }
+	uint wait     (       C *_data )                 { return msg_wait     (this, _data, sizeof(C)); }
+	uint give     ( const C *_data )                 { return msg_give     (this, _data, sizeof(C)); }
+	uint giveISR  ( const C *_data )                 { return msg_giveISR  (this, _data, sizeof(C)); }
 	template<typename T>
-	auto sendFor  ( const C *_data, const T _delay ) { return msg_sendFor  (this, _data, sizeof(C), Clock::count(_delay)); }
+	uint sendFor  ( const C *_data, const T _delay ) { return msg_sendFor  (this, _data, sizeof(C), Clock::count(_delay)); }
 	template<typename T>
-	auto sendUntil( const C *_data, const T _time )  { return msg_sendUntil(this, _data, sizeof(C), Clock::until(_time)); }
-	auto send     ( const C *_data )                 { return msg_send     (this, _data, sizeof(C)); }
-	auto push     ( const C *_data )                 { return msg_push     (this, _data, sizeof(C)); }
-	auto pushISR  ( const C *_data )                 { return msg_pushISR  (this, _data, sizeof(C)); }
+	uint sendUntil( const C *_data, const T _time )  { return msg_sendUntil(this, _data, sizeof(C), Clock::until(_time)); }
+	uint send     ( const C *_data )                 { return msg_send     (this, _data, sizeof(C)); }
+	uint push     ( const C *_data )                 { return msg_push     (this, _data, sizeof(C)); }
+	uint pushISR  ( const C *_data )                 { return msg_pushISR  (this, _data, sizeof(C)); }
 };
 
 #endif//__cplusplus

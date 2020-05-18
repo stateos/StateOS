@@ -539,18 +539,18 @@ struct Mutex : public __mtx
 	void destroy  ( void )           {        mtx_destroy  (this); }
 	void setPrio  ( unsigned _prio ) {        mtx_setPrio  (this, _prio); }
 	void prio     ( unsigned _prio ) {        mtx_prio     (this, _prio); }
-	auto getPrio  ( void )           { return mtx_getPrio  (this); }
-	auto prio     ( void )           { return mtx_getPrio  (this); }
-	auto take     ( void )           { return mtx_take     (this); }
-	auto tryLock  ( void )           { return mtx_tryLock  (this); }
+	uint getPrio  ( void )           { return mtx_getPrio  (this); }
+	uint prio     ( void )           { return mtx_getPrio  (this); }
+	uint take     ( void )           { return mtx_take     (this); }
+	uint tryLock  ( void )           { return mtx_tryLock  (this); }
 	template<typename T>
-	auto waitFor  ( const T _delay ) { return mtx_waitFor  (this, Clock::count(_delay)); }
+	uint waitFor  ( const T _delay ) { return mtx_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	auto waitUntil( const T _time )  { return mtx_waitUntil(this, Clock::until(_time)); }
-	auto wait     ( void )           { return mtx_wait     (this); }
-	auto lock     ( void )           { return mtx_lock     (this); }
-	auto give     ( void )           { return mtx_give     (this); }
-	auto unlock   ( void )           { return mtx_unlock   (this); }
+	uint waitUntil( const T _time )  { return mtx_waitUntil(this, Clock::until(_time)); }
+	uint wait     ( void )           { return mtx_wait     (this); }
+	uint lock     ( void )           { return mtx_lock     (this); }
+	uint give     ( void )           { return mtx_give     (this); }
+	uint unlock   ( void )           { return mtx_unlock   (this); }
 };
 
 #endif//__cplusplus
