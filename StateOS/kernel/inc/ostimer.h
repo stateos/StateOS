@@ -786,13 +786,13 @@ struct baseTimer : public __tmr
 
 /******************************************************************************
  *
- * Class             : [base]Timer::This
+ * Class             : [base]Timer::Current
  *
  * Description       : provide set of functions for current timer
  *
  ******************************************************************************/
 
-	struct This
+	struct Current
 	{
 #if __cplusplus >= 201402
 		static
@@ -809,7 +809,8 @@ struct baseTimer : public __tmr
 	};
 };
 
-using ThisTimer = baseTimer::This;
+using ThisTimer = baseTimer::Current;
+using Self      = baseTimer::Current;
 
 /******************************************************************************
  *
