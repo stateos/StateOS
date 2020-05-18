@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    16.05.2020
+    @date    18.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -775,9 +775,12 @@ struct baseTimer : public __tmr
 	unsigned wait     ( void )                                            { return tmr_wait         (this); }
 	bool     operator!( void )                                            { return __tmr::hdr.id == ID_STOPPED; }
 
+	template<class T = baseTimer> static
+	T      * current  ( void )                                            { return static_cast<T *>(tmr_thisISR()); }
+
 #if __cplusplus >= 201402
 	static
-	void     fun_     ( void )                                            {        static_cast<baseTimer *>(tmr_thisISR())->fun(); }
+	void     fun_     ( void )                                            {        current()->fun(); }
 	Fun_t    fun;
 #endif
 };
@@ -1098,12 +1101,10 @@ struct Timer : public baseTimer
 
 namespace ThisTimer
 {
-	template<class T = baseTimer>
-	static inline T  * current ( void )           { return static_cast<T *>(tmr_thisISR()); }
 #if __cplusplus >= 201402
 	static inline void flipISR ( std::nullptr_t ) { tmr_flipISR (nullptr); }
 	template<class F>
-	static inline void flipISR ( const F _state ) { new (&ThisTimer::current()->fun) Fun_t(_state);
+	static inline void flipISR ( const F _state ) { new (&baseTimer::current()->fun) Fun_t(_state);
 	                                                tmr_flipISR (baseTimer::fun_); }
 #else
 	static inline void flipISR ( fun_t * _state ) { tmr_flipISR (_state); }
