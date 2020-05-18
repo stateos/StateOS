@@ -588,8 +588,11 @@ struct JobQueueT : public __job
 	{
 #if __cplusplus >= 201402
 		auto job = reinterpret_cast<JobQueueT<limit_> *>(sys_alloc(sizeof(JobQueueT<limit_>)));
-		new (job) JobQueueT<limit_>();
-		job->__job::obj.res = job;
+		if (job != nullptr)
+		{
+			new (job) JobQueueT<limit_>();
+			job->__job::obj.res = job;
+		}
 		return job;
 #else
 		return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_));

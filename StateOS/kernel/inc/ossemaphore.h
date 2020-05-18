@@ -535,8 +535,11 @@ struct Semaphore : public __sem
 	{
 #if __cplusplus >= 201402
 		auto sem = reinterpret_cast<Semaphore *>(sys_alloc(sizeof(Semaphore)));
-		new (sem) Semaphore(_init, _limit);
-		sem->__sem::obj.res = sem;
+		if (sem != nullptr)
+		{
+			new (sem) Semaphore(_init, _limit);
+			sem->__sem::obj.res = sem;
+		}
 		return sem;
 #else
 		return reinterpret_cast<Semaphore *>(sem_create(_init, _limit));

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    06.05.2020
+    @date    18.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -62,7 +62,8 @@ tsk_t *priv_wrk_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinabl
 
 	bufsize = STK_SIZE(size) * sizeof(stk_t);
 	tmp = sys_alloc(sizeof(struct tsk_T) + bufsize);
-	priv_wrk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize, tmp, joinable);
+	if (tsk = &tmp->tsk, tsk)
+		priv_wrk_init(tsk, prio, state, tmp->buf, bufsize, tmp, joinable);
 
 	return tsk;
 }
@@ -116,8 +117,11 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size )
 	sys_lock();
 	{
 		tsk = priv_wrk_create(prio, state, size, JOINABLE);
-		core_ctx_init(tsk);
-		core_tsk_insert(tsk);
+		if (tsk)
+		{
+			core_ctx_init(tsk);
+			core_tsk_insert(tsk);
+		}
 	}
 	sys_unlock();
 
@@ -137,8 +141,11 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size )
 	sys_lock();
 	{
 		tsk = priv_wrk_create(prio, state, size, DETACHED);
-		core_ctx_init(tsk);
-		core_tsk_insert(tsk);
+		if (tsk)
+		{
+			core_ctx_init(tsk);
+			core_tsk_insert(tsk);
+		}
 	}
 	sys_unlock();
 

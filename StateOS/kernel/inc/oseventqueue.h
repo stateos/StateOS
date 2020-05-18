@@ -592,8 +592,11 @@ struct EventQueueT : public __evq
 	{
 #if __cplusplus >= 201402
 		auto evq = reinterpret_cast<EventQueueT<limit_> *>(sys_alloc(sizeof(EventQueueT<limit_>)));
-		new (evq) EventQueueT<limit_>();
-		evq->__evq::obj.res = evq;
+		if (evq != nullptr)
+		{
+			new (evq) EventQueueT<limit_>();
+			evq->__evq::obj.res = evq;
+		}
 		return evq;
 #else
 		return reinterpret_cast<EventQueueT<limit_> *>(evq_create(limit_));

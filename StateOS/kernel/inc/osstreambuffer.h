@@ -619,8 +619,11 @@ struct StreamBufferT : public __stm
 	{
 #if __cplusplus >= 201402
 		auto stm = reinterpret_cast<StreamBufferT<limit_> *>(sys_alloc(sizeof(StreamBufferT<limit_>)));
-		new (stm) StreamBufferT<limit_>();
-		stm->__stm::obj.res = stm;
+		if (stm != nullptr)
+		{
+			new (stm) StreamBufferT<limit_>();
+			stm->__stm::obj.res = stm;
+		}
 		return stm;
 #else
 		return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));

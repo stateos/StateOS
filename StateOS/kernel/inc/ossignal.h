@@ -440,8 +440,11 @@ struct Signal : public __sig
 	{
 #if __cplusplus >= 201402
 		auto sig = reinterpret_cast<Signal *>(sys_alloc(sizeof(Signal)));
-		new (sig) Signal(_mask);
-		sig->__sig::obj.res = sig;
+		if (sig != nullptr)
+		{
+			new (sig) Signal(_mask);
+			sig->__sig::obj.res = sig;
+		}
 		return sig;
 #else
 		return reinterpret_cast<Signal *>(sig_create(_mask));

@@ -345,8 +345,11 @@ struct Barrier : public __bar
 	{
 #if __cplusplus >= 201402
 		auto bar = reinterpret_cast<Barrier *>(sys_alloc(sizeof(Barrier)));
-		new (bar) Barrier(_limit);
-		bar->__bar::obj.res = bar;
+		if (bar != nullptr)
+		{
+			new (bar) Barrier(_limit);
+			bar->__bar::obj.res = bar;
+		}
 		return bar;
 #else
 		return reinterpret_cast<Barrier *>(bar_create(_limit));

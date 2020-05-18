@@ -397,8 +397,11 @@ struct FastMutex : public __mut
 	{
 #if __cplusplus >= 201402
 		auto mut = reinterpret_cast<FastMutex *>(sys_alloc(sizeof(FastMutex)));
-		new (mut) FastMutex();
-		mut->__mut::obj.res = mut;
+		if (mut != nullptr)
+		{
+			new (mut) FastMutex();
+			mut->__mut::obj.res = mut;
+		}
 		return mut;
 #else
 		return reinterpret_cast<FastMutex *>(mut_create());

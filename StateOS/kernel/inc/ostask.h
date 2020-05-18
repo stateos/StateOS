@@ -1553,9 +1553,12 @@ struct TaskT : public baseTask, public baseStack<size_>
 	{
 #if __cplusplus >= 201402
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		new (tsk) TaskT<size_>(_prio, _state);
-		tsk->__tsk::hdr.obj.res = tsk;
-		tsk->start();
+		if (tsk != nullptr)
+		{
+			new (tsk) TaskT<size_>(_prio, _state);
+			tsk->__tsk::hdr.obj.res = tsk;
+			tsk->start();
+		}
 		return tsk;
 #else
 		return reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
@@ -1567,9 +1570,12 @@ struct TaskT : public baseTask, public baseStack<size_>
 	TaskT<size_> *Create( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		new (tsk) TaskT<size_>(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
-		tsk->__tsk::hdr.obj.res = tsk;
-		tsk->start();
+		if (tsk != nullptr)
+		{
+			new (tsk) TaskT<size_>(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+			tsk->__tsk::hdr.obj.res = tsk;
+			tsk->start();
+		}
 		return tsk;
 	}
 #endif
@@ -1599,10 +1605,13 @@ struct TaskT : public baseTask, public baseStack<size_>
 	{
 #if __cplusplus >= 201402
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		new (tsk) TaskT<size_>(_prio, _state);
-		tsk->__tsk::hdr.obj.res = tsk;
-		tsk->__tsk::join = DETACHED;
-		tsk->start();
+		if (tsk != nullptr)
+		{
+			new (tsk) TaskT<size_>(_prio, _state);
+			tsk->__tsk::hdr.obj.res = tsk;
+			tsk->__tsk::join = DETACHED;
+			tsk->start();
+		}
 		return tsk;
 #else
 		return reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
@@ -1614,10 +1623,13 @@ struct TaskT : public baseTask, public baseStack<size_>
 	TaskT<size_> *Detached( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		new (tsk) TaskT<size_>(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
-		tsk->__tsk::hdr.obj.res = tsk;
-		tsk->__tsk::join = DETACHED;
-		tsk->start();
+		if (tsk != nullptr)
+		{
+			new (tsk) TaskT<size_>(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+			tsk->__tsk::hdr.obj.res = tsk;
+			tsk->__tsk::join = DETACHED;
+			tsk->start();
+		}
 		return tsk;
 	}
 #endif

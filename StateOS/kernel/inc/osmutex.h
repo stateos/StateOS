@@ -526,8 +526,11 @@ struct Mutex : public __mtx
 	{
 #if __cplusplus >= 201402
 		auto mtx = reinterpret_cast<Mutex *>(sys_alloc(sizeof(Mutex)));
-		new (mtx) Mutex(_mode, _prio);
-		mtx->__mtx::obj.res = mtx;
+		if (mtx != nullptr)
+		{
+			new (mtx) Mutex(_mode, _prio);
+			mtx->__mtx::obj.res = mtx;
+		}
 		return mtx;
 #else
 		return reinterpret_cast<Mutex *>(mtx_create(_mode, _prio));

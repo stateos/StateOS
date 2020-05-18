@@ -413,8 +413,11 @@ struct ConditionVariable : public __cnd
 	{
 #if __cplusplus >= 201402
 		auto cnd = reinterpret_cast<ConditionVariable *>(sys_alloc(sizeof(ConditionVariable)));
-		new (cnd) ConditionVariable();
-		cnd->__cnd::obj.res = cnd;
+		if (cnd != nullptr)
+		{
+			new (cnd) ConditionVariable();
+			cnd->__cnd::obj.res = cnd;
+		}
 		return cnd;
 #else
 		return reinterpret_cast<ConditionVariable *>(cnd_create());

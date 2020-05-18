@@ -492,8 +492,11 @@ struct Flag : public __flg
 	{
 #if __cplusplus >= 201402
 		auto flg = reinterpret_cast<Flag *>(sys_alloc(sizeof(Flag)));
-		new (flg) Flag(_init);
-		flg->__flg::obj.res = flg;
+		if (flg != nullptr)
+		{
+			new (flg) Flag(_init);
+			flg->__flg::obj.res = flg;
+		}
 		return flg;
 #else
 		return reinterpret_cast<Flag *>(flg_create(_init));

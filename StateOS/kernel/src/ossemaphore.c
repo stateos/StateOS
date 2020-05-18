@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    10.05.2020
+    @date    18.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -72,7 +72,8 @@ sem_t *sem_create( unsigned init, unsigned limit )
 	sys_lock();
 	{
 		sem = sys_alloc(sizeof(sem_t));
-		priv_sem_init(sem, init, limit, sem);
+		if (sem)
+			priv_sem_init(sem, init, limit, sem);
 	}
 	sys_unlock();
 

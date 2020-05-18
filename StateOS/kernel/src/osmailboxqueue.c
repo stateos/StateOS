@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    06.05.2020
+    @date    18.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -81,7 +81,8 @@ box_t *box_create( unsigned limit, unsigned size )
 	{
 		bufsize = limit * size;
 		tmp = sys_alloc(sizeof(struct box_T) + bufsize);
-		priv_box_init(box = &tmp->box, size, tmp->buf, bufsize, tmp);
+		if (box = &tmp->box, box)
+			priv_box_init(box, size, tmp->buf, bufsize, tmp);
 	}
 	sys_unlock();
 

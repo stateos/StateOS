@@ -644,8 +644,11 @@ struct MessageBufferT : public __msg
 	{
 #if __cplusplus >= 201402
 		auto msg = reinterpret_cast<MessageBufferT<limit_> *>(sys_alloc(sizeof(MessageBufferT<limit_>)));
-		new (msg) MessageBufferT<limit_>();
-		msg->__msg::obj.res = msg;
+		if (msg != nullptr)
+		{
+			new (msg) MessageBufferT<limit_>();
+			msg->__msg::obj.res = msg;
+		}
 		return msg;
 #else
 		return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_));

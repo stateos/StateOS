@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    06.05.2020
+    @date    18.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -71,7 +71,8 @@ sig_t *sig_create( unsigned mask )
 	sys_lock();
 	{
 		sig = sys_alloc(sizeof(sig_t));
-		priv_sig_init(sig, mask, sig);
+		if (sig)
+			priv_sig_init(sig, mask, sig);
 	}
 	sys_unlock();
 

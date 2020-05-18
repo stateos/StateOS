@@ -359,8 +359,11 @@ struct Event : public __evt
 	{
 #if __cplusplus >= 201402
 		auto evt = reinterpret_cast<Event *>(sys_alloc(sizeof(Event)));
-		new (evt) Event();
-		evt->__evt::obj.res = evt;
+		if (evt != nullptr)
+		{
+			new (evt) Event();
+			evt->__evt::obj.res = evt;
+		}
 		return evt;
 #else
 		return reinterpret_cast<Event *>(evt_create());

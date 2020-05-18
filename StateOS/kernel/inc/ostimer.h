@@ -1085,8 +1085,11 @@ struct Timer : public baseTimer
 	{
 #if __cplusplus >= 201402
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
-		new (tmr) Timer();
-		tmr->__tmr::hdr.obj.res = tmr;
+		if (tmr != nullptr)
+		{
+			new (tmr) Timer();
+			tmr->__tmr::hdr.obj.res = tmr;
+		}
 		return tmr;
 #else
 		return reinterpret_cast<Timer *>(tmr_create(nullptr));
@@ -1098,8 +1101,11 @@ struct Timer : public baseTimer
 	{
 #if __cplusplus >= 201402
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
-		new (tmr) Timer(_state);
-		tmr->__tmr::hdr.obj.res = tmr;
+		if (tmr != nullptr)
+		{
+			new (tmr) Timer(_state);
+			tmr->__tmr::hdr.obj.res = tmr;
+		}
 		return tmr;
 #else
 		return reinterpret_cast<Timer *>(tmr_create(_state));
@@ -1111,8 +1117,11 @@ struct Timer : public baseTimer
 	Timer *Create( F&& _state, A&&... _args )
 	{
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
-		new (tmr) Timer(std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
-		tmr->__tmr::hdr.obj.res = tmr;
+		if (tmr != nullptr)
+		{
+			new (tmr) Timer(std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+			tmr->__tmr::hdr.obj.res = tmr;
+		}
 		return tmr;
 	}
 #endif

@@ -464,8 +464,11 @@ struct MemoryPoolT : public __mem
 	{
 #if __cplusplus >= 201402
 		auto mem = reinterpret_cast<MemoryPoolT<limit_, size_> *>(sys_alloc(sizeof(MemoryPoolT<limit_, size_>)));
-		new (mem) MemoryPoolT<limit_, size_>();
-		mem->__mem::lst.obj.res = mem;
+		if (mem != nullptr)
+		{
+			new (mem) MemoryPoolT<limit_, size_>();
+			mem->__mem::lst.obj.res = mem;
+		}
 		return mem;
 #else
 		return reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
