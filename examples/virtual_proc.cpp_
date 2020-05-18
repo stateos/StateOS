@@ -14,7 +14,7 @@ struct myTask : public Task
 	private:
 	static void run()
 	{
-		ThisTask::current<myTask>()->main();
+		current<myTask>()->main();
 	}
 };
 

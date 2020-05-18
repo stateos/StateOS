@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    16.05.2020
+    @date    18.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1347,12 +1347,15 @@ struct baseTask : public __tsk
 #endif
 	bool     operator!( void )             { return __tsk::hdr.id == ID_STOPPED; }
 
+	template<class T = baseTask> static
+	T      * current  ( void )             { return static_cast<T *>(tsk_this()); }
+
 #if __cplusplus >= 201402
 	static
-	void     fun_     ( void )             {        static_cast<baseTask *>(tsk_this())->fun(); }
+	void     fun_     ( void )             {        current()->fun(); }
 	Fun_t    fun;
 	static
-	void     act_     ( unsigned _signo )  {        static_cast<baseTask *>(tsk_this())->act(_signo); }
+	void     act_     ( unsigned _signo )  {        current()->act(_signo); }
 	Act_t    act;
 #endif
 };
@@ -1569,8 +1572,6 @@ using Task = TaskT<OS_STACK_SIZE>;
 
 namespace ThisTask
 {
-	template<class T = baseTask>
-	static inline T  *     current   ( void )             { return static_cast<T *>(tsk_this()); }
 	static inline unsigned detach    ( void )             { return cur_detach    (); }
 	static inline void     stop      ( void )             {        tsk_stop      (); }
 	static inline void     exit      ( void )             {        tsk_exit      (); }
@@ -1581,7 +1582,7 @@ namespace ThisTask
 	static inline void     pass      ( void )             {        tsk_pass      (); }
 #if __cplusplus >= 201402
 	template<class F>
-	static inline void     flip      ( const F  _state )  {        new (&ThisTask::current()->fun) Fun_t(_state);
+	static inline void     flip      ( const F  _state )  {        new (&baseTask::current()->fun) Fun_t(_state);
 	                                                               tsk_flip      (baseTask::fun_); }
 #else
 	static inline void     flip      ( fun_t *  _state )  {        tsk_flip      (_state); }
@@ -1604,7 +1605,7 @@ namespace ThisTask
 	static inline void     signal    ( unsigned _signo )  {        cur_signal    (_signo); }
 #if __cplusplus >= 201402
 	template<class F>
-	static inline void     action    ( const F  _action ) {        new (&ThisTask::current()->act) Act_t(_action);
+	static inline void     action    ( const F  _action ) {        new (&baseTask::current()->act) Act_t(_action);
 	                                                               cur_action    (baseTask::act_); }
 #else
 	static inline void     action    ( act_t *  _action ) {        cur_action    (_action); }
