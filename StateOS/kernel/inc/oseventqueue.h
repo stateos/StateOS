@@ -203,6 +203,7 @@ void evq_init( evq_t *evq, unsigned *data, unsigned bufsize );
  *   limit           : size of a queue (max number of stored events)
  *
  * Return            : pointer to event queue object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

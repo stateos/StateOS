@@ -166,6 +166,7 @@ void evt_init( evt_t *evt );
  * Parameters        : none
  *
  * Return            : pointer to event object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

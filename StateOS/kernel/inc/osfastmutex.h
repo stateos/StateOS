@@ -170,6 +170,7 @@ void mut_init( mut_t *mut );
  * Parameters        : none
  *
  * Return            : pointer to fast mutex object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

@@ -197,6 +197,7 @@ void lst_init( lst_t *lst );
  * Parameters        : none
  *
  * Return            : pointer to list object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

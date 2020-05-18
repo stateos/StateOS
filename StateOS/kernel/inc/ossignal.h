@@ -196,6 +196,7 @@ void sig_init( sig_t *sig, unsigned mask );
  *   mask            : protection mask of signal object
  *
  * Return            : pointer to signal object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

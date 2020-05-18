@@ -231,6 +231,7 @@ void sem_init( sem_t *sem, unsigned init, unsigned limit );
  *                     otherwise: limited semaphore
  *
  * Return            : pointer to semaphore object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

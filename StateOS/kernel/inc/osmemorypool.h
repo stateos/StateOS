@@ -231,6 +231,7 @@ void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize );
  *   size            : size of memory object (in bytes)
  *
  * Return            : pointer to memory pool object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

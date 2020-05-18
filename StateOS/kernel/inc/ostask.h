@@ -658,6 +658,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
  *   size            : size of task private stack (in bytes)
  *
  * Return            : pointer to task object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *
@@ -682,6 +683,7 @@ tsk_t *wrk_new( unsigned prio, fun_t *state, size_t size ) { return wrk_create(p
  *   size            : size of task private stack (in bytes)
  *
  * Return            : pointer to task object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *
@@ -703,6 +705,7 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size );
  *                     it will be executed into an infinite system-implemented loop
  *
  * Return            : pointer to task object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *
@@ -727,6 +730,7 @@ tsk_t *tsk_new   ( unsigned prio, fun_t *state ) { return wrk_create(prio, state
  *                     it will be executed into an infinite system-implemented loop
  *
  * Return            : pointer to task object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *
@@ -750,6 +754,7 @@ tsk_t *tsk_detached( unsigned prio, fun_t *state ) { return wrk_detached(prio, s
  *   joinable        : JOINABLE / DETACHED
  *
  * Return            : pointer to task object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : for internal use
  *

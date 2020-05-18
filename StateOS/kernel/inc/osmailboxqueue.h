@@ -212,6 +212,7 @@ void box_init( box_t *box, unsigned size, void *data, unsigned bufsize );
  *   size            : size of a single mail (in bytes)
  *
  * Return            : pointer to mailbox queue object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

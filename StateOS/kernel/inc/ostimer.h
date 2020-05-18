@@ -336,6 +336,7 @@ void tmr_init( tmr_t *tmr, fun_t *state );
  *                     NULL: no callback
  *
  * Return            : pointer to timer object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

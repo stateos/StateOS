@@ -173,6 +173,7 @@ void cnd_init( cnd_t *cnd );
  * Parameters        : none
  *
  * Return            : pointer to condition variable object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

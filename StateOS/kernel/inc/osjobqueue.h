@@ -203,6 +203,7 @@ void job_init( job_t *job, fun_t **data, unsigned bufsize );
  *   limit           : size of a queue (max number of stored job procedures)
  *
  * Return            : pointer to job queue object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

@@ -200,6 +200,7 @@ void flg_init( flg_t *flg, unsigned init );
  *   init            : initial value of flag
  *
  * Return            : pointer to flag object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

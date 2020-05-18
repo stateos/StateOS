@@ -176,6 +176,7 @@ void bar_init( bar_t *bar, unsigned limit );
  *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object
  *
  * Return            : pointer to barrier object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

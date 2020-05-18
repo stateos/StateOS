@@ -247,6 +247,7 @@ void mtx_init( mtx_t *mtx, unsigned mode, unsigned prio );
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
  * Return            : pointer to mutex object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *

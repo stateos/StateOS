@@ -219,6 +219,7 @@ void msg_init( msg_t *msg, void *data, unsigned bufsize );
  *   limit           : size of a buffer (max number of stored bytes)
  *
  * Return            : pointer to message buffer object
+ *   NULL            : object not created (not enough free memory)
  *
  * Note              : use only in thread mode
  *
