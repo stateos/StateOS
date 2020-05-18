@@ -1361,13 +1361,13 @@ struct baseTask : public __tsk
 
 /******************************************************************************
  *
- * Class             : [base]Task::This
+ * Class             : [base]Task::Current
  *
  * Description       : provide set of functions for current task
  *
  ******************************************************************************/
 
-	struct This
+	struct Current
 	{
 		static
 		unsigned detach    ( void )             { return cur_detach    (); }
@@ -1428,7 +1428,8 @@ struct baseTask : public __tsk
 	};
 };
 
-using ThisTask = baseTask::This;
+using ThisTask = baseTask::Current;
+using This     = baseTask::Current;
 
 /******************************************************************************
  *

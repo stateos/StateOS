@@ -43,5 +43,5 @@ auto mas = masTask();
 
 int main()
 {
-	Task::This::sleep();
+	This::sleep();
 }
