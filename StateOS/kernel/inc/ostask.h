@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    19.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1294,6 +1294,7 @@ void cur_action( act_t *action ) { tsk_action(System.cur, action); }
 template<size_t size_>
 struct baseStack
 {
+	static_assert(size_>sizeof(ctx_t), "incorrect stack size");
 	stk_t stack_[ STK_SIZE(size_) ];
 };
 
