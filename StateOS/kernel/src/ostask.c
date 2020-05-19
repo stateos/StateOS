@@ -76,7 +76,7 @@ void wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
 	assert(tsk);
 	assert(state);
 	assert(stack);
-	assert(size);
+	assert(size>sizeof(ctx_t));
 
 	sys_lock();
 	{
@@ -93,7 +93,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
 	assert(tsk);
 	assert(state);
 	assert(stack);
-	assert(size);
+	assert(size>sizeof(ctx_t));
 
 	sys_lock();
 	{
