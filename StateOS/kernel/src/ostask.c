@@ -112,7 +112,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size )
 
 	assert_tsk_context();
 	assert(state);
-	assert(size);
+	assert(size>sizeof(ctx_t));
 
 	sys_lock();
 	{
@@ -136,7 +136,7 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size )
 
 	assert_tsk_context();
 	assert(state);
-	assert(size);
+	assert(size>sizeof(ctx_t));
 
 	sys_lock();
 	{
@@ -161,7 +161,7 @@ tsk_t *thd_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinable )
 
 	assert_tsk_context();
 	assert(state);
-	assert(size);
+	assert(size>sizeof(ctx_t));
 	assert(joinable == JOINABLE || joinable == DETACHED);
 
 	sys_lock();
