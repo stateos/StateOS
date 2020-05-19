@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    19.05.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -85,13 +85,11 @@ extern sys_t System; // system data
 
 /* -------------------------------------------------------------------------- */
 
-#define assert_ctx_integrity(tsk) \
-        assert(((tsk) == &MAIN) || ((uintptr_t)(tsk)->stack < (uintptr_t)(tsk)->sp))
+#define assert_ctx_integrity(tsk, sp) \
+        assert(((tsk) == &MAIN) || ((uintptr_t)(tsk)->stack < (uintptr_t)(sp)))
 
 #define assert_stk_integrity() \
-        assert((System.cur == &MAIN) || ((uintptr_t)System.cur->stack < (uintptr_t)port_get_sp()))
-
-/* -------------------------------------------------------------------------- */
+        assert((System.cur == &MAIN) || ((uintptr_t)System.cur->stack + sizeof(ctx_t) < (uintptr_t)port_get_sp()))
 
 #define assert_tsk_context() \
         assert(port_isr_context() == false)

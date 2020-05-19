@@ -653,8 +653,8 @@ void priv_sig_dispatch( tsk_t *tsk )
 	tsk->sig.backup.guard = tsk->guard;
 
 	tsk->sp = (ctx_t *)tsk->sp - 1;
+	assert_ctx_integrity(tsk, tsk->sp);
 	port_ctx_init(tsk->sp, priv_sig_deliver);
-	assert_ctx_integrity(tsk);
 
 	if (tsk->guard)
 		core_tsk_wakeup(tsk, 0);

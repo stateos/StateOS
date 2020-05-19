@@ -43,6 +43,7 @@ Features:
 - updated other classes
 - removed unused OS_FUNCTIONAL definition
 - added CNT_LIMIT definition
+- updated stack assertions
 ---------
 6.6
 - updated os version
