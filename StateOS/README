@@ -44,7 +44,7 @@ Features:
 - removed unused OS_FUNCTIONAL definition
 - added CNT_LIMIT definition
 - updated stack assertions
-- added OS_GUARD_SIZE definition
+- check task stack watermark
 ---------
 6.6
 - updated os version

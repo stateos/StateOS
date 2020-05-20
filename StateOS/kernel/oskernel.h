@@ -85,17 +85,11 @@ extern sys_t System; // system data
 
 /* -------------------------------------------------------------------------- */
 
-#ifndef OS_GUARD_SIZE
-#define OS_GUARD_SIZE     0
-#endif
-
-/* -------------------------------------------------------------------------- */
-
 #define assert_ctx_integrity(tsk, sp) \
-        assert(((tsk) == &MAIN) || ((uintptr_t)(tsk)->stack + OS_GUARD_SIZE < (uintptr_t)(sp)))
+        assert(((tsk) == &MAIN) || ((uintptr_t)(tsk)->stack < (uintptr_t)(sp)))
 
 #define assert_stk_integrity() \
-        assert((System.cur == &MAIN) || ((uintptr_t)System.cur->stack + sizeof(ctx_t) + OS_GUARD_SIZE < (uintptr_t)port_get_sp()))
+        assert((System.cur == &MAIN) || (core_stk_space() > sizeof(stk_t)))
 
 #define assert_tsk_context() \
         assert(port_isr_context() == false)
@@ -111,6 +105,11 @@ void port_sys_init( void );
 
 // initiate task 'tsk' for context switch
 void core_ctx_init( tsk_t *tsk );
+
+// return high water mark of the current task stack
+#ifdef DEBUG
+size_t core_stk_space( void );
+#endif
 
 // save status of the current process and force yield system control to the next
 void core_ctx_switch( void );
