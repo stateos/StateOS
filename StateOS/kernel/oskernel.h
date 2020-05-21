@@ -90,15 +90,25 @@ extern sys_t System; // system data
 #endif
 
 /* -------------------------------------------------------------------------- */
+#ifdef DEBUG
 
-#define assert_ctx_integrity(tsk, sp) \
-        assert(((tsk) == &MAIN) || ((uintptr_t)(tsk)->stack + (OS_GUARD_SIZE) < (uintptr_t)(sp)))
+// return high water mark of the current task stack
+size_t core_stk_space( void );
 
-#define assert_stk_integrity() \
-        assert((System.cur == &MAIN) || (core_stk_space() > sizeof(ctx_t) + (OS_GUARD_SIZE)))
+// check the integrity of stack of the task while context switching
+bool core_ctx_integrity( tsk_t *tsk, void *sp );
 
-#define assert_tsk_context() \
-        assert(port_isr_context() == false)
+// check the integrity of stack of the current task
+bool core_stk_integrity( void );
+
+#endif
+/* -------------------------------------------------------------------------- */
+
+#define assert_ctx_integrity(tsk, sp)  assert(core_ctx_integrity(tsk, sp))
+
+#define assert_stk_integrity()         assert(core_stk_integrity())
+
+#define assert_tsk_context()           assert(port_isr_context() == false)
 
 /* -------------------------------------------------------------------------- */
 
@@ -111,11 +121,6 @@ void port_sys_init( void );
 
 // initiate task 'tsk' for context switch
 void core_ctx_init( tsk_t *tsk );
-
-// return high water mark of the current task stack
-#ifdef DEBUG
-size_t core_stk_space( void );
-#endif
 
 // save status of the current process and force yield system control to the next
 void core_ctx_switch( void );
