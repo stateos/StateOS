@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    20.05.2020
+    @date    21.05.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -534,7 +534,6 @@ void *core_tsk_handler( void *sp )
 {
 	tsk_t *cur, *nxt;
 
-	assert_stk_integrity();
 	assert_ctx_integrity(System.cur, sp);
 
 	port_set_lock();
@@ -565,7 +564,6 @@ void *core_tsk_handler( void *sp )
 	port_clr_lock();
 
 	assert_ctx_integrity(System.cur, sp);
-	assert_stk_integrity();
 
 	return sp;
 }
