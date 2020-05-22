@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -596,7 +596,7 @@ struct JobQueueT : public __job
 		}
 		return job;
 #else
-		return reinterpret_cast<JobQueueT<limit_> *>(job_create(limit_));
+		return static_cast<JobQueueT<limit_> *>(job_create(limit_));
 #endif
 	}
 

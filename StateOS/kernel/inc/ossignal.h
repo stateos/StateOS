@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -448,7 +448,7 @@ struct Signal : public __sig
 		}
 		return sig;
 #else
-		return reinterpret_cast<Signal *>(sig_create(_mask));
+		return static_cast<Signal *>(sig_create(_mask));
 #endif
 	}
 

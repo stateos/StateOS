@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -472,7 +472,7 @@ struct MemoryPoolT : public __mem
 		}
 		return mem;
 #else
-		return reinterpret_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
+		return static_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
 #endif
 	}
 
@@ -530,7 +530,7 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
 	static
 	MemoryPoolTT<limit_, C> *Create( void )
 	{
-		return reinterpret_cast<MemoryPoolTT<limit_, C> *>(MemoryPoolT<limit_, sizeof(C)>::Create());
+		return static_cast<MemoryPoolTT<limit_, C> *>(MemoryPoolT<limit_, sizeof(C)>::Create());
 	}
 
 	uint take     ( C **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data)); }

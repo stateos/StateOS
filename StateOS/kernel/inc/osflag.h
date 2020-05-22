@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -500,7 +500,7 @@ struct Flag : public __flg
 		}
 		return flg;
 #else
-		return reinterpret_cast<Flag *>(flg_create(_init));
+		return static_cast<Flag *>(flg_create(_init));
 #endif
 	}
 

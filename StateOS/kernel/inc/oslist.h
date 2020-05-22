@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -432,7 +432,7 @@ struct ListTT : public __lst
 		}
 		return lst;
 #else
-		return reinterpret_cast<ListTT<C> *>(lst_create());
+		return static_cast<ListTT<C> *>(lst_create());
 #endif
 	}
 

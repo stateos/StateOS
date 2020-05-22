@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    19.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1590,7 +1590,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		}
 		return tsk;
 #else
-		return reinterpret_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
+		return static_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
 #endif
 	}
 
@@ -1643,7 +1643,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		}
 		return tsk;
 #else
-		return reinterpret_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
+		return static_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
 #endif
 	}
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -600,7 +600,7 @@ struct EventQueueT : public __evq
 		}
 		return evq;
 #else
-		return reinterpret_cast<EventQueueT<limit_> *>(evq_create(limit_));
+		return static_cast<EventQueueT<limit_> *>(evq_create(limit_));
 #endif
 	}
 

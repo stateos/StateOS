@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -543,7 +543,7 @@ struct Semaphore : public __sem
 		}
 		return sem;
 #else
-		return reinterpret_cast<Semaphore *>(sem_create(_init, _limit));
+		return static_cast<Semaphore *>(sem_create(_init, _limit));
 #endif
 	}
 

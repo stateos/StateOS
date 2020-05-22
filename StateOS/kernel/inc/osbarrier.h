@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -353,7 +353,7 @@ struct Barrier : public __bar
 		}
 		return bar;
 #else
-		return reinterpret_cast<Barrier *>(bar_create(_limit));
+		return static_cast<Barrier *>(bar_create(_limit));
 #endif
 	}
 

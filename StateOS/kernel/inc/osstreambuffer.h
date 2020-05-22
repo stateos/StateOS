@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -627,7 +627,7 @@ struct StreamBufferT : public __stm
 		}
 		return stm;
 #else
-		return reinterpret_cast<StreamBufferT<limit_> *>(stm_create(limit_));
+		return static_cast<StreamBufferT<limit_> *>(stm_create(limit_));
 #endif
 	}
 
@@ -698,7 +698,7 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(C)>
 	static
 	StreamBufferTT<limit_, C> *Create( void )
 	{
-		return reinterpret_cast<StreamBufferTT<limit_, C> *>(StreamBufferT<limit_*sizeof(C)>::Create());
+		return static_cast<StreamBufferTT<limit_, C> *>(StreamBufferT<limit_*sizeof(C)>::Create());
 	}
 
 	uint take     (       C *_data )                 { return stm_take     (this, _data, sizeof(C)); }

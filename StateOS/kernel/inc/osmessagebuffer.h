@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -652,7 +652,7 @@ struct MessageBufferT : public __msg
 		}
 		return msg;
 #else
-		return reinterpret_cast<MessageBufferT<limit_> *>(msg_create(limit_));
+		return static_cast<MessageBufferT<limit_> *>(msg_create(limit_));
 #endif
 	}
 
@@ -725,7 +725,7 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C
 	static
 	MessageBufferTT<limit_, C> *Create( void )
 	{
-		return reinterpret_cast<MessageBufferTT<limit_, C> *>(MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>::Create());
+		return static_cast<MessageBufferTT<limit_, C> *>(MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>::Create());
 	}
 
 	uint take     (       C *_data )                 { return msg_take     (this, _data, sizeof(C)); }

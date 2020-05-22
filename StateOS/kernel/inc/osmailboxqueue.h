@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -611,7 +611,7 @@ struct MailBoxQueueT : public __box
 		}
 		return box;
 #else
-		return reinterpret_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
+		return static_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
 #endif
 	}
 
@@ -682,7 +682,7 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(C)>
 	static
 	MailBoxQueueTT<limit_, C> *Create( void )
 	{
-		return reinterpret_cast<MailBoxQueueTT<limit_, C> *>(MailBoxQueueT<limit_, sizeof(C)>::Create());
+		return static_cast<MailBoxQueueTT<limit_, C> *>(MailBoxQueueT<limit_, sizeof(C)>::Create());
 	}
 };
 

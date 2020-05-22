@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -367,7 +367,7 @@ struct Event : public __evt
 		}
 		return evt;
 #else
-		return reinterpret_cast<Event *>(evt_create());
+		return static_cast<Event *>(evt_create());
 #endif
 	}
 

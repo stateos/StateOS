@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -405,7 +405,7 @@ struct FastMutex : public __mut
 		}
 		return mut;
 #else
-		return reinterpret_cast<FastMutex *>(mut_create());
+		return static_cast<FastMutex *>(mut_create());
 #endif
 	}
 

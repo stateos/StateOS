@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -534,7 +534,7 @@ struct Mutex : public __mtx
 		}
 		return mtx;
 #else
-		return reinterpret_cast<Mutex *>(mtx_create(_mode, _prio));
+		return static_cast<Mutex *>(mtx_create(_mode, _prio));
 #endif
 	}
 

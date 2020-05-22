@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    22.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1093,7 +1093,7 @@ struct Timer : public baseTimer
 		}
 		return tmr;
 #else
-		return reinterpret_cast<Timer *>(tmr_create(nullptr));
+		return static_cast<Timer *>(tmr_create(nullptr));
 #endif
 	}
 
@@ -1109,7 +1109,7 @@ struct Timer : public baseTimer
 		}
 		return tmr;
 #else
-		return reinterpret_cast<Timer *>(tmr_create(_state));
+		return static_cast<Timer *>(tmr_create(_state));
 #endif
 	}
 
