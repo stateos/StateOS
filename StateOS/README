@@ -45,6 +45,7 @@ Features:
 - added CNT_LIMIT definition
 - updated stack assertions
 - check task stack watermark
+- added tsk_stackSpace function
 ---------
 6.6
 - updated os version
