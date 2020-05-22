@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    21.05.2020
+    @date    22.05.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -92,8 +92,8 @@ extern sys_t System; // system data
 /* -------------------------------------------------------------------------- */
 #ifdef DEBUG
 
-// return high water mark of the current task stack
-size_t core_stk_space( void );
+// return high water mark of stack of the task
+size_t core_stk_space( tsk_t *tsk );
 
 // check the integrity of stack of the task while context switching
 bool core_ctx_integrity( tsk_t *tsk, void *sp );
