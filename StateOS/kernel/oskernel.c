@@ -218,8 +218,8 @@ static  stk_t     MAIN_STK[STK_SIZE(OS_STACK_SIZE)];
 static  union  { stk_t STK[STK_SIZE(OS_IDLE_STACK)];
         struct { char  stk[STK_OVER(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
         IDLE_STACK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
-#define IDLE_STK (void *)(&IDLE_STACK)
-#define IDLE_SP  (void *)(&IDLE_STACK.CTX.ctx)
+#define IDLE_STK  IDLE_STACK.STK
+#define IDLE_SP  &IDLE_STACK.CTX.ctx
 
 tsk_t MAIN = { .hdr={ .prev=&IDLE, .next=&IDLE, .id=ID_READY }, .stack=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
 tsk_t IDLE = { .hdr={ .prev=&MAIN, .next=&MAIN, .id=ID_READY }, .state=priv_tsk_idle, .stack=IDLE_STK, .size=OS_IDLE_STACK, .sp=IDLE_SP }; // idle task and tasks queue
