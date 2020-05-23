@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    19.05.2020
+    @date    23.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -321,9 +321,9 @@ void core_tsk_destructor( void )
 {
 	tsk_t *tsk;
 
-	while (System.des)
+	while (System.rip)
 	{
-		tsk = System.des;                          // task waiting for destruction
+		tsk = System.rip;                          // task waiting for destruction
 
 		if (tsk->join != DETACHED)                 // task not detached
 		{
@@ -341,7 +341,7 @@ static
 void priv_tsk_destroy( void )
 /* -------------------------------------------------------------------------- */
 {
-	core_tsk_waitFor(&System.des, INFINITE);       // wait for destruction
+	core_tsk_waitFor(&System.rip, INFINITE);       // wait for destruction
 
 	assert(!"system cannot return here");
 }
