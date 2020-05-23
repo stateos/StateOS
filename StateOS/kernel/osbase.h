@@ -167,9 +167,6 @@ typedef struct __sys
 	volatile
 	cnt_t    cnt;   // system timer counter
 #endif
-	tsk_t  * sig;   // queue of tasks waiting for a signal
-	tsk_t  * dly;   // queue of sleeping and suspended tasks
-	tsk_t  * rip;   // queue of tasks waiting to be destroyed
 
 }	sys_t;
 

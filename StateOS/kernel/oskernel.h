@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    22.05.2020
+    @date    23.05.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -210,7 +210,7 @@ unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay );
 unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time );
 
 // delay indefinitely execution of given task
-// append given task to System.dly queue
+// append given task to WAIT queue
 // remove given task from tasks READY queue
 // insert given task into timers READY queue
 // force context switch if it is the current task

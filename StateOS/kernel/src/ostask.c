@@ -321,9 +321,9 @@ void core_tsk_destructor( void )
 {
 	tsk_t *tsk;
 
-	while (System.rip)
+	while (IDLE.hdr.obj.queue)
 	{
-		tsk = System.rip;                          // task waiting for destruction
+		tsk = IDLE.hdr.obj.queue;                  // task waiting for destruction
 
 		if (tsk->join != DETACHED)                 // task not detached
 		{
@@ -341,7 +341,7 @@ static
 void priv_tsk_destroy( void )
 /* -------------------------------------------------------------------------- */
 {
-	core_tsk_waitFor(&System.rip, INFINITE);       // wait for destruction
+	core_tsk_waitFor(&IDLE.hdr.obj.queue, INFINITE); // wait for destruction
 
 	assert(!"system cannot return here");
 }
@@ -514,7 +514,7 @@ void tsk_sleepFor( cnt_t delay )
 {
 	sys_lock();
 	{
-		core_tsk_waitFor(&System.dly, delay);
+		core_tsk_waitFor(&WAIT.hdr.obj.queue, delay);
 	}
 	sys_unlock();
 }
@@ -525,7 +525,7 @@ void tsk_sleepNext( cnt_t delay )
 {
 	sys_lock();
 	{
-		core_tsk_waitNext(&System.dly, delay);
+		core_tsk_waitNext(&WAIT.hdr.obj.queue, delay);
 	}
 	sys_unlock();
 }
@@ -536,7 +536,7 @@ void tsk_sleepUntil( cnt_t time )
 {
 	sys_lock();
 	{
-		core_tsk_waitUntil(&System.dly, time);
+		core_tsk_waitUntil(&WAIT.hdr.obj.queue, time);
 	}
 	sys_unlock();
 }
@@ -576,7 +576,7 @@ unsigned tsk_resume( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->guard == &System.dly && tsk->delay == INFINITE)
+		if (tsk->guard == &WAIT.hdr.obj.queue && tsk->delay == INFINITE)
 		{
 			core_tsk_wakeup(tsk, 0); // ignored event value
 			event = E_SUCCESS;

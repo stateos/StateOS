@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    22.05.2020
+    @date    23.05.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -72,8 +72,8 @@ void priv_rdy_insert( hdr_t *hdr, hdr_t *nxt )
 static
 void priv_rdy_remove( hdr_t *hdr )
 {
-	hdr_t *nxt = hdr->next;
 	hdr_t *prv = hdr->prev;
+	hdr_t *nxt = hdr->next;
 
 	nxt->prev = prv;
 	prv->next = nxt;
@@ -393,7 +393,7 @@ unsigned core_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield )
 	if (que)
 	{
 		priv_tsk_remove(tsk);
-		core_tmr_insert((tmr_t *)tsk);
+		core_tmr_insert((tmr_t *)tsk); // sets ID_TIMER awhile
 		core_tsk_append(tsk, que); // must be last; sets ID_READY
 	}
 
@@ -453,7 +453,7 @@ void core_tsk_suspend( tsk_t *tsk )
 {
 	tsk->delay = INFINITE;
 
-	core_tsk_wait(tsk, &System.dly, tsk == System.cur);
+	core_tsk_wait(tsk, &WAIT.hdr.obj.queue, tsk == System.cur);
 }
 
 /* -------------------------------------------------------------------------- */
