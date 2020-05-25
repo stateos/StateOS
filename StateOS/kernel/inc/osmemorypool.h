@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    22.05.2020
+    @date    25.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -217,7 +217,7 @@ void mem_bind( mem_t *mem );
  *
  ******************************************************************************/
 
-void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize );
+void mem_init( mem_t *mem, size_t size, que_t *data, size_t bufsize );
 
 /******************************************************************************
  *
@@ -237,10 +237,10 @@ void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize );
  *
  ******************************************************************************/
 
-mem_t *mem_create( unsigned limit, unsigned size );
+mem_t *mem_create( unsigned limit, size_t size );
 
 __STATIC_INLINE
-mem_t *mem_new( unsigned limit, unsigned size ) { return mem_create(limit, size); }
+mem_t *mem_new( unsigned limit, size_t size ) { return mem_create(limit, size); }
 
 /******************************************************************************
  *
@@ -432,7 +432,7 @@ void mem_giveISR( mem_t *mem, const void *data ) { lst_giveISR(&mem->lst, data);
  *
  ******************************************************************************/
 
-template<unsigned limit_, unsigned size_>
+template<unsigned limit_, size_t size_>
 struct MemoryPoolT : public __mem
 {
 	MemoryPoolT( void ): __mem _MEM_INIT(limit_, MEM_SIZE(size_), data_) { mem_bind(this); }

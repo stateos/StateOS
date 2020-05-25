@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    19.05.2020
+    @date    25.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -60,7 +60,7 @@ void mem_bind( mem_t *mem )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize, void *res )
+void priv_mem_init( mem_t *mem, size_t size, que_t *data, size_t bufsize, void *res )
 /* -------------------------------------------------------------------------- */
 {
 	memset(mem, 0, sizeof(mem_t));
@@ -75,7 +75,7 @@ void priv_mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize, vo
 }
 
 /* -------------------------------------------------------------------------- */
-void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize )
+void mem_init( mem_t *mem, size_t size, que_t *data, size_t bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -92,7 +92,7 @@ void mem_init( mem_t *mem, unsigned size, que_t *data, unsigned bufsize )
 }
 
 /* -------------------------------------------------------------------------- */
-mem_t *mem_create( unsigned limit, unsigned size )
+mem_t *mem_create( unsigned limit, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	struct mem_T { mem_t mem; que_t buf[]; } *tmp;
