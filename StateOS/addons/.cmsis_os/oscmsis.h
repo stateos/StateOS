@@ -2,7 +2,7 @@
 
     @file    StateOS: oscmsis.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    25.05.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -140,9 +140,9 @@ typedef struct __MemoryPool osMemoryPool_t;
 
 struct __MessageQueue
 {
-	box_t        box;   // StateOS mail box object
+	box_t        box;   // StateOS mailbox object
 	uint32_t     flags; // attribute bits
-	const char * name;  // mail box name
+	const char * name;  // mailbox name
 };
 
 typedef struct __MessageQueue osMessageQueue_t;

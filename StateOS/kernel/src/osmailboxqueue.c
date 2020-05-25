@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    19.05.2020
+    @date    25.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_box_init( box_t *box, unsigned size, void *data, unsigned bufsize, void *res )
+void priv_box_init( box_t *box, size_t size, void *data, size_t bufsize, void *res )
 /* -------------------------------------------------------------------------- */
 {
 	memset(box, 0, sizeof(box_t));
@@ -49,7 +49,7 @@ void priv_box_init( box_t *box, unsigned size, void *data, unsigned bufsize, voi
 }
 
 /* -------------------------------------------------------------------------- */
-void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
+void box_init( box_t *box, size_t size, void *data, size_t bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -66,7 +66,7 @@ void box_init( box_t *box, unsigned size, void *data, unsigned bufsize )
 }
 
 /* -------------------------------------------------------------------------- */
-box_t *box_create( unsigned limit, unsigned size )
+box_t *box_create( unsigned limit, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	struct box_T { box_t box; char buf[]; } *tmp;
@@ -137,8 +137,8 @@ static
 void priv_box_get( box_t *box, char *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = box->head;
-	unsigned j = 0;
+	size_t i = box->head;
+	size_t j = 0;
 
 	do data[j++] = box->data[i++]; while (j < box->size);
 
@@ -151,8 +151,8 @@ static
 void priv_box_put( box_t *box, const char *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = box->tail;
-	unsigned j = 0;
+	size_t i = box->tail;
+	size_t j = 0;
 
 	do box->data[i++] = data[j++]; while (j < box->size);
 
