@@ -36,12 +36,12 @@
 #include <string.h>
 #include <stdlib.h>
 #else //__cplusplus
-#if     __cplusplus < 201103
+#if     __cplusplus < 201103L
 #error This version of c++ compiler is unsupported!
 #endif
 #include <cstring>
 #include <cstdlib>
-#if     __cplusplus >= 201402
+#if     __cplusplus >= 201402L
 #include <functional>
 #endif
 #endif
@@ -51,7 +51,7 @@
  *                              FOR INTERNAL USE                              *
  * -------------------------------------------------------------------------- */
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 
 using uint = unsigned int;
 
