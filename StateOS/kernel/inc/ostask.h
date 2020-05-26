@@ -1558,7 +1558,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *
  * Name              : TaskT<>::Create
  *
- * Description       : create, initialize and start dynamic detachable task
+ * Description       : create, initialize and start dynamic joinable task
  *                     with manageable resources
  *
  * Parameters
@@ -1568,7 +1568,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *                     it will be executed into an infinite system-implemented loop
  *   args            : arguments for state function
  *
- * Return            : pointer to TaskT<> object
+ * Return            : pointer to dynamic joinable TaskT<> object
  *
  * Note              : use only in thread mode
  *
@@ -1620,7 +1620,7 @@ struct TaskT : public baseTask, public baseStack<size_>
  *                     it will be executed into an infinite system-implemented loop
  *   args            : arguments for state function
  *
- * Return            : pointer to TaskT<> object
+ * Return            : pointer to dynamic detached TaskT<> object
  *
  * Note              : use only in thread mode
  *
