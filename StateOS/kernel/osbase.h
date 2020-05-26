@@ -38,17 +38,10 @@
 #endif // NDEBUG
 #endif // DEBUG
 
-#ifndef __cplusplus
 #include <stdint.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <assert.h>
-#else //__cplusplus
-#include <cstdint>
-#include <climits>
-#include <cstdbool>
-#include <cassert>
-#endif
 #include "osport.h"
 
 /* -------------------------------------------------------------------------- *

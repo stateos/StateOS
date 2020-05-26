@@ -32,19 +32,8 @@
 #ifndef __STATEOSKERNEL_H
 #define __STATEOSKERNEL_H
 
-#ifndef __cplusplus
 #include <string.h>
 #include <stdlib.h>
-#else //__cplusplus
-#if     __cplusplus < 201103L
-#error This version of c++ compiler is unsupported!
-#endif
-#include <cstring>
-#include <cstdlib>
-#if     __cplusplus >= 201402L
-#include <functional>
-#endif
-#endif
 #include "oscore.h"
 
 /* -------------------------------------------------------------------------- *
@@ -52,10 +41,14 @@
  * -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+#if    __cplusplus < 201103L
+#error This version of c++ compiler is unsupported!
+#endif
 
 using uint = unsigned int;
 
-#if __cplusplus >= 201402
+#if    __cplusplus >= 201402
+#include <functional>
 using Fun_t = std::function<void( void )>;
 using Act_t = std::function<void( unsigned )>;
 #endif
