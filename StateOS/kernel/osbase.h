@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    23.05.2020
+    @date    26.05.2020
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -38,10 +38,17 @@
 #endif // NDEBUG
 #endif // DEBUG
 
+#ifndef __cplusplus
 #include <stdint.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <assert.h>
+#else //__cplusplus
+#include <cstdint>
+#include <climits>
+#include <cstdbool>
+#include <cassert>
+#endif
 #include "osport.h"
 
 /* -------------------------------------------------------------------------- *

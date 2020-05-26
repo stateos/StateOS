@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    25.05.2020
+    @date    26.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #define __STATEOS_MEM_H
 
 #include "oskernel.h"
+#include "osalloc.h"
 #include "osclock.h"
 #include "oslist.h"
 

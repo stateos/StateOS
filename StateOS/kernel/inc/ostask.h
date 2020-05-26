@@ -33,6 +33,7 @@
 #define __STATEOS_TSK_H
 
 #include "oskernel.h"
+#include "osalloc.h"
 #include "osclock.h"
 #include "osmutex.h"
 #include "ostimer.h"
