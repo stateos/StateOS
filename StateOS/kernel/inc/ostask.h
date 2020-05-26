@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    22.05.2020
+    @date    26.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,11 +48,6 @@
 #define STK_CROP( base, size ) \
          LIMITED( (intptr_t)base + (intptr_t)size, stk_t )
 
-/* -------------------------------------------------------------------------- */
-
-#define JOINABLE     ((tsk_t *)((uintptr_t)0))     // task in joinable state
-#define DETACHED     ((tsk_t *)((uintptr_t)0 - 1)) // task in detached state
-
 /******************************************************************************
  *
  * Name              : task (thread)
@@ -76,7 +71,7 @@ struct __tsk
 	unsigned basic; // basic priority
 	unsigned prio;  // current priority
 
-	tsk_t  * join;  // joinable state
+	tsk_t  * owner; // task owner (joinable / detached state)
 	tsk_t ** guard; // BLOCKED queue for the pending process
 
 	unsigned event; // wakeup event
@@ -190,8 +185,8 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define               _TSK_INIT( _prio, _state, _stack, _size )                                                   \
-                       { _HDR_INIT(), _state, 0, 0, 0, NULL, _stack, _size, NULL, _prio, _prio, JOINABLE, NULL, 0, \
+#define               _TSK_INIT( _prio, _state, _stack, _size )                                               \
+                       { _HDR_INIT(), _state, 0, 0, 0, NULL, _stack, _size, NULL, _prio, _prio, NULL, NULL, 0, \
                        { NULL, NULL }, { 0, NULL, { NULL, NULL } }, { { NULL } }, _TSK_EXTRA }
 
 /******************************************************************************
@@ -603,6 +598,7 @@ tsk_t *cur_task( void ) { return System.cur; }
  * Name              : wrk_init
  *
  * Description       : initialize complete work area for task object
+ *                     don't start the task
  *
  * Parameters
  *   tsk             : pointer to task object
@@ -744,14 +740,14 @@ tsk_t *tsk_detached( unsigned prio, fun_t *state ) { return wrk_detached(prio, s
  * Name              : thd_create
  *
  * Description       : create and initialize complete work area for task object
- *                     with defined state: JOINABLE / DETACHED (don't start the task)
+ *                     don't start the task
  *
  * Parameters
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
  *   size            : size of task private stack (in bytes)
- *   joinable        : JOINABLE / DETACHED
+ *   detached        : create as detached?
  *
  * Return            : pointer to task object
  *   NULL            : object not created (not enough free memory)
@@ -760,7 +756,7 @@ tsk_t *tsk_detached( unsigned prio, fun_t *state ) { return wrk_detached(prio, s
  *
  ******************************************************************************/
 
-tsk_t *thd_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinable );
+tsk_t *thd_create( unsigned prio, fun_t *state, size_t size, bool detached );
 
 /******************************************************************************
  *
@@ -1638,7 +1634,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		{
 			new (tsk) TaskT<size_>(_prio, _state);
 			tsk->__tsk::hdr.obj.res = tsk;
-			tsk->__tsk::join = DETACHED;
+			tsk->__tsk::owner = tsk;
 			tsk->start();
 		}
 		return tsk;
@@ -1656,7 +1652,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		{
 			new (tsk) TaskT<size_>(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 			tsk->__tsk::hdr.obj.res = tsk;
-			tsk->__tsk::join = DETACHED;
+			tsk->__tsk::owner = tsk;
 			tsk->start();
 		}
 		return tsk;

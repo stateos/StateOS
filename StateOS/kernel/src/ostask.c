@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    23.05.2020
+    @date    26.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size, void *res, tsk_t *joinable )
+void priv_wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t size, void *res, bool detached )
 /* -------------------------------------------------------------------------- */
 {
 	memset(tsk, 0, sizeof(tsk_t));
@@ -48,12 +48,12 @@ void priv_wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_
 	tsk->state = state;
 	tsk->stack = stack;
 	tsk->size  = size;
-	tsk->join  = joinable;
+	tsk->owner = detached ? tsk : NULL;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-tsk_t *priv_wrk_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinable )
+tsk_t *priv_wrk_create( unsigned prio, fun_t *state, size_t size, bool detached )
 /* -------------------------------------------------------------------------- */
 {
 	struct tsk_T { tsk_t tsk; stk_t buf[]; } *tmp;
@@ -63,7 +63,7 @@ tsk_t *priv_wrk_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinabl
 	bufsize = STK_OVER(size);
 	tmp = sys_alloc(sizeof(struct tsk_T) + bufsize);
 	if (tmp)
-		priv_wrk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize, tmp, joinable);
+		priv_wrk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize, tmp, detached);
 
 	return tsk;
 }
@@ -80,7 +80,7 @@ void wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
 
 	sys_lock();
 	{
-		priv_wrk_init(tsk, prio, state, stack, size, NULL, JOINABLE);
+		priv_wrk_init(tsk, prio, state, stack, size, NULL, false);
 	}
 	sys_unlock();
 }
@@ -97,7 +97,7 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
 
 	sys_lock();
 	{
-		priv_wrk_init(tsk, prio, state, stack, size, NULL, JOINABLE);
+		priv_wrk_init(tsk, prio, state, stack, size, NULL, false);
 		core_ctx_init(tsk);
 		core_tsk_insert(tsk);
 	}
@@ -116,7 +116,7 @@ tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size )
 
 	sys_lock();
 	{
-		tsk = priv_wrk_create(prio, state, size, JOINABLE);
+		tsk = priv_wrk_create(prio, state, size, false);
 		if (tsk)
 		{
 			core_ctx_init(tsk);
@@ -140,7 +140,7 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size )
 
 	sys_lock();
 	{
-		tsk = priv_wrk_create(prio, state, size, DETACHED);
+		tsk = priv_wrk_create(prio, state, size, true);
 		if (tsk)
 		{
 			core_ctx_init(tsk);
@@ -154,7 +154,7 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size )
 
 
 /* -------------------------------------------------------------------------- */
-tsk_t *thd_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinable )
+tsk_t *thd_create( unsigned prio, fun_t *state, size_t size, bool detached )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
@@ -162,11 +162,10 @@ tsk_t *thd_create( unsigned prio, fun_t *state, size_t size, tsk_t *joinable )
 	assert_tsk_context();
 	assert(state);
 	assert(size>sizeof(ctx_t));
-	assert(joinable == JOINABLE || joinable == DETACHED);
 
 	sys_lock();
 	{
-		tsk = priv_wrk_create(prio, state, size, joinable);
+		tsk = priv_wrk_create(prio, state, size, detached);
 	}
 	sys_unlock();
 
@@ -227,19 +226,19 @@ unsigned tsk_detach( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join == DETACHED ||               // task has already been detached
-		    tsk->hdr.obj.res == 0)                 // task is undetachable
+		if (tsk->owner == tsk ||                    // task has already been detached
+		    tsk->hdr.obj.res == 0)                  // task is undetachable
 			event = E_FAILURE;
 		else
-		if (tsk->hdr.id == ID_STOPPED)             // task is already inactive
+		if (tsk->hdr.id == ID_STOPPED)              // task is already inactive
 		{
-			core_res_free(&tsk->hdr.obj);          // release resources
+			core_res_free(&tsk->hdr.obj);           // release resources
 			event = E_SUCCESS;
 		}
-		else                                       // task is active and can be detached
+		else                                        // task is active and can be detached
 		{
-			core_tsk_wakeup(tsk->join, E_FAILURE); // notify waiting task
-			tsk->join = DETACHED;                  // mark as detached
+			core_tsk_wakeup(tsk->owner, E_FAILURE); // notify waiting task
+			tsk->owner = tsk;                       // mark as detached
 			event = E_SUCCESS;
 		}
 	}
@@ -260,19 +259,19 @@ unsigned tsk_join( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join != JOINABLE ||                        // task is unjoinable
-		    tsk == System.cur)                              // deadlock detected
+		if (tsk->owner != NULL ||                            // task is unjoinable
+		    tsk == System.cur)                               // deadlock detected
 			event = E_FAILURE;
 		else
-		if (tsk->hdr.id == ID_STOPPED)                      // task is already inactive
+		if (tsk->hdr.id == ID_STOPPED)                       // task is already inactive
 			event = E_SUCCESS;
-		else                                                // task is active
-			event = core_tsk_waitFor(&tsk->join, INFINITE); // wait for termination
+		else                                                 // task is active
+			event = core_tsk_waitFor(&tsk->owner, INFINITE); // wait for termination
 
-		if (event != E_FAILURE &&                           // task has not been detached
-		    event != E_DELETED &&                           // task has not been deleted
-		    tsk->hdr.id == ID_STOPPED)                      // task is still inactive
-			core_res_free(&tsk->hdr.obj);                   // release resources
+		if (event != E_FAILURE &&                            // task has not been detached
+		    event != E_DELETED &&                            // task has not been deleted
+		    tsk->hdr.id == ID_STOPPED)                       // task is still inactive
+			core_res_free(&tsk->hdr.obj);                    // release resources
 	}
 	sys_unlock();
 
@@ -323,16 +322,16 @@ void core_tsk_destructor( void )
 
 	while (IDLE.hdr.obj.queue)
 	{
-		tsk = IDLE.hdr.obj.queue;                  // task waiting for destruction
+		tsk = IDLE.hdr.obj.queue;                   // task waiting for destruction
 
-		if (tsk->join != DETACHED)                 // task not detached
+		if (tsk->owner != tsk)                      // task not detached
 		{
-			priv_mtx_remove(tsk);                  // release all owned robust mutexes
-			core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task
+			priv_mtx_remove(tsk);                   // release all owned robust mutexes
+			core_tsk_wakeup(tsk->owner, E_DELETED); // notify waiting task
 		}
 
-		priv_tsk_stop(tsk);                        // remove task from all queues
-		core_res_free(&tsk->hdr.obj);              // release resources
+		priv_tsk_stop(tsk);                         // remove task from all queues
+		core_res_free(&tsk->hdr.obj);               // release resources
 	}
 }
 
@@ -364,16 +363,16 @@ void tsk_stop( void )
 
 	port_set_lock();
 
-	priv_tsk_reset(System.cur);                   // reset necessary variables of current task
+	priv_tsk_reset(System.cur);                    // reset necessary variables of current task
 
-	if (System.cur->join == DETACHED)             // current task is detached
-		priv_tsk_destroy();                       // wait for destruction
+	if (System.cur->owner == System.cur)           // current task is detached
+		priv_tsk_destroy();                        // wait for destruction
 
-	core_tsk_wakeup(System.cur->join, E_SUCCESS); // notify waiting task
-	core_tsk_remove(System.cur);                  // remove current task from ready queue
+	core_tsk_wakeup(System.cur->owner, E_SUCCESS); // notify waiting task
+	core_tsk_remove(System.cur);                   // remove current task from ready queue
 
 	assert(!"system cannot return here");
-	for (;;);                                     // disable unnecessary warning
+	for (;;);                                      // disable unnecessary warning
 }
 
 /* -------------------------------------------------------------------------- */
@@ -388,17 +387,17 @@ unsigned tsk_reset( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join == DETACHED)                     // detached task cannot be reseted
+		if (tsk->owner == tsk)                          // detached task cannot be reseted
 			event = E_FAILURE;
 		else
 		{
-			priv_tsk_reset(tsk);                       // reset necessary task variables
+			priv_tsk_reset(tsk);                        // reset necessary task variables
 
-			if (tsk->hdr.id != ID_STOPPED)             // inactive task cannot be removed
+			if (tsk->hdr.id != ID_STOPPED)              // inactive task cannot be removed
 			{
-				priv_mtx_remove(tsk);                  // release all owned robust mutexes
-				core_tsk_wakeup(tsk->join, E_STOPPED); // notify waiting task
-				priv_tsk_stop(tsk);                    // remove task from all queues
+				priv_mtx_remove(tsk);                   // release all owned robust mutexes
+				core_tsk_wakeup(tsk->owner, E_STOPPED); // notify waiting task
+				priv_tsk_stop(tsk);                     // remove task from all queues
 			}
 
 			event = E_SUCCESS;
@@ -421,23 +420,23 @@ unsigned tsk_destroy( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->join == DETACHED)                     // detached task cannot be deleted
+		if (tsk->owner == tsk)                          // detached task cannot be deleted
 			event = E_FAILURE;
 		else
 		{
-			priv_tsk_reset(tsk);                       // reset necessary task variables
+			priv_tsk_reset(tsk);                        // reset necessary task variables
 
-			if (tsk == System.cur)                     // current task will be destroyed by destructor
-				priv_tsk_destroy();                    // wait for destruction
+			if (tsk == System.cur)                      // current task will be destroyed by destructor
+				priv_tsk_destroy();                     // wait for destruction
 
-			if (tsk->hdr.id != ID_STOPPED)             // only active task can be removed
+			if (tsk->hdr.id != ID_STOPPED)              // only active task can be removed
 			{
-				priv_mtx_remove(tsk);                  // release all owned robust mutexes
-				core_tsk_wakeup(tsk->join, E_DELETED); // notify waiting task             
-				priv_tsk_stop(tsk);                    // remove task from all queues     
+				priv_mtx_remove(tsk);                   // release all owned robust mutexes
+				core_tsk_wakeup(tsk->owner, E_DELETED); // notify waiting task
+				priv_tsk_stop(tsk);                     // remove task from all queues
 			}
 
-			core_res_free(&tsk->hdr.obj);              // release resources
+			core_res_free(&tsk->hdr.obj);               // release resources
 			event = E_SUCCESS;
 		}
 	}

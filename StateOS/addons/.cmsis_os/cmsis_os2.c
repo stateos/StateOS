@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    07.05.2020
+    @date    26.05.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -252,7 +252,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 		if (attr->cb_mem    == NULL || attr->cb_size    == 0U) thread->tsk.hdr.obj.res = thread;
 		else
 		if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.hdr.obj.res = stack_mem;
-		thread->tsk.join = (flags & osThreadJoinable) ? JOINABLE : DETACHED;
+		thread->tsk.owner = ((flags & osThreadJoinable) == osThreadJoinable) ? NULL : &thread->tsk;
 		flg_init(&thread->flg, 0);
 		thread->flags = flags;
 		thread->name = (attr == NULL) ? NULL : attr->name;

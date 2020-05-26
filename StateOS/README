@@ -46,6 +46,7 @@ Features:
 - updated stack assertions
 - check task stack watermark
 - added tsk_stackSpace function
+- removed JOINABLE and DETACHED definitions
 ---------
 6.6
 - updated os version
