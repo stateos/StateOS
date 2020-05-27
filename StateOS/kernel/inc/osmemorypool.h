@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -534,14 +534,14 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
 		return static_cast<MemoryPoolTT<limit_, C> *>(MemoryPoolT<limit_, sizeof(C)>::Create());
 	}
 
-	uint take     ( C **_data )               { return mem_take     (this, reinterpret_cast<void **>(_data)); }
-	uint tryWait  ( C **_data )               { return mem_tryWait  (this, reinterpret_cast<void **>(_data)); }
-	uint takeISR  ( C **_data )               { return mem_takeISR  (this, reinterpret_cast<void **>(_data)); }
+	uint take     ( C **_data )                 { return mem_take     (this, reinterpret_cast<void **>(_data)); }
+	uint tryWait  ( C **_data )                 { return mem_tryWait  (this, reinterpret_cast<void **>(_data)); }
+	uint takeISR  ( C **_data )                 { return mem_takeISR  (this, reinterpret_cast<void **>(_data)); }
 	template<typename T>
-	uint waitFor  ( C **_data, cnt_t _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
+	uint waitFor  ( C **_data, const T _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
 	template<typename T>
-	uint waitUntil( C **_data, cnt_t _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
-	uint wait     ( C **_data )               { return mem_wait     (this, reinterpret_cast<void **>(_data)); }
+	uint waitUntil( C **_data, const T _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
+	uint wait     ( C **_data )                 { return mem_wait     (this, reinterpret_cast<void **>(_data)); }
 };
 
 #endif//__cplusplus
