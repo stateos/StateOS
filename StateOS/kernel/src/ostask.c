@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -320,17 +320,9 @@ void core_tsk_destructor( void )
 {
 	tsk_t *tsk;
 
-	while (IDLE.hdr.obj.queue)
+	while (tsk = IDLE.hdr.obj.queue, tsk)
 	{
-		tsk = IDLE.hdr.obj.queue;                   // task waiting for destruction
-
-		if (tsk->owner != tsk)                      // task not detached
-		{
-			priv_mtx_remove(tsk);                   // release all owned robust mutexes
-			core_tsk_wakeup(tsk->owner, E_DELETED); // notify waiting task
-		}
-
-		priv_tsk_stop(tsk);                         // remove task from all queues
+		priv_tsk_stop(tsk);                         // remove task from DESTRUCTOR queue
 		core_res_free(&tsk->hdr.obj);               // release resources
 	}
 }
@@ -364,6 +356,7 @@ void tsk_stop( void )
 	port_set_lock();
 
 	priv_tsk_reset(System.cur);                    // reset necessary variables of current task
+//	priv_mtx_remove(tsk);                          // release all owned robust mutexes
 
 	if (System.cur->owner == System.cur)           // current task is detached
 		priv_tsk_destroy();                        // wait for destruction
@@ -426,13 +419,14 @@ unsigned tsk_destroy( tsk_t *tsk )
 		{
 			priv_tsk_reset(tsk);                        // reset necessary task variables
 
-			if (tsk == System.cur)                      // current task will be destroyed by destructor
-				priv_tsk_destroy();                     // wait for destruction
-
 			if (tsk->hdr.id != ID_STOPPED)              // only active task can be removed
 			{
 				priv_mtx_remove(tsk);                   // release all owned robust mutexes
 				core_tsk_wakeup(tsk->owner, E_DELETED); // notify waiting task
+
+				if (tsk == System.cur)                  // current task will be destroyed by destructor
+					priv_tsk_destroy();                 // wait for destruction
+
 				priv_tsk_stop(tsk);                     // remove task from all queues
 			}
 

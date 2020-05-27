@@ -47,6 +47,7 @@ Features:
 - check task stack watermark
 - added tsk_stackSpace function
 - removed JOINABLE and DETACHED definitions
+- fixed bug in tsk_destroy function
 ---------
 6.6
 - updated os version
