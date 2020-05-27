@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    27.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -43,7 +43,7 @@ void priv_sem_init( sem_t *sem, unsigned init, unsigned limit, void *res )
 	core_obj_init(&sem->obj, res);
 
 	sem->count = init;
-	sem->limit = limit;
+	sem->limit = init < limit ? init : limit;
 }
 
 /* -------------------------------------------------------------------------- */
