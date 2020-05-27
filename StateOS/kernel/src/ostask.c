@@ -339,7 +339,7 @@ void priv_tsk_destroy( void )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_tsk_reset( tsk_t *tsk )
+void priv_sig_reset( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
 	tsk->sig.sigset = 0;
@@ -355,7 +355,7 @@ void tsk_stop( void )
 
 	port_set_lock();
 
-	priv_tsk_reset(System.cur);                    // reset necessary variables of current task
+	priv_sig_reset(System.cur);                    // reset signal variables of current task
 //	priv_mtx_remove(tsk);                          // release all owned robust mutexes
 
 	if (System.cur->owner == System.cur)           // current task is detached
@@ -384,7 +384,7 @@ unsigned tsk_reset( tsk_t *tsk )
 			event = E_FAILURE;
 		else
 		{
-			priv_tsk_reset(tsk);                        // reset necessary task variables
+			priv_sig_reset(tsk);                        // reset task signal variables
 
 			if (tsk->hdr.id != ID_STOPPED)              // inactive task cannot be removed
 			{
@@ -417,7 +417,7 @@ unsigned tsk_destroy( tsk_t *tsk )
 			event = E_FAILURE;
 		else
 		{
-			priv_tsk_reset(tsk);                        // reset necessary task variables
+			priv_sig_reset(tsk);                        // reset task signal variables
 
 			if (tsk->hdr.id != ID_STOPPED)              // only active task can be removed
 			{
@@ -463,7 +463,7 @@ void tsk_flip( fun_t *state )
 
 	System.cur->state = state;
 
-	priv_tsk_reset(System.cur);
+	priv_sig_reset(System.cur); // reset signal variables of current task
 	core_ctx_switch();
 	core_tsk_flip((void *)STK_CROP(System.cur->stack, System.cur->size));
 
