@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -775,7 +775,8 @@ struct baseTimer : public __tmr
 	template<typename T>
 	uint waitUntil    ( const T _time )                                   { return tmr_waitUntil    (this, Clock::until(_time)); }
 	uint wait         ( void )                                            { return tmr_wait         (this); }
-	bool operator!    ( void )                                            { return __tmr::hdr.id == ID_STOPPED; }
+	explicit
+	operator bool     () const                                            { return __tmr::hdr.id != ID_STOPPED; }
 
 	template<class T = baseTimer> static
 	T *  current      ( void )                                            { return static_cast<T *>(tmr_thisISR()); }

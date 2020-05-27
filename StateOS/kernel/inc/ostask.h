@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1371,7 +1371,8 @@ struct baseTask : public __tsk
 #else
 	void action   ( act_t *  _action ) {        tsk_action   (this, _action); }
 #endif
-	bool operator!( void )             { return __tsk::hdr.id == ID_STOPPED; }
+	explicit
+	operator bool () const             { return __tsk::hdr.id != ID_STOPPED; }
 
 	template<class T = baseTask> static
 	T *  current  ( void )             { return static_cast<T *>(tsk_this()); }
