@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -592,6 +592,7 @@ unsigned stm_limitISR( stm_t *stm ) { return stm_limit(stm); }
 template<unsigned limit_>
 struct StreamBufferT : public __stm
 {
+	constexpr
 	StreamBufferT( void ): __stm _STM_INIT(limit_, data_) {}
 
 	StreamBufferT( StreamBufferT&& ) = default;
@@ -678,6 +679,7 @@ struct StreamBufferT : public __stm
 template<unsigned limit_, class C>
 struct StreamBufferTT : public StreamBufferT<limit_*sizeof(C)>
 {
+	constexpr
 	StreamBufferTT( void ): StreamBufferT<limit_*sizeof(C)>() {}
 
 /******************************************************************************

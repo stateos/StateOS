@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -318,6 +318,7 @@ unsigned bar_wait( bar_t *bar ) { return bar_waitFor(bar, INFINITE); }
 
 struct Barrier : public __bar
 {
+	constexpr
 	Barrier( const unsigned _limit ): __bar _BAR_INIT(_limit) {}
 
 	Barrier( Barrier&& ) = default;

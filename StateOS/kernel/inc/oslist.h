@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -397,6 +397,7 @@ void lst_giveISR( lst_t *lst, const void *data ) { lst_give(lst, data); }
 template<class C>
 struct ListTT : public __lst
 {
+	constexpr
 	ListTT( void ): __lst _LST_INIT() {}
 
 	ListTT( ListTT&& ) = default;

@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -371,6 +371,7 @@ unsigned mut_unlock( mut_t *mut ) { return mut_give(mut); }
 
 struct FastMutex : public __mut
 {
+	constexpr
 	FastMutex( void ): __mut _MUT_INIT() {}
 
 	FastMutex( FastMutex&& ) = default;

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -565,6 +565,7 @@ unsigned evq_limitISR( evq_t *evq ) { return evq_limit(evq); }
 template<unsigned limit_>
 struct EventQueueT : public __evq
 {
+	constexpr
 	EventQueueT( void ): __evq _EVQ_INIT(limit_, data_) {}
 
 	EventQueueT( EventQueueT&& ) = default;

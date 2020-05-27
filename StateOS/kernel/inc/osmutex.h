@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -495,6 +495,7 @@ unsigned mtx_unlock( mtx_t *mtx ) { return mtx_give(mtx); }
 
 struct Mutex : public __mtx
 {
+	constexpr
 	Mutex( const unsigned _mode, const unsigned _prio = 0 ): __mtx _MTX_INIT(_mode, _prio) {}
 
 	Mutex( Mutex&& ) = default;

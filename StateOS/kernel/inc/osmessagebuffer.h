@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -617,6 +617,7 @@ unsigned msg_sizeISR( msg_t *msg ) { return msg_size(msg); }
 template<unsigned limit_>
 struct MessageBufferT : public __msg
 {
+	constexpr
 	MessageBufferT( void ): __msg _MSG_INIT(limit_, data_) {}
 
 	MessageBufferT( MessageBufferT&& ) = default;
@@ -705,6 +706,7 @@ struct MessageBufferT : public __msg
 template<unsigned limit_, class C>
 struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>
 {
+	constexpr
 	MessageBufferTT( void ): MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>() {}
 
 /******************************************************************************

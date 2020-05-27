@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -561,6 +561,7 @@ unsigned job_limitISR( job_t *job ) { return job_limit(job); }
 template<unsigned limit_>
 struct JobQueueT : public __job
 {
+	constexpr
 	JobQueueT( void ): __job _JOB_INIT(limit_, data_) {}
 
 	JobQueueT( JobQueueT&& ) = default;
