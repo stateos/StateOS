@@ -42,8 +42,8 @@ void priv_sem_init( sem_t *sem, unsigned init, unsigned limit, void *res )
 
 	core_obj_init(&sem->obj, res);
 
-	sem->count = init;
-	sem->limit = init < limit ? init : limit;
+	sem->count = init < limit ? init : limit;
+	sem->limit = limit;
 }
 
 /* -------------------------------------------------------------------------- */
