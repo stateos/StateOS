@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    27.05.2020
+    @date    28.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1093,13 +1093,7 @@ struct Timer : public baseTimer
 	static
 	std::unique_ptr<Timer> Create( void )
 	{
-		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
-		if (tmr != nullptr)
-		{
-			new (tmr) Timer();
-			tmr->__tmr::hdr.obj.res = tmr;
-		}
-		return std::unique_ptr<Timer>(tmr);
+		return Create(nullptr);
 	}
 
 	template<class F> static
@@ -1117,19 +1111,13 @@ struct Timer : public baseTimer
 	template<typename F, typename... A> static
 	std::unique_ptr<Timer> Create( F&& _state, A&&... _args )
 	{
-		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
-		if (tmr != nullptr)
-		{
-			new (tmr) Timer(std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
-			tmr->__tmr::hdr.obj.res = tmr;
-		}
-		return std::unique_ptr<Timer>(tmr);
+		return Create(std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #else
 	static
 	Timer *Create( void )
 	{
-		return static_cast<Timer *>(tmr_create(nullptr));
+		return Create(nullptr);
 	}
 
 	template<class F> static

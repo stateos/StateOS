@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    27.05.2020
+    @date    28.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1605,14 +1605,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	template<typename F, typename... A> static
 	std::unique_ptr<TaskT<size_>, Deleter> Create( const unsigned _prio, F&& _state, A&&... _args )
 	{
-		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		if (tsk != nullptr)
-		{
-			new (tsk) TaskT<size_>(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
-			tsk->__tsk::hdr.obj.res = tsk;
-			tsk->start();
-		}
-		return std::unique_ptr<TaskT<size_>, Deleter>(tsk);
+		return Create(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #else
 	template<class F> static
@@ -1660,15 +1653,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	template<typename F, typename... A> static
 	std::unique_ptr<TaskT<size_>, Deleter> Detached( const unsigned _prio, F&& _state, A&&... _args )
 	{
-		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
-		if (tsk != nullptr)
-		{
-			new (tsk) TaskT<size_>(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
-			tsk->__tsk::hdr.obj.res = tsk;
-			tsk->__tsk::owner = tsk;
-			tsk->start();
-		}
-		return std::unique_ptr<TaskT<size_>, Deleter>(tsk);
+		return Detached(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #else
 	template<class F> static
