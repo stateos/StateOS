@@ -48,7 +48,7 @@ Building an application for a specific compiler is realised using the appropriat
 - cmsis-rtos2 api
 - nasa-osal support
 - c++ wrapper
-- all documentation is contained within the source files
+- all documentation is contained within source files, in particular header files
 - examples and templates are in separate repositories on [GitHub](https://github.com/stateos)
 - archival releases on [sourceforge](https://sourceforge.net/projects/stateos)
 
