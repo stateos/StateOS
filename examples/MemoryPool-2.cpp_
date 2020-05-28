@@ -1,11 +1,11 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-Led                        led;
-ListTT<unsigned>          *lst;
-MemoryPoolTT<1, unsigned> *mem;
-TaskT<512>                *sla;
-TaskT<768>                *mas;
+Led                            led;
+ListTT<unsigned>::Ptr          lst;
+MemoryPoolTT<1, unsigned>::Ptr mem;
+TaskT<512>::Ptr                sla;
+TaskT<768>::Ptr                mas;
 
 void slave()
 {
@@ -15,7 +15,7 @@ void slave()
 	led = *p;
 	mem->give(p);
 
-	ThisTask::stop();
+	This::stop();
 }
 
 void master()
@@ -26,7 +26,7 @@ void master()
 	for (;;)
 	{
 		sla = TaskT<512>::Detached(0, slave);
-		ThisTask::delay(SEC);
+		This::sleepNext(SEC);
 
 		mem->wait(&p);
 		*p=x;
@@ -41,5 +41,5 @@ int main()
 	mem = MemoryPoolTT<1, unsigned>::Create();
 	mas = TaskT<768>::Create(0, master);
 
-	ThisTask::stop();
+	This::stop();
 }
