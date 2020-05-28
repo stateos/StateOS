@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    12.05.2020
+    @date    28.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -70,7 +70,7 @@ struct __seg
  *   size            : required size of the memory segment (in bytes)
  *
  * Return            : pointer to the beginning of allocated and cleared memory segment
- *   0               : memory segment not allocated (not enough free memory)
+ *   NULL            : memory segment not allocated (not enough free memory)
  *
  * Note              : use only in thread mode
  *
@@ -102,8 +102,7 @@ void sys_free( void *ptr );
  * Description       : get total size of free blocks of the dedicated heap memory
  *                     it is always larger than the size available for allocation
  *
- * Parameters
- *   ptr             : none
+ * Parameters        : none
  *
  * Return            : size of free heap memory
  *
