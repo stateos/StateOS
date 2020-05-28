@@ -505,6 +505,12 @@ struct Mutex : public __mtx
 
 	~Mutex( void ) { assert(__mtx::owner == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<Mutex>;
+#else
+	using Ptr = Mutex *;
+#endif
+
 /******************************************************************************
  *
  * Name              : Mutex::Create
@@ -518,27 +524,31 @@ struct Mutex : public __mtx
  *                     robustness: mtxStalled or mtxRobust
  *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
  *
- * Return            : pointer to Mutex object
+ * Return            : std::unique_pointer / pointer to Mutex object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	Mutex *Create( const unsigned _mode, const unsigned _prio = 0 )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<Mutex> Create( const unsigned _mode, const unsigned _prio = 0 )
+	{
 		auto mtx = reinterpret_cast<Mutex *>(sys_alloc(sizeof(Mutex)));
 		if (mtx != nullptr)
 		{
 			new (mtx) Mutex(_mode, _prio);
 			mtx->__mtx::obj.res = mtx;
 		}
-		return mtx;
-#else
-		return static_cast<Mutex *>(mtx_create(_mode, _prio));
-#endif
+		return std::unique_ptr<Mutex>(mtx);
 	}
+#else
+	static
+	Mutex *Create( const unsigned _mode, const unsigned _prio = 0 )
+	{
+		return static_cast<Mutex *>(mtx_create(_mode, _prio));
+	}
+#endif
 
 	void reset    ( void )           {        mtx_reset    (this); }
 	void kill     ( void )           {        mtx_kill     (this); }

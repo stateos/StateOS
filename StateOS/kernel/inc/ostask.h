@@ -1386,6 +1386,13 @@ struct baseTask : public __tsk
 	Act_t act;
 #endif
 
+#if __cplusplus >= 201402
+	struct Deleter
+	{
+		void operator()( void* ) const {}
+	};
+#endif
+
 /******************************************************************************
  *
  * Class             : [base]Task::Current
@@ -1489,6 +1496,12 @@ struct TaskT : public baseTask, public baseStack<size_>
 
 	~TaskT( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<TaskT<size_>, Deleter>;
+#else
+	using Ptr = TaskT<size_> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : TaskT<>::Make
@@ -1569,16 +1582,16 @@ struct TaskT : public baseTask, public baseStack<size_>
  *                     it will be executed into an infinite system-implemented loop
  *   args            : arguments for state function
  *
- * Return            : pointer to dynamic joinable TaskT<> object
+ * Return            : std::unique_pointer / pointer to dynamic joinable TaskT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	template<class F> static
-	TaskT<size_> *Create( const unsigned _prio, const F _state )
-	{
 #if __cplusplus >= 201402
+	template<class F> static
+	std::unique_ptr<TaskT<size_>, Deleter> Create( const unsigned _prio, const F _state )
+	{
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
 		if (tsk != nullptr)
 		{
@@ -1586,15 +1599,11 @@ struct TaskT : public baseTask, public baseStack<size_>
 			tsk->__tsk::hdr.obj.res = tsk;
 			tsk->start();
 		}
-		return tsk;
-#else
-		return static_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
-#endif
+		return std::unique_ptr<TaskT<size_>, Deleter>(tsk);
 	}
 
-#if __cplusplus >= 201402
 	template<typename F, typename... A> static
-	TaskT<size_> *Create( const unsigned _prio, F&& _state, A&&... _args )
+	std::unique_ptr<TaskT<size_>, Deleter> Create( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
 		if (tsk != nullptr)
@@ -1603,7 +1612,13 @@ struct TaskT : public baseTask, public baseStack<size_>
 			tsk->__tsk::hdr.obj.res = tsk;
 			tsk->start();
 		}
-		return tsk;
+		return std::unique_ptr<TaskT<size_>, Deleter>(tsk);
+	}
+#else
+	template<class F> static
+	TaskT<size_> *Create( const unsigned _prio, const F _state )
+	{
+		return static_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
 	}
 #endif
 
@@ -1621,16 +1636,16 @@ struct TaskT : public baseTask, public baseStack<size_>
  *                     it will be executed into an infinite system-implemented loop
  *   args            : arguments for state function
  *
- * Return            : pointer to dynamic detached TaskT<> object
+ * Return            : std::unique_pointer / pointer to dynamic detached TaskT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	template<class F> static
-	TaskT<size_> *Detached( const unsigned _prio, const F _state )
-	{
 #if __cplusplus >= 201402
+	template<class F> static
+	std::unique_ptr<TaskT<size_>, Deleter> Detached( const unsigned _prio, const F _state )
+	{
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
 		if (tsk != nullptr)
 		{
@@ -1639,15 +1654,11 @@ struct TaskT : public baseTask, public baseStack<size_>
 			tsk->__tsk::owner = tsk;
 			tsk->start();
 		}
-		return tsk;
-#else
-		return static_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
-#endif
+		return std::unique_ptr<TaskT<size_>, Deleter>(tsk);
 	}
 
-#if __cplusplus >= 201402
 	template<typename F, typename... A> static
-	TaskT<size_> *Detached( const unsigned _prio, F&& _state, A&&... _args )
+	std::unique_ptr<TaskT<size_>, Deleter> Detached( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_alloc(sizeof(TaskT<size_>)));
 		if (tsk != nullptr)
@@ -1657,7 +1668,13 @@ struct TaskT : public baseTask, public baseStack<size_>
 			tsk->__tsk::owner = tsk;
 			tsk->start();
 		}
-		return tsk;
+		return std::unique_ptr<TaskT<size_>, Deleter>(tsk);
+	}
+#else
+	template<class F> static
+	TaskT<size_> *Detached( const unsigned _prio, const F _state )
+	{
+		return static_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
 	}
 #endif
 };

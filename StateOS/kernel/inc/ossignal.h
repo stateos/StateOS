@@ -423,6 +423,12 @@ struct Signal : public __sig
 
 	~Signal( void ) { assert(__sig::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<Signal>;
+#else
+	using Ptr = Signal *;
+#endif
+
 /******************************************************************************
  *
  * Name              : Signal::Create
@@ -432,27 +438,31 @@ struct Signal : public __sig
  * Parameters
  *   mask            : protection mask of signal object
  *
- * Return            : pointer to Signal object
+ * Return            : std::unique_pointer / pointer to Signal object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	Signal *Create( const unsigned _mask = 0 )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<Signal> Create( const unsigned _mask = 0 )
+	{
 		auto sig = reinterpret_cast<Signal *>(sys_alloc(sizeof(Signal)));
 		if (sig != nullptr)
 		{
 			new (sig) Signal(_mask);
 			sig->__sig::obj.res = sig;
 		}
-		return sig;
-#else
-		return static_cast<Signal *>(sig_create(_mask));
-#endif
+		return std::unique_ptr<Signal>(sig);
 	}
+#else
+	static
+	Signal *Create( const unsigned _mask = 0 )
+	{
+		return static_cast<Signal *>(sig_create(_mask));
+	}
+#endif
 
 	void reset    ( void )                             {        sig_reset    (this); }
 	void kill     ( void )                             {        sig_kill     (this); }

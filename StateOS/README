@@ -48,6 +48,7 @@ Features:
 - added tsk_stackSpace function
 - removed JOINABLE and DETACHED definitions
 - fixed bug in tsk_destroy function
+- used std::unique_ptr with dynamic objects
 ---------
 6.6
 - updated os version

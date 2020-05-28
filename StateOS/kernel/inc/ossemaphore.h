@@ -462,6 +462,12 @@ struct Semaphore : public __sem
 
 	~Semaphore( void ) { assert(__sem::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<Semaphore>;
+#else
+	using Ptr = Semaphore *;
+#endif
+
 /******************************************************************************
  *
  * Name              : Semaphore::Direct
@@ -527,27 +533,31 @@ struct Semaphore : public __sem
  * Parameters
  *   init            : initial value of semaphore counter
  *
- * Return            : pointer to Semaphore object
+ * Return            : std::unique_pointer / pointer to Semaphore object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	Semaphore *Create( const unsigned _init, const unsigned _limit = semDefault )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<Semaphore> Create( const unsigned _init, const unsigned _limit = semDefault )
+	{
 		auto sem = reinterpret_cast<Semaphore *>(sys_alloc(sizeof(Semaphore)));
 		if (sem != nullptr)
 		{
 			new (sem) Semaphore(_init, _limit);
 			sem->__sem::obj.res = sem;
 		}
-		return sem;
-#else
-		return static_cast<Semaphore *>(sem_create(_init, _limit));
-#endif
+		return std::unique_ptr<Semaphore>(sem);
 	}
+#else
+	static
+	Semaphore *Create( const unsigned _init, const unsigned _limit = semDefault )
+	{
+		return static_cast<Semaphore *>(sem_create(_init, _limit));
+	}
+#endif
 
 	void reset    ( void )           {        sem_reset    (this); }
 	void kill     ( void )           {        sem_kill     (this); }

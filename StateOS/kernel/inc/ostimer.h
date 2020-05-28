@@ -844,6 +844,12 @@ struct Timer : public baseTimer
 
 	~Timer( void ) { assert(__tmr::hdr.id == ID_STOPPED); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<Timer>;
+#else
+	using Ptr = Timer *;
+#endif
+
 /******************************************************************************
  *
  * Name              : Timer::Make
@@ -1077,47 +1083,39 @@ struct Timer : public baseTimer
  *                     none / nullptr: no callback
  *   args            : arguments for callback procedure
  *
- * Return            : pointer to Timer object
+ * Return            : std::unique_pointer / pointer to Timer object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	Timer *Create( void )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<Timer> Create( void )
+	{
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 		if (tmr != nullptr)
 		{
 			new (tmr) Timer();
 			tmr->__tmr::hdr.obj.res = tmr;
 		}
-		return tmr;
-#else
-		return static_cast<Timer *>(tmr_create(nullptr));
-#endif
+		return std::unique_ptr<Timer>(tmr);
 	}
 
 	template<class F> static
-	Timer *Create( const F _state )
+	std::unique_ptr<Timer> Create( const F _state )
 	{
-#if __cplusplus >= 201402
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 		if (tmr != nullptr)
 		{
 			new (tmr) Timer(_state);
 			tmr->__tmr::hdr.obj.res = tmr;
 		}
-		return tmr;
-#else
-		return static_cast<Timer *>(tmr_create(_state));
-#endif
+		return std::unique_ptr<Timer>(tmr);
 	}
 
-#if __cplusplus >= 201402
 	template<typename F, typename... A> static
-	Timer *Create( F&& _state, A&&... _args )
+	std::unique_ptr<Timer> Create( F&& _state, A&&... _args )
 	{
 		auto tmr = reinterpret_cast<Timer *>(sys_alloc(sizeof(Timer)));
 		if (tmr != nullptr)
@@ -1125,7 +1123,19 @@ struct Timer : public baseTimer
 			new (tmr) Timer(std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 			tmr->__tmr::hdr.obj.res = tmr;
 		}
-		return tmr;
+		return std::unique_ptr<Timer>(tmr);
+	}
+#else
+	static
+	Timer *Create( void )
+	{
+		return static_cast<Timer *>(tmr_create(nullptr));
+	}
+
+	template<class F> static
+	Timer *Create( const F _state )
+	{
+		return static_cast<Timer *>(tmr_create(_state));
 	}
 #endif
 };

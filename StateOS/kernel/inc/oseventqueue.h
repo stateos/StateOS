@@ -575,6 +575,12 @@ struct EventQueueT : public __evq
 
 	~EventQueueT( void ) { assert(__evq::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<EventQueueT<limit_>>;
+#else
+	using Ptr = EventQueueT<limit_> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : EventQueueT<>::Create
@@ -584,27 +590,31 @@ struct EventQueueT : public __evq
  * Parameters
  *   limit           : size of a queue (max number of stored events)
  *
- * Return            : pointer to EventQueueT<> object
+ * Return            : std::unique_pointer / pointer to EventQueueT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	EventQueueT<limit_> *Create( void )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<EventQueueT<limit_>> Create( void )
+	{
 		auto evq = reinterpret_cast<EventQueueT<limit_> *>(sys_alloc(sizeof(EventQueueT<limit_>)));
 		if (evq != nullptr)
 		{
 			new (evq) EventQueueT<limit_>();
 			evq->__evq::obj.res = evq;
 		}
-		return evq;
-#else
-		return static_cast<EventQueueT<limit_> *>(evq_create(limit_));
-#endif
+		return std::unique_ptr<EventQueueT<limit_>>(evq);
 	}
+#else
+	static
+	EventQueueT<limit_> *Create( void )
+	{
+		return static_cast<EventQueueT<limit_> *>(evq_create(limit_));
+	}
+#endif
 
 	void reset    ( void )                            {        evq_reset    (this); }
 	void kill     ( void )                            {        evq_kill     (this); }

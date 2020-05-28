@@ -602,6 +602,12 @@ struct StreamBufferT : public __stm
 
 	~StreamBufferT( void ) { assert(__stm::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<StreamBufferT<limit_>>;
+#else
+	using Ptr = StreamBufferT<limit_> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : StreamBufferT<>::Create
@@ -611,27 +617,31 @@ struct StreamBufferT : public __stm
  * Parameters
  *   limit           : size of a buffer (max number of stored bytes)
  *
- * Return            : pointer to StreamBufferT<> object
+ * Return            : std::unique_pointer / pointer to StreamBufferT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	StreamBufferT<limit_> *Create( void )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<StreamBufferT<limit_>> Create( void )
+	{
 		auto stm = reinterpret_cast<StreamBufferT<limit_> *>(sys_alloc(sizeof(StreamBufferT<limit_>)));
 		if (stm != nullptr)
 		{
 			new (stm) StreamBufferT<limit_>();
 			stm->__stm::obj.res = stm;
 		}
-		return stm;
-#else
-		return static_cast<StreamBufferT<limit_> *>(stm_create(limit_));
-#endif
+		return std::unique_ptr<StreamBufferT<limit_>>(stm);
 	}
+#else
+	static
+	StreamBufferT<limit_> *Create( void )
+	{
+		return static_cast<StreamBufferT<limit_> *>(stm_create(limit_));
+	}
+#endif
 
 	void reset    ( void )                                              {        stm_reset    (this); }
 	void kill     ( void )                                              {        stm_kill     (this); }
@@ -682,6 +692,12 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(C)>
 	constexpr
 	StreamBufferTT( void ): StreamBufferT<limit_*sizeof(C)>() {}
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<StreamBufferTT<limit_, C>>;
+#else
+	using Ptr = StreamBufferTT<limit_, C> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : StreamBufferTT<>::Create
@@ -692,17 +708,31 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(C)>
  *   limit           : size of a buffer (max number of stored objects)
  *   C               : class of an object
  *
- * Return            : pointer to StreamBufferTT<> object
+ * Return            : std::unique_pointer / pointer to StreamBufferTT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
+#if __cplusplus >= 201402
+	static
+	std::unique_ptr<StreamBufferTT<limit_, C>> Create( void )
+	{
+		auto stm = reinterpret_cast<StreamBufferTT<limit_, C> *>(sys_alloc(sizeof(StreamBufferT<limit_*sizeof(C)>)));
+		if (stm != nullptr)
+		{
+			new (stm) StreamBufferTT<limit_, C>();
+			stm->__stm::obj.res = stm;
+		}
+		return std::unique_ptr<StreamBufferTT<limit_, C>>(stm);
+	}
+#else
 	static
 	StreamBufferTT<limit_, C> *Create( void )
 	{
-		return static_cast<StreamBufferTT<limit_, C> *>(StreamBufferT<limit_*sizeof(C)>::Create());
+		return static_cast<StreamBufferTT<limit_, C> *>(stm_create(limit_*sizeof(C)));
 	}
+#endif
 
 	uint take     (       C *_data )                 { return stm_take     (this, _data, sizeof(C)); }
 	uint tryWait  (       C *_data )                 { return stm_tryWait  (this, _data, sizeof(C)); }

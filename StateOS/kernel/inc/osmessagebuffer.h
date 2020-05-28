@@ -627,6 +627,12 @@ struct MessageBufferT : public __msg
 
 	~MessageBufferT( void ) { assert(__msg::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<MessageBufferT<limit_>>;
+#else
+	using Ptr = MessageBufferT<limit_> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : MessageBufferT<>::Create
@@ -636,27 +642,31 @@ struct MessageBufferT : public __msg
  * Parameters
  *   limit           : size of a buffer (max number of stored bytes)
  *
- * Return            : pointer to MessageBufferT<> object
+ * Return            : std::unique_pointer / pointer to MessageBufferT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	MessageBufferT<limit_> *Create( void )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<MessageBufferT<limit_>> Create( void )
+	{
 		auto msg = reinterpret_cast<MessageBufferT<limit_> *>(sys_alloc(sizeof(MessageBufferT<limit_>)));
 		if (msg != nullptr)
 		{
 			new (msg) MessageBufferT<limit_>();
 			msg->__msg::obj.res = msg;
 		}
-		return msg;
-#else
-		return static_cast<MessageBufferT<limit_> *>(msg_create(limit_));
-#endif
+		return std::unique_ptr<MessageBufferT<limit_>>(msg);
 	}
+#else
+	static
+	MessageBufferT<limit_> *Create( void )
+	{
+		return static_cast<MessageBufferT<limit_> *>(msg_create(limit_));
+	}
+#endif
 
 	void reset    ( void )                                              {        msg_reset    (this); }
 	void kill     ( void )                                              {        msg_kill     (this); }
@@ -709,6 +719,12 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C
 	constexpr
 	MessageBufferTT( void ): MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>() {}
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<MessageBufferTT<limit_, C>>;
+#else
+	using Ptr = MessageBufferTT<limit_, C> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : MessageBufferTT<>::Create
@@ -719,17 +735,31 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C
  *   limit           : size of a buffer (max number of stored objects)
  *   C               : class of an object
  *
- * Return            : pointer to MessageBufferTT<> object
+ * Return            : std::unique_pointer / pointer to MessageBufferTT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
+#if __cplusplus >= 201402
+	static
+	std::unique_ptr<MessageBufferTT<limit_, C>> Create( void )
+	{
+		auto msg = reinterpret_cast<MessageBufferTT<limit_, C> *>(sys_alloc(sizeof(MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>)));
+		if (msg != nullptr)
+		{
+			new (msg) MessageBufferTT<limit_, C>();
+			msg->__msg::obj.res = msg;
+		}
+		return std::unique_ptr<MessageBufferTT<limit_, C>>(msg);
+	}
+#else
 	static
 	MessageBufferTT<limit_, C> *Create( void )
 	{
-		return static_cast<MessageBufferTT<limit_, C> *>(MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>::Create());
+		return static_cast<MessageBufferTT<limit_, C> *>(msg_create(limit_*(sizeof(unsigned)+sizeof(C))));
 	}
+#endif
 
 	uint take     (       C *_data )                 { return msg_take     (this, _data, sizeof(C)); }
 	uint tryWait  (       C *_data )                 { return msg_tryWait  (this, _data, sizeof(C)); }

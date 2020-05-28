@@ -328,6 +328,12 @@ struct Barrier : public __bar
 
 	~Barrier( void ) { assert(__bar::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<Barrier>;
+#else
+	using Ptr = Barrier *;
+#endif
+
 /******************************************************************************
  *
  * Name              : Barrier::Create
@@ -337,27 +343,31 @@ struct Barrier : public __bar
  * Parameters
  *   limit           : number of tasks that must call bar_wait[Until|For] function to release the barrier object
  *
- * Return            : pointer to Barrier object
+ * Return            : std::unique_pointer / pointer to Barrier object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	Barrier *Create( const unsigned _limit )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<Barrier> Create( const unsigned _limit )
+	{
 		auto bar = reinterpret_cast<Barrier *>(sys_alloc(sizeof(Barrier)));
 		if (bar != nullptr)
 		{
 			new (bar) Barrier(_limit);
 			bar->__bar::obj.res = bar;
 		}
-		return bar;
-#else
-		return static_cast<Barrier *>(bar_create(_limit));
-#endif
+		return std::unique_ptr<Barrier>(bar);
 	}
+#else
+	static
+	Barrier *Create( const unsigned _limit )
+	{
+		return static_cast<Barrier *>(bar_create(_limit));
+	}
+#endif
 
 	void reset    ( void )           {        bar_reset    (this); }
 	void kill     ( void )           {        bar_kill     (this); }

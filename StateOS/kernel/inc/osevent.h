@@ -343,6 +343,12 @@ struct Event : public __evt
 
 	~Event( void ) { assert(__evt::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<Event>;
+#else
+	using Ptr = Event *;
+#endif
+
 /******************************************************************************
  *
  * Name              : Event::Create
@@ -351,27 +357,31 @@ struct Event : public __evt
  *
  * Parameters        : none
  *
- * Return            : pointer to Event object
+ * Return            : std::unique_pointer / pointer to Event object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	Event *Create( void )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<Event> Create( void )
+	{
 		auto evt = reinterpret_cast<Event *>(sys_alloc(sizeof(Event)));
 		if (evt != nullptr)
 		{
 			new (evt) Event();
 			evt->__evt::obj.res = evt;
 		}
-		return evt;
-#else
-		return static_cast<Event *>(evt_create());
-#endif
+		return std::unique_ptr<Event>(evt);
 	}
+#else
+	static
+	Event *Create( void )
+	{
+		return static_cast<Event *>(evt_create());
+	}
+#endif
 
 	void reset    ( void )                             {        evt_reset    (this); }
 	void kill     ( void )                             {        evt_kill     (this); }

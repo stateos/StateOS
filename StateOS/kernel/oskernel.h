@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    27.05.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -49,6 +49,8 @@ using uint = unsigned int;
 
 #if    __cplusplus >= 201402
 #include <functional>
+#include <memory>
+
 using Fun_t = std::function<void( void )>;
 using Act_t = std::function<void( unsigned )>;
 #endif

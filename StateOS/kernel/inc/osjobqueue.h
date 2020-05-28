@@ -571,6 +571,12 @@ struct JobQueueT : public __job
 
 	~JobQueueT( void ) { assert(__job::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<JobQueueT<limit_>>;
+#else
+	using Ptr = JobQueueT<limit_> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : JobQueueT<>::Create
@@ -580,27 +586,31 @@ struct JobQueueT : public __job
  * Parameters
  *   limit           : size of a queue (max number of stored job procedures)
  *
- * Return            : pointer to JobQueueT<> object
+ * Return            : std::unique_pointer / pointer to JobQueueT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	JobQueueT<limit_> *Create( void )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<JobQueueT<limit_>> Create( void )
+	{
 		auto job = reinterpret_cast<JobQueueT<limit_> *>(sys_alloc(sizeof(JobQueueT<limit_>)));
 		if (job != nullptr)
 		{
 			new (job) JobQueueT<limit_>();
 			job->__job::obj.res = job;
 		}
-		return job;
-#else
-		return static_cast<JobQueueT<limit_> *>(job_create(limit_));
-#endif
+		return std::unique_ptr<JobQueueT<limit_>>(job);
 	}
+#else
+	static
+	JobQueueT<limit_> *Create( void )
+	{
+		return static_cast<JobQueueT<limit_> *>(job_create(limit_));
+	}
+#endif
 
 	void reset    ( void )                        {        job_reset    (this); }
 	void kill     ( void )                        {        job_kill     (this); }

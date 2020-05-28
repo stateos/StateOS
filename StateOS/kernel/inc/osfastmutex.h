@@ -381,6 +381,12 @@ struct FastMutex : public __mut
 
 	~FastMutex( void ) { assert(__mut::owner == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<FastMutex>;
+#else
+	using Ptr = FastMutex *;
+#endif
+
 /******************************************************************************
  *
  * Name              : FastMutex::Create
@@ -389,7 +395,7 @@ struct FastMutex : public __mut
  *
  * Parameters        : none
  *
- * Return            : pointer to FastMutex object
+ * Return            : std::unique_pointer / pointer to FastMutex object
  *
  * Note              : use only in thread mode
  *

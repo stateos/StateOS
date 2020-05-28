@@ -445,6 +445,12 @@ struct MemoryPoolT : public __mem
 
 	~MemoryPoolT( void ) { assert(__mem::lst.obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<MemoryPoolT<limit_, size_>>;
+#else
+	using Ptr = MemoryPoolT<limit_, size_> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : MemoryPoolT<>::Create
@@ -455,27 +461,31 @@ struct MemoryPoolT : public __mem
  *   limit           : size of a buffer (max number of objects)
  *   size            : size of memory object (in bytes)
  *
- * Return            : pointer to MemoryPoolT<> object
+ * Return            : std::unique_pointer / pointer to MemoryPoolT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	MemoryPoolT<limit_, size_> *Create( void )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<MemoryPoolT<limit_, size_>> Create( void )
+	{
 		auto mem = reinterpret_cast<MemoryPoolT<limit_, size_> *>(sys_alloc(sizeof(MemoryPoolT<limit_, size_>)));
 		if (mem != nullptr)
 		{
 			new (mem) MemoryPoolT<limit_, size_>();
 			mem->__mem::lst.obj.res = mem;
 		}
-		return mem;
-#else
-		return static_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
-#endif
+		return std::unique_ptr<MemoryPoolT<limit_, size_>>(mem);
 	}
+#else
+	static
+	MemoryPoolT<limit_, size_> *Create( void )
+	{
+		return static_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
+	}
+#endif
 
 	void reset    ( void )                               {        mem_reset    (this); }
 	void kill     ( void )                               {        mem_kill     (this); }
@@ -512,6 +522,12 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
 {
 	MemoryPoolTT( void ): MemoryPoolT<limit_, sizeof(C)>() {}
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<MemoryPoolTT<limit_, C>>;
+#else
+	using Ptr = MemoryPoolTT<limit_, C> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : MemoryPoolTT<>::Create
@@ -522,17 +538,31 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
  *   limit           : size of a buffer (max number of objects)
  *   C               : class of a memory object
  *
- * Return            : pointer to MemoryPoolTT<> object
+ * Return            : std::unique_pointer / pointer to MemoryPoolTT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
+#if __cplusplus >= 201402
+	static
+	std::unique_ptr<MemoryPoolTT<limit_, C>> Create( void )
+	{
+		auto mem = reinterpret_cast<MemoryPoolTT<limit_, C> *>(sys_alloc(sizeof(MemoryPoolTT<limit_, C>)));
+		if (mem != nullptr)
+		{
+			new (mem) MemoryPoolTT<limit_, C>();
+			mem->__mem::lst.obj.res = mem;
+		}
+		return std::unique_ptr<MemoryPoolTT<limit_, C>>(mem);
+	}
+#else
 	static
 	MemoryPoolTT<limit_, C> *Create( void )
 	{
-		return static_cast<MemoryPoolTT<limit_, C> *>(MemoryPoolT<limit_, sizeof(C)>::Create());
+		return static_cast<MemoryPoolTT<limit_, C> *>(mem_create(limit_, sizeof(C)));
 	}
+#endif
 
 	uint take     ( C **_data )                 { return mem_take     (this, reinterpret_cast<void **>(_data)); }
 	uint tryWait  ( C **_data )                 { return mem_tryWait  (this, reinterpret_cast<void **>(_data)); }

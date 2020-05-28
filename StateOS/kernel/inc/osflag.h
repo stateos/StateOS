@@ -475,6 +475,12 @@ struct Flag : public __flg
 
 	~Flag( void ) { assert(__flg::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<Flag>;
+#else
+	using Ptr = Flag *;
+#endif
+
 /******************************************************************************
  *
  * Name              : Flag::Create
@@ -484,27 +490,31 @@ struct Flag : public __flg
  * Parameters
  *   init            : initial value of flag
  *
- * Return            : pointer to Flag object
+ * Return            : std::unique_pointer / pointer to Flag object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	Flag *Create( const unsigned _init = 0 )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<Flag> Create( const unsigned _init = 0 )
+	{
 		auto flg = reinterpret_cast<Flag *>(sys_alloc(sizeof(Flag)));
 		if (flg != nullptr)
 		{
 			new (flg) Flag(_init);
 			flg->__flg::obj.res = flg;
 		}
-		return flg;
-#else
-		return static_cast<Flag *>(flg_create(_init));
-#endif
+		return std::unique_ptr<Flag>(flg);
 	}
+#else
+	static
+	Flag *Create( const unsigned _init = 0 )
+	{
+		return static_cast<Flag *>(flg_create(_init));
+	}
+#endif
 
 	void reset    ( void )                                        {        flg_reset    (this); }
 	void kill     ( void )                                        {        flg_kill     (this); }

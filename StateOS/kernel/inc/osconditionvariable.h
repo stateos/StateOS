@@ -397,6 +397,12 @@ struct ConditionVariable : public __cnd
 
 	~ConditionVariable( void ) { assert(__cnd::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<ConditionVariable>;
+#else
+	using Ptr = ConditionVariable *;
+#endif
+
 /******************************************************************************
  *
  * Name              : ConditionVariable::Create
@@ -405,27 +411,31 @@ struct ConditionVariable : public __cnd
  *
  * Parameters        : none
  *
- * Return            : pointer to ConditionVariable object
+ * Return            : std::unique_pointer / pointer to ConditionVariable object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	ConditionVariable *Create( void )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<ConditionVariable> Create( void )
+	{
 		auto cnd = reinterpret_cast<ConditionVariable *>(sys_alloc(sizeof(ConditionVariable)));
 		if (cnd != nullptr)
 		{
 			new (cnd) ConditionVariable();
 			cnd->__cnd::obj.res = cnd;
 		}
-		return cnd;
-#else
-		return static_cast<ConditionVariable *>(cnd_create());
-#endif
+		return std::unique_ptr<ConditionVariable>(cnd);
 	}
+#else
+	static
+	ConditionVariable *Create( void )
+	{
+		return static_cast<ConditionVariable *>(cnd_create());
+	}
+#endif
 
 	void reset    ( void )                        {        cnd_reset    (this); }
 	void kill     ( void )                        {        cnd_kill     (this); }

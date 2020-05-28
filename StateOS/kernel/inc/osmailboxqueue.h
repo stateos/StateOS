@@ -585,6 +585,12 @@ struct MailBoxQueueT : public __box
 
 	~MailBoxQueueT( void ) { assert(__box::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<MailBoxQueueT<limit_, size_>>;
+#else
+	using Ptr = MailBoxQueueT<limit_, size_> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : MailBoxQueueT<>::Create
@@ -595,27 +601,31 @@ struct MailBoxQueueT : public __box
  *   limit           : size of a queue (max number of stored mails)
  *   size            : size of a single mail (in bytes)
  *
- * Return            : pointer to MailBoxQueueT<> object
+ * Return            : std::unique_pointer / pointer to MailBoxQueueT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	MailBoxQueueT<limit_, size_> *Create( void )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<MailBoxQueueT<limit_, size_>> Create( void )
+	{
 		auto box = reinterpret_cast<MailBoxQueueT<limit_, size_> *>(sys_alloc(sizeof(MailBoxQueueT<limit_, size_>)));
 		if (box != nullptr)
 		{
 			new (box) MailBoxQueueT<limit_, size_>();
 			box->__box::obj.res = box;
 		}
-		return box;
-#else
-		return static_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
-#endif
+		return std::unique_ptr<MailBoxQueueT<limit_, size_>>(box);
 	}
+#else
+	static
+	MailBoxQueueT<limit_, size_> *Create( void )
+	{
+		return static_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
+	}
+#endif
 
 	void reset    (       void )                        {        box_reset    (this); }
 	void kill     (       void )                        {        box_kill     (this); }
@@ -666,6 +676,12 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(C)>
 	constexpr
 	MailBoxQueueTT( void ): MailBoxQueueT<limit_, sizeof(C)>() {}
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<MailBoxQueueTT<limit_, C>>;
+#else
+	using Ptr = MailBoxQueueTT<limit_, C> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : MailBoxQueueTT<>::Create
@@ -676,17 +692,31 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(C)>
  *   limit           : size of a queue (max number of stored mails)
  *   C               : class of a single mail
  *
- * Return            : pointer to MailBoxQueueTT<> object
+ * Return            : std::unique_pointer / pointer to MailBoxQueueTT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
+#if __cplusplus >= 201402
+	static
+	std::unique_ptr<MailBoxQueueTT<limit_, C>> Create( void )
+	{
+		auto box = reinterpret_cast<MailBoxQueueTT<limit_, C> *>(sys_alloc(sizeof(MailBoxQueueTT<limit_, C>)));
+		if (box != nullptr)
+		{
+			new (box) MailBoxQueueTT<limit_, C>();
+			box->__box::obj.res = box;
+		}
+		return std::unique_ptr<MailBoxQueueTT<limit_, C>>(box);
+	}
+#else
 	static
 	MailBoxQueueTT<limit_, C> *Create( void )
 	{
-		return static_cast<MailBoxQueueTT<limit_, C> *>(MailBoxQueueT<limit_, sizeof(C)>::Create());
+		return static_cast<MailBoxQueueTT<limit_, C> *>(box_create(limit_, sizeof(C)));
 	}
+#endif
 };
 
 #endif//__cplusplus

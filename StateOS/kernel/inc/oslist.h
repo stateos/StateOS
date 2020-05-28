@@ -407,6 +407,12 @@ struct ListTT : public __lst
 
 	~ListTT( void ) { assert(__lst::obj.queue == nullptr); }
 
+#if __cplusplus >= 201402
+	using Ptr = std::unique_ptr<ListTT<C>>;
+#else
+	using Ptr = ListTT<C> *;
+#endif
+
 /******************************************************************************
  *
  * Name              : ListTT<>::Create
@@ -416,27 +422,31 @@ struct ListTT : public __lst
  * Parameters
  *   C               : class of a list object
  *
- * Return            : pointer to ListTT<> object
+ * Return            : std::unique_pointer / pointer to ListTT<> object
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-	static
-	ListTT<C> *Create( void )
-	{
 #if __cplusplus >= 201402
+	static
+	std::unique_ptr<ListTT<C>> Create( void )
+	{
 		auto lst = reinterpret_cast<ListTT<C> *>(sys_alloc(sizeof(ListTT<C>)));
 		if (lst != nullptr)
 		{
 			new (lst) ListTT<C>();
 			lst->__lst::obj.res = lst;
 		}
-		return lst;
-#else
-		return static_cast<ListTT<C> *>(lst_create());
-#endif
+		return std::unique_ptr<ListTT<C>>(lst);
 	}
+#else
+	static
+	ListTT<C> *Create( void )
+	{
+		return static_cast<ListTT<C> *>(lst_create());
+	}
+#endif
 
 	void reset    ( void )                              {        lst_reset    (this); }
 	void kill     ( void )                              {        lst_kill     (this); }
