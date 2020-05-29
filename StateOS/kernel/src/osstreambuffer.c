@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    19.05.2020
+    @date    29.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_stm_init( stm_t *stm, void *data, unsigned bufsize, void *res )
+void priv_stm_init( stm_t *stm, void *data, size_t bufsize, void *res )
 /* -------------------------------------------------------------------------- */
 {
 	memset(stm, 0, sizeof(stm_t));
@@ -48,7 +48,7 @@ void priv_stm_init( stm_t *stm, void *data, unsigned bufsize, void *res )
 }
 
 /* -------------------------------------------------------------------------- */
-void stm_init( stm_t *stm, void *data, unsigned bufsize )
+void stm_init( stm_t *stm, void *data, size_t bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -64,7 +64,7 @@ void stm_init( stm_t *stm, void *data, unsigned bufsize )
 }
 
 /* -------------------------------------------------------------------------- */
-stm_t *stm_create( unsigned limit )
+stm_t *stm_create( size_t limit )
 /* -------------------------------------------------------------------------- */
 {
 	struct stm_T { stm_t stm; char buf[]; } *tmp;
@@ -447,10 +447,10 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_count( stm_t *stm )
+size_t stm_count( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned count;
+	size_t count;
 
 	assert(stm);
 	assert(stm->obj.res!=RELEASED);
@@ -465,10 +465,10 @@ unsigned stm_count( stm_t *stm )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_space( stm_t *stm )
+size_t stm_space( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned space;
+	size_t space;
 
 	assert(stm);
 	assert(stm->obj.res!=RELEASED);
@@ -483,10 +483,10 @@ unsigned stm_space( stm_t *stm )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_limit( stm_t *stm )
+size_t stm_limit( stm_t *stm )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned limit;
+	size_t limit;
 
 	assert(stm);
 	assert(stm->obj.res!=RELEASED);
