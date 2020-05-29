@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    27.05.2020
+    @date    29.05.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -83,12 +83,6 @@ extern tsk_t MAIN;   // main task
 extern tsk_t IDLE;   // idle task, tasks' queue
 extern tmr_t WAIT;   // timers' queue
 extern sys_t System; // system data
-
-/* -------------------------------------------------------------------------- */
-
-#ifndef OS_GUARD_SIZE
-#define OS_GUARD_SIZE   0
-#endif
 
 /* -------------------------------------------------------------------------- */
 #ifdef DEBUG

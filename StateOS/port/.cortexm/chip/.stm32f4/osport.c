@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    29.05.2020
     @brief   StateOS port file for STM32F4 uC.
 
  ******************************************************************************
@@ -140,6 +140,16 @@ void port_sys_init( void )
 *******************************************************************************/
 
 	NVIC_SetPriority(PendSV_IRQn, 0xFF);
+
+/******************************************************************************
+ Configuration of memory protection unit
+*******************************************************************************/
+
+#if __MPU_USED
+	port_mpu_nullptrLock();
+	port_mpu_stackLock();
+	port_mpu_enable();
+#endif
 
 /******************************************************************************
  End of configuration

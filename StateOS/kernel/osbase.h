@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    29.05.2020
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -43,6 +43,20 @@
 #include <stdbool.h>
 #include <assert.h>
 #include "osport.h"
+
+/* -------------------------------------------------------------------------- */
+
+#ifndef OS_GUARD_SIZE
+#define OS_GUARD_SIZE     0
+#endif
+
+#ifndef __MPU_USED
+#define __MPU_USED        0U
+#endif
+
+#if (__MPU_USED == 0U)
+#define __STKALIGN
+#endif
 
 /* -------------------------------------------------------------------------- *
  *                              FOR INTERNAL USE                              *

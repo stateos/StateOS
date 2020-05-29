@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    23.05.2020
+    @date    29.05.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -211,12 +211,12 @@ void core_tmr_handler( void )
 /* -------------------------------------------------------------------------- */
 
 #ifndef MAIN_TOP
-static  stk_t     MAIN_STK[STK_SIZE(OS_STACK_SIZE)];
+static  stk_t     MAIN_STK[STK_SIZE(OS_STACK_SIZE)] __STKALIGN;
 #define MAIN_TOP (MAIN_STK+STK_SIZE(OS_STACK_SIZE))
 #endif
 
 static  union  { stk_t STK[STK_SIZE(OS_IDLE_STACK)];
-        struct { char  stk[STK_OVER(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
+        struct { char  stk[STK_OVER(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; } __STKALIGN
         IDLE_STACK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
 #define IDLE_STK  IDLE_STACK.STK
 #define IDLE_SP  &IDLE_STACK.CTX.ctx
@@ -298,8 +298,10 @@ bool priv_stk_integrity( tsk_t *tsk, void *tp, void *sp)
 {
 	if (tsk == &MAIN) return true;
 	if (sp < tp) return false;
+#if (__MPU_USED == 0U)
 	if (tsk == &IDLE) return true;
 	if (core_stk_space(tsk) < STK_OVER(OS_GUARD_SIZE)) return false;
+#endif
 	return true;
 }
 
@@ -584,6 +586,12 @@ void *core_tsk_handler( void *sp )
 		System.cur = nxt;
 		sp = nxt->sp;
 		nxt->sp = 0;
+
+#if (__MPU_USED == 1U)
+//		port_mpu_disable();
+		port_mpu_stackUpdate(nxt == &MAIN ? NULL : nxt->stack);
+//		port_mpu_enable();
+#endif
 	}
 	port_clr_lock();
 

@@ -59,6 +59,8 @@ Features:
 - removed JOINABLE and DETACHED definitions
 - fixed bug in tsk_destroy function
 - used std::unique_ptr with dynamic objects
+- added MPU for prevention the use of the NULL / nullptr
+- added MPU for prevention the stack overflow
 ---------
 6.6
 - updated os version
