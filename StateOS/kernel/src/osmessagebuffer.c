@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    19.05.2020
+    @date    29.05.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -36,7 +36,7 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_init( msg_t *msg, void *data, unsigned bufsize, void *res )
+void priv_msg_init( msg_t *msg, void *data, size_t bufsize, void *res )
 /* -------------------------------------------------------------------------- */
 {
 	memset(msg, 0, sizeof(msg_t));
@@ -48,7 +48,7 @@ void priv_msg_init( msg_t *msg, void *data, unsigned bufsize, void *res )
 }
 
 /* -------------------------------------------------------------------------- */
-void msg_init( msg_t *msg, void *data, unsigned bufsize )
+void msg_init( msg_t *msg, void *data, size_t bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
@@ -64,7 +64,7 @@ void msg_init( msg_t *msg, void *data, unsigned bufsize )
 }
 
 /* -------------------------------------------------------------------------- */
-msg_t *msg_create( unsigned limit )
+msg_t *msg_create( size_t limit )
 /* -------------------------------------------------------------------------- */
 {
 	struct msg_T { msg_t msg; char buf[]; } *tmp;
@@ -509,10 +509,10 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_count( msg_t *msg )
+size_t msg_count( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned count;
+	size_t count;
 
 	assert(msg);
 	assert(msg->obj.res!=RELEASED);
@@ -527,10 +527,10 @@ unsigned msg_count( msg_t *msg )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_space( msg_t *msg )
+size_t msg_space( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned space;
+	size_t space;
 
 	assert(msg);
 	assert(msg->obj.res!=RELEASED);
@@ -545,10 +545,10 @@ unsigned msg_space( msg_t *msg )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_limit( msg_t *msg )
+size_t msg_limit( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned limit;
+	size_t limit;
 
 	assert(msg);
 	assert(msg->obj.res!=RELEASED);

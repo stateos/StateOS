@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    27.05.2020
+    @date    29.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -48,8 +48,8 @@ struct __msg
 {
 	obj_t    obj;   // object header
 
-	unsigned count; // inherited from stream buffer
-	unsigned limit; // inherited from stream buffer
+	size_t   count; // inherited from stream buffer
+	size_t   limit; // inherited from stream buffer
 
 	unsigned head;  // inherited from stream buffer
 	unsigned tail;  // inherited from stream buffer
@@ -207,7 +207,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-void msg_init( msg_t *msg, void *data, unsigned bufsize );
+void msg_init( msg_t *msg, void *data, size_t bufsize );
 
 /******************************************************************************
  *
@@ -226,10 +226,10 @@ void msg_init( msg_t *msg, void *data, unsigned bufsize );
  *
  ******************************************************************************/
 
-msg_t *msg_create( unsigned limit );
+msg_t *msg_create( size_t limit );
 
 __STATIC_INLINE
-msg_t *msg_new( unsigned limit ) { return msg_create(limit); }
+msg_t *msg_new( size_t limit ) { return msg_create(limit); }
 
 /******************************************************************************
  *
@@ -516,21 +516,21 @@ unsigned msg_pushISR( msg_t *msg, const void *data, unsigned size ) { return msg
  * Name              : msg_count
  * ISR alias         : msg_countISR
  *
- * Description       : return the size of the first message in the buffer
+ * Description       : return the amount of data contained in the message buffer
  *
  * Parameters
  *   msg             : pointer to message buffer object
  *
- * Return            : amount of data contained in the first message
+ * Return            : amount of data contained in the message buffer
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned msg_count( msg_t *msg );
+size_t msg_count( msg_t *msg );
 
 __STATIC_INLINE
-unsigned msg_countISR( msg_t *msg ) { return msg_count(msg); }
+size_t msg_countISR( msg_t *msg ) { return msg_count(msg); }
 
 /******************************************************************************
  *
@@ -548,10 +548,10 @@ unsigned msg_countISR( msg_t *msg ) { return msg_count(msg); }
  *
  ******************************************************************************/
 
-unsigned msg_space( msg_t *msg );
+size_t msg_space( msg_t *msg );
 
 __STATIC_INLINE
-unsigned msg_spaceISR( msg_t *msg ) { return msg_space(msg); }
+size_t msg_spaceISR( msg_t *msg ) { return msg_space(msg); }
 
 /******************************************************************************
  *
@@ -569,10 +569,10 @@ unsigned msg_spaceISR( msg_t *msg ) { return msg_space(msg); }
  *
  ******************************************************************************/
 
-unsigned msg_limit( msg_t *msg );
+size_t msg_limit( msg_t *msg );
 
 __STATIC_INLINE
-unsigned msg_limitISR( msg_t *msg ) { return msg_limit(msg); }
+size_t msg_limitISR( msg_t *msg ) { return msg_limit(msg); }
 
 /******************************************************************************
  *
@@ -614,7 +614,7 @@ unsigned msg_sizeISR( msg_t *msg ) { return msg_size(msg); }
  *
  ******************************************************************************/
 
-template<unsigned limit_>
+template<size_t limit_>
 struct MessageBufferT : public __msg
 {
 	constexpr
@@ -688,12 +688,12 @@ struct MessageBufferT : public __msg
 	uint send     ( const void *_data, unsigned _size )                 { return msg_send     (this, _data, _size); }
 	uint push     ( const void *_data, unsigned _size )                 { return msg_push     (this, _data, _size); }
 	uint pushISR  ( const void *_data, unsigned _size )                 { return msg_pushISR  (this, _data, _size); }
-	uint count    ( void )                                              { return msg_count    (this); }
-	uint countISR ( void )                                              { return msg_countISR (this); }
-	uint space    ( void )                                              { return msg_space    (this); }
-	uint spaceISR ( void )                                              { return msg_spaceISR (this); }
-	uint limit    ( void )                                              { return msg_limit    (this); }
-	uint limitISR ( void )                                              { return msg_limitISR (this); }
+	size_t count  ( void )                                              { return msg_count    (this); }
+	size_t countISR( void )                                             { return msg_countISR (this); }
+	size_t space  ( void )                                              { return msg_space    (this); }
+	size_t spaceISR( void )                                             { return msg_spaceISR (this); }
+	size_t limit  ( void )                                              { return msg_limit    (this); }
+	size_t limitISR( void )                                             { return msg_limitISR (this); }
 	uint size     ( void )                                              { return msg_size     (this); }
 	uint sizeISR  ( void )                                              { return msg_sizeISR  (this); }
 
@@ -713,7 +713,7 @@ struct MessageBufferT : public __msg
  *
  ******************************************************************************/
 
-template<unsigned limit_, class C>
+template<size_t limit_, class C>
 struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>
 {
 	constexpr
