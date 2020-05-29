@@ -80,7 +80,7 @@
 // ----------------------------
 // default task stack guard size in bytes
 // default value: 0
-#define OS_GUARD_SIZE        16
+#define OS_GUARD_SIZE        32
 
 // ----------------------------
 // bit size of system timer counter
