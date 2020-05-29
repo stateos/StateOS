@@ -37,7 +37,7 @@
 #if defined (__MPU_PRESENT) && (__MPU_PRESENT == 1U)
 
 #ifndef __MPU_USED
-#if  OS_GUARD_SIZE
+#if defined (OS_GUARD_SIZE) && (OS_GUARD_SIZE > 0)
 #define __MPU_USED          1U
 #else
 #define __MPU_USED          0U
@@ -47,10 +47,6 @@
 #endif//__MPU_USED
 
 #if (__MPU_USED == 1U)
-
-#ifndef OS_GUARD_SIZE
-#error  OS_GUARD_SIZE not defined
-#endif
 
 #define __REGION_SIZE       __REGION_MAKE(OS_GUARD_SIZE)
 #define __REGION_MAKE(size) __REGION_HELP(size)

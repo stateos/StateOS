@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    20.05.2020
+    @date    29.05.2020
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -78,8 +78,9 @@
 #define OS_IDLE_STACK       256
 
 // ----------------------------
-// default task stack guard size in bytes
-// default value: 0
+// task stack guard size in bytes (if MPU is present, indicates the size of the MPU region)
+// DEBUG => the default value depends on the port settings
+// otherwise => default value: 0
 #define OS_GUARD_SIZE        32
 
 // ----------------------------
