@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    29.05.2020
+    @date    30.05.2020
     @brief   StateOS port definitions for STM32F3 uC.
 
  ******************************************************************************
@@ -37,20 +37,9 @@
 #include "osconfig.h"
 #endif
 #include "osdefs.h"
-
-#ifndef OS_GUARD_SIZE
-#ifndef DEBUG
-#define OS_GUARD_SIZE         0
-#else
-#define OS_GUARD_SIZE        32 /* ARM_MPU_REGION_SIZE_32B                    */
-#endif
-#endif
-
-#if (OS_GUARD_SIZE > 0)
 #include "osmpu.h"
-#endif
 
-#if (__MPU_USED == 1U)
+#if     __MPU_USED == 1
 #define __STKALIGN          __ALIGNED(OS_GUARD_SIZE)
 #endif
 

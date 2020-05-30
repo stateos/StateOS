@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    29.05.2020
+    @date    30.05.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -273,7 +273,7 @@ void core_tsk_remove( tsk_t *tsk )
 
 void core_ctx_init( tsk_t *tsk )
 {
-	assert(tsk->size>STK_OVER(OS_GUARD_SIZE));
+	assert(tsk->size>STK_OVER((OS_GUARD_SIZE)+sizeof(ctx_t)));
 #ifdef DEBUG
 	if (tsk != System.cur)
 		memset(tsk->stack, 0xFF, tsk->size);
@@ -298,7 +298,7 @@ bool priv_stk_integrity( tsk_t *tsk, void *tp, void *sp)
 {
 	if (tsk == &MAIN) return true;
 	if (sp < tp) return false;
-#if (__MPU_USED == 0U)
+#if (__MPU_USED == 0) && (OS_GUARD_SIZE > 0)
 	if (tsk == &IDLE) return true;
 	if (core_stk_space(tsk) < STK_OVER(OS_GUARD_SIZE)) return false;
 #endif
@@ -314,7 +314,7 @@ bool core_ctx_integrity( tsk_t *tsk, void *sp )
 bool core_stk_integrity( void )
 {
 	tsk_t *tsk = System.cur;
-	void *tp = tsk->stack + STK_SIZE(OS_GUARD_SIZE + sizeof(ctx_t));
+	void *tp = tsk->stack + STK_SIZE((OS_GUARD_SIZE) + sizeof(ctx_t));
 	void *sp = port_get_sp();
 	return priv_stk_integrity(tsk, tp, sp);
 }
@@ -587,7 +587,7 @@ void *core_tsk_handler( void *sp )
 		sp = nxt->sp;
 		nxt->sp = 0;
 
-#if (__MPU_USED == 1U)
+#if __MPU_USED == 1
 //		port_mpu_disable();
 		port_mpu_stackUpdate(nxt == &MAIN ? NULL : nxt->stack);
 //		port_mpu_enable();

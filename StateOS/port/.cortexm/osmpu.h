@@ -2,7 +2,7 @@
 
     @file    StateOS: osmpu.h
     @author  Rajmund Szymanski
-    @date    29.05.2020
+    @date    30.05.2020
     @brief   This file defines set of memory protection unit functions for StateOS.
 
  ******************************************************************************
@@ -34,27 +34,33 @@
 
 #include "osport.h"
 
-#if defined (__MPU_PRESENT) && (__MPU_PRESENT == 1U)
+#if defined (__MPU_PRESENT) && (__MPU_PRESENT == 1)
+
+#if defined (DEBUG) && !defined (OS_GUARD_SIZE)
+#define OS_GUARD_SIZE    32 /* ARM_MPU_REGION_SIZE_32B */
+#endif
+
+#if defined (OS_GUARD_SIZE) && ((OS_GUARD_SIZE) >= 32) && ((OS_GUARD_SIZE) == ((OS_GUARD_SIZE) & ~((OS_GUARD_SIZE) - 1)))
 
 #ifndef __MPU_USED
-#if defined (OS_GUARD_SIZE) && (OS_GUARD_SIZE > 0)
-#define __MPU_USED          1U
-#else
-#define __MPU_USED          0U
-#endif
+#define __MPU_USED        1
 #elif   __MPU_USED
 #error  __MPU_USED is an internal os definition!
 #endif//__MPU_USED
 
-#if (__MPU_USED == 1U)
-
-#define __REGION_SIZE       __REGION_MAKE(OS_GUARD_SIZE)
-#define __REGION_MAKE(size) __REGION_HELP(size)
-#define __REGION_HELP(size) ARM_MPU_REGION_SIZE_ ## size ## B
+#if     __MPU_USED == 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+__STATIC_INLINE
+uint32_t priv_mpu_region( uint32_t size )
+{
+	uint32_t region = 4;
+	while (size > 32) { size /= 2; region++; }
+	return region;
+}
 
 /******************************************************************************
  *
@@ -140,7 +146,7 @@ void port_mpu_setRegion( const uint32_t  reg,
 __STATIC_INLINE
 void port_mpu_nullptrLock( void )
 {
-	port_mpu_setRegion(1U, 0U, SET, ARM_MPU_AP_NONE, 0U, 0U, __REGION_SIZE);
+	port_mpu_setRegion(1U, 0U, SET, ARM_MPU_AP_NONE, 0U, 0U, priv_mpu_region(OS_GUARD_SIZE));
 }
 
 /******************************************************************************
@@ -158,7 +164,7 @@ void port_mpu_nullptrLock( void )
 __STATIC_INLINE
 void port_mpu_stackLock( void )
 {
-	port_mpu_setRegion(0U, 0U, SET, ARM_MPU_AP_RO, 0U, 0U, __REGION_SIZE);
+	port_mpu_setRegion(0U, 0U, SET, ARM_MPU_AP_RO, 0U, 0U, priv_mpu_region(OS_GUARD_SIZE));
 }
 
 /******************************************************************************
@@ -177,7 +183,7 @@ void port_mpu_stackLock( void )
 __STATIC_INLINE
 void port_mpu_stackUpdate( const void *stk )
 {
-	MPU->RBAR = ARM_MPU_RBAR(0U, (uintptr_t)stk + OS_GUARD_SIZE - 1);
+	MPU->RBAR = ARM_MPU_RBAR(0U, ((uintptr_t)stk + (OS_GUARD_SIZE) - 1) & ~((OS_GUARD_SIZE) - 1));
 }
 
 /* -------------------------------------------------------------------------- */
@@ -189,5 +195,6 @@ void port_mpu_stackUpdate( const void *stk )
 /* -------------------------------------------------------------------------- */
 
 #endif//__MPU_USED
+#endif//OS_GUARD_SIZE
 #endif//__MPU_PRESENT
 #endif//__STATEOSMPU_H

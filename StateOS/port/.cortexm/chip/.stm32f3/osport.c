@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    29.05.2020
+    @date    30.05.2020
     @brief   StateOS port file for STM32F3 uC.
 
  ******************************************************************************
@@ -145,7 +145,7 @@ void port_sys_init( void )
  Configuration of memory protection unit
 *******************************************************************************/
 
-#if __MPU_USED
+#if __MPU_USED == 1
 	port_mpu_nullptrLock();
 	port_mpu_stackLock();
 	port_mpu_enable();
