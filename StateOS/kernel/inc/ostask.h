@@ -335,11 +335,13 @@ extern "C" {
  *
  ******************************************************************************/
 
+#ifdef __CONSTRUCTOR
 #define             OS_WRK_START( tsk, prio, size )                                \
                        void tsk##__fun( void );                                     \
                     OS_WRK( tsk, prio, tsk##__fun, size );                           \
          __CONSTRUCTOR void tsk##__start( void ) { port_sys_init(); tsk_start(tsk); } \
                        void tsk##__fun( void )
+#endif
 
 /******************************************************************************
  *
@@ -357,8 +359,10 @@ extern "C" {
  *
  ******************************************************************************/
 
+#ifdef __CONSTRUCTOR
 #define             OS_TSK_START( tsk, prio, ... ) \
                     OS_WRK_START( tsk, prio, _VA_STK(__VA_ARGS__) )
+#endif
 
 /******************************************************************************
  *
@@ -450,11 +454,13 @@ extern "C" {
  *
  ******************************************************************************/
 
+#ifdef __CONSTRUCTOR
 #define         static_WRK_START( tsk, prio, size )                                \
                 static void tsk##__fun( void );                                     \
                 static_WRK( tsk, prio, tsk##__fun, size );                           \
   __CONSTRUCTOR static void tsk##__start( void ) { port_sys_init(); tsk_start(tsk); } \
                 static void tsk##__fun( void )
+#endif
 
 /******************************************************************************
  *
@@ -472,8 +478,10 @@ extern "C" {
  *
  ******************************************************************************/
 
+#ifdef __CONSTRUCTOR
 #define         static_TSK_START( tsk, prio, ... ) \
                 static_WRK_START( tsk, prio, _VA_STK(__VA_ARGS__) )
+#endif
 
 /******************************************************************************
  *

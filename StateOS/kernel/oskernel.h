@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    29.05.2020
+    @date    30.05.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -109,7 +109,9 @@ bool core_stk_integrity( void );
 
 // initiate and run the system timer
 // the port_sys_init procedure is normally called as a constructor
-__CONSTRUCTOR
+#ifdef __CONSTRUCTOR
+       __CONSTRUCTOR
+#endif
 void port_sys_init( void );
 
 /* -------------------------------------------------------------------------- */

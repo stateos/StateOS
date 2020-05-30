@@ -62,6 +62,7 @@ Features:
 - used std::unique_ptr with dynamic objects
 - added MPU for prevention the use of the NULL / nullptr
 - added MPU for prevention the stack overflow
+- removed empty __CONSTRUCTOR definitions
 ---------
 6.6
 - updated os version

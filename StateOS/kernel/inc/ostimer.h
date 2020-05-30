@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    28.05.2020
+    @date    30.05.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -130,12 +130,14 @@ extern "C" {
  *
  ******************************************************************************/
 
+#ifdef __CONSTRUCTOR
 #define             OS_TMR_START( tmr, delay, period )                                           \
                        void tmr##__fun( void );                                                   \
                        tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                                 \
                        tmr_id tmr = & tmr##__tmr;                                                   \
          __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_start(tmr, delay, period); } \
                        void tmr##__fun( void )
+#endif
 
 /******************************************************************************
  *
@@ -152,12 +154,14 @@ extern "C" {
  *
  ******************************************************************************/
 
+#ifdef __CONSTRUCTOR
 #define             OS_TMR_UNTIL( tmr, time )                                                \
                        void tmr##__fun( void );                                               \
                        tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                             \
                        tmr_id tmr = & tmr##__tmr;                                               \
          __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
                        void tmr##__fun( void )
+#endif
 
 /******************************************************************************
  *
@@ -215,12 +219,14 @@ extern "C" {
  *
  ******************************************************************************/
 
+#ifdef __CONSTRUCTOR
 #define         static_TMR_START( tmr, delay, period )                                           \
                 static void tmr##__fun( void );                                                   \
                 static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                                 \
                 static tmr_id tmr = & tmr##__tmr;                                                   \
   __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_start(tmr, delay, period); } \
                 static void tmr##__fun( void )
+#endif
 
 /******************************************************************************
  *
@@ -237,12 +243,14 @@ extern "C" {
  *
  ******************************************************************************/
 
+#ifdef __CONSTRUCTOR
 #define         static_TMR_UNTIL( tmr, time )                                                \
                 static void tmr##__fun( void );                                               \
                 static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                             \
                 static tmr_id tmr = & tmr##__tmr;                                               \
   __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
                 static  void tmr##__fun( void )
+#endif
 
 /******************************************************************************
  *
