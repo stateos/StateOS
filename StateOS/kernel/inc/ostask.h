@@ -261,8 +261,8 @@ extern "C" {
  ******************************************************************************/
 
 #define             OS_WRK( tsk, prio, state, size )                                             \
-                       struct { tsk_t tsk; stk_t buf[STK_SIZE( size )] __STKALIGN; } tsk##__wrk = \
-                       { _TSK_INIT( prio, state, tsk##__wrk.buf, size ), { 0 } };                  \
+                       struct { tsk_t tsk; stk_t stk[STK_SIZE( size )] __STKALIGN; } tsk##__wrk = \
+                       { _TSK_INIT( prio, state, tsk##__wrk.stk, size ), { 0 } };                  \
                        tsk_id tsk = & tsk##__wrk.tsk
 
 /******************************************************************************
@@ -380,8 +380,8 @@ extern "C" {
  ******************************************************************************/
 
 #define         static_WRK( tsk, prio, state, size )                                             \
-                static struct { tsk_t tsk; stk_t buf[STK_SIZE( size )] __STKALIGN; } tsk##__wrk = \
-                       { _TSK_INIT( prio, state, tsk##__wrk.buf, size ), { 0 } };                  \
+                static struct { tsk_t tsk; stk_t stk[STK_SIZE( size )] __STKALIGN; } tsk##__wrk = \
+                       { _TSK_INIT( prio, state, tsk##__wrk.stk, size ), { 0 } };                  \
                 static tsk_id tsk = & tsk##__wrk.tsk
 
 /******************************************************************************
@@ -1351,9 +1351,9 @@ struct baseTask : public __tsk
 {
 #if __cplusplus >= 201402
 	template<class F>
-	baseTask( const unsigned _prio, const F _state, stk_t * const _stack, const size_t _size ) : __tsk _TSK_INIT(_prio, fun_, _stack, _size), fun{_state} {}
+	baseTask( const unsigned _prio, const F _state, stk_t * const _stack, const size_t _size ): __tsk _TSK_INIT(_prio, fun_, _stack, _size), fun{_state} {}
 #else
-	baseTask( const unsigned _prio, fun_t * _state, stk_t * const _stack, const size_t _size ) : __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
+	baseTask( const unsigned _prio, fun_t * _state, stk_t * const _stack, const size_t _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 #endif
 
 	void start    ( void )             {        tsk_start    (this); }

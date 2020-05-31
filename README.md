@@ -27,7 +27,7 @@ Building an application for a specific compiler is realised using the appropriat
 - kernel can operate in preemptive or cooperative mode
 - kernel can operate with 16, 32 or 64-bit timer counter
 - kernel can operate in tick-less mode
-- basic prevention implemented using MPU (use nullptr, stack overflow)
+- implemented basic protection using MPU (use nullptr, stack overflow)
 - spin locks
 - once flags
 - events
