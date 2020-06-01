@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    28.05.2020
+    @date    01.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,10 +41,10 @@ extern "C" {
 /* -------------------------------------------------------------------------- */
 
 #define SEG_SIZE( size ) \
-    ALIGNED_SIZE( size, seg_t )
+    ALIGNED_SIZE( size, sizeof( seg_t ))
 
 #define SEG_OVER( size ) \
-         ALIGNED( size, seg_t )
+         ALIGNED( size, sizeof( seg_t ))
 
 /******************************************************************************
  *
