@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    01.06.2020
+    @date    02.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1622,7 +1622,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return Create(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #else
-	template<class F> static
+	static
 	TaskT<size_> *Create( const unsigned _prio, fun_t * _state )
 	{
 		return static_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
@@ -1670,7 +1670,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return Detached(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #else
-	template<class F> static
+	static
 	TaskT<size_> *Detached( const unsigned _prio, fun_t * _state )
 	{
 		return static_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
