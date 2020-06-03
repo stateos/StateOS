@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    13.05.2020
+    @date    03.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -199,7 +199,7 @@ size_t sys_heapSize( void )
 		//	it is possible to merge adjacent free memory segments
 				mem->next = nxt->next;
 
-			size += nxt - mem;
+			size += nxt - mem - 1;
 		}
 	}
 	sys_unlock();

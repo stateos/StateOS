@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    30.05.2020
+    @date    03.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -211,18 +211,18 @@ void core_tmr_handler( void )
 /* -------------------------------------------------------------------------- */
 
 #ifndef MAIN_TOP
-static  stk_t     MAIN_STK[STK_SIZE(OS_STACK_SIZE)] __STKALIGN;
-#define MAIN_TOP (MAIN_STK+STK_SIZE(OS_STACK_SIZE))
+static  stk_t     MAIN_STK[STK_SIZE((OS_STACK_SIZE)+(OS_GUARD_SIZE))];
+#define MAIN_TOP (MAIN_STK+STK_SIZE((OS_STACK_SIZE)+(OS_GUARD_SIZE)))
 #endif
 
-static  union  { stk_t STK[STK_SIZE(OS_IDLE_STACK)];
-        struct { char  stk[STK_OVER(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; } __STKALIGN
+static  union  { stk_t STK[STK_SIZE((OS_IDLE_STACK)+(OS_GUARD_SIZE))];
+        struct { char  stk[STK_OVER((OS_IDLE_STACK)+(OS_GUARD_SIZE))-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
         IDLE_STACK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
 #define IDLE_STK  IDLE_STACK.STK
 #define IDLE_SP  &IDLE_STACK.CTX.ctx
 
 tsk_t MAIN = { .hdr={ .prev=&IDLE, .next=&IDLE, .id=ID_READY }, .stack=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { .hdr={ .prev=&MAIN, .next=&MAIN, .id=ID_READY }, .state=priv_tsk_idle, .stack=IDLE_STK, .size=OS_IDLE_STACK, .sp=IDLE_SP }; // idle task and tasks queue
+tsk_t IDLE = { .hdr={ .prev=&MAIN, .next=&MAIN, .id=ID_READY }, .state=priv_tsk_idle, .stack=IDLE_STK, .size=sizeof(IDLE_STK), .sp=IDLE_SP }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
@@ -298,7 +298,7 @@ bool priv_stk_integrity( tsk_t *tsk, void *tp, void *sp)
 {
 	if (tsk == &MAIN) return true;
 	if (sp < tp) return false;
-#if (__MPU_USED == 0) && (OS_GUARD_SIZE > 0)
+#if (__MPU_USED == 0) && ((OS_GUARD_SIZE) > 0)
 	if (tsk == &IDLE) return true;
 	if (core_stk_space(tsk) < STK_OVER(OS_GUARD_SIZE)) return false;
 #endif

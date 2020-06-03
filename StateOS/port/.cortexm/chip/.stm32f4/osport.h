@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    30.05.2020
+    @date    03.06.2020
     @brief   StateOS port definitions for STM32F4 uC.
 
  ******************************************************************************
@@ -38,10 +38,6 @@
 #endif
 #include "osdefs.h"
 #include "osmpu.h"
-
-#if     __MPU_USED == 1
-#define __STKALIGN          __ALIGNED(OS_GUARD_SIZE)
-#endif
 
 #ifdef __cplusplus
 extern "C" {

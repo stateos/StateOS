@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    30.05.2020
+    @date    03.06.2020
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -52,10 +52,6 @@
 
 #ifndef __MPU_USED
 #define __MPU_USED        0
-#endif
-
-#if     __MPU_USED == 0
-#define __STKALIGN
 #endif
 
 /* -------------------------------------------------------------------------- *

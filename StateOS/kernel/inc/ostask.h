@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    02.06.2020
+    @date    03.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -230,7 +230,7 @@ extern "C" {
  ******************************************************************************/
 
 #ifndef __cplusplus
-#define               _TSK_STACK( _size ) (stk_t __STKALIGN [STK_SIZE(_size)]) { 0 }
+#define               _TSK_STACK( _size ) (stk_t [STK_SIZE(_size)]) { 0 }
 #endif
 
 /******************************************************************************
@@ -260,9 +260,9 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define             OS_WRK( tsk, prio, state, size )                                             \
-                       struct { tsk_t tsk; stk_t stk[STK_SIZE( size )] __STKALIGN; } tsk##__wrk = \
-                       { _TSK_INIT( prio, state, tsk##__wrk.stk, size ), { 0 } };                  \
+#define             OS_WRK( tsk, prio, state, size )                                                    \
+                       struct { tsk_t tsk; stk_t stk[STK_SIZE( size + (OS_GUARD_SIZE) )]; } tsk##__wrk = \
+                       { _TSK_INIT( prio, state, tsk##__wrk.stk, size + (OS_GUARD_SIZE) ), { 0 } };       \
                        tsk_id tsk = & tsk##__wrk.tsk
 
 /******************************************************************************
@@ -379,9 +379,9 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define         static_WRK( tsk, prio, state, size )                                             \
-                static struct { tsk_t tsk; stk_t stk[STK_SIZE( size )] __STKALIGN; } tsk##__wrk = \
-                       { _TSK_INIT( prio, state, tsk##__wrk.stk, size ), { 0 } };                  \
+#define         static_WRK( tsk, prio, state, size )                                                    \
+                static struct { tsk_t tsk; stk_t stk[STK_SIZE( size + (OS_GUARD_SIZE) )]; } tsk##__wrk = \
+                       { _TSK_INIT( prio, state, tsk##__wrk.stk, size + (OS_GUARD_SIZE) ), { 0 } };       \
                 static tsk_id tsk = & tsk##__wrk.tsk
 
 /******************************************************************************
@@ -503,7 +503,7 @@ extern "C" {
 
 #ifndef __cplusplus
 #define                WRK_INIT( prio, state, size ) \
-                      _TSK_INIT( prio, state, _TSK_STACK( size ), size )
+                      _TSK_INIT( prio, state, _TSK_STACK( size + (OS_GUARD_SIZE) ), size + (OS_GUARD_SIZE) )
 #endif
 
 /******************************************************************************
@@ -1323,11 +1323,7 @@ template<size_t size_>
 struct baseStack
 {
 	static_assert(size_>STK_OVER((OS_GUARD_SIZE)+sizeof(ctx_t)), "incorrect stack size");
-#if __MPU_USED && __cplusplus >= 201703
-	typename std::aligned_storage<sizeof(stk_t), OS_GUARD_SIZE>::type stack_[STK_SIZE(size_)];
-#else
 	stk_t stack_[STK_SIZE(size_)];
-#endif
 };
 
 /******************************************************************************
@@ -1492,15 +1488,15 @@ using This     = baseTask::Current;
  ******************************************************************************/
 
 template<size_t size_>
-struct TaskT : public baseTask, public baseStack<size_>
+struct TaskT : public baseTask, public baseStack<size_+(OS_GUARD_SIZE)>
 {
 	template<class F>
 	TaskT( const unsigned _prio, F&& _state ):
-	baseTask{_prio, _state, reinterpret_cast<stk_t *>(baseStack<size_>::stack_), size_} {}
+	baseTask{_prio, _state, baseStack<size_+(OS_GUARD_SIZE)>::stack_, size_+(OS_GUARD_SIZE)} {}
 #if __cplusplus >= 201402
 	template<typename F, typename... A>
 	TaskT( const unsigned _prio, F&& _state, A&&... _args ):
-	baseTask{_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...), reinterpret_cast<stk_t *>(baseStack<size_>::stack_), size_} {}
+	baseTask{_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...), baseStack<size_+(OS_GUARD_SIZE)>::stack_, size_+(OS_GUARD_SIZE)} {}
 #endif
 
 	TaskT( TaskT<size_>&& ) = default;
