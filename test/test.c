@@ -72,14 +72,15 @@ int main()
 	TEST_AddUnit(test_timer);
 	TEST_AddUnit(test_task);
 
+	size_t h = sys_heapSize();
 	for (i = 0; i < count * LOOP * 2; i += 2)
 	{
 		printf("%3d%% ", (i + 1) * 50 / count / LOOP);
 		test[i      % count]();
-		ASSERT_heap();
+		ASSERT(h==sys_heapSize());
 		printf("%3d%% ", (i + 2) * 50 / count / LOOP);
 		test[rand() % count]();
-		ASSERT_heap();
+		ASSERT(h==sys_heapSize());
 	}
 
 	test_fini();

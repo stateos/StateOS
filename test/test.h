@@ -23,8 +23,6 @@
 #define ASSERT_dead(tsk)       ASSERT((tsk)->hdr.id == ID_STOPPED)
 #define ASSERT_ready(tsk)      ASSERT((tsk)->hdr.id == ID_READY)
 
-#define ASSERT_heap()          ASSERT(sys_heapSize() == SEG_OVER(OS_HEAP_SIZE))
-
 #ifdef  __cplusplus
 extern "C" {
 #endif
