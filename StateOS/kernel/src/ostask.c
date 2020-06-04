@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    03.06.2020
+    @date    04.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -315,24 +315,11 @@ void priv_tsk_stop( tsk_t *tsk )
 }
 
 /* -------------------------------------------------------------------------- */
-void core_tsk_destructor( void )
-/* -------------------------------------------------------------------------- */
-{
-	tsk_t *tsk;
-
-	while (tsk = IDLE.hdr.obj.queue, tsk)
-	{
-		priv_tsk_stop(tsk);                         // remove task from DESTRUCTOR queue
-		core_res_free(&tsk->hdr.obj);               // release resources
-	}
-}
-
-/* -------------------------------------------------------------------------- */
 static
 void priv_tsk_destroy( void )
 /* -------------------------------------------------------------------------- */
 {
-	core_tsk_waitFor(&IDLE.hdr.obj.queue, INFINITE); // wait for destruction
+	core_tsk_waitFor(&IDLE.hdr.obj.queue, INFINITE); // wait for removal
 
 	assert(!"system cannot return here");
 }

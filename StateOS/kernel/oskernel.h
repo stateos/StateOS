@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    01.06.2020
+    @date    04.06.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -275,14 +275,6 @@ void core_mtx_reset( mtx_t *mtx, unsigned event );
 
 /* -------------------------------------------------------------------------- */
 
-// frees resources of given object
-void core_res_free( obj_t *obj );
-
-// garbage collection procedure
-void core_tsk_destructor( void );
-
-/* -------------------------------------------------------------------------- */
-
 // return current system time in tick-less mode
 #if HW_TIMER_SIZE < OS_TIMER_SIZE // because of CSMCC
 cnt_t port_sys_time( void );
@@ -311,6 +303,14 @@ void core_sys_tick( void )
 #endif
 }
 #endif
+
+/* -------------------------------------------------------------------------- */
+
+// frees resources of given object
+void core_res_free( obj_t *obj );
+
+// garbage collection procedure
+void core_tsk_deleter( void );
 
 /* -------------------------------------------------------------------------- */
 

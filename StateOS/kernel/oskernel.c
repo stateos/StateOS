@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    03.06.2020
+    @date    04.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -683,5 +683,30 @@ void core_sys_tick( void )
 }
 
 #endif
+
+/* -------------------------------------------------------------------------- */
+
+void core_res_free( obj_t *obj )
+{
+	if (obj->res != NULL && obj->res != RELEASED)
+	{
+		sys_free(obj->res);
+		obj->res = RELEASED;
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tsk_deleter( void )
+{
+	tsk_t *tsk;
+
+	while (tsk = IDLE.hdr.obj.queue, tsk) // garbage collection procedure
+	{
+		core_tsk_unlink(tsk, 0);          // remove task from DESTRUCTOR queue; ignored event value
+		core_tmr_remove((tmr_t *)tsk);    // remove task from WAIT queue
+		core_res_free(&tsk->hdr.obj);     // release resources
+	}
+}
 
 /* -------------------------------------------------------------------------- */

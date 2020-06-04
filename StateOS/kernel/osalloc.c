@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    03.06.2020
+    @date    04.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -61,7 +61,7 @@ void *sys_alloc( size_t size )
 	sys_lock();
 	{
 		//	call garbage collection procedure
-		core_tsk_destructor();
+		core_tsk_deleter();
 
 		for (mem = Heap; mem; mem = mem->next)
 		{
@@ -111,7 +111,7 @@ void *sys_alloc( size_t size )
 	sys_lock();
 	{
 		//	call garbage collection procedure
-		core_tsk_destructor();
+		core_tsk_deleter();
 	}
 	sys_unlock();
 
@@ -138,7 +138,7 @@ void sys_free( void *ptr )
 	sys_lock();
 	{
 		//	call garbage collection procedure
-		core_tsk_destructor();
+		core_tsk_deleter();
 
 		for (mem = Heap; mem; mem = mem->next)
 		{
@@ -163,7 +163,7 @@ void sys_free( void *ptr )
 	sys_lock();
 	{
 		//	call garbage collection procedure
-		core_tsk_destructor();
+		core_tsk_deleter();
 	}
 	sys_unlock();
 
@@ -187,7 +187,7 @@ size_t sys_heapSize( void )
 	sys_lock();
 	{
 		//	call garbage collection procedure
-		core_tsk_destructor();
+		core_tsk_deleter();
 
 		for (mem = Heap; mem; mem = mem->next)
 		{
@@ -216,7 +216,7 @@ size_t sys_heapSize( void )
 	sys_lock();
 	{
 		//	call garbage collection procedure
-		core_tsk_destructor();
+		core_tsk_deleter();
 	}
 	sys_unlock();
 
@@ -224,16 +224,5 @@ size_t sys_heapSize( void )
 }
 
 #endif
-
-/* -------------------------------------------------------------------------- */
-
-void core_res_free( obj_t *obj )
-{
-	if (obj->res != NULL && obj->res != RELEASED)
-	{
-		sys_free(obj->res);
-		obj->res = RELEASED;
-	}
-}
 
 /* -------------------------------------------------------------------------- */
