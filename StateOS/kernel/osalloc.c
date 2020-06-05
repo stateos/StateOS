@@ -77,7 +77,7 @@ void *priv_mem_alloc( size_t alignment, size_t size )
 
 		if (nxt > mem)
 		{
-	//	memory must be aligned
+	//	memory segment must be aligned
 			nxt->next  = mem->next;
 			nxt->owner = nxt;
 			mem->next  = nxt;
