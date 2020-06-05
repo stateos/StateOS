@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    03.06.2020
+    @date    05.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -77,6 +77,25 @@ struct __seg
  ******************************************************************************/
 
 void *sys_alloc( size_t size );
+
+/******************************************************************************
+ *
+ * Name              : sys_realloc
+ *
+ * Description       : system realloc procedure
+ *
+ * Parameters
+ *   ptr             : pointer to a memory segment previously allocated with sys_alloc
+ *   size            : required size of the memory segment (in bytes)
+ *
+ * Return            : pointer to the beginning of reallocated memory segment
+ *   NULL            : memory segment cannot be reallocated (not enough free memory)
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+void *sys_realloc( void *ptr, size_t size );
 
 /******************************************************************************
  *

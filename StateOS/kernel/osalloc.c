@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    04.06.2020
+    @date    05.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -32,6 +32,9 @@
 #include "osalloc.h"
 #include "inc/oscriticalsection.h"
 
+#define SEG_ALIGN( base, alignment ) \
+ (seg_t *)ALIGNED((uintptr_t)(base), alignment )
+
 /* -------------------------------------------------------------------------- */
 // SYSTEM ALLOC/FREE SERVICES
 /* -------------------------------------------------------------------------- */
@@ -48,49 +51,128 @@ seg_t Heap[SEG_SIZE(OS_HEAP_SIZE)+1] =
 
 #if OS_HEAP_SIZE
 
-void *sys_alloc( size_t size )
+static
+void *priv_mem_alloc( size_t alignment, size_t size )
 {
 	seg_t *mem;
 	seg_t *nxt;
 
-	assert_tsk_context();
-	assert(size>0&&size<OS_HEAP_SIZE);
+	size = SEG_SIZE(size + sizeof(seg_t));
+
+	for (mem = Heap; mem; mem = mem->next)
+	{
+		if (mem->owner == NULL)
+	//	memory segment has already been allocated
+			continue;
+
+		while (nxt = mem->next, nxt->owner != NULL)
+	//	it is possible to merge adjacent free memory segments
+			mem->next = nxt->next;
+
+		nxt = SEG_ALIGN(mem, alignment);
+
+		if (nxt + size > mem->next)
+	//	memory segment is too small
+			continue;
+
+		if (nxt > mem)
+		{
+	//	memory must be aligned
+			nxt->next  = mem->next;
+			nxt->owner = nxt;
+			mem->next  = nxt;
+			mem = nxt;
+		}
+
+		if (mem + size < mem->next)
+		{
+	//	memory segment is larger than required
+			nxt = mem + size;
+			nxt->next  = mem->next;
+			nxt->owner = nxt;
+			mem->next  = nxt;
+		}
+
+	//	memory segment can be allocated
+		mem->owner = NULL;
+		mem = mem + 1;
+		break;
+	}
+
+	return mem;
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+static
+size_t priv_mem_resize( void *ptr, size_t size )
+{
+	seg_t *mem;
+	seg_t *nxt;
 
 	size = SEG_SIZE(size + sizeof(seg_t));
+	mem  = (seg_t *)ptr - 1;
+
+	while (nxt = mem->next, nxt->owner != NULL)
+	//	it is possible to attach adjacent free memory segment
+		mem->next = nxt->next;
+
+	if (mem + size < mem->next)
+	{
+	//	it is possible to reduce the size of the memory segment
+		nxt = mem + size;
+		nxt->next  = mem->next;
+		nxt->owner = nxt;
+		mem->next  = nxt;
+	}
+
+	return (mem->next - mem - 1) * sizeof(seg_t);
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+static
+void priv_mem_free( void *ptr )
+{
+	seg_t *mem;
+	seg_t *seg = (seg_t *)ptr - 1;
+
+	for (mem = Heap; mem; mem = mem->next)
+	{
+		if (mem != seg)
+	//	this is not the memory segment we are looking for
+			continue;
+
+	//	memory segment can be released
+		mem->owner = mem;
+		break;
+	}
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+void *memalign( size_t alignment, size_t size )
+{
+	seg_t *mem;
+
+	assert(alignment>0&&alignment==(alignment&~(alignment-1)));
+	assert(size>0&&size<OS_HEAP_SIZE);
 
 	sys_lock();
 	{
-		//	call garbage collection procedure
-		core_tsk_deleter();
-
-		for (mem = Heap; mem; mem = mem->next)
-		{
-			if (mem->owner == NULL)
-		//	memory segment has already been allocated
-				continue;
-
-			while (nxt = mem->next, nxt->owner != NULL)
-		//	it is possible to merge adjacent free memory segments
-				mem->next = nxt->next;
-
-			if (mem + size > nxt)
-		//	memory segment is too small
-				continue;
-
-			if (mem + size < nxt)
-			{
-		//	memory segment is larger than required
-				nxt = mem + size;
-				nxt->next  = mem->next;
-				nxt->owner = nxt;
-				mem->next  = nxt;
-			}
-
-		//	memory segment can be allocated
-			mem->owner = NULL;
-			mem = mem + 1;
-			break;
-		}
+		mem = priv_mem_alloc(alignment, size);
 	}
 	sys_unlock();
 
@@ -99,7 +181,111 @@ void *sys_alloc( size_t size )
 	return mem;
 }
 
-#else
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+void *malloc( size_t size )
+{
+	seg_t *mem;
+
+	assert(size>0&&size<OS_HEAP_SIZE);
+
+	sys_lock();
+	{
+		mem = priv_mem_alloc(1, size);
+	}
+	sys_unlock();
+
+	assert(mem);
+
+	return mem;
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+void *calloc( size_t num, size_t size )
+{
+	void *mem;
+
+	mem = malloc(size *= num);
+
+	if (mem != NULL)
+		memset(mem, 0, size);
+
+	return mem;
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+void *realloc( void *ptr, size_t size )
+{
+	size_t len;
+	void * mem;
+
+	assert(ptr==NULL||(ptr>(void*)Heap&&ptr<(void*)(Heap+SEG_SIZE(OS_HEAP_SIZE))));
+	assert(size<OS_HEAP_SIZE);
+
+	if (ptr == NULL)
+		return malloc(size);
+
+	if (size == 0)
+	{
+		free(ptr);
+		return NULL;
+	}
+
+	sys_lock();
+	{
+		len = priv_mem_resize(ptr, size);
+	}
+	sys_unlock();
+
+	if (len >= size)
+		return ptr;
+
+	mem = malloc(size);
+	if (mem != NULL)
+	{
+		memcpy(mem, ptr, len);
+		free(ptr);
+	}
+
+	assert(mem);
+
+	return mem;
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+void free( void *ptr )
+{
+	assert(ptr>(void*)Heap&&ptr<(void*)(Heap+SEG_SIZE(OS_HEAP_SIZE)));
+
+	sys_lock();
+	{
+		priv_mem_free(ptr);
+	}
+	sys_unlock();
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
 
 void *sys_alloc( size_t size )
 {
@@ -110,7 +296,6 @@ void *sys_alloc( size_t size )
 
 	sys_lock();
 	{
-		//	call garbage collection procedure
 		core_tsk_deleter();
 	}
 	sys_unlock();
@@ -122,47 +307,35 @@ void *sys_alloc( size_t size )
 	return mem;
 }
 
-#endif
+/* -------------------------------------------------------------------------- */
+
+void *sys_realloc( void *ptr, size_t size )
+{
+	void *mem;
+
+	assert_tsk_context();
+
+	sys_lock();
+	{
+		core_tsk_deleter();
+	}
+	sys_unlock();
+
+	mem = realloc(ptr, size);
+
+	assert(mem);
+
+	return mem;
+}
 
 /* -------------------------------------------------------------------------- */
 
-#if OS_HEAP_SIZE
-
-void sys_free( void *ptr )
-{
-	seg_t *mem;
-	seg_t *seg = (seg_t *)ptr - 1;
-
-	assert_tsk_context();
-
-	sys_lock();
-	{
-		//	call garbage collection procedure
-		core_tsk_deleter();
-
-		for (mem = Heap; mem; mem = mem->next)
-		{
-			if (mem != seg)
-		//	this is not the memory segment we are looking for
-				continue;
-
-		//	memory segment can be released
-			mem->owner = mem;
-			break;
-		}
-	}
-	sys_unlock();
-}
-
-#else
-
 void sys_free( void *ptr )
 {
 	assert_tsk_context();
 
 	sys_lock();
 	{
-		//	call garbage collection procedure
 		core_tsk_deleter();
 	}
 	sys_unlock();
@@ -170,11 +343,7 @@ void sys_free( void *ptr )
 	free(ptr);
 }
 
-#endif
-
 /* -------------------------------------------------------------------------- */
-
-#if OS_HEAP_SIZE
 
 size_t sys_heapSize( void )
 {
@@ -188,7 +357,7 @@ size_t sys_heapSize( void )
 	{
 		//	call garbage collection procedure
 		core_tsk_deleter();
-
+#if OS_HEAP_SIZE
 		for (mem = Heap; mem; mem = mem->next)
 		{
 			if (mem->owner == NULL)
@@ -201,28 +370,15 @@ size_t sys_heapSize( void )
 
 			size += nxt - mem - 1;
 		}
+#else
+		// to prevent warnings
+		(void) mem;
+		(void) nxt;
+#endif
 	}
 	sys_unlock();
 
 	return size * sizeof(seg_t);
 }
-
-#else
-
-size_t sys_heapSize( void )
-{
-	assert_tsk_context(); 
-
-	sys_lock();
-	{
-		//	call garbage collection procedure
-		core_tsk_deleter();
-	}
-	sys_unlock();
-
-	return 0;
-}
-
-#endif
 
 /* -------------------------------------------------------------------------- */
