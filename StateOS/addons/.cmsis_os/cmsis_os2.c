@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    26.05.2020
+    @date    05.06.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -225,7 +225,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	if (thread == NULL && stack_mem == NULL)
 	{
 		stack_size = osThreadStackSize(stack_size);
-		thread = sys_alloc(SEG_OVER(osThreadCbSize) + stack_size);
+		thread = sys_malloc(SEG_OVER(osThreadCbSize) + stack_size);
 		stack_mem = (void *)((size_t)thread + SEG_OVER(osThreadCbSize));
 		if (thread == NULL)
 			return NULL;
@@ -233,7 +233,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	else
 	if (thread == NULL)
 	{
-		thread = sys_alloc(osThreadCbSize);
+		thread = sys_malloc(osThreadCbSize);
 		if (thread == NULL)
 			return NULL;
 	}
@@ -241,7 +241,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	if (stack_mem == NULL)
 	{
 		stack_size = osThreadStackSize(stack_size);
-		stack_mem = sys_alloc(stack_size);
+		stack_mem = sys_malloc(stack_size);
 		if (stack_mem == NULL)
 			return NULL;
 	}
@@ -608,7 +608,7 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 
 	if (timer == NULL)
 	{
-		timer = sys_alloc(osTimerCbSize);
+		timer = sys_malloc(osTimerCbSize);
 		if (timer == NULL)
 			return NULL;
 	}
@@ -711,7 +711,7 @@ osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 
 	if (ef == NULL)
 	{
-		ef = sys_alloc(osEventFlagsCbSize);
+		ef = sys_malloc(osEventFlagsCbSize);
 		if (ef == NULL)
 			return NULL;
 	}
@@ -836,7 +836,7 @@ osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 
 	if (mutex == NULL)
 	{
-		mutex = sys_alloc(osMutexCbSize);
+		mutex = sys_malloc(osMutexCbSize);
 		if (mutex == NULL)
 			return NULL;
 	}
@@ -942,7 +942,7 @@ osSemaphoreId_t osSemaphoreNew (uint32_t max_count, uint32_t initial_count, cons
 
 	if (semaphore == NULL)
 	{
-		semaphore = sys_alloc(osSemaphoreCbSize);
+		semaphore = sys_malloc(osSemaphoreCbSize);
 		if (semaphore == NULL)
 			return NULL;
 	}
@@ -1055,7 +1055,7 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 
 	if (mp == NULL && data == NULL)
 	{
-		mp = sys_alloc(SEG_OVER(osMemoryPoolCbSize) + size);
+		mp = sys_malloc(SEG_OVER(osMemoryPoolCbSize) + size);
 		data = (void *)((size_t)mp + SEG_OVER(osMemoryPoolCbSize));
 		if (mp == NULL)
 			return NULL;
@@ -1063,14 +1063,14 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 	else
 	if (mp == NULL)
 	{
-		mp = sys_alloc(osMemoryPoolCbSize);
+		mp = sys_malloc(osMemoryPoolCbSize);
 		if (mp == NULL)
 			return NULL;
 	}
 	else
 	if (data == NULL)
 	{
-		data = sys_alloc(size);
+		data = sys_malloc(size);
 		if (data == NULL)
 			return NULL;
 	}
@@ -1229,7 +1229,7 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 
 	if (mq == NULL && data == NULL)
 	{
-		mq = sys_alloc(SEG_OVER(osMessageQueueCbSize) + size);
+		mq = sys_malloc(SEG_OVER(osMessageQueueCbSize) + size);
 		data = (void *)((size_t)mq + SEG_OVER(osMessageQueueCbSize));
 		if (mq == NULL)
 			return NULL;
@@ -1237,14 +1237,14 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 	else
 	if (mq == NULL)
 	{
-		mq = sys_alloc(osMessageQueueCbSize);
+		mq = sys_malloc(osMessageQueueCbSize);
 		if (mq == NULL)
 			return NULL;
 	}
 	else
 	if (data == NULL)
 	{
-		data = sys_alloc(size);
+		data = sys_malloc(size);
 		if (data == NULL)
 			return NULL;
 	}

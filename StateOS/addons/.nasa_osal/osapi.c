@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    05.05.2020
+    @date    05.06.2020
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -205,7 +205,7 @@ int32 OS_QueueCreate(uint32 *queue_id, const char *queue_name, uint32 queue_dept
 					status = OS_ERR_NO_FREE_IDS;
 				else
 				{
-					data = sys_alloc(queue_depth * data_size);
+					data = sys_malloc(queue_depth * data_size);
 
 					if (!data)
 						status = OS_ERROR;
@@ -1010,7 +1010,7 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 					if (!stack)
 					{
 						if (!stack_size) stack_size = OS_STACK_SIZE;
-						stack = sys_alloc(stack_size);
+						stack = sys_malloc(stack_size);
 					}
 					if (!stack)
 						status = OS_ERROR;
