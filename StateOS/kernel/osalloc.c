@@ -242,6 +242,34 @@ void *aligned_alloc( size_t alignment, size_t size )
 
 #if OS_HEAP_SIZE
 
+int posix_memalign( void **ptr, size_t alignment, size_t size )
+{
+	seg_t *mem;
+
+	assert(alignment>=sizeof(void*)&&alignment==(alignment&~(alignment-1)));
+	assert(size>0&&size<OS_HEAP_SIZE);
+
+	sys_lock();
+	{
+		mem = priv_mem_alloc(alignment, size);
+	}
+	sys_unlock();
+
+	assert(mem);
+
+	if (mem == NULL)
+		return 12; // ENOMEM
+
+	*ptr = mem;
+	return 0;
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
 void *malloc( size_t size )
 {
 	seg_t *mem;

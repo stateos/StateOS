@@ -150,6 +150,20 @@ void sys_free( void *ptr );
 
 size_t sys_heapSize( void );
 
+/******************************************************************************
+ *
+ * Description       : set of standard aligned memory allocation functions
+ *
+ ******************************************************************************/
+
+#if OS_HEAP_SIZE
+
+void *memalign      (             size_t alignment, size_t size );
+void *aligned_alloc (             size_t alignment, size_t size );
+int   posix_memalign( void **ptr, size_t alignment, size_t size );
+
+#endif
+
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
