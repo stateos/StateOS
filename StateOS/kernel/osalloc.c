@@ -36,7 +36,7 @@
  (seg_t *)ALIGNED((uintptr_t)(base), alignment )
 
 /* -------------------------------------------------------------------------- */
-// SYSTEM ALLOC/FREE SERVICES
+// INTERNAL ALLOC/FREE SERVICES
 /* -------------------------------------------------------------------------- */
 
 #if OS_HEAP_SIZE
@@ -155,6 +155,32 @@ void priv_mem_free( void *ptr )
 		mem->owner = mem;
 		break;
 	}
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+// STANDARD ALLOC/FREE SERVICES
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+size_t malloc_usable_size( void *ptr )
+{
+	seg_t *mem;
+	size_t size;
+
+	if (ptr == NULL)
+		return 0;
+
+	sys_lock();
+	{
+		mem  = (seg_t *)ptr - 1;
+		size = (mem->next - mem - 1) * sizeof(seg_t);
+	}
+	sys_unlock();
+
+	return size;
 }
 
 #endif
@@ -285,6 +311,8 @@ void free( void *ptr )
 
 #endif
 
+/* -------------------------------------------------------------------------- */
+// SYSTEM ALLOC/FREE SERVICES
 /* -------------------------------------------------------------------------- */
 
 void *sys_alloc( size_t size )
