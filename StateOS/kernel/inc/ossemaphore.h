@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    27.05.2020
+    @date    05.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -543,7 +543,7 @@ struct Semaphore : public __sem
 	static
 	std::unique_ptr<Semaphore> Create( const unsigned _init, const unsigned _limit = semDefault )
 	{
-		auto sem = reinterpret_cast<Semaphore *>(sys_alloc(sizeof(Semaphore)));
+		auto sem = reinterpret_cast<Semaphore *>(sys_malloc(sizeof(Semaphore)));
 		if (sem != nullptr)
 		{
 			new (sem) Semaphore(_init, _limit);

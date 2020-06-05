@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    27.05.2020
+    @date    05.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -600,7 +600,7 @@ struct EventQueueT : public __evq
 	static
 	std::unique_ptr<EventQueueT<limit_>> Create( void )
 	{
-		auto evq = reinterpret_cast<EventQueueT<limit_> *>(sys_alloc(sizeof(EventQueueT<limit_>)));
+		auto evq = reinterpret_cast<EventQueueT<limit_> *>(sys_malloc(sizeof(EventQueueT<limit_>)));
 		if (evq != nullptr)
 		{
 			new (evq) EventQueueT<limit_>();

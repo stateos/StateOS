@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    27.05.2020
+    @date    05.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -500,7 +500,7 @@ struct Flag : public __flg
 	static
 	std::unique_ptr<Flag> Create( const unsigned _init = 0 )
 	{
-		auto flg = reinterpret_cast<Flag *>(sys_alloc(sizeof(Flag)));
+		auto flg = reinterpret_cast<Flag *>(sys_malloc(sizeof(Flag)));
 		if (flg != nullptr)
 		{
 			new (flg) Flag(_init);

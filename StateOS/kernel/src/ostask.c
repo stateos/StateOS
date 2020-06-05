@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    04.06.2020
+    @date    05.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -61,7 +61,7 @@ tsk_t *priv_wrk_create( unsigned prio, fun_t *state, size_t size, bool detached 
 	size_t bufsize;
 
 	bufsize = STK_OVER(size + (OS_GUARD_SIZE));
-	tmp = sys_alloc(sizeof(struct tsk_T) + bufsize);
+	tmp = sys_malloc(sizeof(struct tsk_T) + bufsize);
 	if (tmp)
 		priv_wrk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize, tmp, detached);
 

@@ -160,31 +160,36 @@ void priv_mem_free( void *ptr )
 #endif
 
 /* -------------------------------------------------------------------------- */
-// STANDARD ALLOC/FREE SERVICES
-/* -------------------------------------------------------------------------- */
 
 #if OS_HEAP_SIZE
 
-size_t malloc_usable_size( void *ptr )
+static
+size_t priv_mem_size( void )
 {
 	seg_t *mem;
-	size_t size;
+	seg_t *nxt;
+	size_t size = 0;
 
-	if (ptr == NULL)
-		return 0;
-
-	sys_lock();
+	for (mem = Heap; mem; mem = mem->next)
 	{
-		mem  = (seg_t *)ptr - 1;
-		size = (mem->next - mem - 1) * sizeof(seg_t);
-	}
-	sys_unlock();
+		if (mem->owner == NULL)
+	//	memory segment has already been allocated
+			continue;
 
-	return size;
+		while (nxt = mem->next, nxt->owner != NULL)
+	//	it is possible to merge adjacent free memory segments
+			mem->next = nxt->next;
+
+		size += nxt - mem - 1;
+	}
+
+	return size * sizeof(seg_t);
 }
 
 #endif
 
+/* -------------------------------------------------------------------------- */
+// STANDARD ALLOC/FREE SERVICES
 /* -------------------------------------------------------------------------- */
 
 #if OS_HEAP_SIZE
@@ -195,6 +200,30 @@ void *memalign( size_t alignment, size_t size )
 
 	assert(alignment>0&&alignment==(alignment&~(alignment-1)));
 	assert(size>0&&size<OS_HEAP_SIZE);
+
+	sys_lock();
+	{
+		mem = priv_mem_alloc(alignment, size);
+	}
+	sys_unlock();
+
+	assert(mem);
+
+	return mem;
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+void *aligned_alloc( size_t alignment, size_t size )
+{
+	seg_t *mem;
+
+	assert(alignment>0&&alignment==(alignment&~(alignment-1)));
+	assert(size>0&&size<OS_HEAP_SIZE&&size%alignment==0);
 
 	sys_lock();
 	{
@@ -287,8 +316,6 @@ void *realloc( void *ptr, size_t size )
 		free(ptr);
 	}
 
-	assert(mem);
-
 	return mem;
 }
 
@@ -300,7 +327,7 @@ void *realloc( void *ptr, size_t size )
 
 void free( void *ptr )
 {
-	assert(ptr>(void*)Heap&&ptr<(void*)(Heap+SEG_SIZE(OS_HEAP_SIZE)));
+	assert(ptr==NULL||(ptr>(void*)Heap&&ptr<(void*)(Heap+SEG_SIZE(OS_HEAP_SIZE))));
 
 	sys_lock();
 	{
@@ -315,12 +342,12 @@ void free( void *ptr )
 // SYSTEM ALLOC/FREE SERVICES
 /* -------------------------------------------------------------------------- */
 
-void *sys_alloc( size_t size )
+void *sys_malloc( size_t size )
 {
 	void *mem;
 
 	assert_tsk_context();
-	assert(size);
+	assert(size>0);
 
 	sys_lock();
 	{
@@ -329,6 +356,28 @@ void *sys_alloc( size_t size )
 	sys_unlock();
 
 	mem = malloc(size);
+
+	assert(mem);
+
+	return mem;
+}
+
+/* -------------------------------------------------------------------------- */
+
+void *sys_calloc( size_t num, size_t size )
+{
+	void *mem;
+
+	assert_tsk_context();
+	assert(num*size>0);
+
+	sys_lock();
+	{
+		core_tsk_deleter();
+	}
+	sys_unlock();
+
+	mem = calloc(num, size);
 
 	assert(mem);
 
@@ -375,38 +424,22 @@ void sys_free( void *ptr )
 
 size_t sys_heapSize( void )
 {
-	seg_t *mem;
-	seg_t *nxt;
-	size_t size = 0;
+	size_t size;
 
 	assert_tsk_context(); 
 
 	sys_lock();
 	{
-		//	call garbage collection procedure
 		core_tsk_deleter();
 #if OS_HEAP_SIZE
-		for (mem = Heap; mem; mem = mem->next)
-		{
-			if (mem->owner == NULL)
-		//	memory segment has already been allocated
-				continue;
-
-			while (nxt = mem->next, nxt->owner != NULL)
-		//	it is possible to merge adjacent free memory segments
-				mem->next = nxt->next;
-
-			size += nxt - mem - 1;
-		}
+		size = priv_mem_size();
 #else
-		// to prevent warnings
-		(void) mem;
-		(void) nxt;
+		size = 0;
 #endif
 	}
 	sys_unlock();
 
-	return size * sizeof(seg_t);
+	return size;
 }
 
 /* -------------------------------------------------------------------------- */

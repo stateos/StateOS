@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    27.05.2020
+    @date    05.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -432,7 +432,7 @@ struct ListTT : public __lst
 	static
 	std::unique_ptr<ListTT<C>> Create( void )
 	{
-		auto lst = reinterpret_cast<ListTT<C> *>(sys_alloc(sizeof(ListTT<C>)));
+		auto lst = reinterpret_cast<ListTT<C> *>(sys_malloc(sizeof(ListTT<C>)));
 		if (lst != nullptr)
 		{
 			new (lst) ListTT<C>();

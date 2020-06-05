@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    29.05.2020
+    @date    05.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -77,7 +77,7 @@ msg_t *msg_create( size_t limit )
 	sys_lock();
 	{
 		bufsize = limit;
-		tmp = sys_alloc(sizeof(struct msg_T) + bufsize);
+		tmp = sys_malloc(sizeof(struct msg_T) + bufsize);
 		if (tmp)
 			priv_msg_init(msg = &tmp->msg, tmp->buf, bufsize, tmp);
 	}

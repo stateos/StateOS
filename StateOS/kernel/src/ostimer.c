@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    05.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -69,7 +69,7 @@ tmr_t *tmr_create( fun_t *state )
 
 	sys_lock();
 	{
-		tmr = sys_alloc(sizeof(tmr_t));
+		tmr = sys_malloc(sizeof(tmr_t));
 		if (tmr)
 			priv_tmr_init(tmr, state, tmr);
 	}

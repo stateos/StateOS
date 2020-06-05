@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    05.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -68,7 +68,7 @@ lst_t *lst_create( void )
 
 	sys_lock();
 	{
-		lst = sys_alloc(sizeof(lst_t));
+		lst = sys_malloc(sizeof(lst_t));
 		if (lst)
 			priv_lst_init(lst, lst);
 	}

@@ -62,7 +62,7 @@ struct __seg
 
 /******************************************************************************
  *
- * Name              : sys_alloc
+ * Name              : sys_malloc
  *
  * Description       : system malloc procedure
  *
@@ -76,7 +76,26 @@ struct __seg
  *
  ******************************************************************************/
 
-void *sys_alloc( size_t size );
+void *sys_malloc( size_t size );
+
+/******************************************************************************
+ *
+ * Name              : sys_calloc
+ *
+ * Description       : system calloc procedure
+ *
+ * Parameters
+ *   num             : number of elements to allocate
+ *   size            : size of each element (in bytes)
+ *
+ * Return            : pointer to the beginning of allocated memory segment
+ *   NULL            : memory segment not allocated (not enough free memory)
+ *
+ * Note              : use only in thread mode
+ *
+ ******************************************************************************/
+
+void *sys_calloc( size_t num, size_t size );
 
 /******************************************************************************
  *
@@ -85,7 +104,7 @@ void *sys_alloc( size_t size );
  * Description       : system realloc procedure
  *
  * Parameters
- *   ptr             : pointer to a memory segment previously allocated with sys_alloc
+ *   ptr             : pointer to a memory segment previously allocated with sys_malloc
  *   size            : required size of the memory segment (in bytes)
  *
  * Return            : pointer to the beginning of reallocated memory segment
@@ -104,7 +123,7 @@ void *sys_realloc( void *ptr, size_t size );
  * Description       : system free procedure
  *
  * Parameters
- *   ptr             : pointer to a memory segment previously allocated with sys_alloc, xxx_create or xxx_new functions
+ *   ptr             : pointer to a memory segment previously allocated with sys_malloc, xxx_create or xxx_new functions
  *
  * Return            : none
  *
@@ -123,6 +142,7 @@ void sys_free( void *ptr );
  * Parameters        : none
  *
  * Return            : size of free heap memory
+ *   0               : there is no dedicated heap memory or the heap is full
  *
  * Note              : use only in thread mode
  *

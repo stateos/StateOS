@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    27.05.2020
+    @date    05.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -596,7 +596,7 @@ struct JobQueueT : public __job
 	static
 	std::unique_ptr<JobQueueT<limit_>> Create( void )
 	{
-		auto job = reinterpret_cast<JobQueueT<limit_> *>(sys_alloc(sizeof(JobQueueT<limit_>)));
+		auto job = reinterpret_cast<JobQueueT<limit_> *>(sys_malloc(sizeof(JobQueueT<limit_>)));
 		if (job != nullptr)
 		{
 			new (job) JobQueueT<limit_>();

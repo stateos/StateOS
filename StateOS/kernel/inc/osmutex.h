@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    27.05.2020
+    @date    05.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -534,7 +534,7 @@ struct Mutex : public __mtx
 	static
 	std::unique_ptr<Mutex> Create( const unsigned _mode, const unsigned _prio = 0 )
 	{
-		auto mtx = reinterpret_cast<Mutex *>(sys_alloc(sizeof(Mutex)));
+		auto mtx = reinterpret_cast<Mutex *>(sys_malloc(sizeof(Mutex)));
 		if (mtx != nullptr)
 		{
 			new (mtx) Mutex(_mode, _prio);

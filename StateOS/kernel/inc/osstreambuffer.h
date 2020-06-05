@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    29.05.2020
+    @date    05.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -627,7 +627,7 @@ struct StreamBufferT : public __stm
 	static
 	std::unique_ptr<StreamBufferT<limit_>> Create( void )
 	{
-		auto stm = reinterpret_cast<StreamBufferT<limit_> *>(sys_alloc(sizeof(StreamBufferT<limit_>)));
+		auto stm = reinterpret_cast<StreamBufferT<limit_> *>(sys_malloc(sizeof(StreamBufferT<limit_>)));
 		if (stm != nullptr)
 		{
 			new (stm) StreamBufferT<limit_>();
@@ -718,7 +718,7 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(C)>
 	static
 	std::unique_ptr<StreamBufferTT<limit_, C>> Create( void )
 	{
-		auto stm = reinterpret_cast<StreamBufferTT<limit_, C> *>(sys_alloc(sizeof(StreamBufferT<limit_*sizeof(C)>)));
+		auto stm = reinterpret_cast<StreamBufferTT<limit_, C> *>(sys_malloc(sizeof(StreamBufferT<limit_*sizeof(C)>)));
 		if (stm != nullptr)
 		{
 			new (stm) StreamBufferTT<limit_, C>();

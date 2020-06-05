@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    18.05.2020
+    @date    05.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -67,7 +67,7 @@ mut_t *mut_create( void )
 
 	sys_lock();
 	{
-		mut = sys_alloc(sizeof(mut_t));
+		mut = sys_malloc(sizeof(mut_t));
 		if (mut)
 			priv_mut_init(mut, mut);
 	}
