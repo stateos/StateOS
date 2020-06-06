@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,6 @@
 #define __STATEOS_CND_H
 
 #include "oskernel.h"
-#include "osalloc.h"
 #include "osclock.h"
 #include "osmutex.h"
 
@@ -421,7 +420,7 @@ struct ConditionVariable : public __cnd
 	static
 	std::unique_ptr<ConditionVariable> Create( void )
 	{
-		auto cnd = reinterpret_cast<ConditionVariable *>(sys_malloc(sizeof(ConditionVariable)));
+		auto cnd = reinterpret_cast<ConditionVariable *>(malloc(sizeof(ConditionVariable)));
 		if (cnd != nullptr)
 		{
 			new (cnd) ConditionVariable();

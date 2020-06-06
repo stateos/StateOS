@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,6 @@
 #define __STATEOS_BOX_H
 
 #include "oskernel.h"
-#include "osalloc.h"
 #include "osclock.h"
 
 /******************************************************************************
@@ -611,7 +610,7 @@ struct MailBoxQueueT : public __box
 	static
 	std::unique_ptr<MailBoxQueueT<limit_, size_>> Create( void )
 	{
-		auto box = reinterpret_cast<MailBoxQueueT<limit_, size_> *>(sys_malloc(sizeof(MailBoxQueueT<limit_, size_>)));
+		auto box = reinterpret_cast<MailBoxQueueT<limit_, size_> *>(malloc(sizeof(MailBoxQueueT<limit_, size_>)));
 		if (box != nullptr)
 		{
 			new (box) MailBoxQueueT<limit_, size_>();
@@ -702,7 +701,7 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(C)>
 	static
 	std::unique_ptr<MailBoxQueueTT<limit_, C>> Create( void )
 	{
-		auto box = reinterpret_cast<MailBoxQueueTT<limit_, C> *>(sys_malloc(sizeof(MailBoxQueueTT<limit_, C>)));
+		auto box = reinterpret_cast<MailBoxQueueTT<limit_, C> *>(malloc(sizeof(MailBoxQueueTT<limit_, C>)));
 		if (box != nullptr)
 		{
 			new (box) MailBoxQueueTT<limit_, C>();

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,7 +32,6 @@
 #include "inc/osmailboxqueue.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
-#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 static
@@ -80,7 +79,7 @@ box_t *box_create( unsigned limit, unsigned size )
 	sys_lock();
 	{
 		bufsize = limit * size;
-		tmp = sys_malloc(sizeof(struct box_T) + bufsize);
+		tmp = malloc(sizeof(struct box_T) + bufsize);
 		if (tmp)
 			priv_box_init(box = &tmp->box, size, tmp->buf, bufsize, tmp);
 	}

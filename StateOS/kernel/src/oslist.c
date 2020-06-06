@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,7 +32,6 @@
 #include "inc/oslist.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
-#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 static
@@ -68,7 +67,7 @@ lst_t *lst_create( void )
 
 	sys_lock();
 	{
-		lst = sys_malloc(sizeof(lst_t));
+		lst = malloc(sizeof(lst_t));
 		if (lst)
 			priv_lst_init(lst, lst);
 	}

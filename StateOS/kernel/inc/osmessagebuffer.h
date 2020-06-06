@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,6 @@
 #define __STATEOS_MSG_H
 
 #include "oskernel.h"
-#include "osalloc.h"
 #include "osclock.h"
 
 /******************************************************************************
@@ -652,7 +651,7 @@ struct MessageBufferT : public __msg
 	static
 	std::unique_ptr<MessageBufferT<limit_>> Create( void )
 	{
-		auto msg = reinterpret_cast<MessageBufferT<limit_> *>(sys_malloc(sizeof(MessageBufferT<limit_>)));
+		auto msg = reinterpret_cast<MessageBufferT<limit_> *>(malloc(sizeof(MessageBufferT<limit_>)));
 		if (msg != nullptr)
 		{
 			new (msg) MessageBufferT<limit_>();
@@ -745,7 +744,7 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C
 	static
 	std::unique_ptr<MessageBufferTT<limit_, C>> Create( void )
 	{
-		auto msg = reinterpret_cast<MessageBufferTT<limit_, C> *>(sys_malloc(sizeof(MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>)));
+		auto msg = reinterpret_cast<MessageBufferTT<limit_, C> *>(malloc(sizeof(MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>)));
 		if (msg != nullptr)
 		{
 			new (msg) MessageBufferTT<limit_, C>();

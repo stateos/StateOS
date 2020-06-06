@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,7 +32,6 @@
 #include "inc/ossignal.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
-#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 static
@@ -70,7 +69,7 @@ sig_t *sig_create( unsigned mask )
 
 	sys_lock();
 	{
-		sig = sys_malloc(sizeof(sig_t));
+		sig = malloc(sizeof(sig_t));
 		if (sig)
 			priv_sig_init(sig, mask, sig);
 	}

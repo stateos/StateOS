@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,6 @@
 #define __STATEOS_SIG_H
 
 #include "oskernel.h"
-#include "osalloc.h"
 #include "osclock.h"
 
 /* -------------------------------------------------------------------------- */
@@ -448,7 +447,7 @@ struct Signal : public __sig
 	static
 	std::unique_ptr<Signal> Create( const unsigned _mask = 0 )
 	{
-		auto sig = reinterpret_cast<Signal *>(sys_malloc(sizeof(Signal)));
+		auto sig = reinterpret_cast<Signal *>(malloc(sizeof(Signal)));
 		if (sig != nullptr)
 		{
 			new (sig) Signal(_mask);

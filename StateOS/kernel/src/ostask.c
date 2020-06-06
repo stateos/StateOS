@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,7 +32,6 @@
 #include "inc/ostask.h"
 #include "inc/ossignal.h"
 #include "inc/oscriticalsection.h"
-#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 static
@@ -61,7 +60,7 @@ tsk_t *priv_wrk_create( unsigned prio, fun_t *state, size_t size, bool detached 
 	size_t bufsize;
 
 	bufsize = STK_OVER(size + (OS_GUARD_SIZE));
-	tmp = sys_malloc(sizeof(struct tsk_T) + bufsize);
+	tmp = malloc(sizeof(struct tsk_T) + bufsize);
 	if (tmp)
 		priv_wrk_init(tsk = &tmp->tsk, prio, state, tmp->buf, bufsize, tmp, detached);
 
@@ -316,9 +315,24 @@ void priv_tsk_stop( tsk_t *tsk )
 
 /* -------------------------------------------------------------------------- */
 static
+void priv_tsk_idle( void )
+/* -------------------------------------------------------------------------- */
+{
+	sys_lock();
+	{
+		core_tsk_deleter();              // call garbage collection procedure
+		IDLE.state = core_tsk_idle;      // restore default idle procedure
+	}
+	sys_unlock();
+}
+
+/* -------------------------------------------------------------------------- */
+static
 void priv_tsk_destroy( void )
 /* -------------------------------------------------------------------------- */
 {
+	core_tsk_deleter();                  // call garbage collection procedure
+	IDLE.state = priv_tsk_idle;          // set task deleter as idle procedure
 	core_tsk_waitFor(&IDLE.hdr.obj.queue, INFINITE); // wait for removal
 
 	assert(!"system cannot return here");

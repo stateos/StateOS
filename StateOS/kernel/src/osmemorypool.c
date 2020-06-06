@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.c
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -32,7 +32,6 @@
 #include "inc/osmemorypool.h"
 #include "inc/ostask.h"
 #include "inc/oscriticalsection.h"
-#include "osalloc.h"
 
 /* -------------------------------------------------------------------------- */
 void mem_bind( mem_t *mem )
@@ -106,7 +105,7 @@ mem_t *mem_create( unsigned limit, size_t size )
 	sys_lock();
 	{
 		bufsize = limit * (1 + MEM_SIZE(size)) * sizeof(que_t);
-		tmp = sys_malloc(sizeof(struct mem_T) + bufsize);
+		tmp = malloc(sizeof(struct mem_T) + bufsize);
 		if (tmp)
 			priv_mem_init(mem = &tmp->mem, size, tmp->buf, bufsize, tmp);
 	}

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,6 @@
 #define __STATEOS_TSK_H
 
 #include "oskernel.h"
-#include "osalloc.h"
 #include "osclock.h"
 #include "osmutex.h"
 #include "ostimer.h"
@@ -1602,7 +1601,7 @@ struct TaskT : public baseTask, public baseStack<size_+(OS_GUARD_SIZE)>
 	template<class F> static
 	std::unique_ptr<TaskT<size_>, Deleter> Create( const unsigned _prio, F&& _state )
 	{
-		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_malloc(sizeof(TaskT<size_>)));
+		auto tsk = reinterpret_cast<TaskT<size_> *>(malloc(sizeof(TaskT<size_>)));
 		if (tsk != nullptr)
 		{
 			new (tsk) TaskT<size_>(_prio, _state);
@@ -1649,7 +1648,7 @@ struct TaskT : public baseTask, public baseStack<size_+(OS_GUARD_SIZE)>
 	template<class F> static
 	std::unique_ptr<TaskT<size_>, Deleter> Detached( const unsigned _prio, F&& _state )
 	{
-		auto tsk = reinterpret_cast<TaskT<size_> *>(sys_malloc(sizeof(TaskT<size_>)));
+		auto tsk = reinterpret_cast<TaskT<size_> *>(malloc(sizeof(TaskT<size_>)));
 		if (tsk != nullptr)
 		{
 			new (tsk) TaskT<size_>(_prio, _state);

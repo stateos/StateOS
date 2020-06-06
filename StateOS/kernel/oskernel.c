@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    04.06.2020
+    @date    06.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -36,14 +36,6 @@
 
 /* -------------------------------------------------------------------------- */
 // SYSTEM INTERNAL SERVICES
-/* -------------------------------------------------------------------------- */
-
-static
-void priv_tsk_idle( void )
-{
-	__WFI();
-}
-
 /* -------------------------------------------------------------------------- */
 
 static
@@ -222,7 +214,7 @@ static  union  { stk_t STK[STK_SIZE((OS_IDLE_STACK)+(OS_GUARD_SIZE))];
 #define IDLE_SP  &IDLE_STACK.CTX.ctx
 
 tsk_t MAIN = { .hdr={ .prev=&IDLE, .next=&IDLE, .id=ID_READY }, .stack=MAIN_TOP, .basic=OS_MAIN_PRIO, .prio=OS_MAIN_PRIO }; // main task
-tsk_t IDLE = { .hdr={ .prev=&MAIN, .next=&MAIN, .id=ID_READY }, .state=priv_tsk_idle, .stack=IDLE_STK, .size=sizeof(IDLE_STK), .sp=IDLE_SP }; // idle task and tasks queue
+tsk_t IDLE = { .hdr={ .prev=&MAIN, .next=&MAIN, .id=ID_READY }, .state=core_tsk_idle, .stack=IDLE_STK, .size=sizeof(IDLE_STK), .sp=IDLE_SP }; // idle task and tasks queue
 sys_t System = { .cur=&MAIN };
 
 /* -------------------------------------------------------------------------- */
@@ -686,11 +678,18 @@ void core_sys_tick( void )
 
 /* -------------------------------------------------------------------------- */
 
+void core_tsk_idle( void )
+{
+	__WFI();
+}
+
+/* -------------------------------------------------------------------------- */
+
 void core_res_free( obj_t *obj )
 {
 	if (obj->res != NULL && obj->res != RELEASED)
 	{
-		sys_free(obj->res);
+		free(obj->res);
 		obj->res = RELEASED;
 	}
 }

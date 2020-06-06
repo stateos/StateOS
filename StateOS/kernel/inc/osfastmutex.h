@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,6 @@
 #define __STATEOS_MUT_H
 
 #include "oskernel.h"
-#include "osalloc.h"
 #include "osclock.h"
 
 /******************************************************************************
@@ -405,7 +404,7 @@ struct FastMutex : public __mut
 	FastMutex *Create( void )
 	{
 #if __cplusplus >= 201402
-		auto mut = reinterpret_cast<FastMutex *>(sys_malloc(sizeof(FastMutex)));
+		auto mut = reinterpret_cast<FastMutex *>(malloc(sizeof(FastMutex)));
 		if (mut != nullptr)
 		{
 			new (mut) FastMutex();

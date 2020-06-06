@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,6 @@
 #define __STATEOS_MEM_H
 
 #include "oskernel.h"
-#include "osalloc.h"
 #include "osclock.h"
 #include "oslist.h"
 
@@ -471,7 +470,7 @@ struct MemoryPoolT : public __mem
 	static
 	std::unique_ptr<MemoryPoolT<limit_, size_>> Create( void )
 	{
-		auto mem = reinterpret_cast<MemoryPoolT<limit_, size_> *>(sys_malloc(sizeof(MemoryPoolT<limit_, size_>)));
+		auto mem = reinterpret_cast<MemoryPoolT<limit_, size_> *>(malloc(sizeof(MemoryPoolT<limit_, size_>)));
 		if (mem != nullptr)
 		{
 			new (mem) MemoryPoolT<limit_, size_>();
@@ -548,7 +547,7 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
 	static
 	std::unique_ptr<MemoryPoolTT<limit_, C>> Create( void )
 	{
-		auto mem = reinterpret_cast<MemoryPoolTT<limit_, C> *>(sys_malloc(sizeof(MemoryPoolTT<limit_, C>)));
+		auto mem = reinterpret_cast<MemoryPoolTT<limit_, C> *>(malloc(sizeof(MemoryPoolTT<limit_, C>)));
 		if (mem != nullptr)
 		{
 			new (mem) MemoryPoolTT<limit_, C>();

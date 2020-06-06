@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -64,7 +64,7 @@ struct __seg
  *
  * Name              : sys_malloc
  *
- * Description       : system malloc procedure
+ * Description       : system malloc procedure, deprecated
  *
  * Parameters
  *   size            : required size of the memory segment (in bytes)
@@ -76,51 +76,14 @@ struct __seg
  *
  ******************************************************************************/
 
-void *sys_malloc( size_t size );
-
-/******************************************************************************
- *
- * Name              : sys_calloc
- *
- * Description       : system calloc procedure
- *
- * Parameters
- *   num             : number of elements to allocate
- *   size            : size of each element (in bytes)
- *
- * Return            : pointer to the beginning of allocated memory segment
- *   NULL            : memory segment not allocated (not enough free memory)
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-void *sys_calloc( size_t num, size_t size );
-
-/******************************************************************************
- *
- * Name              : sys_realloc
- *
- * Description       : system realloc procedure
- *
- * Parameters
- *   ptr             : pointer to a memory segment previously allocated with sys_malloc
- *   size            : required size of the memory segment (in bytes)
- *
- * Return            : pointer to the beginning of reallocated memory segment
- *   NULL            : memory segment cannot be reallocated (not enough free memory)
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-void *sys_realloc( void *ptr, size_t size );
+__STATIC_INLINE
+void *sys_malloc( size_t size ) { return malloc(size); }
 
 /******************************************************************************
  *
  * Name              : sys_free
  *
- * Description       : system free procedure
+ * Description       : system free procedure, deprecated
  *
  * Parameters
  *   ptr             : pointer to a memory segment previously allocated with sys_malloc, xxx_create or xxx_new functions
@@ -131,7 +94,8 @@ void *sys_realloc( void *ptr, size_t size );
  *
  ******************************************************************************/
 
-void sys_free( void *ptr );
+__STATIC_INLINE
+void sys_free( void *ptr ) { free(ptr); }
 
 /******************************************************************************
  *
@@ -152,17 +116,21 @@ size_t sys_heapSize( void );
 
 /******************************************************************************
  *
- * Description       : set of standard aligned memory allocation functions
+ * Name              : sys_segSize
+ *
+ * Description       : get memory segment size
+ *
+ * Parameters
+ *   ptr             : pointer to a memory segment previously allocated with sys_malloc, xxx_create or xxx_new functions
+ *
+ * Return            : size of free heap memory
+ *   0               : there is no dedicated heap memory or the heap is full
+ *
+ * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-#if OS_HEAP_SIZE
-
-void *memalign      (             size_t alignment, size_t size );
-void *aligned_alloc (             size_t alignment, size_t size );
-int   posix_memalign( void **ptr, size_t alignment, size_t size );
-
-#endif
+size_t sys_segSize( void *ptr );
 
 /* -------------------------------------------------------------------------- */
 

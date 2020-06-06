@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    05.06.2020
+    @date    06.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -33,7 +33,6 @@
 #define __STATEOS_EVT_H
 
 #include "oskernel.h"
-#include "osalloc.h"
 #include "osclock.h"
 
 /******************************************************************************
@@ -367,7 +366,7 @@ struct Event : public __evt
 	static
 	std::unique_ptr<Event> Create( void )
 	{
-		auto evt = reinterpret_cast<Event *>(sys_malloc(sizeof(Event)));
+		auto evt = reinterpret_cast<Event *>(malloc(sizeof(Event)));
 		if (evt != nullptr)
 		{
 			new (evt) Event();
