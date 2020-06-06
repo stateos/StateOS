@@ -529,25 +529,14 @@ struct Mutex : public __mtx
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<Mutex> Create( const unsigned _mode, const unsigned _prio = 0 )
+	Ptr Create( const unsigned _mode, const unsigned _prio = 0 )
 	{
-		auto mtx = reinterpret_cast<Mutex *>(malloc(sizeof(Mutex)));
+		auto mtx = new Mutex(_mode, _prio);
 		if (mtx != nullptr)
-		{
-			new (mtx) Mutex(_mode, _prio);
 			mtx->__mtx::obj.res = mtx;
-		}
-		return std::unique_ptr<Mutex>(mtx);
+		return Ptr(mtx);
 	}
-#else
-	static
-	Mutex *Create( const unsigned _mode, const unsigned _prio = 0 )
-	{
-		return static_cast<Mutex *>(mtx_create(_mode, _prio));
-	}
-#endif
 
 	void reset    ( void )           {        mtx_reset    (this); }
 	void kill     ( void )           {        mtx_kill     (this); }

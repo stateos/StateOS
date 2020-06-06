@@ -647,25 +647,14 @@ struct MessageBufferT : public __msg
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<MessageBufferT<limit_>> Create( void )
+	Ptr Create( void )
 	{
-		auto msg = reinterpret_cast<MessageBufferT<limit_> *>(malloc(sizeof(MessageBufferT<limit_>)));
+		auto msg = new MessageBufferT<limit_>();
 		if (msg != nullptr)
-		{
-			new (msg) MessageBufferT<limit_>();
 			msg->__msg::obj.res = msg;
-		}
-		return std::unique_ptr<MessageBufferT<limit_>>(msg);
+		return Ptr(msg);
 	}
-#else
-	static
-	MessageBufferT<limit_> *Create( void )
-	{
-		return static_cast<MessageBufferT<limit_> *>(msg_create(limit_));
-	}
-#endif
 
 	void reset    ( void )                                              {        msg_reset    (this); }
 	void kill     ( void )                                              {        msg_kill     (this); }
@@ -740,25 +729,14 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<MessageBufferTT<limit_, C>> Create( void )
+	Ptr Create( void )
 	{
-		auto msg = reinterpret_cast<MessageBufferTT<limit_, C> *>(malloc(sizeof(MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>)));
+		auto msg = new MessageBufferTT<limit_, C>();
 		if (msg != nullptr)
-		{
-			new (msg) MessageBufferTT<limit_, C>();
 			msg->__msg::obj.res = msg;
-		}
-		return std::unique_ptr<MessageBufferTT<limit_, C>>(msg);
+		return Ptr(msg);
 	}
-#else
-	static
-	MessageBufferTT<limit_, C> *Create( void )
-	{
-		return static_cast<MessageBufferTT<limit_, C> *>(msg_create(limit_*(sizeof(unsigned)+sizeof(C))));
-	}
-#endif
 
 	uint take     (       C *_data )                 { return msg_take     (this, _data, sizeof(C)); }
 	uint tryWait  (       C *_data )                 { return msg_tryWait  (this, _data, sizeof(C)); }

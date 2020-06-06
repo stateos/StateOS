@@ -595,25 +595,14 @@ struct EventQueueT : public __evq
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<EventQueueT<limit_>> Create( void )
+	Ptr Create( void )
 	{
-		auto evq = reinterpret_cast<EventQueueT<limit_> *>(malloc(sizeof(EventQueueT<limit_>)));
+		auto evq = new EventQueueT<limit_>();
 		if (evq != nullptr)
-		{
-			new (evq) EventQueueT<limit_>();
 			evq->__evq::obj.res = evq;
-		}
-		return std::unique_ptr<EventQueueT<limit_>>(evq);
+		return Ptr(evq);
 	}
-#else
-	static
-	EventQueueT<limit_> *Create( void )
-	{
-		return static_cast<EventQueueT<limit_> *>(evq_create(limit_));
-	}
-#endif
 
 	void reset    ( void )                            {        evq_reset    (this); }
 	void kill     ( void )                            {        evq_kill     (this); }

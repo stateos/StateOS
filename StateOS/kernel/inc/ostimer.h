@@ -1136,59 +1136,43 @@ struct Timer : public baseTimer
  *
  ******************************************************************************/
 
+	static
+	Ptr Create( void )
+	{
+		auto tmr = new Timer();
+		if (tmr != nullptr)
+			tmr->__tmr::hdr.obj.res = tmr;
+		return Ptr(tmr);
+	}
 #if __cplusplus >= 201402
 	static
-	std::unique_ptr<Timer> Create( void )
+	Ptr Create( std::nullptr_t )
 	{
-		auto tmr = reinterpret_cast<Timer *>(malloc(sizeof(Timer)));
-		if (tmr != nullptr)
-		{
-			new (tmr) Timer();
-			tmr->__tmr::hdr.obj.res = tmr;
-		}
-		return std::unique_ptr<Timer>(tmr);
-	}
-
-	static
-	std::unique_ptr<Timer> Create( std::nullptr_t )
-	{
-		auto tmr = reinterpret_cast<Timer *>(malloc(sizeof(Timer)));
-		if (tmr != nullptr)
-		{
-			new (tmr) Timer();
-			tmr->__tmr::hdr.obj.res = tmr;
-		}
-		return std::unique_ptr<Timer>(tmr);
+		return Create();
 	}
 
 	template<class F> static
-	std::unique_ptr<Timer> Create( F&& _state )
+	Ptr Create( F&& _state )
 	{
-		auto tmr = reinterpret_cast<Timer *>(malloc(sizeof(Timer)));
+		auto tmr = new Timer(_state);
 		if (tmr != nullptr)
-		{
-			new (tmr) Timer(_state);
 			tmr->__tmr::hdr.obj.res = tmr;
-		}
-		return std::unique_ptr<Timer>(tmr);
+		return Ptr(tmr);
 	}
 
 	template<typename F, typename... A> static
-	std::unique_ptr<Timer> Create( F&& _state, A&&... _args )
+	Ptr Create( F&& _state, A&&... _args )
 	{
 		return Create(std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #else
 	static
-	Timer *Create( void )
+	Ptr Create( fun_t * _state )
 	{
-		return static_cast<Timer *>(tmr_create(nullptr));
-	}
-
-	static
-	Timer *Create( fun_t * _state )
-	{
-		return static_cast<Timer *>(tmr_create(_state));
+		auto tmr = new Timer(_state);
+		if (tmr != nullptr)
+			tmr->__tmr::hdr.obj.res = tmr;
+		return Ptr(tmr);
 	}
 #endif
 };

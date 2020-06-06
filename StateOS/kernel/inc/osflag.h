@@ -495,25 +495,14 @@ struct Flag : public __flg
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<Flag> Create( const unsigned _init = 0 )
+	Ptr Create( const unsigned _init = 0 )
 	{
-		auto flg = reinterpret_cast<Flag *>(malloc(sizeof(Flag)));
+		auto flg = new Flag(_init);
 		if (flg != nullptr)
-		{
-			new (flg) Flag(_init);
 			flg->__flg::obj.res = flg;
-		}
-		return std::unique_ptr<Flag>(flg);
+		return Ptr(flg);
 	}
-#else
-	static
-	Flag *Create( const unsigned _init = 0 )
-	{
-		return static_cast<Flag *>(flg_create(_init));
-	}
-#endif
 
 	void reset    ( void )                                        {        flg_reset    (this); }
 	void kill     ( void )                                        {        flg_kill     (this); }

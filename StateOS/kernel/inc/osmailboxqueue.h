@@ -606,25 +606,14 @@ struct MailBoxQueueT : public __box
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<MailBoxQueueT<limit_, size_>> Create( void )
+	Ptr Create( void )
 	{
-		auto box = reinterpret_cast<MailBoxQueueT<limit_, size_> *>(malloc(sizeof(MailBoxQueueT<limit_, size_>)));
+		auto box = new MailBoxQueueT<limit_, size_>();
 		if (box != nullptr)
-		{
-			new (box) MailBoxQueueT<limit_, size_>();
 			box->__box::obj.res = box;
-		}
-		return std::unique_ptr<MailBoxQueueT<limit_, size_>>(box);
+		return Ptr(box);
 	}
-#else
-	static
-	MailBoxQueueT<limit_, size_> *Create( void )
-	{
-		return static_cast<MailBoxQueueT<limit_, size_> *>(box_create(limit_, size_));
-	}
-#endif
 
 	void reset    (       void )                        {        box_reset    (this); }
 	void kill     (       void )                        {        box_kill     (this); }
@@ -697,25 +686,14 @@ struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(C)>
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<MailBoxQueueTT<limit_, C>> Create( void )
+	Ptr Create( void )
 	{
-		auto box = reinterpret_cast<MailBoxQueueTT<limit_, C> *>(malloc(sizeof(MailBoxQueueTT<limit_, C>)));
+		auto box = new MailBoxQueueTT<limit_, C>();
 		if (box != nullptr)
-		{
-			new (box) MailBoxQueueTT<limit_, C>();
 			box->__box::obj.res = box;
-		}
-		return std::unique_ptr<MailBoxQueueTT<limit_, C>>(box);
+		return Ptr(box);
 	}
-#else
-	static
-	MailBoxQueueTT<limit_, C> *Create( void )
-	{
-		return static_cast<MailBoxQueueTT<limit_, C> *>(box_create(limit_, sizeof(C)));
-	}
-#endif
 };
 
 #endif//__cplusplus

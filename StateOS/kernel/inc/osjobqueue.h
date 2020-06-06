@@ -591,25 +591,14 @@ struct JobQueueT : public __job
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<JobQueueT<limit_>> Create( void )
+	Ptr Create( void )
 	{
-		auto job = reinterpret_cast<JobQueueT<limit_> *>(malloc(sizeof(JobQueueT<limit_>)));
+		auto job = new JobQueueT<limit_>();
 		if (job != nullptr)
-		{
-			new (job) JobQueueT<limit_>();
 			job->__job::obj.res = job;
-		}
-		return std::unique_ptr<JobQueueT<limit_>>(job);
+		return Ptr(job);
 	}
-#else
-	static
-	JobQueueT<limit_> *Create( void )
-	{
-		return static_cast<JobQueueT<limit_> *>(job_create(limit_));
-	}
-#endif
 
 	void reset    ( void )                        {        job_reset    (this); }
 	void kill     ( void )                        {        job_kill     (this); }

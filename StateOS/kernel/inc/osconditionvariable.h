@@ -416,25 +416,14 @@ struct ConditionVariable : public __cnd
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<ConditionVariable> Create( void )
+	Ptr Create( void )
 	{
-		auto cnd = reinterpret_cast<ConditionVariable *>(malloc(sizeof(ConditionVariable)));
+		auto cnd = new ConditionVariable();
 		if (cnd != nullptr)
-		{
-			new (cnd) ConditionVariable();
 			cnd->__cnd::obj.res = cnd;
-		}
-		return std::unique_ptr<ConditionVariable>(cnd);
+		return Ptr(cnd);
 	}
-#else
-	static
-	ConditionVariable *Create( void )
-	{
-		return static_cast<ConditionVariable *>(cnd_create());
-	}
-#endif
 
 	void reset    ( void )                        {        cnd_reset    (this); }
 	void kill     ( void )                        {        cnd_kill     (this); }

@@ -538,25 +538,14 @@ struct Semaphore : public __sem
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<Semaphore> Create( const unsigned _init, const unsigned _limit = semDefault )
+	Ptr Create( const unsigned _init, const unsigned _limit = semDefault )
 	{
-		auto sem = reinterpret_cast<Semaphore *>(malloc(sizeof(Semaphore)));
+		auto sem = new Semaphore(_init, _limit);
 		if (sem != nullptr)
-		{
-			new (sem) Semaphore(_init, _limit);
 			sem->__sem::obj.res = sem;
-		}
-		return std::unique_ptr<Semaphore>(sem);
+		return Ptr(sem);
 	}
-#else
-	static
-	Semaphore *Create( const unsigned _init, const unsigned _limit = semDefault )
-	{
-		return static_cast<Semaphore *>(sem_create(_init, _limit));
-	}
-#endif
 
 	void reset    ( void )           {        sem_reset    (this); }
 	void kill     ( void )           {        sem_kill     (this); }

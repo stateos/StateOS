@@ -443,25 +443,14 @@ struct Signal : public __sig
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<Signal> Create( const unsigned _mask = 0 )
+	Ptr Create( const unsigned _mask = 0 )
 	{
-		auto sig = reinterpret_cast<Signal *>(malloc(sizeof(Signal)));
+		auto sig = new Signal(_mask);
 		if (sig != nullptr)
-		{
-			new (sig) Signal(_mask);
 			sig->__sig::obj.res = sig;
-		}
-		return std::unique_ptr<Signal>(sig);
+		return Ptr(sig);
 	}
-#else
-	static
-	Signal *Create( const unsigned _mask = 0 )
-	{
-		return static_cast<Signal *>(sig_create(_mask));
-	}
-#endif
 
 	void reset    ( void )                             {        sig_reset    (this); }
 	void kill     ( void )                             {        sig_kill     (this); }

@@ -348,25 +348,14 @@ struct Barrier : public __bar
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<Barrier> Create( const unsigned _limit )
+	Ptr Create( const unsigned _limit )
 	{
-		auto bar = reinterpret_cast<Barrier *>(malloc(sizeof(Barrier)));
+		auto bar = new Barrier(_limit);
 		if (bar != nullptr)
-		{
-			new (bar) Barrier(_limit);
 			bar->__bar::obj.res = bar;
-		}
-		return std::unique_ptr<Barrier>(bar);
+		return Ptr(bar);
 	}
-#else
-	static
-	Barrier *Create( const unsigned _limit )
-	{
-		return static_cast<Barrier *>(bar_create(_limit));
-	}
-#endif
 
 	void reset    ( void )           {        bar_reset    (this); }
 	void kill     ( void )           {        bar_kill     (this); }

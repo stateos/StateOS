@@ -427,25 +427,14 @@ struct ListTT : public __lst
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<ListTT<C>> Create( void )
+	Ptr Create( void )
 	{
-		auto lst = reinterpret_cast<ListTT<C> *>(malloc(sizeof(ListTT<C>)));
+		auto lst = new ListTT<C>();
 		if (lst != nullptr)
-		{
-			new (lst) ListTT<C>();
 			lst->__lst::obj.res = lst;
-		}
-		return std::unique_ptr<ListTT<C>>(lst);
+		return Ptr(lst);
 	}
-#else
-	static
-	ListTT<C> *Create( void )
-	{
-		return static_cast<ListTT<C> *>(lst_create());
-	}
-#endif
 
 	void reset    ( void )                              {        lst_reset    (this); }
 	void kill     ( void )                              {        lst_kill     (this); }

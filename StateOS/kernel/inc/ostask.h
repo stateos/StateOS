@@ -1599,28 +1599,33 @@ struct TaskT : public baseTask, public baseStack<size_+(OS_GUARD_SIZE)>
 
 #if __cplusplus >= 201402
 	template<class F> static
-	std::unique_ptr<TaskT<size_>, Deleter> Create( const unsigned _prio, F&& _state )
+	Ptr Create( const unsigned _prio, F&& _state )
 	{
-		auto tsk = reinterpret_cast<TaskT<size_> *>(malloc(sizeof(TaskT<size_>)));
+		auto tsk = new TaskT<size_>(_prio, _state);
 		if (tsk != nullptr)
 		{
-			new (tsk) TaskT<size_>(_prio, _state);
 			tsk->__tsk::hdr.obj.res = tsk;
 			tsk->start();
 		}
-		return std::unique_ptr<TaskT<size_>, Deleter>(tsk);
+		return Ptr(tsk);
 	}
 
 	template<typename F, typename... A> static
-	std::unique_ptr<TaskT<size_>, Deleter> Create( const unsigned _prio, F&& _state, A&&... _args )
+	Ptr Create( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		return Create(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #else
 	static
-	TaskT<size_> *Create( const unsigned _prio, fun_t * _state )
+	Ptr Create( const unsigned _prio, fun_t * _state )
 	{
-		return static_cast<TaskT<size_> *>(wrk_create(_prio, _state, size_));
+		auto tsk = new TaskT<size_>(_prio, _state);
+		if (tsk != nullptr)
+		{
+			tsk->__tsk::hdr.obj.res = tsk;
+			tsk->start();
+		}
+		return Ptr(tsk);
 	}
 #endif
 
@@ -1646,29 +1651,35 @@ struct TaskT : public baseTask, public baseStack<size_+(OS_GUARD_SIZE)>
 
 #if __cplusplus >= 201402
 	template<class F> static
-	std::unique_ptr<TaskT<size_>, Deleter> Detached( const unsigned _prio, F&& _state )
+	Ptr Detached( const unsigned _prio, F&& _state )
 	{
-		auto tsk = reinterpret_cast<TaskT<size_> *>(malloc(sizeof(TaskT<size_>)));
+		auto tsk = new TaskT<size_>(_prio, _state);
 		if (tsk != nullptr)
 		{
-			new (tsk) TaskT<size_>(_prio, _state);
 			tsk->__tsk::hdr.obj.res = tsk;
 			tsk->__tsk::owner = tsk;
 			tsk->start();
 		}
-		return std::unique_ptr<TaskT<size_>, Deleter>(tsk);
+		return Ptr(tsk);
 	}
 
 	template<typename F, typename... A> static
-	std::unique_ptr<TaskT<size_>, Deleter> Detached( const unsigned _prio, F&& _state, A&&... _args )
+	Ptr Detached( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		return Detached(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #else
 	static
-	TaskT<size_> *Detached( const unsigned _prio, fun_t * _state )
+	Ptr Detached( const unsigned _prio, fun_t * _state )
 	{
-		return static_cast<TaskT<size_> *>(wrk_detached(_prio, _state, size_));
+		auto tsk = new TaskT<size_>(_prio, _state);
+		if (tsk != nullptr)
+		{
+			tsk->__tsk::hdr.obj.res = tsk;
+			tsk->__tsk::owner = tsk;
+			tsk->start();
+		}
+		return Ptr(tsk);
 	}
 #endif
 };

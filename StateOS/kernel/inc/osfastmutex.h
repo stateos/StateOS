@@ -401,19 +401,12 @@ struct FastMutex : public __mut
  ******************************************************************************/
 
 	static
-	FastMutex *Create( void )
+	Ptr Create( void )
 	{
-#if __cplusplus >= 201402
-		auto mut = reinterpret_cast<FastMutex *>(malloc(sizeof(FastMutex)));
+		auto mut = new FastMutex();
 		if (mut != nullptr)
-		{
-			new (mut) FastMutex();
 			mut->__mut::obj.res = mut;
-		}
-		return mut;
-#else
-		return static_cast<FastMutex *>(mut_create());
-#endif
+		return Ptr(mut);
 	}
 
 	void reset    ( void )           {        mut_reset    (this); }

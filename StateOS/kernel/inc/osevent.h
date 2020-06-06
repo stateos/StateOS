@@ -362,25 +362,14 @@ struct Event : public __evt
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<Event> Create( void )
+	Ptr Create( void )
 	{
-		auto evt = reinterpret_cast<Event *>(malloc(sizeof(Event)));
+		auto evt = new Event();
 		if (evt != nullptr)
-		{
-			new (evt) Event();
 			evt->__evt::obj.res = evt;
-		}
-		return std::unique_ptr<Event>(evt);
+		return Ptr(evt);
 	}
-#else
-	static
-	Event *Create( void )
-	{
-		return static_cast<Event *>(evt_create());
-	}
-#endif
 
 	void reset    ( void )                             {        evt_reset    (this); }
 	void kill     ( void )                             {        evt_kill     (this); }

@@ -622,25 +622,14 @@ struct StreamBufferT : public __stm
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<StreamBufferT<limit_>> Create( void )
+	Ptr Create( void )
 	{
-		auto stm = reinterpret_cast<StreamBufferT<limit_> *>(malloc(sizeof(StreamBufferT<limit_>)));
+		auto stm = new StreamBufferT<limit_>();
 		if (stm != nullptr)
-		{
-			new (stm) StreamBufferT<limit_>();
 			stm->__stm::obj.res = stm;
-		}
-		return std::unique_ptr<StreamBufferT<limit_>>(stm);
+		return Ptr(stm);
 	}
-#else
-	static
-	StreamBufferT<limit_> *Create( void )
-	{
-		return static_cast<StreamBufferT<limit_> *>(stm_create(limit_));
-	}
-#endif
 
 	void reset    ( void )                                              {        stm_reset    (this); }
 	void kill     ( void )                                              {        stm_kill     (this); }
@@ -713,25 +702,14 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(C)>
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<StreamBufferTT<limit_, C>> Create( void )
+	Ptr Create( void )
 	{
-		auto stm = reinterpret_cast<StreamBufferTT<limit_, C> *>(malloc(sizeof(StreamBufferT<limit_*sizeof(C)>)));
+		auto stm = new StreamBufferTT<limit_, C>();
 		if (stm != nullptr)
-		{
-			new (stm) StreamBufferTT<limit_, C>();
 			stm->__stm::obj.res = stm;
-		}
-		return std::unique_ptr<StreamBufferTT<limit_, C>>(stm);
+		return Ptr(stm);
 	}
-#else
-	static
-	StreamBufferTT<limit_, C> *Create( void )
-	{
-		return static_cast<StreamBufferTT<limit_, C> *>(stm_create(limit_*sizeof(C)));
-	}
-#endif
 
 	uint take     (       C *_data )                 { return stm_take     (this, _data, sizeof(C)); }
 	uint tryWait  (       C *_data )                 { return stm_tryWait  (this, _data, sizeof(C)); }

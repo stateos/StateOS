@@ -466,25 +466,14 @@ struct MemoryPoolT : public __mem
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<MemoryPoolT<limit_, size_>> Create( void )
+	Ptr Create( void )
 	{
-		auto mem = reinterpret_cast<MemoryPoolT<limit_, size_> *>(malloc(sizeof(MemoryPoolT<limit_, size_>)));
+		auto mem = new MemoryPoolT<limit_, size_>();
 		if (mem != nullptr)
-		{
-			new (mem) MemoryPoolT<limit_, size_>();
 			mem->__mem::lst.obj.res = mem;
-		}
-		return std::unique_ptr<MemoryPoolT<limit_, size_>>(mem);
+		return Ptr(mem);
 	}
-#else
-	static
-	MemoryPoolT<limit_, size_> *Create( void )
-	{
-		return static_cast<MemoryPoolT<limit_, size_> *>(mem_create(limit_, size_));
-	}
-#endif
 
 	void reset    ( void )                               {        mem_reset    (this); }
 	void kill     ( void )                               {        mem_kill     (this); }
@@ -543,25 +532,14 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	static
-	std::unique_ptr<MemoryPoolTT<limit_, C>> Create( void )
+	Ptr Create( void )
 	{
-		auto mem = reinterpret_cast<MemoryPoolTT<limit_, C> *>(malloc(sizeof(MemoryPoolTT<limit_, C>)));
+		auto mem = new MemoryPoolTT<limit_, C>();
 		if (mem != nullptr)
-		{
-			new (mem) MemoryPoolTT<limit_, C>();
 			mem->__mem::lst.obj.res = mem;
-		}
-		return std::unique_ptr<MemoryPoolTT<limit_, C>>(mem);
+		return Ptr(mem);
 	}
-#else
-	static
-	MemoryPoolTT<limit_, C> *Create( void )
-	{
-		return static_cast<MemoryPoolTT<limit_, C> *>(mem_create(limit_, sizeof(C)));
-	}
-#endif
 
 	uint take     ( C **_data )                 { return mem_take     (this, reinterpret_cast<void **>(_data)); }
 	uint tryWait  ( C **_data )                 { return mem_tryWait  (this, reinterpret_cast<void **>(_data)); }
