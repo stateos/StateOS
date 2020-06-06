@@ -50,6 +50,8 @@ int main()
 {
 	int i;
 
+	srand(0);
+
 	test_init();
 	
 	TEST_AddUnit(test_alloc);
