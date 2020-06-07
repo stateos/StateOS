@@ -47,8 +47,24 @@
 #if OS_HEAP_SIZE
 
 static
-seg_t Heap[SEG_SIZE(OS_HEAP_SIZE)+1] =
-  { { Heap+SEG_SIZE(OS_HEAP_SIZE), Heap } };
+seg_t            Heap[SEG_SIZE(OS_HEAP_SIZE)+1];
+#define HeapEnd (Heap+SEG_SIZE(OS_HEAP_SIZE))
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+static
+void priv_init( void )
+{
+	if (Heap[0].next == NULL)
+	{
+		Heap[0].next  = HeapEnd;
+		Heap[0].owner = Heap;
+	}
+}
 
 #endif
 
@@ -63,6 +79,8 @@ void *priv_alloc( size_t alignment, size_t size )
 	seg_t *nxt;
 
 	size = SEG_SIZE(size + sizeof(seg_t));
+
+	priv_init();
 
 	for (mem = Heap; mem; mem = mem->next)
 	{
@@ -119,6 +137,8 @@ void priv_free( void *ptr )
 	seg_t *mem;
 	seg_t *seg = (seg_t *)ptr - 1;
 
+	priv_init();
+
 	for (mem = Heap; mem; mem = mem->next)
 	{
 		if (mem != seg)
@@ -146,6 +166,8 @@ void *priv_realloc( void *ptr, size_t size )
 
 	len = SEG_SIZE(size + sizeof(seg_t));
 	mem = (seg_t *)ptr - 1;
+
+	priv_init();
 
 	while (nxt = mem->next, nxt->owner != NULL)
 	//	it is possible to attach adjacent free memory segment
@@ -189,6 +211,8 @@ size_t priv_size( void )
 	seg_t *mem;
 	seg_t *nxt;
 	size_t size = 0;
+
+	priv_init();
 
 	for (mem = Heap; mem; mem = mem->next)
 	{
@@ -329,7 +353,7 @@ void *calloc( size_t num, size_t size )
 void free( void *ptr )
 {
 	assert_tsk_context();
-	assert(ptr==NULL||(ptr>(void*)Heap&&ptr<(void*)(Heap+SEG_SIZE(OS_HEAP_SIZE))));
+	assert(ptr==NULL||(ptr>(void*)Heap&&ptr<(void*)HeapEnd));
 
 	sys_lock();
 	{
@@ -349,7 +373,7 @@ void *realloc( void *ptr, size_t size )
 	void * mem;
 
 	assert_tsk_context();
-	assert(ptr==NULL||(ptr>(void*)Heap&&ptr<(void*)(Heap+SEG_SIZE(OS_HEAP_SIZE))));
+	assert(ptr==NULL||(ptr>(void*)Heap&&ptr<(void*)HeapEnd));
 	assert(size<OS_HEAP_SIZE);
 
 	if (ptr == NULL)
