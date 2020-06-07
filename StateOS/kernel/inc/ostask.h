@@ -1538,7 +1538,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	template<typename F, typename... A> static
 	TaskT<size_> Make( const unsigned _prio, F&& _state, A&&... _args )
 	{
-		return { _prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
+		return Make(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #endif
 
@@ -1571,9 +1571,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	template<typename F, typename... A> static
 	TaskT<size_> Start( const unsigned _prio, F&& _state, A&&... _args )
 	{
-		TaskT<size_> tsk { _prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
-		tsk.start();
-		return tsk;
+		return Start(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #endif
 
@@ -1597,7 +1595,6 @@ struct TaskT : public baseTask, public baseStack<size_>
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	template<class F> static
 	Ptr Create( const unsigned _prio, F&& _state )
 	{
@@ -1610,22 +1607,11 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return Ptr(tsk);
 	}
 
+#if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	Ptr Create( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		return Create(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
-	}
-#else
-	static
-	Ptr Create( const unsigned _prio, fun_t * _state )
-	{
-		auto tsk = new TaskT<size_>(_prio, _state);
-		if (tsk != nullptr)
-		{
-			tsk->__tsk::hdr.obj.res = tsk;
-			tsk->start();
-		}
-		return Ptr(tsk);
 	}
 #endif
 
@@ -1649,7 +1635,6 @@ struct TaskT : public baseTask, public baseStack<size_>
  *
  ******************************************************************************/
 
-#if __cplusplus >= 201402
 	template<class F> static
 	Ptr Detached( const unsigned _prio, F&& _state )
 	{
@@ -1663,23 +1648,11 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return Ptr(tsk);
 	}
 
+#if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	Ptr Detached( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		return Detached(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
-	}
-#else
-	static
-	Ptr Detached( const unsigned _prio, fun_t * _state )
-	{
-		auto tsk = new TaskT<size_>(_prio, _state);
-		if (tsk != nullptr)
-		{
-			tsk->__tsk::hdr.obj.res = tsk;
-			tsk->__tsk::owner = tsk;
-			tsk->start();
-		}
-		return Ptr(tsk);
 	}
 #endif
 };
