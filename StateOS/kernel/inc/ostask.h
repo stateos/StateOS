@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    07.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1321,8 +1321,8 @@ size_t tsk_stackSpace( void )
 template<size_t size_>
 struct baseStack
 {
-	static_assert(size_>STK_OVER((OS_GUARD_SIZE)+sizeof(ctx_t)), "incorrect stack size");
-	stk_t stack_[STK_SIZE(size_)];
+	static_assert(size_>sizeof(ctx_t), "incorrect stack size");
+	stk_t stack_[STK_SIZE(size_ + (OS_GUARD_SIZE))];
 };
 
 /******************************************************************************
@@ -1487,15 +1487,15 @@ using This     = baseTask::Current;
  ******************************************************************************/
 
 template<size_t size_>
-struct TaskT : public baseTask, public baseStack<size_+(OS_GUARD_SIZE)>
+struct TaskT : public baseTask, public baseStack<size_>
 {
 	template<class F>
 	TaskT( const unsigned _prio, F&& _state ):
-	baseTask{_prio, _state, baseStack<size_+(OS_GUARD_SIZE)>::stack_, size_+(OS_GUARD_SIZE)} {}
+	baseTask{_prio, _state, baseStack<size_>::stack_, sizeof(baseStack<size_>::stack_)} {}
 #if __cplusplus >= 201402
 	template<typename F, typename... A>
 	TaskT( const unsigned _prio, F&& _state, A&&... _args ):
-	baseTask{_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...), baseStack<size_+(OS_GUARD_SIZE)>::stack_, size_+(OS_GUARD_SIZE)} {}
+	baseTask{_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...), baseStack<size_>::stack_, sizeof(baseStack<size_>::stack_)} {}
 #endif
 
 	TaskT( TaskT<size_>&& ) = default;
