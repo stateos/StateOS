@@ -26,8 +26,8 @@ void master(void const *arg)
 	}
 }
 
-osThreadDef(slave,  osPriorityNormal, 1, 0);
-osThreadDef(master, osPriorityNormal, 1, 0);
+osThreadDef(slave,  osPriorityNormal, 1, 1024);
+osThreadDef(master, osPriorityNormal, 1, 1024);
 
 int main( void )
 {

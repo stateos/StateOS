@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    07.06.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -196,7 +196,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	osThread_t *thread     = NULL;
 	uint32_t    flags      = osThreadJoinable;
 	void       *stack_mem  = NULL;
-	uint32_t    stack_size = 0;
+	uint32_t    stack_size = OS_STACK_SIZE;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED() || (func == NULL))
 		return NULL;
@@ -225,8 +225,8 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	if (thread == NULL && stack_mem == NULL)
 	{
 		stack_size = osThreadStackSize(stack_size);
-		thread = malloc(SEG_OVER(osThreadCbSize) + stack_size);
-		stack_mem = (void *)((size_t)thread + SEG_OVER(osThreadCbSize));
+		thread = malloc(osThreadCbSize + stack_size);
+		stack_mem = thread->stk;
 		if (thread == NULL)
 			return NULL;
 	}
@@ -249,9 +249,8 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	sys_lock();
 	{
 		tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, stack_mem, stack_size);
-		if (attr->cb_mem    == NULL || attr->cb_size    == 0U) thread->tsk.hdr.obj.res = thread;
-		else
-		if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.hdr.obj.res = stack_mem;
+		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U ) thread->tsk.hdr.obj.res = thread;
+		else if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.hdr.obj.res = stack_mem;
 		thread->tsk.owner = ((flags & osThreadJoinable) == osThreadJoinable) ? NULL : &thread->tsk;
 		flg_init(&thread->flg, 0);
 		thread->flags = flags;
@@ -616,7 +615,7 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 	sys_lock();
 	{
 		tmr_init(&timer->tmr, timer_handler);
-		if (attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.hdr.obj.res = timer;
+		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.hdr.obj.res = timer;
 		timer->flags = flags;
 		timer->name = (attr == NULL) ? NULL : attr->name;
 		timer->func = func;
@@ -719,7 +718,7 @@ osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 	sys_lock();
 	{
 		flg_init(&ef->flg, 0);
-		if (attr->cb_mem == NULL || attr->cb_size == 0U) ef->flg.obj.res = ef;
+		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U) ef->flg.obj.res = ef;
 		ef->flags = flags;
 		ef->name = (attr == NULL) ? NULL : attr->name;
 	}
@@ -844,7 +843,7 @@ osMutexId_t osMutexNew (const osMutexAttr_t *attr)
 	sys_lock();
 	{
 		mtx_init(&mutex->mtx, mutex_mode(flags), 0);
-		if (attr->cb_mem == NULL || attr->cb_size == 0U) mutex->mtx.obj.res = mutex;
+		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U) mutex->mtx.obj.res = mutex;
 		mutex->flags = flags;
 		mutex->name = (attr == NULL) ? NULL : attr->name;
 	}
@@ -950,7 +949,7 @@ osSemaphoreId_t osSemaphoreNew (uint32_t max_count, uint32_t initial_count, cons
 	sys_lock();
 	{
 		sem_init(&semaphore->sem, initial_count, max_count);
-		if (attr->cb_mem == NULL || attr->cb_size == 0U) semaphore->sem.obj.res = semaphore;
+		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U) semaphore->sem.obj.res = semaphore;
 		semaphore->flags = flags;
 		semaphore->name = (attr == NULL) ? NULL : attr->name;
 	}
@@ -1055,8 +1054,8 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 
 	if (mp == NULL && data == NULL)
 	{
-		mp = malloc(SEG_OVER(osMemoryPoolCbSize) + size);
-		data = (void *)((size_t)mp + SEG_OVER(osMemoryPoolCbSize));
+		mp = malloc(osMemoryPoolCbSize + size);
+		data = mp->buf;
 		if (mp == NULL)
 			return NULL;
 	}
@@ -1078,9 +1077,8 @@ osMemoryPoolId_t osMemoryPoolNew (uint32_t block_count, uint32_t block_size, con
 	sys_lock();
 	{
 		mem_init(&mp->mem, block_size, data, size);
-		if (attr->cb_mem == NULL || attr->cb_size == 0U) mp->mem.lst.obj.res = mp;
-		else
-		if (attr->mp_mem == NULL || attr->mp_size == 0U) mp->mem.lst.obj.res = data;
+		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U) mp->mem.lst.obj.res = mp;
+		else if (attr->mp_mem == NULL || attr->mp_size == 0U) mp->mem.lst.obj.res = data;
 		mp->flags = flags;
 		mp->name = (attr == NULL) ? NULL : attr->name;
 	}
@@ -1229,8 +1227,8 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 
 	if (mq == NULL && data == NULL)
 	{
-		mq = malloc(SEG_OVER(osMessageQueueCbSize) + size);
-		data = (void *)((size_t)mq + SEG_OVER(osMessageQueueCbSize));
+		mq = malloc(osMessageQueueCbSize + size);
+		data = mq->buf;
 		if (mq == NULL)
 			return NULL;
 	}
@@ -1252,9 +1250,8 @@ osMessageQueueId_t osMessageQueueNew (uint32_t msg_count, uint32_t msg_size, con
 	sys_lock();
 	{
 		box_init(&mq->box, msg_count, data, msg_size);
-		if (attr->cb_mem == NULL || attr->cb_size == 0U) mq->box.obj.res = mq;
-		else
-		if (attr->mq_mem == NULL || attr->mq_size == 0U) mq->box.obj.res = data;
+		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U) mq->box.obj.res = mq;
+		else if (attr->mq_mem == NULL || attr->mq_size == 0U) mq->box.obj.res = data;
 		mq->flags = flags;
 		mq->name = (attr == NULL) ? NULL : attr->name;
 	}

@@ -2,7 +2,7 @@
 
     @file    StateOS: oscmsis.h
     @author  Rajmund Szymanski
-    @date    25.05.2020
+    @date    07.06.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -61,12 +61,13 @@ struct __Thread
 	const char   * name;  // task name
 	osThreadFunc_t func;  // task function
 	void         * arg;   // task function argument
+	stk_t          stk[]; // task stack
 };
 
 typedef struct __Thread osThread_t;
 
 #define osThreadCbSize sizeof(osThread_t)
-#define osThreadStackSize(size) (((((size)?(size):(OS_STACK_SIZE))+7)/8)*8)
+#define osThreadStackSize(size) STK_OVER(size)
 
 /*---------------------------------------------------------------------------*/
 
@@ -129,12 +130,13 @@ struct __MemoryPool
 	mem_t        mem;   // StateOS memory pool object
 	uint32_t     flags; // attribute bits
 	const char * name;  // memory pool name
+	que_t        buf[]; // memory pool buffer
 };
 
 typedef struct __MemoryPool osMemoryPool_t;
 
 #define osMemoryPoolCbSize sizeof(osMemoryPool_t)
-#define osMemoryPoolMemSize(count, size) ((((((size)+3)/4)+1)*4)*count)
+#define osMemoryPoolMemSize(count, size) (count*(1+MEM_SIZE(size))*sizeof(que_t))
 
 /*---------------------------------------------------------------------------*/
 
@@ -143,12 +145,13 @@ struct __MessageQueue
 	box_t        box;   // StateOS mailbox object
 	uint32_t     flags; // attribute bits
 	const char * name;  // mailbox name
+	char         buf[]; // mailbox buffer
 };
 
 typedef struct __MessageQueue osMessageQueue_t;
 
 #define osMessageQueueCbSize sizeof(osMessageQueue_t)
-#define osMessageQueueMemSize(count, size) (((((size)+3)/4)*4)*count)
+#define osMessageQueueMemSize(count, size) (count*size)
 
 /* -------------------------------------------------------------------------- */
 

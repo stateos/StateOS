@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    07.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -38,14 +38,6 @@
 extern "C" {
 #endif
 
-/* -------------------------------------------------------------------------- */
-
-#define SEG_SIZE( size ) \
-    ALIGNED_SIZE( size, sizeof( seg_t ))
-
-#define SEG_OVER( size ) \
-         ALIGNED( size, sizeof( seg_t ))
-
 /******************************************************************************
  *
  * Name              : memory segment header
@@ -58,11 +50,12 @@ struct __seg
 {
 	seg_t  * next;  // next memory block
 	seg_t  * owner; // owner of memory block (used as free / occupied flag)
+	stk_t  : 0;     // alignment
 };
 
 /******************************************************************************
  *
- * Name              : sys_malloc
+ * Alias             : sys_malloc
  *
  * Description       : system malloc procedure, deprecated
  *
@@ -81,7 +74,7 @@ void *sys_malloc( size_t size ) { return malloc(size); }
 
 /******************************************************************************
  *
- * Name              : sys_free
+ * Alias             : sys_free
  *
  * Description       : system free procedure, deprecated
  *

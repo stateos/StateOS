@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    07.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -32,8 +32,13 @@
 #include "osalloc.h"
 #include "inc/oscriticalsection.h"
 
+/* -------------------------------------------------------------------------- */
+
+#define  SEG_SIZE( size ) \
+     ALIGNED_SIZE( size, sizeof( seg_t ))
+
 #define SEG_ALIGN( base, alignment ) \
- (seg_t *)ALIGNED((uintptr_t)(base), alignment )
+ (seg_t *)ALIGNED((uintptr_t)( base ), alignment )
 
 /* -------------------------------------------------------------------------- */
 // INTERNAL ALLOC/FREE SERVICES
@@ -52,7 +57,7 @@ seg_t Heap[SEG_SIZE(OS_HEAP_SIZE)+1] =
 #if OS_HEAP_SIZE
 
 static
-void *priv_mem_alloc( size_t alignment, size_t size )
+void *priv_alloc( size_t alignment, size_t size )
 {
 	seg_t *mem;
 	seg_t *nxt;
@@ -109,7 +114,7 @@ void *priv_mem_alloc( size_t alignment, size_t size )
 #if OS_HEAP_SIZE
 
 static
-void priv_mem_free( void *ptr )
+void priv_free( void *ptr )
 {
 	seg_t *mem;
 	seg_t *seg = (seg_t *)ptr - 1;
@@ -133,7 +138,7 @@ void priv_mem_free( void *ptr )
 #if OS_HEAP_SIZE
 
 static
-void *priv_mem_resize( void *ptr, size_t size )
+void *priv_realloc( void *ptr, size_t size )
 {
 	seg_t *mem;
 	seg_t *nxt;
@@ -160,13 +165,13 @@ void *priv_mem_resize( void *ptr, size_t size )
 	//	memory segment has been successfully resized
 		return ptr;
 
-	mem = priv_mem_alloc(1, size);
+	mem = priv_alloc(1, size);
 
 	if (mem != NULL)
 	{
 	//	new memory segment has been successfully allocated
 		memcpy(mem, ptr, len);
-		priv_mem_free(ptr);
+		priv_free(ptr);
 	}
 
 	return mem;
@@ -179,7 +184,7 @@ void *priv_mem_resize( void *ptr, size_t size )
 #if OS_HEAP_SIZE
 
 static
-size_t priv_mem_size( void )
+size_t priv_size( void )
 {
 	seg_t *mem;
 	seg_t *nxt;
@@ -218,7 +223,7 @@ void *memalign( size_t alignment, size_t size )
 
 	sys_lock();
 	{
-		mem = priv_mem_alloc(alignment, size);
+		mem = priv_alloc(alignment, size);
 	}
 	sys_unlock();
 
@@ -242,7 +247,7 @@ void *aligned_alloc( size_t alignment, size_t size )
 
 	sys_lock();
 	{
-		mem = priv_mem_alloc(alignment, size);
+		mem = priv_alloc(alignment, size);
 	}
 	sys_unlock();
 
@@ -264,7 +269,7 @@ int posix_memalign( void **ptr, size_t alignment, size_t size )
 
 	sys_lock();
 	{
-		*ptr = priv_mem_alloc(alignment, size);
+		*ptr = priv_alloc(alignment, size);
 	}
 	sys_unlock();
 
@@ -288,7 +293,7 @@ void *malloc( size_t size )
 
 	sys_lock();
 	{
-		mem = priv_mem_alloc(1, size);
+		mem = priv_alloc(1, size);
 	}
 	sys_unlock();
 
@@ -328,7 +333,7 @@ void free( void *ptr )
 
 	sys_lock();
 	{
-		priv_mem_free(ptr);
+		priv_free(ptr);
 	}
 	sys_unlock();
 }
@@ -360,7 +365,7 @@ void *realloc( void *ptr, size_t size )
 
 	sys_lock();
 	{
-		mem = priv_mem_resize(ptr, size);
+		mem = priv_realloc(ptr, size);
 	}
 	sys_unlock();
 
@@ -385,7 +390,7 @@ size_t sys_heapSize( void )
 	{
 		core_tsk_deleter();
 #if OS_HEAP_SIZE
-		size = priv_mem_size();
+		size = priv_size();
 #else
 		size = 0;
 #endif
@@ -409,6 +414,7 @@ size_t sys_segSize( void *ptr )
 		seg_t *seg = (seg_t *)ptr - 1;
 		size = ((seg->next - seg) - 1) * sizeof(seg_t);
 #else
+		(void) ptr;
 		size = 0;
 #endif
 	}
