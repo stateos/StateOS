@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    07.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -890,13 +890,13 @@ struct Timer : public baseTimer
 	static
 	Timer Make( std::nullptr_t )
 	{
-		return {};
+		return Make();
 	}
 
 	template<typename F, typename... A> static
 	Timer Make( F&& _state, A&&... _args )
 	{
-		return { std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
+		return Make(std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #endif
 
@@ -944,17 +944,13 @@ struct Timer : public baseTimer
 	template<typename T> static
 	Timer Start( const T _delay, const T _period, std::nullptr_t )
 	{
-		Timer tmr {};
-		tmr.start(Clock::count(_delay), Clock::count(_period));
-		return tmr;
+		return Start(_delay, _period);
 	}
 
 	template<typename T, typename F, typename... A> static
 	Timer Start( const T _delay, const T _period, F&& _state, A&&... _args )
 	{
-		Timer tmr { std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
-		tmr.start(Clock::count(_delay), Clock::count(_period));
-		return tmr;
+		return Start(_delay, _period, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #endif
 
@@ -998,17 +994,13 @@ struct Timer : public baseTimer
 	template<typename T> static
 	Timer StartFor( const T _delay, std::nullptr_t )
 	{
-		Timer tmr {};
-		tmr.startFor(Clock::count(_delay));
-		return tmr;
+		return StartFor(_delay);
 	}
 
 	template<typename T, typename F, typename... A> static
 	Timer StartFor( const T _delay, F&& _state, A&&... _args )
 	{
-		Timer tmr { std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
-		tmr.startFor(Clock::count(_delay));
-		return tmr;
+		return StartFor(_delay, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #endif
 
@@ -1053,17 +1045,13 @@ struct Timer : public baseTimer
 	template<typename T> static
 	Timer StartPeriodic( const T _period, std::nullptr_t )
 	{
-		Timer tmr {};
-		tmr.startPeriodic(Clock::count(_period));
-		return tmr;
+		return StartPeriodic(_period);
 	}
 
 	template<typename T, typename F, typename... A> static
 	Timer StartPeriodic( const T _period, F&& _state, A&&... _args )
 	{
-		Timer tmr { std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
-		tmr.startPeriodic(Clock::count(_period));
-		return tmr;
+		return StartPeriodic(_period, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #endif
 
@@ -1105,17 +1093,13 @@ struct Timer : public baseTimer
 	template<typename T> static
 	Timer StartUntil( const T _time, std::nullptr_t )
 	{
-		Timer tmr {};
-		tmr.startUntil(Clock::until(_time));
-		return tmr;
+		return StartUntil(_time);
 	}
 
 	template<typename T, typename F, typename... A> static
 	Timer StartUntil( const T _time, F&& _state, A&&... _args )
 	{
-		Timer tmr { std::bind(std::forward<F>(_state), std::forward<A>(_args)...) };
-		tmr.startUntil(Clock::until(_time));
-		return tmr;
+		return StartUntil(_time, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 #endif
 
@@ -1144,12 +1128,6 @@ struct Timer : public baseTimer
 			tmr->__tmr::hdr.obj.res = tmr;
 		return Ptr(tmr);
 	}
-#if __cplusplus >= 201402
-	static
-	Ptr Create( std::nullptr_t )
-	{
-		return Create();
-	}
 
 	template<class F> static
 	Ptr Create( F&& _state )
@@ -1160,19 +1138,17 @@ struct Timer : public baseTimer
 		return Ptr(tmr);
 	}
 
+#if __cplusplus >= 201402
+	static
+	Ptr Create( std::nullptr_t )
+	{
+		return Create();
+	}
+
 	template<typename F, typename... A> static
 	Ptr Create( F&& _state, A&&... _args )
 	{
 		return Create(std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
-	}
-#else
-	static
-	Ptr Create( fun_t * _state )
-	{
-		auto tmr = new Timer(_state);
-		if (tmr != nullptr)
-			tmr->__tmr::hdr.obj.res = tmr;
-		return Ptr(tmr);
 	}
 #endif
 };
