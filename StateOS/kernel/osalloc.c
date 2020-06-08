@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    07.06.2020
+    @date    08.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -38,7 +38,7 @@
      ALIGNED_SIZE( size, sizeof( seg_t ))
 
 #define SEG_ALIGN( base, alignment ) \
- (seg_t *)ALIGNED((uintptr_t)( base ), alignment )
+(seg_t *)(ALIGNED((uintptr_t)( base ) + sizeof( seg_t ), alignment ) - sizeof(seg_t))
 
 /* -------------------------------------------------------------------------- */
 // INTERNAL ALLOC/FREE SERVICES
