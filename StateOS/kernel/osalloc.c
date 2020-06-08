@@ -102,7 +102,7 @@ void *priv_alloc( size_t alignment, size_t size )
 		{
 	//	memory segment must be aligned
 			nxt->next  = mem->next;
-			nxt->owner = nxt;
+	//		nxt->owner = nxt; // updated below (mem->owner = NULL)
 			mem->next  = nxt;
 			mem = nxt;
 		}
