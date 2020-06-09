@@ -61,6 +61,7 @@ seg_t *priv_init( void )
 {
 	if (Heap[0].next == NULL)
 	{
+	//	system heap must be initialized
 		Heap[0].next  = HeapEnd;
 		Heap[0].owner = Heap;
 	}
@@ -160,36 +161,47 @@ void *priv_realloc( void *ptr, size_t size )
 {
 	seg_t *mem;
 	seg_t *nxt;
-	size_t len;
+	seg_t *seg = (seg_t *)ptr - 1;
+	size_t len = SEG_SIZE(size + sizeof(seg_t));
 
-	len = SEG_SIZE(size + sizeof(seg_t));
-	mem = (seg_t *)ptr - 1;
+	for (mem = priv_init(); mem != NULL; mem = mem->next)
+	{
+		if (mem != seg)
+	//	this is not the memory segment we are looking for
+			continue;
 
-	while (nxt = mem->next, nxt->owner != NULL)
+		if (mem->owner != NULL)
+	//	memory segment is not allocated
+			return NULL;
+
+		while (nxt = mem->next, nxt->owner != NULL)
 	//	it is possible to attach adjacent free memory segment
-		mem->next = nxt->next;
+			mem->next = nxt->next;
 
-	if (mem + len < mem->next)
-	{
+		if (mem + len < mem->next)
+		{
 	//	it is possible to reduce the size of the memory segment
-		nxt = mem + len;
-		nxt->next  = mem->next;
-		nxt->owner = nxt;
-		mem->next  = nxt;
-	}
+			nxt = mem + len;
+			nxt->next  = mem->next;
+			nxt->owner = nxt;
+			mem->next  = nxt;
+		}
 
-	len = ((mem->next - mem) - 1) * sizeof(seg_t);
-	if (len >= size)
+		len = ((mem->next - mem) - 1) * sizeof(seg_t);
+		if (len >= size)
 	//	memory segment has been successfully resized
-		return ptr;
+			return ptr;
 
-	mem = priv_alloc(sizeof(stk_t), size);
+		mem = priv_alloc(sizeof(stk_t), size);
 
-	if (mem != NULL)
-	{
+		if (mem != NULL)
+		{
 	//	new memory segment has been successfully allocated
-		memcpy(mem, ptr, len);
-		priv_free(ptr);
+			memcpy(mem, ptr, len);
+			priv_free(ptr);
+		}
+
+		break;
 	}
 
 	return mem;
