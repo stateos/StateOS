@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    09.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -203,12 +203,12 @@ void core_tmr_handler( void )
 /* -------------------------------------------------------------------------- */
 
 #ifndef MAIN_TOP
-static  stk_t     MAIN_STK[STK_SIZE((OS_STACK_SIZE)+(OS_GUARD_SIZE))];
-#define MAIN_TOP (MAIN_STK+STK_SIZE((OS_STACK_SIZE)+(OS_GUARD_SIZE)))
+static  stk_t     MAIN_STK[STK_SIZE(OS_STACK_SIZE)];
+#define MAIN_TOP (MAIN_STK+STK_SIZE(OS_STACK_SIZE))
 #endif
 
-static  union  { stk_t STK[STK_SIZE((OS_IDLE_STACK)+(OS_GUARD_SIZE))];
-        struct { char  stk[STK_OVER((OS_IDLE_STACK)+(OS_GUARD_SIZE))-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
+static  union  { stk_t STK[STK_SIZE(OS_IDLE_STACK)];
+        struct { char  stk[STK_OVER(OS_IDLE_STACK)-sizeof(ctx_t)]; ctx_t ctx; } CTX; }
         IDLE_STACK = { .CTX = { .ctx = _CTX_INIT(core_tsk_loop) } };
 #define IDLE_STK  IDLE_STACK.STK
 #define IDLE_SP  &IDLE_STACK.CTX.ctx
@@ -265,7 +265,7 @@ void core_tsk_remove( tsk_t *tsk )
 
 void core_ctx_init( tsk_t *tsk )
 {
-	assert(tsk->size>STK_OVER((OS_GUARD_SIZE)+sizeof(ctx_t)));
+	assert(tsk->size>STK_OVER(sizeof(ctx_t)));
 #ifdef DEBUG
 	if (tsk != System.cur)
 		memset(tsk->stack, 0xFF, tsk->size);
@@ -292,21 +292,21 @@ bool priv_stk_integrity( tsk_t *tsk, void *tp, void *sp)
 	if (sp < tp) return false;
 #if (__MPU_USED == 0) && ((OS_GUARD_SIZE) > 0)
 	if (tsk == &IDLE) return true;
-	if (core_stk_space(tsk) < STK_OVER(OS_GUARD_SIZE)) return false;
+	if (core_stk_space(tsk) < STK_OVER(0)) return false;
 #endif
 	return true;
 }
 
 bool core_ctx_integrity( tsk_t *tsk, void *sp )
 {
-	void *tp = tsk->stack + STK_SIZE(OS_GUARD_SIZE);
+	void *tp = tsk->stack + STK_SIZE(0);
 	return priv_stk_integrity(tsk, tp, sp);
 }
 
 bool core_stk_integrity( void )
 {
 	tsk_t *tsk = System.cur;
-	void *tp = tsk->stack + STK_SIZE((OS_GUARD_SIZE) + sizeof(ctx_t));
+	void *tp = tsk->stack + STK_SIZE(sizeof(ctx_t));
 	void *sp = port_get_sp();
 	return priv_stk_integrity(tsk, tp, sp);
 }

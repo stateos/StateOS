@@ -2,7 +2,7 @@
 
     @file    StateOS: oscmsis.h
     @author  Rajmund Szymanski
-    @date    08.06.2020
+    @date    09.06.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -67,7 +67,7 @@ struct __Thread
 typedef struct __Thread osThread_t;
 
 #define osThreadCbSize sizeof(osThread_t)
-#define osThreadStackSize(size) STK_OVER(((size)?(size):(OS_STACK_SIZE))+(OS_GUARD_SIZE))
+#define osThreadStackSize(size) STK_OVER((size)?(size):(OS_STACK_SIZE))
 
 /*---------------------------------------------------------------------------*/
 
