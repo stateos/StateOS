@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    03.06.2020
+    @date    09.06.2020
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -46,20 +46,20 @@
 
 /* -------------------------------------------------------------------------- */
 
-#ifndef OS_GUARD_SIZE
-#define OS_GUARD_SIZE     0
-#endif
-
-#ifndef __MPU_USED
-#define __MPU_USED        0
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /* -------------------------------------------------------------------------- *
  *                              FOR INTERNAL USE                              *
  * -------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
-extern "C" {
+#ifndef OS_GUARD_SIZE
+#define OS_GUARD_SIZE     0
+#endif
+
+#ifndef __MPU_USED
+#define __MPU_USED        0
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -83,7 +83,7 @@ typedef uint64_t     cnt_t;
 #error  Invalid OS_TIMER_SIZE value!
 #endif
 
-#define CNT_LIMIT         ((CNT_MAX)<<((OS_TIMER_SIZE)/4*3))
+#define CNT_LIMIT       ((CNT_MAX)-((CNT_MAX)>>((OS_TIMER_SIZE)/4)))
 
 /* -------------------------------------------------------------------------- */
 
