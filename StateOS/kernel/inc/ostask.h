@@ -246,6 +246,21 @@ extern "C" {
 
 /******************************************************************************
  *
+ * Name              : OS_STK
+ *
+ * Description       : define task stack
+ *
+ * Parameters
+ *   stk             : name of the stack
+ *   size            : (optional) size of task stack (in bytes); default: OS_STACK_SIZE
+ *
+ ******************************************************************************/
+
+#define             OS_STK( stk, ... ) \
+                       stk_t stk[ STK_SIZE( _VA_STK(__VA_ARGS__) ) ] __STKALIGN
+
+/******************************************************************************
+ *
  * Name              : OS_WRK
  *
  * Description       : define and initialize complete work area for task object
@@ -362,6 +377,21 @@ extern "C" {
 #define             OS_TSK_START( tsk, prio, ... ) \
                     OS_WRK_START( tsk, prio, _VA_STK(__VA_ARGS__) )
 #endif
+
+/******************************************************************************
+ *
+ * Name              : static_STK
+ *
+ * Description       : define task static stack
+ *
+ * Parameters
+ *   stk             : name of the stack
+ *   size            : (optional) size of task stack (in bytes); default: OS_STACK_SIZE
+ *
+ ******************************************************************************/
+
+#define         static_STK( stk, ... ) \
+                static stk_t stk[ STK_SIZE( _VA_STK(__VA_ARGS__) ) ] __STKALIGN
 
 /******************************************************************************
  *

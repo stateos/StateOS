@@ -1,0 +1,28 @@
+#include <stm32f4_discovery.h>
+#include <os.h>
+
+sem_t sem;
+tsk_t sla; stk_t sla_stk[STK_SIZE(256)];
+tsk_t mas; stk_t mas_stk[STK_SIZE(512)];
+
+void slave()
+{
+	sem_wait(&sem);
+	LED_Tick();
+}
+
+void master()
+{
+	tsk_delay(SEC);
+	sem_give(&sem);
+}
+
+int main()
+{
+	LED_Init();
+
+	sem_init(&sem, 0, semBinary);
+	tsk_init(&sla, 0, slave,  sla_stk, sizeof(sla_stk));
+	tsk_init(&mas, 0, master, mas_stk, sizeof(mas_stk));
+	tsk_stop();
+}

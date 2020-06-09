@@ -1,11 +1,9 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-#define STKSIZE 32
-
 sem_t sem;
-tsk_t sla; stk_t sla_stk[STKSIZE];
-tsk_t mas; stk_t mas_stk[STKSIZE];
+tsk_t sla; OS_STK(sla_stk);
+tsk_t mas; OS_STK(mas_stk, 512);
 
 void slave()
 {
