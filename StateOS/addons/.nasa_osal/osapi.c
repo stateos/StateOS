@@ -24,7 +24,7 @@
 
     @file    StateOS: osapi.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    09.06.2020
     @brief   NASA OSAPI implementation for StateOS.
 
  ******************************************************************************
@@ -1010,7 +1010,7 @@ int32 OS_TaskCreate(uint32 *task_id, const char *task_name, osal_task_entry func
 					if (!stack)
 					{
 						if (!stack_size) stack_size = OS_STACK_SIZE;
-						stack = malloc(stack_size);
+						stack = malloc(STK_OVER(stack_size));
 					}
 					if (!stack)
 						status = OS_ERROR;
