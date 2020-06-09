@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    09.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -112,10 +112,10 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define             OS_BOX( box, limit, size )                                   \
-                       struct { box_t box; char buf[limit * size]; } box##__wrk = \
-                       { _BOX_INIT( limit, size, box##__wrk.buf ), { 0 } };        \
-                       box_id box = & box##__wrk.box
+#define             OS_BOX( box, limit, size )                                \
+                       char box##__buf[limit * size];                          \
+                       box_t box##__box = _BOX_INIT( limit, size, box##__buf ); \
+                       box_id box = & box##__box
 
 /******************************************************************************
  *
@@ -130,10 +130,10 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define         static_BOX( box, limit, size )                                   \
-                static struct { box_t box; char buf[limit * size]; } box##__wrk = \
-                       { _BOX_INIT( limit, size, box##__wrk.buf ), { 0 } };        \
-                static box_id box = & box##__wrk.box
+#define         static_BOX( box, limit, size )                                \
+                static char box##__buf[limit * size];                          \
+                static box_t box##__box = _BOX_INIT( limit, size, box##__buf ); \
+                static box_id box = & box##__box
 
 /******************************************************************************
  *

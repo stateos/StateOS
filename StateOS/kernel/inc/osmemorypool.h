@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    09.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -114,10 +114,10 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define             OS_MEM( mem, limit, size )                                                    \
-                       struct { mem_t mem; que_t buf[limit * (1 + MEM_SIZE(size))]; } mem##__wrk = \
-                       { _MEM_INIT( limit, MEM_SIZE(size), mem##__wrk.buf ), { { NULL } } };        \
-                       mem_id mem = & mem##__wrk.mem
+#define             OS_MEM( mem, limit, size )                                          \
+                       que_t mem##__buf[limit * (1 + MEM_SIZE(size))];                   \
+                       mem_t mem##__mem = _MEM_INIT( limit, MEM_SIZE(size), mem##__buf ); \
+                       mem_id mem = & mem##__mem
 
 /******************************************************************************
  *
@@ -132,10 +132,10 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define         static_MEM( mem, limit, size )                                                    \
-                static struct { mem_t mem; que_t buf[limit * (1 + MEM_SIZE(size))]; } mem##__wrk = \
-                       { _MEM_INIT( limit, MEM_SIZE(size), mem##__wrk.buf ), { { NULL } } };        \
-                static mem_id mem = & mem##__wrk.mem
+#define         static_MEM( mem, limit, size )                                          \
+                static que_t mem##__buf[limit * (1 + MEM_SIZE(size))];                   \
+                static mem_t mem##__mem = _MEM_INIT( limit, MEM_SIZE(size), mem##__buf ); \
+                static mem_id mem = & mem##__mem
 
 /******************************************************************************
  *

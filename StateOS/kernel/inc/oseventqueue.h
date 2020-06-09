@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    09.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -108,10 +108,10 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define             OS_EVQ( evq, limit )                                      \
-                       struct { evq_t evq; unsigned buf[limit]; } evq##__wrk = \
-                       { _EVQ_INIT( limit, evq##__wrk.buf ), { 0 } };           \
-                       evq_id evq = & evq##__wrk.evq
+#define             OS_EVQ( evq, limit )                                \
+                       unsigned evq##__buf[limit];                       \
+                       evq_t evq##__evq = _EVQ_INIT( limit, evq##__buf ); \
+                       evq_id evq = & evq##__evq
 
 /******************************************************************************
  *
@@ -125,10 +125,10 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define         static_EVQ( evq, limit )                                      \
-                static struct { evq_t evq; unsigned buf[limit]; } evq##__wrk = \
-                       { _EVQ_INIT( limit, evq##__wrk.buf ), { 0 } };           \
-                static evq_id evq = & evq##__wrk.evq
+#define         static_EVQ( evq, limit )                                \
+                static unsigned evq##__buf[limit];                       \
+                static evq_t evq##__evq = _EVQ_INIT( limit, evq##__buf ); \
+                static evq_id evq = & evq##__evq
 
 /******************************************************************************
  *
