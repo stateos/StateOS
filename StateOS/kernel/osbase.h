@@ -62,6 +62,12 @@ extern "C" {
 #define __MPU_USED        0
 #endif
 
+#if     __MPU_USED
+#define __STKALIGN      __ALIGNED(OS_GUARD_SIZE)
+#else
+#define __STKALIGN
+#endif
+
 #ifndef __ALIGNED
 #define __ALIGNED(x)
 #endif

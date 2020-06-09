@@ -260,7 +260,7 @@ extern "C" {
  ******************************************************************************/
 
 #define             OS_WRK( tsk, prio, state, size )                                            \
-                       stk_t tsk##__stk[STK_SIZE( size )];                                       \
+                       stk_t tsk##__stk[STK_SIZE( size )] __STKALIGN;                            \
                        tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk, STK_OVER( size ) ); \
                        tsk_id tsk = & tsk##__tsk
 
@@ -379,7 +379,7 @@ extern "C" {
  ******************************************************************************/
 
 #define         static_WRK( tsk, prio, state, size )                                            \
-                static stk_t tsk##__stk[STK_SIZE( size )];                                       \
+                static stk_t tsk##__stk[STK_SIZE( size )] __STKALIGN;                            \
                 static tsk_t tsk##__tsk = _TSK_INIT( prio, state, tsk##__stk, STK_OVER( size ) ); \
                 static tsk_id tsk = & tsk##__tsk
 
