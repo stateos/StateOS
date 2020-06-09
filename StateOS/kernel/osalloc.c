@@ -183,7 +183,7 @@ void *priv_realloc( void *ptr, size_t size )
 	//	memory segment has been successfully resized
 		return ptr;
 
-	mem = priv_alloc(1, size);
+	mem = priv_alloc(sizeof(stk_t), size);
 
 	if (mem != NULL)
 	{
@@ -311,7 +311,7 @@ void *malloc( size_t size )
 
 	sys_lock();
 	{
-		mem = priv_alloc(1, size);
+		mem = priv_alloc(sizeof(stk_t), size);
 	}
 	sys_unlock();
 
