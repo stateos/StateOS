@@ -56,7 +56,7 @@ seg_t            Heap[SEG_SIZE(OS_HEAP_SIZE)+1] __ALIGNED(sizeof(stk_t));
 
 #if OS_HEAP_SIZE
 
-static inline
+static
 seg_t *priv_init( void )
 {
 	if (Heap[0].next == NULL)
