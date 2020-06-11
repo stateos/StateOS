@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    10.06.2020
+    @date    11.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -297,6 +297,7 @@ void *aligned_alloc( size_t alignment, size_t size )
 int posix_memalign( void **ptr, size_t alignment, size_t size )
 {
 	assert_tsk_context();
+	assert(ptr!=NULL);
 	assert(alignment>=sizeof(void*)&&alignment==(alignment&-alignment));
 	assert(size>0&&size<(OS_HEAP_SIZE));
 
