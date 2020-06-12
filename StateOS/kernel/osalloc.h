@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.h
     @author  Rajmund Szymanski
-    @date    09.06.2020
+    @date    12.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -115,7 +115,7 @@ size_t sys_heapSize( void );
  * Parameters
  *   ptr             : pointer to a memory segment previously allocated with sys_malloc, xxx_create or xxx_new functions
  *
- * Return            : size of free heap memory
+ * Return            : size of allocated memory segment
  *   0               : there is no dedicated heap memory or the heap is full
  *
  * Note              : use only in thread mode
