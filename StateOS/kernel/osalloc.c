@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    11.06.2020
+    @date    12.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -244,80 +244,6 @@ size_t priv_size( void )
 
 #if OS_HEAP_SIZE
 
-void *memalign( size_t alignment, size_t size )
-{
-	seg_t *mem;
-
-	assert_tsk_context();
-	assert(alignment>0&&alignment==(alignment&-alignment));
-	assert(size>0&&size<(OS_HEAP_SIZE));
-
-	sys_lock();
-	{
-		mem = priv_alloc(alignment, size);
-	}
-	sys_unlock();
-
-	assert(mem);
-
-	return mem;
-}
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#if OS_HEAP_SIZE
-
-void *aligned_alloc( size_t alignment, size_t size )
-{
-	seg_t *mem;
-
-	assert_tsk_context();
-	assert(alignment>0&&alignment==(alignment&-alignment));
-	assert(size>0&&size<(OS_HEAP_SIZE)&&(size%alignment)==0);
-
-	sys_lock();
-	{
-		mem = priv_alloc(alignment, size);
-	}
-	sys_unlock();
-
-	assert(mem);
-
-	return mem;
-}
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#if OS_HEAP_SIZE
-
-int posix_memalign( void **ptr, size_t alignment, size_t size )
-{
-	assert_tsk_context();
-	assert(ptr!=NULL);
-	assert(alignment>=sizeof(void*)&&alignment==(alignment&-alignment));
-	assert(size>0&&size<(OS_HEAP_SIZE));
-
-	sys_lock();
-	{
-		*ptr = priv_alloc(alignment, size);
-	}
-	sys_unlock();
-
-	assert(*ptr);
-
-	return *ptr ? 0 /*OK*/ : 12 /*ENOMEM*/;
-}
-
-#endif
-
-/* -------------------------------------------------------------------------- */
-
-#if OS_HEAP_SIZE
-
 void *malloc( size_t size )
 {
 	seg_t *mem;
@@ -410,6 +336,68 @@ void *realloc( void *ptr, size_t size )
 	assert(mem);
 
 	return mem;
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+void *memalign( size_t alignment, size_t size )
+{
+	seg_t *mem;
+
+	assert_tsk_context();
+	assert(alignment>0&&alignment==(alignment&-alignment));
+	assert(size>0&&size<(OS_HEAP_SIZE));
+
+	sys_lock();
+	{
+		mem = priv_alloc(alignment, size);
+	}
+	sys_unlock();
+
+	assert(mem);
+
+	return mem;
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+int posix_memalign( void **ptr, size_t alignment, size_t size )
+{
+	assert(ptr);
+
+	*ptr = memalign(alignment, size);
+
+	return *ptr ? 0 /*OK*/ : 12 /*ENOMEM*/;
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+void *aligned_alloc( size_t alignment, size_t size )
+{
+	return memalign(alignment, size);
+}
+
+#endif
+
+/* -------------------------------------------------------------------------- */
+
+#if OS_HEAP_SIZE
+
+void aligned_free( void *ptr )
+{
+	free(ptr);
 }
 
 #endif
