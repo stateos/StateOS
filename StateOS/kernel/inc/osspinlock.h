@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    09.05.2020
+    @date    14.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -209,10 +209,10 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  *
  * Name              : spn_lock
  *
- * Description       : save interrupts state, disable interrupts then lock the spin lock object
+ * Description       : lock the spin lock object
  *                     (wait indefinitely if the spin lock object can't be locked immediately)
  *                     or do nothing if OS_MULTICORE is not defined
- *                   / enter into critical section
+ *                   / enter into multicore critical section
  *
  * Parameters
  *   spn             : pointer to spin lock object
@@ -224,8 +224,8 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  *
  ******************************************************************************/
 
-#define                spn_lock(spn) \
-                       sys_lock(); core_spn_lock(spn)
+__STATIC_INLINE
+void spn_lock( spn_t *spn ) { core_spn_lock(spn); }
 
 /******************************************************************************
  *
@@ -233,8 +233,7 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  *
  * Description       : unlock the spin lock object
  *                     or do nothing if OS_MULTICORE is not defined
- *                     then restore saved interrupts state
- *                   / exit from critical section
+ *                   / exit from multicore critical section
  *
  * Parameters
  *   spn             : pointer to spin lock object
@@ -246,8 +245,8 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  *
  ******************************************************************************/
 
-#define                spn_unlock(spn) \
-                       core_spn_unlock(spn); sys_unlock()
+__STATIC_INLINE
+void spn_unlock( spn_t *spn ) { core_spn_unlock(spn); }
 
 #ifdef __cplusplus
 }
@@ -268,7 +267,7 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  *
  ******************************************************************************/
 
-struct SpinLock : private CriticalSection
+struct SpinLock
 {
 	 SpinLock( spn_id _spn ): spn_{_spn} { core_spn_lock  (spn_); }
 	~SpinLock( void )                    { core_spn_unlock(spn_); }
