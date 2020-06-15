@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    09.06.2020
+    @date    15.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1427,13 +1427,6 @@ struct baseTask : public __tsk
 	Act_t act;
 #endif
 
-#if __cplusplus >= 201402
-	struct Deleter
-	{
-		void operator()( void* ) const {}
-	};
-#endif
-
 /******************************************************************************
  *
  * Class             : [base]Task::Current
@@ -1540,6 +1533,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	~TaskT( void ) { assert(__tsk::hdr.id == ID_STOPPED); }
 
 #if __cplusplus >= 201402
+	using Deleter = struct { void operator()( void* ) const {} };
 	using Ptr = std::unique_ptr<TaskT<size_>, Deleter>;
 #else
 	using Ptr = TaskT<size_> *;
