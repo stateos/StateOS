@@ -2,7 +2,7 @@
 
     @file    StateOS: osdefs.h
     @author  Rajmund Szymanski
-    @date    30.05.2020
+    @date    14.06.2020
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -34,7 +34,9 @@
 
 /* -------------------------------------------------------------------------- */
 
-#define port_sys_init __iar_init_core
+#ifndef __CONSTRUCTOR
+#define __CONSTRUCTOR       __attribute__((constructor))
+#endif
 
 /* -------------------------------------------------------------------------- */
 
