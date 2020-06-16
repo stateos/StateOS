@@ -444,7 +444,7 @@ size_t sys_heapSize( void )
 {
 	size_t size;
 
-	assert_tsk_context(); 
+	assert_tsk_context();
 
 	sys_lock();
 	{
@@ -466,7 +466,7 @@ size_t sys_segSize( void *ptr )
 {
 	size_t size;
 
-	assert_tsk_context(); 
+	assert_tsk_context();
 
 	sys_lock();
 	{
