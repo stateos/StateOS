@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    12.06.2020
+    @date    16.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -371,9 +371,18 @@ void *memalign( size_t alignment, size_t size )
 
 int posix_memalign( void **ptr, size_t alignment, size_t size )
 {
-	assert(ptr);
+	assert_tsk_context();
+	assert(ptr!=NULL);
+	assert(alignment>0&&alignment==(alignment&-alignment));
+	assert(size>0&&size<(OS_HEAP_SIZE));
 
-	*ptr = memalign(alignment, size);
+	sys_lock();
+	{
+		*ptr = priv_alloc(alignment, size);
+	}
+	sys_unlock();
+
+	assert(*ptr);
 
 	return *ptr ? 0 /*OK*/ : 12 /*ENOMEM*/;
 }
@@ -386,7 +395,21 @@ int posix_memalign( void **ptr, size_t alignment, size_t size )
 
 void *aligned_alloc( size_t alignment, size_t size )
 {
-	return memalign(alignment, size);
+	seg_t *mem;
+
+	assert_tsk_context();
+	assert(alignment>0&&alignment==(alignment&-alignment));
+	assert(size>0&&size<(OS_HEAP_SIZE));
+
+	sys_lock();
+	{
+		mem = priv_alloc(alignment, size);
+	}
+	sys_unlock();
+
+	assert(mem);
+
+	return mem;
 }
 
 #endif
@@ -397,7 +420,18 @@ void *aligned_alloc( size_t alignment, size_t size )
 
 void aligned_free( void *ptr )
 {
-	free(ptr);
+	assert_tsk_context();
+	assert(ptr==NULL||(ptr>(void*)Heap&&ptr<(void*)HeapEnd));
+
+	if (ptr == NULL)
+	// nothing to release
+		return;
+
+	sys_lock();
+	{
+		priv_free(ptr);
+	}
+	sys_unlock();
 }
 
 #endif
