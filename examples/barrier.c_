@@ -3,26 +3,26 @@
 
 OS_BAR(bar, 2);
 
-void slave()
+void consumer()
 {
 	bar_wait(bar);
 	LED_Tick();
 }
 
-void master()
+void producer()
 {
 	tsk_delay(1000*MSEC);
 	bar_wait(bar);
 }
 
-OS_TSK(sla, 0, slave);
-OS_TSK(mas, 0, master);
+OS_TSK(cons, 0, consumer);
+OS_TSK(prod, 0, producer);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(sla);
-	tsk_start(mas);
+	tsk_start(cons);
+	tsk_start(prod);
 	tsk_stop();
 }

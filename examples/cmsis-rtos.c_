@@ -4,7 +4,7 @@
 osSemaphoreId  sem;
 osSemaphoreDef(sem);
 
-void slave(void const *arg)
+void consumer(void const *arg)
 {
 	(void) arg;
 
@@ -15,7 +15,7 @@ void slave(void const *arg)
 	}
 }
 
-void master(void const *arg)
+void producer(void const *arg)
 {
 	(void) arg;
 
@@ -26,16 +26,16 @@ void master(void const *arg)
 	}
 }
 
-osThreadDef(slave,  osPriorityNormal, 1, 1024);
-osThreadDef(master, osPriorityNormal, 1, 1024);
+osThreadDef(consumer, osPriorityNormal, 1, 1024);
+osThreadDef(producer, osPriorityNormal, 1, 1024);
 
 int main( void )
 {
 	LED_Init();
 	osKernelInitialize();
 	sem = osSemaphoreCreate(osSemaphore(sem), 1);
-	osThreadCreate(osThread(slave),  NULL);
-	osThreadCreate(osThread(master), NULL);
+	osThreadCreate(osThread(consumer), NULL);
+	osThreadCreate(osThread(producer), NULL);
 	osKernelStart();
 	osThreadTerminate(osThreadGetId());
 }

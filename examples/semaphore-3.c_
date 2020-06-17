@@ -3,26 +3,26 @@
 
 sem_id sem = SEM_CREATE(0, semBinary);
 
-void slave()
+void consumer()
 {
 	sem_wait(sem);
 	LED_Tick();
 }
 
-void master()
+void producer()
 {
 	tsk_delay(SEC);
 	sem_give(sem);
 }
 
-tsk_id sla = TSK_CREATE(0, slave);
-tsk_id mas = TSK_CREATE(0, master);
+tsk_id cons = TSK_CREATE(0, consumer);
+tsk_id prod = TSK_CREATE(0, producer);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(sla);
-	tsk_start(mas);
+	tsk_start(cons);
+	tsk_start(prod);
 	tsk_stop();
 }

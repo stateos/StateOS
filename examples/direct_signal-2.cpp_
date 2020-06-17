@@ -5,7 +5,7 @@ int main()
 {
 	auto led = Led();
 
-	auto sla = Task::Start(0, [&]
+	auto cons = Task::Start(0, [&]
 	{
 		ThisTask::action([&](unsigned signo)
 		{
@@ -18,14 +18,14 @@ int main()
 		ThisTask::suspend();
 	});
 
-	auto mas = Task::Start(0, [&]
+	auto prod = Task::Start(0, [&]
 	{
 		unsigned x = 0;
 
 		for (;;)
 		{
 			ThisTask::sleepNext(SEC);
-			sla.signal(x);
+			cons.signal(x);
 			x = (x + 1) % 4;
 		}
 	});

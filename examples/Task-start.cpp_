@@ -5,8 +5,8 @@ int main()
 {
 	auto led = Led();
 	auto sem = Semaphore::Binary();
-	auto sla = Task::Make (0, [&]{ sem.wait(); led.tick(); });
-	auto mas = Task::Start(0, [&]{ ThisTask::sleepFor(SEC); sem.give(); });
-	sla.start();
-	sla.join();
+	auto cons = Task::Make (0, [&]{ sem.wait(); led.tick(); });
+	auto prod = Task::Start(0, [&]{ ThisTask::sleepFor(SEC); sem.give(); });
+	cons.start();
+	cons.join();
 }

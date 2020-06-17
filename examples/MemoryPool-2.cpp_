@@ -4,10 +4,10 @@
 Led                            led;
 ListTT<unsigned>::Ptr          lst;
 MemoryPoolTT<1, unsigned>::Ptr mem;
-TaskT<512>::Ptr                sla;
-TaskT<768>::Ptr                mas;
+TaskT<512>::Ptr                cons;
+TaskT<768>::Ptr                prod;
 
-void slave()
+void consumer()
 {
 	unsigned*p;
 
@@ -18,14 +18,14 @@ void slave()
 	This::stop();
 }
 
-void master()
+void producer()
 {
 	unsigned*p;
 	unsigned x = 1;
 
 	for (;;)
 	{
-		sla = TaskT<512>::Detached(0, slave);
+		cons = TaskT<512>::Detached(0, consumer);
 		This::sleepNext(SEC);
 
 		mem->wait(&p);
@@ -39,7 +39,7 @@ int main()
 {
 	lst = ListTT<unsigned>::Create();
 	mem = MemoryPoolTT<1, unsigned>::Create();
-	mas = TaskT<768>::Create(0, master);
+	prod = TaskT<768>::Create(0, producer);
 
 	This::stop();
 }

@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-void slave( Semaphore &sem )
+void consumer( Semaphore &sem )
 {
 	Led led;
 
@@ -12,7 +12,7 @@ void slave( Semaphore &sem )
 	}
 }
 
-void master( Semaphore &sem )
+void producer( Semaphore &sem )
 {
 	for (;;)
 	{
@@ -25,11 +25,11 @@ int main()
 {
 	auto sem = Semaphore::Binary();
 
-	auto sla = Task(0, slave,  std::ref(sem));
-	auto mas = Task(0, master, std::ref(sem));
+	auto cons = Task(0, consumer, std::ref(sem));
+	auto prod = Task(0, producer, std::ref(sem));
 
-	sla.start();
-	mas.start();
+	cons.start();
+	prod.start();
 
 	ThisTask::sleep();
 }

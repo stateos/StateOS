@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-void slave()
+void consumer()
 {
 	static uint32_t time = 0;
 
@@ -9,22 +9,22 @@ void slave()
 	tsk_stop();
 }
 
-OS_TSK(sla, 0, slave);
+OS_TSK(cons, 0, consumer);
 
-void master()
+void producer()
 {
-	tsk_start(sla);
-	tsk_join(sla);
+	tsk_start(cons);
+	tsk_join(cons);
 
 	LED_Tick();
 }
 
-OS_TSK(mas, 0, master);
+OS_TSK(prod, 0, producer);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(mas);
-	tsk_join(mas);
+	tsk_start(prod);
+	tsk_join(prod);
 }

@@ -3,7 +3,7 @@
 
 auto led = Led();
 auto job = JobQueueT<1>();
-auto sla = Task::Start(0, []{ job.wait(); });
+auto cons = Task::Start(0, []{ job.wait(); });
 auto tmr = Timer::StartPeriodic(SEC, []{ job.give([]{ led.tick(); }); });
 
 int main()

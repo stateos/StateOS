@@ -4,7 +4,7 @@
 OS_MTX(mtx, mtxDefault);
 OS_CND(cnd);
 
-void slave()
+void consumer()
 {
 	mtx_wait(mtx);
 	for (;;)
@@ -14,7 +14,7 @@ void slave()
 	}
 }
 
-void master()
+void producer()
 {
 	mtx_wait(mtx);
 	tsk_delay(SEC);
@@ -22,15 +22,15 @@ void master()
 	mtx_give(mtx);
 }
 
-OS_TSK(sla, 1, slave);
-OS_TSK(mas, 1, master);
+OS_TSK(cons, 1, consumer);
+OS_TSK(prod, 1, producer);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(sla);
-	tsk_start(mas);
+	tsk_start(cons);
+	tsk_start(prod);
 
 	tsk_stop();
 }

@@ -18,7 +18,7 @@ struct myTask : public Task
 	}
 };
 
-struct slaTask : public myTask
+struct Consumer : public myTask
 {
 	virtual
 	void main() override
@@ -28,7 +28,7 @@ struct slaTask : public myTask
 	}
 };
 	
-struct masTask : public myTask
+struct Producer : public myTask
 {
 	virtual
 	void main() override
@@ -38,8 +38,8 @@ struct masTask : public myTask
 	}
 };
 
-auto sla = slaTask();
-auto mas = masTask();
+auto cons = Consumer();
+auto prod = Producer();
 
 int main()
 {

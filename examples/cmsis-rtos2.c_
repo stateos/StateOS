@@ -3,7 +3,7 @@
 
 osSemaphoreId_t sem;
 
-void slave(void *arg)
+void consumer(void *arg)
 {
 	(void) arg;
 
@@ -14,7 +14,7 @@ void slave(void *arg)
 	}
 }
 
-void master(void *arg)
+void producer(void *arg)
 {
 	(void) arg;
 
@@ -30,8 +30,8 @@ int main(void)
 	LED_Init();
 	osKernelInitialize();
 	sem = osSemaphoreNew(1, 0, NULL);
-	osThreadNew(slave,  NULL, NULL);
-	osThreadNew(master, NULL, NULL);
+	osThreadNew(consumer, NULL, NULL);
+	osThreadNew(producer, NULL, NULL);
 	osKernelStart();
 	osThreadExit();
 }

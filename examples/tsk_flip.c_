@@ -1,26 +1,26 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-void slave (void);
-void master(void);
+void consumer(void);
+void producer(void);
 
-void slave()
+void consumer()
 {
 	LED_Tick();
-	tsk_flip(master);
+	tsk_flip(producer);
 }
 
-void master()
+void producer()
 {
 	static uint32_t time = 0;
 
 	tsk_sleepUntil(time += SEC);
-	tsk_flip(slave);
+	tsk_flip(consumer);
 }
 
 int main()
 {
 	LED_Init();
 
-	tsk_flip(master);
+	tsk_flip(producer);
 }

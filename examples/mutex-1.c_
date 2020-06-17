@@ -3,14 +3,14 @@
 
 OS_MTX(mtx, mtxErrorCheck);
 
-OS_TSK_DEF(sla, 0)
+OS_TSK_DEF(cons, 0)
 {
 	mtx_wait(mtx);
 	LED_Tick();
 	mtx_give(mtx);
 }
 
-OS_TSK_DEF(mas, 1)
+OS_TSK_DEF(prod, 1)
 {
 	mtx_wait(mtx);
 	tsk_delay(SEC);
@@ -21,7 +21,7 @@ int main()
 {
 	LED_Init();
 
-	tsk_start(sla);
-	tsk_start(mas);
+	tsk_start(cons);
+	tsk_start(prod);
 	tsk_stop();
 }

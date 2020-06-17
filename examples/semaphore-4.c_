@@ -3,13 +3,13 @@
 
 OS_SEM(sem, 0);
 
-OS_TSK_START(sla, 0)
+OS_TSK_START(cons, 0)
 {
 	sem_wait(sem);
 	LED_Tick();
 }
 
-OS_TSK_START(mas, 0)
+OS_TSK_START(prod, 0)
 {
 	tsk_delay(SEC);
 	sem_give(sem);

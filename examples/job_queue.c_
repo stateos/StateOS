@@ -8,7 +8,7 @@ void tick()
 	LED_Tick();
 }
 
-OS_TSK_START(sla, 0)
+OS_TSK_START(cons, 0)
 {
 	job_wait(job);
 }

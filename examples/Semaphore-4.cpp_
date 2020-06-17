@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-void slave(Semaphore &sem, Led &led)
+void consumer(Semaphore &sem, Led &led)
 {
 	for (;;)
 	{
@@ -10,7 +10,7 @@ void slave(Semaphore &sem, Led &led)
 	}
 }
 
-void master(Semaphore &sem)
+void producer(Semaphore &sem)
 {
 	for (;;)
 	{
@@ -23,7 +23,7 @@ int main()
 {
 	Led led;
 	Semaphore sem(0);
-	Task::Start(0, [&]{ slave(sem, led); });
-	Task::Start(0, [&]{ master(sem); });
+	Task::Start(0, [&]{ consumer(sem, led); });
+	Task::Start(0, [&]{ producer(sem); });
 	ThisTask::sleep();
 }

@@ -3,26 +3,26 @@
 
 sem_t sem = SEM_INIT(0, semBinary);
 
-void slave()
+void consumer()
 {
 	sem_wait(&sem);
 	LED_Tick();
 }
 
-void master()
+void producer()
 {
 	tsk_delay(SEC);
 	sem_give(&sem);
 }
 
-tsk_t sla = TSK_INIT(0, slave);
-tsk_t mas = TSK_INIT(0, master);
+tsk_t cons = TSK_INIT(0, consumer);
+tsk_t prod = TSK_INIT(0, producer);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(&sla);
-	tsk_start(&mas);
+	tsk_start(&cons);
+	tsk_start(&prod);
 	tsk_stop();
 }

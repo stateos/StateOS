@@ -3,13 +3,13 @@
 
 auto led = Led();
 auto sem = Semaphore(0);
-auto sla = Task(0, []{ sem.wait(); led.tick(); });
-auto mas = Task(0, []{ ThisTask::sleepFor(SEC); sem.give(); });
+auto cons = Task(0, []{ sem.wait(); led.tick(); });
+auto prod = Task(0, []{ ThisTask::sleepFor(SEC); sem.give(); });
 
 int main()
 {
-	sla.start();
-	mas.start();
+	cons.start();
+	prod.start();
 
 	ThisTask::stop();
 }

@@ -4,9 +4,9 @@
 auto led = Led();
 auto sem = Semaphore(0);
 
-struct slaTask : public Task
+struct Consumer : public Task
 {
-	slaTask(): Task(0, run) { start(); }
+	Consumer(): Task(0, run) { start(); }
 
 	private:
 	static void run()
@@ -16,9 +16,9 @@ struct slaTask : public Task
 	}
 };
 	
-struct masTask : public Task
+struct Producer : public Task
 {
-	masTask(): Task(0, run) { start(); }
+	Producer(): Task(0, run) { start(); }
 
 	private:
 	static void run()
@@ -28,8 +28,8 @@ struct masTask : public Task
 	}
 };
 
-auto sla = slaTask();
-auto mas = masTask();
+auto cons = Consumer();
+auto prod = Producer();
 
 int main()
 {

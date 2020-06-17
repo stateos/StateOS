@@ -13,33 +13,33 @@ void action( unsigned signo )
 	}
 }
 
-void slave()
+void consumer()
 {
 	cur_action(action);
 	cur_suspend();
 }
 
-OS_TSK(sla, 0, slave);
+OS_TSK(cons, 0, consumer);
 
-void master()
+void producer()
 {
 	unsigned x = 0;
 
 	for (;;)
 	{
 		tsk_delay(SEC);
-		tsk_give(sla, 12 + x);
+		tsk_give(cons, 12 + x);
 		x = (x + 1) % 4;
 	}
 }
 
-OS_TSK(mas, 0, master);
+OS_TSK(prod, 0, producer);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(sla);
-	tsk_start(mas);
+	tsk_start(cons);
+	tsk_start(prod);
 	tsk_stop();
 }

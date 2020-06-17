@@ -3,20 +3,20 @@
 
 tsk_t tsk = TSK_INIT(0, 0);
 
-void slave()
+void consumer()
 {
 	LED_Tick();
 	tsk_stop();
 }
 
-void master()
+void producer()
 {
 	uint32_t time = 0;
 
 	for (;;)
 	{
 		tsk_sleepUntil(time += SEC);
-		tsk_startFrom(&tsk, slave);
+		tsk_startFrom(&tsk, consumer);
 	}
 }
 
@@ -24,5 +24,5 @@ int main()
 {
 	LED_Init();
 
-	tsk_flip(master);
+	tsk_flip(producer);
 }

@@ -16,11 +16,11 @@ void tickLoop(Semaphore &own, Semaphore &another)
 	}
 }
 
-auto sla_sem = Semaphore(0);
-auto mas_sem = Semaphore(1);
+auto cons_sem = Semaphore(0);
+auto prod_sem = Semaphore(1);
 
-auto sla = Task::Start(0, []{ tickLoop(sla_sem, mas_sem); });
-auto mas = Task::Start(0, []{ tickLoop(mas_sem, sla_sem); });
+auto cons = Task::Start(0, []{ tickLoop(cons_sem, prod_sem); });
+auto prod = Task::Start(0, []{ tickLoop(prod_sem, cons_sem); });
 
 int main()
 {

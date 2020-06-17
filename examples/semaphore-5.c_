@@ -3,13 +3,13 @@
 
 sem_t sem = SEM_INIT(0, semDirect);
 
-void slave()
+void consumer()
 {
 	sem_wait(&sem);
 	LED_Tick();
 }
 
-void master()
+void producer()
 {
 	tsk_delay(SEC);
 	sem_post(&sem);
@@ -19,7 +19,7 @@ int main()
 {
 	LED_Init();
 
-	tsk_new(0, slave);
-	tsk_new(0, master);
+	tsk_new(0, consumer);
+	tsk_new(0, producer);
 	tsk_stop();
 }

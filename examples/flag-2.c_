@@ -3,26 +3,26 @@
 
 OS_FLG(flg, 1);
 
-void slave()
+void consumer()
 {
 	flg_wait(flg, 1, flgProtect+flgIgnore);
 	LED_Tick();
 }
 
-void master()
+void producer()
 {
 	tsk_delay(SEC);
 	flg_give(flg, 1);
 }
 
-OS_TSK(sla, 0, slave);
-OS_TSK(mas, 0, master);
+OS_TSK(cons, 0, consumer);
+OS_TSK(prod, 0, producer);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(sla);
-	tsk_start(mas);
+	tsk_start(cons);
+	tsk_start(prod);
 	tsk_stop();
 }

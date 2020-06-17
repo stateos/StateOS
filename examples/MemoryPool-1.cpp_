@@ -5,7 +5,7 @@ auto led = Led();
 auto lst = ListTT<unsigned>();
 auto mem = MemoryPoolTT<1, unsigned>();
 
-void slave()
+void consumer()
 {
 	unsigned*p;
 
@@ -17,7 +17,7 @@ void slave()
 	}
 }
 
-void master()
+void producer()
 {
 	unsigned*p;
 	unsigned x = 1;
@@ -33,13 +33,13 @@ void master()
 	}
 }
 
-auto sla = Task(0, slave);
-auto mas = Task(0, master);
+auto cons = Task(0, consumer);
+auto prod = Task(0, producer);
 
 int main()
 {
-	sla.start();
-	mas.start();
+	cons.start();
+	prod.start();
 
 	ThisTask::stop();
 }

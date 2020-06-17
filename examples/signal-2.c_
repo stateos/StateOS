@@ -3,7 +3,7 @@
 
 sig_id sig = SIG_CREATE(0);
 
-void slave()
+void consumer()
 {
 	unsigned x;
 
@@ -11,7 +11,7 @@ void slave()
 	LEDs = SIGSET(x);
 }
 
-void master()
+void producer()
 {
 	unsigned x = 0;
 
@@ -27,7 +27,7 @@ int main()
 {
 	LED_Init();
 
-	tsk_start(TSK_CREATE(0, slave));
-	tsk_start(TSK_CREATE(0, master));
+	tsk_start(TSK_CREATE(0, consumer));
+	tsk_start(TSK_CREATE(0, producer));
 	tsk_sleep();
 }

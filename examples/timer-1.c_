@@ -3,7 +3,7 @@
 
 OS_SEM(sem, 0, semBinary);
 
-void slave()
+void consumer()
 {
 	sem_wait(sem);
 	LED_Tick();
@@ -14,14 +14,14 @@ void proc()
 	sem_giveISR(sem);
 }
 
-OS_TSK(sla, 0, slave);
+OS_TSK(cons, 0, consumer);
 OS_TMR(tmr, proc);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(sla);
+	tsk_start(cons);
 	tmr_startPeriodic(tmr, SEC);
 	tsk_stop();
 }

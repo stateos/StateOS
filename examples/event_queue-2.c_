@@ -3,7 +3,7 @@
 
 evq_t evq = EVQ_INIT(1);
 
-void slave()
+void consumer()
 {
 	unsigned x;
 
@@ -14,7 +14,7 @@ void slave()
 	}
 }
 
-void master()
+void producer()
 {
 	unsigned x = 1;
 
@@ -26,14 +26,14 @@ void master()
 	}
 }
 
-tsk_t sla = TSK_INIT(0, slave,  256);
-tsk_t mas = TSK_INIT(0, master, 256);
+tsk_t cons = TSK_INIT(0, consumer, 256);
+tsk_t prod = TSK_INIT(0, producer, 256);
 
 int main()
 {
 	LED_Init();
 
-	tsk_start(&sla);
-	tsk_start(&mas);
+	tsk_start(&cons);
+	tsk_start(&prod);
 	tsk_stop();
 }
