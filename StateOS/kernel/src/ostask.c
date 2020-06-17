@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    09.06.2020
+    @date    17.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -615,16 +615,16 @@ static
 void priv_sig_deliver( void )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t *tsk = System.cur;
+	tsk_t *cur = System.cur;
 
 	port_set_lock();
 
-	priv_sig_handler(tsk);
+	priv_sig_handler(cur);
 
-	tsk->sp = tsk->sig.backup.sp;
-	tsk->sig.backup.sp = 0;
+	cur->sp = cur->sig.backup.sp;
+	cur->sig.backup.sp = 0;
 
-	core_tsk_wait(tsk, tsk->sig.backup.guard, true);
+	core_tsk_wait(cur, cur->sig.backup.guard);
 
 	assert(!"system cannot return here");
 }

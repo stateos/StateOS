@@ -66,6 +66,7 @@ Features:
 - renamed sys_alloc function to malloc
 - added set of standard aligned memory allocation functions
 - the task deleter go back to the idle process
+- simplified parameters of the core_tsk_wait function
 ---------
 6.6
 - updated os version

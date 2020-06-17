@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    09.06.2020
+    @date    17.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -380,18 +380,18 @@ void core_tsk_transfer( tsk_t *tsk, tsk_t **que )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_wait( tsk_t *tsk, tsk_t **que, bool yield )
+unsigned core_tsk_wait( tsk_t *tsk, tsk_t **que )
 {
 	assert_tsk_context();
 
 	if (que)
 	{
 		priv_tsk_remove(tsk);
-		core_tmr_insert((tmr_t *)tsk); // sets ID_TIMER awhile
-		core_tsk_append(tsk, que); // must be last; sets ID_READY
+		core_tmr_insert((tmr_t *)tsk); // sets ID_TIMER for a while
+		core_tsk_append(tsk, que);     // must be last; sets ID_READY back
 	}
 
-	if (yield)
+	if (tsk == System.cur)
 		priv_ctx_switchNow();
 
 	return tsk->event;
@@ -409,7 +409,7 @@ unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay )
 	if (cur->delay == IMMEDIATE)
 		return E_TIMEOUT;
 
-	return core_tsk_wait(cur, que, true);
+	return core_tsk_wait(cur, que);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -423,7 +423,7 @@ unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay )
 	if (cur->delay == IMMEDIATE)
 		return E_TIMEOUT;
 
-	return core_tsk_wait(cur, que, true);
+	return core_tsk_wait(cur, que);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -438,7 +438,7 @@ unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time )
 	if (cur->delay - 1 > CNT_LIMIT)
 		return E_TIMEOUT;
 
-	return core_tsk_wait(cur, que, true);
+	return core_tsk_wait(cur, que);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -447,7 +447,7 @@ void core_tsk_suspend( tsk_t *tsk )
 {
 	tsk->delay = INFINITE;
 
-	core_tsk_wait(tsk, &WAIT.hdr.obj.queue, tsk == System.cur);
+	core_tsk_wait(tsk, &WAIT.hdr.obj.queue);
 }
 
 /* -------------------------------------------------------------------------- */
