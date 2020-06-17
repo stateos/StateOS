@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    15.06.2020
+    @date    17.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -154,11 +154,11 @@ struct __tsk
 	}        job;   // temporary data used by job queue object
 
 	}        tmp;
-#if defined(__ARMCC_VERSION) && !defined(__MICROLIB)
-	char     libspace[96];
-	#define _TSK_EXTRA { 0 }
+
+#ifndef _PORT_DATA_INIT
+#define _PORT_DATA_INIT()
 #else
-	#define _TSK_EXTRA
+	    _PORT_DATA();
 #endif
 };
 
@@ -187,7 +187,7 @@ extern "C" {
 
 #define               _TSK_INIT( _prio, _state, _stack, _size )                                               \
                        { _HDR_INIT(), _state, 0, 0, 0, NULL, _stack, _size, NULL, _prio, _prio, NULL, NULL, 0, \
-                       { NULL, NULL }, { 0, NULL, { NULL, NULL } }, { { NULL } }, _TSK_EXTRA }
+                       { NULL, NULL }, { 0, NULL, { NULL, NULL } }, { { NULL } }, _PORT_DATA_INIT() }
 
 /******************************************************************************
  *

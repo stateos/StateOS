@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    17.06.2020
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -79,6 +79,13 @@ typedef uint64_t              stk_t;
 
 extern  stk_t               __initial_sp[];
 #define MAIN_TOP            __initial_sp
+
+/* -------------------------------------------------------------------------- */
+
+#ifndef __MICROLIB
+#define  _PORT_DATA()       char libspace[96]
+#define  _PORT_DATA_INIT()  { 0 }
+#endif
 
 /* -------------------------------------------------------------------------- */
 
