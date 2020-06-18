@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    09.06.2020
+    @date    18.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -39,7 +39,7 @@
 /* -------------------------------------------------------------------------- */
 
 #define MEM_SIZE( size ) \
-    ALIGNED_SIZE( size, sizeof( que_t ))
+    ALIGNED_SIZE( size, sizeof(que_t) )
 
 /******************************************************************************
  *

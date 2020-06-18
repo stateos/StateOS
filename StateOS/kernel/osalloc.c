@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    16.06.2020
+    @date    18.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -35,10 +35,7 @@
 /* -------------------------------------------------------------------------- */
 
 #define  SEG_SIZE( size ) \
-     ALIGNED_SIZE( size, sizeof( seg_t ))
-
-#define SEG_ALIGN( base, alignment ) \
-(seg_t *)(ALIGNED((uintptr_t)( base ) + sizeof( seg_t ), alignment ) - sizeof(seg_t))
+     ALIGNED_SIZE( size, sizeof(seg_t) )
 
 /* -------------------------------------------------------------------------- */
 // INTERNAL ALLOC/FREE SERVICES
@@ -93,7 +90,7 @@ void *priv_alloc( size_t alignment, size_t size )
 	//	it is possible to merge adjacent free memory segments
 			mem->next = nxt->next;
 
-		nxt = SEG_ALIGN(mem, alignment);
+		nxt = (seg_t *)ALIGNED_OFFSET(mem, sizeof(seg_t), alignment);
 
 		if (nxt + size > mem->next)
 	//	memory segment is too small

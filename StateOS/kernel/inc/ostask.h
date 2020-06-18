@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    17.06.2020
+    @date    18.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -40,13 +40,13 @@
 /* -------------------------------------------------------------------------- */
 
 #define STK_SIZE( size ) \
-    ALIGNED_SIZE(( size ) + (OS_GUARD_SIZE), sizeof( stk_t ))
+    ALIGNED_SIZE((size_t)( size ) + (OS_GUARD_SIZE), sizeof(stk_t))
 
 #define STK_OVER( size ) \
-         ALIGNED(( size ) + (OS_GUARD_SIZE), sizeof( stk_t ))
+         ALIGNED((size_t)( size ) + (OS_GUARD_SIZE), sizeof(stk_t))
 
 #define STK_CROP( base, size ) \
-         LIMITED((uintptr_t)( base ) + (size_t)( size ), sizeof( stk_t ))
+         LIMITED((size_t)( base ) + (size_t)( size ), sizeof(stk_t))
 
 /******************************************************************************
  *

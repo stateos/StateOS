@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    17.06.2020
+    @date    18.06.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -59,17 +59,20 @@ using Act_t = std::function<void( unsigned )>;
 
 /* -------------------------------------------------------------------------- */
 
-#define ALIGNED_SIZE( size, alignment ) \
-          (((size_t)( size ) + ( alignment ) - 1) / ( alignment ))
+#define ALIGNED( value, alignment ) \
+          (((size_t)( value ) + (size_t)( alignment ) - 1) & ~((size_t)( alignment ) - 1))
 
-#define LIMITED_SIZE( size, alignment ) \
-          (((size_t)( size )) / ( alignment ))
+#define ALIGNED_SIZE( value, alignment ) \
+          (((size_t)( value ) + (size_t)( alignment ) - 1) / (size_t)( alignment ))
 
-#define      ALIGNED( size, alignment ) \
-       (ALIGNED_SIZE( size, alignment ) * ( alignment ))
+#define ALIGNED_OFFSET( value, offset, alignment ) \
+          (ALIGNED((size_t)( value ) + (size_t)( offset ), alignment) - (size_t)( offset ))
 
-#define      LIMITED( size, alignment ) \
-       (LIMITED_SIZE( size, alignment ) * ( alignment ))
+#define LIMITED( value, alignment ) \
+          ((size_t)( value ) & ~((size_t)( alignment ) - 1))
+
+#define LIMITED_SIZE( value, alignment ) \
+          ((size_t)( value ) / (size_t)( alignment ))
 
 /* -------------------------------------------------------------------------- */
 
