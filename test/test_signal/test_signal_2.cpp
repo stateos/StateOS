@@ -45,7 +45,7 @@ static void proc0()
 		                                         ASSERT_dead(tsk1);
 	        tsk_startFrom(tsk1, proc1);          ASSERT_ready(tsk1);
 	event = sig_wait(&sig0, sigAll);             ASSERT(event == sent);
- 	        sig_give(sig1, sent);
+ 	        sig_give(sig1, event);
 	event = sig_wait(&sig0, sigAll);             ASSERT(event == sent);
 	event = tsk_join(tsk1);                      ASSERT_success(event);
 	        tsk_stop();
