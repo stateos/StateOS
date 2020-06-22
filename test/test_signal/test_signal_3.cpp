@@ -9,58 +9,47 @@ static unsigned sent;
 
 static void proc3()
 {
-	unsigned value;
 	unsigned event;
 
-	event = Sig3.wait(sigAll, &value);           ASSERT_success(event);
-	                                             ASSERT(value == sent);
- 	        Sig2.give(value);
+	event = Sig3.wait(sigAll);                   ASSERT(event == sent);
+ 	        Sig2.give(event);
 	        ThisTask::stop();
 }
 
 static void proc2()
 {
-	unsigned value;
 	unsigned event;
 		                                         ASSERT(!Tsk3);
 	        Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
-	event = Sig2.wait(sigAll, &value);           ASSERT_success(event);
-	                                             ASSERT(value == sent);
- 	        Sig3.give(value);
-	event = Sig2.wait(sigAll, &value);           ASSERT_success(event);
-	                                             ASSERT(value == sent);
- 	        Sig1.give(value);
+	event = Sig2.wait(sigAll);                   ASSERT(event == sent);
+ 	        Sig3.give(event);
+	event = Sig2.wait(sigAll);                   ASSERT(event == sent);
+ 	        Sig1.give(event);
 	event = Tsk3.join();                         ASSERT_success(event);
 	        ThisTask::stop();
 }
 
 static void proc1()
 {
-	unsigned value;
 	unsigned event;
 		                                         ASSERT(!Tsk2);
 	        Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
-	event = Sig1.wait(sigAll, &value);           ASSERT_success(event);
-	                                             ASSERT(value == sent);
- 	        Sig2.give(value);
-	event = Sig1.wait(sigAll, &value);           ASSERT_success(event);
-	                                             ASSERT(value == sent);
- 	        Sig0.give(value);
+	event = Sig1.wait(sigAll);                   ASSERT(event == sent);
+ 	        Sig2.give(event);
+	event = Sig1.wait(sigAll);                   ASSERT(event == sent);
+ 	        Sig0.give(event);
 	event = Tsk2.join();                         ASSERT_success(event);
 	        ThisTask::stop();
 }
 
 static void proc0()
 {
-	unsigned value;
 	unsigned event;
 		                                         ASSERT(!Tsk1);
 	        Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
-	event = Sig0.wait(sigAll, &value);           ASSERT_success(event);
-	                                             ASSERT(value == sent);
- 	        Sig1.give(value);
-	event = Sig0.wait(sigAll, &value);           ASSERT_success(event);
-	                                             ASSERT(value == sent);
+	event = Sig0.wait(sigAll);                   ASSERT(event == sent);
+ 	        Sig1.give(event);
+	event = Sig0.wait(sigAll);                   ASSERT(event == sent);
 	event = Tsk1.join();                         ASSERT_success(event);
 	        ThisTask::stop();
 }

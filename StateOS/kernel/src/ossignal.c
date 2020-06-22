@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    22.06.2020
+    @date    06.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -121,94 +121,86 @@ void sig_destroy( sig_t *sig )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
+unsigned priv_sig_take( sig_t *sig, unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	unsigned signo = E_TIMEOUT;
 
 	sigset &= sig->sigset;
 	sigset &= -sigset;
+	sig->sigset &= ~sigset | sig->mask;
 	if (sigset)
-	{
-		sig->sigset &= ~sigset | sig->mask;
-		for (*signo = 0; sigset >>= 1; *signo += 1);
-		event = E_SUCCESS;
-	}
+		for (signo = 0; sigset >>= 1; signo++);
 
-	return event;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
+unsigned sig_take( sig_t *sig, unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned signo;
 
 	assert(sig);
-	assert(signo);
 	assert(sig->obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, sigset, signo);
+		signo = priv_sig_take(sig, sigset);
 	}
 	sys_unlock();
 
-	return event;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitFor( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t delay )
+unsigned sig_waitFor( sig_t *sig, unsigned sigset, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned signo;
 
 	assert_tsk_context();
 	assert(sig);
-	assert(signo);
 	assert(sig->obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, sigset, signo);
+		signo = priv_sig_take(sig, sigset);
 
-		if (event == E_TIMEOUT)
+		if (signo == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
-			System.cur->tmp.sig.signo  = signo;
-			event = core_tsk_waitFor(&sig->obj.queue, delay);
+			signo = core_tsk_waitFor(&sig->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitUntil( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t time )
+unsigned sig_waitUntil( sig_t *sig, unsigned sigset, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	unsigned signo;
 
 	assert_tsk_context();
 	assert(sig);
-	assert(signo);
 	assert(sig->obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, sigset, signo);
+		signo = priv_sig_take(sig, sigset);
 
-		if (event == E_TIMEOUT)
+		if (signo == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
-			System.cur->tmp.sig.signo  = signo;
-			event = core_tsk_waitUntil(&sig->obj.queue, time);
+			signo = core_tsk_waitUntil(&sig->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return signo;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -233,8 +225,7 @@ void sig_give( sig_t *sig, unsigned signo )
 			if ((tsk->tmp.sig.sigset & sigset) != 0 || tsk->tmp.sig.sigset == 0)
 			{
 				sig->sigset &= ~sigset | sig->mask;
-				*tsk->tmp.sig.signo = signo;
-				core_tsk_wakeup(tsk, E_SUCCESS);
+				core_tsk_wakeup(tsk, signo);
 				continue;
 			}
 			obj = &tsk->hdr.obj;

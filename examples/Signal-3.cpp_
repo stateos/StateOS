@@ -10,7 +10,7 @@ void consumer()
 
 	for (;;)
 	{
-		sig.wait(sigAny, x);
+		x = sig.wait(sigAny);
 		led = x;
 	}
 }

@@ -7,7 +7,7 @@ void consumer()
 {
 	unsigned x;
 
-	sig_wait(sig, sigAny, &x);
+	x = sig_wait(sig, sigAny);
 	LEDs = x;
 }
 
