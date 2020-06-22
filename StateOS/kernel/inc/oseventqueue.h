@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    09.06.2020
+    @date    22.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -190,7 +190,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-void evq_init( evq_t *evq, unsigned *data, unsigned bufsize );
+void evq_init( evq_t *evq, unsigned *data, size_t bufsize );
 
 /******************************************************************************
  *

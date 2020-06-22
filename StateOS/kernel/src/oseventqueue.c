@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    22.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,7 +35,7 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_evq_init( evq_t *evq, unsigned *data, unsigned bufsize, void *res )
+void priv_evq_init( evq_t *evq, unsigned *data, size_t bufsize, void *res )
 /* -------------------------------------------------------------------------- */
 {
 	memset(evq, 0, sizeof(evq_t));
@@ -47,7 +47,7 @@ void priv_evq_init( evq_t *evq, unsigned *data, unsigned bufsize, void *res )
 }
 
 /* -------------------------------------------------------------------------- */
-void evq_init( evq_t *evq, unsigned *data, unsigned bufsize )
+void evq_init( evq_t *evq, unsigned *data, size_t bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();

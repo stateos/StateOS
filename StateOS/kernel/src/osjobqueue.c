@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    22.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -35,7 +35,7 @@
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_job_init( job_t *job, fun_t **data, unsigned bufsize, void *res )
+void priv_job_init( job_t *job, fun_t **data, size_t bufsize, void *res )
 /* -------------------------------------------------------------------------- */
 {
 	memset(job, 0, sizeof(job_t));
@@ -47,7 +47,7 @@ void priv_job_init( job_t *job, fun_t **data, unsigned bufsize, void *res )
 }
 
 /* -------------------------------------------------------------------------- */
-void job_init( job_t *job, fun_t **data, unsigned bufsize )
+void job_init( job_t *job, fun_t **data, size_t bufsize )
 /* -------------------------------------------------------------------------- */
 {
 	assert_tsk_context();
