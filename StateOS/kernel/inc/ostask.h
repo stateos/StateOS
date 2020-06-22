@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    18.06.2020
+    @date    22.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -98,6 +98,7 @@ struct __tsk
 
 	struct {
 	unsigned sigset;
+	unsigned*signo;
 	}        sig;   // temporary data used by signal object
 
 	struct {

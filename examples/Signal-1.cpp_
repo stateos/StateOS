@@ -6,9 +6,11 @@ auto sig = Signal();
 
 void consumer()
 {
+	unsigned x;
+
 	for (;;)
 	{
-		sig.wait(SIGSET(1));
+		sig.wait(SIGSET(1), x);
 		led.tick();
 	}
 }
