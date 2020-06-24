@@ -707,7 +707,7 @@ struct MessageBufferT : public __msg
  *
  ******************************************************************************/
 
-template<size_t limit_, class C>
+template<unsigned limit_, class C>
 struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C))>
 {
 	constexpr

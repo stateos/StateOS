@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    22.06.2020
+    @date    24.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -571,7 +571,7 @@ unsigned box_limitISR( box_t *box ) { return box_limit(box); }
  *
  ******************************************************************************/
 
-template<size_t limit_, size_t size_>
+template<unsigned limit_, size_t size_>
 struct MailBoxQueueT : public __box
 {
 	constexpr
@@ -658,7 +658,7 @@ struct MailBoxQueueT : public __box
  *
  ******************************************************************************/
 
-template<size_t limit_, class C>
+template<unsigned limit_, class C>
 struct MailBoxQueueTT : public MailBoxQueueT<limit_, sizeof(C)>
 {
 	constexpr

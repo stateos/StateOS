@@ -680,7 +680,7 @@ struct StreamBufferT : public __stm
  *
  ******************************************************************************/
 
-template<size_t limit_, class C>
+template<unsigned limit_, class C>
 struct StreamBufferTT : public StreamBufferT<limit_*sizeof(C)>
 {
 	constexpr
