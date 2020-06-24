@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -172,11 +172,11 @@ void priv_stm_skip( stm_t *stm, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_getUpdate( stm_t *stm, char *data, unsigned size )
+void priv_stm_getUpdate( stm_t *stm, char *data, unsigned size, unsigned *read )
 /* -------------------------------------------------------------------------- */
 {
-	if (size > stm->count)
-		size = stm->count;
+	if (size > stm->count) size = stm->count;
+	if (read != NULL) *read = size;
 	priv_stm_get(stm, data, size);
 
 	while (stm->obj.queue != 0 && stm->count + stm->obj.queue->tmp.stm.size <= stm->limit)
@@ -184,8 +184,6 @@ unsigned priv_stm_getUpdate( stm_t *stm, char *data, unsigned size )
 		priv_stm_put(stm, stm->obj.queue->tmp.stm.data.out, stm->obj.queue->tmp.stm.size);
 		core_one_wakeup(stm->obj.queue, E_SUCCESS);
 	}
-
-	return size;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -197,11 +195,10 @@ void priv_stm_putUpdate( stm_t *stm, const char *data, unsigned size )
 
 	while (stm->obj.queue != 0 && stm->count > 0)
 	{
-		size = stm->obj.queue->tmp.stm.size;
-		if (size > stm->count)
-			size = stm->count;
-		priv_stm_get(stm, stm->obj.queue->tmp.stm.data.in, size);
-		core_one_wakeup(stm->obj.queue, size);
+		if (stm->obj.queue->tmp.stm.size > stm->count)
+			stm->obj.queue->tmp.stm.size = stm->count;
+		priv_stm_get(stm, stm->obj.queue->tmp.stm.data.in, stm->obj.queue->tmp.stm.size);
+		core_one_wakeup(stm->obj.queue, E_SUCCESS);
 	}
 }
 
@@ -224,41 +221,45 @@ void priv_stm_skipUpdate( stm_t *stm, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_take( stm_t *stm, char *data, unsigned size )
+unsigned priv_stm_take( stm_t *stm, char *data, unsigned size, unsigned *read )
 /* -------------------------------------------------------------------------- */
 {
 	if (stm->count > 0)
-		return priv_stm_getUpdate(stm, data, size);
+	{
+		priv_stm_getUpdate(stm, data, size, read);
+		return E_SUCCESS;
+	}
 
 	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_take( stm_t *stm, void *data, unsigned size )
+unsigned stm_take( stm_t *stm, void *data, unsigned size, unsigned *read )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned event;
 
 	assert(stm);
 	assert(stm->obj.res!=RELEASED);
 	assert(stm->data);
 	assert(stm->limit);
 	assert(data);
+	assert(size);
 
 	sys_lock();
 	{
-		len = priv_stm_take(stm, data, size);
+		event = priv_stm_take(stm, data, size, read);
 	}
 	sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay )
+unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, unsigned *read, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned event;
 
 	assert_tsk_context();
 	assert(stm);
@@ -266,28 +267,31 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay )
 	assert(stm->data);
 	assert(stm->limit);
 	assert(data);
+	assert(size);
 
 	sys_lock();
 	{
-		len = priv_stm_take(stm, data, size);
+		event = priv_stm_take(stm, data, size, read);
 
-		if (len == E_TIMEOUT)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.in = data;
 			System.cur->tmp.stm.size = size;
-			len = core_tsk_waitFor(&stm->obj.queue, delay);
+			event = core_tsk_waitFor(&stm->obj.queue, delay);
+			if (event == E_SUCCESS && read != NULL)
+				*read = System.cur->tmp.stm.size;
 		}
 	}
 	sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time )
+unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, unsigned *read, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned event;
 
 	assert_tsk_context();
 	assert(stm);
@@ -295,21 +299,24 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time )
 	assert(stm->data);
 	assert(stm->limit);
 	assert(data);
+	assert(size);
 
 	sys_lock();
 	{
-		len = priv_stm_take(stm, data, size);
+		event = priv_stm_take(stm, data, size, read);
 
-		if (len == E_TIMEOUT)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.in = data;
 			System.cur->tmp.stm.size = size;
-			len = core_tsk_waitUntil(&stm->obj.queue, time);
+			event = core_tsk_waitUntil(&stm->obj.queue, time);
+			if (event == E_SUCCESS && read != NULL)
+				*read = System.cur->tmp.stm.size;
 		}
 	}
 	sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -340,6 +347,7 @@ unsigned stm_give( stm_t *stm, const void *data, unsigned size )
 	assert(stm->data);
 	assert(stm->limit);
 	assert(data);
+	assert(size);
 
 	sys_lock();
 	{
@@ -362,6 +370,7 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
 	assert(stm->data);
 	assert(stm->limit);
 	assert(data);
+	assert(size);
 
 	sys_lock();
 	{
@@ -391,6 +400,7 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
 	assert(stm->data);
 	assert(stm->limit);
 	assert(data);
+	assert(size);
 
 	sys_lock();
 	{
@@ -435,6 +445,7 @@ unsigned stm_push( stm_t *stm, const void *data, unsigned size )
 	assert(stm->data);
 	assert(stm->limit);
 	assert(data);
+	assert(size);
 
 	sys_lock();
 	{

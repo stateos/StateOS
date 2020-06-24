@@ -69,6 +69,7 @@ Features:
 - simplified parameters of the core_tsk_wait function
 - updated signal functions
 - updated message buffer functions
+- updated stream buffer functions
 ---------
 6.6
 - updated os version

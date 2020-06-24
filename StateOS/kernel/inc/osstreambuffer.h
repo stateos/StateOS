@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    09.06.2020
+    @date    24.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -283,23 +283,25 @@ void stm_delete( stm_t *stm ) { stm_destroy(stm); }
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
+ *   read            : pointer to the variable getting number of read bytes
  *
- * Return            : number of bytes read from the stream buffer or
+ * Return
+ *   E_SUCCESS       : variable 'read' contains the number of bytes read from the stream buffer
  *   E_TIMEOUT       : stream buffer object is empty, try again
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned stm_take( stm_t *stm, void *data, unsigned size );
+unsigned stm_take( stm_t *stm, void *data, unsigned size, unsigned *read );
 
 __STATIC_INLINE
-unsigned stm_tryWait( stm_t *stm, void *data, unsigned size ) { return stm_take(stm, data, size); }
+unsigned stm_tryWait( stm_t *stm, void *data, unsigned size, unsigned *read ) { return stm_take(stm, data, size, read); }
 
 __STATIC_INLINE
-unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(stm, data, size); }
+unsigned stm_takeISR( stm_t *stm, void *data, unsigned size, unsigned *read ) { return stm_take(stm, data, size, read); }
 
 /******************************************************************************
  *
@@ -310,13 +312,14 @@ unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to the buffer
+ *   size            : pointer to the variable containing size of the buffer
  *   delay           : duration of time (maximum number of ticks to wait while the stream buffer object is empty)
  *                     IMMEDIATE: don't wait if the stream buffer object is empty
  *                     INFINITE:  wait indefinitely while the stream buffer object is empty
  *
- * Return            : number of bytes read from the stream buffer or
+ * Return
+ *   E_SUCCESS       : variable 'size' contains the number of bytes read from the stream buffer
  *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
  *   E_DELETED       : stream buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : stream buffer object is empty and was not received data before the specified timeout expired
@@ -325,7 +328,7 @@ unsigned stm_takeISR( stm_t *stm, void *data, unsigned size ) { return stm_take(
  *
  ******************************************************************************/
 
-unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
+unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, unsigned *read, cnt_t delay );
 
 /******************************************************************************
  *
@@ -336,11 +339,12 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to the buffer
+ *   size            : pointer to the variable containing size of the buffer
  *   time            : timepoint value
  *
- * Return            : number of bytes read from the stream buffer or
+ * Return
+ *   E_SUCCESS       : variable 'size' contains the number of bytes read from the stream buffer
  *   E_STOPPED       : stream buffer object was reseted before the specified timeout expired
  *   E_DELETED       : stream buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : stream buffer object is empty and was not received data before the specified timeout expired
@@ -349,7 +353,7 @@ unsigned stm_waitFor( stm_t *stm, void *data, unsigned size, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
+unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, unsigned *read, cnt_t time );
 
 /******************************************************************************
  *
@@ -360,10 +364,12 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
+ *   read            : pointer to the variable getting number of read bytes
  *
- * Return            : number of bytes read from the stream buffer or
+ * Return
+ *   E_SUCCESS       : variable 'read' contains the number of bytes read from the stream buffer
  *   E_STOPPED       : stream buffer object was reseted
  *   E_DELETED       : stream buffer object was deleted
  *
@@ -372,7 +378,7 @@ unsigned stm_waitUntil( stm_t *stm, void *data, unsigned size, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(stm, data, size, INFINITE); }
+unsigned stm_wait( stm_t *stm, void *data, unsigned size, unsigned *read ) { return stm_waitFor(stm, data, size, read, INFINITE); }
 
 /******************************************************************************
  *
@@ -384,8 +390,8 @@ unsigned stm_wait( stm_t *stm, void *data, unsigned size ) { return stm_waitFor(
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
  *
  * Return
  *   E_SUCCESS       : stream data was successfully transferred to the stream buffer object
@@ -410,8 +416,8 @@ unsigned stm_giveISR( stm_t *stm, const void *data, unsigned size ) { return stm
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
  *   delay           : duration of time (maximum number of ticks to wait while the stream buffer object is full)
  *                     IMMEDIATE: don't wait if the stream buffer object is full
  *                     INFINITE:  wait indefinitely while the stream buffer object is full
@@ -438,8 +444,8 @@ unsigned stm_sendFor( stm_t *stm, const void *data, unsigned size, cnt_t delay )
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
  *   time            : timepoint value
  *
  * Return
@@ -464,8 +470,8 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, unsigned size, cnt_t time 
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
  *
  * Return
  *   E_SUCCESS       : stream data was successfully transferred to the stream buffer object
@@ -490,8 +496,8 @@ unsigned stm_send( stm_t *stm, const void *data, unsigned size ) { return stm_se
  *
  * Parameters
  *   stm             : pointer to stream buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
  *
  * Return
  *   E_SUCCESS       : stream data was successfully transferred to the stream buffer object
@@ -631,32 +637,32 @@ struct StreamBufferT : public __stm
 		return Ptr(stm);
 	}
 
-	void reset    ( void )                                              {        stm_reset    (this); }
-	void kill     ( void )                                              {        stm_kill     (this); }
-	void destroy  ( void )                                              {        stm_destroy  (this); }
-	uint take     (       void *_data, unsigned _size )                 { return stm_take     (this, _data, _size); }
-	uint tryWait  (       void *_data, unsigned _size )                 { return stm_tryWait  (this, _data, _size); }
-	uint takeISR  (       void *_data, unsigned _size )                 { return stm_takeISR  (this, _data, _size); }
+	void reset    ( void )                                                                {        stm_reset    (this); }
+	void kill     ( void )                                                                {        stm_kill     (this); }
+	void destroy  ( void )                                                                {        stm_destroy  (this); }
+	uint take     (       void *_data, unsigned _size, unsigned *_read = nullptr )        { return stm_take     (this, _data, _size, _read); }
+	uint tryWait  (       void *_data, unsigned _size, unsigned *_read = nullptr )        { return stm_tryWait  (this, _data, _size, _read); }
+	uint takeISR  (       void *_data, unsigned _size, unsigned *_read = nullptr )        { return stm_takeISR  (this, _data, _size, _read); }
 	template<typename T>
-	uint waitFor  (       void *_data, unsigned _size, const T _delay ) { return stm_waitFor  (this, _data, _size, _delay); }
+	uint waitFor  (       void *_data, unsigned _size, unsigned *_read,  const T _delay ) { return stm_waitFor  (this, _data, _size, _read, _delay); }
 	template<typename T>
-	uint waitUntil(       void *_data, unsigned _size, const T _time )  { return stm_waitUntil(this, _data, _size, _time); }
-	uint wait     (       void *_data, unsigned _size )                 { return stm_wait     (this, _data, _size); }
-	uint give     ( const void *_data, unsigned _size )                 { return stm_give     (this, _data, _size); }
-	uint giveISR  ( const void *_data, unsigned _size )                 { return stm_giveISR  (this, _data, _size); }
+	uint waitUntil(       void *_data, unsigned _size, unsigned *_read,  const T _time )  { return stm_waitUntil(this, _data, _size, _read, _time); }
+	uint wait     (       void *_data, unsigned _size, unsigned *_read = nullptr )        { return stm_wait     (this, _data, _size, _read); }
+	uint give     ( const void *_data, unsigned _size )                                   { return stm_give     (this, _data, _size); }
+	uint giveISR  ( const void *_data, unsigned _size )                                   { return stm_giveISR  (this, _data, _size); }
 	template<typename T>
-	uint sendFor  ( const void *_data, unsigned _size, const T _delay ) { return stm_sendFor  (this, _data, _size, _delay); }
+	uint sendFor  ( const void *_data, unsigned _size, const T   _delay )                 { return stm_sendFor  (this, _data, _size, _delay); }
 	template<typename T>
-	uint sendUntil( const void *_data, unsigned _size, const T _time )  { return stm_sendUntil(this, _data, _size, _time); }
-	uint send     ( const void *_data, unsigned _size )                 { return stm_send     (this, _data, _size); }
-	uint push     ( const void *_data, unsigned _size )                 { return stm_push     (this, _data, _size); }
-	uint pushISR  ( const void *_data, unsigned _size )                 { return stm_pushISR  (this, _data, _size); }
-	size_t count  ( void )                                              { return stm_count    (this); }
-	size_t countISR( void )                                             { return stm_countISR (this); }
-	size_t space  ( void )                                              { return stm_space    (this); }
-	size_t spaceISR( void )                                             { return stm_spaceISR (this); }
-	size_t limit  ( void )                                              { return stm_limit    (this); }
-	size_t limitISR( void )                                             { return stm_limitISR (this); }
+	uint sendUntil( const void *_data, unsigned _size, const T   _time )                  { return stm_sendUntil(this, _data, _size, _time); }
+	uint send     ( const void *_data, unsigned _size )                                   { return stm_send     (this, _data, _size); }
+	uint push     ( const void *_data, unsigned _size )                                   { return stm_push     (this, _data, _size); }
+	uint pushISR  ( const void *_data, unsigned _size )                                   { return stm_pushISR  (this, _data, _size); }
+	size_t count  ( void )                                                                { return stm_count    (this); }
+	size_t countISR( void )                                                               { return stm_countISR (this); }
+	size_t space  ( void )                                                                { return stm_space    (this); }
+	size_t spaceISR( void )                                                               { return stm_spaceISR (this); }
+	size_t limit  ( void )                                                                { return stm_limit    (this); }
+	size_t limitISR( void )                                                               { return stm_limitISR (this); }
 
 	private:
 	char data_[limit_];
@@ -711,19 +717,19 @@ struct StreamBufferTT : public StreamBufferT<limit_*sizeof(C)>
 		return Ptr(stm);
 	}
 
-	uint take     (       C *_data )                 { return stm_take     (this, _data, sizeof(C)); }
-	uint tryWait  (       C *_data )                 { return stm_tryWait  (this, _data, sizeof(C)); }
-	uint takeISR  (       C *_data )                 { return stm_takeISR  (this, _data, sizeof(C)); }
-	template<typename T>
-	uint waitFor  (       C *_data, const T _delay ) { return stm_waitFor  (this, _data, sizeof(C), _delay); }
-	template<typename T>
-	uint waitUntil(       C *_data, const T _time )  { return stm_waitUntil(this, _data, sizeof(C), _time); }
-	uint wait     (       C *_data )                 { return stm_wait     (this, _data, sizeof(C)); }
+	uint take     (       C *_data )                 { return stm_take     (this, _data, sizeof(C), nullptr); }
+	uint tryWait  (       C *_data )                 { return stm_tryWait  (this, _data, sizeof(C), nullptr); }
+	uint takeISR  (       C *_data )                 { return stm_takeISR  (this, _data, sizeof(C), nullptr); }
+	template<typename T>                               
+	uint waitFor  (       C *_data, const T _delay ) { return stm_waitFor  (this, _data, sizeof(C), nullptr, _delay); }
+	template<typename T>                               
+	uint waitUntil(       C *_data, const T _time )  { return stm_waitUntil(this, _data, sizeof(C), nullptr, _time); }
+	uint wait     (       C *_data )                 { return stm_wait     (this, _data, sizeof(C), nullptr); }
 	uint give     ( const C *_data )                 { return stm_give     (this, _data, sizeof(C)); }
 	uint giveISR  ( const C *_data )                 { return stm_giveISR  (this, _data, sizeof(C)); }
-	template<typename T>
+	template<typename T>                               
 	uint sendFor  ( const C *_data, const T _delay ) { return stm_sendFor  (this, _data, sizeof(C), _delay); }
-	template<typename T>
+	template<typename T>                               
 	uint sendUntil( const C *_data, const T _time )  { return stm_sendUntil(this, _data, sizeof(C), _time); }
 	uint send     ( const C *_data )                 { return stm_send     (this, _data, sizeof(C)); }
 	uint push     ( const C *_data )                 { return stm_push     (this, _data, sizeof(C)); }
