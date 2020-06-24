@@ -5,7 +5,7 @@ sig_t sig = SIG_INIT();
 
 void consumer()
 {
-	sig_wait(&sig, SIGSET(1));
+	sig_wait(&sig, SIGSET(1), NULL);
 	LED_Tick();
 }
 
