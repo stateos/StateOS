@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    09.06.2020
+    @date    24.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -283,24 +283,26 @@ void msg_delete( msg_t *msg ) { msg_destroy(msg); }
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
+ *   read            : pointer to the variable getting number of read bytes
  *
- * Return            : number of bytes read from the message buffer or
- *   E_FAILURE       : not enough space in the write buffer
+ * Return
+ *   E_SUCCESS       : variable 'read' contains the number of bytes read from the message buffer
+ *   E_FAILURE       : not enough space in the buffer
  *   E_TIMEOUT       : message buffer object is empty, try again
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned msg_take( msg_t *msg, void *data, unsigned size );
+unsigned msg_take( msg_t *msg, void *data, unsigned size, unsigned *read );
 
 __STATIC_INLINE
-unsigned msg_tryWait( msg_t *msg, void *data, unsigned size ) { return msg_take(msg, data, size); }
+unsigned msg_tryWait( msg_t *msg, void *data, unsigned size, unsigned *read ) { return msg_take(msg, data, size, read); }
 
 __STATIC_INLINE
-unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(msg, data, size); }
+unsigned msg_takeISR( msg_t *msg, void *data, unsigned size, unsigned *read ) { return msg_take(msg, data, size, read); }
 
 /******************************************************************************
  *
@@ -311,14 +313,15 @@ unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to the buffer
+ *   size            : pointer to the variable containing size of the buffer
  *   delay           : duration of time (maximum number of ticks to wait while the message buffer object is empty)
  *                     IMMEDIATE: don't wait if the message buffer object is empty
  *                     INFINITE:  wait indefinitely while the message buffer object is empty
  *
- * Return            : number of bytes read from the message buffer or
- *   E_FAILURE       : not enough space in the write buffer
+ * Return
+ *   E_SUCCESS       : variable 'size' contains the number of bytes read from the message buffer
+ *   E_FAILURE       : not enough space in the buffer
  *   E_STOPPED       : message buffer object was reseted before the specified timeout expired
  *   E_DELETED       : message buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : message buffer object is empty and was not received data before the specified timeout expired
@@ -327,7 +330,7 @@ unsigned msg_takeISR( msg_t *msg, void *data, unsigned size ) { return msg_take(
  *
  ******************************************************************************/
 
-unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay );
+unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, unsigned *read, cnt_t delay );
 
 /******************************************************************************
  *
@@ -338,12 +341,13 @@ unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay );
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to the buffer
+ *   size            : pointer to the variable containing size of the buffer
  *   time            : timepoint value
  *
- * Return            : number of bytes read from the message buffer or
- *   E_FAILURE       : not enough space in the write buffer
+ * Return
+ *   E_SUCCESS       : variable 'size' contains the number of bytes read from the message buffer
+ *   E_FAILURE       : not enough space in the buffer
  *   E_STOPPED       : message buffer object was reseted before the specified timeout expired
  *   E_DELETED       : message buffer object was deleted before the specified timeout expired
  *   E_TIMEOUT       : message buffer object is empty and was not received data before the specified timeout expired
@@ -352,7 +356,7 @@ unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time );
+unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, unsigned *read, cnt_t time );
 
 /******************************************************************************
  *
@@ -363,11 +367,13 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time );
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to write buffer
- *   size            : size of write buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
+ *   read            : pointer to the variable getting number of read bytes
  *
- * Return            : number of bytes read from the message buffer or
- *   E_FAILURE       : not enough space in the write buffer
+ * Return
+ *   E_SUCCESS       : variable 'read' contains the number of bytes read from the message buffer
+ *   E_FAILURE       : not enough space in the buffer
  *   E_STOPPED       : message buffer object was reseted
  *   E_DELETED       : message buffer object was deleted
  *
@@ -376,7 +382,7 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned msg_wait( msg_t *msg, void *data, unsigned size ) { return msg_waitFor(msg, data, size, INFINITE); }
+unsigned msg_wait( msg_t *msg, void *data, unsigned size, unsigned *read ) { return msg_waitFor(msg, data, size, read, INFINITE); }
 
 /******************************************************************************
  *
@@ -388,8 +394,8 @@ unsigned msg_wait( msg_t *msg, void *data, unsigned size ) { return msg_waitFor(
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
  *
  * Return
  *   E_SUCCESS       : message data was successfully transferred to the message buffer object
@@ -414,8 +420,8 @@ unsigned msg_giveISR( msg_t *msg, const void *data, unsigned size ) { return msg
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
  *   delay           : duration of time (maximum number of ticks to wait while the message buffer object is full)
  *                     IMMEDIATE: don't wait if the message buffer object is full
  *                     INFINITE:  wait indefinitely while the message buffer object is full
@@ -442,8 +448,8 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
  *   time            : timepoint value
  *
  * Return
@@ -468,8 +474,8 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
  *
  * Return
  *   E_SUCCESS       : message data was successfully transferred to the message buffer object
@@ -494,8 +500,8 @@ unsigned msg_send( msg_t *msg, const void *data, unsigned size ) { return msg_se
  *
  * Parameters
  *   msg             : pointer to message buffer object
- *   data            : pointer to read buffer
- *   size            : size of read buffer
+ *   data            : pointer to the buffer
+ *   size            : size of the buffer
  *
  * Return
  *   E_SUCCESS       : message data was successfully transferred to the message buffer object
@@ -656,34 +662,34 @@ struct MessageBufferT : public __msg
 		return Ptr(msg);
 	}
 
-	void reset    ( void )                                              {        msg_reset    (this); }
-	void kill     ( void )                                              {        msg_kill     (this); }
-	void destroy  ( void )                                              {        msg_destroy  (this); }
-	uint take     (       void *_data, unsigned _size )                 { return msg_take     (this, _data, _size); }
-	uint tryWait  (       void *_data, unsigned _size )                 { return msg_tryWait  (this, _data, _size); }
-	uint takeISR  (       void *_data, unsigned _size )                 { return msg_takeISR  (this, _data, _size); }
+	void reset    ( void )                                                                {        msg_reset    (this); }
+	void kill     ( void )                                                                {        msg_kill     (this); }
+	void destroy  ( void )                                                                {        msg_destroy  (this); }
+	uint take     (       void *_data, unsigned _size, unsigned *_read = nullptr )        { return msg_take     (this, _data, _size, _read); }
+	uint tryWait  (       void *_data, unsigned _size, unsigned *_read = nullptr )        { return msg_tryWait  (this, _data, _size, _read); }
+	uint takeISR  (       void *_data, unsigned _size, unsigned *_read = nullptr )        { return msg_takeISR  (this, _data, _size, _read); }
 	template<typename T>
-	uint waitFor  (       void *_data, unsigned _size, const T _delay ) { return msg_waitFor  (this, _data, _size, Clock::count(_delay)); }
+	uint waitFor  (       void *_data, unsigned _size, unsigned *_read,  const T _delay ) { return msg_waitFor  (this, _data, _size, _read, Clock::count(_delay)); }
 	template<typename T>
-	uint waitUntil(       void *_data, unsigned _size, const T _time )  { return msg_waitUntil(this, _data, _size, Clock::until(_time)); }
-	uint wait     (       void *_data, unsigned _size )                 { return msg_wait     (this, _data, _size); }
-	uint give     ( const void *_data, unsigned _size )                 { return msg_give     (this, _data, _size); }
-	uint giveISR  ( const void *_data, unsigned _size )                 { return msg_giveISR  (this, _data, _size); }
+	uint waitUntil(       void *_data, unsigned _size, unsigned *_read,  const T _time )  { return msg_waitUntil(this, _data, _size, _read, Clock::until(_time)); }
+	uint wait     (       void *_data, unsigned _size, unsigned *_read = nullptr )        { return msg_wait     (this, _data, _size, _read); }
+	uint give     ( const void *_data, unsigned _size )                                   { return msg_give     (this, _data, _size); }
+	uint giveISR  ( const void *_data, unsigned _size )                                   { return msg_giveISR  (this, _data, _size); }
 	template<typename T>
-	uint sendFor  ( const void *_data, unsigned _size, const T _delay ) { return msg_sendFor  (this, _data, _size, Clock::count(_delay)); }
+	uint sendFor  ( const void *_data, unsigned _size, const T   _delay )                 { return msg_sendFor  (this, _data, _size, Clock::count(_delay)); }
 	template<typename T>
-	uint sendUntil( const void *_data, unsigned _size, const T _time )  { return msg_sendUntil(this, _data, _size, Clock::until(_time)); }
-	uint send     ( const void *_data, unsigned _size )                 { return msg_send     (this, _data, _size); }
-	uint push     ( const void *_data, unsigned _size )                 { return msg_push     (this, _data, _size); }
-	uint pushISR  ( const void *_data, unsigned _size )                 { return msg_pushISR  (this, _data, _size); }
-	size_t count  ( void )                                              { return msg_count    (this); }
-	size_t countISR( void )                                             { return msg_countISR (this); }
-	size_t space  ( void )                                              { return msg_space    (this); }
-	size_t spaceISR( void )                                             { return msg_spaceISR (this); }
-	size_t limit  ( void )                                              { return msg_limit    (this); }
-	size_t limitISR( void )                                             { return msg_limitISR (this); }
-	uint size     ( void )                                              { return msg_size     (this); }
-	uint sizeISR  ( void )                                              { return msg_sizeISR  (this); }
+	uint sendUntil( const void *_data, unsigned _size, const T   _time )                  { return msg_sendUntil(this, _data, _size, Clock::until(_time)); }
+	uint send     ( const void *_data, unsigned _size )                                   { return msg_send     (this, _data, _size); }
+	uint push     ( const void *_data, unsigned _size )                                   { return msg_push     (this, _data, _size); }
+	uint pushISR  ( const void *_data, unsigned _size )                                   { return msg_pushISR  (this, _data, _size); }
+	size_t count  ( void )                                                                { return msg_count    (this); }
+	size_t countISR( void )                                                               { return msg_countISR (this); }
+	size_t space  ( void )                                                                { return msg_space    (this); }
+	size_t spaceISR( void )                                                               { return msg_spaceISR (this); }
+	size_t limit  ( void )                                                                { return msg_limit    (this); }
+	size_t limitISR( void )                                                               { return msg_limitISR (this); }
+	uint size     ( void )                                                                { return msg_size     (this); }
+	uint sizeISR  ( void )                                                                { return msg_sizeISR  (this); }
 
 	private:
 	char data_[limit_];
@@ -738,14 +744,14 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(unsigned)+sizeof(C
 		return Ptr(msg);
 	}
 
-	uint take     (       C *_data )                 { return msg_take     (this, _data, sizeof(C)); }
-	uint tryWait  (       C *_data )                 { return msg_tryWait  (this, _data, sizeof(C)); }
-	uint takeISR  (       C *_data )                 { return msg_takeISR  (this, _data, sizeof(C)); }
+	uint take     (       C *_data )                 { return msg_take     (this, _data, sizeof(C), nullptr); }
+	uint tryWait  (       C *_data )                 { return msg_tryWait  (this, _data, sizeof(C), nullptr); }
+	uint takeISR  (       C *_data )                 { return msg_takeISR  (this, _data, sizeof(C), nullptr); }
 	template<typename T>
-	uint waitFor  (       C *_data, const T _delay ) { return msg_waitFor  (this, _data, sizeof(C), Clock::count(_delay)); }
+	uint waitFor  (       C *_data, const T _delay ) { return msg_waitFor  (this, _data, sizeof(C), nullptr, Clock::count(_delay)); }
 	template<typename T>
-	uint waitUntil(       C *_data, const T _time )  { return msg_waitUntil(this, _data, sizeof(C), Clock::until(_time)); }
-	uint wait     (       C *_data )                 { return msg_wait     (this, _data, sizeof(C)); }
+	uint waitUntil(       C *_data, const T _time )  { return msg_waitUntil(this, _data, sizeof(C), nullptr, Clock::until(_time)); }
+	uint wait     (       C *_data )                 { return msg_wait     (this, _data, sizeof(C), nullptr); }
 	uint give     ( const C *_data )                 { return msg_give     (this, _data, sizeof(C)); }
 	uint giveISR  ( const C *_data )                 { return msg_giveISR  (this, _data, sizeof(C)); }
 	template<typename T>

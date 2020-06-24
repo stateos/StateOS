@@ -8,58 +8,69 @@ static unsigned sent;
 
 static void proc3()
 {
-	unsigned bytes;
 	unsigned event;
+	unsigned value;
+	unsigned read = SIZE;
 
- 	bytes = msg_wait(msg3, &event, SIZE);        ASSERT(bytes == SIZE);
-	                                             ASSERT(event == sent);
-	event = msg_give(msg2, &event, SIZE);        ASSERT_success(event);
+	event = msg_wait(msg3, &value, SIZE, &read); ASSERT_success(event);
+	                                             ASSERT(read == SIZE);
+	                                             ASSERT(value == sent);
+	event = msg_give(msg2, &value, SIZE);        ASSERT_success(event);
 	        tsk_stop();
 }
 
 static void proc2()
 {
-	unsigned bytes;
 	unsigned event;
+	unsigned value;
+	unsigned read = SIZE;
 		                                         ASSERT_dead(tsk3);
 	        tsk_startFrom(tsk3, proc3);          ASSERT_ready(tsk3);
- 	bytes = msg_wait(msg2, &event, SIZE);        ASSERT(bytes == SIZE);
- 	                                             ASSERT(event == sent);
-	event = msg_give(msg3, &event, SIZE);        ASSERT_success(event);
- 	bytes = msg_wait(msg2, &event, SIZE);        ASSERT(bytes == SIZE);
-	                                             ASSERT(event == sent);
-	event = msg_give(msg1, &event, SIZE);        ASSERT_success(event);
+	event = msg_wait(msg2, &value, SIZE, &read); ASSERT_success(event);
+	                                             ASSERT(read == SIZE);
+ 	                                             ASSERT(value == sent);
+	event = msg_give(msg3, &value, SIZE);        ASSERT_success(event);
+	event = msg_wait(msg2, &value, SIZE, &read); ASSERT_success(event);
+	                                             ASSERT(read == SIZE);
+ 	                                             ASSERT(value == sent);
+	event = msg_give(msg1, &value, SIZE);        ASSERT_success(event);
 	event = tsk_join(tsk3);                      ASSERT_success(event);
 	        tsk_stop();
 }
 
 static void proc1()
 {
-	unsigned bytes;
 	unsigned event;
+	unsigned value;
+	unsigned read = SIZE;
 		                                         ASSERT_dead(tsk2);
 	        tsk_startFrom(tsk2, proc2);          ASSERT_ready(tsk2);
- 	bytes = msg_wait(msg1, &event, SIZE);        ASSERT(bytes == SIZE);
- 	                                             ASSERT(event == sent);
-	event = msg_give(msg2, &event, SIZE);        ASSERT_success(event);
- 	bytes = msg_wait(msg1, &event, SIZE);        ASSERT(bytes == SIZE);
- 	                                             ASSERT(event == sent);
-	event = msg_give(&msg0, &event, SIZE);       ASSERT_success(event);
+	event = msg_wait(msg1, &value, SIZE, &read); ASSERT_success(event);
+	                                             ASSERT(read == SIZE);
+ 	                                             ASSERT(value == sent);
+	event = msg_give(msg2, &value, SIZE);        ASSERT_success(event);
+	event = msg_wait(msg1, &value, SIZE, &read); ASSERT_success(event);
+	                                             ASSERT(read == SIZE);
+ 	                                             ASSERT(value == sent);
+	event = msg_give(&msg0, &value, SIZE);       ASSERT_success(event);
 	event = tsk_join(tsk2);                      ASSERT_success(event);
 	        tsk_stop();
 }
 
 static void proc0()
 {
-	unsigned bytes;
 	unsigned event;
+	unsigned value;
+	unsigned read = SIZE;
 		                                         ASSERT_dead(tsk1);
 	        tsk_startFrom(tsk1, proc1);          ASSERT_ready(tsk1);
- 	bytes = msg_wait(&msg0, &event, SIZE);       ASSERT(bytes == SIZE);
- 	                                             ASSERT(event == sent);
-	event = msg_give(msg1, &event, SIZE);        ASSERT_success(event);
- 	bytes = msg_wait(&msg0, &event, SIZE);       ASSERT(bytes == SIZE);
- 	                                             ASSERT(event == sent);
+	event = msg_wait(&msg0, &value, SIZE, &read);ASSERT_success(event);
+	                                             ASSERT(read == SIZE);
+ 	                                             ASSERT(value == sent);
+	event = msg_give(msg1, &value, SIZE);        ASSERT_success(event);
+	event = msg_wait(&msg0, &value, SIZE, &read);ASSERT_success(event);
+	                                             ASSERT(read == SIZE);
+ 	                                             ASSERT(value == sent);
 	event = tsk_join(tsk1);                      ASSERT_success(event);
 	        tsk_stop();
 }

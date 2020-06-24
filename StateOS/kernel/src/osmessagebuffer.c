@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -222,10 +222,11 @@ void priv_msg_putSize( msg_t *msg, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_getUpdate( msg_t *msg, char *data, unsigned size )
+void priv_msg_getUpdate( msg_t *msg, char *data, unsigned size, unsigned *read )
 /* -------------------------------------------------------------------------- */
 {
 	size = priv_msg_getSize(msg);
+	if (read != NULL) *read = size;
 	priv_msg_get(msg, data, size);
 
 	while (msg->obj.queue != 0 && msg->count + sizeof(unsigned) + msg->obj.queue->tmp.msg.size <= msg->limit)
@@ -234,8 +235,6 @@ unsigned priv_msg_getUpdate( msg_t *msg, char *data, unsigned size )
 		priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
 		core_one_wakeup(msg->obj.queue, E_SUCCESS);
 	}
-
-	return size;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -246,13 +245,13 @@ void priv_msg_putUpdate( msg_t *msg, const char *data, unsigned size )
 	priv_msg_putSize(msg, size);
 	priv_msg_put(msg, data, size);
 
-	while (msg->obj.queue != 0)
+	while (msg->obj.queue != 0 && msg->count > 0)
 	{
 		if (msg->obj.queue->tmp.msg.size >= priv_msg_size(msg))
 		{
-			size = priv_msg_getSize(msg);
-			priv_msg_get(msg, msg->obj.queue->tmp.msg.data.in, size);
-			core_one_wakeup(msg->obj.queue, size);
+			msg->obj.queue->tmp.msg.size = priv_msg_getSize(msg);
+			priv_msg_get(msg, msg->obj.queue->tmp.msg.data.in, msg->obj.queue->tmp.msg.size);
+			core_one_wakeup(msg->obj.queue, E_SUCCESS);
 		}
 		else
 		{
@@ -281,13 +280,16 @@ void priv_msg_skipUpdate( msg_t *msg, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_take( msg_t *msg, char *data, unsigned size )
+unsigned priv_msg_take( msg_t *msg, char *data, unsigned size, unsigned *read )
 /* -------------------------------------------------------------------------- */
 {
 	if (msg->count > 0)
 	{
 		if (size >= priv_msg_size(msg))
-			return priv_msg_getUpdate(msg, data, size);
+		{
+			priv_msg_getUpdate(msg, data, size, read);
+			return E_SUCCESS;
+		}
 
 		return E_FAILURE;
 	}
@@ -296,82 +298,86 @@ unsigned priv_msg_take( msg_t *msg, char *data, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_take( msg_t *msg, void *data, unsigned size )
+unsigned msg_take( msg_t *msg, void *data, unsigned size, unsigned *read )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned event;
 
 	assert(msg);
 	assert(msg->obj.res!=RELEASED);
 	assert(msg->data);
 	assert(msg->limit);
-	assert(data);
+	assert(data||size==0);
 
 	sys_lock();
 	{
-		len = priv_msg_take(msg, data, size);
+		event = priv_msg_take(msg, data, size, read);
 	}
 	sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, cnt_t delay )
+unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, unsigned *read, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned event;
 
 	assert_tsk_context();
 	assert(msg);
 	assert(msg->obj.res!=RELEASED);
 	assert(msg->data);
 	assert(msg->limit);
-	assert(data);
+	assert(data||size==0);
 
 	sys_lock();
 	{
-		len = priv_msg_take(msg, data, size);
+		event = priv_msg_take(msg, data, size, read);
 
-		if (len == E_TIMEOUT)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.in = data;
 			System.cur->tmp.msg.size = size;
-			len = core_tsk_waitFor(&msg->obj.queue, delay);
+			event = core_tsk_waitFor(&msg->obj.queue, delay);
+			if (event == E_SUCCESS && read != NULL)
+				*read = System.cur->tmp.msg.size;
 		}
 	}
 	sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, cnt_t time )
+unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, unsigned *read, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned len;
+	unsigned event;
 
 	assert_tsk_context();
 	assert(msg);
 	assert(msg->obj.res!=RELEASED);
 	assert(msg->data);
 	assert(msg->limit);
-	assert(data);
+	assert(data||size==0);
 
 	sys_lock();
 	{
-		len = priv_msg_take(msg, data, size);
+		event = priv_msg_take(msg, data, size, read);
 
-		if (len == E_TIMEOUT)
+		if (event == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.in = data;
 			System.cur->tmp.msg.size = size;
-			len = core_tsk_waitUntil(&msg->obj.queue, time);
+			event = core_tsk_waitUntil(&msg->obj.queue, time);
+			if (event == E_SUCCESS && read != NULL)
+				*read = System.cur->tmp.msg.size;
 		}
 	}
 	sys_unlock();
 
-	return len;
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -401,7 +407,7 @@ unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 	assert(msg->obj.res!=RELEASED);
 	assert(msg->data);
 	assert(msg->limit);
-	assert(data);
+	assert(data||size==0);
 
 	sys_lock();
 	{
@@ -423,7 +429,7 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
 	assert(msg->obj.res!=RELEASED);
 	assert(msg->data);
 	assert(msg->limit);
-	assert(data);
+	assert(data||size==0);
 
 	sys_lock();
 	{
@@ -452,7 +458,7 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
 	assert(msg->obj.res!=RELEASED);
 	assert(msg->data);
 	assert(msg->limit);
-	assert(data);
+	assert(data||size==0);
 
 	sys_lock();
 	{
@@ -496,7 +502,7 @@ unsigned msg_push( msg_t *msg, const void *data, unsigned size )
 	assert(msg->obj.res!=RELEASED);
 	assert(msg->data);
 	assert(msg->limit);
-	assert(data);
+	assert(data||size==0);
 
 	sys_lock();
 	{

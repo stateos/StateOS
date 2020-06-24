@@ -68,6 +68,7 @@ Features:
 - the task deleter go back to the idle process
 - simplified parameters of the core_tsk_wait function
 - updated signal functions
+- updated message buffer functions
 ---------
 6.6
 - updated os version
