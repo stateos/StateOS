@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    18.06.2020
+    @date    25.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -475,19 +475,19 @@ struct MemoryPoolT : public __mem
 		return Ptr(mem);
 	}
 
-	void reset    ( void )                               {        mem_reset    (this); }
-	void kill     ( void )                               {        mem_kill     (this); }
-	void destroy  ( void )                               {        mem_destroy  (this); }
-	uint take     (       void **_data )                 { return mem_take     (this, _data); }
-	uint tryWait  (       void **_data )                 { return mem_tryWait  (this, _data); }
-	uint takeISR  (       void **_data )                 { return mem_takeISR  (this, _data); }
+	void     reset    ( void )                               {        mem_reset    (this); }
+	void     kill     ( void )                               {        mem_kill     (this); }
+	void     destroy  ( void )                               {        mem_destroy  (this); }
+	unsigned take     (       void **_data )                 { return mem_take     (this, _data); }
+	unsigned tryWait  (       void **_data )                 { return mem_tryWait  (this, _data); }
+	unsigned takeISR  (       void **_data )                 { return mem_takeISR  (this, _data); }
 	template<typename T>
-	uint waitFor  (       void **_data, const T _delay ) { return mem_waitFor  (this, _data, Clock::count(_delay)); }
+	unsigned waitFor  (       void **_data, const T _delay ) { return mem_waitFor  (this, _data, Clock::count(_delay)); }
 	template<typename T>
-	uint waitUntil(       void **_data, const T _time )  { return mem_waitUntil(this, _data, Clock::until(_time)); }
-	uint wait     (       void **_data )                 { return mem_wait     (this, _data); }
-	void give     ( const void  *_data )                 {        mem_give     (this, _data); }
-	void giveISR  ( const void  *_data )                 {        mem_giveISR  (this, _data); }
+	unsigned waitUntil(       void **_data, const T _time )  { return mem_waitUntil(this, _data, Clock::until(_time)); }
+	unsigned wait     (       void **_data )                 { return mem_wait     (this, _data); }
+	void     give     ( const void  *_data )                 {        mem_give     (this, _data); }
+	void     giveISR  ( const void  *_data )                 {        mem_giveISR  (this, _data); }
 
 	private:
 	que_t data_[limit_ * (1 + MEM_SIZE(size_))];
@@ -541,14 +541,14 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
 		return Ptr(mem);
 	}
 
-	uint take     ( C **_data )                 { return mem_take     (this, reinterpret_cast<void **>(_data)); }
-	uint tryWait  ( C **_data )                 { return mem_tryWait  (this, reinterpret_cast<void **>(_data)); }
-	uint takeISR  ( C **_data )                 { return mem_takeISR  (this, reinterpret_cast<void **>(_data)); }
+	unsigned take     ( C **_data )                 { return mem_take     (this, reinterpret_cast<void **>(_data)); }
+	unsigned tryWait  ( C **_data )                 { return mem_tryWait  (this, reinterpret_cast<void **>(_data)); }
+	unsigned takeISR  ( C **_data )                 { return mem_takeISR  (this, reinterpret_cast<void **>(_data)); }
 	template<typename T>
-	uint waitFor  ( C **_data, const T _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
+	unsigned waitFor  ( C **_data, const T _delay ) { return mem_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
 	template<typename T>
-	uint waitUntil( C **_data, const T _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
-	uint wait     ( C **_data )                 { return mem_wait     (this, reinterpret_cast<void **>(_data)); }
+	unsigned waitUntil( C **_data, const T _time )  { return mem_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
+	unsigned wait     ( C **_data )                 { return mem_wait     (this, reinterpret_cast<void **>(_data)); }
 };
 
 #endif//__cplusplus

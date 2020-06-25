@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.h
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    25.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -436,19 +436,19 @@ struct ListTT : public __lst
 		return Ptr(lst);
 	}
 
-	void reset    ( void )                              {        lst_reset    (this); }
-	void kill     ( void )                              {        lst_kill     (this); }
-	void destroy  ( void )                              {        lst_destroy  (this); }
-	uint take     (       C   **_data )                 { return lst_take     (this, reinterpret_cast<void **>(_data)); }
-	uint tryWait  (       C   **_data )                 { return lst_tryWait  (this, reinterpret_cast<void **>(_data)); }
-	uint takeISR  (       C   **_data )                 { return lst_takeISR  (this, reinterpret_cast<void **>(_data)); }
+	void     reset    ( void )                              {        lst_reset    (this); }
+	void     kill     ( void )                              {        lst_kill     (this); }
+	void     destroy  ( void )                              {        lst_destroy  (this); }
+	unsigned take     (       C   **_data )                 { return lst_take     (this, reinterpret_cast<void **>(_data)); }
+	unsigned tryWait  (       C   **_data )                 { return lst_tryWait  (this, reinterpret_cast<void **>(_data)); }
+	unsigned takeISR  (       C   **_data )                 { return lst_takeISR  (this, reinterpret_cast<void **>(_data)); }
 	template<typename T>
-	uint waitFor  (       C   **_data, const T _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
+	unsigned waitFor  (       C   **_data, const T _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
 	template<typename T>
-	uint waitUntil(       C   **_data, const T _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
-	uint wait     (       C   **_data )                 { return lst_wait     (this, reinterpret_cast<void **>(_data)); }
-	void give     ( const void *_data )                 {        lst_give     (this,                           _data); }
-	void giveISR  ( const void *_data )                 {        lst_giveISR  (this,                           _data); }
+	unsigned waitUntil(       C   **_data, const T _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
+	unsigned wait     (       C   **_data )                 { return lst_wait     (this, reinterpret_cast<void **>(_data)); }
+	void     give     ( const void *_data )                 {        lst_give     (this,                           _data); }
+	void     giveISR  ( const void *_data )                 {        lst_giveISR  (this,                           _data); }
 };
 
 /******************************************************************************

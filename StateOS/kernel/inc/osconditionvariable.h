@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    25.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -425,23 +425,23 @@ struct ConditionVariable : public __cnd
 		return Ptr(cnd);
 	}
 
-	void reset    ( void )                        {        cnd_reset    (this); }
-	void kill     ( void )                        {        cnd_kill     (this); }
-	void destroy  ( void )                        {        cnd_destroy  (this); }
+	void     reset    ( void )                        {        cnd_reset    (this); }
+	void     kill     ( void )                        {        cnd_kill     (this); }
+	void     destroy  ( void )                        {        cnd_destroy  (this); }
 	template<typename T>
-	uint waitFor  ( mtx_t *_mtx, const T _delay ) { return cnd_waitFor  (this,  _mtx, Clock::count(_delay)); }
+	unsigned waitFor  ( mtx_t *_mtx, const T _delay ) { return cnd_waitFor  (this,  _mtx, Clock::count(_delay)); }
 	template<typename T>
-	uint waitFor  ( mtx_t &_mtx, const T _delay ) { return cnd_waitFor  (this, &_mtx, Clock::count(_delay)); }
+	unsigned waitFor  ( mtx_t &_mtx, const T _delay ) { return cnd_waitFor  (this, &_mtx, Clock::count(_delay)); }
 	template<typename T>
-	uint waitUntil( mtx_t *_mtx, const T _time )  { return cnd_waitUntil(this,  _mtx, Clock::until(_time)); }
+	unsigned waitUntil( mtx_t *_mtx, const T _time )  { return cnd_waitUntil(this,  _mtx, Clock::until(_time)); }
 	template<typename T>
-	uint waitUntil( mtx_t &_mtx, const T _time )  { return cnd_waitUntil(this, &_mtx, Clock::until(_time)); }
-	uint wait     ( mtx_t *_mtx )                 { return cnd_wait     (this,  _mtx); }
-	uint wait     ( mtx_t &_mtx )                 { return cnd_wait     (this, &_mtx); }
-	void give     ( bool   _all = cndAll )        {        cnd_give     (this,  _all); }
-	void giveISR  ( bool   _all = cndAll )        {        cnd_giveISR  (this,  _all); }
-	void notifyOne( void )                        {        cnd_notifyOne(this); }
-	void notifyAll( void )                        {        cnd_notifyAll(this); }
+	unsigned waitUntil( mtx_t &_mtx, const T _time )  { return cnd_waitUntil(this, &_mtx, Clock::until(_time)); }
+	unsigned wait     ( mtx_t *_mtx )                 { return cnd_wait     (this,  _mtx); }
+	unsigned wait     ( mtx_t &_mtx )                 { return cnd_wait     (this, &_mtx); }
+	void     give     ( bool   _all = cndAll )        {        cnd_give     (this,  _all); }
+	void     giveISR  ( bool   _all = cndAll )        {        cnd_giveISR  (this,  _all); }
+	void     notifyOne( void )                        {        cnd_notifyOne(this); }
+	void     notifyAll( void )                        {        cnd_notifyAll(this); }
 };
 
 #endif//__cplusplus

@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    22.06.2020
+    @date    25.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -604,40 +604,40 @@ struct EventQueueT : public __evq
 		return Ptr(evq);
 	}
 
-	void reset    ( void )                            {        evq_reset    (this); }
-	void kill     ( void )                            {        evq_kill     (this); }
-	void destroy  ( void )                            {        evq_destroy  (this); }
-	uint take     ( unsigned *_data )                 { return evq_take     (this,  _data); }
-	uint take     ( unsigned &_data )                 { return evq_take     (this, &_data); }
-	uint tryWait  ( unsigned *_data )                 { return evq_tryWait  (this,  _data); }
-	uint tryWait  ( unsigned &_data )                 { return evq_tryWait  (this, &_data); }
-	uint takeISR  ( unsigned *_data )                 { return evq_takeISR  (this,  _data); }
-	uint takeISR  ( unsigned &_data )                 { return evq_takeISR  (this, &_data); }
+	void     reset    ( void )                            {        evq_reset    (this); }
+	void     kill     ( void )                            {        evq_kill     (this); }
+	void     destroy  ( void )                            {        evq_destroy  (this); }
+	unsigned take     ( unsigned *_data )                 { return evq_take     (this,  _data); }
+	unsigned take     ( unsigned &_data )                 { return evq_take     (this, &_data); }
+	unsigned tryWait  ( unsigned *_data )                 { return evq_tryWait  (this,  _data); }
+	unsigned tryWait  ( unsigned &_data )                 { return evq_tryWait  (this, &_data); }
+	unsigned takeISR  ( unsigned *_data )                 { return evq_takeISR  (this,  _data); }
+	unsigned takeISR  ( unsigned &_data )                 { return evq_takeISR  (this, &_data); }
 	template<typename T>
-	uint waitFor  ( unsigned *_data, const T _delay ) { return evq_waitFor  (this,  _data, Clock::count(_delay)); }
+	unsigned waitFor  ( unsigned *_data, const T _delay ) { return evq_waitFor  (this,  _data, Clock::count(_delay)); }
 	template<typename T>
-	uint waitFor  ( unsigned &_data, const T _delay ) { return evq_waitFor  (this, &_data, Clock::count(_delay)); }
+	unsigned waitFor  ( unsigned &_data, const T _delay ) { return evq_waitFor  (this, &_data, Clock::count(_delay)); }
 	template<typename T>
-	uint waitUntil( unsigned *_data, const T _time )  { return evq_waitUntil(this,  _data, Clock::until(_time)); }
+	unsigned waitUntil( unsigned *_data, const T _time )  { return evq_waitUntil(this,  _data, Clock::until(_time)); }
 	template<typename T>
-	uint waitUntil( unsigned &_data, const T _time )  { return evq_waitUntil(this, &_data, Clock::until(_time)); }
-	uint wait     ( unsigned *_data )                 { return evq_wait     (this,  _data); }
-	uint wait     ( unsigned &_data )                 { return evq_wait     (this, &_data); }
-	uint give     ( unsigned  _data )                 { return evq_give     (this,  _data); }
-	uint giveISR  ( unsigned  _data )                 { return evq_giveISR  (this,  _data); }
+	unsigned waitUntil( unsigned &_data, const T _time )  { return evq_waitUntil(this, &_data, Clock::until(_time)); }
+	unsigned wait     ( unsigned *_data )                 { return evq_wait     (this,  _data); }
+	unsigned wait     ( unsigned &_data )                 { return evq_wait     (this, &_data); }
+	unsigned give     ( unsigned  _data )                 { return evq_give     (this,  _data); }
+	unsigned giveISR  ( unsigned  _data )                 { return evq_giveISR  (this,  _data); }
 	template<typename T>
-	uint sendFor  ( unsigned  _data, const T _delay ) { return evq_sendFor  (this,  _data, Clock::count(_delay)); }
+	unsigned sendFor  ( unsigned  _data, const T _delay ) { return evq_sendFor  (this,  _data, Clock::count(_delay)); }
 	template<typename T>
-	uint sendUntil( unsigned  _data, const T _time )  { return evq_sendUntil(this,  _data, Clock::until(_time)); }
-	uint send     ( unsigned  _data )                 { return evq_send     (this,  _data); }
-	void push     ( unsigned  _data )                 {        evq_push     (this,  _data); }
-	void pushISR  ( unsigned  _data )                 {        evq_pushISR  (this,  _data); }
-	uint count    ( void )                            { return evq_count    (this); }
-	uint countISR ( void )                            { return evq_countISR (this); }
-	uint space    ( void )                            { return evq_space    (this); }
-	uint spaceISR ( void )                            { return evq_spaceISR (this); }
-	uint limit    ( void )                            { return evq_limit    (this); }
-	uint limitISR ( void )                            { return evq_limitISR (this); }
+	unsigned sendUntil( unsigned  _data, const T _time )  { return evq_sendUntil(this,  _data, Clock::until(_time)); }
+	unsigned send     ( unsigned  _data )                 { return evq_send     (this,  _data); }
+	void     push     ( unsigned  _data )                 {        evq_push     (this,  _data); }
+	void     pushISR  ( unsigned  _data )                 {        evq_pushISR  (this,  _data); }
+	unsigned count    ( void )                            { return evq_count    (this); }
+	unsigned countISR ( void )                            { return evq_countISR (this); }
+	unsigned space    ( void )                            { return evq_space    (this); }
+	unsigned spaceISR ( void )                            { return evq_spaceISR (this); }
+	unsigned limit    ( void )                            { return evq_limit    (this); }
+	unsigned limitISR ( void )                            { return evq_limitISR (this); }
 
 	private:
 	unsigned data_[limit_];

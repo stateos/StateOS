@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.h
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    25.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -409,19 +409,19 @@ struct FastMutex : public __mut
 		return Ptr(mut);
 	}
 
-	void reset    ( void )           {        mut_reset    (this); }
-	void kill     ( void )           {        mut_kill     (this); }
-	void destroy  ( void )           {        mut_destroy  (this); }
-	uint take     ( void )           { return mut_take     (this); }
-	uint tryLock  ( void )           { return mut_tryLock  (this); }
+	void     reset    ( void )           {        mut_reset    (this); }
+	void     kill     ( void )           {        mut_kill     (this); }
+	void     destroy  ( void )           {        mut_destroy  (this); }
+	unsigned take     ( void )           { return mut_take     (this); }
+	unsigned tryLock  ( void )           { return mut_tryLock  (this); }
 	template<typename T>
-	uint waitFor  ( const T _delay ) { return mut_waitFor  (this, Clock::count(_delay)); }
+	unsigned waitFor  ( const T _delay ) { return mut_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	uint waitUntil( const T _time )  { return mut_waitUntil(this, Clock::until(_time)); }
-	uint wait     ( void )           { return mut_wait     (this); }
-	uint lock     ( void )           { return mut_lock     (this); }
-	uint give     ( void )           { return mut_give     (this); }
-	uint unlock   ( void )           { return mut_unlock   (this); }
+	unsigned waitUntil( const T _time )  { return mut_waitUntil(this, Clock::until(_time)); }
+	unsigned wait     ( void )           { return mut_wait     (this); }
+	unsigned lock     ( void )           { return mut_lock     (this); }
+	unsigned give     ( void )           { return mut_give     (this); }
+	unsigned unlock   ( void )           { return mut_unlock   (this); }
 };
 
 #endif//__cplusplus

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    25.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1386,46 +1386,46 @@ struct baseTask : public __tsk
 	baseTask( const unsigned _prio, fun_t * _state, stk_t * const _stack, const size_t _size ): __tsk _TSK_INIT(_prio, _state, _stack, _size) {}
 #endif
 
-	void start    ( void )             {        tsk_start    (this); }
+	void     start    ( void )             {        tsk_start    (this); }
 #if __cplusplus >= 201402
 	template<class F>
-	void startFrom( F&&      _state )  {        new (&fun) Fun_t(_state);
-	                                            tsk_startFrom(this, fun_); }
+	void     startFrom( F&&      _state )  {        new (&fun) Fun_t(_state);
+	                                                tsk_startFrom(this, fun_); }
 #else
-	void startFrom( fun_t *  _state )  {        tsk_startFrom(this, _state); }
+	void     startFrom( fun_t *  _state )  {        tsk_startFrom(this, _state); }
 #endif
-	uint detach   ( void )             { return tsk_detach   (this); }
-	uint join     ( void )             { return tsk_join     (this); }
-	uint reset    ( void )             { return tsk_reset    (this); }
-	uint kill     ( void )             { return tsk_kill     (this); }
-	uint destroy  ( void )             { return tsk_destroy  (this); }
-	uint prio     ( void )             { return __tsk::basic; }
-	uint getPrio  ( void )             { return __tsk::basic; }
-	uint suspend  ( void )             { return tsk_suspend  (this); }
-	uint resume   ( void )             { return tsk_resume   (this); }
-	uint resumeISR( void )             { return tsk_resumeISR(this); }
-	void give     ( unsigned _signo )  {        tsk_give     (this, _signo); }
-	void signal   ( unsigned _signo )  {        tsk_signal   (this, _signo); }
+	unsigned detach   ( void )             { return tsk_detach   (this); }
+	unsigned join     ( void )             { return tsk_join     (this); }
+	unsigned reset    ( void )             { return tsk_reset    (this); }
+	unsigned kill     ( void )             { return tsk_kill     (this); }
+	unsigned destroy  ( void )             { return tsk_destroy  (this); }
+	unsigned prio     ( void )             { return __tsk::basic; }
+	unsigned getPrio  ( void )             { return __tsk::basic; }
+	unsigned suspend  ( void )             { return tsk_suspend  (this); }
+	unsigned resume   ( void )             { return tsk_resume   (this); }
+	unsigned resumeISR( void )             { return tsk_resumeISR(this); }
+	void     give     ( unsigned _signo )  {        tsk_give     (this, _signo); }
+	void     signal   ( unsigned _signo )  {        tsk_signal   (this, _signo); }
 #if __cplusplus >= 201402
 	template<class F>
-	void action   ( F&&      _action ) {        new (&act) Act_t(_action);
-	                                            tsk_action   (this, act_); }
+	void     action   ( F&&      _action ) {        new (&act) Act_t(_action);
+	                                                tsk_action   (this, act_); }
 #else
-	void action   ( act_t *  _action ) {        tsk_action   (this, _action); }
+	void     action   ( act_t *  _action ) {        tsk_action   (this, _action); }
 #endif
 	explicit
-	operator bool () const             { return __tsk::hdr.id != ID_STOPPED; }
+	operator bool     () const             { return __tsk::hdr.id != ID_STOPPED; }
 
 	template<class T = baseTask> static
-	T *  current  ( void )             { return static_cast<T *>(tsk_this()); }
+	T *      current  ( void )             { return static_cast<T *>(tsk_this()); }
 
 #if __cplusplus >= 201402
 	static
-	void fun_     ( void )             {        current()->fun(); }
-	Fun_t fun;
+	void     fun_     ( void )             {        current()->fun(); }
+	Fun_t    fun;
 	static
-	void act_     ( unsigned _signo )  {        current()->act(_signo); }
-	Act_t act;
+	void     act_     ( unsigned _signo )  {        current()->act(_signo); }
+	Act_t    act;
 #endif
 
 /******************************************************************************
@@ -1439,60 +1439,60 @@ struct baseTask : public __tsk
 	struct Current
 	{
 		static
-		uint detach    ( void )             { return cur_detach    (); }
+		unsigned detach    ( void )             { return cur_detach    (); }
 		static
-		void stop      ( void )             {        tsk_stop      (); }
+		void     stop      ( void )             {        tsk_stop      (); }
 		static
-		void exit      ( void )             {        tsk_exit      (); }
+		void     exit      ( void )             {        tsk_exit      (); }
 		static
-		uint reset     ( void )             { return cur_reset     (); }
+		unsigned reset     ( void )             { return cur_reset     (); }
 		static
-		uint kill      ( void )             { return cur_kill      (); }
+		unsigned kill      ( void )             { return cur_kill      (); }
 		static
-		uint destroy   ( void )             { return cur_destroy   (); }
+		unsigned destroy   ( void )             { return cur_destroy   (); }
 		static
-		void yield     ( void )             {        tsk_yield     (); }
+		void     yield     ( void )             {        tsk_yield     (); }
 		static
-		void pass      ( void )             {        tsk_pass      (); }
+		void     pass      ( void )             {        tsk_pass      (); }
 #if __cplusplus >= 201402
 		template<class F> static
-		void flip      ( F&&      _state )  {        new (&current()->fun) Fun_t(_state);
-		                                             tsk_flip      (fun_); }
+		void     flip      ( F&&      _state )  {        new (&current()->fun) Fun_t(_state);
+		                                                 tsk_flip      (fun_); }
 #else
 		static
-		void flip      ( fun_t *  _state )  {        tsk_flip      (_state); }
+		void     flip      ( fun_t *  _state )  {        tsk_flip      (_state); }
 #endif
 		static
-		void setPrio   ( unsigned _prio )   {        tsk_setPrio   (_prio); }
+		void     setPrio   ( unsigned _prio )   {        tsk_setPrio   (_prio); }
 		static
-		void prio      ( unsigned _prio )   {        tsk_prio      (_prio); }
+		void     prio      ( unsigned _prio )   {        tsk_prio      (_prio); }
 		static
-		uint getPrio   ( void )             { return tsk_getPrio   (); }
+		unsigned getPrio   ( void )             { return tsk_getPrio   (); }
 		static
-		uint prio      ( void )             { return tsk_getPrio   (); }
+		unsigned prio      ( void )             { return tsk_getPrio   (); }
 		template<typename T> static
-		void sleepFor  ( const T  _delay )  {        tsk_sleepFor  (Clock::count(_delay)); }
+		void     sleepFor  ( const T  _delay )  {        tsk_sleepFor  (Clock::count(_delay)); }
 		template<typename T> static
-		void sleepNext ( const T  _delay )  {        tsk_sleepNext (Clock::count(_delay)); }
+		void     sleepNext ( const T  _delay )  {        tsk_sleepNext (Clock::count(_delay)); }
 		template<typename T> static
-		void sleepUntil( const T  _time )   {        tsk_sleepUntil(Clock::until(_time)); }
+		void     sleepUntil( const T  _time )   {        tsk_sleepUntil(Clock::until(_time)); }
 		static
-		void sleep     ( void )             {        tsk_sleep     (); }
+		void     sleep     ( void )             {        tsk_sleep     (); }
 		template<typename T> static
-		void delay     ( const T  _delay )  {        tsk_delay     (Clock::count(_delay)); }
+		void     delay     ( const T  _delay )  {        tsk_delay     (Clock::count(_delay)); }
 		static
-		void suspend   ( void )             {        cur_suspend   (); }
+		void     suspend   ( void )             {        cur_suspend   (); }
 		static
-		void give      ( unsigned _signo )  {        cur_give      (_signo); }
+		void     give      ( unsigned _signo )  {        cur_give      (_signo); }
 		static
-		void signal    ( unsigned _signo )  {        cur_signal    (_signo); }
+		void     signal    ( unsigned _signo )  {        cur_signal    (_signo); }
 #if __cplusplus >= 201402
 		template<class F> static
-		void action    ( F&&      _action ) {        new (&current()->act) Act_t(_action);
-		                                             cur_action    (act_); }
+		void     action    ( F&&      _action ) {        new (&current()->act) Act_t(_action);
+		                                                 cur_action    (act_); }
 #else
 		static
-		void action    ( act_t *  _action ) {        cur_action    (_action); }
+		void     action    ( act_t *  _action ) {        cur_action    (_action); }
 #endif
 	};
 };

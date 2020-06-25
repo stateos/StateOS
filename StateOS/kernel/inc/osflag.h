@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    25.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -504,24 +504,24 @@ struct Flag : public __flg
 		return Ptr(flg);
 	}
 
-	void reset    ( void )                                        {        flg_reset    (this); }
-	void kill     ( void )                                        {        flg_kill     (this); }
-	void destroy  ( void )                                        {        flg_destroy  (this); }
-	uint take     ( unsigned _flags, char _mode = flgAll )        { return flg_take     (this, _flags, _mode); }
-	uint tryWait  ( unsigned _flags, char _mode = flgAll )        { return flg_tryWait  (this, _flags, _mode); }
-	uint takeISR  ( unsigned _flags, char _mode = flgAll )        { return flg_takeISR  (this, _flags, _mode); }
+	void     reset    ( void )                                        {        flg_reset    (this); }
+	void     kill     ( void )                                        {        flg_kill     (this); }
+	void     destroy  ( void )                                        {        flg_destroy  (this); }
+	unsigned take     ( unsigned _flags, char _mode = flgAll )        { return flg_take     (this, _flags, _mode); }
+	unsigned tryWait  ( unsigned _flags, char _mode = flgAll )        { return flg_tryWait  (this, _flags, _mode); }
+	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )        { return flg_takeISR  (this, _flags, _mode); }
 	template<typename T>
-	uint waitFor  ( unsigned _flags, char _mode, const T _delay ) { return flg_waitFor  (this, _flags, _mode, Clock::count(_delay)); }
+	unsigned waitFor  ( unsigned _flags, char _mode, const T _delay ) { return flg_waitFor  (this, _flags, _mode, Clock::count(_delay)); }
 	template<typename T>
-	uint waitUntil( unsigned _flags, char _mode, const T _time )  { return flg_waitUntil(this, _flags, _mode, Clock::until(_time)); }
-	uint wait     ( unsigned _flags, char _mode = flgAll )        { return flg_wait     (this, _flags, _mode); }
-	uint give     ( unsigned _flags )                             { return flg_give     (this, _flags); }
-	uint set      ( unsigned _flags )                             { return flg_set      (this, _flags); }
-	uint giveISR  ( unsigned _flags )                             { return flg_giveISR  (this, _flags); }
-	uint clear    ( unsigned _flags )                             { return flg_clear    (this, _flags); }
-	uint clearISR ( unsigned _flags )                             { return flg_clearISR (this, _flags); }
-	uint get      ( void )                                        { return flg_get      (this); }
-	uint getISR   ( void )                                        { return flg_getISR   (this); }
+	unsigned waitUntil( unsigned _flags, char _mode, const T _time )  { return flg_waitUntil(this, _flags, _mode, Clock::until(_time)); }
+	unsigned wait     ( unsigned _flags, char _mode = flgAll )        { return flg_wait     (this, _flags, _mode); }
+	unsigned give     ( unsigned _flags )                             { return flg_give     (this, _flags); }
+	unsigned set      ( unsigned _flags )                             { return flg_set      (this, _flags); }
+	unsigned giveISR  ( unsigned _flags )                             { return flg_giveISR  (this, _flags); }
+	unsigned clear    ( unsigned _flags )                             { return flg_clear    (this, _flags); }
+	unsigned clearISR ( unsigned _flags )                             { return flg_clearISR (this, _flags); }
+	unsigned get      ( void )                                        { return flg_get      (this); }
+	unsigned getISR   ( void )                                        { return flg_getISR   (this); }
 };
 
 #endif//__cplusplus
