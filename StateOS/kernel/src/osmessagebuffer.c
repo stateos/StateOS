@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    25.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -130,7 +130,7 @@ void msg_destroy( msg_t *msg )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_peek( msg_t *msg, char *data, unsigned size )
+void priv_msg_peek( msg_t *msg, char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i = msg->head;
@@ -144,7 +144,7 @@ void priv_msg_peek( msg_t *msg, char *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_get( msg_t *msg, char *data, unsigned size )
+void priv_msg_get( msg_t *msg, char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i = msg->head;
@@ -160,7 +160,7 @@ void priv_msg_get( msg_t *msg, char *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_put( msg_t *msg, const char *data, unsigned size )
+void priv_msg_put( msg_t *msg, const char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i = msg->tail;
@@ -176,7 +176,7 @@ void priv_msg_put( msg_t *msg, const char *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_skip( msg_t *msg, unsigned size )
+void priv_msg_skip( msg_t *msg, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	msg->count -= size;
@@ -186,50 +186,50 @@ void priv_msg_skip( msg_t *msg, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_size( msg_t *msg )
+size_t priv_msg_size( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned size;
+	size_t size;
 
 	assert(msg->count);
 
-	priv_msg_peek(msg, (void *)&size, sizeof(unsigned));
+	priv_msg_peek(msg, (void *)&size, sizeof(size_t));
 
 	return size;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_getSize( msg_t *msg )
+size_t priv_msg_getSize( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned size;
+	size_t size;
 
 	assert(msg->count);
 
-	priv_msg_get(msg, (void *)&size, sizeof(unsigned));
+	priv_msg_get(msg, (void *)&size, sizeof(size_t));
 
 	return size;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_putSize( msg_t *msg, unsigned size )
+void priv_msg_putSize( msg_t *msg, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	priv_msg_put(msg, (const void *)&size, sizeof(unsigned));
+	priv_msg_put(msg, (const void *)&size, sizeof(size_t));
 }
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_getUpdate( msg_t *msg, char *data, unsigned size, unsigned *read )
+void priv_msg_getUpdate( msg_t *msg, char *data, size_t size, size_t *read )
 /* -------------------------------------------------------------------------- */
 {
 	size = priv_msg_getSize(msg);
 	if (read != NULL) *read = size;
 	priv_msg_get(msg, data, size);
 
-	while (msg->obj.queue != 0 && msg->count + sizeof(unsigned) + msg->obj.queue->tmp.msg.size <= msg->limit)
+	while (msg->obj.queue != 0 && msg->count + sizeof(size_t) + msg->obj.queue->tmp.msg.size <= msg->limit)
 	{
 		priv_msg_putSize(msg, msg->obj.queue->tmp.msg.size);
 		priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
@@ -239,7 +239,7 @@ void priv_msg_getUpdate( msg_t *msg, char *data, unsigned size, unsigned *read )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_putUpdate( msg_t *msg, const char *data, unsigned size )
+void priv_msg_putUpdate( msg_t *msg, const char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	priv_msg_putSize(msg, size);
@@ -262,14 +262,14 @@ void priv_msg_putUpdate( msg_t *msg, const char *data, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_skipUpdate( msg_t *msg, unsigned size )
+void priv_msg_skipUpdate( msg_t *msg, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	while (msg->count + sizeof(unsigned) + size > msg->limit)
+	while (msg->count + sizeof(size_t) + size > msg->limit)
 	{
 		priv_msg_skip(msg, priv_msg_getSize(msg));
 
-		while (msg->obj.queue != 0 && msg->count + sizeof(unsigned) + msg->obj.queue->tmp.msg.size <= msg->limit)
+		while (msg->obj.queue != 0 && msg->count + sizeof(size_t) + msg->obj.queue->tmp.msg.size <= msg->limit)
 		{
 			priv_msg_putSize(msg, msg->obj.queue->tmp.msg.size);
 			priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
@@ -280,7 +280,7 @@ void priv_msg_skipUpdate( msg_t *msg, unsigned size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_take( msg_t *msg, char *data, unsigned size, unsigned *read )
+unsigned priv_msg_take( msg_t *msg, char *data, size_t size, size_t *read )
 /* -------------------------------------------------------------------------- */
 {
 	if (msg->count > 0)
@@ -298,7 +298,7 @@ unsigned priv_msg_take( msg_t *msg, char *data, unsigned size, unsigned *read )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_take( msg_t *msg, void *data, unsigned size, unsigned *read )
+unsigned msg_take( msg_t *msg, void *data, size_t size, size_t *read )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -319,7 +319,7 @@ unsigned msg_take( msg_t *msg, void *data, unsigned size, unsigned *read )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, unsigned *read, cnt_t delay )
+unsigned msg_waitFor( msg_t *msg, void *data, size_t size, size_t *read, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -350,7 +350,7 @@ unsigned msg_waitFor( msg_t *msg, void *data, unsigned size, unsigned *read, cnt
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, unsigned *read, cnt_t time )
+unsigned msg_waitUntil( msg_t *msg, void *data, size_t size, size_t *read, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -382,23 +382,23 @@ unsigned msg_waitUntil( msg_t *msg, void *data, unsigned size, unsigned *read, c
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_give( msg_t *msg, const char *data, unsigned size )
+unsigned priv_msg_give( msg_t *msg, const char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	if (msg->count + sizeof(unsigned) + size <= msg->limit)
+	if (msg->count + sizeof(size_t) + size <= msg->limit)
 	{
 		priv_msg_putUpdate(msg, data, size);
 		return E_SUCCESS;
 	}
 
-	if (sizeof(unsigned) + size <= msg->limit)
+	if (sizeof(size_t) + size <= msg->limit)
 		return E_TIMEOUT;
 
 	return E_FAILURE;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_give( msg_t *msg, const void *data, unsigned size )
+unsigned msg_give( msg_t *msg, const void *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -419,7 +419,7 @@ unsigned msg_give( msg_t *msg, const void *data, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
+unsigned msg_sendFor( msg_t *msg, const void *data, size_t size, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -448,7 +448,7 @@ unsigned msg_sendFor( msg_t *msg, const void *data, unsigned size, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time )
+unsigned msg_sendUntil( msg_t *msg, const void *data, size_t size, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -478,10 +478,10 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, unsigned size, cnt_t time 
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_push( msg_t *msg, const void *data, unsigned size )
+unsigned priv_msg_push( msg_t *msg, const void *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	if (sizeof(unsigned) + size <= msg->limit)
+	if (sizeof(size_t) + size <= msg->limit)
 	{
 		priv_msg_skipUpdate(msg, size);
 		priv_msg_putUpdate(msg, data, size);
@@ -493,7 +493,7 @@ unsigned priv_msg_push( msg_t *msg, const void *data, unsigned size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_push( msg_t *msg, const void *data, unsigned size )
+unsigned msg_push( msg_t *msg, const void *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned event;
@@ -542,7 +542,7 @@ size_t msg_space( msg_t *msg )
 
 	sys_lock();
 	{
-		space = (msg->limit >= msg->count + sizeof(unsigned)) ? msg->limit - msg->count - sizeof(unsigned) : 0;
+		space = (msg->limit >= msg->count + sizeof(size_t)) ? msg->limit - msg->count - sizeof(size_t) : 0;
 	}
 	sys_unlock();
 
@@ -560,7 +560,7 @@ size_t msg_limit( msg_t *msg )
 
 	sys_lock();
 	{
-		limit = (msg->limit >= sizeof(unsigned)) ? msg->limit - sizeof(unsigned) : 0;
+		limit = (msg->limit >= sizeof(size_t)) ? msg->limit - sizeof(size_t) : 0;
 	}
 	sys_unlock();
 
@@ -568,10 +568,10 @@ size_t msg_limit( msg_t *msg )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_size( msg_t *msg )
+size_t msg_size( msg_t *msg )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned size = 0;
+	size_t size = 0;
 
 	assert(msg);
 	assert(msg->obj.res!=RELEASED);
