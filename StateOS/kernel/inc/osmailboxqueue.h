@@ -51,9 +51,9 @@ struct __box
 	size_t   limit; // size of the mailbox buffer (in bytes)
 	size_t   size;  // size of a single mail (in bytes)
 
-	unsigned head;  // first element to read from data buffer
-	unsigned tail;  // first element to write into data buffer
-	char   * data;  // data buffer
+	size_t   head;  // first element to read from data buffer
+	size_t   tail;  // first element to write into data buffer
+	char *   data;  // data buffer
 };
 
 #ifdef __cplusplus

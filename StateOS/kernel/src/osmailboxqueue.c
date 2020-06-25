@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    22.06.2020
+    @date    25.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -136,13 +136,14 @@ static
 void priv_box_get( box_t *box, char *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = box->head;
-	unsigned j = 0;
+	size_t size = box->size;
+	size_t i = box->head;
 
-	do data[j++] = box->data[i++]; while (j < box->size);
-
-	box->head = (i < box->limit) ? i : 0;
-	box->count -= j;
+	box->count -= size;
+	while (size--)
+		*data++ = box->data[i++];
+	if (i == box->limit) i = 0;
+	box->head = i;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -150,13 +151,14 @@ static
 void priv_box_put( box_t *box, const char *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = box->tail;
-	unsigned j = 0;
+	size_t size = box->size;
+	size_t i = box->tail;
 
-	do box->data[i++] = data[j++]; while (j < box->size);
-
-	box->tail = (i < box->limit) ? i : 0;
-	box->count += j;
+	box->count += size;
+	while (size--)
+		box->data[i++] = *data++;
+	if (i == box->limit) i = 0;
+	box->tail = i;
 }
 
 /* -------------------------------------------------------------------------- */
