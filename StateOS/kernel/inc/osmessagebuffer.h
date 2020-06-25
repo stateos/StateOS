@@ -50,9 +50,9 @@ struct __msg
 	size_t   count; // inherited from stream buffer
 	size_t   limit; // inherited from stream buffer
 
-	unsigned head;  // inherited from stream buffer
-	unsigned tail;  // inherited from stream buffer
-	char   * data;  // inherited from stream buffer
+	size_t   head;  // inherited from stream buffer
+	size_t   tail;  // inherited from stream buffer
+	char *   data;  // inherited from stream buffer
 };
 
 #ifdef __cplusplus

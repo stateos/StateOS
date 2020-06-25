@@ -133,12 +133,12 @@ static
 void priv_msg_peek( msg_t *msg, char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = msg->head;
+	size_t i = msg->head;
 
 	while (size--)
 	{
 		*data++ = msg->data[i++];
-		if (i >= msg->limit) i = 0;
+		if (i == msg->limit) i = 0;
 	}
 }
 
@@ -147,13 +147,13 @@ static
 void priv_msg_get( msg_t *msg, char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = msg->head;
+	size_t i = msg->head;
 
 	msg->count -= size;
 	while (size--)
 	{
 		*data++ = msg->data[i++];
-		if (i >= msg->limit) i = 0;
+		if (i == msg->limit) i = 0;
 	}
 	msg->head = i;
 }
@@ -163,13 +163,13 @@ static
 void priv_msg_put( msg_t *msg, const char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned i = msg->tail;
+	size_t i = msg->tail;
 
 	msg->count += size;
 	while (size--)
 	{
 		msg->data[i++] = *data++;
-		if (i >= msg->limit) i = 0;
+		if (i == msg->limit) i = 0;
 	}
 	msg->tail = i;
 }
