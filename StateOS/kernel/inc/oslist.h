@@ -271,13 +271,13 @@ void lst_delete( lst_t *lst ) { lst_destroy(lst); }
  *
  ******************************************************************************/
 
-unsigned lst_take( lst_t *lst, void **data );
+int lst_take( lst_t *lst, void **data );
 
 __STATIC_INLINE
-unsigned lst_tryWait( lst_t *lst, void **data ) { return lst_take(lst, data); }
+int lst_tryWait( lst_t *lst, void **data ) { return lst_take(lst, data); }
 
 __STATIC_INLINE
-unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_take(lst, data); }
+int lst_takeISR( lst_t *lst, void **data ) { return lst_take(lst, data); }
 
 /******************************************************************************
  *
@@ -303,7 +303,7 @@ unsigned lst_takeISR( lst_t *lst, void **data ) { return lst_take(lst, data); }
  *
  ******************************************************************************/
 
-unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay );
+int lst_waitFor( lst_t *lst, void **data, cnt_t delay );
 
 /******************************************************************************
  *
@@ -327,7 +327,7 @@ unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time );
+int lst_waitUntil( lst_t *lst, void **data, cnt_t time );
 
 /******************************************************************************
  *
@@ -350,7 +350,7 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned lst_wait( lst_t *lst, void **data ) { return lst_waitFor(lst, data, INFINITE); }
+int lst_wait( lst_t *lst, void **data ) { return lst_waitFor(lst, data, INFINITE); }
 
 /******************************************************************************
  *
@@ -436,19 +436,19 @@ struct ListTT : public __lst
 		return Ptr(lst);
 	}
 
-	void     reset    ( void )                              {        lst_reset    (this); }
-	void     kill     ( void )                              {        lst_kill     (this); }
-	void     destroy  ( void )                              {        lst_destroy  (this); }
-	unsigned take     (       C   **_data )                 { return lst_take     (this, reinterpret_cast<void **>(_data)); }
-	unsigned tryWait  (       C   **_data )                 { return lst_tryWait  (this, reinterpret_cast<void **>(_data)); }
-	unsigned takeISR  (       C   **_data )                 { return lst_takeISR  (this, reinterpret_cast<void **>(_data)); }
+	void reset    ( void )                              {        lst_reset    (this); }
+	void kill     ( void )                              {        lst_kill     (this); }
+	void destroy  ( void )                              {        lst_destroy  (this); }
+	int  take     (       C   **_data )                 { return lst_take     (this, reinterpret_cast<void **>(_data)); }
+	int  tryWait  (       C   **_data )                 { return lst_tryWait  (this, reinterpret_cast<void **>(_data)); }
+	int  takeISR  (       C   **_data )                 { return lst_takeISR  (this, reinterpret_cast<void **>(_data)); }
 	template<typename T>
-	unsigned waitFor  (       C   **_data, const T _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
+	int  waitFor  (       C   **_data, const T _delay ) { return lst_waitFor  (this, reinterpret_cast<void **>(_data), Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil(       C   **_data, const T _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
-	unsigned wait     (       C   **_data )                 { return lst_wait     (this, reinterpret_cast<void **>(_data)); }
-	void     give     ( const void *_data )                 {        lst_give     (this,                           _data); }
-	void     giveISR  ( const void *_data )                 {        lst_giveISR  (this,                           _data); }
+	int  waitUntil(       C   **_data, const T _time )  { return lst_waitUntil(this, reinterpret_cast<void **>(_data), Clock::until(_time)); }
+	int  wait     (       C   **_data )                 { return lst_wait     (this, reinterpret_cast<void **>(_data)); }
+	void give     ( const void *_data )                 {        lst_give     (this,                           _data); }
+	void giveISR  ( const void *_data )                 {        lst_giveISR  (this,                           _data); }
 };
 
 /******************************************************************************

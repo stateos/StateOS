@@ -276,13 +276,13 @@ void job_delete( job_t *job ) { job_destroy(job); }
  *
  ******************************************************************************/
 
-unsigned job_take( job_t *job );
+int job_take( job_t *job );
 
 __STATIC_INLINE
-unsigned job_tryWait( job_t *job ) { return job_take(job); }
+int job_tryWait( job_t *job ) { return job_take(job); }
 
 __STATIC_INLINE
-unsigned job_takeISR( job_t *job ) { return job_take(job); }
+int job_takeISR( job_t *job ) { return job_take(job); }
 
 /******************************************************************************
  *
@@ -307,7 +307,7 @@ unsigned job_takeISR( job_t *job ) { return job_take(job); }
  *
  ******************************************************************************/
 
-unsigned job_waitFor( job_t *job, cnt_t delay );
+int job_waitFor( job_t *job, cnt_t delay );
 
 /******************************************************************************
  *
@@ -330,7 +330,7 @@ unsigned job_waitFor( job_t *job, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned job_waitUntil( job_t *job, cnt_t time );
+int job_waitUntil( job_t *job, cnt_t time );
 
 /******************************************************************************
  *
@@ -352,7 +352,7 @@ unsigned job_waitUntil( job_t *job, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
+int job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
 
 /******************************************************************************
  *
@@ -374,10 +374,10 @@ unsigned job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
  *
  ******************************************************************************/
 
-unsigned job_give( job_t *job, fun_t *fun );
+int job_give( job_t *job, fun_t *fun );
 
 __STATIC_INLINE
-unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_give(job, fun); }
+int job_giveISR( job_t *job, fun_t *fun ) { return job_give(job, fun); }
 
 /******************************************************************************
  *
@@ -403,7 +403,7 @@ unsigned job_giveISR( job_t *job, fun_t *fun ) { return job_give(job, fun); }
  *
  ******************************************************************************/
 
-unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay );
+int job_sendFor( job_t *job, fun_t *fun, cnt_t delay );
 
 /******************************************************************************
  *
@@ -427,7 +427,7 @@ unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
+int job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
 
 /******************************************************************************
  *
@@ -450,7 +450,7 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned job_send( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, INFINITE); }
+int job_send( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, INFINITE); }
 
 /******************************************************************************
  *
@@ -604,20 +604,20 @@ struct JobQueueT : public __job
 	void     kill     ( void )                        {        job_kill     (this); }
 	void     destroy  ( void )                        {        job_destroy  (this); }
 	template<typename T>
-	unsigned waitFor  ( const T _delay )              { return job_waitFor  (this, Clock::count(_delay)); }
+	int      waitFor  ( const T _delay )              { return job_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )               { return job_waitUntil(this, Clock::until(_time)); }
-	unsigned wait     ( void )                        { return job_wait     (this); }
-	unsigned take     ( void )                        { return job_take     (this); }
-	unsigned tryWait  ( void )                        { return job_tryWait  (this); }
-	unsigned takeISR  ( void )                        { return job_takeISR  (this); }
+	int      waitUntil( const T _time )               { return job_waitUntil(this, Clock::until(_time)); }
+	int      wait     ( void )                        { return job_wait     (this); }
+	int      take     ( void )                        { return job_take     (this); }
+	int      tryWait  ( void )                        { return job_tryWait  (this); }
+	int      takeISR  ( void )                        { return job_takeISR  (this); }
 	template<typename T>
-	unsigned sendFor  ( fun_t *_fun, const T _delay ) { return job_sendFor  (this, _fun, Clock::count(_delay)); }
+	int      sendFor  ( fun_t *_fun, const T _delay ) { return job_sendFor  (this, _fun, Clock::count(_delay)); }
 	template<typename T>
-	unsigned sendUntil( fun_t *_fun, const T _time )  { return job_sendUntil(this, _fun, Clock::until(_time)); }
-	unsigned send     ( fun_t *_fun )                 { return job_send     (this, _fun); }
-	unsigned give     ( fun_t *_fun )                 { return job_give     (this, _fun); }
-	unsigned giveISR  ( fun_t *_fun )                 { return job_giveISR  (this, _fun); }
+	int      sendUntil( fun_t *_fun, const T _time )  { return job_sendUntil(this, _fun, Clock::until(_time)); }
+	int      send     ( fun_t *_fun )                 { return job_send     (this, _fun); }
+	int      give     ( fun_t *_fun )                 { return job_give     (this, _fun); }
+	int      giveISR  ( fun_t *_fun )                 { return job_giveISR  (this, _fun); }
 	void     push     ( fun_t *_fun )                 {        job_push     (this, _fun); }
 	void     pushISR  ( fun_t *_fun )                 {        job_pushISR  (this, _fun); }
 	unsigned count    ( void )                        { return job_count    (this); }

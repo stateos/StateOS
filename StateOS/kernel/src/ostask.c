@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    17.06.2020
+    @date    26.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -214,10 +214,10 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_detach( tsk_t *tsk )
+int tsk_detach( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(tsk);
@@ -226,31 +226,31 @@ unsigned tsk_detach( tsk_t *tsk )
 	sys_lock();
 	{
 		if (tsk->owner == tsk ||                    // task has already been detached
-		    tsk->hdr.obj.res == 0)                  // task is undetachable
-			event = E_FAILURE;
+		    tsk->hdr.obj.res == NULL)               // task is undetachable
+			result = E_FAILURE;
 		else
 		if (tsk->hdr.id == ID_STOPPED)              // task is already inactive
 		{
 			core_res_free(&tsk->hdr.obj);           // release resources
-			event = E_SUCCESS;
+			result = E_SUCCESS;
 		}
 		else                                        // task is active and can be detached
 		{
 			core_tsk_wakeup(tsk->owner, E_FAILURE); // notify waiting task
 			tsk->owner = tsk;                       // mark as detached
-			event = E_SUCCESS;
+			result = E_SUCCESS;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_join( tsk_t *tsk )
+int tsk_join( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(tsk);
@@ -258,23 +258,23 @@ unsigned tsk_join( tsk_t *tsk )
 
 	sys_lock();
 	{
-		if (tsk->owner != NULL ||                            // task is unjoinable
-		    tsk == System.cur)                               // deadlock detected
-			event = E_FAILURE;
+		if (tsk->owner != NULL ||                             // task is unjoinable
+		    tsk == System.cur)                                // deadlock detected
+			result = E_FAILURE;
 		else
-		if (tsk->hdr.id == ID_STOPPED)                       // task is already inactive
-			event = E_SUCCESS;
-		else                                                 // task is active
-			event = core_tsk_waitFor(&tsk->owner, INFINITE); // wait for termination
+		if (tsk->hdr.id == ID_STOPPED)                        // task is already inactive
+			result = E_SUCCESS;
+		else                                                  // task is active
+			result = core_tsk_waitFor(&tsk->owner, INFINITE); // wait for termination
 
-		if (event != E_FAILURE &&                            // task has not been detached
-		    event != E_DELETED &&                            // task has not been deleted
-		    tsk->hdr.id == ID_STOPPED)                       // task is still inactive
-			core_res_free(&tsk->hdr.obj);                    // release resources
+		if (result != E_FAILURE &&                            // task has not been detached
+		    result != E_DELETED &&                            // task has not been deleted
+		    tsk->hdr.id == ID_STOPPED)                        // task is still inactive
+			core_res_free(&tsk->hdr.obj);                     // release resources
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -370,10 +370,10 @@ void tsk_stop( void )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_reset( tsk_t *tsk )
+int tsk_reset( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(tsk);
@@ -382,7 +382,7 @@ unsigned tsk_reset( tsk_t *tsk )
 	sys_lock();
 	{
 		if (tsk->owner == tsk)                          // detached task cannot be reseted
-			event = E_FAILURE;
+			result = E_FAILURE;
 		else
 		{
 			priv_sig_reset(tsk);                        // reset task signal variables
@@ -394,19 +394,19 @@ unsigned tsk_reset( tsk_t *tsk )
 				priv_tsk_stop(tsk);                     // remove task from all queues
 			}
 
-			event = E_SUCCESS;
+			result = E_SUCCESS;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_destroy( tsk_t *tsk )
+int tsk_destroy( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(tsk);
@@ -415,7 +415,7 @@ unsigned tsk_destroy( tsk_t *tsk )
 	sys_lock();
 	{
 		if (tsk->owner == tsk)                          // detached task cannot be deleted
-			event = E_FAILURE;
+			result = E_FAILURE;
 		else
 		{
 			priv_sig_reset(tsk);                        // reset task signal variables
@@ -432,12 +432,12 @@ unsigned tsk_destroy( tsk_t *tsk )
 			}
 
 			core_res_free(&tsk->hdr.obj);               // release resources
-			event = E_SUCCESS;
+			result = E_SUCCESS;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -536,10 +536,10 @@ void tsk_sleepUntil( cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_suspend( tsk_t *tsk )
+int tsk_suspend( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
@@ -549,21 +549,21 @@ unsigned tsk_suspend( tsk_t *tsk )
 		if (tsk->hdr.id == ID_READY && tsk->guard == 0)
 		{
 			core_tsk_suspend(tsk);
-			event = E_SUCCESS;
+			result = E_SUCCESS;
 		}
 		else
-			event = E_FAILURE;
+			result = E_FAILURE;
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tsk_resume( tsk_t *tsk )
+int tsk_resume( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
@@ -573,14 +573,14 @@ unsigned tsk_resume( tsk_t *tsk )
 		if (tsk->guard == &WAIT.hdr.obj.queue && tsk->delay == INFINITE)
 		{
 			core_tsk_wakeup(tsk, 0); // ignored event value
-			event = E_SUCCESS;
+			result = E_SUCCESS;
 		}
 		else
-			event = E_FAILURE;
+			result = E_FAILURE;
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

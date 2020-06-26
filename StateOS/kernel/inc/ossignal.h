@@ -271,13 +271,13 @@ void sig_delete( sig_t *sig ) { sig_destroy(sig); }
  *
  ******************************************************************************/
 
-unsigned sig_take( sig_t *sig, unsigned sigset, unsigned *signo );
+int sig_take( sig_t *sig, unsigned sigset, unsigned *signo );
 
 __STATIC_INLINE
-unsigned sig_tryWait( sig_t *sig, unsigned sigset, unsigned *signo ) { return sig_take(sig, sigset, signo); }
+int sig_tryWait( sig_t *sig, unsigned sigset, unsigned *signo ) { return sig_take(sig, sigset, signo); }
 
 __STATIC_INLINE
-unsigned sig_takeISR( sig_t *sig, unsigned sigset, unsigned *signo ) { return sig_take(sig, sigset, signo); }
+int sig_takeISR( sig_t *sig, unsigned sigset, unsigned *signo ) { return sig_take(sig, sigset, signo); }
 
 /******************************************************************************
  *
@@ -304,7 +304,7 @@ unsigned sig_takeISR( sig_t *sig, unsigned sigset, unsigned *signo ) { return si
  *
  ******************************************************************************/
 
-unsigned sig_waitFor( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t delay );
+int sig_waitFor( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t delay );
 
 /******************************************************************************
  *
@@ -329,7 +329,7 @@ unsigned sig_waitFor( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t delay 
  *
  ******************************************************************************/
 
-unsigned sig_waitUntil( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t time );
+int sig_waitUntil( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t time );
 
 /******************************************************************************
  *
@@ -353,7 +353,7 @@ unsigned sig_waitUntil( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t time
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned sig_wait( sig_t *sig, unsigned sigset, unsigned *signo ) { return sig_waitFor(sig, sigset, signo, INFINITE); }
+int sig_wait( sig_t *sig, unsigned sigset, unsigned *signo ) { return sig_waitFor(sig, sigset, signo, INFINITE); }
 
 /******************************************************************************
  *
@@ -464,22 +464,22 @@ struct Signal : public __sig
 		return Ptr(sig);
 	}
 
-	void     reset    ( void )                                                {        sig_reset    (this); }
-	void     kill     ( void )                                                {        sig_kill     (this); }
-	void     destroy  ( void )                                                {        sig_destroy  (this); }
-	unsigned take     ( unsigned _sigset, unsigned *_signo = nullptr )        { return sig_take     (this, _sigset, _signo); }
-	unsigned tryWait  ( unsigned _sigset, unsigned *_signo = nullptr )        { return sig_tryWait  (this, _sigset, _signo); }
-	unsigned takeISR  ( unsigned _sigset, unsigned *_signo = nullptr )        { return sig_takeISR  (this, _sigset, _signo); }
+	void reset    ( void )                                                {        sig_reset    (this); }
+	void kill     ( void )                                                {        sig_kill     (this); }
+	void destroy  ( void )                                                {        sig_destroy  (this); }
+	int  take     ( unsigned _sigset, unsigned *_signo = nullptr )        { return sig_take     (this, _sigset, _signo); }
+	int  tryWait  ( unsigned _sigset, unsigned *_signo = nullptr )        { return sig_tryWait  (this, _sigset, _signo); }
+	int  takeISR  ( unsigned _sigset, unsigned *_signo = nullptr )        { return sig_takeISR  (this, _sigset, _signo); }
 	template<typename T>
-	unsigned waitFor  ( unsigned _sigset, unsigned *_signo,  const T _delay ) { return sig_waitFor  (this, _sigset, _signo, Clock::count(_delay)); }
+	int  waitFor  ( unsigned _sigset, unsigned *_signo,  const T _delay ) { return sig_waitFor  (this, _sigset, _signo, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( unsigned _sigset, unsigned *_signo,  const T _time )  { return sig_waitUntil(this, _sigset, _signo, Clock::until(_time)); }
-	unsigned wait     ( unsigned _sigset, unsigned *_signo = nullptr )        { return sig_wait     (this, _sigset, _signo); }
-	void     give     ( unsigned _signo )                                     {        sig_give     (this, _signo); }
-	void     set      ( unsigned _signo )                                     {        sig_set      (this, _signo); }
-	void     giveISR  ( unsigned _signo )                                     {        sig_giveISR  (this, _signo); }
-	void     clear    ( unsigned _signo )                                     {        sig_clear    (this, _signo); }
-	void     clearISR ( unsigned _signo )                                     {        sig_clearISR (this, _signo); }
+	int  waitUntil( unsigned _sigset, unsigned *_signo,  const T _time )  { return sig_waitUntil(this, _sigset, _signo, Clock::until(_time)); }
+	int  wait     ( unsigned _sigset, unsigned *_signo = nullptr )        { return sig_wait     (this, _sigset, _signo); }
+	void give     ( unsigned _signo )                                     {        sig_give     (this, _signo); }
+	void set      ( unsigned _signo )                                     {        sig_set      (this, _signo); }
+	void giveISR  ( unsigned _signo )                                     {        sig_giveISR  (this, _signo); }
+	void clear    ( unsigned _signo )                                     {        sig_clear    (this, _signo); }
+	void clearISR ( unsigned _signo )                                     {        sig_clearISR (this, _signo); }
 };
 
 #endif//__cplusplus

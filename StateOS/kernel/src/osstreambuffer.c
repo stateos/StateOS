@@ -87,7 +87,7 @@ stm_t *stm_create( size_t limit )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_stm_reset( stm_t *stm, unsigned event )
+void priv_stm_reset( stm_t *stm, int event )
 /* -------------------------------------------------------------------------- */
 {
 	stm->count = 0;
@@ -221,7 +221,7 @@ void priv_stm_skipUpdate( stm_t *stm, size_t size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_take( stm_t *stm, char *data, size_t size, size_t *read )
+int priv_stm_take( stm_t *stm, char *data, size_t size, size_t *read )
 /* -------------------------------------------------------------------------- */
 {
 	if (stm->count > 0)
@@ -234,10 +234,10 @@ unsigned priv_stm_take( stm_t *stm, char *data, size_t size, size_t *read )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_take( stm_t *stm, void *data, size_t size, size_t *read )
+int stm_take( stm_t *stm, void *data, size_t size, size_t *read )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(stm);
 	assert(stm->obj.res!=RELEASED);
@@ -248,18 +248,18 @@ unsigned stm_take( stm_t *stm, void *data, size_t size, size_t *read )
 
 	sys_lock();
 	{
-		event = priv_stm_take(stm, data, size, read);
+		result = priv_stm_take(stm, data, size, read);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_waitFor( stm_t *stm, void *data, size_t size, size_t *read, cnt_t delay )
+int stm_waitFor( stm_t *stm, void *data, size_t size, size_t *read, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(stm);
@@ -271,27 +271,27 @@ unsigned stm_waitFor( stm_t *stm, void *data, size_t size, size_t *read, cnt_t d
 
 	sys_lock();
 	{
-		event = priv_stm_take(stm, data, size, read);
+		result = priv_stm_take(stm, data, size, read);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.in = data;
 			System.cur->tmp.stm.size = size;
-			event = core_tsk_waitFor(&stm->obj.queue, delay);
-			if (event == E_SUCCESS && read != NULL)
+			result = core_tsk_waitFor(&stm->obj.queue, delay);
+			if (result == E_SUCCESS && read != NULL)
 				*read = System.cur->tmp.stm.size;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_waitUntil( stm_t *stm, void *data, size_t size, size_t *read, cnt_t time )
+int stm_waitUntil( stm_t *stm, void *data, size_t size, size_t *read, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(stm);
@@ -303,25 +303,25 @@ unsigned stm_waitUntil( stm_t *stm, void *data, size_t size, size_t *read, cnt_t
 
 	sys_lock();
 	{
-		event = priv_stm_take(stm, data, size, read);
+		result = priv_stm_take(stm, data, size, read);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.in = data;
 			System.cur->tmp.stm.size = size;
-			event = core_tsk_waitUntil(&stm->obj.queue, time);
-			if (event == E_SUCCESS && read != NULL)
+			result = core_tsk_waitUntil(&stm->obj.queue, time);
+			if (result == E_SUCCESS && read != NULL)
 				*read = System.cur->tmp.stm.size;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_give( stm_t *stm, const char *data, size_t size )
+int priv_stm_give( stm_t *stm, const char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	if (stm->count + size <= stm->limit)
@@ -337,10 +337,10 @@ unsigned priv_stm_give( stm_t *stm, const char *data, size_t size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_give( stm_t *stm, const void *data, size_t size )
+int stm_give( stm_t *stm, const void *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(stm);
 	assert(stm->obj.res!=RELEASED);
@@ -351,18 +351,18 @@ unsigned stm_give( stm_t *stm, const void *data, size_t size )
 
 	sys_lock();
 	{
-		event = priv_stm_give(stm, data, size);
+		result = priv_stm_give(stm, data, size);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_sendFor( stm_t *stm, const void *data, size_t size, cnt_t delay )
+int stm_sendFor( stm_t *stm, const void *data, size_t size, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(stm);
@@ -374,25 +374,25 @@ unsigned stm_sendFor( stm_t *stm, const void *data, size_t size, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_stm_give(stm, data, size);
+		result = priv_stm_give(stm, data, size);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.out = data;
 			System.cur->tmp.stm.size = size;
-			event = core_tsk_waitFor(&stm->obj.queue, delay);
+			result = core_tsk_waitFor(&stm->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_sendUntil( stm_t *stm, const void *data, size_t size, cnt_t time )
+int stm_sendUntil( stm_t *stm, const void *data, size_t size, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(stm);
@@ -404,23 +404,23 @@ unsigned stm_sendUntil( stm_t *stm, const void *data, size_t size, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_stm_give(stm, data, size);
+		result = priv_stm_give(stm, data, size);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.out = data;
 			System.cur->tmp.stm.size = size;
-			event = core_tsk_waitUntil(&stm->obj.queue, time);
+			result = core_tsk_waitUntil(&stm->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_stm_push( stm_t *stm, const void *data, size_t size )
+int priv_stm_push( stm_t *stm, const void *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	if (size <= stm->limit)
@@ -435,10 +435,10 @@ unsigned priv_stm_push( stm_t *stm, const void *data, size_t size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned stm_push( stm_t *stm, const void *data, size_t size )
+int stm_push( stm_t *stm, const void *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(stm);
 	assert(stm->obj.res!=RELEASED);
@@ -449,11 +449,11 @@ unsigned stm_push( stm_t *stm, const void *data, size_t size )
 
 	sys_lock();
 	{
-		event = priv_stm_push(stm, data, size);
+		result = priv_stm_push(stm, data, size);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

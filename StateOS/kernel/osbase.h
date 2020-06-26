@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    09.06.2020
+    @date    25.06.2020
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -111,12 +111,17 @@ typedef         void act_t(unsigned);       // signal action
 
 /* -------------------------------------------------------------------------- */
 
-#define E_SUCCESS  ( 0U )   // process was released as a result of taking the supervising object
-#define E_FAILURE  ( 0U-1 ) // process was released as a result of any failure
-#define E_STOPPED  ( 0U-2 ) // process was released as a result of reset the supervising object
-#define E_DELETED  ( 0U-3 ) // process was released as a result of deleting the supervising object
-#define E_TIMEOUT  ( 0U-4 ) // process was released as a result of the end of the timer countdown
-#define OWNERDEAD  ( 1U )   // previous owner has been killed
+// error codes
+
+enum
+{
+	E_SUCCESS = 0,  // process was released as a result of taking the supervising object
+	E_FAILURE,      // process was released as a result of any failure
+	E_STOPPED,      // process was released as a result of reset the supervising object
+	E_DELETED,      // process was released as a result of deleting the supervising object
+	E_TIMEOUT,      // process was released as a result of the end of the timer countdown
+	OWNERDEAD,      // previous owner has been killed
+};
 
 /* -------------------------------------------------------------------------- */
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -79,7 +79,7 @@ tmr_t *tmr_create( fun_t *state )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_tmr_reset( tmr_t *tmr, unsigned event )
+void priv_tmr_reset( tmr_t *tmr, int event )
 /* -------------------------------------------------------------------------- */
 {
 	if (tmr->hdr.id != ID_STOPPED)
@@ -209,7 +209,7 @@ void tmr_startUntil( tmr_t *tmr, cnt_t time )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_tmr_take( tmr_t *tmr )
+int priv_tmr_take( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
 	if (tmr->hdr.next == 0)
@@ -222,28 +222,28 @@ unsigned priv_tmr_take( tmr_t *tmr )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_take( tmr_t *tmr )
+int tmr_take( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(tmr);
 	assert(tmr->hdr.obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		event = priv_tmr_take(tmr);
+		result = priv_tmr_take(tmr);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay )
+int tmr_waitFor( tmr_t *tmr, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(tmr);
@@ -251,21 +251,21 @@ unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_tmr_take(tmr);
+		result = priv_tmr_take(tmr);
 
-		if (event == E_TIMEOUT)
-			event = core_tsk_waitFor(&tmr->hdr.obj.queue, delay);
+		if (result == E_TIMEOUT)
+			result = core_tsk_waitFor(&tmr->hdr.obj.queue, delay);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay )
+int tmr_waitNext( tmr_t *tmr, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(tmr);
@@ -273,21 +273,21 @@ unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_tmr_take(tmr);
+		result = priv_tmr_take(tmr);
 
-		if (event == E_TIMEOUT)
-			event = core_tsk_waitNext(&tmr->hdr.obj.queue, delay);
+		if (result == E_TIMEOUT)
+			result = core_tsk_waitNext(&tmr->hdr.obj.queue, delay);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time )
+int tmr_waitUntil( tmr_t *tmr, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(tmr);
@@ -295,14 +295,14 @@ unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_tmr_take(tmr);
+		result = priv_tmr_take(tmr);
 
-		if (event == E_TIMEOUT)
-			event = core_tsk_waitUntil(&tmr->hdr.obj.queue, time);
+		if (result == E_TIMEOUT)
+			result = core_tsk_waitUntil(&tmr->hdr.obj.queue, time);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

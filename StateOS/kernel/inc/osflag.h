@@ -315,7 +315,7 @@ unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(
  *
  ******************************************************************************/
 
-unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay );
+int flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay );
 
 /******************************************************************************
  *
@@ -344,7 +344,7 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
+int flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
 
 /******************************************************************************
  *
@@ -372,7 +372,7 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned flg_wait( flg_t *flg, unsigned flags, char mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
+int flg_wait( flg_t *flg, unsigned flags, char mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
 
 /******************************************************************************
  *
@@ -511,10 +511,10 @@ struct Flag : public __flg
 	unsigned tryWait  ( unsigned _flags, char _mode = flgAll )        { return flg_tryWait  (this, _flags, _mode); }
 	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )        { return flg_takeISR  (this, _flags, _mode); }
 	template<typename T>
-	unsigned waitFor  ( unsigned _flags, char _mode, const T _delay ) { return flg_waitFor  (this, _flags, _mode, Clock::count(_delay)); }
+	int      waitFor  ( unsigned _flags, char _mode, const T _delay ) { return flg_waitFor  (this, _flags, _mode, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( unsigned _flags, char _mode, const T _time )  { return flg_waitUntil(this, _flags, _mode, Clock::until(_time)); }
-	unsigned wait     ( unsigned _flags, char _mode = flgAll )        { return flg_wait     (this, _flags, _mode); }
+	int      waitUntil( unsigned _flags, char _mode, const T _time )  { return flg_waitUntil(this, _flags, _mode, Clock::until(_time)); }
+	int      wait     ( unsigned _flags, char _mode = flgAll )        { return flg_wait     (this, _flags, _mode); }
 	unsigned give     ( unsigned _flags )                             { return flg_give     (this, _flags); }
 	unsigned set      ( unsigned _flags )                             { return flg_set      (this, _flags); }
 	unsigned giveISR  ( unsigned _flags )                             { return flg_giveISR  (this, _flags); }

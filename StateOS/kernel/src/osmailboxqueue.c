@@ -90,7 +90,7 @@ box_t *box_create( unsigned limit, size_t size )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_box_reset( box_t *box, unsigned event )
+void priv_box_reset( box_t *box, int event )
 /* -------------------------------------------------------------------------- */
 {
 	box->count = 0;
@@ -210,7 +210,7 @@ void priv_box_skipUpdate( box_t *box )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_box_take( box_t *box, void *data )
+int priv_box_take( box_t *box, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	if (box->count > 0)
@@ -223,10 +223,10 @@ unsigned priv_box_take( box_t *box, void *data )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_take( box_t *box, void *data )
+int box_take( box_t *box, void *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(box);
 	assert(box->obj.res!=RELEASED);
@@ -236,18 +236,18 @@ unsigned box_take( box_t *box, void *data )
 
 	sys_lock();
 	{
-		event = priv_box_take(box, data);
+		result = priv_box_take(box, data);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
+int box_waitFor( box_t *box, void *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(box);
@@ -258,24 +258,24 @@ unsigned box_waitFor( box_t *box, void *data, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_box_take(box, data);
+		result = priv_box_take(box, data);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.in = data;
-			event = core_tsk_waitFor(&box->obj.queue, delay);
+			result = core_tsk_waitFor(&box->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
+int box_waitUntil( box_t *box, void *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(box);
@@ -286,22 +286,22 @@ unsigned box_waitUntil( box_t *box, void *data, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_box_take(box, data);
+		result = priv_box_take(box, data);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.in = data;
-			event = core_tsk_waitUntil(&box->obj.queue, time);
+			result = core_tsk_waitUntil(&box->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_box_give( box_t *box, const void *data )
+int priv_box_give( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
 	if (box->count < box->limit)
@@ -314,10 +314,10 @@ unsigned priv_box_give( box_t *box, const void *data )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_give( box_t *box, const void *data )
+int box_give( box_t *box, const void *data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(box);
 	assert(box->obj.res!=RELEASED);
@@ -327,18 +327,18 @@ unsigned box_give( box_t *box, const void *data )
 
 	sys_lock();
 	{
-		event = priv_box_give(box, data);
+		result = priv_box_give(box, data);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
+int box_sendFor( box_t *box, const void *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(box);
@@ -349,24 +349,24 @@ unsigned box_sendFor( box_t *box, const void *data, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_box_give(box, data);
+		result = priv_box_give(box, data);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.out = data;
-			event = core_tsk_waitFor(&box->obj.queue, delay);
+			result = core_tsk_waitFor(&box->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
+int box_sendUntil( box_t *box, const void *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(box);
@@ -377,17 +377,17 @@ unsigned box_sendUntil( box_t *box, const void *data, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_box_give(box, data);
+		result = priv_box_give(box, data);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.out = data;
-			event = core_tsk_waitUntil(&box->obj.queue, time);
+			result = core_tsk_waitUntil(&box->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

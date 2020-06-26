@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,7 +78,7 @@ lst_t *lst_create( void )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_lst_reset( lst_t *lst, unsigned event )
+void priv_lst_reset( lst_t *lst, int event )
 /* -------------------------------------------------------------------------- */
 {
 	core_all_wakeup(lst->obj.queue, event);
@@ -117,7 +117,7 @@ void lst_destroy( lst_t *lst )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_lst_take( lst_t *lst, void **data )
+int priv_lst_take( lst_t *lst, void **data )
 /* -------------------------------------------------------------------------- */
 {
 	if (lst->head.next)
@@ -131,10 +131,10 @@ unsigned priv_lst_take( lst_t *lst, void **data )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned lst_take( lst_t *lst, void **data )
+int lst_take( lst_t *lst, void **data )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(lst);
 	assert(lst->obj.res!=RELEASED);
@@ -142,18 +142,18 @@ unsigned lst_take( lst_t *lst, void **data )
 
 	sys_lock();
 	{
-		event = priv_lst_take(lst, data);
+		result = priv_lst_take(lst, data);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
+int lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(lst);
@@ -162,24 +162,24 @@ unsigned lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_lst_take(lst, data);
+		result = priv_lst_take(lst, data);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.lst.data.in = data;
-			event = core_tsk_waitFor(&lst->obj.queue, delay);
+			result = core_tsk_waitFor(&lst->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
+int lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(lst);
@@ -188,17 +188,17 @@ unsigned lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_lst_take(lst, data);
+		result = priv_lst_take(lst, data);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.lst.data.in = data;
-			event = core_tsk_waitUntil(&lst->obj.queue, time);
+			result = core_tsk_waitUntil(&lst->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    22.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -87,7 +87,7 @@ job_t *job_create( unsigned limit )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_job_reset( job_t *job, unsigned event )
+void priv_job_reset( job_t *job, int event )
 /* -------------------------------------------------------------------------- */
 {
 	job->count = 0;
@@ -204,7 +204,7 @@ void priv_job_skipUpdate( job_t *job )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_job_take( job_t *job, fun_t **fun )
+int priv_job_take( job_t *job, fun_t **fun )
 /* -------------------------------------------------------------------------- */
 {
 	if (job->count > 0)
@@ -217,11 +217,11 @@ unsigned priv_job_take( job_t *job, fun_t **fun )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_take( job_t *job )
+int job_take( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t  * fun;
-	unsigned event;
+	fun_t *fun;
+	int result;
 
 	assert(job);
 	assert(job->obj.res!=RELEASED);
@@ -230,22 +230,22 @@ unsigned job_take( job_t *job )
 
 	sys_lock();
 	{
-		event = priv_job_take(job, &fun);
+		result = priv_job_take(job, &fun);
 	}
 	sys_unlock();
 
-	if (event == E_SUCCESS)
+	if (result == E_SUCCESS)
 		fun();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_waitFor( job_t *job, cnt_t delay )
+int job_waitFor( job_t *job, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t  * fun;
-	unsigned event;
+	fun_t *fun;
+	int result;
 
 	assert_tsk_context();
 	assert(job);
@@ -255,28 +255,28 @@ unsigned job_waitFor( job_t *job, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_job_take(job, &fun);
+		result = priv_job_take(job, &fun);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.job.data.in = &fun;
-			event = core_tsk_waitFor(&job->obj.queue, delay);
+			result = core_tsk_waitFor(&job->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	if (event == E_SUCCESS)
+	if (result == E_SUCCESS)
 		fun();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_waitUntil( job_t *job, cnt_t time )
+int job_waitUntil( job_t *job, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t  * fun;
-	unsigned event;
+	fun_t *fun;
+	int result;
 
 	assert_tsk_context();
 	assert(job);
@@ -286,25 +286,25 @@ unsigned job_waitUntil( job_t *job, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_job_take(job, &fun);
+		result = priv_job_take(job, &fun);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.job.data.in = &fun;
-			event = core_tsk_waitUntil(&job->obj.queue, time);
+			result = core_tsk_waitUntil(&job->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	if (event == E_SUCCESS)
+	if (result == E_SUCCESS)
 		fun();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_job_give( job_t *job, fun_t *fun )
+int priv_job_give( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
 	if (job->count < job->limit)
@@ -317,10 +317,10 @@ unsigned priv_job_give( job_t *job, fun_t *fun )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_give( job_t *job, fun_t *fun )
+int job_give( job_t *job, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(job);
 	assert(job->obj.res!=RELEASED);
@@ -330,18 +330,18 @@ unsigned job_give( job_t *job, fun_t *fun )
 
 	sys_lock();
 	{
-		event = priv_job_give(job, fun);
+		result = priv_job_give(job, fun);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
+int job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(job);
@@ -352,24 +352,24 @@ unsigned job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_job_give(job, fun);
+		result = priv_job_give(job, fun);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.job.data.out = fun;
-			event = core_tsk_waitFor(&job->obj.queue, delay);
+			result = core_tsk_waitFor(&job->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
+int job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(job);
@@ -380,17 +380,17 @@ unsigned job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_job_give(job, fun);
+		result = priv_job_give(job, fun);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.job.data.out = fun;
-			event = core_tsk_waitUntil(&job->obj.queue, time);
+			result = core_tsk_waitUntil(&job->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

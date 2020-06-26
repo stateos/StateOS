@@ -360,10 +360,10 @@ unsigned mtx_getPrio( mtx_t *mtx );
  *
  ******************************************************************************/
 
-unsigned mtx_take( mtx_t *mtx );
+int mtx_take( mtx_t *mtx );
 
 __STATIC_INLINE
-unsigned mtx_tryLock( mtx_t *mtx ) { return mtx_take(mtx); }
+int mtx_tryLock( mtx_t *mtx ) { return mtx_take(mtx); }
 
 /******************************************************************************
  *
@@ -390,7 +390,7 @@ unsigned mtx_tryLock( mtx_t *mtx ) { return mtx_take(mtx); }
  *
  ******************************************************************************/
 
-unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay );
+int mtx_waitFor( mtx_t *mtx, cnt_t delay );
 
 /******************************************************************************
  *
@@ -415,7 +415,7 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
+int mtx_waitUntil( mtx_t *mtx, cnt_t time );
 
 /******************************************************************************
  *
@@ -440,10 +440,10 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned mtx_wait( mtx_t *mtx ) { return mtx_waitFor(mtx, INFINITE); }
+int mtx_wait( mtx_t *mtx ) { return mtx_waitFor(mtx, INFINITE); }
 
 __STATIC_INLINE
-unsigned mtx_lock( mtx_t *mtx ) { return mtx_wait(mtx); }
+int mtx_lock( mtx_t *mtx ) { return mtx_wait(mtx); }
 
 /******************************************************************************
  *
@@ -464,10 +464,10 @@ unsigned mtx_lock( mtx_t *mtx ) { return mtx_wait(mtx); }
  *
  ******************************************************************************/
 
-unsigned mtx_give( mtx_t *mtx );
+int mtx_give( mtx_t *mtx );
 
 __STATIC_INLINE
-unsigned mtx_unlock( mtx_t *mtx ) { return mtx_give(mtx); }
+int mtx_unlock( mtx_t *mtx ) { return mtx_give(mtx); }
 
 #ifdef __cplusplus
 }
@@ -545,16 +545,16 @@ struct Mutex : public __mtx
 	void     prio     ( unsigned _prio ) {        mtx_prio     (this, _prio); }
 	unsigned getPrio  ( void )           { return mtx_getPrio  (this); }
 	unsigned prio     ( void )           { return mtx_getPrio  (this); }
-	unsigned take     ( void )           { return mtx_take     (this); }
-	unsigned tryLock  ( void )           { return mtx_tryLock  (this); }
+	int      take     ( void )           { return mtx_take     (this); }
+	int      tryLock  ( void )           { return mtx_tryLock  (this); }
 	template<typename T>
-	unsigned waitFor  ( const T _delay ) { return mtx_waitFor  (this, Clock::count(_delay)); }
+	int      waitFor  ( const T _delay ) { return mtx_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )  { return mtx_waitUntil(this, Clock::until(_time)); }
-	unsigned wait     ( void )           { return mtx_wait     (this); }
-	unsigned lock     ( void )           { return mtx_lock     (this); }
-	unsigned give     ( void )           { return mtx_give     (this); }
-	unsigned unlock   ( void )           { return mtx_unlock   (this); }
+	int      waitUntil( const T _time )  { return mtx_waitUntil(this, Clock::until(_time)); }
+	int      wait     ( void )           { return mtx_wait     (this); }
+	int      lock     ( void )           { return mtx_lock     (this); }
+	int      give     ( void )           { return mtx_give     (this); }
+	int      unlock   ( void )           { return mtx_unlock   (this); }
 };
 
 #endif//__cplusplus

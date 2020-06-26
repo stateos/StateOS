@@ -86,7 +86,7 @@ msg_t *msg_create( size_t limit )
 }
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_reset( msg_t *msg, unsigned event )
+void priv_msg_reset( msg_t *msg, int event )
 /* -------------------------------------------------------------------------- */
 {
 	msg->count = 0;
@@ -280,7 +280,7 @@ void priv_msg_skipUpdate( msg_t *msg, size_t size )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_take( msg_t *msg, char *data, size_t size, size_t *read )
+int priv_msg_take( msg_t *msg, char *data, size_t size, size_t *read )
 /* -------------------------------------------------------------------------- */
 {
 	if (msg->count > 0)
@@ -298,10 +298,10 @@ unsigned priv_msg_take( msg_t *msg, char *data, size_t size, size_t *read )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_take( msg_t *msg, void *data, size_t size, size_t *read )
+int msg_take( msg_t *msg, void *data, size_t size, size_t *read )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(msg);
 	assert(msg->obj.res!=RELEASED);
@@ -311,18 +311,18 @@ unsigned msg_take( msg_t *msg, void *data, size_t size, size_t *read )
 
 	sys_lock();
 	{
-		event = priv_msg_take(msg, data, size, read);
+		result = priv_msg_take(msg, data, size, read);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitFor( msg_t *msg, void *data, size_t size, size_t *read, cnt_t delay )
+int msg_waitFor( msg_t *msg, void *data, size_t size, size_t *read, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(msg);
@@ -333,27 +333,27 @@ unsigned msg_waitFor( msg_t *msg, void *data, size_t size, size_t *read, cnt_t d
 
 	sys_lock();
 	{
-		event = priv_msg_take(msg, data, size, read);
+		result = priv_msg_take(msg, data, size, read);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.in = data;
 			System.cur->tmp.msg.size = size;
-			event = core_tsk_waitFor(&msg->obj.queue, delay);
-			if (event == E_SUCCESS && read != NULL)
+			result = core_tsk_waitFor(&msg->obj.queue, delay);
+			if (result == E_SUCCESS && read != NULL)
 				*read = System.cur->tmp.msg.size;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_waitUntil( msg_t *msg, void *data, size_t size, size_t *read, cnt_t time )
+int msg_waitUntil( msg_t *msg, void *data, size_t size, size_t *read, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(msg);
@@ -364,25 +364,25 @@ unsigned msg_waitUntil( msg_t *msg, void *data, size_t size, size_t *read, cnt_t
 
 	sys_lock();
 	{
-		event = priv_msg_take(msg, data, size, read);
+		result = priv_msg_take(msg, data, size, read);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.in = data;
 			System.cur->tmp.msg.size = size;
-			event = core_tsk_waitUntil(&msg->obj.queue, time);
-			if (event == E_SUCCESS && read != NULL)
+			result = core_tsk_waitUntil(&msg->obj.queue, time);
+			if (result == E_SUCCESS && read != NULL)
 				*read = System.cur->tmp.msg.size;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_give( msg_t *msg, const char *data, size_t size )
+int priv_msg_give( msg_t *msg, const char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	if (msg->count + sizeof(size_t) + size <= msg->limit)
@@ -398,10 +398,10 @@ unsigned priv_msg_give( msg_t *msg, const char *data, size_t size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_give( msg_t *msg, const void *data, size_t size )
+int msg_give( msg_t *msg, const void *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(msg);
 	assert(msg->obj.res!=RELEASED);
@@ -411,18 +411,18 @@ unsigned msg_give( msg_t *msg, const void *data, size_t size )
 
 	sys_lock();
 	{
-		event = priv_msg_give(msg, data, size);
+		result = priv_msg_give(msg, data, size);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendFor( msg_t *msg, const void *data, size_t size, cnt_t delay )
+int msg_sendFor( msg_t *msg, const void *data, size_t size, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(msg);
@@ -433,25 +433,25 @@ unsigned msg_sendFor( msg_t *msg, const void *data, size_t size, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_msg_give(msg, data, size);
+		result = priv_msg_give(msg, data, size);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.out = data;
 			System.cur->tmp.msg.size = size;
-			event = core_tsk_waitFor(&msg->obj.queue, delay);
+			result = core_tsk_waitFor(&msg->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_sendUntil( msg_t *msg, const void *data, size_t size, cnt_t time )
+int msg_sendUntil( msg_t *msg, const void *data, size_t size, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(msg);
@@ -462,23 +462,23 @@ unsigned msg_sendUntil( msg_t *msg, const void *data, size_t size, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_msg_give(msg, data, size);
+		result = priv_msg_give(msg, data, size);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.out = data;
 			System.cur->tmp.msg.size = size;
-			event = core_tsk_waitUntil(&msg->obj.queue, time);
+			result = core_tsk_waitUntil(&msg->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_msg_push( msg_t *msg, const void *data, size_t size )
+int priv_msg_push( msg_t *msg, const void *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	if (sizeof(size_t) + size <= msg->limit)
@@ -493,10 +493,10 @@ unsigned priv_msg_push( msg_t *msg, const void *data, size_t size )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned msg_push( msg_t *msg, const void *data, size_t size )
+int msg_push( msg_t *msg, const void *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(msg);
 	assert(msg->obj.res!=RELEASED);
@@ -506,11 +506,11 @@ unsigned msg_push( msg_t *msg, const void *data, size_t size )
 
 	sys_lock();
 	{
-		event = priv_msg_push(msg, data, size);
+		result = priv_msg_push(msg, data, size);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

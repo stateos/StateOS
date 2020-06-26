@@ -572,13 +572,13 @@ void tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0); }
  *
  ******************************************************************************/
 
-unsigned tmr_take( tmr_t *tmr );
+int tmr_take( tmr_t *tmr );
 
 __STATIC_INLINE
-unsigned tmr_tryWait( tmr_t *tmr ) { return tmr_take(tmr); }
+int tmr_tryWait( tmr_t *tmr ) { return tmr_take(tmr); }
 
 __STATIC_INLINE
-unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_take(tmr); }
+int tmr_takeISR( tmr_t *tmr ) { return tmr_take(tmr); }
 
 /******************************************************************************
  *
@@ -603,7 +603,7 @@ unsigned tmr_takeISR( tmr_t *tmr ) { return tmr_take(tmr); }
  *
  ******************************************************************************/
 
-unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay );
+int tmr_waitFor( tmr_t *tmr, cnt_t delay );
 
 /******************************************************************************
  *
@@ -629,7 +629,7 @@ unsigned tmr_waitFor( tmr_t *tmr, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay );
+int tmr_waitNext( tmr_t *tmr, cnt_t delay );
 
 /******************************************************************************
  *
@@ -652,7 +652,7 @@ unsigned tmr_waitNext( tmr_t *tmr, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time );
+int tmr_waitUntil( tmr_t *tmr, cnt_t time );
 
 /******************************************************************************
  *
@@ -674,7 +674,7 @@ unsigned tmr_waitUntil( tmr_t *tmr, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
+int tmr_wait( tmr_t *tmr ) { return tmr_waitFor(tmr, INFINITE); }
 
 /******************************************************************************
  *
@@ -747,50 +747,50 @@ struct baseTimer : public __tmr
 	baseTimer( fun_t * _state ): __tmr _TMR_INIT(_state) {}
 #endif
 
-	void     reset        ( void )                                            {        tmr_reset        (this); }
-	void     kill         ( void )                                            {        tmr_kill         (this); }
-	void     destroy      ( void )                                            {        tmr_destroy      (this); }
+	void reset        ( void )                                            {        tmr_reset        (this); }
+	void kill         ( void )                                            {        tmr_kill         (this); }
+	void destroy      ( void )                                            {        tmr_destroy      (this); }
 	template<typename T>
-	void     start        ( const T _delay, const T _period )                 {        tmr_start        (this, Clock::count(_delay), Clock::count(_period)); }
+	void start        ( const T _delay, const T _period )                 {        tmr_start        (this, Clock::count(_delay), Clock::count(_period)); }
 	template<typename T>
-	void     startFor     ( const T _delay )                                  {        tmr_startFor     (this, Clock::count(_delay)); }
+	void startFor     ( const T _delay )                                  {        tmr_startFor     (this, Clock::count(_delay)); }
 	template<typename T>
-	void     startPeriodic( const T _period )                                 {        tmr_startPeriodic(this, Clock::count(_period)); }
+	void startPeriodic( const T _period )                                 {        tmr_startPeriodic(this, Clock::count(_period)); }
 	template<typename T>
-	void     startNext    ( const T _delay )                                  {        tmr_startNext    (this, Clock::count(_delay)); }
+	void startNext    ( const T _delay )                                  {        tmr_startNext    (this, Clock::count(_delay)); }
 	template<typename T>
-	void     startUntil   ( const T _time )                                   {        tmr_startUntil   (this, Clock::until(_time)); }
+	void startUntil   ( const T _time )                                   {        tmr_startUntil   (this, Clock::until(_time)); }
 #if __cplusplus >= 201402
 	template<typename T>
-	void     startFrom    ( const T _delay, const T _period, std::nullptr_t ) {        tmr_startFrom    (this, Clock::count(_delay), Clock::count(_period), nullptr); }
+	void startFrom    ( const T _delay, const T _period, std::nullptr_t ) {        tmr_startFrom    (this, Clock::count(_delay), Clock::count(_period), nullptr); }
 	template<typename T, class F>
-	void     startFrom    ( const T _delay, const T _period, F&&     _state ) {        new (&fun) Fun_t(_state);
-	                                                                                   tmr_startFrom    (this, Clock::count(_delay), Clock::count(_period), fun_); }
+	void startFrom    ( const T _delay, const T _period, F&&     _state ) {        new (&fun) Fun_t(_state);
+	                                                                               tmr_startFrom    (this, Clock::count(_delay), Clock::count(_period), fun_); }
 #else
 	template<typename T>
-	void     startFrom    ( const T _delay, const T _period, fun_t * _state ) {        tmr_startFrom    (this, Clock::count(_delay), Clock::count(_period), _state); }
+	void startFrom    ( const T _delay, const T _period, fun_t * _state ) {        tmr_startFrom    (this, Clock::count(_delay), Clock::count(_period), _state); }
 #endif
-	void     stop         ( void )                                            {        tmr_stop         (this); }
-	unsigned take         ( void )                                            { return tmr_take         (this); }
-	unsigned tryWait      ( void )                                            { return tmr_tryWait      (this); }
-	unsigned takeISR      ( void )                                            { return tmr_takeISR      (this); }
+	void stop         ( void )                                            {        tmr_stop         (this); }
+	int  take         ( void )                                            { return tmr_take         (this); }
+	int  tryWait      ( void )                                            { return tmr_tryWait      (this); }
+	int  takeISR      ( void )                                            { return tmr_takeISR      (this); }
 	template<typename T>
-	unsigned waitFor      ( const T _delay )                                  { return tmr_waitFor      (this, Clock::count(_delay)); }
+	int  waitFor      ( const T _delay )                                  { return tmr_waitFor      (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitNext     ( const T _delay )                                  { return tmr_waitNext     (this, Clock::count(_delay)); }
+	int  waitNext     ( const T _delay )                                  { return tmr_waitNext     (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil    ( const T _time )                                   { return tmr_waitUntil    (this, Clock::until(_time)); }
-	unsigned wait         ( void )                                            { return tmr_wait         (this); }
+	int  waitUntil    ( const T _time )                                   { return tmr_waitUntil    (this, Clock::until(_time)); }
+	int  wait         ( void )                                            { return tmr_wait         (this); }
 	explicit
-	operator bool         () const                                            { return __tmr::hdr.id != ID_STOPPED; }
+	operator bool     () const                                            { return __tmr::hdr.id != ID_STOPPED; }
 
 	template<class T = baseTimer> static
-	T *      current      ( void )                                            { return static_cast<T *>(tmr_thisISR()); }
+	T *  current      ( void )                                            { return static_cast<T *>(tmr_thisISR()); }
 
 #if __cplusplus >= 201402
 	static
-	void     fun_         ( void )                                            {        current()->fun(); }
-	Fun_t    fun;
+	void fun_         ( void )                                            {        current()->fun(); }
+	Fun_t fun;
 #endif
 
 /******************************************************************************

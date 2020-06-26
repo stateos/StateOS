@@ -80,7 +80,7 @@ sig_t *sig_create( unsigned mask )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_sig_reset( sig_t *sig, unsigned event )
+void priv_sig_reset( sig_t *sig, int event )
 /* -------------------------------------------------------------------------- */
 {
 	sig->sigset = 0;
@@ -121,10 +121,10 @@ void sig_destroy( sig_t *sig )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
+int priv_sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event = E_TIMEOUT;
+	int result = E_TIMEOUT;
 
 	sigset &= sig->sigset;
 	sigset &= -sigset;
@@ -133,35 +133,35 @@ unsigned priv_sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 		sig->sigset &= ~sigset | sig->mask;
 		if (signo)
 			for (*signo = 0; sigset >>= 1; *signo += 1);
-		event = E_SUCCESS;
+		result = E_SUCCESS;
 	}
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
+int sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert(sig);
 	assert(sig->obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, sigset, signo);
+		result = priv_sig_take(sig, sigset, signo);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitFor( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t delay )
+int sig_waitFor( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(sig);
@@ -169,25 +169,25 @@ unsigned sig_waitFor( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t delay 
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, sigset, signo);
+		result = priv_sig_take(sig, sigset, signo);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
 			System.cur->tmp.sig.signo  = signo;
-			event = core_tsk_waitFor(&sig->obj.queue, delay);
+			result = core_tsk_waitFor(&sig->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned sig_waitUntil( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t time )
+int sig_waitUntil( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(sig);
@@ -195,18 +195,18 @@ unsigned sig_waitUntil( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t time
 
 	sys_lock();
 	{
-		event = priv_sig_take(sig, sigset, signo);
+		result = priv_sig_take(sig, sigset, signo);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
 			System.cur->tmp.sig.signo  = signo;
-			event = core_tsk_waitUntil(&sig->obj.queue, time);
+			result = core_tsk_waitUntil(&sig->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

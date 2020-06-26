@@ -277,13 +277,13 @@ void evq_delete( evq_t *evq ) { evq_destroy(evq); }
  *
  ******************************************************************************/
 
-unsigned evq_take( evq_t *evq, unsigned *data );
+int evq_take( evq_t *evq, unsigned *data );
 
 __STATIC_INLINE
-unsigned evq_tryWait( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
+int evq_tryWait( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
 
 __STATIC_INLINE
-unsigned evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
+int evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data); }
 
 /******************************************************************************
  *
@@ -309,7 +309,7 @@ unsigned evq_takeISR( evq_t *evq, unsigned *data ) { return evq_take(evq, data);
  *
  ******************************************************************************/
 
-unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay );
+int evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay );
 
 /******************************************************************************
  *
@@ -333,7 +333,7 @@ unsigned evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time );
+int evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time );
 
 /******************************************************************************
  *
@@ -356,7 +356,7 @@ unsigned evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, INFINITE); }
+int evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, INFINITE); }
 
 /******************************************************************************
  *
@@ -378,10 +378,10 @@ unsigned evq_wait( evq_t *evq, unsigned *data ) { return evq_waitFor(evq, data, 
  *
  ******************************************************************************/
 
-unsigned evq_give( evq_t *evq, unsigned data );
+int evq_give( evq_t *evq, unsigned data );
 
 __STATIC_INLINE
-unsigned evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); }
+int evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); }
 
 /******************************************************************************
  *
@@ -407,7 +407,7 @@ unsigned evq_giveISR( evq_t *evq, unsigned data ) { return evq_give(evq, data); 
  *
  ******************************************************************************/
 
-unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay );
+int evq_sendFor( evq_t *evq, unsigned data, cnt_t delay );
 
 /******************************************************************************
  *
@@ -431,7 +431,7 @@ unsigned evq_sendFor( evq_t *evq, unsigned data, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time );
+int evq_sendUntil( evq_t *evq, unsigned data, cnt_t time );
 
 /******************************************************************************
  *
@@ -454,7 +454,7 @@ unsigned evq_sendUntil( evq_t *evq, unsigned data, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned evq_send( evq_t *evq, unsigned data ) { return evq_sendFor(evq, data, INFINITE); }
+int evq_send( evq_t *evq, unsigned data ) { return evq_sendFor(evq, data, INFINITE); }
 
 /******************************************************************************
  *
@@ -607,29 +607,29 @@ struct EventQueueT : public __evq
 	void     reset    ( void )                            {        evq_reset    (this); }
 	void     kill     ( void )                            {        evq_kill     (this); }
 	void     destroy  ( void )                            {        evq_destroy  (this); }
-	unsigned take     ( unsigned *_data )                 { return evq_take     (this,  _data); }
-	unsigned take     ( unsigned &_data )                 { return evq_take     (this, &_data); }
-	unsigned tryWait  ( unsigned *_data )                 { return evq_tryWait  (this,  _data); }
-	unsigned tryWait  ( unsigned &_data )                 { return evq_tryWait  (this, &_data); }
-	unsigned takeISR  ( unsigned *_data )                 { return evq_takeISR  (this,  _data); }
-	unsigned takeISR  ( unsigned &_data )                 { return evq_takeISR  (this, &_data); }
+	int      take     ( unsigned *_data )                 { return evq_take     (this,  _data); }
+	int      take     ( unsigned &_data )                 { return evq_take     (this, &_data); }
+	int      tryWait  ( unsigned *_data )                 { return evq_tryWait  (this,  _data); }
+	int      tryWait  ( unsigned &_data )                 { return evq_tryWait  (this, &_data); }
+	int      takeISR  ( unsigned *_data )                 { return evq_takeISR  (this,  _data); }
+	int      takeISR  ( unsigned &_data )                 { return evq_takeISR  (this, &_data); }
 	template<typename T>
-	unsigned waitFor  ( unsigned *_data, const T _delay ) { return evq_waitFor  (this,  _data, Clock::count(_delay)); }
+	int      waitFor  ( unsigned *_data, const T _delay ) { return evq_waitFor  (this,  _data, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitFor  ( unsigned &_data, const T _delay ) { return evq_waitFor  (this, &_data, Clock::count(_delay)); }
+	int      waitFor  ( unsigned &_data, const T _delay ) { return evq_waitFor  (this, &_data, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( unsigned *_data, const T _time )  { return evq_waitUntil(this,  _data, Clock::until(_time)); }
+	int      waitUntil( unsigned *_data, const T _time )  { return evq_waitUntil(this,  _data, Clock::until(_time)); }
 	template<typename T>
-	unsigned waitUntil( unsigned &_data, const T _time )  { return evq_waitUntil(this, &_data, Clock::until(_time)); }
-	unsigned wait     ( unsigned *_data )                 { return evq_wait     (this,  _data); }
-	unsigned wait     ( unsigned &_data )                 { return evq_wait     (this, &_data); }
-	unsigned give     ( unsigned  _data )                 { return evq_give     (this,  _data); }
-	unsigned giveISR  ( unsigned  _data )                 { return evq_giveISR  (this,  _data); }
+	int      waitUntil( unsigned &_data, const T _time )  { return evq_waitUntil(this, &_data, Clock::until(_time)); }
+	int      wait     ( unsigned *_data )                 { return evq_wait     (this,  _data); }
+	int      wait     ( unsigned &_data )                 { return evq_wait     (this, &_data); }
+	int      give     ( unsigned  _data )                 { return evq_give     (this,  _data); }
+	int      giveISR  ( unsigned  _data )                 { return evq_giveISR  (this,  _data); }
 	template<typename T>
-	unsigned sendFor  ( unsigned  _data, const T _delay ) { return evq_sendFor  (this,  _data, Clock::count(_delay)); }
+	int      sendFor  ( unsigned  _data, const T _delay ) { return evq_sendFor  (this,  _data, Clock::count(_delay)); }
 	template<typename T>
-	unsigned sendUntil( unsigned  _data, const T _time )  { return evq_sendUntil(this,  _data, Clock::until(_time)); }
-	unsigned send     ( unsigned  _data )                 { return evq_send     (this,  _data); }
+	int      sendUntil( unsigned  _data, const T _time )  { return evq_sendUntil(this,  _data, Clock::until(_time)); }
+	int      send     ( unsigned  _data )                 { return evq_send     (this,  _data); }
 	void     push     ( unsigned  _data )                 {        evq_push     (this,  _data); }
 	void     pushISR  ( unsigned  _data )                 {        evq_pushISR  (this,  _data); }
 	unsigned count    ( void )                            { return evq_count    (this); }

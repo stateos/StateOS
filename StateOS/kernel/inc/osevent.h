@@ -242,7 +242,7 @@ void evt_delete( evt_t *evt ) { evt_destroy(evt); }
  *
  ******************************************************************************/
 
-unsigned evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay );
+int evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay );
 
 /******************************************************************************
  *
@@ -265,7 +265,7 @@ unsigned evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time );
+int evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time );
 
 /******************************************************************************
  *
@@ -287,7 +287,7 @@ unsigned evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned evt_wait( evt_t *evt, unsigned *data ) { return evt_waitFor(evt, data, INFINITE); }
+int evt_wait( evt_t *evt, unsigned *data ) { return evt_waitFor(evt, data, INFINITE); }
 
 /******************************************************************************
  *
@@ -371,21 +371,21 @@ struct Event : public __evt
 		return Ptr(evt);
 	}
 
-	void     reset    ( void )                             {        evt_reset    (this); }
-	void     kill     ( void )                             {        evt_kill     (this); }
-	void     destroy  ( void )                             {        evt_destroy  (this); }
+	void reset    ( void )                             {        evt_reset    (this); }
+	void kill     ( void )                             {        evt_kill     (this); }
+	void destroy  ( void )                             {        evt_destroy  (this); }
 	template<typename T>
-	unsigned waitFor  ( unsigned *_event, const T _delay ) { return evt_waitFor  (this,  _event, Clock::count(_delay)); }
+	int  waitFor  ( unsigned *_event, const T _delay ) { return evt_waitFor  (this,  _event, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitFor  ( unsigned &_event, const T _delay ) { return evt_waitFor  (this, &_event, Clock::count(_delay)); }
+	int  waitFor  ( unsigned &_event, const T _delay ) { return evt_waitFor  (this, &_event, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( unsigned *_event, const T _time )  { return evt_waitUntil(this,  _event, Clock::until(_time)); }
+	int  waitUntil( unsigned *_event, const T _time )  { return evt_waitUntil(this,  _event, Clock::until(_time)); }
 	template<typename T>
-	unsigned waitUntil( unsigned &_event, const T _time )  { return evt_waitUntil(this, &_event, Clock::until(_time)); }
-	unsigned wait     ( unsigned *_event )                 { return evt_wait     (this,  _event); }
-	unsigned wait     ( unsigned &_event )                 { return evt_wait     (this, &_event); }
-	void     give     ( unsigned  _event )                 {        evt_give     (this,  _event); }
-	void     giveISR  ( unsigned  _event )                 {        evt_giveISR  (this,  _event); }
+	int  waitUntil( unsigned &_event, const T _time )  { return evt_waitUntil(this, &_event, Clock::until(_time)); }
+	int  wait     ( unsigned *_event )                 { return evt_wait     (this,  _event); }
+	int  wait     ( unsigned &_event )                 { return evt_wait     (this, &_event); }
+	void give     ( unsigned  _event )                 {        evt_give     (this,  _event); }
+	void giveISR  ( unsigned  _event )                 {        evt_giveISR  (this,  _event); }
 };
 
 #endif//__cplusplus

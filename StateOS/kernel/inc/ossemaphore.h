@@ -304,13 +304,13 @@ void sem_delete( sem_t *sem ) { sem_destroy(sem); }
  *
  ******************************************************************************/
 
-unsigned sem_take( sem_t *sem );
+int sem_take( sem_t *sem );
 
 __STATIC_INLINE
-unsigned sem_tryWait( sem_t *sem ) { return sem_take(sem); }
+int sem_tryWait( sem_t *sem ) { return sem_take(sem); }
 
 __STATIC_INLINE
-unsigned sem_takeISR( sem_t *sem ) { return sem_take(sem); }
+int sem_takeISR( sem_t *sem ) { return sem_take(sem); }
 
 /******************************************************************************
  *
@@ -335,7 +335,7 @@ unsigned sem_takeISR( sem_t *sem ) { return sem_take(sem); }
  *
  ******************************************************************************/
 
-unsigned sem_waitFor( sem_t *sem, cnt_t delay );
+int sem_waitFor( sem_t *sem, cnt_t delay );
 
 /******************************************************************************
  *
@@ -358,7 +358,7 @@ unsigned sem_waitFor( sem_t *sem, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned sem_waitUntil( sem_t *sem, cnt_t time );
+int sem_waitUntil( sem_t *sem, cnt_t time );
 
 /******************************************************************************
  *
@@ -380,7 +380,7 @@ unsigned sem_waitUntil( sem_t *sem, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
+int sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
 
 /******************************************************************************
  *
@@ -402,13 +402,13 @@ unsigned sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
  *
  ******************************************************************************/
 
-unsigned sem_give( sem_t *sem );
+int sem_give( sem_t *sem );
 
 __STATIC_INLINE
-unsigned sem_post( sem_t *sem ) { return sem_give(sem); }
+int sem_post( sem_t *sem ) { return sem_give(sem); }
 
 __STATIC_INLINE
-unsigned sem_giveISR( sem_t *sem ) { return sem_give(sem); }
+int sem_giveISR( sem_t *sem ) { return sem_give(sem); }
 
 /******************************************************************************
  *
@@ -547,21 +547,21 @@ struct Semaphore : public __sem
 		return Ptr(sem);
 	}
 
-	void     reset    ( void )           {        sem_reset    (this); }
-	void     kill     ( void )           {        sem_kill     (this); }
-	void     destroy  ( void )           {        sem_destroy  (this); }
-	unsigned take     ( void )           { return sem_take     (this); }
-	unsigned tryWait  ( void )           { return sem_tryWait  (this); }
-	unsigned takeISR  ( void )           { return sem_takeISR  (this); }
+	void reset    ( void )           {        sem_reset    (this); }
+	void kill     ( void )           {        sem_kill     (this); }
+	void destroy  ( void )           {        sem_destroy  (this); }
+	int  take     ( void )           { return sem_take     (this); }
+	int  tryWait  ( void )           { return sem_tryWait  (this); }
+	int  takeISR  ( void )           { return sem_takeISR  (this); }
 	template<typename T>
-	unsigned waitFor  ( const T _delay ) { return sem_waitFor  (this, Clock::count(_delay)); }
+	int  waitFor  ( const T _delay ) { return sem_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )  { return sem_waitUntil(this, Clock::until(_time)); }
-	unsigned wait     ( void )           { return sem_wait     (this); }
-	unsigned give     ( void )           { return sem_give     (this); }
-	unsigned post     ( void )           { return sem_post     (this); }
-	unsigned giveISR  ( void )           { return sem_giveISR  (this); }
-	unsigned getValue ( void )           { return sem_getValue (this); }
+	int  waitUntil( const T _time )  { return sem_waitUntil(this, Clock::until(_time)); }
+	int  wait     ( void )           { return sem_wait     (this); }
+	int  give     ( void )           { return sem_give     (this); }
+	int  post     ( void )           { return sem_post     (this); }
+	int  giveISR  ( void )           { return sem_giveISR  (this); }
+	int  getValue ( void )           { return sem_getValue (this); }
 };
 
 #endif//__cplusplus

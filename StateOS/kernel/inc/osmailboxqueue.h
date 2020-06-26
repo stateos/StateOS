@@ -286,13 +286,13 @@ void box_delete( box_t *box ) { box_destroy(box); }
  *
  ******************************************************************************/
 
-unsigned box_take( box_t *box, void *data );
+int box_take( box_t *box, void *data );
 
 __STATIC_INLINE
-unsigned box_tryWait( box_t *box, void *data ) { return box_take(box, data); }
+int box_tryWait( box_t *box, void *data ) { return box_take(box, data); }
 
 __STATIC_INLINE
-unsigned box_takeISR( box_t *box, void *data ) { return box_take(box, data); }
+int box_takeISR( box_t *box, void *data ) { return box_take(box, data); }
 
 /******************************************************************************
  *
@@ -318,7 +318,7 @@ unsigned box_takeISR( box_t *box, void *data ) { return box_take(box, data); }
  *
  ******************************************************************************/
 
-unsigned box_waitFor( box_t *box, void *data, cnt_t delay );
+int box_waitFor( box_t *box, void *data, cnt_t delay );
 
 /******************************************************************************
  *
@@ -342,7 +342,7 @@ unsigned box_waitFor( box_t *box, void *data, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned box_waitUntil( box_t *box, void *data, cnt_t time );
+int box_waitUntil( box_t *box, void *data, cnt_t time );
 
 /******************************************************************************
  *
@@ -365,7 +365,7 @@ unsigned box_waitUntil( box_t *box, void *data, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFINITE); }
+int box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFINITE); }
 
 /******************************************************************************
  *
@@ -387,10 +387,10 @@ unsigned box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFI
  *
  ******************************************************************************/
 
-unsigned box_give( box_t *box, const void *data );
+int box_give( box_t *box, const void *data );
 
 __STATIC_INLINE
-unsigned box_giveISR( box_t *box, const void *data ) { return box_give(box, data); }
+int box_giveISR( box_t *box, const void *data ) { return box_give(box, data); }
 
 /******************************************************************************
  *
@@ -416,7 +416,7 @@ unsigned box_giveISR( box_t *box, const void *data ) { return box_give(box, data
  *
  ******************************************************************************/
 
-unsigned box_sendFor( box_t *box, const void *data, cnt_t delay );
+int box_sendFor( box_t *box, const void *data, cnt_t delay );
 
 /******************************************************************************
  *
@@ -440,7 +440,7 @@ unsigned box_sendFor( box_t *box, const void *data, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned box_sendUntil( box_t *box, const void *data, cnt_t time );
+int box_sendUntil( box_t *box, const void *data, cnt_t time );
 
 /******************************************************************************
  *
@@ -463,7 +463,7 @@ unsigned box_sendUntil( box_t *box, const void *data, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned box_send( box_t *box, const void *data ) { return box_sendFor(box, data, INFINITE); }
+int box_send( box_t *box, const void *data ) { return box_sendFor(box, data, INFINITE); }
 
 /******************************************************************************
  *
@@ -618,21 +618,21 @@ struct MailBoxQueueT : public __box
 	void     reset    (       void )                        {        box_reset    (this); }
 	void     kill     (       void )                        {        box_kill     (this); }
 	void     destroy  (       void )                        {        box_destroy  (this); }
-	unsigned take     (       void *_data )                 { return box_take     (this, _data); }
-	unsigned tryWait  (       void *_data )                 { return box_tryWait  (this, _data); }
-	unsigned takeISR  (       void *_data )                 { return box_takeISR  (this, _data); }
+	int      take     (       void *_data )                 { return box_take     (this, _data); }
+	int      tryWait  (       void *_data )                 { return box_tryWait  (this, _data); }
+	int      takeISR  (       void *_data )                 { return box_takeISR  (this, _data); }
 	template<typename T>
-	unsigned waitFor  (       void *_data, const T _delay ) { return box_waitFor  (this, _data, Clock::count(_delay)); }
+	int      waitFor  (       void *_data, const T _delay ) { return box_waitFor  (this, _data, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil(       void *_data, const T _time )  { return box_waitUntil(this, _data, Clock::until(_time)); }
-	unsigned wait     (       void *_data )                 { return box_wait     (this, _data); }
-	unsigned give     ( const void *_data )                 { return box_give     (this, _data); }
-	unsigned giveISR  ( const void *_data )                 { return box_giveISR  (this, _data); }
+	int      waitUntil(       void *_data, const T _time )  { return box_waitUntil(this, _data, Clock::until(_time)); }
+	int      wait     (       void *_data )                 { return box_wait     (this, _data); }
+	int      give     ( const void *_data )                 { return box_give     (this, _data); }
+	int      giveISR  ( const void *_data )                 { return box_giveISR  (this, _data); }
 	template<typename T>
-	unsigned sendFor  ( const void *_data, const T _delay ) { return box_sendFor  (this, _data, Clock::count(_delay)); }
+	int      sendFor  ( const void *_data, const T _delay ) { return box_sendFor  (this, _data, Clock::count(_delay)); }
 	template<typename T>
-	unsigned sendUntil( const void *_data, const T _time )  { return box_sendUntil(this, _data, Clock::until(_time)); }
-	unsigned send     ( const void *_data )                 { return box_send     (this, _data); }
+	int      sendUntil( const void *_data, const T _time )  { return box_sendUntil(this, _data, Clock::until(_time)); }
+	int      send     ( const void *_data )                 { return box_send     (this, _data); }
 	void     push     ( const void *_data )                 {        box_push     (this, _data); }
 	void     pushISR  ( const void *_data )                 {        box_pushISR  (this, _data); }
 	unsigned count    (       void )                        { return box_count    (this); }

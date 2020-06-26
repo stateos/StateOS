@@ -251,7 +251,7 @@ void bar_delete( bar_t *bar ) { bar_destroy(bar); }
  *
  ******************************************************************************/
 
-unsigned bar_waitFor( bar_t *bar, cnt_t delay );
+int bar_waitFor( bar_t *bar, cnt_t delay );
 
 /******************************************************************************
  *
@@ -273,7 +273,7 @@ unsigned bar_waitFor( bar_t *bar, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned bar_waitUntil( bar_t *bar, cnt_t time );
+int bar_waitUntil( bar_t *bar, cnt_t time );
 
 /******************************************************************************
  *
@@ -294,7 +294,7 @@ unsigned bar_waitUntil( bar_t *bar, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned bar_wait( bar_t *bar ) { return bar_waitFor(bar, INFINITE); }
+int bar_wait( bar_t *bar ) { return bar_waitFor(bar, INFINITE); }
 
 #ifdef __cplusplus
 }
@@ -357,14 +357,14 @@ struct Barrier : public __bar
 		return Ptr(bar);
 	}
 
-	void     reset    ( void )           {        bar_reset    (this); }
-	void     kill     ( void )           {        bar_kill     (this); }
-	void     destroy  ( void )           {        bar_destroy  (this); }
+	void reset    ( void )           {        bar_reset    (this); }
+	void kill     ( void )           {        bar_kill     (this); }
+	void destroy  ( void )           {        bar_destroy  (this); }
 	template<typename T>
-	unsigned waitFor  ( const T _delay ) { return bar_waitFor  (this, Clock::count(_delay)); }
+	int  waitFor  ( const T _delay ) { return bar_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )  { return bar_waitUntil(this, Clock::until(_time)); }
-	unsigned wait     ( void )           { return bar_wait     (this); }
+	int  waitUntil( const T _time )  { return bar_waitUntil(this, Clock::until(_time)); }
+	int  wait     ( void )           { return bar_wait     (this); }
 };
 
 #endif//__cplusplus

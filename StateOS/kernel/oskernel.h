@@ -170,7 +170,7 @@ void core_tsk_remove( tsk_t *tsk );
 void core_tsk_append( tsk_t *tsk, tsk_t **obj );
 
 // remove task 'tsk' from the blocked queue with event value 'event'
-void core_tsk_unlink( tsk_t *tsk, unsigned event );
+void core_tsk_unlink( tsk_t *tsk, int event );
 
 // transfer task 'tsk' to the blocked queue 'que'
 void core_tsk_transfer( tsk_t *tsk, tsk_t **que );
@@ -181,7 +181,7 @@ void core_tsk_transfer( tsk_t *tsk, tsk_t **que );
 // insert the current task into timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay );
+int core_tsk_waitFor( tsk_t **que, cnt_t delay );
 
 // delay execution of given task 'tsk'
 // append the current task to the blocked queue 'que'
@@ -189,7 +189,7 @@ unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay );
 // insert the current task into timers READY queue
 // context switch if 'tsk' is the current task
 // return event value
-unsigned core_tsk_wait( tsk_t *tsk, tsk_t **que );
+int core_tsk_wait( tsk_t *tsk, tsk_t **que );
 
 // delay execution of current task for given duration of time 'delay' from the end of the previous countdown
 // append the current task to the blocked queue 'que'
@@ -197,7 +197,7 @@ unsigned core_tsk_wait( tsk_t *tsk, tsk_t **que );
 // insert the current task into timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay );
+int core_tsk_waitNext( tsk_t **que, cnt_t delay );
 
 // delay execution of the current task until given time point 'time'
 // append the current task to the blocked queue 'que'
@@ -205,7 +205,7 @@ unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay );
 // insert the current task into timers READY queue
 // force context switch
 // return event value
-unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time );
+int core_tsk_waitUntil( tsk_t **que, cnt_t time );
 
 // delay indefinitely execution of given task
 // append given task to WAIT queue
@@ -220,7 +220,7 @@ void core_tsk_suspend( tsk_t *tsk );
 // insert resumed task into tasks READY queue
 // force context switch if priority of resumed task is greater then priority of the current task and kernel works in preemptive mode
 // return 'tsk'
-tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event );
+tsk_t *core_tsk_wakeup( tsk_t *tsk, int event );
 
 // resume execution of first task from blocked queue with event value 'event'; 'tsk' is the head (first task) of the queue
 // remove resumed task from guard object blocked queue
@@ -229,7 +229,7 @@ tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event );
 // force context switch if priority of resumed task is greater then priority of the current task and kernel works in preemptive mode
 // return 'tsk'
 __STATIC_INLINE
-tsk_t *core_one_wakeup( tsk_t *tsk, unsigned event )
+tsk_t *core_one_wakeup( tsk_t *tsk, int event )
 {
 	return core_tsk_wakeup(tsk, event);
 }
@@ -239,7 +239,7 @@ tsk_t *core_one_wakeup( tsk_t *tsk, unsigned event )
 // remove all resumed tasks from timers READY queue
 // insert all resumed tasks into tasks READY queue
 // force context switch if priority of any resumed task is greater then priority of the current task and kernel works in preemptive mode
-void core_all_wakeup( tsk_t *tsk, unsigned event );
+void core_all_wakeup( tsk_t *tsk, int event );
 
 // return count of tasks blocked on the queue; 'tsk' is the head (first task) of the queue
 unsigned core_tsk_count( tsk_t *tsk );
@@ -269,10 +269,10 @@ void core_mtx_unlink( mtx_t *mtx );
 // transfer lock to the next task in the blocked queue of mutex 'mtx'
 // the task is waked with event 'event'
 // return pointer to the waked task or 0 if the blocked queue of 'mtx' is empty
-tsk_t *core_mtx_transferLock( mtx_t *mtx, unsigned event );
+tsk_t *core_mtx_transferLock( mtx_t *mtx, int event );
 
 // reset mutex 'mtx' and release all blocked tasks with event 'event'
-void core_mtx_reset( mtx_t *mtx, unsigned event );
+void core_mtx_reset( mtx_t *mtx, int event );
 
 /* -------------------------------------------------------------------------- */
 

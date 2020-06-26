@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -77,7 +77,7 @@ mut_t *mut_create( void )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_mut_reset( mut_t *mut, unsigned event )
+void priv_mut_reset( mut_t *mut, int event )
 /* -------------------------------------------------------------------------- */
 {
 	core_all_wakeup(mut->obj.queue, event);
@@ -116,7 +116,7 @@ void mut_destroy( mut_t *mut )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mut_take( mut_t *mut )
+int priv_mut_take( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
 	if (mut->owner == 0)
@@ -132,10 +132,10 @@ unsigned priv_mut_take( mut_t *mut )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_take( mut_t *mut )
+int mut_take( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(mut);
@@ -143,18 +143,18 @@ unsigned mut_take( mut_t *mut )
 
 	sys_lock();
 	{
-		event = priv_mut_take(mut);
+		result = priv_mut_take(mut);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_waitFor( mut_t *mut, cnt_t delay )
+int mut_waitFor( mut_t *mut, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(mut);
@@ -162,21 +162,21 @@ unsigned mut_waitFor( mut_t *mut, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_mut_take(mut);
+		result = priv_mut_take(mut);
 
-		if (event == E_TIMEOUT)
-			event = core_tsk_waitFor(&mut->obj.queue, delay);
+		if (result == E_TIMEOUT)
+			result = core_tsk_waitFor(&mut->obj.queue, delay);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_waitUntil( mut_t *mut, cnt_t time )
+int mut_waitUntil( mut_t *mut, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(mut);
@@ -184,19 +184,19 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_mut_take(mut);
+		result = priv_mut_take(mut);
 
-		if (event == E_TIMEOUT)
-			event = core_tsk_waitUntil(&mut->obj.queue, time);
+		if (result == E_TIMEOUT)
+			result = core_tsk_waitUntil(&mut->obj.queue, time);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mut_give( mut_t *mut )
+int priv_mut_give( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
 	if (mut->owner == System.cur)
@@ -209,10 +209,10 @@ unsigned priv_mut_give( mut_t *mut )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mut_give( mut_t *mut )
+int mut_give( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(mut);
@@ -220,11 +220,11 @@ unsigned mut_give( mut_t *mut )
 
 	sys_lock();
 	{
-		event = priv_mut_give(mut);
+		result = priv_mut_give(mut);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    17.06.2020
+    @date    25.06.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -159,7 +159,7 @@ bool priv_tmr_expired( tmr_t *tmr )
 /* -------------------------------------------------------------------------- */
 
 static
-void priv_tmr_wakeup( tmr_t *tmr, unsigned event )
+void priv_tmr_wakeup( tmr_t *tmr, int event )
 {
 	if (tmr->state)
 		tmr->state();
@@ -358,7 +358,7 @@ void core_tsk_append( tsk_t *tsk, tsk_t **que )
 
 /* -------------------------------------------------------------------------- */
 
-void core_tsk_unlink( tsk_t *tsk, unsigned event )
+void core_tsk_unlink( tsk_t *tsk, int event )
 {
 	tsk_t**que = tsk->back;
 	tsk_t *nxt = tsk->hdr.obj.queue;
@@ -380,7 +380,7 @@ void core_tsk_transfer( tsk_t *tsk, tsk_t **que )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_wait( tsk_t *tsk, tsk_t **que )
+int core_tsk_wait( tsk_t *tsk, tsk_t **que )
 {
 	assert_tsk_context();
 
@@ -399,7 +399,7 @@ unsigned core_tsk_wait( tsk_t *tsk, tsk_t **que )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay )
+int core_tsk_waitFor( tsk_t **que, cnt_t delay )
 {
 	tsk_t *cur = System.cur;
 
@@ -414,7 +414,7 @@ unsigned core_tsk_waitFor( tsk_t **que, cnt_t delay )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay )
+int core_tsk_waitNext( tsk_t **que, cnt_t delay )
 {
 	tsk_t *cur = System.cur;
 
@@ -428,7 +428,7 @@ unsigned core_tsk_waitNext( tsk_t **que, cnt_t delay )
 
 /* -------------------------------------------------------------------------- */
 
-unsigned core_tsk_waitUntil( tsk_t **que, cnt_t time )
+int core_tsk_waitUntil( tsk_t **que, cnt_t time )
 {
 	tsk_t *cur = System.cur;
 
@@ -452,7 +452,7 @@ void core_tsk_suspend( tsk_t *tsk )
 
 /* -------------------------------------------------------------------------- */
 
-tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event )
+tsk_t *core_tsk_wakeup( tsk_t *tsk, int event )
 {
 	if (tsk)
 	{
@@ -466,7 +466,7 @@ tsk_t *core_tsk_wakeup( tsk_t *tsk, unsigned event )
 
 /* -------------------------------------------------------------------------- */
 
-void core_all_wakeup( tsk_t *tsk, unsigned event )
+void core_all_wakeup( tsk_t *tsk, int event )
 {
 	while (tsk = core_tsk_wakeup(tsk, event), tsk) tsk = tsk->hdr.obj.queue;
 }
@@ -639,7 +639,7 @@ void core_mtx_unlink( mtx_t *mtx )
 
 /* -------------------------------------------------------------------------- */
 
-tsk_t *core_mtx_transferLock( mtx_t *mtx, unsigned event )
+tsk_t *core_mtx_transferLock( mtx_t *mtx, int event )
 {
 	tsk_t *tsk;
 
@@ -652,7 +652,7 @@ tsk_t *core_mtx_transferLock( mtx_t *mtx, unsigned event )
 
 /* -------------------------------------------------------------------------- */
 
-void core_mtx_reset( mtx_t *mtx, unsigned event )
+void core_mtx_reset( mtx_t *mtx, int event )
 {
 	core_mtx_unlink(mtx);
 	core_all_wakeup(mtx->obj.queue, event);

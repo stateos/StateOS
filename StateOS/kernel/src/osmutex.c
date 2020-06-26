@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -153,7 +153,7 @@ unsigned mtx_getPrio( mtx_t *mtx )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mtx_take( mtx_t *mtx )
+int priv_mtx_take( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
 	if ((mtx->mode & mtxPrioMASK) == mtxPrioProtect && mtx->prio < System.cur->prio)
@@ -187,10 +187,10 @@ unsigned priv_mtx_take( mtx_t *mtx )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mtx_take( mtx_t *mtx )
+int mtx_take( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(mtx);
@@ -201,18 +201,18 @@ unsigned mtx_take( mtx_t *mtx )
 
 	sys_lock();
 	{
-		event = priv_mtx_take(mtx);
+		result = priv_mtx_take(mtx);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay )
+int mtx_waitFor( mtx_t *mtx, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(mtx);
@@ -223,28 +223,28 @@ unsigned mtx_waitFor( mtx_t *mtx, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_mtx_take(mtx);
+		result = priv_mtx_take(mtx);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && mtx->owner->prio < System.cur->prio)
 				core_tsk_prio(mtx->owner, System.cur->prio);
 
 			System.cur->mtx.tree = mtx;
-			event = core_tsk_waitFor(&mtx->obj.queue, delay);
+			result = core_tsk_waitFor(&mtx->obj.queue, delay);
 			System.cur->mtx.tree = 0;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
+int mtx_waitUntil( mtx_t *mtx, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(mtx);
@@ -255,26 +255,26 @@ unsigned mtx_waitUntil( mtx_t *mtx, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_mtx_take(mtx);
+		result = priv_mtx_take(mtx);
 
-		if (event == E_TIMEOUT)
+		if (result == E_TIMEOUT)
 		{
 			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && mtx->owner->prio < System.cur->prio)
 				core_tsk_prio(mtx->owner, System.cur->prio);
 
 			System.cur->mtx.tree = mtx;
-			event = core_tsk_waitUntil(&mtx->obj.queue, time);
+			result = core_tsk_waitUntil(&mtx->obj.queue, time);
 			System.cur->mtx.tree = 0;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_mtx_give( mtx_t *mtx )
+int priv_mtx_give( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
 	if ((mtx->mode & (mtxTypeMASK + mtxRobust)) == mtxNormal || mtx->owner == System.cur)
@@ -293,10 +293,10 @@ unsigned priv_mtx_give( mtx_t *mtx )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned mtx_give( mtx_t *mtx )
+int mtx_give( mtx_t *mtx )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(mtx);
@@ -307,11 +307,11 @@ unsigned mtx_give( mtx_t *mtx )
 
 	sys_lock();
 	{
-		event = priv_mtx_give(mtx);
+		result = priv_mtx_give(mtx);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -77,7 +77,7 @@ cnd_t *cnd_create( void )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_cnd_reset( cnd_t *cnd, unsigned event )
+void priv_cnd_reset( cnd_t *cnd, int event )
 /* -------------------------------------------------------------------------- */
 {
 	core_all_wakeup(cnd->obj.queue, event);
@@ -115,11 +115,11 @@ void cnd_destroy( cnd_t *cnd )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
+int cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-	unsigned wait_event;
+	int result;
+	int wait_result;
 
 	assert_tsk_context();
 	assert(cnd);
@@ -129,26 +129,26 @@ unsigned cnd_waitFor( cnd_t *cnd, mtx_t *mtx, cnt_t delay )
 
 	sys_lock();
 	{
-		event = mtx_give(mtx);
-		if (event == E_SUCCESS)
+		result = mtx_give(mtx);
+		if (result == E_SUCCESS)
 		{
-			wait_event = core_tsk_waitFor(&cnd->obj.queue, delay);
-			event = mtx_wait(mtx);
-			if (event == E_SUCCESS)
-				event = wait_event;
+			wait_result = core_tsk_waitFor(&cnd->obj.queue, delay);
+			result = mtx_wait(mtx);
+			if (result == E_SUCCESS)
+				result = wait_result;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
+int cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
-	unsigned wait_event;
+	int result;
+	int wait_result;
 
 	assert_tsk_context();
 	assert(cnd);
@@ -158,18 +158,18 @@ unsigned cnd_waitUntil( cnd_t *cnd, mtx_t *mtx, cnt_t time )
 
 	sys_lock();
 	{
-		event = mtx_give(mtx);
-		if (event == E_SUCCESS)
+		result = mtx_give(mtx);
+		if (result == E_SUCCESS)
 		{
-			wait_event = core_tsk_waitUntil(&cnd->obj.queue, time);
-			event = mtx_wait(mtx);
-			if (event == E_SUCCESS)
-				event = wait_event;
+			wait_result = core_tsk_waitUntil(&cnd->obj.queue, time);
+			result = mtx_wait(mtx);
+			if (result == E_SUCCESS)
+				result = wait_result;
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

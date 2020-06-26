@@ -74,7 +74,7 @@ struct __tsk
 	tsk_t  * owner; // task owner (joinable / detached state)
 	tsk_t ** guard; // BLOCKED queue for the pending process
 
-	unsigned event; // wakeup event
+	int      event; // wakeup event
 
 	struct {
 	mtx_t  * list;  // list of mutexes held
@@ -850,7 +850,7 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state );
  *
  ******************************************************************************/
 
-unsigned tsk_detach( tsk_t *tsk );
+int tsk_detach( tsk_t *tsk );
 
 /******************************************************************************
  *
@@ -869,7 +869,7 @@ unsigned tsk_detach( tsk_t *tsk );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned cur_detach( void ) { return tsk_detach(System.cur); }
+int cur_detach( void ) { return tsk_detach(System.cur); }
 
 /******************************************************************************
  *
@@ -890,7 +890,7 @@ unsigned cur_detach( void ) { return tsk_detach(System.cur); }
  *
  ******************************************************************************/
 
-unsigned tsk_join( tsk_t *tsk );
+int tsk_join( tsk_t *tsk );
 
 /******************************************************************************
  *
@@ -935,10 +935,10 @@ void tsk_exit( void ) { tsk_stop(); }
  *
  ******************************************************************************/
 
-unsigned tsk_reset( tsk_t *tsk );
+int tsk_reset( tsk_t *tsk );
 
 __STATIC_INLINE
-unsigned tsk_kill( tsk_t *tsk ) { return tsk_reset(tsk); }
+int tsk_kill( tsk_t *tsk ) { return tsk_reset(tsk); }
 
 /******************************************************************************
  *
@@ -958,10 +958,10 @@ unsigned tsk_kill( tsk_t *tsk ) { return tsk_reset(tsk); }
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned cur_reset( void ) { return tsk_reset(System.cur); }
+int cur_reset( void ) { return tsk_reset(System.cur); }
 
 __STATIC_INLINE
-unsigned cur_kill( void ) { return cur_reset(); }
+int cur_kill( void ) { return cur_reset(); }
 
 /******************************************************************************
  *
@@ -981,10 +981,10 @@ unsigned cur_kill( void ) { return cur_reset(); }
  *
  ******************************************************************************/
 
-unsigned tsk_destroy( tsk_t *tsk );
+int tsk_destroy( tsk_t *tsk );
 
 __STATIC_INLINE
-unsigned tsk_delete( tsk_t *tsk ) { return tsk_destroy(tsk); }
+int tsk_delete( tsk_t *tsk ) { return tsk_destroy(tsk); }
 
 /******************************************************************************
  *
@@ -1004,10 +1004,10 @@ unsigned tsk_delete( tsk_t *tsk ) { return tsk_destroy(tsk); }
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned cur_destroy( void ) { return tsk_destroy(System.cur); }
+int cur_destroy( void ) { return tsk_destroy(System.cur); }
 
 __STATIC_INLINE
-unsigned cur_delete( void ) { return cur_destroy(); }
+int cur_delete( void ) { return cur_destroy(); }
 
 /******************************************************************************
  *
@@ -1180,7 +1180,7 @@ void tsk_sleep( void ) { tsk_sleepFor(INFINITE); }
  *
  ******************************************************************************/
 
-unsigned tsk_suspend( tsk_t *tsk );
+int tsk_suspend( tsk_t *tsk );
 
 /******************************************************************************
  *
@@ -1219,10 +1219,10 @@ void cur_suspend( void ) { tsk_suspend(System.cur); }
  *
  ******************************************************************************/
 
-unsigned tsk_resume( tsk_t *tsk );
+int tsk_resume( tsk_t *tsk );
 
 __STATIC_INLINE
-unsigned tsk_resumeISR( tsk_t *tsk ) { return tsk_resume(tsk); }
+int tsk_resumeISR( tsk_t *tsk ) { return tsk_resume(tsk); }
 
 /******************************************************************************
  *
@@ -1394,16 +1394,16 @@ struct baseTask : public __tsk
 #else
 	void     startFrom( fun_t *  _state )  {        tsk_startFrom(this, _state); }
 #endif
-	unsigned detach   ( void )             { return tsk_detach   (this); }
-	unsigned join     ( void )             { return tsk_join     (this); }
-	unsigned reset    ( void )             { return tsk_reset    (this); }
-	unsigned kill     ( void )             { return tsk_kill     (this); }
-	unsigned destroy  ( void )             { return tsk_destroy  (this); }
+	int      detach   ( void )             { return tsk_detach   (this); }
+	int      join     ( void )             { return tsk_join     (this); }
+	int      reset    ( void )             { return tsk_reset    (this); }
+	int      kill     ( void )             { return tsk_kill     (this); }
+	int      destroy  ( void )             { return tsk_destroy  (this); }
 	unsigned prio     ( void )             { return __tsk::basic; }
 	unsigned getPrio  ( void )             { return __tsk::basic; }
-	unsigned suspend  ( void )             { return tsk_suspend  (this); }
-	unsigned resume   ( void )             { return tsk_resume   (this); }
-	unsigned resumeISR( void )             { return tsk_resumeISR(this); }
+	int      suspend  ( void )             { return tsk_suspend  (this); }
+	int      resume   ( void )             { return tsk_resume   (this); }
+	int      resumeISR( void )             { return tsk_resumeISR(this); }
 	void     give     ( unsigned _signo )  {        tsk_give     (this, _signo); }
 	void     signal   ( unsigned _signo )  {        tsk_signal   (this, _signo); }
 #if __cplusplus >= 201402
@@ -1439,17 +1439,17 @@ struct baseTask : public __tsk
 	struct Current
 	{
 		static
-		unsigned detach    ( void )             { return cur_detach    (); }
+		int      detach    ( void )             { return cur_detach    (); }
 		static
 		void     stop      ( void )             {        tsk_stop      (); }
 		static
 		void     exit      ( void )             {        tsk_exit      (); }
 		static
-		unsigned reset     ( void )             { return cur_reset     (); }
+		int      reset     ( void )             { return cur_reset     (); }
 		static
-		unsigned kill      ( void )             { return cur_kill      (); }
+		int      kill      ( void )             { return cur_kill      (); }
 		static
-		unsigned destroy   ( void )             { return cur_destroy   (); }
+		int      destroy   ( void )             { return cur_destroy   (); }
 		static
 		void     yield     ( void )             {        tsk_yield     (); }
 		static

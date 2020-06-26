@@ -243,10 +243,10 @@ void mut_delete( mut_t *mut ) { mut_destroy(mut); }
  *
  ******************************************************************************/
 
-unsigned mut_take( mut_t *mut );
+int mut_take( mut_t *mut );
 
 __STATIC_INLINE
-unsigned mut_tryLock( mut_t *mut ) { return mut_take(mut); }
+int mut_tryLock( mut_t *mut ) { return mut_take(mut); }
 
 /******************************************************************************
  *
@@ -272,7 +272,7 @@ unsigned mut_tryLock( mut_t *mut ) { return mut_take(mut); }
  *
  ******************************************************************************/
 
-unsigned mut_waitFor( mut_t *mut, cnt_t delay );
+int mut_waitFor( mut_t *mut, cnt_t delay );
 
 /******************************************************************************
  *
@@ -296,7 +296,7 @@ unsigned mut_waitFor( mut_t *mut, cnt_t delay );
  *
  ******************************************************************************/
 
-unsigned mut_waitUntil( mut_t *mut, cnt_t time );
+int mut_waitUntil( mut_t *mut, cnt_t time );
 
 /******************************************************************************
  *
@@ -320,10 +320,10 @@ unsigned mut_waitUntil( mut_t *mut, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-unsigned mut_wait( mut_t *mut ) { return mut_waitFor(mut, INFINITE); }
+int mut_wait( mut_t *mut ) { return mut_waitFor(mut, INFINITE); }
 
 __STATIC_INLINE
-unsigned mut_lock( mut_t *mut ) { return mut_wait(mut); }
+int mut_lock( mut_t *mut ) { return mut_wait(mut); }
 
 /******************************************************************************
  *
@@ -344,10 +344,10 @@ unsigned mut_lock( mut_t *mut ) { return mut_wait(mut); }
  *
  ******************************************************************************/
 
-unsigned mut_give( mut_t *mut );
+int mut_give( mut_t *mut );
 
 __STATIC_INLINE
-unsigned mut_unlock( mut_t *mut ) { return mut_give(mut); }
+int mut_unlock( mut_t *mut ) { return mut_give(mut); }
 
 #ifdef __cplusplus
 }
@@ -409,19 +409,19 @@ struct FastMutex : public __mut
 		return Ptr(mut);
 	}
 
-	void     reset    ( void )           {        mut_reset    (this); }
-	void     kill     ( void )           {        mut_kill     (this); }
-	void     destroy  ( void )           {        mut_destroy  (this); }
-	unsigned take     ( void )           { return mut_take     (this); }
-	unsigned tryLock  ( void )           { return mut_tryLock  (this); }
+	void reset    ( void )           {        mut_reset    (this); }
+	void kill     ( void )           {        mut_kill     (this); }
+	void destroy  ( void )           {        mut_destroy  (this); }
+	int  take     ( void )           { return mut_take     (this); }
+	int  tryLock  ( void )           { return mut_tryLock  (this); }
 	template<typename T>
-	unsigned waitFor  ( const T _delay ) { return mut_waitFor  (this, Clock::count(_delay)); }
+	int  waitFor  ( const T _delay ) { return mut_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	unsigned waitUntil( const T _time )  { return mut_waitUntil(this, Clock::until(_time)); }
-	unsigned wait     ( void )           { return mut_wait     (this); }
-	unsigned lock     ( void )           { return mut_lock     (this); }
-	unsigned give     ( void )           { return mut_give     (this); }
-	unsigned unlock   ( void )           { return mut_unlock   (this); }
+	int  waitUntil( const T _time )  { return mut_waitUntil(this, Clock::until(_time)); }
+	int  wait     ( void )           { return mut_wait     (this); }
+	int  lock     ( void )           { return mut_lock     (this); }
+	int  give     ( void )           { return mut_give     (this); }
+	int  unlock   ( void )           { return mut_unlock   (this); }
 };
 
 #endif//__cplusplus

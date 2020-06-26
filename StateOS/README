@@ -70,6 +70,7 @@ Features:
 - updated signal functions
 - updated message buffer functions
 - updated stream buffer functions
+- changed type of system functions result (int)
 ---------
 6.6
 - updated os version

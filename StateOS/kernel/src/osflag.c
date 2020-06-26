@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -80,7 +80,7 @@ flg_t *flg_create( unsigned init )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_flg_reset( flg_t *flg, unsigned event )
+void priv_flg_reset( flg_t *flg, int event )
 /* -------------------------------------------------------------------------- */
 {
 	flg->flags = 0;
@@ -159,10 +159,10 @@ unsigned flg_take( flg_t *flg, unsigned flags, char mode )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay )
+int flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(flg);
@@ -175,25 +175,25 @@ unsigned flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay )
 
 		if (flags == 0)
 		{
-			event = E_SUCCESS;
+			result = E_SUCCESS;
 		}
 		else
 		{
 			System.cur->tmp.flg.mode  = mode;
 			System.cur->tmp.flg.flags = flags;
-			event = core_tsk_waitFor(&flg->obj.queue, delay);
+			result = core_tsk_waitFor(&flg->obj.queue, delay);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
+int flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(flg);
@@ -206,18 +206,18 @@ unsigned flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
 
 		if (flags == 0)
 		{
-			event = E_SUCCESS;
+			result = E_SUCCESS;
 		}
 		else
 		{
 			System.cur->tmp.flg.mode  = mode;
 			System.cur->tmp.flg.flags = flags;
-			event = core_tsk_waitUntil(&flg->obj.queue, time);
+			result = core_tsk_waitUntil(&flg->obj.queue, time);
 		}
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

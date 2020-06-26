@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -78,7 +78,7 @@ evt_t *evt_create( void )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_evt_reset( evt_t *evt, unsigned event )
+void priv_evt_reset( evt_t *evt, int event )
 /* -------------------------------------------------------------------------- */
 {
 	core_all_wakeup(evt->obj.queue, event);
@@ -116,10 +116,10 @@ void evt_destroy( evt_t *evt )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay )
+int evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(evt);
@@ -129,18 +129,18 @@ unsigned evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay )
 	sys_lock();
 	{
 		System.cur->tmp.evt.data = data;
-		event = core_tsk_waitFor(&evt->obj.queue, delay);
+		result = core_tsk_waitFor(&evt->obj.queue, delay);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time )
+int evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(evt);
@@ -150,11 +150,11 @@ unsigned evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time )
 	sys_lock();
 	{
 		System.cur->tmp.evt.data = data;
-		event = core_tsk_waitUntil(&evt->obj.queue, time);
+		result = core_tsk_waitUntil(&evt->obj.queue, time);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */

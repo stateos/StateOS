@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    06.06.2020
+    @date    24.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -81,7 +81,7 @@ bar_t *bar_create( unsigned limit )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_bar_reset( bar_t *bar, unsigned event )
+void priv_bar_reset( bar_t *bar, int event )
 /* -------------------------------------------------------------------------- */
 {
 	core_all_wakeup(bar->obj.queue, event);
@@ -120,7 +120,7 @@ void bar_destroy( bar_t *bar )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_bar_take( bar_t *bar )
+int priv_bar_take( bar_t *bar )
 /* -------------------------------------------------------------------------- */
 {
 	if (core_tsk_count(bar->obj.queue) + 1 == bar->limit)
@@ -134,10 +134,10 @@ unsigned priv_bar_take( bar_t *bar )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned bar_waitFor( bar_t *bar, cnt_t delay )
+int bar_waitFor( bar_t *bar, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(bar);
@@ -146,21 +146,21 @@ unsigned bar_waitFor( bar_t *bar, cnt_t delay )
 
 	sys_lock();
 	{
-		event = priv_bar_take(bar);
+		result = priv_bar_take(bar);
 
-		if (event == E_TIMEOUT)
-			event = core_tsk_waitFor(&bar->obj.queue, delay);
+		if (result == E_TIMEOUT)
+			result = core_tsk_waitFor(&bar->obj.queue, delay);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned bar_waitUntil( bar_t *bar, cnt_t time )
+int bar_waitUntil( bar_t *bar, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned event;
+	int result;
 
 	assert_tsk_context();
 	assert(bar);
@@ -169,14 +169,14 @@ unsigned bar_waitUntil( bar_t *bar, cnt_t time )
 
 	sys_lock();
 	{
-		event = priv_bar_take(bar);
+		result = priv_bar_take(bar);
 
-		if (event == E_TIMEOUT)
-			event = core_tsk_waitUntil(&bar->obj.queue, time);
+		if (result == E_TIMEOUT)
+			result = core_tsk_waitUntil(&bar->obj.queue, time);
 	}
 	sys_unlock();
 
-	return event;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
