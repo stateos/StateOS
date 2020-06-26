@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    26.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -315,12 +315,13 @@ int msg_takeISR( msg_t *msg, void *data, size_t size, size_t *read ) { return ms
  *   msg             : pointer to message buffer object
  *   data            : pointer to the buffer
  *   size            : pointer to the variable containing size of the buffer
+ *   read            : pointer to the variable getting number of read bytes
  *   delay           : duration of time (maximum number of ticks to wait while the message buffer object is empty)
  *                     IMMEDIATE: don't wait if the message buffer object is empty
  *                     INFINITE:  wait indefinitely while the message buffer object is empty
  *
  * Return
- *   E_SUCCESS       : variable 'size' contains the number of bytes read from the message buffer
+ *   E_SUCCESS       : variable 'read' contains the number of bytes read from the message buffer
  *   E_FAILURE       : not enough space in the buffer
  *   E_STOPPED       : message buffer object was reseted before the specified timeout expired
  *   E_DELETED       : message buffer object was deleted before the specified timeout expired
@@ -343,10 +344,11 @@ int msg_waitFor( msg_t *msg, void *data, size_t size, size_t *read, cnt_t delay 
  *   msg             : pointer to message buffer object
  *   data            : pointer to the buffer
  *   size            : pointer to the variable containing size of the buffer
+ *   read            : pointer to the variable getting number of read bytes
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : variable 'size' contains the number of bytes read from the message buffer
+ *   E_SUCCESS       : variable 'read' contains the number of bytes read from the message buffer
  *   E_FAILURE       : not enough space in the buffer
  *   E_STOPPED       : message buffer object was reseted before the specified timeout expired
  *   E_DELETED       : message buffer object was deleted before the specified timeout expired
