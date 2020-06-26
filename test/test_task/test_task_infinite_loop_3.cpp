@@ -2,52 +2,52 @@
 
 static void proc3()
 {
-	        for (;;);
+	         for (;;);
 }
 
 static void proc2()
 {
-	unsigned event;
+	int result;
 
-	        ThisTask::setPrio(3);                ASSERT(!Tsk3);
-	        Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
-	        ThisTask::yield();
-	event = Tsk3.kill();                         ASSERT_success(event);
-	        ThisTask::setPrio(2);
-	        for (;;);
+	         ThisTask::setPrio(3);                ASSERT(!Tsk3);
+	         Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
+	         ThisTask::yield();
+	result = Tsk3.kill();                         ASSERT_success(result);
+	         ThisTask::setPrio(2);
+	         for (;;);
 }
 
 static void proc1()
 {
-	unsigned event;
+	int result;
 
-	        ThisTask::setPrio(2);                ASSERT(!Tsk2);
-	        Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
-	        ThisTask::yield();
-	event = Tsk2.kill();                         ASSERT_success(event);
-	        ThisTask::setPrio(1);
-	        for (;;);
+	         ThisTask::setPrio(2);                ASSERT(!Tsk2);
+	         Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
+	         ThisTask::yield();
+	result = Tsk2.kill();                         ASSERT_success(result);
+	         ThisTask::setPrio(1);
+	         for (;;);
 }
 
 static void proc0()
 {
-	unsigned event;
+	int result;
 
-	        ThisTask::setPrio(1);                ASSERT(!Tsk1);
-	        Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
-	        ThisTask::yield();
-	event = Tsk1.kill();                         ASSERT_success(event);
-	        ThisTask::setPrio(0);
-	        for (;;);
+	         ThisTask::setPrio(1);                ASSERT(!Tsk1);
+	         Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
+	         ThisTask::yield();
+	result = Tsk1.kill();                         ASSERT_success(result);
+	         ThisTask::setPrio(0);
+	         for (;;);
 }
 
 static void test()
 {
-	unsigned event;
-	                                             ASSERT(!Tsk0);
-	        Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	        ThisTask::yield();
-	event = Tsk0.kill();                         ASSERT_success(event);
+	int result;
+	                                              ASSERT(!Tsk0);
+	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
+	         ThisTask::yield();
+	result = Tsk0.kill();                         ASSERT_success(result);
 }
 
 extern "C"

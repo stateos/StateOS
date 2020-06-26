@@ -10,71 +10,71 @@ static unsigned sent;
 static void proc3()
 {
 	unsigned received;
-	unsigned event;
+	int result;
 
- 	event = Box3.wait(&received);                ASSERT_success(event);
- 	                                             ASSERT(received == sent);
-	event = Box2.give(&received);                ASSERT_success(event);
-	        ThisTask::stop();
+	result = Box3.wait(&received);                ASSERT_success(result);
+	                                              ASSERT(received == sent);
+	result = Box2.give(&received);                ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc2()
 {
 	unsigned received;
-	unsigned event;
-		                                         ASSERT(!Tsk3);
-	        Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
- 	event = Box2.wait(&received);                ASSERT_success(event);
- 	                                             ASSERT(received == sent);
-	event = Box3.give(&received);                ASSERT_success(event);
- 	event = Box2.wait(&received);                ASSERT_success(event);
- 	                                             ASSERT(received == sent);
-	event = Box1.give(&received);                ASSERT_success(event);
-	event = Tsk3.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk3);
+	         Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
+	result = Box2.wait(&received);                ASSERT_success(result);
+	                                              ASSERT(received == sent);
+	result = Box3.give(&received);                ASSERT_success(result);
+	result = Box2.wait(&received);                ASSERT_success(result);
+	                                              ASSERT(received == sent);
+	result = Box1.give(&received);                ASSERT_success(result);
+	result = Tsk3.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc1()
 {
 	unsigned received;
-	unsigned event;
-		                                         ASSERT(!Tsk2);
-	        Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
- 	event = Box1.wait(&received);                ASSERT_success(event);
- 	                                             ASSERT(received == sent);
-	event = Box2.give(&received);                ASSERT_success(event);
- 	event = Box1.wait(&received);                ASSERT_success(event);
- 	                                             ASSERT(received == sent);
-	event = Box0.give(&received);                ASSERT_success(event);
-	event = Tsk2.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk2);
+	         Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
+	result = Box1.wait(&received);                ASSERT_success(result);
+	                                              ASSERT(received == sent);
+	result = Box2.give(&received);                ASSERT_success(result);
+	result = Box1.wait(&received);                ASSERT_success(result);
+	                                              ASSERT(received == sent);
+	result = Box0.give(&received);                ASSERT_success(result);
+	result = Tsk2.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc0()
 {
 	unsigned received;
-	unsigned event;
-		                                         ASSERT(!Tsk1);
-	        Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
- 	event = Box0.wait(&received);                ASSERT_success(event);
- 	                                             ASSERT(received == sent);
-	event = Box1.give(&received);                ASSERT_success(event);
- 	event = Box0.wait(&received);                ASSERT_success(event);
- 	                                             ASSERT(received == sent);
-	event = Tsk1.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk1);
+	         Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
+	result = Box0.wait(&received);                ASSERT_success(result);
+	                                              ASSERT(received == sent);
+	result = Box1.give(&received);                ASSERT_success(result);
+	result = Box0.wait(&received);                ASSERT_success(result);
+	                                              ASSERT(received == sent);
+	result = Tsk1.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void test()
 {
-	unsigned event;
-		                                         ASSERT(!Tsk0);
-	        Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	        tsk_yield();
-	        tsk_yield();
-	        sent = rand();
-	event = Box0.give(&sent);                    ASSERT_success(event);
-	event = Tsk0.join();                         ASSERT_success(event);
+	int result;
+	                                              ASSERT(!Tsk0);
+	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
+	         tsk_yield();
+	         tsk_yield();
+	         sent = rand();
+	result = Box0.give(&sent);                    ASSERT_success(result);
+	result = Tsk0.join();                         ASSERT_success(result);
 }
 
 extern "C"

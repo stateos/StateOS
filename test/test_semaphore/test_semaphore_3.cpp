@@ -7,60 +7,60 @@ auto Sem3 = Semaphore(0);
 
 static void proc3()
 {
-	unsigned event;
+	int result;
 
- 	event = Sem3.wait();                         ASSERT_success(event);
- 	event = Sem2.give();                         ASSERT_success(event);
-	        ThisTask::stop();
+	result = Sem3.wait();                         ASSERT_success(result);
+	result = Sem2.give();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc2()
 {
-	unsigned event;
-		                                         ASSERT(!Tsk3);
-	        Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
- 	event = Sem2.wait();                         ASSERT_success(event);
- 	event = Sem3.give();                         ASSERT_success(event);
- 	event = Sem2.wait();                         ASSERT_success(event);
- 	event = Sem1.give();                         ASSERT_success(event);
-	event = Tsk3.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk3);
+	         Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
+	result = Sem2.wait();                         ASSERT_success(result);
+	result = Sem3.give();                         ASSERT_success(result);
+	result = Sem2.wait();                         ASSERT_success(result);
+	result = Sem1.give();                         ASSERT_success(result);
+	result = Tsk3.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc1()
 {
-	unsigned event;
-		                                         ASSERT(!Tsk2);
-	        Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
- 	event = Sem1.wait();                         ASSERT_success(event);
- 	event = Sem2.give();                         ASSERT_success(event);
- 	event = Sem1.wait();                         ASSERT_success(event);
- 	event = Sem0.give();                         ASSERT_success(event);
-	event = Tsk2.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk2);
+	         Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
+	result = Sem1.wait();                         ASSERT_success(result);
+	result = Sem2.give();                         ASSERT_success(result);
+	result = Sem1.wait();                         ASSERT_success(result);
+	result = Sem0.give();                         ASSERT_success(result);
+	result = Tsk2.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc0()
 {
-	unsigned event;
-		                                         ASSERT(!Tsk1);
-	        Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
- 	event = Sem0.wait();                         ASSERT_success(event);
- 	event = Sem1.give();                         ASSERT_success(event);
- 	event = Sem0.wait();                         ASSERT_success(event);
-	event = Tsk1.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk1);
+	         Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
+	result = Sem0.wait();                         ASSERT_success(result);
+	result = Sem1.give();                         ASSERT_success(result);
+	result = Sem0.wait();                         ASSERT_success(result);
+	result = Tsk1.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void test()
 {
-	unsigned event;
-		                                         ASSERT(!Tsk0);
-	        Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	        ThisTask::yield();
-	        ThisTask::yield();
- 	event = Sem0.give();                         ASSERT_success(event);
-	event = Tsk0.join();                         ASSERT_success(event);
+	int result;
+	                                              ASSERT(!Tsk0);
+	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
+	         ThisTask::yield();
+	         ThisTask::yield();
+	result = Sem0.give();                         ASSERT_success(result);
+	result = Tsk0.join();                         ASSERT_success(result);
 }
 
 extern "C"

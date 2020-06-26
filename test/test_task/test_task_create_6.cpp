@@ -2,24 +2,24 @@
 
 static void proc()
 {
-	        ThisTask::stop();
+	         ThisTask::stop();
 }
 
 static void test()
 {
-	unsigned event;
+	int result;
 
-	auto Tsk6 = TaskT<512>::Detached(6, proc);  ASSERT(Tsk6);
-	event = Tsk6->join();                       ASSERT_failure(event);
+	auto Tsk6 = TaskT<512>::Detached(6, proc);   ASSERT(Tsk6);
+	result = Tsk6->join();                       ASSERT_failure(result);
 
-	auto Tsk7 = Task::Create(7, proc);          ASSERT(Tsk7);
-	event = Tsk7->join();                       ASSERT_success(event);
+	auto Tsk7 = Task::Create(7, proc);           ASSERT(Tsk7);
+	result = Tsk7->join();                       ASSERT_success(result);
 
-	auto Tsk8 = TaskT<512>::Create(8, proc);    ASSERT(Tsk8);
-	event = Tsk8->join();                       ASSERT_success(event);
+	auto Tsk8 = TaskT<512>::Create(8, proc);     ASSERT(Tsk8);
+	result = Tsk8->join();                       ASSERT_success(result);
 
-	auto Tsk9 = Task::Detached(9, proc);        ASSERT(Tsk9);
-	event = Tsk9->join();                       ASSERT_failure(event);
+	auto Tsk9 = Task::Detached(9, proc);         ASSERT(Tsk9);
+	result = Tsk9->join();                       ASSERT_failure(result);
 }
 
 extern "C"

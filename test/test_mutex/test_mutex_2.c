@@ -2,50 +2,50 @@
 
 static void proc4()
 {
-	unsigned event;
+	int result;
 
-	event = mtx_wait(mtx2);                      ASSERT_success(event);
-	event = tsk_kill(tsk3);                      ASSERT_success(event);
-	event = mtx_give(mtx2);                      ASSERT_success(event);
-	        tsk_stop();
+	result = mtx_wait(mtx2);                      ASSERT_success(result);
+	result = tsk_kill(tsk3);                      ASSERT_success(result);
+	result = mtx_give(mtx2);                      ASSERT_success(result);
+	         tsk_stop();
 }
 
 static void proc3()
 {
-	                                             ASSERT_dead(tsk4);
-	        tsk_startFrom(tsk4, proc4);          ASSERT(!"test program cannot be caught here");
+	                                              ASSERT_dead(tsk4);
+	         tsk_startFrom(tsk4, proc4);          ASSERT(!"test program cannot be caught here");
 }
 
 static void proc2()
 {
-	unsigned event;
+	int result;
 
-	event = mtx_wait(mtx2);                      ASSERT_success(event);
-	event = mtx_wait(mtx1);                      ASSERT_success(event);
-	event = tsk_kill(tsk1);                      ASSERT_success(event);
-	event = mtx_give(mtx1);                      ASSERT_success(event);
-	event = mtx_give(mtx2);                      ASSERT_success(event);
-	        tsk_stop();
+	result = mtx_wait(mtx2);                      ASSERT_success(result);
+	result = mtx_wait(mtx1);                      ASSERT_success(result);
+	result = tsk_kill(tsk1);                      ASSERT_success(result);
+	result = mtx_give(mtx1);                      ASSERT_success(result);
+	result = mtx_give(mtx2);                      ASSERT_success(result);
+	         tsk_stop();
 }
 
 static void proc1()
 {
-	                                             ASSERT_dead(tsk2);
-	        tsk_startFrom(tsk2, proc2);          ASSERT(!"test program cannot be caught here");
+	                                              ASSERT_dead(tsk2);
+	         tsk_startFrom(tsk2, proc2);          ASSERT(!"test program cannot be caught here");
 }
 
 static void test()
 {
-	unsigned event;
+	int result;
 
-	event = mtx_wait(mtx1);                      ASSERT_success(event);
-	                                             ASSERT_dead(tsk1);
-	        tsk_startFrom(tsk1, proc1);
-	                                             ASSERT_dead(tsk3);
-	        tsk_startFrom(tsk3, proc3);
-	event = mtx_give(mtx1);                      ASSERT_success(event);
-	event = tsk_join(tsk3);                      ASSERT_success(event);
-	event = tsk_join(tsk1);                      ASSERT_success(event);
+	result = mtx_wait(mtx1);                      ASSERT_success(result);
+	                                              ASSERT_dead(tsk1);
+	         tsk_startFrom(tsk1, proc1);
+	                                              ASSERT_dead(tsk3);
+	         tsk_startFrom(tsk3, proc3);
+	result = mtx_give(mtx1);                      ASSERT_success(result);
+	result = tsk_join(tsk3);                      ASSERT_success(result);
+	result = tsk_join(tsk1);                      ASSERT_success(result);
 }
 
 void test_mutex_2()

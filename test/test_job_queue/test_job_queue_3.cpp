@@ -10,74 +10,73 @@ static int counter;
 static void proc()
 {
 	CriticalSection cs;
-
-	        counter++;
+	counter++;
 }
 
 static void proc3()
 {
-	unsigned event;
+	int result;
 
-	event = Job3.wait();                         ASSERT_success(event);
-	                                             ASSERT(counter == 4);
-	event = Job2.give(proc);                     ASSERT_success(event);
-	        ThisTask::stop();
+	result = Job3.wait();                         ASSERT_success(result);
+	                                              ASSERT(counter == 4);
+	result = Job2.give(proc);                     ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc2()
 {
-	unsigned event;
-		                                         ASSERT(!Tsk3);
-	        Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
-	event = Job2.wait();                         ASSERT_success(event);
-	                                             ASSERT(counter == 3);
-	event = Job3.give(proc);                     ASSERT_success(event);
-	event = Job2.wait();                         ASSERT_success(event);
-	                                             ASSERT(counter == 5);
-	event = Job1.give(proc);                     ASSERT_success(event);
-	event = Tsk3.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk3);
+	         Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
+	result = Job2.wait();                         ASSERT_success(result);
+	                                              ASSERT(counter == 3);
+	result = Job3.give(proc);                     ASSERT_success(result);
+	result = Job2.wait();                         ASSERT_success(result);
+	                                              ASSERT(counter == 5);
+	result = Job1.give(proc);                     ASSERT_success(result);
+	result = Tsk3.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc1()
 {
-	unsigned event;
-		                                         ASSERT(!Tsk2);
-	        Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
-	event = Job1.wait();                         ASSERT_success(event);
-	                                             ASSERT(counter == 2);
-	event = Job2.give(proc);                     ASSERT_success(event);
-	event = Job1.wait();                         ASSERT_success(event);
-	                                             ASSERT(counter == 6);
-	event = Job0.give(proc);                     ASSERT_success(event);
-	event = Tsk2.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk2);
+	         Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
+	result = Job1.wait();                         ASSERT_success(result);
+	                                              ASSERT(counter == 2);
+	result = Job2.give(proc);                     ASSERT_success(result);
+	result = Job1.wait();                         ASSERT_success(result);
+	                                              ASSERT(counter == 6);
+	result = Job0.give(proc);                     ASSERT_success(result);
+	result = Tsk2.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc0()
 {
-	unsigned event;
-		                                         ASSERT(!Tsk1);
-	        Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
-	event = Job0.wait();                         ASSERT_success(event);
-	                                             ASSERT(counter == 1);
-	event = Job1.give(proc);                     ASSERT_success(event);
-	event = Job0.wait();                         ASSERT_success(event);
-	                                             ASSERT(counter == 7);
-	event = Tsk1.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk1);
+	         Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
+	result = Job0.wait();                         ASSERT_success(result);
+	                                              ASSERT(counter == 1);
+	result = Job1.give(proc);                     ASSERT_success(result);
+	result = Job0.wait();                         ASSERT_success(result);
+	                                              ASSERT(counter == 7);
+	result = Tsk1.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void test()
 {
-	unsigned event;
-	                                             ASSERT(!Tsk0);
-	        Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	        ThisTask::yield();
-	        ThisTask::yield();
-	        counter = 0;
-	event = Job0.give(proc);                     ASSERT_success(event);
-	event = Tsk0.join();                         ASSERT_success(event);
+	int result;
+	                                              ASSERT(!Tsk0);
+	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
+	         ThisTask::yield();
+	         ThisTask::yield();
+	         counter = 0;
+	result = Job0.give(proc);                     ASSERT_success(result);
+	result = Tsk0.join();                         ASSERT_success(result);
 }
 
 extern "C"

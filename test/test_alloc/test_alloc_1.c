@@ -17,13 +17,14 @@ static void proc2()
 
 static void proc1()
 {
-	stk_t  * stk;
-	tsk_t  * tsk;
-	unsigned event;
+	stk_t *stk;
+	tsk_t *tsk;
+	int result;
+
 	tsk = malloc(sizeof(tsk_t));                 ASSERT(tsk);
 	stk = malloc(OS_STACK_SIZE);                 ASSERT(stk);
 	tsk_init(tsk, 2, proc2, stk, OS_STACK_SIZE); ASSERT_dead(tsk);
-	event = tsk_join(tsk);                       ASSERT_success(event);
+	result = tsk_join(tsk);                      ASSERT_success(result);
 	free(tsk);
 	free(stk);
 	tsk_stop();
@@ -31,11 +32,11 @@ static void proc1()
 
 static void test()
 {
-	tsk_t  * tsk;
-	unsigned event;
+	tsk_t *tsk;
+	int result;
 
 	tsk = tsk_new(1, proc1);                     ASSERT(tsk);
-	event = tsk_join(tsk);                       ASSERT_success(event);
+	result = tsk_join(tsk);                      ASSERT_success(result);
 }
 
 void test_alloc_1()

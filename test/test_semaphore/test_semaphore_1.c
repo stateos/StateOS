@@ -4,60 +4,60 @@ static_SEM(sem3, 0, semBinary);
 
 static void proc3()
 {
-	unsigned event;
+	int result;
 
- 	event = sem_wait(sem3);                      ASSERT_success(event);
- 	event = sem_give(sem2);                      ASSERT_success(event);
-	        tsk_stop();
+	result = sem_wait(sem3);                      ASSERT_success(result);
+	result = sem_give(sem2);                      ASSERT_success(result);
+	         tsk_stop();
 }
 
 static void proc2()
 {
-	unsigned event;
-		                                         ASSERT_dead(tsk3);
-	        tsk_startFrom(tsk3, proc3);          ASSERT_ready(tsk3);
- 	event = sem_wait(sem2);                      ASSERT_success(event);
- 	event = sem_give(sem3);                      ASSERT_success(event);
- 	event = sem_wait(sem2);                      ASSERT_success(event);
- 	event = sem_give(sem1);                      ASSERT_success(event);
-	event = tsk_join(tsk3);                      ASSERT_success(event);
-	        tsk_stop();
+	int result;
+	                                              ASSERT_dead(tsk3);
+	         tsk_startFrom(tsk3, proc3);          ASSERT_ready(tsk3);
+	result = sem_wait(sem2);                      ASSERT_success(result);
+	result = sem_give(sem3);                      ASSERT_success(result);
+	result = sem_wait(sem2);                      ASSERT_success(result);
+	result = sem_give(sem1);                      ASSERT_success(result);
+	result = tsk_join(tsk3);                      ASSERT_success(result);
+	         tsk_stop();
 }
 
 static void proc1()
 {
-	unsigned event;
-		                                         ASSERT_dead(tsk2);
-	        tsk_startFrom(tsk2, proc2);          ASSERT_ready(tsk2);
- 	event = sem_wait(sem1);                      ASSERT_success(event);
- 	event = sem_give(sem2);                      ASSERT_success(event);
- 	event = sem_wait(sem1);                      ASSERT_success(event);
- 	event = sem_give(&sem0);                     ASSERT_success(event);
-	event = tsk_join(tsk2);                      ASSERT_success(event);
-	        tsk_stop();
+	int result;
+	                                              ASSERT_dead(tsk2);
+	         tsk_startFrom(tsk2, proc2);          ASSERT_ready(tsk2);
+	result = sem_wait(sem1);                      ASSERT_success(result);
+	result = sem_give(sem2);                      ASSERT_success(result);
+	result = sem_wait(sem1);                      ASSERT_success(result);
+	result = sem_give(&sem0);                     ASSERT_success(result);
+	result = tsk_join(tsk2);                      ASSERT_success(result);
+	         tsk_stop();
 }
 
 static void proc0()
 {
-	unsigned event;
-		                                         ASSERT_dead(tsk1);
-	        tsk_startFrom(tsk1, proc1);          ASSERT_ready(tsk1);
- 	event = sem_wait(&sem0);                     ASSERT_success(event);
- 	event = sem_give(sem1);                      ASSERT_success(event);
- 	event = sem_wait(&sem0);                     ASSERT_success(event);
-	event = tsk_join(tsk1);                      ASSERT_success(event);
-	        tsk_stop();
+	int result;
+	                                              ASSERT_dead(tsk1);
+	         tsk_startFrom(tsk1, proc1);          ASSERT_ready(tsk1);
+	result = sem_wait(&sem0);                     ASSERT_success(result);
+	result = sem_give(sem1);                      ASSERT_success(result);
+	result = sem_wait(&sem0);                     ASSERT_success(result);
+	result = tsk_join(tsk1);                      ASSERT_success(result);
+	         tsk_stop();
 }
 
 static void test()
 {
-	unsigned event;
-		                                         ASSERT_dead(&tsk0);
-	        tsk_startFrom(&tsk0, proc0);         ASSERT_ready(&tsk0);
-	        tsk_yield();
-	        tsk_yield();
- 	event = sem_give(&sem0);                     ASSERT_success(event);
-	event = tsk_join(&tsk0);                     ASSERT_success(event);
+	int result;
+	                                              ASSERT_dead(&tsk0);
+	         tsk_startFrom(&tsk0, proc0);         ASSERT_ready(&tsk0);
+	         tsk_yield();
+	         tsk_yield();
+	result = sem_give(&sem0);                     ASSERT_success(result);
+	result = tsk_join(&tsk0);                     ASSERT_success(result);
 }
 
 void test_semaphore_1()

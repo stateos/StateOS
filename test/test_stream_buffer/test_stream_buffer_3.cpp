@@ -11,72 +11,72 @@ static unsigned sent;
 
 static void proc3()
 {
-	unsigned event;
+	int result;
 	unsigned value;
 
- 	event = Stm3.wait(&value);                   ASSERT_success(event);
-	                                             ASSERT(value == sent);
-	event = Stm2.give(&value);                   ASSERT_success(event);
-	        ThisTask::stop();
+	result = Stm3.wait(&value);                   ASSERT_success(result);
+	                                              ASSERT(value == sent);
+	result = Stm2.give(&value);                   ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc2()
 {
-	unsigned event;
+	int result;
 	unsigned value;
-		                                         ASSERT(!Tsk3);
-	        Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
- 	event = Stm2.wait(&value);                   ASSERT_success(event);
-	                                             ASSERT(value == sent);
-	event = Stm3.give(&value);                   ASSERT_success(event);
- 	event = Stm2.wait(&value);                   ASSERT_success(event);
-	                                             ASSERT(value == sent);
-	event = Stm1.give(&value);                   ASSERT_success(event);
-	event = Tsk3.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	                                              ASSERT(!Tsk3);
+	         Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
+	result = Stm2.wait(&value);                   ASSERT_success(result);
+	                                              ASSERT(value == sent);
+	result = Stm3.give(&value);                   ASSERT_success(result);
+	result = Stm2.wait(&value);                   ASSERT_success(result);
+	                                              ASSERT(value == sent);
+	result = Stm1.give(&value);                   ASSERT_success(result);
+	result = Tsk3.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc1()
 {
-	unsigned event;
+	int result;
 	unsigned value;
-		                                         ASSERT(!Tsk2);
-	        Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
- 	event = Stm1.wait(&value);                   ASSERT_success(event);
- 	                                             ASSERT(value == sent);
-	event = Stm2.give(&value);                   ASSERT_success(event);
- 	event = Stm1.wait(&value);                   ASSERT_success(event);
-	                                             ASSERT(value == sent);
-	event = Stm0.give(&value);                   ASSERT_success(event);
-	event = Tsk2.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	                                              ASSERT(!Tsk2);
+	         Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
+	result = Stm1.wait(&value);                   ASSERT_success(result);
+	                                              ASSERT(value == sent);
+	result = Stm2.give(&value);                   ASSERT_success(result);
+	result = Stm1.wait(&value);                   ASSERT_success(result);
+	                                              ASSERT(value == sent);
+	result = Stm0.give(&value);                   ASSERT_success(result);
+	result = Tsk2.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc0()
 {
-	unsigned event;
+	int result;
 	unsigned value;
-		                                         ASSERT(!Tsk1);
-	        Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
- 	event = Stm0.wait(&value);                   ASSERT_success(event);
- 	                                             ASSERT(value == sent);
-	event = Stm1.give(&value);                   ASSERT_success(event);
- 	event = Stm0.wait(&value);                   ASSERT_success(event);
-	                                             ASSERT(value == sent);
-	event = Tsk1.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	                                              ASSERT(!Tsk1);
+	         Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
+	result = Stm0.wait(&value);                   ASSERT_success(result);
+	                                              ASSERT(value == sent);
+	result = Stm1.give(&value);                   ASSERT_success(result);
+	result = Stm0.wait(&value);                   ASSERT_success(result);
+	                                              ASSERT(value == sent);
+	result = Tsk1.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void test()
 {
-	unsigned event;
-		                                         ASSERT(!Tsk0);
-	        Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	        ThisTask::yield();
-	        ThisTask::yield();
-	        sent = rand();
-	event = Stm0.give(&sent);                    ASSERT_success(event);
-	event = Tsk0.join();                         ASSERT_success(event);
+	int result;
+	                                              ASSERT(!Tsk0);
+	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
+	         ThisTask::yield();
+	         ThisTask::yield();
+	         sent = rand();
+	result = Stm0.give(&sent);                    ASSERT_success(result);
+	result = Tsk0.join();                         ASSERT_success(result);
 }
 
 extern "C"

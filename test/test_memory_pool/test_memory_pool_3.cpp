@@ -15,95 +15,95 @@ static void proc3()
 {
 	unsigned *p;
 	unsigned received;
-	unsigned event;
+	int result;
 
- 	event = Lst3.wait(&p);                       ASSERT_success(event);
-	        received = *p;                       ASSERT(sent == received);
-            Mem3.give(p);
- 	event = Mem2.wait(&p);                       ASSERT_success(event);
-	        *p = received;
-	        Lst2.give(p);
-	        ThisTask::stop();
+	result = Lst3.wait(&p);                       ASSERT_success(result);
+	         received = *p;                       ASSERT(sent == received);
+             Mem3.give(p);
+	result = Mem2.wait(&p);                       ASSERT_success(result);
+	         *p = received;
+	         Lst2.give(p);
+	         ThisTask::stop();
 }
 
 static void proc2()
 {
 	unsigned *p;
 	unsigned received;
-	unsigned event;
-		                                         ASSERT(!Tsk3);
-	        Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
- 	event = Lst2.wait(&p);                       ASSERT_success(event);
-	        received = *p;                       ASSERT(sent == received);
-            Mem2.give(p);
- 	event = Mem3.wait(&p);                       ASSERT_success(event);
-	        *p = received;
-	        Lst3.give(p);
- 	event = Lst2.wait(&p);                       ASSERT_success(event);
-	        received = *p;                       ASSERT(sent == received);
-            Mem2.give(p);
- 	event = Mem1.wait(&p);                       ASSERT_success(event);
-	        *p = received;
-	        Lst1.give(p);
-	event = Tsk3.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk3);
+	         Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
+	result = Lst2.wait(&p);                       ASSERT_success(result);
+	         received = *p;                       ASSERT(sent == received);
+             Mem2.give(p);
+	result = Mem3.wait(&p);                       ASSERT_success(result);
+	         *p = received;
+	         Lst3.give(p);
+	result = Lst2.wait(&p);                       ASSERT_success(result);
+	         received = *p;                       ASSERT(sent == received);
+             Mem2.give(p);
+	result = Mem1.wait(&p);                       ASSERT_success(result);
+	         *p = received;
+	         Lst1.give(p);
+	result = Tsk3.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc1()
 {
 	unsigned *p;
 	unsigned received;
-	unsigned event;
-		                                         ASSERT(!Tsk2);
-	        Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
- 	event = Lst1.wait(&p);                       ASSERT_success(event);
-	        received = *p;                       ASSERT(sent == received);
-            Mem1.give(p);
- 	event = Mem2.wait(&p);                       ASSERT_success(event);
-	        *p = received;
-	        Lst2.give(p);
- 	event = Lst1.wait(&p);                       ASSERT_success(event);
-	        received = *p;                       ASSERT(sent == received);
-            Mem1.give(p);
- 	event = Mem0.wait(&p);                       ASSERT_success(event);
-	        *p = received;
-	        Lst0.give(p);
-	event = Tsk2.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk2);
+	         Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
+	result = Lst1.wait(&p);                       ASSERT_success(result);
+	         received = *p;                       ASSERT(sent == received);
+             Mem1.give(p);
+	result = Mem2.wait(&p);                       ASSERT_success(result);
+	         *p = received;
+	         Lst2.give(p);
+	result = Lst1.wait(&p);                       ASSERT_success(result);
+	         received = *p;                       ASSERT(sent == received);
+             Mem1.give(p);
+	result = Mem0.wait(&p);                       ASSERT_success(result);
+	         *p = received;
+	         Lst0.give(p);
+	result = Tsk2.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc0()
 {
 	unsigned *p;
 	unsigned received;
-	unsigned event;
-		                                         ASSERT(!Tsk1);
-	        Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
- 	event = Lst0.wait(&p);                       ASSERT_success(event);
-	        received = *p;                       ASSERT(sent == received);
-            Mem0.give(p);
- 	event = Mem1.wait(&p);                       ASSERT_success(event);
-	        *p = received;
-	        Lst1.give(p);
- 	event = Lst0.wait(&p);                       ASSERT_success(event);
-	        received = *p;                       ASSERT(sent == received);
-            Mem0.give(p);
-	event = Tsk1.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk1);
+	         Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
+	result = Lst0.wait(&p);                       ASSERT_success(result);
+	         received = *p;                       ASSERT(sent == received);
+             Mem0.give(p);
+	result = Mem1.wait(&p);                       ASSERT_success(result);
+	         *p = received;
+	         Lst1.give(p);
+	result = Lst0.wait(&p);                       ASSERT_success(result);
+	         received = *p;                       ASSERT(sent == received);
+             Mem0.give(p);
+	result = Tsk1.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void test()
 {
 	unsigned *p;
-	unsigned event;
-		                                         ASSERT(!Tsk0);
-	        Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	        tsk_yield();
-	        tsk_yield();
- 	event = Mem0.wait(&p);                       ASSERT_success(event);
-	        *p = sent = rand();
-	        Lst0.give(p);
-	event = Tsk0.join();                         ASSERT_success(event);
+	int result;
+	                                              ASSERT(!Tsk0);
+	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
+	         tsk_yield();
+	         tsk_yield();
+	result = Mem0.wait(&p);                       ASSERT_success(result);
+	         *p = sent = rand();
+	         Lst0.give(p);
+	result = Tsk0.join();                         ASSERT_success(result);
 }
 
 extern "C"

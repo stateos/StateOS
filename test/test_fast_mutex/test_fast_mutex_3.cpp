@@ -7,66 +7,66 @@ static auto Mut3 = FastMutex();
 
 static void proc3()
 {
-	unsigned event;
+	int result;
 
-	event = Mut2.take();                         ASSERT_timeout(event);
-	event = Mut3.wait();                         ASSERT_success(event);
-	event = Mut3.take();                         ASSERT_failure(event);
-	event = Mut3.give();                         ASSERT_success(event);
-	event = Mut3.give();                         ASSERT_failure(event);
-	        ThisTask::stop();
+	result = Mut2.take();                         ASSERT_timeout(result);
+	result = Mut3.wait();                         ASSERT_success(result);
+	result = Mut3.take();                         ASSERT_failure(result);
+	result = Mut3.give();                         ASSERT_success(result);
+	result = Mut3.give();                         ASSERT_failure(result);
+	         ThisTask::stop();
 }
 
 static void proc2()
 {
-	unsigned event;
+	int result;
 
-	event = Mut1.take();                         ASSERT_timeout(event);
-	event = Mut2.wait();                         ASSERT_success(event);
-	event = Mut2.take();                         ASSERT_failure(event);
-	                                             ASSERT(!Tsk3);
-	        Tsk3.startFrom(proc3);               ASSERT(!Tsk3);
-	event = Tsk3.join();                         ASSERT_success(event);
-	event = Mut2.give();                         ASSERT_success(event);
-	event = Mut2.give();                         ASSERT_failure(event);
-	        ThisTask::stop();
+	result = Mut1.take();                         ASSERT_timeout(result);
+	result = Mut2.wait();                         ASSERT_success(result);
+	result = Mut2.take();                         ASSERT_failure(result);
+	                                              ASSERT(!Tsk3);
+	         Tsk3.startFrom(proc3);               ASSERT(!Tsk3);
+	result = Tsk3.join();                         ASSERT_success(result);
+	result = Mut2.give();                         ASSERT_success(result);
+	result = Mut2.give();                         ASSERT_failure(result);
+	         ThisTask::stop();
 }
 
 static void proc1()
 {
-	unsigned event;
+	int result;
 
-	event = Mut0.take();                         ASSERT_timeout(event);
-	event = Mut1.wait();                         ASSERT_success(event);
-	event = Mut1.take();                         ASSERT_failure(event);
-	                                             ASSERT(!Tsk2);
-	        Tsk2.startFrom(proc2);               ASSERT(!Tsk2);
-	event = Tsk2.join();                         ASSERT_success(event);
-	event = Mut1.give();                         ASSERT_success(event);
-	event = Mut1.give();                         ASSERT_failure(event);
-	        ThisTask::stop();
+	result = Mut0.take();                         ASSERT_timeout(result);
+	result = Mut1.wait();                         ASSERT_success(result);
+	result = Mut1.take();                         ASSERT_failure(result);
+	                                              ASSERT(!Tsk2);
+	         Tsk2.startFrom(proc2);               ASSERT(!Tsk2);
+	result = Tsk2.join();                         ASSERT_success(result);
+	result = Mut1.give();                         ASSERT_success(result);
+	result = Mut1.give();                         ASSERT_failure(result);
+	         ThisTask::stop();
 }
 
 static void proc0()
 {
-	unsigned event;
+	int result;
 
-	event = Mut0.wait();                         ASSERT_success(event);
-	event = Mut0.take();                         ASSERT_failure(event);
-	                                             ASSERT(!Tsk1);
-	        Tsk1.startFrom(proc1);               ASSERT(!Tsk1);
-	event = Tsk1.join();                         ASSERT_success(event);
-	event = Mut0.give();                         ASSERT_success(event);
-	event = Mut0.give();                         ASSERT_failure(event);
-	        ThisTask::stop();
+	result = Mut0.wait();                         ASSERT_success(result);
+	result = Mut0.take();                         ASSERT_failure(result);
+	                                              ASSERT(!Tsk1);
+	         Tsk1.startFrom(proc1);               ASSERT(!Tsk1);
+	result = Tsk1.join();                         ASSERT_success(result);
+	result = Mut0.give();                         ASSERT_success(result);
+	result = Mut0.give();                         ASSERT_failure(result);
+	         ThisTask::stop();
 }
 
 static void test()
 {
-	unsigned event;
-	                                             ASSERT(!Tsk0);
-	        Tsk0.startFrom(proc0);
-	event = Tsk0.join();                         ASSERT_success(event);
+	int result;
+	                                              ASSERT(!Tsk0);
+	         Tsk0.startFrom(proc0);
+	result = Tsk0.join();                         ASSERT_success(result);
 }
 
 extern "C"

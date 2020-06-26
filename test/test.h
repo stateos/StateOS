@@ -8,20 +8,20 @@
 #define PASS                   1000
 
 #ifndef DEBUG
-#define ASSERT(event)          (void)(event)
+#define ASSERT(result)          (void)(result)
 #else
-#define ASSERT(event)          assert(event)
+#define ASSERT(result)          assert(result)
 #endif
 
-#define ASSERT_success(event)  ASSERT((event) == E_SUCCESS)
-#define ASSERT_failure(event)  ASSERT((event) == E_FAILURE)
-#define ASSERT_stopped(event)  ASSERT((event) == E_STOPPED)
-#define ASSERT_deleted(event)  ASSERT((event) == E_DELETED)
-#define ASSERT_timeout(event)  ASSERT((event) == E_TIMEOUT)
-#define ASSERT_owndead(event)  ASSERT((event) == OWNERDEAD)
+#define ASSERT_success(result)  ASSERT((result) == E_SUCCESS)
+#define ASSERT_failure(result)  ASSERT((result) == E_FAILURE)
+#define ASSERT_stopped(result)  ASSERT((result) == E_STOPPED)
+#define ASSERT_deleted(result)  ASSERT((result) == E_DELETED)
+#define ASSERT_timeout(result)  ASSERT((result) == E_TIMEOUT)
+#define ASSERT_owndead(result)  ASSERT((result) == OWNERDEAD)
 
-#define ASSERT_dead(tsk)       ASSERT((tsk)->hdr.id == ID_STOPPED)
-#define ASSERT_ready(tsk)      ASSERT((tsk)->hdr.id == ID_READY)
+#define ASSERT_dead(tsk)        ASSERT((tsk)->hdr.id == ID_STOPPED)
+#define ASSERT_ready(tsk)       ASSERT((tsk)->hdr.id == ID_READY)
 
 #ifdef  __cplusplus
 extern "C" {

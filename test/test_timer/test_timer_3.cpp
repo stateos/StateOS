@@ -15,28 +15,27 @@ static int counter;
 static void proc()
 {
 	CriticalSection cs;
-
-	        counter++;
+	counter++;
 }
 
 static void test()
 {
-	unsigned event;
+	int result;
 
-	        counter = 0;
-	event = Tmr4.wait();                         ASSERT_success(event);
-	event = Tmr5.wait();                         ASSERT_success(event);
-	event = Tmr6.wait();                         ASSERT_success(event);
-	event = Tmr7.wait();                         ASSERT_success(event);
-	        Tmr3.startFrom(3, 0, proc);
-	        Tmr2.startFrom(2, 0, proc);
-	        Tmr1.startFrom(1, 0, proc);
-	        Tmr0.startFrom(0, 0, proc);
-	event = Tmr0.wait();                         ASSERT_success(event);
-	event = Tmr1.wait();                         ASSERT_success(event);
-	event = Tmr2.wait();                         ASSERT_success(event);
-	event = Tmr3.wait();                         ASSERT_success(event);
-	                                             ASSERT(counter == 4);
+	         counter = 0;
+	result = Tmr4.wait();                         ASSERT_success(result);
+	result = Tmr5.wait();                         ASSERT_success(result);
+	result = Tmr6.wait();                         ASSERT_success(result);
+	result = Tmr7.wait();                         ASSERT_success(result);
+	         Tmr3.startFrom(3, 0, proc);
+	         Tmr2.startFrom(2, 0, proc);
+	         Tmr1.startFrom(1, 0, proc);
+	         Tmr0.startFrom(0, 0, proc);
+	result = Tmr0.wait();                         ASSERT_success(result);
+	result = Tmr1.wait();                         ASSERT_success(result);
+	result = Tmr2.wait();                         ASSERT_success(result);
+	result = Tmr3.wait();                         ASSERT_success(result);
+	                                              ASSERT(counter == 4);
 }
 
 extern "C"

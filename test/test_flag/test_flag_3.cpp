@@ -17,71 +17,72 @@ static void give(Flag &Flg, unsigned bitfield, unsigned check)
 
 	while (bitfield)
 	{
-		flag = bitfield & (~bitfield + 1);
+		flag  = bitfield & (~bitfield + 1);
 		bitfield -= flag;
-		flags = Flg.give(flag);                  ASSERT(flags == check);
+		flags = Flg.give(flag);                   ASSERT(flags == check);
 	}
 }
 
 static void proc3()
 {
 	unsigned flags;
-	unsigned event;
+	int result;
 
-	event = Flg3.wait(FLAG3, flgAll+flgProtect+flgIgnore); ASSERT_success(event);
-	flags = Flg2.give(FLAG2);                    ASSERT(flags == FLAG2);
-	        ThisTask::stop();
+	result = Flg3.wait(FLAG3, flgAll+flgProtect+flgIgnore);
+	                                              ASSERT_success(result);
+	flags  = Flg2.give(FLAG2);                    ASSERT(flags == FLAG2);
+	         ThisTask::stop();
 }
 
 static void proc2()
 {
 	unsigned flags;
-	unsigned event;
-	                                             ASSERT(!Tsk3);
-	        Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
-	event = Flg2.wait(FLAG2, flgAll);            ASSERT_success(event);
-	        give(Flg3, FLAG3, FLAG3);
-	event = Flg2.wait(FLAG2, flgAll);            ASSERT_success(event);
-	flags = Flg1.give(FLAG1);                    ASSERT(flags == FLAG1);
-	event = Tsk3.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk3);
+	         Tsk3.startFrom(proc3);               ASSERT(!!Tsk3);
+	result = Flg2.wait(FLAG2, flgAll);            ASSERT_success(result);
+	         give(Flg3, FLAG3, FLAG3);
+	result = Flg2.wait(FLAG2, flgAll);            ASSERT_success(result);
+	flags  = Flg1.give(FLAG1);                    ASSERT(flags == FLAG1);
+	result = Tsk3.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc1()
 {
 	unsigned flags;
-	unsigned event;
-	                                             ASSERT(!Tsk2);
-	        Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
-	event = Flg1.wait(FLAG1, flgAll);            ASSERT_success(event);
-	        give(Flg2, FLAG2, 0);
-	event = Flg1.wait(FLAG1, flgAll);            ASSERT_success(event);
-	flags = Flg0.give(FLAG0);                    ASSERT(flags == FLAG0);
-	event = Tsk2.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk2);
+	         Tsk2.startFrom(proc2);               ASSERT(!!Tsk2);
+	result = Flg1.wait(FLAG1, flgAll);            ASSERT_success(result);
+	         give(Flg2, FLAG2, 0);
+	result = Flg1.wait(FLAG1, flgAll);            ASSERT_success(result);
+	flags  = Flg0.give(FLAG0);                    ASSERT(flags == FLAG0);
+	result = Tsk2.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void proc0()
 {
-	unsigned event;
-	                                             ASSERT(!Tsk1);
-	        Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
-	event = Flg0.wait(FLAG0, flgAll);            ASSERT_success(event);
-	        give(Flg1, FLAG1, 0);
-	event = Flg0.wait(FLAG0, flgAll);            ASSERT_success(event);
-	event = Tsk1.join();                         ASSERT_success(event);
-	        ThisTask::stop();
+	int result;
+	                                              ASSERT(!Tsk1);
+	         Tsk1.startFrom(proc1);               ASSERT(!!Tsk1);
+	result = Flg0.wait(FLAG0, flgAll);            ASSERT_success(result);
+	         give(Flg1, FLAG1, 0);
+	result = Flg0.wait(FLAG0, flgAll);            ASSERT_success(result);
+	result = Tsk1.join();                         ASSERT_success(result);
+	         ThisTask::stop();
 }
 
 static void test()
 {
-	unsigned event;
-	                                             ASSERT(!Tsk0);
-	        Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	        ThisTask::yield();
-	        ThisTask::yield();
-	        give(Flg0, FLAG0, 0);
-	event = Tsk0.join();                         ASSERT_success(event);
+	int result;
+	                                              ASSERT(!Tsk0);
+	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
+	         ThisTask::yield();
+	         ThisTask::yield();
+	         give(Flg0, FLAG0, 0);
+	result = Tsk0.join();                         ASSERT_success(result);
 }
 
 extern "C"

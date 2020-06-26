@@ -11,31 +11,31 @@ static int counter;
 
 static void proc()
 {
-	        sys_lock();
-	        {
-		        counter++;
-	        }
-	        sys_unlock();
+	sys_lock();
+	{
+		counter++;
+	}
+	sys_unlock();
 }
 
 static void test()
 {
-	unsigned event;
+	int result;
 
-	        counter = 0;
-	event = tmr_wait(tmr4);                      ASSERT_success(event);
-	event = tmr_wait(tmr5);                      ASSERT_success(event);
-	event = tmr_wait(tmr6);                      ASSERT_success(event);
-	event = tmr_wait(tmr7);                      ASSERT_success(event);
-	        tmr_startFrom(tmr3, 3, 0, proc);
-	        tmr_startFrom(tmr2, 2, 0, proc);
-	        tmr_startFrom(tmr1, 1, 0, proc);
-	        tmr_startFrom(&tmr0, 0, 0, proc);
-	event = tmr_wait(&tmr0);                     ASSERT_success(event);
-	event = tmr_wait(tmr1);                      ASSERT_success(event);
-	event = tmr_wait(tmr2);                      ASSERT_success(event);
-	event = tmr_wait(tmr3);                      ASSERT_success(event);
-	                                             ASSERT(counter == 4);
+	         counter = 0;
+	result = tmr_wait(tmr4);                      ASSERT_success(result);
+	result = tmr_wait(tmr5);                      ASSERT_success(result);
+	result = tmr_wait(tmr6);                      ASSERT_success(result);
+	result = tmr_wait(tmr7);                      ASSERT_success(result);
+	         tmr_startFrom(tmr3, 3, 0, proc);
+	         tmr_startFrom(tmr2, 2, 0, proc);
+	         tmr_startFrom(tmr1, 1, 0, proc);
+	         tmr_startFrom(&tmr0, 0, 0, proc);
+	result = tmr_wait(&tmr0);                     ASSERT_success(result);
+	result = tmr_wait(tmr1);                      ASSERT_success(result);
+	result = tmr_wait(tmr2);                      ASSERT_success(result);
+	result = tmr_wait(tmr3);                      ASSERT_success(result);
+	                                              ASSERT(counter == 4);
 }
 
 extern "C"
