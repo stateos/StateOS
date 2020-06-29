@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    29.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -270,21 +270,23 @@ void flg_delete( flg_t *flg ) { flg_destroy(flg); }
  *                     flgProtect: don't clear flags in flag object
  *                     flgIgnore:  ignore flags in flag object that have been set and not accepted before
  *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
+ *   remain          : pointer to remaining flags value
  *
- * Return            : flags that remain to be set or
- *   0               : required flags have been set
+ * Return
+ *   E_SUCCESS       : required flags have been set
+ *   E_TIMEOUT       : required flags have not been set, try again
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned flg_take( flg_t *flg, unsigned flags, char mode );
+int flg_take( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain );
 
 __STATIC_INLINE
-unsigned flg_tryWait( flg_t *flg, unsigned flags, char mode ) { return flg_take(flg, flags, mode); }
+int flg_tryWait( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain ) { return flg_take(flg, flags, mode, remain); }
 
 __STATIC_INLINE
-unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(flg, flags, mode); }
+int flg_takeISR( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain ) { return flg_take(flg, flags, mode, remain); }
 
 /******************************************************************************
  *
@@ -301,6 +303,7 @@ unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(
  *                     flgProtect: don't clear flags in flag object
  *                     flgIgnore:  ignore flags in flag object that have been set and not accepted before
  *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
+ *   remain          : pointer to remaining flags value
  *   delay           : duration of time (maximum number of ticks to wait on flag object for given flags)
  *                     IMMEDIATE: don't wait until required flags have been set
  *                     INFINITE:  wait indefinitely until required flags have been set
@@ -315,7 +318,7 @@ unsigned flg_takeISR( flg_t *flg, unsigned flags, char mode ) { return flg_take(
  *
  ******************************************************************************/
 
-int flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay );
+int flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain, cnt_t delay );
 
 /******************************************************************************
  *
@@ -332,6 +335,7 @@ int flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay );
  *                     flgProtect: don't clear flags in flag object
  *                     flgIgnore:  ignore flags in flag object that have been set and not accepted before
  *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
+ *   remain          : pointer to remaining flags
  *   time            : timepoint value
  *
  * Return
@@ -344,7 +348,7 @@ int flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay );
  *
  ******************************************************************************/
 
-int flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
+int flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain, cnt_t time );
 
 /******************************************************************************
  *
@@ -361,6 +365,7 @@ int flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
  *                     flgProtect: don't clear flags in flag object
  *                     flgIgnore:  ignore flags in flag object that have been set and not accepted before
  *                     ( either flgAny or flgAll can be OR'ed with flgProtect or flgIgnore )
+ *   remain          : pointer to remaining flags
  *
  * Return
  *   E_SUCCESS       : required flags have been set
@@ -372,7 +377,7 @@ int flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-int flg_wait( flg_t *flg, unsigned flags, char mode ) { return flg_waitFor(flg, flags, mode, INFINITE); }
+int flg_wait( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain ) { return flg_waitFor(flg, flags, mode, remain, INFINITE); }
 
 /******************************************************************************
  *
@@ -385,20 +390,21 @@ int flg_wait( flg_t *flg, unsigned flags, char mode ) { return flg_waitFor(flg, 
  * Parameters
  *   flg             : pointer to flag object
  *   flags           : all flags to set
+ *   after           : pointer to flags after setting
  *
- * Return            : flags in flag object after setting
+ * Return            : none
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned flg_give( flg_t *flg, unsigned flags );
+void flg_give( flg_t *flg, unsigned flags, unsigned *after );
 
 __STATIC_INLINE
-unsigned flg_set( flg_t *flg, unsigned flags ) { return flg_give(flg, flags); }
+void flg_set( flg_t *flg, unsigned flags, unsigned *after ) { flg_give(flg, flags, after); }
 
 __STATIC_INLINE
-unsigned flg_giveISR( flg_t *flg, unsigned flags ) { return flg_give(flg, flags); }
+void flg_giveISR( flg_t *flg, unsigned flags, unsigned *after ) { flg_give(flg, flags, after); }
 
 /******************************************************************************
  *
@@ -410,17 +416,18 @@ unsigned flg_giveISR( flg_t *flg, unsigned flags ) { return flg_give(flg, flags)
  * Parameters
  *   flg             : pointer to flag object
  *   flags           : all flags to clear
+ *   before          : pointer to flags before clearing
  *
- * Return            : flags in flag object before clearing
+ * Return            : none
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-unsigned flg_clear( flg_t *flg, unsigned flags );
+void flg_clear( flg_t *flg, unsigned flags, unsigned *before );
 
 __STATIC_INLINE
-unsigned flg_clearISR( flg_t *flg, unsigned flags ) { return flg_clear(flg, flags); }
+void flg_clearISR( flg_t *flg, unsigned flags, unsigned *before ) { flg_clear(flg, flags, before); }
 
 /******************************************************************************
  *
@@ -504,24 +511,24 @@ struct Flag : public __flg
 		return Ptr(flg);
 	}
 
-	void     reset    ( void )                                        {        flg_reset    (this); }
-	void     kill     ( void )                                        {        flg_kill     (this); }
-	void     destroy  ( void )                                        {        flg_destroy  (this); }
-	unsigned take     ( unsigned _flags, char _mode = flgAll )        { return flg_take     (this, _flags, _mode); }
-	unsigned tryWait  ( unsigned _flags, char _mode = flgAll )        { return flg_tryWait  (this, _flags, _mode); }
-	unsigned takeISR  ( unsigned _flags, char _mode = flgAll )        { return flg_takeISR  (this, _flags, _mode); }
+	void     reset    ( void )                                                                    {        flg_reset    (this); }
+	void     kill     ( void )                                                                    {        flg_kill     (this); }
+	void     destroy  ( void )                                                                    {        flg_destroy  (this); }
+	unsigned take     ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_take     (this, _flags, _mode, _remain); }
+	unsigned tryWait  ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_tryWait  (this, _flags, _mode, _remain); }
+	unsigned takeISR  ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_takeISR  (this, _flags, _mode, _remain); }
 	template<typename T>
-	int      waitFor  ( unsigned _flags, char _mode, const T _delay ) { return flg_waitFor  (this, _flags, _mode, Clock::count(_delay)); }
+	int      waitFor  ( unsigned _flags, char _mode,          unsigned *_remain, const T _delay ) { return flg_waitFor  (this, _flags, _mode, _remain, Clock::count(_delay)); }
 	template<typename T>
-	int      waitUntil( unsigned _flags, char _mode, const T _time )  { return flg_waitUntil(this, _flags, _mode, Clock::until(_time)); }
-	int      wait     ( unsigned _flags, char _mode = flgAll )        { return flg_wait     (this, _flags, _mode); }
-	unsigned give     ( unsigned _flags )                             { return flg_give     (this, _flags); }
-	unsigned set      ( unsigned _flags )                             { return flg_set      (this, _flags); }
-	unsigned giveISR  ( unsigned _flags )                             { return flg_giveISR  (this, _flags); }
-	unsigned clear    ( unsigned _flags )                             { return flg_clear    (this, _flags); }
-	unsigned clearISR ( unsigned _flags )                             { return flg_clearISR (this, _flags); }
-	unsigned get      ( void )                                        { return flg_get      (this); }
-	unsigned getISR   ( void )                                        { return flg_getISR   (this); }
+	int      waitUntil( unsigned _flags, char _mode,          unsigned *_remain, const T _time )  { return flg_waitUntil(this, _flags, _mode, _remain, Clock::until(_time)); }
+	int      wait     ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_wait     (this, _flags, _mode, _remain); }
+	void     give     ( unsigned _flags,                      unsigned *_after  = nullptr )       {        flg_give     (this, _flags,        _after); }
+	void     set      ( unsigned _flags,                      unsigned *_after  = nullptr )       {        flg_set      (this, _flags,        _after); }
+	void     giveISR  ( unsigned _flags,                      unsigned *_after  = nullptr )       {        flg_giveISR  (this, _flags,        _after); }
+	void     clear    ( unsigned _flags,                      unsigned *_before = nullptr )       {        flg_clear    (this, _flags,        _before); }
+	void     clearISR ( unsigned _flags,                      unsigned *_before = nullptr )       {        flg_clearISR (this, _flags,        _before); }
+	unsigned get      ( void )                                                                    { return flg_get      (this); }
+	unsigned getISR   ( void )                                                                    { return flg_getISR   (this); }
 };
 
 #endif//__cplusplus

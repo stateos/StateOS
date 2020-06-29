@@ -5,14 +5,14 @@ OS_FLG(flg, 1);
 
 void consumer()
 {
-	flg_wait(flg, 1, flgProtect+flgIgnore);
+	flg_wait(flg, 1, flgProtect+flgIgnore, NULL);
 	LED_Tick();
 }
 
 void producer()
 {
 	tsk_delay(SEC);
-	flg_give(flg, 1);
+	flg_give(flg, 1, NULL);
 }
 
 OS_TSK(cons, 0, consumer);

@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    08.06.2020
+    @date    29.06.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -505,23 +505,28 @@ uint32_t osThreadEnumerate (osThreadId_t *thread_array, uint32_t array_items)
 
 uint32_t osThreadFlagsSet (osThreadId_t thread_id, uint32_t flags)
 {
+	uint32_t after;
 	osThread_t *thread = thread_id;
 
 	if ((thread_id == NULL) || ((flags & osFlagsError) != 0U))
 		return osFlagsErrorParameter;
 
-	return flg_give(&thread->flg, flags);
+
+	flg_give(&thread->flg, flags, (unsigned *)&after);
+	return after;
 }
 
 uint32_t osThreadFlagsClear (uint32_t flags)
 {
+	uint32_t before;
 	void *tmp = tsk_this(); // because of COSMIC compiler
 	osThread_t *thread = tmp;
 
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osFlagsErrorISR;
 
-	return flg_clear(&thread->flg, flags);
+	flg_clear(&thread->flg, flags, (unsigned *)&before);
+	return before;
 }
 
 uint32_t osThreadFlagsGet (void)
@@ -545,7 +550,7 @@ uint32_t osThreadFlagsWait (uint32_t flags, uint32_t options, uint32_t timeout)
 	if ((flags & osFlagsError) != 0U)
 		return osFlagsErrorParameter;
 
-	switch (flg_waitFor(&thread->flg, flags, options, timeout))
+	switch (flg_waitFor(&thread->flg, flags, options, NULL, timeout))
 	{
 		case E_SUCCESS: return flags;
 		case E_TIMEOUT: return osFlagsErrorTimeout;
@@ -729,22 +734,26 @@ osEventFlagsId_t osEventFlagsNew (const osEventFlagsAttr_t *attr)
 
 uint32_t osEventFlagsSet (osEventFlagsId_t ef_id, uint32_t flags)
 {
+	uint32_t after;
 	osEventFlags_t *ef = ef_id;
 
 	if ((ef_id == NULL) || ((flags & osFlagsError) != 0U))
 		return osFlagsErrorParameter;
 
-	return flg_give(&ef->flg, flags);
+	flg_give(&ef->flg, flags, (unsigned *)&after);
+	return after;
 }
 
 uint32_t osEventFlagsClear (osEventFlagsId_t ef_id, uint32_t flags)
 {
+	uint32_t before;
 	osEventFlags_t *ef = ef_id;
 
 	if ((ef_id == NULL) || ((flags & osFlagsError) != 0U))
 		return osFlagsErrorParameter;
 
-	return flg_clear(&ef->flg, flags);
+	flg_clear(&ef->flg, flags, (unsigned *)&before);
+	return before;
 }
 
 uint32_t osEventFlagsGet (osEventFlagsId_t ef_id)
@@ -766,7 +775,7 @@ uint32_t osEventFlagsWait (osEventFlagsId_t ef_id, uint32_t flags, uint32_t opti
 	if ((IS_IRQ_MODE() || IS_IRQ_MASKED()) && (timeout != 0U))
 		return osFlagsErrorParameter;
 
-	switch (flg_waitFor(&ef->flg, flags, options, timeout))
+	switch (flg_waitFor(&ef->flg, flags, options, NULL, timeout))
 	{
 		case E_SUCCESS: return flags;
 		case E_TIMEOUT: return osFlagsErrorTimeout;

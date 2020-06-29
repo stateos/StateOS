@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    29.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -121,45 +121,49 @@ void flg_destroy( flg_t *flg )
 
 /* -------------------------------------------------------------------------- */
 static
-unsigned priv_flg_take( flg_t *flg, unsigned flags, char mode )
+int priv_flg_take( flg_t *flg, unsigned flags, unsigned mode )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned value;
+	unsigned value = flags;
 
 	if ((mode & flgIgnore) == 0)
 	{
-		value = flags;
 		flags &= ~flg->flags;
-
 		if ((mode & flgProtect) == 0)
 			flg->flags &= ~value;
-
-		if (flags != value && (mode & flgAll) == 0)
-			flags = 0;
 	}
 
-	return flags;
+	System.cur->tmp.flg.flags = flags;
+
+	if (flags == 0 || (flags != value && (mode & flgAll) == 0))
+		return E_SUCCESS;
+
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_take( flg_t *flg, unsigned flags, char mode )
+int flg_take( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain )
 /* -------------------------------------------------------------------------- */
 {
+	int result;
+
 	assert(flg);
 	assert(flg->obj.res!=RELEASED);
 	assert((mode & ~flgMASK) == 0);
 
 	sys_lock();
 	{
-		flags = priv_flg_take(flg, flags, mode);
+		result = priv_flg_take(flg, flags, mode);
+		if (remain != NULL)
+			*remain = System.cur->tmp.flg.flags;
 	}
 	sys_unlock();
 
-	return flags;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-int flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay )
+int flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -171,18 +175,16 @@ int flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay )
 
 	sys_lock();
 	{
-		flags = priv_flg_take(flg, flags, mode);
+		result = priv_flg_take(flg, flags, mode);
 
-		if (flags == 0)
+		if (result == E_TIMEOUT)
 		{
-			result = E_SUCCESS;
-		}
-		else
-		{
-			System.cur->tmp.flg.mode  = mode;
-			System.cur->tmp.flg.flags = flags;
+			System.cur->tmp.flg.mode = mode;
 			result = core_tsk_waitFor(&flg->obj.queue, delay);
 		}
+
+		if (remain != NULL)
+			*remain = System.cur->tmp.flg.flags;
 	}
 	sys_unlock();
 
@@ -190,7 +192,7 @@ int flg_waitFor( flg_t *flg, unsigned flags, char mode, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-int flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
+int flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -202,18 +204,16 @@ int flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
 
 	sys_lock();
 	{
-		flags = priv_flg_take(flg, flags, mode);
+		result = priv_flg_take(flg, flags, mode);
 
-		if (flags == 0)
+		if (result == E_TIMEOUT)
 		{
-			result = E_SUCCESS;
-		}
-		else
-		{
-			System.cur->tmp.flg.mode  = mode;
-			System.cur->tmp.flg.flags = flags;
+			System.cur->tmp.flg.mode = mode;
 			result = core_tsk_waitUntil(&flg->obj.queue, time);
 		}
+
+		if (remain != NULL)
+			*remain = System.cur->tmp.flg.flags;
 	}
 	sys_unlock();
 
@@ -221,7 +221,7 @@ int flg_waitUntil( flg_t *flg, unsigned flags, char mode, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_give( flg_t *flg, unsigned flags )
+void flg_give( flg_t *flg, unsigned flags, unsigned *after )
 /* -------------------------------------------------------------------------- */
 {
 	obj_t *obj;
@@ -252,31 +252,28 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 			obj = &tsk->hdr.obj;
 		}
 
-		flags = flg->flags;
+	//	System.cur->tmp.flg.flags = flg->flags;
+		if (after != NULL)
+			*after = flg->flags;
 	}
 	sys_unlock();
-
-	return flags;
 }
 
 /* -------------------------------------------------------------------------- */
-unsigned flg_clear( flg_t *flg, unsigned flags )
+void flg_clear( flg_t *flg, unsigned flags, unsigned *before )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned temp;
-
 	assert(flg);
 	assert(flg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		temp = flg->flags;
+	//	System.cur->tmp.flg.flags = flg->flags;
+		if (before != NULL)
+			*before = flg->flags;
 		flg->flags &= ~flags;
-		flags = temp;
 	}
 	sys_unlock();
-
-	return flags;
 }
 
 /* -------------------------------------------------------------------------- */
