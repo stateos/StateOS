@@ -98,7 +98,7 @@ struct __tsk
 
 	struct {
 	unsigned sigset;
-	unsigned*signo;
+	unsigned signo;
 	}        sig;   // temporary data used by signal object
 
 	struct {

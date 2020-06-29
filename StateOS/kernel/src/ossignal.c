@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    27.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -121,9 +121,10 @@ void sig_destroy( sig_t *sig )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
+int priv_sig_take( sig_t *sig, unsigned sigset )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned signo;
 	int result = E_TIMEOUT;
 
 	sigset &= sig->sigset;
@@ -131,8 +132,8 @@ int priv_sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 	if (sigset)
 	{
 		sig->sigset &= ~sigset | sig->mask;
-		if (signo)
-			for (*signo = 0; sigset >>= 1; *signo += 1);
+		for (signo = 0; sigset >>= 1; signo++);
+		System.cur->tmp.sig.signo = signo;
 		result = E_SUCCESS;
 	}
 
@@ -150,7 +151,9 @@ int sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 
 	sys_lock();
 	{
-		result = priv_sig_take(sig, sigset, signo);
+		result = priv_sig_take(sig, sigset);
+		if (result == E_SUCCESS && signo != NULL)
+			*signo = System.cur->tmp.sig.signo;
 	}
 	sys_unlock();
 
@@ -169,14 +172,16 @@ int sig_waitFor( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t delay )
 
 	sys_lock();
 	{
-		result = priv_sig_take(sig, sigset, signo);
+		result = priv_sig_take(sig, sigset);
 
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
-			System.cur->tmp.sig.signo  = signo;
 			result = core_tsk_waitFor(&sig->obj.queue, delay);
 		}
+
+		if (result == E_SUCCESS && signo != NULL)
+			*signo = System.cur->tmp.sig.signo;
 	}
 	sys_unlock();
 
@@ -195,14 +200,16 @@ int sig_waitUntil( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t time )
 
 	sys_lock();
 	{
-		result = priv_sig_take(sig, sigset, signo);
+		result = priv_sig_take(sig, sigset);
 
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
-			System.cur->tmp.sig.signo  = signo;
 			result = core_tsk_waitUntil(&sig->obj.queue, time);
 		}
+
+		if (result == E_SUCCESS && signo != NULL)
+			*signo = System.cur->tmp.sig.signo;
 	}
 	sys_unlock();
 
@@ -231,8 +238,7 @@ void sig_give( sig_t *sig, unsigned signo )
 			if ((tsk->tmp.sig.sigset & sigset) != 0 || tsk->tmp.sig.sigset == 0)
 			{
 				sig->sigset &= ~sigset | sig->mask;
-				if (tsk->tmp.sig.signo)
-					*tsk->tmp.sig.signo = signo;
+				tsk->tmp.sig.signo = signo;
 				core_tsk_wakeup(tsk, E_SUCCESS);
 				continue;
 			}
