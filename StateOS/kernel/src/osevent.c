@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    27.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -116,7 +116,7 @@ void evt_destroy( evt_t *evt )
 }
 
 /* -------------------------------------------------------------------------- */
-int evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay )
+int evt_waitFor( evt_t *evt, unsigned *event, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -124,12 +124,12 @@ int evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay )
 	assert_tsk_context();
 	assert(evt);
 	assert(evt->obj.res!=RELEASED);
-	assert(data);
 
 	sys_lock();
 	{
-		System.cur->tmp.evt.data = data;
 		result = core_tsk_waitFor(&evt->obj.queue, delay);
+		if (result == E_SUCCESS && event != NULL)
+			*event = System.cur->tmp.evt.event;
 	}
 	sys_unlock();
 
@@ -137,7 +137,7 @@ int evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-int evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time )
+int evt_waitUntil( evt_t *evt, unsigned *event, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -145,12 +145,12 @@ int evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time )
 	assert_tsk_context();
 	assert(evt);
 	assert(evt->obj.res!=RELEASED);
-	assert(data);
 
 	sys_lock();
 	{
-		System.cur->tmp.evt.data = data;
 		result = core_tsk_waitUntil(&evt->obj.queue, time);
+		if (result == E_SUCCESS && event != NULL)
+			*event = System.cur->tmp.evt.event;
 	}
 	sys_unlock();
 
@@ -158,7 +158,7 @@ int evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-void evt_give( evt_t *evt, unsigned data )
+void evt_give( evt_t *evt, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
@@ -168,9 +168,9 @@ void evt_give( evt_t *evt, unsigned data )
 
 	sys_lock();
 	{
-		while ((tsk = evt->obj.queue) != 0)
+		while (tsk = evt->obj.queue, tsk != NULL)
 		{
-			*tsk->tmp.evt.data = data;
+			tsk->tmp.evt.event = event;
 			core_tsk_wakeup(tsk, E_SUCCESS);
 		}
 	}

@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    27.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -227,13 +227,13 @@ void evt_delete( evt_t *evt ) { evt_destroy(evt); }
  *
  * Parameters
  *   evt             : pointer to event object
- *   data            : pointer to store event data
+ *   event           : pointer to store event value
  *   delay           : duration of time (maximum number of ticks to wait for release the event object)
  *                     IMMEDIATE: don't wait until the event object has been released
  *                     INFINITE:  wait indefinitely until the event object has been released
  *
  * Return
- *   E_SUCCESS       : event data was successfully transferred from the event object
+ *   E_SUCCESS       : event value was successfully transferred from the event object
  *   E_STOPPED       : event object was reseted before the specified timeout expired
  *   E_DELETED       : event object was deleted before the specified timeout expired
  *   E_TIMEOUT       : event object was not released before the specified timeout expired
@@ -242,7 +242,7 @@ void evt_delete( evt_t *evt ) { evt_destroy(evt); }
  *
  ******************************************************************************/
 
-int evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay );
+int evt_waitFor( evt_t *evt, unsigned *event, cnt_t delay );
 
 /******************************************************************************
  *
@@ -252,11 +252,11 @@ int evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay );
  *
  * Parameters
  *   evt             : pointer to event object
- *   data            : pointer to store event data
+ *   event           : pointer to store event value
  *   time            : timepoint value
  *
  * Return
- *   E_SUCCESS       : event data was successfully transferred from the event object
+ *   E_SUCCESS       : event value was successfully transferred from the event object
  *   E_STOPPED       : event object was reseted before the specified timeout expired
  *   E_DELETED       : event object was deleted before the specified timeout expired
  *   E_TIMEOUT       : event object was not released before the specified timeout expired
@@ -265,7 +265,7 @@ int evt_waitFor( evt_t *evt, unsigned *data, cnt_t delay );
  *
  ******************************************************************************/
 
-int evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time );
+int evt_waitUntil( evt_t *evt, unsigned *event, cnt_t time );
 
 /******************************************************************************
  *
@@ -275,10 +275,10 @@ int evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time );
  *
  * Parameters
  *   evt             : pointer to event object
- *   data            : pointer to store event data
+ *   event           : pointer to store event value
  *
  * Return
- *   E_SUCCESS       : event data was successfully transferred from the event object
+ *   E_SUCCESS       : event value was successfully transferred from the event object
  *   E_STOPPED       : event object was reseted
  *   E_DELETED       : event object was deleted
  *
@@ -287,7 +287,7 @@ int evt_waitUntil( evt_t *evt, unsigned *data, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-int evt_wait( evt_t *evt, unsigned *data ) { return evt_waitFor(evt, data, INFINITE); }
+int evt_wait( evt_t *evt, unsigned *event ) { return evt_waitFor(evt, event, INFINITE); }
 
 /******************************************************************************
  *
@@ -298,7 +298,7 @@ int evt_wait( evt_t *evt, unsigned *data ) { return evt_waitFor(evt, data, INFIN
  *
  * Parameters
  *   evt             : pointer to event object
- *   data            : event value
+ *   event           : event value
  *
  * Return            : none
  *
@@ -306,10 +306,10 @@ int evt_wait( evt_t *evt, unsigned *data ) { return evt_waitFor(evt, data, INFIN
  *
  ******************************************************************************/
 
-void evt_give( evt_t *evt, unsigned data );
+void evt_give( evt_t *evt, unsigned event );
 
 __STATIC_INLINE
-void evt_giveISR( evt_t *evt, unsigned data ) { evt_give(evt, data); }
+void evt_giveISR( evt_t *evt, unsigned event ) { evt_give(evt, event); }
 
 #ifdef __cplusplus
 }
@@ -375,17 +375,12 @@ struct Event : public __evt
 	void kill     ( void )                             {        evt_kill     (this); }
 	void destroy  ( void )                             {        evt_destroy  (this); }
 	template<typename T>
-	int  waitFor  ( unsigned *_event, const T _delay ) { return evt_waitFor  (this,  _event, Clock::count(_delay)); }
+	int  waitFor  ( unsigned *_event, const T _delay ) { return evt_waitFor  (this, _event, Clock::count(_delay)); }
 	template<typename T>
-	int  waitFor  ( unsigned &_event, const T _delay ) { return evt_waitFor  (this, &_event, Clock::count(_delay)); }
-	template<typename T>
-	int  waitUntil( unsigned *_event, const T _time )  { return evt_waitUntil(this,  _event, Clock::until(_time)); }
-	template<typename T>
-	int  waitUntil( unsigned &_event, const T _time )  { return evt_waitUntil(this, &_event, Clock::until(_time)); }
-	int  wait     ( unsigned *_event )                 { return evt_wait     (this,  _event); }
-	int  wait     ( unsigned &_event )                 { return evt_wait     (this, &_event); }
-	void give     ( unsigned  _event )                 {        evt_give     (this,  _event); }
-	void giveISR  ( unsigned  _event )                 {        evt_giveISR  (this,  _event); }
+	int  waitUntil( unsigned *_event, const T _time )  { return evt_waitUntil(this, _event, Clock::until(_time)); }
+	int  wait     ( unsigned *_event )                 { return evt_wait     (this, _event); }
+	void give     ( unsigned  _event )                 {        evt_give     (this, _event); }
+	void giveISR  ( unsigned  _event )                 {        evt_giveISR  (this, _event); }
 };
 
 #endif//__cplusplus
