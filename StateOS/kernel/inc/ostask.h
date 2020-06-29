@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    26.06.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -93,7 +93,7 @@ struct __tsk
 	union  {
 
 	struct {
-	unsigned*data;
+	unsigned event;
 	}        evt;   // temporary data used by event object
 
 	struct {
@@ -141,10 +141,7 @@ struct __tsk
 	}        box;   // temporary data used by mailbox queue object
 
 	struct {
-	union  {
-	unsigned out;
-	unsigned*in;
-	}        data;
+	unsigned event;
 	}        evq;   // temporary data used by event queue object
 
 	struct {
@@ -188,7 +185,7 @@ extern "C" {
 
 #define               _TSK_INIT( _prio, _state, _stack, _size )                                               \
                        { _HDR_INIT(), _state, 0, 0, 0, NULL, _stack, _size, NULL, _prio, _prio, NULL, NULL, 0, \
-                       { NULL, NULL }, { 0, NULL, { NULL, NULL } }, { { NULL } }, _PORT_DATA_INIT() }
+                       { NULL, NULL }, { 0, NULL, { NULL, NULL } }, { { 0 } }, _PORT_DATA_INIT() }
 
 /******************************************************************************
  *

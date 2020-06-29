@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    27.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -130,25 +130,26 @@ void evq_destroy( evq_t *evq )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_evq_get( evq_t *evq, unsigned *data )
+unsigned priv_evq_get( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i = evq->head;
-
-	*data = evq->data[i++];
+	unsigned event = evq->data[i++];
 
 	evq->head = (i < evq->limit) ? i : 0;
 	evq->count--;
+
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_evq_put( evq_t *evq, const unsigned data )
+void priv_evq_put( evq_t *evq, const unsigned event )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i = evq->tail;
 
-	evq->data[i++] = data;
+	evq->data[i++] = event;
 
 	evq->tail = (i < evq->limit) ? i : 0;
 	evq->count++;
@@ -166,26 +167,25 @@ void priv_evq_skip( evq_t *evq )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_evq_getUpdate( evq_t *evq, unsigned *data )
+unsigned priv_evq_getUpdate( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t *tsk;
-
-	priv_evq_get(evq, data);
-	tsk = core_one_wakeup(evq->obj.queue, E_SUCCESS);
-	if (tsk) priv_evq_put(evq, tsk->tmp.evq.data.out);
+	unsigned event = priv_evq_get(evq);
+	tsk_t  * tsk = core_one_wakeup(evq->obj.queue, E_SUCCESS);
+	if (tsk) priv_evq_put(evq, tsk->tmp.evq.event);
+	return event;
 }
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_evq_putUpdate( evq_t *evq, const unsigned data )
+void priv_evq_putUpdate( evq_t *evq, const unsigned event )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
 
-	priv_evq_put(evq, data);
+	priv_evq_put(evq, event);
 	tsk = core_one_wakeup(evq->obj.queue, E_SUCCESS);
-	if (tsk) priv_evq_get(evq, tsk->tmp.evq.data.in);
+	if (tsk) tsk->tmp.evq.event = priv_evq_get(evq);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -199,18 +199,18 @@ void priv_evq_skipUpdate( evq_t *evq )
 	{
 		priv_evq_skip(evq);
 		tsk = core_one_wakeup(evq->obj.queue, E_SUCCESS);
-		if (tsk) priv_evq_put(evq, tsk->tmp.evq.data.out);
+		if (tsk) priv_evq_put(evq, tsk->tmp.evq.event);
 	}
 }
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_evq_take( evq_t *evq, unsigned *data )
+int priv_evq_take( evq_t *evq )
 /* -------------------------------------------------------------------------- */
 {
 	if (evq->count > 0)
 	{
-		priv_evq_getUpdate(evq, data);
+		System.cur->tmp.evq.event = priv_evq_getUpdate(evq);
 		return E_SUCCESS;
 	}
 
@@ -218,7 +218,7 @@ int priv_evq_take( evq_t *evq, unsigned *data )
 }
 
 /* -------------------------------------------------------------------------- */
-int evq_take( evq_t *evq, unsigned *data )
+int evq_take( evq_t *evq, unsigned *event )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -227,11 +227,12 @@ int evq_take( evq_t *evq, unsigned *data )
 	assert(evq->obj.res!=RELEASED);
 	assert(evq->data);
 	assert(evq->limit);
-	assert(data);
 
 	sys_lock();
 	{
-		result = priv_evq_take(evq, data);
+		result = priv_evq_take(evq);
+		if (result == E_SUCCESS && event != NULL)
+			*event = System.cur->tmp.evq.event;
 	}
 	sys_unlock();
 
@@ -239,7 +240,7 @@ int evq_take( evq_t *evq, unsigned *data )
 }
 
 /* -------------------------------------------------------------------------- */
-int evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay )
+int evq_waitFor( evq_t *evq, unsigned *event, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -249,17 +250,16 @@ int evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay )
 	assert(evq->obj.res!=RELEASED);
 	assert(evq->data);
 	assert(evq->limit);
-	assert(data);
 
 	sys_lock();
 	{
-		result = priv_evq_take(evq, data);
+		result = priv_evq_take(evq);
 
 		if (result == E_TIMEOUT)
-		{
-			System.cur->tmp.evq.data.in = data;
 			result = core_tsk_waitFor(&evq->obj.queue, delay);
-		}
+
+		if (result == E_SUCCESS && event != NULL)
+			*event = System.cur->tmp.evq.event;
 	}
 	sys_unlock();
 
@@ -267,7 +267,7 @@ int evq_waitFor( evq_t *evq, unsigned *data, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-int evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time )
+int evq_waitUntil( evq_t *evq, unsigned *event, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -277,17 +277,16 @@ int evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time )
 	assert(evq->obj.res!=RELEASED);
 	assert(evq->data);
 	assert(evq->limit);
-	assert(data);
 
 	sys_lock();
 	{
-		result = priv_evq_take(evq, data);
+		result = priv_evq_take(evq);
 
 		if (result == E_TIMEOUT)
-		{
-			System.cur->tmp.evq.data.in = data;
 			result = core_tsk_waitUntil(&evq->obj.queue, time);
-		}
+
+		if (result == E_SUCCESS && event != NULL)
+			*event = System.cur->tmp.evq.event;
 	}
 	sys_unlock();
 
@@ -296,12 +295,12 @@ int evq_waitUntil( evq_t *evq, unsigned *data, cnt_t time )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_evq_give( evq_t *evq, unsigned data )
+int priv_evq_give( evq_t *evq, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
 	if (evq->count < evq->limit)
 	{
-		priv_evq_putUpdate(evq, data);
+		priv_evq_putUpdate(evq, event);
 		return E_SUCCESS;
 	}
 
@@ -309,7 +308,7 @@ int priv_evq_give( evq_t *evq, unsigned data )
 }
 
 /* -------------------------------------------------------------------------- */
-int evq_give( evq_t *evq, unsigned data )
+int evq_give( evq_t *evq, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -321,7 +320,7 @@ int evq_give( evq_t *evq, unsigned data )
 
 	sys_lock();
 	{
-		result = priv_evq_give(evq, data);
+		result = priv_evq_give(evq, event);
 	}
 	sys_unlock();
 
@@ -329,7 +328,7 @@ int evq_give( evq_t *evq, unsigned data )
 }
 
 /* -------------------------------------------------------------------------- */
-int evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
+int evq_sendFor( evq_t *evq, unsigned event, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -342,11 +341,11 @@ int evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
 
 	sys_lock();
 	{
-		result = priv_evq_give(evq, data);
+		result = priv_evq_give(evq, event);
 
 		if (result == E_TIMEOUT)
 		{
-			System.cur->tmp.evq.data.out = data;
+			System.cur->tmp.evq.event = event;
 			result = core_tsk_waitFor(&evq->obj.queue, delay);
 		}
 	}
@@ -356,7 +355,7 @@ int evq_sendFor( evq_t *evq, unsigned data, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-int evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
+int evq_sendUntil( evq_t *evq, unsigned event, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -369,11 +368,11 @@ int evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
 
 	sys_lock();
 	{
-		result = priv_evq_give(evq, data);
+		result = priv_evq_give(evq, event);
 
 		if (result == E_TIMEOUT)
 		{
-			System.cur->tmp.evq.data.out = data;
+			System.cur->tmp.evq.event = event;
 			result = core_tsk_waitUntil(&evq->obj.queue, time);
 		}
 	}
@@ -383,7 +382,7 @@ int evq_sendUntil( evq_t *evq, unsigned data, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-void evq_push( evq_t *evq, unsigned data )
+void evq_push( evq_t *evq, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
 	assert(evq);
@@ -394,7 +393,7 @@ void evq_push( evq_t *evq, unsigned data )
 	sys_lock();
 	{
 		priv_evq_skipUpdate(evq);
-		priv_evq_putUpdate(evq, data);
+		priv_evq_putUpdate(evq, event);
 	}
 	sys_unlock();
 }
