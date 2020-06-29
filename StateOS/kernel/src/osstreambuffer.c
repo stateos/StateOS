@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    28.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -172,11 +172,10 @@ void priv_stm_skip( stm_t *stm, size_t size )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_stm_getUpdate( stm_t *stm, char *data, size_t size, size_t *read )
+size_t priv_stm_getUpdate( stm_t *stm, char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	if (size > stm->count) size = stm->count;
-	if (read != NULL) *read = size;
 	priv_stm_get(stm, data, size);
 
 	while (stm->obj.queue != 0 && stm->count + stm->obj.queue->tmp.stm.size <= stm->limit)
@@ -184,6 +183,8 @@ void priv_stm_getUpdate( stm_t *stm, char *data, size_t size, size_t *read )
 		priv_stm_put(stm, stm->obj.queue->tmp.stm.data.out, stm->obj.queue->tmp.stm.size);
 		core_one_wakeup(stm->obj.queue, E_SUCCESS);
 	}
+
+	return size;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -221,12 +222,12 @@ void priv_stm_skipUpdate( stm_t *stm, size_t size )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_stm_take( stm_t *stm, char *data, size_t size, size_t *read )
+int priv_stm_take( stm_t *stm, char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	if (stm->count > 0)
 	{
-		priv_stm_getUpdate(stm, data, size, read);
+		System.cur->tmp.stm.size = priv_stm_getUpdate(stm, data, size);
 		return E_SUCCESS;
 	}
 
@@ -248,7 +249,9 @@ int stm_take( stm_t *stm, void *data, size_t size, size_t *read )
 
 	sys_lock();
 	{
-		result = priv_stm_take(stm, data, size, read);
+		result = priv_stm_take(stm, data, size);
+		if (result == E_SUCCESS && read != NULL)
+			*read = System.cur->tmp.stm.size;
 	}
 	sys_unlock();
 
@@ -271,16 +274,17 @@ int stm_waitFor( stm_t *stm, void *data, size_t size, size_t *read, cnt_t delay 
 
 	sys_lock();
 	{
-		result = priv_stm_take(stm, data, size, read);
+		result = priv_stm_take(stm, data, size);
 
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.in = data;
 			System.cur->tmp.stm.size = size;
 			result = core_tsk_waitFor(&stm->obj.queue, delay);
-			if (result == E_SUCCESS && read != NULL)
-				*read = System.cur->tmp.stm.size;
 		}
+
+		if (result == E_SUCCESS && read != NULL)
+			*read = System.cur->tmp.stm.size;
 	}
 	sys_unlock();
 
@@ -303,16 +307,17 @@ int stm_waitUntil( stm_t *stm, void *data, size_t size, size_t *read, cnt_t time
 
 	sys_lock();
 	{
-		result = priv_stm_take(stm, data, size, read);
+		result = priv_stm_take(stm, data, size);
 
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.in = data;
 			System.cur->tmp.stm.size = size;
 			result = core_tsk_waitUntil(&stm->obj.queue, time);
-			if (result == E_SUCCESS && read != NULL)
-				*read = System.cur->tmp.stm.size;
 		}
+
+		if (result == E_SUCCESS && read != NULL)
+			*read = System.cur->tmp.stm.size;
 	}
 	sys_unlock();
 

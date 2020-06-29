@@ -116,7 +116,7 @@ struct __tsk
 	char   * out;
 	char   * in;
 	}        data;
-	unsigned size;
+	size_t   size;
 	}        stm;   // temporary data used by stream buffer object
 
 	struct {
