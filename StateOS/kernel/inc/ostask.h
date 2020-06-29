@@ -141,10 +141,7 @@ struct __tsk
 	}        evq;   // temporary data used by event queue object
 
 	struct {
-	union  {
-	fun_t  * out;
-	fun_t ** in;
-	}        data;
+	fun_t  * fun;
 	}        job;   // temporary data used by job queue object
 
 	}        tmp;

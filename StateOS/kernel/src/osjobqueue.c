@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    27.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -130,14 +130,14 @@ void job_destroy( job_t *job )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_job_get( job_t *job, fun_t **fun )
+fun_t *priv_job_get( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i = job->head;
-
-	*fun = job->data[i++];
+	fun_t *fun = job->data[i++];
 	job->head = (i < job->limit) ? i : 0;
 	job->count--;
+	return fun;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -165,14 +165,13 @@ void priv_job_skip( job_t *job )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_job_getUpdate( job_t *job, fun_t **fun )
+fun_t *priv_job_getUpdate( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
-	tsk_t *tsk;
-
-	priv_job_get(job, fun);
-	tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
-	if (tsk) priv_job_put(job, tsk->tmp.job.data.out);
+	fun_t *fun = priv_job_get(job);
+	tsk_t *tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
+	if (tsk) priv_job_put(job, tsk->tmp.job.fun);
+	return fun;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -184,7 +183,7 @@ void priv_job_putUpdate( job_t *job, fun_t *fun )
 
 	priv_job_put(job, fun);
 	tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
-	if (tsk) priv_job_get(job, tsk->tmp.job.data.in);
+	if (tsk) tsk->tmp.job.fun = priv_job_get(job);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -198,18 +197,18 @@ void priv_job_skipUpdate( job_t *job )
 	{
 		priv_job_skip(job);
 		tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
-		if (tsk) priv_job_put(job, tsk->tmp.job.data.out);
+		if (tsk) priv_job_put(job, tsk->tmp.job.fun);
 	}
 }
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_job_take( job_t *job, fun_t **fun )
+int priv_job_take( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
 	if (job->count > 0)
 	{
-		priv_job_getUpdate(job, fun);
+		System.cur->tmp.job.fun = priv_job_getUpdate(job);
 		return E_SUCCESS;
 	}
 
@@ -220,7 +219,6 @@ int priv_job_take( job_t *job, fun_t **fun )
 int job_take( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t *fun;
 	int result;
 
 	assert(job);
@@ -230,12 +228,12 @@ int job_take( job_t *job )
 
 	sys_lock();
 	{
-		result = priv_job_take(job, &fun);
+		result = priv_job_take(job);
 	}
 	sys_unlock();
 
 	if (result == E_SUCCESS)
-		fun();
+		System.cur->tmp.job.fun();
 
 	return result;
 }
@@ -244,7 +242,6 @@ int job_take( job_t *job )
 int job_waitFor( job_t *job, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t *fun;
 	int result;
 
 	assert_tsk_context();
@@ -255,18 +252,15 @@ int job_waitFor( job_t *job, cnt_t delay )
 
 	sys_lock();
 	{
-		result = priv_job_take(job, &fun);
+		result = priv_job_take(job);
 
 		if (result == E_TIMEOUT)
-		{
-			System.cur->tmp.job.data.in = &fun;
 			result = core_tsk_waitFor(&job->obj.queue, delay);
-		}
 	}
 	sys_unlock();
 
 	if (result == E_SUCCESS)
-		fun();
+		System.cur->tmp.job.fun();
 
 	return result;
 }
@@ -275,7 +269,6 @@ int job_waitFor( job_t *job, cnt_t delay )
 int job_waitUntil( job_t *job, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t *fun;
 	int result;
 
 	assert_tsk_context();
@@ -286,18 +279,15 @@ int job_waitUntil( job_t *job, cnt_t time )
 
 	sys_lock();
 	{
-		result = priv_job_take(job, &fun);
+		result = priv_job_take(job);
 
 		if (result == E_TIMEOUT)
-		{
-			System.cur->tmp.job.data.in = &fun;
 			result = core_tsk_waitUntil(&job->obj.queue, time);
-		}
 	}
 	sys_unlock();
 
 	if (result == E_SUCCESS)
-		fun();
+		System.cur->tmp.job.fun();
 
 	return result;
 }
@@ -356,7 +346,7 @@ int job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 
 		if (result == E_TIMEOUT)
 		{
-			System.cur->tmp.job.data.out = fun;
+			System.cur->tmp.job.fun = fun;
 			result = core_tsk_waitFor(&job->obj.queue, delay);
 		}
 	}
@@ -384,7 +374,7 @@ int job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 
 		if (result == E_TIMEOUT)
 		{
-			System.cur->tmp.job.data.out = fun;
+			System.cur->tmp.job.fun = fun;
 			result = core_tsk_waitUntil(&job->obj.queue, time);
 		}
 	}
