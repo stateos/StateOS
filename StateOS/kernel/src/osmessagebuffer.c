@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    28.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -222,11 +222,10 @@ void priv_msg_putSize( msg_t *msg, size_t size )
 
 /* -------------------------------------------------------------------------- */
 static
-void priv_msg_getUpdate( msg_t *msg, char *data, size_t size, size_t *read )
+size_t priv_msg_getUpdate( msg_t *msg, char *data )
 /* -------------------------------------------------------------------------- */
 {
-	size = priv_msg_getSize(msg);
-	if (read != NULL) *read = size;
+	size_t size = priv_msg_getSize(msg);
 	priv_msg_get(msg, data, size);
 
 	while (msg->obj.queue != 0 && msg->count + sizeof(size_t) + msg->obj.queue->tmp.msg.size <= msg->limit)
@@ -235,6 +234,8 @@ void priv_msg_getUpdate( msg_t *msg, char *data, size_t size, size_t *read )
 		priv_msg_put(msg, msg->obj.queue->tmp.msg.data.out, msg->obj.queue->tmp.msg.size);
 		core_one_wakeup(msg->obj.queue, E_SUCCESS);
 	}
+
+	return size;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -280,14 +281,14 @@ void priv_msg_skipUpdate( msg_t *msg, size_t size )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_msg_take( msg_t *msg, char *data, size_t size, size_t *read )
+int priv_msg_take( msg_t *msg, char *data, size_t size )
 /* -------------------------------------------------------------------------- */
 {
 	if (msg->count > 0)
 	{
 		if (size >= priv_msg_size(msg))
 		{
-			priv_msg_getUpdate(msg, data, size, read);
+			System.cur->tmp.msg.size = priv_msg_getUpdate(msg, data);
 			return E_SUCCESS;
 		}
 
@@ -311,7 +312,9 @@ int msg_take( msg_t *msg, void *data, size_t size, size_t *read )
 
 	sys_lock();
 	{
-		result = priv_msg_take(msg, data, size, read);
+		result = priv_msg_take(msg, data, size);
+		if (result == E_SUCCESS && read != NULL)
+			*read = System.cur->tmp.msg.size;
 	}
 	sys_unlock();
 
@@ -333,16 +336,17 @@ int msg_waitFor( msg_t *msg, void *data, size_t size, size_t *read, cnt_t delay 
 
 	sys_lock();
 	{
-		result = priv_msg_take(msg, data, size, read);
+		result = priv_msg_take(msg, data, size);
 
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.in = data;
 			System.cur->tmp.msg.size = size;
 			result = core_tsk_waitFor(&msg->obj.queue, delay);
-			if (result == E_SUCCESS && read != NULL)
-				*read = System.cur->tmp.msg.size;
 		}
+
+		if (result == E_SUCCESS && read != NULL)
+			*read = System.cur->tmp.msg.size;
 	}
 	sys_unlock();
 
@@ -364,16 +368,17 @@ int msg_waitUntil( msg_t *msg, void *data, size_t size, size_t *read, cnt_t time
 
 	sys_lock();
 	{
-		result = priv_msg_take(msg, data, size, read);
+		result = priv_msg_take(msg, data, size);
 
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.in = data;
 			System.cur->tmp.msg.size = size;
 			result = core_tsk_waitUntil(&msg->obj.queue, time);
-			if (result == E_SUCCESS && read != NULL)
-				*read = System.cur->tmp.msg.size;
 		}
+
+		if (result == E_SUCCESS && read != NULL)
+			*read = System.cur->tmp.msg.size;
 	}
 	sys_unlock();
 

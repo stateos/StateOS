@@ -125,7 +125,7 @@ struct __tsk
 	char   * out;
 	char   * in;
 	}        data;
-	unsigned size;
+	size_t   size;
 	}        msg;   // temporary data used by message buffer object
 
 	struct {
