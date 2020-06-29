@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    27.06.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -117,12 +117,12 @@ void lst_destroy( lst_t *lst )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_lst_take( lst_t *lst, void **data )
+int priv_lst_take( lst_t *lst )
 /* -------------------------------------------------------------------------- */
 {
 	if (lst->head.next)
 	{
-		*data = lst->head.next + 1;
+		System.cur->tmp.lst.data = lst->head.next + 1;
 		lst->head.next = lst->head.next->next;
 		return E_SUCCESS;
 	}
@@ -142,7 +142,9 @@ int lst_take( lst_t *lst, void **data )
 
 	sys_lock();
 	{
-		result = priv_lst_take(lst, data);
+		result = priv_lst_take(lst);
+		if (result == E_SUCCESS)
+			*data = System.cur->tmp.lst.data;
 	}
 	sys_unlock();
 
@@ -162,13 +164,13 @@ int lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 
 	sys_lock();
 	{
-		result = priv_lst_take(lst, data);
+		result = priv_lst_take(lst);
 
 		if (result == E_TIMEOUT)
-		{
-			System.cur->tmp.lst.data.in = data;
 			result = core_tsk_waitFor(&lst->obj.queue, delay);
-		}
+
+		if (result == E_SUCCESS)
+			*data = System.cur->tmp.lst.data;
 	}
 	sys_unlock();
 
@@ -188,13 +190,13 @@ int lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 
 	sys_lock();
 	{
-		result = priv_lst_take(lst, data);
+		result = priv_lst_take(lst);
 
 		if (result == E_TIMEOUT)
-		{
-			System.cur->tmp.lst.data.in = data;
 			result = core_tsk_waitUntil(&lst->obj.queue, time);
-		}
+
+		if (result == E_SUCCESS)
+			*data = System.cur->tmp.lst.data;
 	}
 	sys_unlock();
 
@@ -202,7 +204,7 @@ int lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 }
 
 /* -------------------------------------------------------------------------- */
-void lst_give( lst_t *lst, const void *data )
+void lst_give( lst_t *lst, void *data )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
@@ -218,7 +220,7 @@ void lst_give( lst_t *lst, const void *data )
 
 		if (tsk)
 		{
-			*tsk->tmp.lst.data.out = data;
+			tsk->tmp.lst.data = data;
 		}
 		else
 		{

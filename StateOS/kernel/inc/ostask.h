@@ -107,11 +107,7 @@ struct __tsk
 	}        flg;   // temporary data used by flag object
 
 	struct {
-	union  {
-	const
-	void  ** out;
-	void  ** in;
-	}        data;
+	void   * data;
 	}        lst;   // temporary data used by list / memory pool object
 
 	struct {
