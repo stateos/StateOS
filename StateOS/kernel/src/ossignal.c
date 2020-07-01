@@ -121,10 +121,9 @@ void sig_destroy( sig_t *sig )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_sig_take( sig_t *sig, unsigned sigset )
+int priv_sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned signo;
 	int result = E_TIMEOUT;
 
 	sigset &= sig->sigset;
@@ -132,8 +131,7 @@ int priv_sig_take( sig_t *sig, unsigned sigset )
 	if (sigset)
 	{
 		sig->sigset &= ~sigset | sig->mask;
-		for (signo = 0; sigset >>= 1; signo++);
-		System.cur->tmp.sig.signo = signo;
+		for (*signo = 0; sigset >>= 1; *signo += 1);
 		result = E_SUCCESS;
 	}
 
@@ -144,6 +142,7 @@ int priv_sig_take( sig_t *sig, unsigned sigset )
 int sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned n;
 	int result;
 
 	assert(sig);
@@ -151,9 +150,9 @@ int sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 
 	sys_lock();
 	{
-		result = priv_sig_take(sig, sigset);
+		result = priv_sig_take(sig, sigset, &n);
 		if (result == E_SUCCESS && signo != NULL)
-			*signo = System.cur->tmp.sig.signo;
+			*signo = n;
 	}
 	sys_unlock();
 
@@ -172,7 +171,7 @@ int sig_waitFor( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t delay )
 
 	sys_lock();
 	{
-		result = priv_sig_take(sig, sigset);
+		result = priv_sig_take(sig, sigset, &System.cur->tmp.sig.signo);
 
 		if (result == E_TIMEOUT)
 		{
@@ -200,7 +199,7 @@ int sig_waitUntil( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t time )
 
 	sys_lock();
 	{
-		result = priv_sig_take(sig, sigset);
+		result = priv_sig_take(sig, sigset, &System.cur->tmp.sig.signo);
 
 		if (result == E_TIMEOUT)
 		{
