@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    29.06.2020
+    @date    01.07.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -390,21 +390,20 @@ int flg_wait( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain ) { re
  * Parameters
  *   flg             : pointer to flag object
  *   flags           : all flags to set
- *   after           : pointer to flags after setting
  *
- * Return            : none
+ * Return            : flags after setting
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-void flg_give( flg_t *flg, unsigned flags, unsigned *after );
+unsigned flg_give( flg_t *flg, unsigned flags );
 
 __STATIC_INLINE
-void flg_set( flg_t *flg, unsigned flags, unsigned *after ) { flg_give(flg, flags, after); }
+unsigned flg_set( flg_t *flg, unsigned flags ) { return flg_give(flg, flags); }
 
 __STATIC_INLINE
-void flg_giveISR( flg_t *flg, unsigned flags, unsigned *after ) { flg_give(flg, flags, after); }
+unsigned flg_giveISR( flg_t *flg, unsigned flags ) { return flg_give(flg, flags); }
 
 /******************************************************************************
  *
@@ -416,18 +415,17 @@ void flg_giveISR( flg_t *flg, unsigned flags, unsigned *after ) { flg_give(flg, 
  * Parameters
  *   flg             : pointer to flag object
  *   flags           : all flags to clear
- *   before          : pointer to flags before clearing
  *
- * Return            : none
+ * Return            : flags before clearing
  *
  * Note              : may be used both in thread and handler mode
  *
  ******************************************************************************/
 
-void flg_clear( flg_t *flg, unsigned flags, unsigned *before );
+unsigned flg_clear( flg_t *flg, unsigned flags );
 
 __STATIC_INLINE
-void flg_clearISR( flg_t *flg, unsigned flags, unsigned *before ) { flg_clear(flg, flags, before); }
+unsigned flg_clearISR( flg_t *flg, unsigned flags ) { return flg_clear(flg, flags); }
 
 /******************************************************************************
  *
@@ -522,11 +520,11 @@ struct Flag : public __flg
 	template<typename T>
 	int      waitUntil( unsigned _flags, char _mode,          unsigned *_remain, const T _time )  { return flg_waitUntil(this, _flags, _mode, _remain, Clock::until(_time)); }
 	int      wait     ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_wait     (this, _flags, _mode, _remain); }
-	void     give     ( unsigned _flags,                      unsigned *_after  = nullptr )       {        flg_give     (this, _flags,        _after); }
-	void     set      ( unsigned _flags,                      unsigned *_after  = nullptr )       {        flg_set      (this, _flags,        _after); }
-	void     giveISR  ( unsigned _flags,                      unsigned *_after  = nullptr )       {        flg_giveISR  (this, _flags,        _after); }
-	void     clear    ( unsigned _flags,                      unsigned *_before = nullptr )       {        flg_clear    (this, _flags,        _before); }
-	void     clearISR ( unsigned _flags,                      unsigned *_before = nullptr )       {        flg_clearISR (this, _flags,        _before); }
+	unsigned give     ( unsigned _flags )                                                         { return flg_give     (this, _flags); }
+	unsigned set      ( unsigned _flags )                                                         { return flg_set      (this, _flags); }
+	unsigned giveISR  ( unsigned _flags )                                                         { return flg_giveISR  (this, _flags); }
+	unsigned clear    ( unsigned _flags )                                                         { return flg_clear    (this, _flags); }
+	unsigned clearISR ( unsigned _flags )                                                         { return flg_clearISR (this, _flags); }
 	unsigned get      ( void )                                                                    { return flg_get      (this); }
 	unsigned getISR   ( void )                                                                    { return flg_getISR   (this); }
 };

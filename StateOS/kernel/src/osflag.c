@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    29.06.2020
+    @date    01.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -221,9 +221,11 @@ int flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain, 
 }
 
 /* -------------------------------------------------------------------------- */
-void flg_give( flg_t *flg, unsigned flags, unsigned *after )
+unsigned flg_give( flg_t *flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned result;
+
 	obj_t *obj;
 	tsk_t *tsk;
 
@@ -252,28 +254,30 @@ void flg_give( flg_t *flg, unsigned flags, unsigned *after )
 			obj = &tsk->hdr.obj;
 		}
 
-	//	System.cur->tmp.flg.flags = flg->flags;
-		if (after != NULL)
-			*after = flg->flags;
+		result = flg->flags;
 	}
 	sys_unlock();
+
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-void flg_clear( flg_t *flg, unsigned flags, unsigned *before )
+unsigned flg_clear( flg_t *flg, unsigned flags )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned result;
+
 	assert(flg);
 	assert(flg->obj.res!=RELEASED);
 
 	sys_lock();
 	{
-	//	System.cur->tmp.flg.flags = flg->flags;
-		if (before != NULL)
-			*before = flg->flags;
+		result = flg->flags;
 		flg->flags &= ~flags;
 	}
 	sys_unlock();
+
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
