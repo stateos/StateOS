@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    28.06.2020
+    @date    01.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -196,9 +196,10 @@ void priv_stm_putUpdate( stm_t *stm, const char *data, size_t size )
 
 	while (stm->obj.queue != 0 && stm->count > 0)
 	{
-		if (stm->obj.queue->tmp.stm.size > stm->count)
-			stm->obj.queue->tmp.stm.size = stm->count;
-		priv_stm_get(stm, stm->obj.queue->tmp.stm.data.in, stm->obj.queue->tmp.stm.size);
+		size = stm->obj.queue->tmp.stm.size;
+		if (size > stm->count) size = stm->count;
+		stm->obj.queue->tmp.stm.size = size;
+		priv_stm_get(stm, stm->obj.queue->tmp.stm.data.in, size);
 		core_one_wakeup(stm->obj.queue, E_SUCCESS);
 	}
 }
@@ -222,12 +223,12 @@ void priv_stm_skipUpdate( stm_t *stm, size_t size )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_stm_take( stm_t *stm, char *data, size_t size )
+int priv_stm_take( stm_t *stm, char *data, size_t size, size_t *read )
 /* -------------------------------------------------------------------------- */
 {
 	if (stm->count > 0)
 	{
-		System.cur->tmp.stm.size = priv_stm_getUpdate(stm, data, size);
+		*read = priv_stm_getUpdate(stm, data, size);
 		return E_SUCCESS;
 	}
 
@@ -249,9 +250,10 @@ int stm_take( stm_t *stm, void *data, size_t size, size_t *read )
 
 	sys_lock();
 	{
-		result = priv_stm_take(stm, data, size);
+		result = priv_stm_take(stm, data, size, &size);
+
 		if (result == E_SUCCESS && read != NULL)
-			*read = System.cur->tmp.stm.size;
+			*read = size;
 	}
 	sys_unlock();
 
@@ -274,7 +276,7 @@ int stm_waitFor( stm_t *stm, void *data, size_t size, size_t *read, cnt_t delay 
 
 	sys_lock();
 	{
-		result = priv_stm_take(stm, data, size);
+		result = priv_stm_take(stm, data, size, &System.cur->tmp.stm.size);
 
 		if (result == E_TIMEOUT)
 		{
@@ -307,7 +309,7 @@ int stm_waitUntil( stm_t *stm, void *data, size_t size, size_t *read, cnt_t time
 
 	sys_lock();
 	{
-		result = priv_stm_take(stm, data, size);
+		result = priv_stm_take(stm, data, size, &System.cur->tmp.stm.size);
 
 		if (result == E_TIMEOUT)
 		{
