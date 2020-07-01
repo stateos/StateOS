@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    27.06.2020
+    @date    01.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -117,12 +117,12 @@ void lst_destroy( lst_t *lst )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_lst_take( lst_t *lst )
+int priv_lst_take( lst_t *lst, void **data )
 /* -------------------------------------------------------------------------- */
 {
-	if (lst->head.next)
+	if (lst->head.next != NULL)
 	{
-		System.cur->tmp.lst.data = lst->head.next + 1;
+		*data = lst->head.next + 1;
 		lst->head.next = lst->head.next->next;
 		return E_SUCCESS;
 	}
@@ -142,9 +142,7 @@ int lst_take( lst_t *lst, void **data )
 
 	sys_lock();
 	{
-		result = priv_lst_take(lst);
-		if (result == E_SUCCESS)
-			*data = System.cur->tmp.lst.data;
+		result = priv_lst_take(lst, data);
 	}
 	sys_unlock();
 
@@ -164,13 +162,15 @@ int lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 
 	sys_lock();
 	{
-		result = priv_lst_take(lst);
+		result = priv_lst_take(lst, data);
 
 		if (result == E_TIMEOUT)
+		{
 			result = core_tsk_waitFor(&lst->obj.queue, delay);
 
-		if (result == E_SUCCESS)
-			*data = System.cur->tmp.lst.data;
+			if (result == E_SUCCESS)
+				*data = System.cur->tmp.lst.data;
+		}
 	}
 	sys_unlock();
 
@@ -190,13 +190,15 @@ int lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 
 	sys_lock();
 	{
-		result = priv_lst_take(lst);
+		result = priv_lst_take(lst, data);
 
 		if (result == E_TIMEOUT)
+		{
 			result = core_tsk_waitUntil(&lst->obj.queue, time);
 
-		if (result == E_SUCCESS)
-			*data = System.cur->tmp.lst.data;
+			if (result == E_SUCCESS)
+				*data = System.cur->tmp.lst.data;
+		}
 	}
 	sys_unlock();
 
