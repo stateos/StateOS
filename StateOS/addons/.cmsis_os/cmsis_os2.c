@@ -546,7 +546,7 @@ uint32_t osThreadFlagsWait (uint32_t flags, uint32_t options, uint32_t timeout)
 	if ((flags & osFlagsError) != 0U)
 		return osFlagsErrorParameter;
 
-	switch (flg_waitFor(&thread->flg, flags, options, NULL, timeout))
+	switch (flg_waitFor(&thread->flg, flags, options, timeout))
 	{
 		case E_SUCCESS: return flags;
 		case E_TIMEOUT: return osFlagsErrorTimeout;
@@ -767,7 +767,7 @@ uint32_t osEventFlagsWait (osEventFlagsId_t ef_id, uint32_t flags, uint32_t opti
 	if ((IS_IRQ_MODE() || IS_IRQ_MASKED()) && (timeout != 0U))
 		return osFlagsErrorParameter;
 
-	switch (flg_waitFor(&ef->flg, flags, options, NULL, timeout))
+	switch (flg_waitFor(&ef->flg, flags, options, timeout))
 	{
 		case E_SUCCESS: return flags;
 		case E_TIMEOUT: return osFlagsErrorTimeout;

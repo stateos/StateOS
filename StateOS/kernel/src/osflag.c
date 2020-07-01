@@ -121,52 +121,46 @@ void flg_destroy( flg_t *flg )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_flg_take( flg_t *flg, unsigned flags, unsigned mode )
+unsigned priv_flg_take( flg_t *flg, unsigned flags, unsigned mode )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned value = flags;
+	unsigned result = flags;
 
 	if ((mode & flgIgnore) == 0)
 	{
-		flags &= ~flg->flags;
+		result &= ~flg->flags;
 		if ((mode & flgProtect) == 0)
-			flg->flags &= ~value;
+			flg->flags &= ~flags;
 	}
 
-	System.cur->tmp.flg.flags = flags;
+	if (result != flags && (mode & flgAll) == 0)
+		result = 0;
 
-	if (flags == 0 || (flags != value && (mode & flgAll) == 0))
-		return E_SUCCESS;
-
-	return E_TIMEOUT;
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
-int flg_take( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain )
+unsigned flg_take( flg_t *flg, unsigned flags, unsigned mode )
 /* -------------------------------------------------------------------------- */
 {
-	int result;
-
 	assert(flg);
 	assert(flg->obj.res!=RELEASED);
 	assert((mode & ~flgMASK) == 0);
 
 	sys_lock();
 	{
-		result = priv_flg_take(flg, flags, mode);
-		if (remain != NULL)
-			*remain = System.cur->tmp.flg.flags;
+		flags = priv_flg_take(flg, flags, mode);
 	}
 	sys_unlock();
 
-	return result;
+	return flags;
 }
 
 /* -------------------------------------------------------------------------- */
-int flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain, cnt_t delay )
+int flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
-	int result;
+	int result = E_SUCCESS;
 
 	assert_tsk_context();
 	assert(flg);
@@ -175,16 +169,14 @@ int flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain, cn
 
 	sys_lock();
 	{
-		result = priv_flg_take(flg, flags, mode);
+		flags = priv_flg_take(flg, flags, mode);
 
-		if (result == E_TIMEOUT)
+		if (flags != 0)
 		{
-			System.cur->tmp.flg.mode = mode;
+			System.cur->tmp.flg.flags = flags;
+			System.cur->tmp.flg.mode  = mode;
 			result = core_tsk_waitFor(&flg->obj.queue, delay);
 		}
-
-		if (remain != NULL)
-			*remain = System.cur->tmp.flg.flags;
 	}
 	sys_unlock();
 
@@ -192,10 +184,10 @@ int flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain, cn
 }
 
 /* -------------------------------------------------------------------------- */
-int flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain, cnt_t time )
+int flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
-	int result;
+	int result = E_SUCCESS;
 
 	assert_tsk_context();
 	assert(flg);
@@ -204,16 +196,14 @@ int flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, unsigned *remain, 
 
 	sys_lock();
 	{
-		result = priv_flg_take(flg, flags, mode);
+		flags = priv_flg_take(flg, flags, mode);
 
-		if (result == E_TIMEOUT)
+		if (flags != 0)
 		{
-			System.cur->tmp.flg.mode = mode;
+			System.cur->tmp.flg.flags = flags;
+			System.cur->tmp.flg.mode  = mode;
 			result = core_tsk_waitUntil(&flg->obj.queue, time);
 		}
-
-		if (remain != NULL)
-			*remain = System.cur->tmp.flg.flags;
 	}
 	sys_unlock();
 
