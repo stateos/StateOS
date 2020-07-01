@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.c
     @author  Rajmund Szymanski
-    @date    27.06.2020
+    @date    01.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -128,6 +128,7 @@ int evt_waitFor( evt_t *evt, unsigned *event, cnt_t delay )
 	sys_lock();
 	{
 		result = core_tsk_waitFor(&evt->obj.queue, delay);
+
 		if (result == E_SUCCESS && event != NULL)
 			*event = System.cur->tmp.evt.event;
 	}
@@ -149,6 +150,7 @@ int evt_waitUntil( evt_t *evt, unsigned *event, cnt_t time )
 	sys_lock();
 	{
 		result = core_tsk_waitUntil(&evt->obj.queue, time);
+
 		if (result == E_SUCCESS && event != NULL)
 			*event = System.cur->tmp.evt.event;
 	}
