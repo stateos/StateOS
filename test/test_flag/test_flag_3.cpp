@@ -19,7 +19,7 @@ static void give(Flag &Flg, unsigned bitfield, unsigned check)
 	{
 		flag  = bitfield & -bitfield;
 		bitfield -= flag;
-		Flg.give(flag, &flags);                   ASSERT(flags == check);
+		flags = Flg.give(flag);                   ASSERT(flags == check);
 	}
 }
 
@@ -30,7 +30,7 @@ static void proc3()
 
 	result = Flg3.wait(FLAG3, flgAll+flgProtect+flgIgnore);
 	                                              ASSERT_success(result);
-	         Flg2.give(FLAG2, &flags);            ASSERT(flags == FLAG2);
+	         flags = Flg2.give(FLAG2);            ASSERT(flags == FLAG2);
 	         ThisTask::stop();
 }
 
@@ -43,7 +43,7 @@ static void proc2()
 	result = Flg2.wait(FLAG2, flgAll);            ASSERT_success(result);
 	         give(Flg3, FLAG3, FLAG3);
 	result = Flg2.wait(FLAG2, flgAll);            ASSERT_success(result);
-	         Flg1.give(FLAG1, &flags);            ASSERT(flags == FLAG1);
+	         flags = Flg1.give(FLAG1);            ASSERT(flags == FLAG1);
 	result = Tsk3.join();                         ASSERT_success(result);
 	         ThisTask::stop();
 }
@@ -57,7 +57,7 @@ static void proc1()
 	result = Flg1.wait(FLAG1, flgAll);            ASSERT_success(result);
 	         give(Flg2, FLAG2, 0);
 	result = Flg1.wait(FLAG1, flgAll);            ASSERT_success(result);
-	         Flg0.give(FLAG0, &flags);            ASSERT(flags == FLAG0);
+	         flags = Flg0.give(FLAG0);            ASSERT(flags == FLAG0);
 	result = Tsk2.join();                         ASSERT_success(result);
 	         ThisTask::stop();
 }
