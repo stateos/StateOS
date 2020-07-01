@@ -512,9 +512,9 @@ struct Flag : public __flg
 	void     reset    ( void )                                                                    {        flg_reset    (this); }
 	void     kill     ( void )                                                                    {        flg_kill     (this); }
 	void     destroy  ( void )                                                                    {        flg_destroy  (this); }
-	unsigned take     ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_take     (this, _flags, _mode, _remain); }
-	unsigned tryWait  ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_tryWait  (this, _flags, _mode, _remain); }
-	unsigned takeISR  ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_takeISR  (this, _flags, _mode, _remain); }
+	int      take     ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_take     (this, _flags, _mode, _remain); }
+	int      tryWait  ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_tryWait  (this, _flags, _mode, _remain); }
+	int      takeISR  ( unsigned _flags, char _mode = flgAll, unsigned *_remain = nullptr )       { return flg_takeISR  (this, _flags, _mode, _remain); }
 	template<typename T>
 	int      waitFor  ( unsigned _flags, char _mode,          unsigned *_remain, const T _delay ) { return flg_waitFor  (this, _flags, _mode, _remain, Clock::count(_delay)); }
 	template<typename T>
