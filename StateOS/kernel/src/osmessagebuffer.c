@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    28.06.2020
+    @date    01.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -250,8 +250,9 @@ void priv_msg_putUpdate( msg_t *msg, const char *data, size_t size )
 	{
 		if (msg->obj.queue->tmp.msg.size >= priv_msg_size(msg))
 		{
-			msg->obj.queue->tmp.msg.size = priv_msg_getSize(msg);
-			priv_msg_get(msg, msg->obj.queue->tmp.msg.data.in, msg->obj.queue->tmp.msg.size);
+			size = priv_msg_getSize(msg);
+			msg->obj.queue->tmp.msg.size = size;
+			priv_msg_get(msg, msg->obj.queue->tmp.msg.data.in, size);
 			core_one_wakeup(msg->obj.queue, E_SUCCESS);
 		}
 		else
@@ -281,14 +282,14 @@ void priv_msg_skipUpdate( msg_t *msg, size_t size )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_msg_take( msg_t *msg, char *data, size_t size )
+int priv_msg_take( msg_t *msg, char *data, size_t size, size_t *read )
 /* -------------------------------------------------------------------------- */
 {
 	if (msg->count > 0)
 	{
 		if (size >= priv_msg_size(msg))
 		{
-			System.cur->tmp.msg.size = priv_msg_getUpdate(msg, data);
+			*read = priv_msg_getUpdate(msg, data);
 			return E_SUCCESS;
 		}
 
@@ -312,9 +313,10 @@ int msg_take( msg_t *msg, void *data, size_t size, size_t *read )
 
 	sys_lock();
 	{
-		result = priv_msg_take(msg, data, size);
+		result = priv_msg_take(msg, data, size, &size);
+
 		if (result == E_SUCCESS && read != NULL)
-			*read = System.cur->tmp.msg.size;
+			*read = size;
 	}
 	sys_unlock();
 
@@ -336,7 +338,7 @@ int msg_waitFor( msg_t *msg, void *data, size_t size, size_t *read, cnt_t delay 
 
 	sys_lock();
 	{
-		result = priv_msg_take(msg, data, size);
+		result = priv_msg_take(msg, data, size, &System.cur->tmp.msg.size);
 
 		if (result == E_TIMEOUT)
 		{
@@ -368,7 +370,7 @@ int msg_waitUntil( msg_t *msg, void *data, size_t size, size_t *read, cnt_t time
 
 	sys_lock();
 	{
-		result = priv_msg_take(msg, data, size);
+		result = priv_msg_take(msg, data, size, &System.cur->tmp.msg.size);
 
 		if (result == E_TIMEOUT)
 		{
