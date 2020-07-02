@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    27.06.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -124,25 +124,24 @@ static
 int priv_sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 /* -------------------------------------------------------------------------- */
 {
-	int result = E_TIMEOUT;
-
 	sigset &= sig->sigset;
 	sigset &= -sigset;
+
 	if (sigset)
 	{
 		sig->sigset &= ~sigset | sig->mask;
-		for (*signo = 0; sigset >>= 1; *signo += 1);
-		result = E_SUCCESS;
+		if (signo != NULL)
+			for (*signo = 0; sigset >>= 1; *signo += 1);
+		return E_SUCCESS;
 	}
 
-	return result;
+	return E_TIMEOUT;
 }
 
 /* -------------------------------------------------------------------------- */
 int sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned n;
 	int result;
 
 	assert(sig);
@@ -150,9 +149,7 @@ int sig_take( sig_t *sig, unsigned sigset, unsigned *signo )
 
 	sys_lock();
 	{
-		result = priv_sig_take(sig, sigset, &n);
-		if (result == E_SUCCESS && signo != NULL)
-			*signo = n;
+		result = priv_sig_take(sig, sigset, signo);
 	}
 	sys_unlock();
 
@@ -171,16 +168,14 @@ int sig_waitFor( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t delay )
 
 	sys_lock();
 	{
-		result = priv_sig_take(sig, sigset, &System.cur->tmp.sig.signo);
-
+		result = priv_sig_take(sig, sigset, signo);
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
 			result = core_tsk_waitFor(&sig->obj.queue, delay);
+			if (result == E_SUCCESS && signo != NULL)
+				*signo = System.cur->tmp.sig.signo;
 		}
-
-		if (result == E_SUCCESS && signo != NULL)
-			*signo = System.cur->tmp.sig.signo;
 	}
 	sys_unlock();
 
@@ -199,16 +194,14 @@ int sig_waitUntil( sig_t *sig, unsigned sigset, unsigned *signo, cnt_t time )
 
 	sys_lock();
 	{
-		result = priv_sig_take(sig, sigset, &System.cur->tmp.sig.signo);
-
+		result = priv_sig_take(sig, sigset, signo);
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.sig.sigset = sigset;
 			result = core_tsk_waitUntil(&sig->obj.queue, time);
+			if (result == E_SUCCESS && signo != NULL)
+				*signo = System.cur->tmp.sig.signo;
 		}
-
-		if (result == E_SUCCESS && signo != NULL)
-			*signo = System.cur->tmp.sig.signo;
 	}
 	sys_unlock();
 

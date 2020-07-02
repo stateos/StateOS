@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -163,7 +163,6 @@ int mut_waitFor( mut_t *mut, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_mut_take(mut);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitFor(&mut->obj.queue, delay);
 	}
@@ -185,7 +184,6 @@ int mut_waitUntil( mut_t *mut, cnt_t time )
 	sys_lock();
 	{
 		result = priv_mut_take(mut);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitUntil(&mut->obj.queue, time);
 	}

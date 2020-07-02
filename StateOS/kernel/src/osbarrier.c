@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -126,7 +126,6 @@ int priv_bar_take( bar_t *bar )
 	if (core_tsk_count(bar->obj.queue) + 1 == bar->limit)
 	{
 		core_all_wakeup(bar->obj.queue, E_SUCCESS);
-
 		return E_SUCCESS;
 	}
 
@@ -147,7 +146,6 @@ int bar_waitFor( bar_t *bar, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_bar_take(bar);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitFor(&bar->obj.queue, delay);
 	}
@@ -170,7 +168,6 @@ int bar_waitUntil( bar_t *bar, cnt_t time )
 	sys_lock();
 	{
 		result = priv_bar_take(bar);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitUntil(&bar->obj.queue, time);
 	}

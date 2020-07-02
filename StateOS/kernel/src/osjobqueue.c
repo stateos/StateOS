@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    01.07.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -134,7 +134,8 @@ fun_t *priv_job_get( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
 	unsigned i = job->head;
-	fun_t  * fun = job->data[i++];
+
+	fun_t *fun = job->data[i++];
 
 	job->head = (i < job->limit) ? i : 0;
 	job->count--;
@@ -171,8 +172,11 @@ static
 fun_t *priv_job_getUpdate( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
+	tsk_t *tsk;
+
 	fun_t *fun = priv_job_get(job);
-	tsk_t *tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
+
+	tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
 	if (tsk) priv_job_put(job, tsk->tmp.job.fun);
 
 	return fun;
@@ -186,6 +190,7 @@ void priv_job_putUpdate( job_t *job, fun_t *fun )
 	tsk_t *tsk;
 
 	priv_job_put(job, fun);
+
 	tsk = core_one_wakeup(job->obj.queue, E_SUCCESS);
 	if (tsk) tsk->tmp.job.fun = priv_job_get(job);
 }
@@ -258,7 +263,6 @@ int job_waitFor( job_t *job, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_job_take(job, &System.cur->tmp.job.fun);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitFor(&job->obj.queue, delay);
 	}
@@ -285,7 +289,6 @@ int job_waitUntil( job_t *job, cnt_t time )
 	sys_lock();
 	{
 		result = priv_job_take(job, &System.cur->tmp.job.fun);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitUntil(&job->obj.queue, time);
 	}
@@ -348,7 +351,6 @@ int job_sendFor( job_t *job, fun_t *fun, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_job_give(job, fun);
-
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.job.fun = fun;
@@ -376,7 +378,6 @@ int job_sendUntil( job_t *job, fun_t *fun, cnt_t time )
 	sys_lock();
 	{
 		result = priv_job_give(job, fun);
-
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.job.fun = fun;

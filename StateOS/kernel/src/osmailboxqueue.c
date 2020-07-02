@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -259,7 +259,6 @@ int box_waitFor( box_t *box, void *data, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_box_take(box, data);
-
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.in = data;
@@ -287,7 +286,6 @@ int box_waitUntil( box_t *box, void *data, cnt_t time )
 	sys_lock();
 	{
 		result = priv_box_take(box, data);
-
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.in = data;
@@ -350,7 +348,6 @@ int box_sendFor( box_t *box, const void *data, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_box_give(box, data);
-
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.out = data;
@@ -378,7 +375,6 @@ int box_sendUntil( box_t *box, const void *data, cnt_t time )
 	sys_lock();
 	{
 		result = priv_box_give(box, data);
-
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.box.data.out = data;

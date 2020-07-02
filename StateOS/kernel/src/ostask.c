@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    26.06.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -539,7 +539,7 @@ void tsk_sleepUntil( cnt_t time )
 int tsk_suspend( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	int result;
+	int result = E_FAILURE;
 
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
@@ -551,8 +551,6 @@ int tsk_suspend( tsk_t *tsk )
 			core_tsk_suspend(tsk);
 			result = E_SUCCESS;
 		}
-		else
-			result = E_FAILURE;
 	}
 	sys_unlock();
 
@@ -563,7 +561,7 @@ int tsk_suspend( tsk_t *tsk )
 int tsk_resume( tsk_t *tsk )
 /* -------------------------------------------------------------------------- */
 {
-	int result;
+	int result = E_FAILURE;
 
 	assert(tsk);
 	assert(tsk->hdr.obj.res!=RELEASED);
@@ -575,8 +573,6 @@ int tsk_resume( tsk_t *tsk )
 			core_tsk_wakeup(tsk, 0); // ignored event value
 			result = E_SUCCESS;
 		}
-		else
-			result = E_FAILURE;
 	}
 	sys_unlock();
 

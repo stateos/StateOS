@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -252,7 +252,6 @@ int tmr_waitFor( tmr_t *tmr, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_tmr_take(tmr);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitFor(&tmr->hdr.obj.queue, delay);
 	}
@@ -274,7 +273,6 @@ int tmr_waitNext( tmr_t *tmr, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_tmr_take(tmr);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitNext(&tmr->hdr.obj.queue, delay);
 	}
@@ -296,7 +294,6 @@ int tmr_waitUntil( tmr_t *tmr, cnt_t time )
 	sys_lock();
 	{
 		result = priv_tmr_take(tmr);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitUntil(&tmr->hdr.obj.queue, time);
 	}

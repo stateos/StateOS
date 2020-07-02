@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    01.07.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -170,7 +170,6 @@ int flg_waitFor( flg_t *flg, unsigned flags, unsigned mode, cnt_t delay )
 	sys_lock();
 	{
 		flags = priv_flg_take(flg, flags, mode);
-
 		if (flags != 0)
 		{
 			System.cur->tmp.flg.flags = flags;
@@ -197,7 +196,6 @@ int flg_waitUntil( flg_t *flg, unsigned flags, unsigned mode, cnt_t time )
 	sys_lock();
 	{
 		flags = priv_flg_take(flg, flags, mode);
-
 		if (flags != 0)
 		{
 			System.cur->tmp.flg.flags = flags;

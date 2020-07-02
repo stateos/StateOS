@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.c
     @author  Rajmund Szymanski
-    @date    01.07.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -289,7 +289,9 @@ int priv_msg_take( msg_t *msg, char *data, size_t size, size_t *read )
 	{
 		if (size >= priv_msg_size(msg))
 		{
-			*read = priv_msg_getUpdate(msg, data);
+			size = priv_msg_getUpdate(msg, data);
+			if (read != NULL)
+				*read = size;
 			return E_SUCCESS;
 		}
 
@@ -313,10 +315,7 @@ int msg_take( msg_t *msg, void *data, size_t size, size_t *read )
 
 	sys_lock();
 	{
-		result = priv_msg_take(msg, data, size, &size);
-
-		if (result == E_SUCCESS && read != NULL)
-			*read = size;
+		result = priv_msg_take(msg, data, size, read);
 	}
 	sys_unlock();
 
@@ -338,17 +337,15 @@ int msg_waitFor( msg_t *msg, void *data, size_t size, size_t *read, cnt_t delay 
 
 	sys_lock();
 	{
-		result = priv_msg_take(msg, data, size, &System.cur->tmp.msg.size);
-
+		result = priv_msg_take(msg, data, size, read);
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.in = data;
 			System.cur->tmp.msg.size = size;
 			result = core_tsk_waitFor(&msg->obj.queue, delay);
+			if (result == E_SUCCESS && read != NULL)
+				*read = System.cur->tmp.msg.size;
 		}
-
-		if (result == E_SUCCESS && read != NULL)
-			*read = System.cur->tmp.msg.size;
 	}
 	sys_unlock();
 
@@ -370,17 +367,15 @@ int msg_waitUntil( msg_t *msg, void *data, size_t size, size_t *read, cnt_t time
 
 	sys_lock();
 	{
-		result = priv_msg_take(msg, data, size, &System.cur->tmp.msg.size);
-
+		result = priv_msg_take(msg, data, size, read);
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.in = data;
 			System.cur->tmp.msg.size = size;
 			result = core_tsk_waitUntil(&msg->obj.queue, time);
+			if (result == E_SUCCESS && read != NULL)
+				*read = System.cur->tmp.msg.size;
 		}
-
-		if (result == E_SUCCESS && read != NULL)
-			*read = System.cur->tmp.msg.size;
 	}
 	sys_unlock();
 
@@ -441,7 +436,6 @@ int msg_sendFor( msg_t *msg, const void *data, size_t size, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_msg_give(msg, data, size);
-
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.out = data;
@@ -470,7 +464,6 @@ int msg_sendUntil( msg_t *msg, const void *data, size_t size, cnt_t time )
 	sys_lock();
 	{
 		result = priv_msg_give(msg, data, size);
-
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.msg.data.out = data;

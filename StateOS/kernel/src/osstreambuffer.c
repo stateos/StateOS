@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.c
     @author  Rajmund Szymanski
-    @date    01.07.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -228,7 +228,9 @@ int priv_stm_take( stm_t *stm, char *data, size_t size, size_t *read )
 {
 	if (stm->count > 0)
 	{
-		*read = priv_stm_getUpdate(stm, data, size);
+		size = priv_stm_getUpdate(stm, data, size);
+		if (read != NULL)
+			*read = size;
 		return E_SUCCESS;
 	}
 
@@ -250,10 +252,7 @@ int stm_take( stm_t *stm, void *data, size_t size, size_t *read )
 
 	sys_lock();
 	{
-		result = priv_stm_take(stm, data, size, &size);
-
-		if (result == E_SUCCESS && read != NULL)
-			*read = size;
+		result = priv_stm_take(stm, data, size, read);
 	}
 	sys_unlock();
 
@@ -276,17 +275,15 @@ int stm_waitFor( stm_t *stm, void *data, size_t size, size_t *read, cnt_t delay 
 
 	sys_lock();
 	{
-		result = priv_stm_take(stm, data, size, &System.cur->tmp.stm.size);
-
+		result = priv_stm_take(stm, data, size, read);
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.in = data;
 			System.cur->tmp.stm.size = size;
 			result = core_tsk_waitFor(&stm->obj.queue, delay);
+			if (result == E_SUCCESS && read != NULL)
+				*read = System.cur->tmp.stm.size;
 		}
-
-		if (result == E_SUCCESS && read != NULL)
-			*read = System.cur->tmp.stm.size;
 	}
 	sys_unlock();
 
@@ -309,17 +306,15 @@ int stm_waitUntil( stm_t *stm, void *data, size_t size, size_t *read, cnt_t time
 
 	sys_lock();
 	{
-		result = priv_stm_take(stm, data, size, &System.cur->tmp.stm.size);
-
+		result = priv_stm_take(stm, data, size, read);
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.in = data;
 			System.cur->tmp.stm.size = size;
 			result = core_tsk_waitUntil(&stm->obj.queue, time);
+			if (result == E_SUCCESS && read != NULL)
+				*read = System.cur->tmp.stm.size;
 		}
-
-		if (result == E_SUCCESS && read != NULL)
-			*read = System.cur->tmp.stm.size;
 	}
 	sys_unlock();
 
@@ -382,7 +377,6 @@ int stm_sendFor( stm_t *stm, const void *data, size_t size, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_stm_give(stm, data, size);
-
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.out = data;
@@ -412,7 +406,6 @@ int stm_sendUntil( stm_t *stm, const void *data, size_t size, cnt_t time )
 	sys_lock();
 	{
 		result = priv_stm_give(stm, data, size);
-
 		if (result == E_TIMEOUT)
 		{
 			System.cur->tmp.stm.data.out = data;

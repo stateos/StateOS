@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.c
     @author  Rajmund Szymanski
-    @date    24.06.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -124,7 +124,6 @@ void mtx_setPrio( mtx_t *mtx, unsigned prio )
 	sys_lock();
 	{
 		mtx->prio = prio;
-
 		if ((mtx->mode & mtxPrioMASK) == mtxPrioProtect)
 			while (mtx->obj.queue && mtx->obj.queue->prio > prio)
 				core_one_wakeup(mtx->obj.queue, E_FAILURE);
@@ -224,7 +223,6 @@ int mtx_waitFor( mtx_t *mtx, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_mtx_take(mtx);
-
 		if (result == E_TIMEOUT)
 		{
 			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && mtx->owner->prio < System.cur->prio)
@@ -256,7 +254,6 @@ int mtx_waitUntil( mtx_t *mtx, cnt_t time )
 	sys_lock();
 	{
 		result = priv_mtx_take(mtx);
-
 		if (result == E_TIMEOUT)
 		{
 			if ((mtx->mode & mtxPrioMASK) != mtxPrioNone && mtx->owner->prio < System.cur->prio)

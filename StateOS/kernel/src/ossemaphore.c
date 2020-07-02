@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    26.06.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -165,7 +165,6 @@ int sem_waitFor( sem_t *sem, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_sem_take(sem);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitFor(&sem->obj.queue, delay);
 	}
@@ -188,7 +187,6 @@ int sem_waitUntil( sem_t *sem, cnt_t time )
 	sys_lock();
 	{
 		result = priv_sem_take(sem);
-
 		if (result == E_TIMEOUT)
 			result = core_tsk_waitUntil(&sem->obj.queue, time);
 	}

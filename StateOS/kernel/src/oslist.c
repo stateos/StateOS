@@ -2,7 +2,7 @@
 
     @file    StateOS: oslist.c
     @author  Rajmund Szymanski
-    @date    01.07.2020
+    @date    02.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -163,11 +163,9 @@ int lst_waitFor( lst_t *lst, void **data, cnt_t delay )
 	sys_lock();
 	{
 		result = priv_lst_take(lst, data);
-
 		if (result == E_TIMEOUT)
 		{
 			result = core_tsk_waitFor(&lst->obj.queue, delay);
-
 			if (result == E_SUCCESS)
 				*data = System.cur->tmp.lst.data;
 		}
@@ -191,11 +189,9 @@ int lst_waitUntil( lst_t *lst, void **data, cnt_t time )
 	sys_lock();
 	{
 		result = priv_lst_take(lst, data);
-
 		if (result == E_TIMEOUT)
 		{
 			result = core_tsk_waitUntil(&lst->obj.queue, time);
-
 			if (result == E_SUCCESS)
 				*data = System.cur->tmp.lst.data;
 		}
@@ -219,7 +215,6 @@ void lst_give( lst_t *lst, void *data )
 	sys_lock();
 	{
 		tsk = core_one_wakeup(lst->obj.queue, E_SUCCESS);
-
 		if (tsk)
 		{
 			tsk->tmp.lst.data = data;
