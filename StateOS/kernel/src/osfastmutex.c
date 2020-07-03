@@ -2,7 +2,7 @@
 
     @file    StateOS: osfastmutex.c
     @author  Rajmund Szymanski
-    @date    02.07.2020
+    @date    03.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -119,7 +119,7 @@ static
 int priv_mut_take( mut_t *mut )
 /* -------------------------------------------------------------------------- */
 {
-	if (mut->owner == 0)
+	if (mut->owner == NULL)
 	{
 		mut->owner = System.cur;
 		return E_SUCCESS;
