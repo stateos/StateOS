@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    14.05.2020
+    @date    06.07.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -58,6 +58,7 @@
 #include "inc/osmutex.h"
 #include "inc/osfastmutex.h"
 #include "inc/osconditionvariable.h"
+#include "inc/osrwlock.h"
 #include "inc/oslist.h"
 #include "inc/osmemorypool.h"
 #include "inc/osstreambuffer.h"

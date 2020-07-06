@@ -38,6 +38,7 @@ Building an application for a specific compiler is realised using the appropriat
 - mutexes with configurable type, protocol and robustness
 - fast mutexes (error checking)
 - condition variables
+- read/write locks
 - memory pools
 - stream buffers
 - message buffers
