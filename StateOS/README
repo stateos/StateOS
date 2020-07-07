@@ -73,6 +73,7 @@ Features:
 - updated stream buffer functions
 - changed type of system functions result (int)
 - added read/write lock
+- added lock guard
 ---------
 6.6
 - updated os version

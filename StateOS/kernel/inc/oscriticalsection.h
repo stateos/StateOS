@@ -2,7 +2,7 @@
 
     @file    StateOS: oscriticalsection.h
     @author  Rajmund Szymanski
-    @date    09.05.2020
+    @date    07.07.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -201,6 +201,33 @@ struct CriticalSection
 
 	private:
 	lck_t lck_;
+};
+
+/******************************************************************************
+ *
+ * Class             : Lock
+ *
+ * Description       : create and initialize a guard object
+ *
+ * Constructor parameters
+ *   T               : guard class
+ *
+ ******************************************************************************/
+
+template<class T>
+struct Lock
+{
+	 Lock( T &_lck ): lck_(_lck), result_(lck_.lock()) { assert(result_==E_SUCCESS); }
+	~Lock( void ) { if (result_ == E_SUCCESS) lck_.unlock(); }
+
+	Lock( Lock&& ) = default;
+	Lock( const Lock& ) = delete;
+	Lock& operator=( Lock&& ) = delete;
+	Lock& operator=( const Lock& ) = delete;
+
+	private:
+	T &lck_;
+	const int result_;
 };
 
 #endif//__cplusplus
