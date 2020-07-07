@@ -250,7 +250,7 @@ int rwl_tryLockRead( rwl_t *rwl ) { return rwl_takeRead(rwl); }
 
 /******************************************************************************
  *
- * Name              : rwl_waitForRead
+ * Name              : rwl_waitReadFor
  *
  * Description       : try to lock the reader,
  *                     wait for given duration of time if the reader can't be locked immediately
@@ -271,11 +271,11 @@ int rwl_tryLockRead( rwl_t *rwl ) { return rwl_takeRead(rwl); }
  *
  ******************************************************************************/
 
-int rwl_waitForRead( rwl_t *rwl, cnt_t delay );
+int rwl_waitReadFor( rwl_t *rwl, cnt_t delay );
 
 /******************************************************************************
  *
- * Name              : rwl_waitUntilRead
+ * Name              : rwl_waitReadUntil
  *
  * Description       : try to lock the reader,
  *                     wait until given timepoint if the reader can't be locked immediately
@@ -294,7 +294,7 @@ int rwl_waitForRead( rwl_t *rwl, cnt_t delay );
  *
  ******************************************************************************/
 
-int rwl_waitUntilRead( rwl_t *rwl, cnt_t time );
+int rwl_waitReadUntil( rwl_t *rwl, cnt_t time );
 
 /******************************************************************************
  *
@@ -317,7 +317,7 @@ int rwl_waitUntilRead( rwl_t *rwl, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-int rwl_waitRead( rwl_t *rwl ) { return rwl_waitForRead(rwl, INFINITE); }
+int rwl_waitRead( rwl_t *rwl ) { return rwl_waitReadFor(rwl, INFINITE); }
 
 __STATIC_INLINE
 int rwl_lockRead( rwl_t *rwl ) { return rwl_waitRead(rwl); }
@@ -370,7 +370,7 @@ int rwl_tryLockWrite( rwl_t *rwl ) { return rwl_takeWrite(rwl); }
 
 /******************************************************************************
  *
- * Name              : rwl_waitForWrite
+ * Name              : rwl_waitWriteFor
  *
  * Description       : try to lock the writer,
  *                     wait for given duration of time if the writer can't be locked immediately
@@ -392,11 +392,11 @@ int rwl_tryLockWrite( rwl_t *rwl ) { return rwl_takeWrite(rwl); }
  *
  ******************************************************************************/
 
-int rwl_waitForWrite( rwl_t *rwl, cnt_t delay );
+int rwl_waitWriteFor( rwl_t *rwl, cnt_t delay );
 
 /******************************************************************************
  *
- * Name              : rwl_waitUntilWrite
+ * Name              : rwl_waitWriteUntil
  *
  * Description       : try to lock the writer,
  *                     wait until given timepoint if the writer can't be locked immediately
@@ -416,7 +416,7 @@ int rwl_waitForWrite( rwl_t *rwl, cnt_t delay );
  *
  ******************************************************************************/
 
-int rwl_waitUntilWrite( rwl_t *rwl, cnt_t time );
+int rwl_waitWriteUntil( rwl_t *rwl, cnt_t time );
 
 /******************************************************************************
  *
@@ -440,7 +440,7 @@ int rwl_waitUntilWrite( rwl_t *rwl, cnt_t time );
  ******************************************************************************/
 
 __STATIC_INLINE
-int rwl_waitWrite( rwl_t *rwl ) { return rwl_waitForWrite(rwl, INFINITE); }
+int rwl_waitWrite( rwl_t *rwl ) { return rwl_waitWriteFor(rwl, INFINITE); }
 
 __STATIC_INLINE
 int rwl_lockWrite( rwl_t *rwl ) { return rwl_waitWrite(rwl); }
@@ -535,9 +535,9 @@ struct RWLock : public __rwl
 	int  takeRead      ( void )           { return rwl_takeRead      (this); }
 	int  tryLockRead   ( void )           { return rwl_tryLockRead   (this); }
 	template<typename T>
-	int  waitForRead   ( const T _delay ) { return rwl_waitForRead   (this, Clock::count(_delay)); }
+	int  waitReadFor   ( const T _delay ) { return rwl_waitReadFor   (this, Clock::count(_delay)); }
 	template<typename T>
-	int  waitUntilRead ( const T _time )  { return rwl_waitUntilRead (this, Clock::until(_time)); }
+	int  waitReadUntil ( const T _time )  { return rwl_waitReadUntil (this, Clock::until(_time)); }
 	int  waitRead      ( void )           { return rwl_waitRead      (this); }
 	int  lockRead      ( void )           { return rwl_lockRead      (this); }
 	void giveRead      ( void )           {        rwl_giveRead      (this); }
@@ -545,9 +545,9 @@ struct RWLock : public __rwl
 	int  takeWrite     ( void )           { return rwl_takeWrite     (this); }
 	int  tryLockWrite  ( void )           { return rwl_tryLockWrite  (this); }
 	template<typename T>
-	int  waitForWrite  ( const T _delay ) { return rwl_waitForWrite  (this, Clock::count(_delay)); }
+	int  waitWriteFor  ( const T _delay ) { return rwl_waitWriteFor  (this, Clock::count(_delay)); }
 	template<typename T>
-	int  waitUntilWrite( const T _time )  { return rwl_waitUntilWrite(this, Clock::until(_time)); }
+	int  waitWriteUntil( const T _time )  { return rwl_waitWriteUntil(this, Clock::until(_time)); }
 	int  waitWrite     ( void )           { return rwl_waitWrite     (this); }
 	int  lockWrite     ( void )           { return rwl_lockWrite     (this); }
 	int  giveWrite     ( void )           { return rwl_giveWrite     (this); }

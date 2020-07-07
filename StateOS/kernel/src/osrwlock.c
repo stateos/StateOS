@@ -2,7 +2,7 @@
 
     @file    StateOS: osrwlock.c
     @author  Rajmund Szymanski
-    @date    06.07.2020
+    @date    07.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -147,7 +147,7 @@ int rwl_takeRead( rwl_t *rwl )
 }
 
 /* -------------------------------------------------------------------------- */
-int rwl_waitForRead( rwl_t *rwl, cnt_t delay )
+int rwl_waitReadFor( rwl_t *rwl, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -168,7 +168,7 @@ int rwl_waitForRead( rwl_t *rwl, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-int rwl_waitUntilRead( rwl_t *rwl, cnt_t time )
+int rwl_waitReadUntil( rwl_t *rwl, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -250,7 +250,7 @@ int rwl_takeWrite( rwl_t *rwl )
 }
 
 /* -------------------------------------------------------------------------- */
-int rwl_waitForWrite( rwl_t *rwl, cnt_t delay )
+int rwl_waitWriteFor( rwl_t *rwl, cnt_t delay )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
@@ -271,7 +271,7 @@ int rwl_waitForWrite( rwl_t *rwl, cnt_t delay )
 }
 
 /* -------------------------------------------------------------------------- */
-int rwl_waitUntilWrite( rwl_t *rwl, cnt_t time )
+int rwl_waitWriteUntil( rwl_t *rwl, cnt_t time )
 /* -------------------------------------------------------------------------- */
 {
 	int result;
