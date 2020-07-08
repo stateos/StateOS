@@ -2,7 +2,7 @@
 
     @file    StateOS: osrwlock.h
     @author  Rajmund Szymanski
-    @date    07.07.2020
+    @date    08.07.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -35,6 +35,10 @@
 #include "oskernel.h"
 #include "osclock.h"
 
+/* -------------------------------------------------------------------------- */
+
+#define RDR_LIMIT    ( 0U-1 )
+
 /******************************************************************************
  *
  * Name              : read/write lock (one write, many read)
@@ -47,9 +51,8 @@ struct __rwl
 {
 	obj_t    obj;   // object header
 
-	tsk_t  * owner; // writer
-
 	tsk_t  * queue; // readers queue
+	bool     write; // writer is active
 	unsigned count; // number of active readers
 };
 
@@ -71,7 +74,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define               _RWL_INIT() { _OBJ_INIT(), NULL, NULL, 0 }
+#define               _RWL_INIT() { _OBJ_INIT(), NULL, false, 0 }
 
 /******************************************************************************
  *
@@ -356,7 +359,6 @@ void rwl_unlockRead( rwl_t *rwl ) { rwl_giveRead(rwl); }
  *
  * Return
  *   E_SUCCESS       : writer was successfully locked
- *   E_FAILURE       : writer can't be locked by owner task
  *   E_TIMEOUT       : writer can't be locked immediately, try again
  *
  * Note              : use only in thread mode
@@ -383,7 +385,6 @@ int rwl_tryLockWrite( rwl_t *rwl ) { return rwl_takeWrite(rwl); }
  *
  * Return
  *   E_SUCCESS       : writer was successfully locked
- *   E_FAILURE       : writer can't be locked by owner task
  *   E_STOPPED       : writer was reseted before the specified timeout expired
  *   E_DELETED       : writer was deleted before the specified timeout expired
  *   E_TIMEOUT       : writer was not locked before the specified timeout expired
@@ -407,7 +408,6 @@ int rwl_waitWriteFor( rwl_t *rwl, cnt_t delay );
  *
  * Return
  *   E_SUCCESS       : writer was successfully locked
- *   E_FAILURE       : writer can't be locked by owner task
  *   E_STOPPED       : writer was reseted before the specified timeout expired
  *   E_DELETED       : writer was deleted before the specified timeout expired
  *   E_TIMEOUT       : writer was not locked before the specified timeout expired
@@ -431,7 +431,6 @@ int rwl_waitWriteUntil( rwl_t *rwl, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : writer was successfully locked
- *   E_FAILURE       : writer can't be locked by owner task
  *   E_STOPPED       : writer was reseted
  *   E_DELETED       : writer was deleted
  *
@@ -450,24 +449,21 @@ int rwl_lockWrite( rwl_t *rwl ) { return rwl_waitWrite(rwl); }
  * Name              : rwl_giveWrite
  * Alias             : rwl_unlockWrite
  *
- * Description       : try to unlock the writer (only owner task can unlock writer),
- *                     don't wait if the writer can't be unlocked
+ * Description       : unlock the writer
  *
  * Parameters
  *   rwl             : pointer to read/write lock object
  *
- * Return
- *   E_SUCCESS       : writer was successfully unlocked
- *   E_FAILURE       : writer can't be unlocked
+ * Return            : none
  *
  * Note              : use only in thread mode
  *
  ******************************************************************************/
 
-int rwl_giveWrite( rwl_t *rwl );
+void rwl_giveWrite( rwl_t *rwl );
 
 __STATIC_INLINE
-int rwl_unlockWrite( rwl_t *rwl ) { return rwl_giveWrite(rwl); }
+void rwl_unlockWrite( rwl_t *rwl ) { rwl_giveWrite(rwl); }
 
 #ifdef __cplusplus
 }
@@ -498,7 +494,7 @@ struct RWLock : public __rwl
 	RWLock& operator=( RWLock&& ) = delete;
 	RWLock& operator=( const RWLock& ) = delete;
 
-	~RWLock( void ) { assert(__rwl::owner == nullptr && __rwl::count == 0); }
+	~RWLock( void ) { assert(__rwl::write == false && __rwl::count == 0); }
 
 #if __cplusplus >= 201402
 	using Ptr = std::unique_ptr<RWLock>;
@@ -550,8 +546,8 @@ struct RWLock : public __rwl
 	int  waitWriteUntil( const T _time )  { return rwl_waitWriteUntil(this, Clock::until(_time)); }
 	int  waitWrite     ( void )           { return rwl_waitWrite     (this); }
 	int  lockWrite     ( void )           { return rwl_lockWrite     (this); }
-	int  giveWrite     ( void )           { return rwl_giveWrite     (this); }
-	int  unlockWrite   ( void )           { return rwl_unlockWrite   (this); }
+	void giveWrite     ( void )           {        rwl_giveWrite     (this); }
+	void unlockWrite   ( void )           {        rwl_unlockWrite   (this); }
 };
 
 /******************************************************************************

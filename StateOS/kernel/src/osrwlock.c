@@ -2,7 +2,7 @@
 
     @file    StateOS: osrwlock.c
     @author  Rajmund Szymanski
-    @date    07.07.2020
+    @date    08.07.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -120,7 +120,7 @@ static
 int priv_rwl_takeRead( rwl_t *rwl )
 /* -------------------------------------------------------------------------- */
 {
-	if (rwl->owner != NULL)
+	if (rwl->write || rwl->count == RDR_LIMIT )
 		return E_TIMEOUT;
 
 	rwl->count++;
@@ -193,9 +193,10 @@ static
 void priv_rwl_giveRead( rwl_t *rwl )
 /* -------------------------------------------------------------------------- */
 {
-	rwl->count--;
-	if (rwl->count == 0)
-		rwl->owner = core_one_wakeup(rwl->obj.queue, E_SUCCESS);
+	if (core_one_wakeup(rwl->queue, E_SUCCESS) == NULL)
+		if (--rwl->count == 0)
+			if (core_one_wakeup(rwl->obj.queue, E_SUCCESS) != NULL)
+				rwl->write = true;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -205,7 +206,7 @@ void rwl_giveRead( rwl_t *rwl )
 	assert_tsk_context();
 	assert(rwl);
 	assert(rwl->obj.res!=RELEASED);
-	assert(rwl->owner==NULL);
+	assert(rwl->write==false);
 	assert(rwl->count>0);
 
 	sys_lock();
@@ -220,13 +221,10 @@ static
 int priv_rwl_takeWrite( rwl_t *rwl )
 /* -------------------------------------------------------------------------- */
 {
-	if (rwl->owner == System.cur)
-		return E_FAILURE;
-
-	if (rwl->owner != NULL || rwl->count > 0)
+	if (rwl->write || rwl->count > 0)
 		return E_TIMEOUT;
 
-	rwl->owner = System.cur;
+	rwl->write = true;
 	return E_SUCCESS;
 }
 
@@ -293,42 +291,32 @@ int rwl_waitWriteUntil( rwl_t *rwl, cnt_t time )
 
 /* -------------------------------------------------------------------------- */
 static
-int priv_rwl_giveWrite( rwl_t *rwl )
+void priv_rwl_giveWrite( rwl_t *rwl )
 /* -------------------------------------------------------------------------- */
 {
-	if (rwl->owner == System.cur)
+	if (core_one_wakeup(rwl->obj.queue, E_SUCCESS) == NULL)
 	{
-		rwl->owner = core_one_wakeup(rwl->obj.queue, E_SUCCESS);
-		if (rwl->owner == NULL)
-		{
-			rwl->count = core_tsk_count(rwl->queue);
-			core_all_wakeup(rwl->queue, E_SUCCESS);
-		}
-
-		return E_SUCCESS;
+		rwl->write = false;
+		rwl->count = core_tsk_count(rwl->queue);
+		core_all_wakeup(rwl->queue, E_SUCCESS);
 	}
-
-	return E_FAILURE;
 }
 
 /* -------------------------------------------------------------------------- */
-int rwl_giveWrite( rwl_t *rwl )
+void rwl_giveWrite( rwl_t *rwl )
 /* -------------------------------------------------------------------------- */
 {
-	int result;
-
 	assert_tsk_context();
 	assert(rwl);
 	assert(rwl->obj.res!=RELEASED);
+	assert(rwl->write==true);
 	assert(rwl->count==0);
 
 	sys_lock();
 	{
-		result = priv_rwl_giveWrite(rwl);
+		priv_rwl_giveWrite(rwl);
 	}
 	sys_unlock();
-
-	return result;
 }
 
 /* -------------------------------------------------------------------------- */
