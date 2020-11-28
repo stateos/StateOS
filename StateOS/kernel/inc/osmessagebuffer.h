@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    26.06.2020
+    @date    28.11.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -314,7 +314,7 @@ int msg_takeISR( msg_t *msg, void *data, size_t size, size_t *read ) { return ms
  * Parameters
  *   msg             : pointer to message buffer object
  *   data            : pointer to the buffer
- *   size            : pointer to the variable containing size of the buffer
+ *   size            : size of the buffer
  *   read            : pointer to the variable getting number of read bytes
  *   delay           : duration of time (maximum number of ticks to wait while the message buffer object is empty)
  *                     IMMEDIATE: don't wait if the message buffer object is empty
@@ -343,7 +343,7 @@ int msg_waitFor( msg_t *msg, void *data, size_t size, size_t *read, cnt_t delay 
  * Parameters
  *   msg             : pointer to message buffer object
  *   data            : pointer to the buffer
- *   size            : pointer to the variable containing size of the buffer
+ *   size            : size of the buffer
  *   read            : pointer to the variable getting number of read bytes
  *   time            : timepoint value
  *

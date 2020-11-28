@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    26.06.2020
+    @date    28.11.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -313,7 +313,7 @@ int stm_takeISR( stm_t *stm, void *data, size_t size, size_t *read ) { return st
  * Parameters
  *   stm             : pointer to stream buffer object
  *   data            : pointer to the buffer
- *   size            : pointer to the variable containing size of the buffer
+ *   size            : size of the buffer
  *   read            : pointer to the variable getting number of read bytes
  *   delay           : duration of time (maximum number of ticks to wait while the stream buffer object is empty)
  *                     IMMEDIATE: don't wait if the stream buffer object is empty
@@ -341,7 +341,7 @@ int stm_waitFor( stm_t *stm, void *data, size_t size, size_t *read, cnt_t delay 
  * Parameters
  *   stm             : pointer to stream buffer object
  *   data            : pointer to the buffer
- *   size            : pointer to the variable containing size of the buffer
+ *   size            : size of the buffer
  *   read            : pointer to the variable getting number of read bytes
  *   time            : timepoint value
  *
