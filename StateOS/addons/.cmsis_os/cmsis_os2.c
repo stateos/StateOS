@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    01.07.2020
+    @date    01.12.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -89,7 +89,7 @@ osStatus_t osKernelStart (void)
 	if (IS_IRQ_MODE() || IS_IRQ_MASKED())
 		return osErrorISR;
 
-	tsk_prio(osPriorityNormal);
+	tsk_prio((unsigned)osPriorityNormal);
 	return osOK;
 }
 
@@ -248,7 +248,7 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 
 	sys_lock();
 	{
-		tsk_init(&thread->tsk, (attr == NULL) ? osPriorityNormal : attr->priority, thread_handler, stack_mem, stack_size);
+		tsk_init(&thread->tsk, (unsigned)((attr == NULL) ? osPriorityNormal : attr->priority), thread_handler, stack_mem, stack_size);
 		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U ) thread->tsk.hdr.obj.res = thread;
 		else if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.hdr.obj.res = stack_mem;
 		thread->tsk.owner = ((flags & osThreadJoinable) == osThreadJoinable) ? NULL : &thread->tsk;

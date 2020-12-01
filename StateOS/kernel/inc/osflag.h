@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    01.07.2020
+    @date    01.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -37,11 +37,11 @@
 
 /* -------------------------------------------------------------------------- */
 
-#define flgAny          0
-#define flgAll          1
-#define flgProtect      2
-#define flgIgnore       4
-#define flgMASK         7
+#define flgAny          0U
+#define flgAll          1U
+#define flgProtect      2U
+#define flgIgnore       4U
+#define flgMASK         7U
 
 #define flgAnyProtect ( flgAny | flgProtect )
 #define flgAllProtect ( flgAll | flgProtect )

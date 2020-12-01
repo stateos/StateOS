@@ -2,7 +2,7 @@
 
     @file    StateOS: osalloc.c
     @author  Rajmund Szymanski
-    @date    18.06.2020
+    @date    01.12.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -184,7 +184,7 @@ void *priv_realloc( void *ptr, size_t size )
 			mem->next  = nxt;
 		}
 
-		len = (mem->next - mem) * sizeof(seg_t) - sizeof(seg_t);
+		len = (size_t)(mem->next - mem) * sizeof(seg_t) - sizeof(seg_t);
 		if (len >= size)
 	//	memory segment has been successfully resized
 			return ptr;
@@ -227,7 +227,7 @@ size_t priv_size( void )
 	//	it is possible to merge adjacent free memory segments
 			mem->next = nxt->next;
 
-		size += (mem->next - mem) * sizeof(seg_t) - sizeof(seg_t);
+		size += (size_t)(mem->next - mem) * sizeof(seg_t) - sizeof(seg_t);
 	}
 
 	return size;
@@ -469,7 +469,7 @@ size_t sys_segSize( void *ptr )
 	{
 #if OS_HEAP_SIZE
 		seg_t *seg = (seg_t *)ptr - 1;
-		size = (seg->next - seg) * sizeof(seg_t) - sizeof(seg_t);
+		size = (size_t)(seg->next - seg) * sizeof(seg_t) - sizeof(seg_t);
 #else
 		(void) ptr;
 		size = 0;

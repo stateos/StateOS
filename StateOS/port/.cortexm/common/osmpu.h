@@ -2,7 +2,7 @@
 
     @file    StateOS: osmpu.h
     @author  Rajmund Szymanski
-    @date    30.05.2020
+    @date    01.12.2020
     @brief   This file defines set of memory protection unit functions for StateOS.
 
  ******************************************************************************
@@ -183,7 +183,7 @@ void port_mpu_stackLock( void )
 __STATIC_INLINE
 void port_mpu_stackUpdate( const void *stk )
 {
-	MPU->RBAR = ARM_MPU_RBAR(0U, ((uintptr_t)stk + (OS_GUARD_SIZE) - 1) & ~((OS_GUARD_SIZE) - 1));
+	MPU->RBAR = ARM_MPU_RBAR(0U, ((uintptr_t)stk + (size_t)(OS_GUARD_SIZE) - 1) & ~((size_t)(OS_GUARD_SIZE) - 1));
 }
 
 /* -------------------------------------------------------------------------- */

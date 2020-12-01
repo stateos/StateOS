@@ -47,6 +47,9 @@ Features:
 - all documentation is contained within source files, in particular header files
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
+6.8
+- preventing conversion warnings
+---------
 6.7
 - updated os version
 - implementation of steady clock
