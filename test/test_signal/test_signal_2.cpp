@@ -69,7 +69,8 @@ static void test()
 	         tsk_startFrom(&tsk0, proc0);         ASSERT_ready(&tsk0);
 	         tsk_yield();
 	         tsk_yield();
-	         sig_give(&sig0, sent = rand() % SIG_LIMIT);
+	         sent = (unsigned)rand() % SIG_LIMIT;
+	         sig_give(&sig0, sent);
 	result = tsk_join(&tsk0);                     ASSERT_success(result);
 }
 

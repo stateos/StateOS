@@ -5,14 +5,14 @@
 static void proc2()
 {
 	size_t heap = sys_heapSize();
-	size_t len1 = rand() % (SIZE) + 1;
-	size_t len2 = rand() % (SIZE) + 1;
+	size_t len1 = (size_t)rand() % (SIZE) + 1;
+	size_t len2 = (size_t)rand() % (SIZE) + 1;
 	void * buf1 = malloc(len1);                  ASSERT(buf1);
 	void * buf2 = malloc(len2);                  ASSERT(buf2);
 	memset(buf1, 0xFF, len1);
 	memset(buf2, 0xFF, len2);
-	       len1 = rand() % (SIZE) + 1;
-	       len2 = rand() % (SIZE) + 1;
+	       len1 = (size_t)rand() % (SIZE) + 1;
+	       len2 = (size_t)rand() % (SIZE) + 1;
 	       buf1 = realloc(buf1, len1);           ASSERT(buf1);
 	       buf2 = realloc(buf2, len2);           ASSERT(buf2);
 	memset(buf1, 0xFF, len1);

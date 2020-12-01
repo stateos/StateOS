@@ -63,7 +63,8 @@ static void test()
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
 	         ThisTask::yield();
 	         ThisTask::yield();
-	         Evt0.give(sent = rand());
+	         sent = (unsigned)rand();
+	         Evt0.give(sent);
 	result = Tsk0.join();                         ASSERT_success(result);
 }
 

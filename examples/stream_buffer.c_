@@ -10,7 +10,7 @@ OS_TSK_DEF(cons, 0)
 	for (;;)
 	{
 		stm_wait(stm, &x, sizeof(x), NULL);
-		LEDs = x;
+		LEDs = x & 0xF;
 	}
 }
 

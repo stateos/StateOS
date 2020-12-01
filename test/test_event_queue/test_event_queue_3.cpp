@@ -70,7 +70,8 @@ static void test()
 	int result;
 	                                              ASSERT(!Tsk0);
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	result = Evq0.give(sent = rand());            ASSERT_success(result);
+	         sent = (unsigned)rand();
+	result = Evq0.give(sent);                     ASSERT_success(result);
 	result = Tsk0.join();                         ASSERT_success(result);
 }
 

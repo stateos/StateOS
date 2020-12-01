@@ -95,7 +95,7 @@ static void test()
 	         tsk_yield();
 	         tsk_yield();
 	result = mem_wait(&mem0, &p);                 ASSERT_success(result);
-	         *(unsigned *)p = sent = rand();
+	         *(unsigned *)p = sent = (unsigned)rand();
 	         lst_give(&lst0, p);
 	result = tsk_join(&tsk0);                     ASSERT_success(result);
 }

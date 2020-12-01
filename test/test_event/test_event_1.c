@@ -60,7 +60,8 @@ static void test()
 	         tsk_startFrom(&tsk0, proc0);         ASSERT_ready(&tsk0);
 	         tsk_yield();
 	         tsk_yield();
-	         evt_give(&evt0, sent = rand());
+	         sent = (unsigned)rand();
+	         evt_give(&evt0, sent);
 	result = tsk_join(&tsk0);                     ASSERT_success(result);
 }
 

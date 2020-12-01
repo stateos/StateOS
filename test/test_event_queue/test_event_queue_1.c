@@ -67,7 +67,8 @@ static void test()
 	int result;
 	                                              ASSERT_dead(&tsk0);
 	         tsk_startFrom(&tsk0, proc0);         ASSERT_ready(&tsk0);
-	result = evq_give(&evq0, sent = rand());      ASSERT_success(result);
+	         sent = (unsigned)rand();
+	result = evq_give(&evq0, sent);               ASSERT_success(result);
 	result = tsk_join(&tsk0);                     ASSERT_success(result);
 }
 

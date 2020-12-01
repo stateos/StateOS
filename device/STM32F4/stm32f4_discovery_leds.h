@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    stm32f4_discovery_leds.h
  * @author  Rajmund Szymanski
- * @date    24.12.2018
+ * @date    01.12.2020
  * @brief   This file contains definitions for STM32F4-Discovery Kit.
  ******************************************************************************/
 
@@ -49,14 +49,15 @@ void LED_Init( void )
 static inline
 bool LED_Get( unsigned nr )
 {
+	bool result = false;
 	switch (nr)
 	{
-	case  0: return (GPIOD->ODR & GPIO_ODR_OD12) != 0;
-	case  1: return (GPIOD->ODR & GPIO_ODR_OD13) != 0;
-	case  2: return (GPIOD->ODR & GPIO_ODR_OD14) != 0;
-	case  3: return (GPIOD->ODR & GPIO_ODR_OD15) != 0;
-	default: return false;
+	case 0: result = (GPIOD->ODR & GPIO_ODR_OD12) != 0; break;
+	case 1: result = (GPIOD->ODR & GPIO_ODR_OD13) != 0; break;
+	case 2: result = (GPIOD->ODR & GPIO_ODR_OD14) != 0; break;
+	case 3: result = (GPIOD->ODR & GPIO_ODR_OD15) != 0; break;
 	}
+	return result;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -68,11 +69,10 @@ void LED_Set( unsigned nr )
 {
 	switch (nr)
 	{
-	case  0: GPIOD->BSRR = GPIO_BSRR_BS12; break;
-	case  1: GPIOD->BSRR = GPIO_BSRR_BS13; break;
-	case  2: GPIOD->BSRR = GPIO_BSRR_BS14; break;
-	case  3: GPIOD->BSRR = GPIO_BSRR_BS15; break;
-	default: break;
+	case 0: GPIOD->BSRR = GPIO_BSRR_BS12; break;
+	case 1: GPIOD->BSRR = GPIO_BSRR_BS13; break;
+	case 2: GPIOD->BSRR = GPIO_BSRR_BS14; break;
+	case 3: GPIOD->BSRR = GPIO_BSRR_BS15; break;
 	}
 }
 
@@ -85,11 +85,10 @@ void LED_Reset( unsigned nr )
 {
 	switch (nr)
 	{
-	case  0: GPIOD->BSRR = GPIO_BSRR_BR12; break;
-	case  1: GPIOD->BSRR = GPIO_BSRR_BR13; break;
-	case  2: GPIOD->BSRR = GPIO_BSRR_BR14; break;
-	case  3: GPIOD->BSRR = GPIO_BSRR_BR15; break;
-	default: break;
+	case 0: GPIOD->BSRR = GPIO_BSRR_BR12; break;
+	case 1: GPIOD->BSRR = GPIO_BSRR_BR13; break;
+	case 2: GPIOD->BSRR = GPIO_BSRR_BR14; break;
+	case 3: GPIOD->BSRR = GPIO_BSRR_BR15; break;
 	}
 }
 
@@ -102,11 +101,10 @@ void LED_Toggle( unsigned nr )
 {
 	switch (nr)
 	{
-	case  0: GPIOD->ODR ^= GPIO_ODR_OD12; break;
-	case  1: GPIOD->ODR ^= GPIO_ODR_OD13; break;
-	case  2: GPIOD->ODR ^= GPIO_ODR_OD14; break;
-	case  3: GPIOD->ODR ^= GPIO_ODR_OD15; break;
-	default: break;
+	case 0: GPIOD->ODR ^= GPIO_ODR_OD12; break;
+	case 1: GPIOD->ODR ^= GPIO_ODR_OD13; break;
+	case 2: GPIOD->ODR ^= GPIO_ODR_OD14; break;
+	case 3: GPIOD->ODR ^= GPIO_ODR_OD15; break;
 	}
 }
 
@@ -196,7 +194,7 @@ struct Led
 	void toggle( unsigned nr ) {        LED_Toggle(nr); }
 	void tick  ( void )        {        LED_Tick();     }
 
-	unsigned   operator = ( const unsigned status ) { return LEDs = status; }
+	unsigned   operator = ( const unsigned status ) { return LEDs = status & 0xF; }
 	unsigned & operator []( const unsigned number ) { return (unsigned &)LED[number]; }
 };
 

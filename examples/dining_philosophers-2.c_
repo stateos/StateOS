@@ -11,7 +11,7 @@ sem_t *forks[NUM];
 
 cnt_t get_delay()
 {
-	return ((rand() % DLY) + 1) * SEC;
+	return (cnt_t)((rand() % DLY) + 1) * SEC;
 }
 
 void philosopher()

@@ -8,7 +8,7 @@ void consumer()
 	unsigned x;
 
 	evt_wait(evt, &x);
-	LEDs = x;
+	LEDs = x & 0xF;
 }
 
 void producer()

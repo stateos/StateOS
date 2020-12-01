@@ -101,7 +101,7 @@ static void test()
 	         tsk_yield();
 	         tsk_yield();
 	result = Mem0.wait(&p);                       ASSERT_success(result);
-	         *p = sent = rand();
+	         *p = sent = (unsigned)rand();
 	         Lst0.give(p);
 	result = Tsk0.join();                         ASSERT_success(result);
 }

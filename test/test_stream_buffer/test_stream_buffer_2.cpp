@@ -82,7 +82,7 @@ static void test()
 	         tsk_startFrom(&tsk0, proc0);         ASSERT_ready(&tsk0);
 	         tsk_yield();
 	         tsk_yield();
-	         sent = rand();
+	         sent = (unsigned)rand();
 	result = stm_give(&stm0, &sent, SIZE);        ASSERT_success(result);
 	result = tsk_join(&tsk0);                     ASSERT_success(result);
 }

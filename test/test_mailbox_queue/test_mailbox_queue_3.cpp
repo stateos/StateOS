@@ -72,7 +72,7 @@ static void test()
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
 	         tsk_yield();
 	         tsk_yield();
-	         sent = rand();
+	         sent = (unsigned)rand();
 	result = Box0.give(&sent);                    ASSERT_success(result);
 	result = Tsk0.join();                         ASSERT_success(result);
 }

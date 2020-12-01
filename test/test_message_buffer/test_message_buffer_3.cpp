@@ -74,7 +74,7 @@ static void test()
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
 	         ThisTask::yield();
 	         ThisTask::yield();
-	         sent = rand();
+	         sent = (unsigned)rand();
 	result = Msg0.give(&sent);                    ASSERT_success(result);
 	result = Tsk0.join();                         ASSERT_success(result);
 }
