@@ -2,7 +2,7 @@
 
     @file    StateOS: osmutex.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    03.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,14 +41,14 @@
 #define mtxNormal        0U // normal mutex
 #define mtxErrorCheck    1U // error checking mutex
 #define mtxRecursive     2U // recursive mutex
-#define mtxDefault      mtxNormal
-#define mtxTypeMASK   ( mtxNormal | mtxErrorCheck | mtxRecursive )
+#define mtxDefault       mtxNormal
+#define mtxTypeMASK    ( mtxNormal | mtxErrorCheck | mtxRecursive )
 
 /////// mutex protocol
 #define mtxPrioNone      0U // none
 #define mtxPrioInherit   4U // priority inheritance mutex
 #define mtxPrioProtect   8U // priority protected mutex (OCPP)
-#define mtxPrioMASK   ( mtxPrioNone | mtxPrioInherit | mtxPrioProtect )
+#define mtxPrioMASK    ( mtxPrioNone | mtxPrioInherit | mtxPrioProtect )
 
 /////// mutex robustness
 #define mtxStalled       0U // stalled mutex
@@ -57,11 +57,11 @@
 /////// inconsistency of robust mutex
 #define mtxInconsistent 32U // inconsistent mutex
 
-#define mtxMASK       ( mtxTypeMASK | mtxPrioMASK | mtxRobust | mtxInconsistent )
+#define mtxMASK        ( mtxTypeMASK | mtxPrioMASK | mtxRobust | mtxInconsistent )
 
 /* -------------------------------------------------------------------------- */
 
-#define MTX_LIMIT    ( 0U-1 )
+#define MTX_LIMIT      ( 0U-1 )
 
 /******************************************************************************
  *
@@ -77,7 +77,7 @@ struct __mtx
 	tsk_t  * owner; // mutex owner
 	unsigned mode;  // mutex mode: mutex type + mutex protocol + mutex robustness
 	unsigned count; // current value of the mutex counter
-	unsigned prio;  // mutex priority; unused if mtxPrioProtect protocol is not set
+	unsigned prio;  // mutex priority; used only with mtxPrioProtect protocol
 	mtx_t  * list;  // list of mutexes held by owner
 };
 
@@ -96,7 +96,7 @@ extern "C" {
  *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
- *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
+ *   prio            : mutex priority; used only with mtxPrioProtect protocol
  *
  * Return            : mutex object
  *
@@ -131,7 +131,7 @@ extern "C" {
  *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
- *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
+ *   prio            : mutex priority; used only with mtxPrioProtect protocol
  *
  ******************************************************************************/
 
@@ -151,7 +151,7 @@ extern "C" {
  *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
- *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
+ *   prio            : mutex priority; used only with mtxPrioProtect protocol
  *
  ******************************************************************************/
 
@@ -170,7 +170,7 @@ extern "C" {
  *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
- *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
+ *   prio            : mutex priority; used only with mtxPrioProtect protocol
  *
  * Return            : mutex object
  *
@@ -195,7 +195,7 @@ extern "C" {
  *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
- *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
+ *   prio            : mutex priority; used only with mtxPrioProtect protocol
  *
  * Return            : pointer to mutex object
  *
@@ -222,7 +222,7 @@ extern "C" {
  *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
- *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
+ *   prio            : mutex priority; used only with mtxPrioProtect protocol
  *
  * Return            : none
  *
@@ -244,7 +244,7 @@ void mtx_init( mtx_t *mtx, unsigned mode, unsigned prio );
  *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
- *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
+ *   prio            : mutex priority; used only with mtxPrioProtect protocol
  *
  * Return            : pointer to mutex object
  *   NULL            : object not created (not enough free memory)
@@ -488,7 +488,7 @@ int mtx_unlock( mtx_t *mtx ) { return mtx_give(mtx); }
  *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
- *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
+ *   prio            : mutex priority; used only with mtxPrioProtect protocol
  *
  ******************************************************************************/
 
@@ -521,7 +521,7 @@ struct Mutex : public __mtx
  *                           type: mtxNormal or mtxErrorCheck or mtxRecursive
  *                       protocol: mtxPrioNone or mtxPrioInherit or mtxPrioProtect
  *                     robustness: mtxStalled or mtxRobust
- *   prio            : mutex priority; unused if mtxPrioProtect protocol is not set
+ *   prio            : mutex priority; used only with mtxPrioProtect protocol
  *
  * Return            : std::unique_pointer / pointer to Mutex object
  *
