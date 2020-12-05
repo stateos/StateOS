@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    05.12.2020
     @brief   StateOS port definitions for STM32L1 uC.
 
  ******************************************************************************
@@ -99,7 +99,7 @@ extern "C" {
 __STATIC_INLINE
 uint16_t port_sys_time( void )
 {
-	return TIM2->CNT;
+	return (uint16_t)TIM2->CNT;
 }
 
 #endif
@@ -145,7 +145,7 @@ void port_tmr_stop( void )
 // set time breakpoint
 
 __STATIC_INLINE
-void port_tmr_start( uint32_t timeout )
+void port_tmr_start( uint16_t timeout )
 {
 #if HW_TIMER_SIZE
 	TIM2->CCR1 = timeout;

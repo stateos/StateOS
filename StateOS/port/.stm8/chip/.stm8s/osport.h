@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.h
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    05.12.2020
     @brief   StateOS port definitions for STM8S uC.
 
  ******************************************************************************
@@ -141,7 +141,7 @@ void port_tmr_stop( void )
 // set time breakpoint
 
 __STATIC_INLINE
-void port_tmr_start( uint32_t timeout )
+void port_tmr_start( uint16_t timeout )
 {
 #if HW_TIMER_SIZE
 	TIM3->CCR2H = (uint8_t)(timeout >> 8);

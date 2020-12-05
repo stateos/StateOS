@@ -131,7 +131,13 @@ bool priv_tmr_expired( tmr_t *tmr )
 	if (tmr->delay <= (cnt_t)(core_sys_time() - tmr->start))
 	return true;  // return if timer finished counting
 
+#if   HW_TIMER_SIZE <= 16
+	port_tmr_start((uint16_t)(tmr->start + tmr->delay));
+#elif HW_TIMER_SIZE <= 32
 	port_tmr_start((uint32_t)(tmr->start + tmr->delay));
+#elif HW_TIMER_SIZE <= 64
+	port_tmr_start((uint64_t)(tmr->start + tmr->delay));
+#endif
 
 	if (tmr->delay >  (cnt_t)(core_sys_time() - tmr->start))
 	return false; // return if timer still counts
