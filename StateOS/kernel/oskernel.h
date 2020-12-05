@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    04.12.2020
+    @date    05.12.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -300,7 +300,7 @@ __STATIC_INLINE
 void core_sys_tick( void )
 {
 #if HW_TIMER_SIZE < OS_TIMER_SIZE
-	System.cnt += (cnt_t)(1) << (HW_TIMER_SIZE);
+	System.cnt = (cnt_t)(System.cnt + ((cnt_t)1 << (HW_TIMER_SIZE)));
 #endif
 }
 #endif

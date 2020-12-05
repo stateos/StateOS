@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    05.12.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -131,7 +131,7 @@ bool priv_tmr_expired( tmr_t *tmr )
 	if (tmr->delay <= (cnt_t)(core_sys_time() - tmr->start))
 	return true;  // return if timer finished counting
 
-	port_tmr_start((cnt_t)(tmr->start + tmr->delay));
+	port_tmr_start((uint32_t)(tmr->start + tmr->delay));
 
 	if (tmr->delay >  (cnt_t)(core_sys_time() - tmr->start))
 	return false; // return if timer still counts
@@ -181,7 +181,7 @@ void core_tmr_handler( void )
 	{
 		while (priv_tmr_expired(tmr = WAIT.hdr.next))
 		{
-			tmr->start += tmr->delay;
+			tmr->start = (cnt_t)(tmr->start + tmr->delay);
 
 			if (tmr->hdr.id == ID_TIMER)
 			{
@@ -433,9 +433,9 @@ int core_tsk_waitUntil( tsk_t **que, cnt_t time )
 	tsk_t *cur = System.cur;
 
 	cur->start = core_sys_time();
-	cur->delay = time - cur->start;
+	cur->delay = (cnt_t)(time - cur->start);
 
-	if (cur->delay - 1 > CNT_LIMIT)
+	if (cur->delay - 1U > CNT_LIMIT)
 		return E_TIMEOUT;
 
 	return core_tsk_wait(cur, que);
