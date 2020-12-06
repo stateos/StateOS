@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    05.12.2020
+    @date    29.03.2020
     @brief   StateOS port file for STM32L1 uC.
 
  ******************************************************************************
@@ -202,11 +202,11 @@ cnt_t port_sys_time( void )
 	uint16_t tck;
 
 	cnt = System.cnt;
-	tck = (uint16_t)TIM2->CNT;
+	tck = TIM2->CNT;
 
 	if (TIM2->SR & TIM_SR_UIF)
 	{
-		tck = (uint16_t)TIM2->CNT;
+		tck = TIM2->CNT;
 		cnt += (cnt_t)(1) << (HW_TIMER_SIZE);
 	}
 

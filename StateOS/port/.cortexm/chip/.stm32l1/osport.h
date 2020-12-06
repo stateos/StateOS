@@ -99,7 +99,7 @@ extern "C" {
 __STATIC_INLINE
 uint16_t port_sys_time( void )
 {
-	return (uint16_t)TIM2->CNT;
+	return TIM2->CNT;
 }
 
 #endif
