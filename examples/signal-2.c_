@@ -8,7 +8,7 @@ void consumer()
 	unsigned x;
 
 	sig_wait(sig, sigAll, &x);
-	LEDs = SIGSET(x) & 0xF;
+	LEDs = SIGSET(x);
 }
 
 void producer()

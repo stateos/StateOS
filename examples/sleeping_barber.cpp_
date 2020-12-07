@@ -62,7 +62,7 @@ int main()
 	{
 		Task::Create(1, customer);
 
-		cnt_t dly = rand() % DELAY;
+		cnt_t dly = (unsigned)rand() % DELAY;
 		ThisTask::delay(dly * MSEC);
 	}
 }

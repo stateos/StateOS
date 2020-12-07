@@ -4,9 +4,9 @@
 
 // Sleeping barber problem
 
-#define BARBERS   2  // num of barbers
-#define CUSTOMERS 4  // num of chairs in the waiting room
-#define DELAY   256U // time constant
+#define BARBERS   2 // num of barbers
+#define CUSTOMERS 4 // num of chairs in the waiting room
+#define DELAY   256 // time constant
 
 OS_MTX(doors, mtxDefault);
 OS_SEM(barbers,   0);
