@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    07.12.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -280,7 +280,7 @@ void core_ctx_init( tsk_t *tsk )
 size_t core_stk_space( tsk_t *tsk )
 {
 	void *stk = tsk->stack;
-	char *ptr = stk;
+	uint8_t *ptr = stk;
 	while (*ptr == 0xFF) ptr++;
 	return (uintptr_t)ptr - (uintptr_t)stk;
 }
