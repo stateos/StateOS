@@ -86,7 +86,7 @@ void priv_tmr_insert( tmr_t *tmr )
 
 	if (tmr->delay != INFINITE)
 		do nxt = nxt->hdr.next;
-		while (nxt->delay < (cnt_t)(tmr->start + tmr->delay - nxt->start));
+		while (nxt->delay < tmr->start + tmr->delay - nxt->start);
 
 	tmr->hdr.id = ID_TIMER;
 	priv_rdy_insert(&tmr->hdr, &nxt->hdr);
@@ -128,12 +128,12 @@ bool priv_tmr_expired( tmr_t *tmr )
 	if (tmr->delay == INFINITE)
 	return false; // return if timer counting indefinitely
 
-	if (tmr->delay <= (cnt_t)(core_sys_time() - tmr->start))
+	if (tmr->delay <= core_sys_time() - tmr->start)
 	return true;  // return if timer finished counting
 
-	port_tmr_start((cnt_t)(tmr->start + tmr->delay));
+	port_tmr_start(tmr->start + tmr->delay);
 
-	if (tmr->delay >  (cnt_t)(core_sys_time() - tmr->start))
+	if (tmr->delay >  core_sys_time() - tmr->start)
 	return false; // return if timer still counts
 
 	port_tmr_stop();
@@ -148,7 +148,7 @@ bool priv_tmr_expired( tmr_t *tmr )
 static
 bool priv_tmr_expired( tmr_t *tmr )
 {
-	if (tmr->delay >= (cnt_t)(core_sys_time() - tmr->start + 1))
+	if (tmr->delay >= core_sys_time() - tmr->start + 1)
 	return false; // return if timer still counts or counting indefinitely
 
 	return true;  // timer finished counting
@@ -165,7 +165,7 @@ void priv_tmr_wakeup( tmr_t *tmr, int event )
 		tmr->state();
 
 	priv_tmr_remove(tmr);
-	if (tmr->delay >= (cnt_t)(core_sys_time() - tmr->start + 1))
+	if (tmr->delay >= core_sys_time() - tmr->start + 1)
 		priv_tmr_insert(tmr);
 
 	core_all_wakeup(tmr->hdr.obj.queue, event);
