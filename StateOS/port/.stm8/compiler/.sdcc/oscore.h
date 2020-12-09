@@ -96,9 +96,9 @@ struct __ctx
 };
 
 #if !defined(__SDCC_MODEL_LARGE)
-#define _CTX_INIT( pc ) { 0, 0x20, 0, 0, 0, 0, (fun_t*)pc }
+#define _CTX_INIT( pc ) { 0, 0x20, 0, 0, 0, 0, (fun_t *) pc }
 #else
-#define _CTX_INIT( pc ) { 0, 0x20, 0, 0, 0,    (fun_t*)pc }
+#define _CTX_INIT( pc ) { 0, 0x20, 0, 0, 0,    (fun_t *) pc }
 #endif
 
 /* -------------------------------------------------------------------------- */
