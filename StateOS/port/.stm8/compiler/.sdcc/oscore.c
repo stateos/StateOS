@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    09.12.2020
     @brief   StateOS port file for STM8 uC.
 
  ******************************************************************************
@@ -37,16 +37,12 @@ void *_get_SP( void ) __naked
 {
 	__asm
 
-#ifdef __SDCC_MODEL_LARGE
-	pop    a
-#endif
-	popw   y
 	ldw    x, sp
-	pushw  y
 #ifdef __SDCC_MODEL_LARGE
-	push   a
+	addw   x, #3
 	retf
 #else
+	addw   x, #2
 	ret
 #endif
 
