@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    06.12.2020
+    @date    10.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1343,7 +1343,7 @@ template<size_t size_>
 struct baseStack
 {
 	static_assert(size_>sizeof(ctx_t), "incorrect stack size");
-#if __cplusplus >= 201703
+#if __cplusplus >= 201703 && !defined(__ICCARM__)
 	stk_t stack_[STK_SIZE(size_)] __STKALIGN;
 #else
 	stk_t stack_[STK_SIZE(size_)];
