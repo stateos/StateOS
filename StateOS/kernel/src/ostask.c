@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    02.07.2020
+    @date    13.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -73,7 +73,6 @@ void wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
 {
 	assert_tsk_context();
 	assert(tsk);
-	assert(state);
 	assert(stack);
 	assert(size>sizeof(ctx_t));
 
