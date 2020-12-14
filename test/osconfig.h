@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    29.05.2020
+    @date    14.12.2020
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -88,3 +88,11 @@
 // available values: 16, 32, 64
 // default value: 32
 #define OS_TIMER_SIZE        32
+
+// ----------------------------
+// system procedure for starting the task
+// available values: 0, 1
+// 0 => task function will be executed into an infinite system-implemented loop
+// 1 => while return from the task function, tsk_exit will be executed
+// default value: 0
+#define OS_TASK_EXIT          0

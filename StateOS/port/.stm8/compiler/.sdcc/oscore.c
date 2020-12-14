@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    09.12.2020
+    @date    14.12.2020
     @brief   StateOS port file for STM8 uC.
 
  ******************************************************************************
@@ -121,7 +121,11 @@ void _set_CC( lck_t cc ) __naked
 void core_tsk_flip( void *sp )
 {
 	_set_SP((char *)sp - 1);
+#if OS_TASK_EXIT == 0
 	core_tsk_loop();
+#else
+	core_tsk_exec();
+#endif
 }
 
 /* -------------------------------------------------------------------------- */

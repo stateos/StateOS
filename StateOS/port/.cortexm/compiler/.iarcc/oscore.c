@@ -2,7 +2,7 @@
 
     @file    StateOS: oscore.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    14.12.2020
     @brief   StateOS port file for ARM Cotrex-M uC.
 
  ******************************************************************************
@@ -135,10 +135,14 @@ void core_tsk_flip( void *sp )
 	__ASM volatile
 	(
 "	mov   sp,  %[sp]               \n"
-"	b  %c[core_tsk_loop]           \n"
+"	b  %c[core_tsk_start]          \n"
 
 ::	[sp] "r" (sp),
-	[core_tsk_loop] "i" (core_tsk_loop)
+#if OS_TASK_EXIT == 0
+	[core_tsk_start] "i" (core_tsk_loop)
+#else
+	[core_tsk_start] "i" (core_tsk_exec)
+#endif
 :	"memory"
 	);
 

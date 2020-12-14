@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    14.12.2020
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -53,6 +53,12 @@ extern "C" {
 /* -------------------------------------------------------------------------- *
  *                              FOR INTERNAL USE                              *
  * -------------------------------------------------------------------------- */
+
+#ifndef OS_TASK_EXIT
+#define OS_TASK_EXIT      0
+#endif
+
+/* -------------------------------------------------------------------------- */
 
 #ifndef OS_GUARD_SIZE
 #define OS_GUARD_SIZE     0

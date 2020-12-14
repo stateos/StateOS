@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    07.12.2020
+    @date    14.12.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -271,7 +271,11 @@ void core_ctx_init( tsk_t *tsk )
 		memset(tsk->stack, 0xFF, tsk->size);
 #endif
 	tsk->sp = (ctx_t *)STK_CROP(tsk->stack, tsk->size) - 1;
+#if OS_TASK_EXIT == 0
 	port_ctx_init(tsk->sp, core_tsk_loop);
+#else
+	port_ctx_init(tsk->sp, core_tsk_exec);
+#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -333,6 +337,15 @@ void core_tsk_loop( void )
 		port_set_lock();
 		core_ctx_switch();
 	}
+}
+
+/* -------------------------------------------------------------------------- */
+
+void core_tsk_exec( void )
+{
+	port_clr_lock();
+	System.cur->state();
+	tsk_stop();
 }
 
 /* -------------------------------------------------------------------------- */
