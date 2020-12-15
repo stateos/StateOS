@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    09.05.2020
+    @date    15.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,7 +41,16 @@
  *
  ******************************************************************************/
 
-typedef volatile unsigned spn_t, * const spn_id;
+#if OS_ATOMIC
+typedef atomic_flag spn_t, * const spn_id;
+#else
+typedef struct __spn spn_t, * const spn_id;
+
+struct __spn
+{
+	uint_fast8_t val;
+};
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,7 +70,11 @@ extern "C" {
  *
  ******************************************************************************/
 
-#define               _SPN_INIT()   0
+#if OS_ATOMIC
+#define               _SPN_INIT()   { ATOMIC_VAR_INIT(0) }
+#else
+#define               _SPN_INIT()   { 0 }
+#endif
 
 /******************************************************************************
  *
@@ -140,7 +153,7 @@ extern "C" {
  *
  * Description       : lock the spin lock object
  *                     (wait indefinitely if the spin lock object can't be locked immediately)
- *                     or do nothing if OS_MULTICORE is not defined
+ *                     or do nothing if OS_ATOMIC is not defined
  *
  * Parameters
  *   spn             : pointer to spin lock object
@@ -154,8 +167,8 @@ extern "C" {
 __STATIC_INLINE
 void core_spn_lock( spn_t *spn )
 {
-#ifdef  OS_MULTICORE
-	port_spn_lock(spn);
+#if OS_ATOMIC
+	while (atomic_flag_test_and_set(spn));
 #else
 	(void) spn;
 #endif
@@ -166,7 +179,7 @@ void core_spn_lock( spn_t *spn )
  * Name              : core_spn_unlock
  *
  * Description       : unlock the spin lock object
- *                     or do nothing if OS_MULTICORE is not defined
+ *                     or do nothing if OS_ATOMIC is not defined
  *
  * Parameters
  *   spn             : pointer to spin lock object
@@ -180,8 +193,8 @@ void core_spn_lock( spn_t *spn )
 __STATIC_INLINE
 void core_spn_unlock( spn_t *spn )
 {
-#ifdef  OS_MULTICORE
-	*spn = 0;
+#if OS_ATOMIC
+	atomic_flag_clear(spn);
 #else
 	(void) spn;
 #endif
@@ -203,7 +216,14 @@ void core_spn_unlock( spn_t *spn )
  ******************************************************************************/
 
 __STATIC_INLINE
-void spn_init( spn_t *spn ) { *spn = 0; }
+void spn_init( spn_t *spn )
+{
+#if OS_ATOMIC
+	atomic_flag_clear(spn);
+#else
+	spn->val = 0;
+#endif
+}
 
 /******************************************************************************
  *
@@ -211,7 +231,7 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  *
  * Description       : save interrupts state, disable interrupts then lock the spin lock object
  *                     (wait indefinitely if the spin lock object can't be locked immediately)
- *                     or do nothing if OS_MULTICORE is not defined
+ *                     or do nothing if OS_ATOMIC is not defined
  *                   / enter into critical section
  *
  * Parameters
@@ -232,7 +252,7 @@ void spn_init( spn_t *spn ) { *spn = 0; }
  * Name              : spn_unlock
  *
  * Description       : unlock the spin lock object
- *                     or do nothing if OS_MULTICORE is not defined
+ *                     or do nothing if OS_ATOMIC is not defined
  *                     then restore saved interrupts state
  *                   / exit from critical section
  *
