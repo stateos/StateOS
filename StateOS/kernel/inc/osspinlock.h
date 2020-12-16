@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    15.12.2020
+    @date    16.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -42,7 +42,7 @@
  ******************************************************************************/
 
 #if OS_ATOMIC
-typedef atomic_flag spn_t, * const spn_id;
+typedef __STD atomic_flag spn_t, * const spn_id;
 #else
 typedef struct __spn spn_t, * const spn_id;
 
@@ -168,7 +168,7 @@ __STATIC_INLINE
 void core_spn_lock( spn_t *spn )
 {
 #if OS_ATOMIC
-	while (atomic_flag_test_and_set(spn));
+	while (__STD atomic_flag_test_and_set(spn));
 #else
 	(void) spn;
 #endif
@@ -194,7 +194,7 @@ __STATIC_INLINE
 void core_spn_unlock( spn_t *spn )
 {
 #if OS_ATOMIC
-	atomic_flag_clear(spn);
+	__STD atomic_flag_clear(spn);
 #else
 	(void) spn;
 #endif
@@ -219,7 +219,7 @@ __STATIC_INLINE
 void spn_init( spn_t *spn )
 {
 #if OS_ATOMIC
-	atomic_flag_clear(spn);
+	__STD atomic_flag_clear(spn);
 #else
 	spn->val = 0;
 #endif
