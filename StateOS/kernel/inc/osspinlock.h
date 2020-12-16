@@ -44,12 +44,7 @@
 #if OS_ATOMIC
 typedef __STD atomic_flag spn_t, * const spn_id;
 #else
-typedef struct __spn spn_t, * const spn_id;
-
-struct __spn
-{
-	uint_fast8_t val;
-};
+typedef uint_fast8_t spn_t, * const spn_id;
 #endif
 
 #ifdef __cplusplus
@@ -73,7 +68,7 @@ extern "C" {
 #if OS_ATOMIC
 #define               _SPN_INIT()   ATOMIC_FLAG_INIT
 #else
-#define               _SPN_INIT()   { 0 }
+#define               _SPN_INIT()   0
 #endif
 
 /******************************************************************************
@@ -221,7 +216,7 @@ void spn_init( spn_t *spn )
 #if OS_ATOMIC
 	__STD atomic_flag_clear(spn);
 #else
-	spn->val = 0;
+	*spn = 0;
 #endif
 }
 
