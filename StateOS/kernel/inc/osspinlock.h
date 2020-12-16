@@ -42,7 +42,7 @@
  ******************************************************************************/
 
 #if OS_ATOMIC
-typedef __STD atomic_flag spn_t, * const spn_id;
+typedef __STD atomic_uint_fast8_t spn_t, * const spn_id;
 #else
 typedef uint_fast8_t spn_t, * const spn_id;
 #endif
@@ -65,11 +65,7 @@ extern "C" {
  *
  ******************************************************************************/
 
-#if OS_ATOMIC
-#define               _SPN_INIT()   ATOMIC_FLAG_INIT
-#else
 #define               _SPN_INIT()   0
-#endif
 
 /******************************************************************************
  *
@@ -163,7 +159,7 @@ __STATIC_INLINE
 void core_spn_lock( spn_t *spn )
 {
 #if OS_ATOMIC
-	while (__STD atomic_flag_test_and_set(spn));
+	while (__STD atomic_exchange(spn, 1) != 0);
 #else
 	(void) spn;
 #endif
@@ -189,7 +185,7 @@ __STATIC_INLINE
 void core_spn_unlock( spn_t *spn )
 {
 #if OS_ATOMIC
-	__STD atomic_flag_clear(spn);
+	__STD atomic_store(spn, 0);
 #else
 	(void) spn;
 #endif
@@ -214,7 +210,7 @@ __STATIC_INLINE
 void spn_init( spn_t *spn )
 {
 #if OS_ATOMIC
-	__STD atomic_flag_clear(spn);
+	__STD atomic_store(spn, 0);
 #else
 	*spn = 0;
 #endif
