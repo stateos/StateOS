@@ -71,7 +71,7 @@ extern "C" {
  ******************************************************************************/
 
 #if OS_ATOMIC
-#define               _SPN_INIT()   { ATOMIC_VAR_INIT(0) }
+#define               _SPN_INIT()   ATOMIC_FLAG_INIT
 #else
 #define               _SPN_INIT()   { 0 }
 #endif
