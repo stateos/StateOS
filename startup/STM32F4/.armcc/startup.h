@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.h
 @author   Rajmund Szymanski
-@date     03.01.2020
+@date     13.12.2020
 @brief    Startup file header for armcc compiler.
 *******************************************************************************/
 
@@ -22,5 +22,6 @@
 __NO_RETURN __ALIAS(Fault_Handler) void _microlib_exit( void );
 __NO_RETURN __ALIAS(Fault_Handler) void      _sys_exit( void );
 __NO_RETURN                        void         __main( void );
+__NO_RETURN __ALIAS(_exit)         void           exit( int  );
 
 /******************************************************************************/

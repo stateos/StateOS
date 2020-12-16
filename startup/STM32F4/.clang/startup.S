@@ -1,7 +1,7 @@
 /*******************************************************************************
 @file     startup.S
 @author   Rajmund Szymanski
-@date     03.01.2020
+@date     07.01.2020
 @brief    Startup code for armclang compiler.
 *******************************************************************************/
 
@@ -14,19 +14,20 @@
 
 	#define   __main_stack_size (((main_stack_size)+7)&(~7))
 	#define   __proc_stack_size (((proc_stack_size)+7)&(~7))
+
 	#define   __RAM_end            0x20020000
 
 	.syntax     unified
-    .arch       armv7e-m
+	.arch       armv7e-m
 
 	.section    .heap, "w","nobits"
-	.align      3
+	.align 3
 __heap_base   = .
 __heap_limit  = __RAM_end - __proc_stack_size
 
 	#if         __main_stack_size > 0
 	.section    .stack, "w","nobits"
-	.align      3
+	.align 3
 	.space      __main_stack_size
 __initial_msp = .
 	#else
@@ -35,7 +36,7 @@ __initial_msp = __heap_limit
 
 	#if         __proc_stack_size > 0
 	.section    .heap, "w","nobits"
-	.align      3
+	.align 3
 	.space      __proc_stack_size
 __initial_sp  = __RAM_end
 	#else

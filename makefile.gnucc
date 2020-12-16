@@ -124,6 +124,11 @@ LD_FLAGS   += --specs=nosys.specs
 endif
 ifneq ($(filter USE_SEMIHOST,$(DEFS)),)
 LD_FLAGS   += --specs=rdimon.specs
+ifeq  ($(filter qemu,$(MAKECMDGOALS)),)
+ifeq  ($(filter monitor,$(MAKECMDGOALS)),)
+DEFS       := $(DEFS:USE_SEMIHOST=)
+endif
+endif
 endif
 ifneq ($(filter USE_LTO,$(DEFS)),)
 COMMON_F   += -flto
