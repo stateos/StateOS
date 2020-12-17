@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    14.12.2020
+    @date    17.12.2020
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -47,31 +47,6 @@ void priv_ctx_switchNow( void )
 }
 
 /* -------------------------------------------------------------------------- */
-
-static
-void priv_rdy_insert( hdr_t *hdr, hdr_t *nxt )
-{
-	hdr_t *prv = nxt->prev;
-
-	hdr->prev = prv;
-	hdr->next = nxt;
-	nxt->prev = hdr;
-	prv->next = hdr;
-}
-
-/* -------------------------------------------------------------------------- */
-
-static
-void priv_rdy_remove( hdr_t *hdr )
-{
-	hdr_t *prv = hdr->prev;
-	hdr_t *nxt = hdr->next;
-
-	nxt->prev = prv;
-	prv->next = nxt;
-}
-
-/* -------------------------------------------------------------------------- */
 // SYSTEM TIMER SERVICES
 /* -------------------------------------------------------------------------- */
 
@@ -82,6 +57,7 @@ tmr_t WAIT = { .hdr={ .prev=&WAIT, .next=&WAIT, .id=ID_TIMER }, .delay=INFINITE 
 static
 void priv_tmr_insert( tmr_t *tmr )
 {
+	tmr_t *prv;
 	tmr_t *nxt = &WAIT;
 
 	if (tmr->delay != INFINITE)
@@ -89,7 +65,13 @@ void priv_tmr_insert( tmr_t *tmr )
 		while (nxt->delay < tmr->start + tmr->delay - nxt->start);
 
 	tmr->hdr.id = ID_TIMER;
-	priv_rdy_insert(&tmr->hdr, &nxt->hdr);
+
+	prv = nxt->hdr.prev;
+
+	tmr->hdr.prev = prv;
+	tmr->hdr.next = nxt;
+	nxt->hdr.prev = tmr;
+	prv->hdr.next = tmr;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -97,8 +79,13 @@ void priv_tmr_insert( tmr_t *tmr )
 static
 void priv_tmr_remove( tmr_t *tmr )
 {
+	tmr_t *prv = tmr->hdr.prev;
+	tmr_t *nxt = tmr->hdr.next;
+
 	tmr->hdr.id = ID_STOPPED;
-	priv_rdy_remove(&tmr->hdr);
+
+	nxt->hdr.prev = prv;
+	prv->hdr.next = nxt;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -168,7 +155,7 @@ void priv_tmr_wakeup( tmr_t *tmr, int event )
 	if (tmr->delay >= core_sys_time() - tmr->start + 1)
 		priv_tmr_insert(tmr);
 
-	core_all_wakeup(tmr->hdr.obj.queue, event);
+	core_all_wakeup(tmr->obj.queue, event);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -222,6 +209,7 @@ sys_t System = { .cur=&MAIN };
 static
 void priv_tsk_insert( tsk_t *tsk )
 {
+	tsk_t *prv;
 	tsk_t *nxt = &IDLE;
 #if OS_ROBIN && HW_TIMER_SIZE == 0
 	tsk->slice = 0;
@@ -230,7 +218,12 @@ void priv_tsk_insert( tsk_t *tsk )
 		do nxt = nxt->hdr.next;
 		while (tsk->prio <= nxt->prio);
 
-	priv_rdy_insert(&tsk->hdr, &nxt->hdr);
+	prv = nxt->hdr.prev;
+
+	tsk->hdr.prev = prv;
+	tsk->hdr.next = nxt;
+	nxt->hdr.prev = tsk;
+	prv->hdr.next = tsk;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -238,7 +231,11 @@ void priv_tsk_insert( tsk_t *tsk )
 static
 void priv_tsk_remove( tsk_t *tsk )
 {
-	priv_rdy_remove(&tsk->hdr);
+	tsk_t *prv = tsk->hdr.prev;
+	tsk_t *nxt = tsk->hdr.next;
+
+	nxt->hdr.prev = prv;
+	prv->hdr.next = nxt;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -358,14 +355,14 @@ void core_tsk_append( tsk_t *tsk, tsk_t **que )
 
 	while (nxt && tsk->prio <= nxt->prio)
 	{
-		que = &nxt->hdr.obj.queue;
+		que = &nxt->obj.queue;
 		nxt = *que;
 	}
 
 	if (nxt)
-		nxt->back = &tsk->hdr.obj.queue;
+		nxt->back = &tsk->obj.queue;
 	tsk->back = que;
-	tsk->hdr.obj.queue = nxt;
+	tsk->obj.queue = nxt;
 	*que = tsk;
 }
 
@@ -374,7 +371,7 @@ void core_tsk_append( tsk_t *tsk, tsk_t **que )
 void core_tsk_unlink( tsk_t *tsk, int event )
 {
 	tsk_t**que = tsk->back;
-	tsk_t *nxt = tsk->hdr.obj.queue;
+	tsk_t *nxt = tsk->obj.queue;
 	tsk->event = event;
 	tsk->guard = 0;
 
@@ -460,7 +457,7 @@ void core_tsk_suspend( tsk_t *tsk )
 {
 	tsk->delay = INFINITE;
 
-	core_tsk_wait(tsk, &WAIT.hdr.obj.queue);
+	core_tsk_wait(tsk, &WAIT.obj.queue);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -481,7 +478,7 @@ tsk_t *core_tsk_wakeup( tsk_t *tsk, int event )
 
 void core_all_wakeup( tsk_t *tsk, int event )
 {
-	while (tsk = core_tsk_wakeup(tsk, event), tsk) tsk = tsk->hdr.obj.queue;
+	while (tsk = core_tsk_wakeup(tsk, event), tsk) tsk = tsk->obj.queue;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -490,7 +487,7 @@ unsigned core_tsk_count( tsk_t *tsk )
 {
 	unsigned cnt = 0;
 
-	while (tsk) { cnt++; tsk = tsk->hdr.obj.queue; }
+	while (tsk) { cnt++; tsk = tsk->obj.queue; }
 
 	return cnt;
 }
@@ -713,11 +710,11 @@ void core_tsk_deleter( void )
 {
 	tsk_t *tsk;
 
-	while (tsk = IDLE.hdr.obj.queue, tsk) // garbage collection procedure
+	while (tsk = IDLE.obj.queue, tsk)   // garbage collection procedure
 	{
-		core_tsk_unlink(tsk, 0);          // remove task from DESTRUCTOR queue; ignored event value
-		core_tmr_remove((tmr_t *)tsk);    // remove task from WAIT queue
-		core_res_free(&tsk->hdr.obj);     // release resources
+		core_tsk_unlink(tsk, 0);        // remove task from DESTRUCTOR queue; ignored event value
+		core_tmr_remove((tmr_t *)tsk);  // remove task from WAIT queue
+		core_res_free(&tsk->obj);       // release resources
 	}
 }
 

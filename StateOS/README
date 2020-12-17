@@ -53,6 +53,7 @@ Features:
 - task behavior on return from the task function is now configurable using the OS_TASK_EXIT config constant
 - idle task is detached
 - used stdatomic for spin lock/unlock
+- updated internal insert / remove functions
 ---------
 6.7
 - updated os version

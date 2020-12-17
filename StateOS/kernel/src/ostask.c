@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    13.12.2020
+    @date    17.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -40,7 +40,8 @@ void priv_wrk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_
 {
 	memset(tsk, 0, sizeof(tsk_t));
 
-	core_hdr_init(&tsk->hdr, res);
+	core_obj_init(&tsk->obj, res);
+	core_hdr_init(&tsk->hdr);
 
 	tsk->prio  = prio;
 	tsk->basic = prio;
@@ -176,7 +177,7 @@ void tsk_start( tsk_t *tsk )
 {
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED); // object with released resources cannot be used
+	assert(tsk->obj.res!=RELEASED);     // object with released resources cannot be used
 	assert(tsk->state);
 
 	sys_lock();
@@ -196,7 +197,7 @@ void tsk_startFrom( tsk_t *tsk, fun_t *state )
 {
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED); // object with released resources cannot be used
+	assert(tsk->obj.res!=RELEASED);     // object with released resources cannot be used
 	assert(state);
 
 	sys_lock();
@@ -220,17 +221,17 @@ int tsk_detach( tsk_t *tsk )
 
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
+	assert(tsk->obj.res!=RELEASED);
 
 	sys_lock();
 	{
 		if (tsk->owner == tsk ||                    // task has already been detached
-		    tsk->hdr.obj.res == NULL)               // task is undetachable
+		    tsk->obj.res == NULL)                   // task is undetachable
 			result = E_FAILURE;
 		else
 		if (tsk->hdr.id == ID_STOPPED)              // task is already inactive
 		{
-			core_res_free(&tsk->hdr.obj);           // release resources
+			core_res_free(&tsk->obj);               // release resources
 			result = E_SUCCESS;
 		}
 		else                                        // task is active and can be detached
@@ -253,7 +254,7 @@ int tsk_join( tsk_t *tsk )
 
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
+	assert(tsk->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -269,7 +270,7 @@ int tsk_join( tsk_t *tsk )
 		if (result != E_FAILURE &&                            // task has not been detached
 		    result != E_DELETED &&                            // task has not been deleted
 		    tsk->hdr.id == ID_STOPPED)                        // task is still inactive
-			core_res_free(&tsk->hdr.obj);                     // release resources
+			core_res_free(&tsk->obj);                         // release resources
 	}
 	sys_unlock();
 
@@ -332,7 +333,7 @@ void priv_tsk_destroy( void )
 {
 	core_tsk_deleter();                  // call garbage collection procedure
 	IDLE.state = priv_tsk_idle;          // set task deleter as idle procedure
-	core_tsk_waitFor(&IDLE.hdr.obj.queue, INFINITE); // wait for removal
+	core_tsk_waitFor(&IDLE.obj.queue, INFINITE); // wait for removal
 
 	assert(!"system cannot return here");
 }
@@ -376,7 +377,7 @@ int tsk_reset( tsk_t *tsk )
 
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
+	assert(tsk->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -409,7 +410,7 @@ int tsk_destroy( tsk_t *tsk )
 
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
+	assert(tsk->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -430,7 +431,7 @@ int tsk_destroy( tsk_t *tsk )
 				priv_tsk_stop(tsk);                     // remove task from all queues
 			}
 
-			core_res_free(&tsk->hdr.obj);               // release resources
+			core_res_free(&tsk->obj);                   // release resources
 			result = E_SUCCESS;
 		}
 	}
@@ -507,7 +508,7 @@ void tsk_sleepFor( cnt_t delay )
 {
 	sys_lock();
 	{
-		core_tsk_waitFor(&WAIT.hdr.obj.queue, delay);
+		core_tsk_waitFor(&WAIT.obj.queue, delay);
 	}
 	sys_unlock();
 }
@@ -518,7 +519,7 @@ void tsk_sleepNext( cnt_t delay )
 {
 	sys_lock();
 	{
-		core_tsk_waitNext(&WAIT.hdr.obj.queue, delay);
+		core_tsk_waitNext(&WAIT.obj.queue, delay);
 	}
 	sys_unlock();
 }
@@ -529,7 +530,7 @@ void tsk_sleepUntil( cnt_t time )
 {
 	sys_lock();
 	{
-		core_tsk_waitUntil(&WAIT.hdr.obj.queue, time);
+		core_tsk_waitUntil(&WAIT.obj.queue, time);
 	}
 	sys_unlock();
 }
@@ -541,7 +542,7 @@ int tsk_suspend( tsk_t *tsk )
 	int result = E_FAILURE;
 
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
+	assert(tsk->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -563,11 +564,11 @@ int tsk_resume( tsk_t *tsk )
 	int result = E_FAILURE;
 
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
+	assert(tsk->obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		if (tsk->guard == &WAIT.hdr.obj.queue && tsk->delay == INFINITE)
+		if (tsk->guard == &WAIT.obj.queue && tsk->delay == INFINITE)
 		{
 			core_tsk_wakeup(tsk, 0); // ignored event value
 			result = E_SUCCESS;
@@ -657,7 +658,7 @@ void tsk_give( tsk_t *tsk, unsigned signo )
 
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
+	assert(tsk->obj.res!=RELEASED);
 	assert(sigset);
 
 	sys_lock();
@@ -678,7 +679,7 @@ void tsk_action( tsk_t *tsk, act_t *action )
 {
 	assert_tsk_context();
 	assert(tsk);
-	assert(tsk->hdr.obj.res!=RELEASED);
+	assert(tsk->obj.res!=RELEASED);
 
 	sys_lock();
 	{

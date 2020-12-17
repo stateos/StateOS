@@ -24,7 +24,7 @@
 
     @file    StateOS: cmsis_os2.c
     @author  Rajmund Szymanski
-    @date    07.12.2020
+    @date    17.12.2020
     @brief   CMSIS-RTOS2 API implementation for StateOS.
 
  ******************************************************************************
@@ -249,8 +249,8 @@ osThreadId_t osThreadNew (osThreadFunc_t func, void *argument, const osThreadAtt
 	sys_lock();
 	{
 		tsk_init(&thread->tsk, attr == NULL ? osPriorityNormal : (unsigned)attr->priority, thread_handler, stack_mem, stack_size);
-		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U ) thread->tsk.hdr.obj.res = thread;
-		else if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.hdr.obj.res = stack_mem;
+		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U ) thread->tsk.obj.res = thread;
+		else if (attr->stack_mem == NULL || attr->stack_size == 0U) thread->tsk.obj.res = stack_mem;
 		thread->tsk.owner = ((flags & osThreadJoinable) == osThreadJoinable) ? NULL : &thread->tsk;
 		flg_init(&thread->flg, 0);
 		thread->flags = flags;
@@ -616,7 +616,7 @@ osTimerId_t osTimerNew (osTimerFunc_t func, osTimerType_t type, void *argument, 
 	sys_lock();
 	{
 		tmr_init(&timer->tmr, timer_handler);
-		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.hdr.obj.res = timer;
+		if (attr == NULL || attr->cb_mem == NULL || attr->cb_size == 0U) timer->tmr.obj.res = timer;
 		timer->flags = flags;
 		timer->name = (attr == NULL) ? NULL : attr->name;
 		timer->func = func;

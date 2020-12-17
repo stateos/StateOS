@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.c
     @author  Rajmund Szymanski
-    @date    02.07.2020
+    @date    17.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -234,7 +234,7 @@ void sig_give( sig_t *sig, unsigned signo )
 				core_tsk_wakeup(tsk, E_SUCCESS);
 				continue;
 			}
-			obj = &tsk->hdr.obj;
+			obj = &tsk->obj;
 		}
 	}
 	sys_unlock();

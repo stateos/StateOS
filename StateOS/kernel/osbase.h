@@ -2,7 +2,7 @@
 
     @file    StateOS: osbase.h
     @author  Rajmund Szymanski
-    @date    16.12.2020
+    @date    17.12.2020
     @brief   This file contains basic definitions for StateOS.
 
  ******************************************************************************
@@ -187,22 +187,19 @@ void core_obj_init( obj_t *obj, void *res )
 
 typedef struct __hdr
 {
-	obj_t    obj;   // object header
 	void   * prev;  // previous object (timer / task) in the READY queue
 	void   * next;  // next object (timer / task) in the READY queue
 	tid_t    id;    // timer / task id
 
 }	hdr_t;
 
-#define               _HDR_INIT() { _OBJ_INIT(), NULL, NULL, ID_STOPPED }
+#define               _HDR_INIT() { NULL, NULL, ID_STOPPED }
 
 /* -------------------------------------------------------------------------- */
 
 __STATIC_INLINE
-void core_hdr_init( hdr_t *hdr, void *res )
+void core_hdr_init( hdr_t *hdr )
 {
-	core_obj_init(&hdr->obj, res);
-
 	hdr->id = ID_STOPPED;
 }
 

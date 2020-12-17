@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.c
     @author  Rajmund Szymanski
-    @date    02.07.2020
+    @date    17.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -39,7 +39,8 @@ void priv_tmr_init( tmr_t *tmr, fun_t *state, void *res )
 {
 	memset(tmr, 0, sizeof(tmr_t));
 
-	core_hdr_init(&tmr->hdr, res);
+	core_obj_init(&tmr->obj, res);
+	core_hdr_init(&tmr->hdr);
 
 	tmr->state = state;
 }
@@ -84,7 +85,7 @@ void priv_tmr_reset( tmr_t *tmr, int event )
 {
 	if (tmr->hdr.id != ID_STOPPED)
 	{
-		core_all_wakeup(tmr->hdr.obj.queue, event);
+		core_all_wakeup(tmr->obj.queue, event);
 		core_tmr_remove(tmr);
 	}
 }
@@ -95,7 +96,7 @@ void tmr_reset( tmr_t *tmr )
 {
 	assert_tsk_context();
 	assert(tmr);
-	assert(tmr->hdr.obj.res!=RELEASED);
+	assert(tmr->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -110,12 +111,12 @@ void tmr_destroy( tmr_t *tmr )
 {
 	assert_tsk_context();
 	assert(tmr);
-	assert(tmr->hdr.obj.res!=RELEASED);
+	assert(tmr->obj.res!=RELEASED);
 
 	sys_lock();
 	{
-		priv_tmr_reset(tmr, tmr->hdr.obj.res ? E_DELETED : E_STOPPED);
-		core_res_free(&tmr->hdr.obj);
+		priv_tmr_reset(tmr, tmr->obj.res ? E_DELETED : E_STOPPED);
+		core_res_free(&tmr->obj);
 	}
 	sys_unlock();
 }
@@ -136,7 +137,7 @@ void tmr_start( tmr_t *tmr, cnt_t delay, cnt_t period )
 {
 	assert_tsk_context();
 	assert(tmr);
-	assert(tmr->hdr.obj.res!=RELEASED);
+	assert(tmr->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -155,7 +156,7 @@ void tmr_startFrom( tmr_t *tmr, cnt_t delay, cnt_t period, fun_t *proc )
 {
 	assert_tsk_context();
 	assert(tmr);
-	assert(tmr->hdr.obj.res!=RELEASED);
+	assert(tmr->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -175,7 +176,7 @@ void tmr_startNext( tmr_t *tmr, cnt_t delay )
 {
 	assert_tsk_context();
 	assert(tmr);
-	assert(tmr->hdr.obj.res!=RELEASED);
+	assert(tmr->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -192,7 +193,7 @@ void tmr_startUntil( tmr_t *tmr, cnt_t time )
 {
 	assert_tsk_context();
 	assert(tmr);
-	assert(tmr->hdr.obj.res!=RELEASED);
+	assert(tmr->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -228,7 +229,7 @@ int tmr_take( tmr_t *tmr )
 	int result;
 
 	assert(tmr);
-	assert(tmr->hdr.obj.res!=RELEASED);
+	assert(tmr->obj.res!=RELEASED);
 
 	sys_lock();
 	{
@@ -247,13 +248,13 @@ int tmr_waitFor( tmr_t *tmr, cnt_t delay )
 
 	assert_tsk_context();
 	assert(tmr);
-	assert(tmr->hdr.obj.res!=RELEASED);
+	assert(tmr->obj.res!=RELEASED);
 
 	sys_lock();
 	{
 		result = priv_tmr_take(tmr);
 		if (result == E_TIMEOUT)
-			result = core_tsk_waitFor(&tmr->hdr.obj.queue, delay);
+			result = core_tsk_waitFor(&tmr->obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -268,13 +269,13 @@ int tmr_waitNext( tmr_t *tmr, cnt_t delay )
 
 	assert_tsk_context();
 	assert(tmr);
-	assert(tmr->hdr.obj.res!=RELEASED);
+	assert(tmr->obj.res!=RELEASED);
 
 	sys_lock();
 	{
 		result = priv_tmr_take(tmr);
 		if (result == E_TIMEOUT)
-			result = core_tsk_waitNext(&tmr->hdr.obj.queue, delay);
+			result = core_tsk_waitNext(&tmr->obj.queue, delay);
 	}
 	sys_unlock();
 
@@ -289,13 +290,13 @@ int tmr_waitUntil( tmr_t *tmr, cnt_t time )
 
 	assert_tsk_context();
 	assert(tmr);
-	assert(tmr->hdr.obj.res!=RELEASED);
+	assert(tmr->obj.res!=RELEASED);
 
 	sys_lock();
 	{
 		result = priv_tmr_take(tmr);
 		if (result == E_TIMEOUT)
-			result = core_tsk_waitUntil(&tmr->hdr.obj.queue, time);
+			result = core_tsk_waitUntil(&tmr->obj.queue, time);
 	}
 	sys_unlock();
 

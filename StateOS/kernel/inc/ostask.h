@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    10.12.2020
+    @date    17.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -56,6 +56,7 @@
 
 struct __tsk
 {
+	obj_t    obj;   // object header
 	hdr_t    hdr;   // timer / task header
 
 	fun_t  * state; // task state (initial task function, doesn't have to be noreturn-type)
@@ -177,7 +178,7 @@ extern "C" {
  ******************************************************************************/
 
 #define               _TSK_INIT( _prio, _state, _stack, _size )                                               \
-                       { _HDR_INIT(), _state, 0, 0, 0, NULL, _stack, _size, NULL, _prio, _prio, NULL, NULL, 0, \
+                       { _OBJ_INIT(), _HDR_INIT(), _state, 0, 0, 0, NULL, _stack, _size, NULL, _prio, _prio, NULL, NULL, 0, \
                        { NULL, NULL }, { 0, NULL, { NULL, NULL } }, { { 0 } }, _PORT_DATA_INIT() }
 
 /******************************************************************************
@@ -1620,7 +1621,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		auto tsk = new TaskT<size_>(_prio, _state);
 		if (tsk != nullptr)
 		{
-			tsk->__tsk::hdr.obj.res = tsk;
+			tsk->__tsk::obj.res = tsk;
 			tsk->start();
 		}
 		return Ptr(tsk);
@@ -1660,7 +1661,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		auto tsk = new TaskT<size_>(_prio, _state);
 		if (tsk != nullptr)
 		{
-			tsk->__tsk::hdr.obj.res = tsk;
+			tsk->__tsk::obj.res = tsk;
 			tsk->__tsk::owner = tsk;
 			tsk->start();
 		}

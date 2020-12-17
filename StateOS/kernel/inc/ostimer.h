@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    17.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -43,6 +43,7 @@
 
 struct __tmr
 {
+	obj_t    obj;   // object header
 	hdr_t    hdr;   // timer / task header
 
 	fun_t  * state; // callback procedure
@@ -72,7 +73,7 @@ extern "C" {
  ******************************************************************************/
 
 #define               _TMR_INIT( _state ) \
-                    { _HDR_INIT(), _state, 0, 0, 0 }
+                    { _OBJ_INIT(), _HDR_INIT(), _state, 0, 0, 0 }
 
 /******************************************************************************
  *
@@ -1125,7 +1126,7 @@ struct Timer : public baseTimer
 	{
 		auto tmr = new Timer();
 		if (tmr != nullptr)
-			tmr->__tmr::hdr.obj.res = tmr;
+			tmr->__tmr::obj.res = tmr;
 		return Ptr(tmr);
 	}
 
@@ -1134,7 +1135,7 @@ struct Timer : public baseTimer
 	{
 		auto tmr = new Timer(_state);
 		if (tmr != nullptr)
-			tmr->__tmr::hdr.obj.res = tmr;
+			tmr->__tmr::obj.res = tmr;
 		return Ptr(tmr);
 	}
 

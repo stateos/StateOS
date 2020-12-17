@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.c
     @author  Rajmund Szymanski
-    @date    02.07.2020
+    @date    17.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -239,7 +239,7 @@ unsigned flg_give( flg_t *flg, unsigned flags )
 					continue;
 				}
 			}
-			obj = &tsk->hdr.obj;
+			obj = &tsk->obj;
 		}
 
 		result = flg->flags;
