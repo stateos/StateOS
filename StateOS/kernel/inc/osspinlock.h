@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    16.12.2020
+    @date    17.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -41,11 +41,7 @@
  *
  ******************************************************************************/
 
-#if OS_ATOMICS
-typedef __STD atomic_uint_fast8_t spn_t, * const spn_id;
-#else
 typedef uint_fast8_t spn_t, * const spn_id;
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -159,7 +155,7 @@ __STATIC_INLINE
 void core_spn_lock( spn_t *spn )
 {
 #if OS_ATOMICS
-	while (__STD atomic_exchange(spn, 1) != 0);
+	while (__STD atomic_exchange((__STD atomic_uint_fast8_t *)spn, 1) != 0);
 #else
 	(void) spn;
 #endif
@@ -185,7 +181,7 @@ __STATIC_INLINE
 void core_spn_unlock( spn_t *spn )
 {
 #if OS_ATOMICS
-	__STD atomic_store(spn, 0);
+	__STD atomic_store((__STD atomic_uint_fast8_t *)spn, 0);
 #else
 	(void) spn;
 #endif
@@ -209,11 +205,7 @@ void core_spn_unlock( spn_t *spn )
 __STATIC_INLINE
 void spn_init( spn_t *spn )
 {
-#if OS_ATOMICS
-	__STD atomic_store(spn, 0);
-#else
 	*spn = 0;
-#endif
 }
 
 /******************************************************************************
@@ -281,8 +273,9 @@ void spn_init( spn_t *spn )
 
 struct SpinLock : private CriticalSection
 {
-	 SpinLock( spn_id _spn ): spn_{_spn} { core_spn_lock  (spn_); }
-	~SpinLock( void )                    { core_spn_unlock(spn_); }
+	 SpinLock( spn_t *_spn ): spn_{ _spn} { core_spn_lock  (spn_); }
+	 SpinLock( spn_t &_spn ): spn_{&_spn} { core_spn_lock  (spn_); }
+	~SpinLock( void )                     { core_spn_unlock(spn_); }
 
 	SpinLock( SpinLock&& ) = delete;
 	SpinLock( const SpinLock& ) = delete;
@@ -290,7 +283,7 @@ struct SpinLock : private CriticalSection
 	SpinLock& operator=( const SpinLock& ) = delete;
 
 	private:
-	spn_id spn_;
+	spn_t *spn_;
 };
 
 #endif//__cplusplus
