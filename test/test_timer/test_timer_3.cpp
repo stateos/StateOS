@@ -5,10 +5,10 @@ static auto Tmr1 = Timer(nullptr);
 static auto Tmr2 = Timer(nullptr);
 static auto Tmr3 = Timer(nullptr);
 
-static auto Tmr4 = Timer::Start(4, 0, []{});
-static auto Tmr5 = Timer::Start(5, 0, []{});
-static auto Tmr6 = Timer::Start(6, 0, []{});
-static auto Tmr7 = Timer::Start(7, 0, []{});
+static auto Tmr4 = Timer::Start(4U, 0U, []{});
+static auto Tmr5 = Timer::Start(5U, 0U, []{});
+static auto Tmr6 = Timer::Start(6U, 0U, []{});
+static auto Tmr7 = Timer::Start(7U, 0U, []{});
 
 static int counter;
 
@@ -27,10 +27,10 @@ static void test()
 	result = Tmr5.wait();                         ASSERT_success(result);
 	result = Tmr6.wait();                         ASSERT_success(result);
 	result = Tmr7.wait();                         ASSERT_success(result);
-	         Tmr3.startFrom(3, 0, proc);
-	         Tmr2.startFrom(2, 0, proc);
-	         Tmr1.startFrom(1, 0, proc);
-	         Tmr0.startFrom(0, 0, proc);
+	         Tmr3.startFrom(3U, 0U, proc);
+	         Tmr2.startFrom(2U, 0U, proc);
+	         Tmr1.startFrom(1U, 0U, proc);
+	         Tmr0.startFrom(0U, 0U, proc);
 	result = Tmr0.wait();                         ASSERT_success(result);
 	result = Tmr1.wait();                         ASSERT_success(result);
 	result = Tmr2.wait();                         ASSERT_success(result);
