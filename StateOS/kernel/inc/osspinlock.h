@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    17.12.2020
+    @date    18.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -136,11 +136,40 @@ extern "C" {
 
 /******************************************************************************
  *
+ * Name              : core_spn_tryLock
+ *
+ * Description       : try lock the spin lock object
+ *
+ * Parameters
+ *   spn             : pointer to spin lock object
+ *
+ * Return
+ *   true            : spin lock object was successfully locked
+ *   false           : spin lock object can't be locked immediately
+ *                     or OS_ATOMICS is zero
+ *
+ * Note              : for internal use
+ *
+ ******************************************************************************/
+
+__STATIC_INLINE
+bool core_spn_tryLock( spn_t *spn )
+{
+#if OS_ATOMICS
+	return __STD atomic_exchange((__STD atomic_uint_fast8_t *)spn, 1) == 0;
+#else
+	(void) spn;
+	return false;
+#endif
+}
+
+/******************************************************************************
+ *
  * Name              : core_spn_lock
  *
  * Description       : lock the spin lock object
  *                     (wait indefinitely if the spin lock object can't be locked immediately)
- *                     or do nothing if OS_ATOMICS is not defined
+ *                     or do nothing if OS_ATOMICS is zero
  *
  * Parameters
  *   spn             : pointer to spin lock object
@@ -155,7 +184,7 @@ __STATIC_INLINE
 void core_spn_lock( spn_t *spn )
 {
 #if OS_ATOMICS
-	while (__STD atomic_exchange((__STD atomic_uint_fast8_t *)spn, 1) != 0);
+	while (!core_spn_tryLock(spn));
 #else
 	(void) spn;
 #endif
@@ -166,7 +195,7 @@ void core_spn_lock( spn_t *spn )
  * Name              : core_spn_unlock
  *
  * Description       : unlock the spin lock object
- *                     or do nothing if OS_ATOMICS is not defined
+ *                     or do nothing if OS_ATOMICS is zero
  *
  * Parameters
  *   spn             : pointer to spin lock object
@@ -214,7 +243,7 @@ void spn_init( spn_t *spn )
  *
  * Description       : save interrupts state, disable interrupts then lock the spin lock object
  *                     (wait indefinitely if the spin lock object can't be locked immediately)
- *                     or do nothing if OS_ATOMICS is not defined
+ *                     or do nothing if OS_ATOMICS is zero
  *                   / enter into critical section
  *
  * Parameters
@@ -235,7 +264,7 @@ void spn_init( spn_t *spn )
  * Name              : spn_unlock
  *
  * Description       : unlock the spin lock object
- *                     or do nothing if OS_ATOMICS is not defined
+ *                     or do nothing if OS_ATOMICS is zero
  *                     then restore saved interrupts state
  *                   / exit from critical section
  *

@@ -54,6 +54,7 @@ Features:
 - idle task is detached
 - used stdatomic for spin lock/unlock
 - updated internal insert / remove functions
+- added core_spn_tryLock function
 ---------
 6.7
 - updated os version
