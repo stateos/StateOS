@@ -1,5 +1,5 @@
 # StateOS
-  [![Build Status](https://travis-ci.org/stateos/StateOS.svg)](https://travis-ci.org/stateos/StateOS)
+  [![Build Status](https://travis-ci.com/stateos/StateOS.svg)](https://travis-ci.com/stateos/StateOS)
   [![Software License](https://img.shields.io/github/license/stateos/StateOS.svg)](https://opensource.org/licenses/MIT)
   [![Github Release](https://img.shields.io/github/release/stateos/StateOS.svg)](https://github.com/stateos/StateOS/releases)
   [![Software Download](https://img.shields.io/sourceforge/dt/stateos.svg)](https://sourceforge.net/projects/stateos/files/latest/download)
