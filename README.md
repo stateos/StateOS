@@ -1,5 +1,5 @@
 # StateOS
-  ![CI Status](https://github.com/stateos/StateOS/workflows/CI/badge.svg)
+  [![CI Status](https://github.com/stateos/StateOS/workflows/CI/badge.svg)](https://github.com/stateos/StateOS/actions)
   [![Build Status](https://travis-ci.com/stateos/StateOS.svg)](https://travis-ci.com/stateos/StateOS)
   [![Software License](https://img.shields.io/github/license/stateos/StateOS.svg)](https://opensource.org/licenses/MIT)
   [![Github Release](https://img.shields.io/github/release/stateos/StateOS.svg)](https://github.com/stateos/StateOS/releases)
