@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    18.12.2020
+    @date    19.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -144,9 +144,8 @@ extern "C" {
  *   spn             : pointer to spin lock object
  *
  * Return
- *   true            : spin lock object was successfully locked
- *   false           : spin lock object can't be locked immediately
- *                     or OS_ATOMICS is zero
+ *   true            : spin lock object was successfully locked or OS_ATOMICS is zero
+ *   false           : otherwise
  *
  * Note              : for internal use
  *
@@ -159,7 +158,7 @@ bool core_spn_tryLock( spn_t *spn )
 	return __STD atomic_exchange((__STD atomic_uint_fast8_t *)spn, 1) == 0;
 #else
 	(void) spn;
-	return false;
+	return true;
 #endif
 }
 
@@ -183,11 +182,7 @@ bool core_spn_tryLock( spn_t *spn )
 __STATIC_INLINE
 void core_spn_lock( spn_t *spn )
 {
-#if OS_ATOMICS
 	while (!core_spn_tryLock(spn));
-#else
-	(void) spn;
-#endif
 }
 
 /******************************************************************************
