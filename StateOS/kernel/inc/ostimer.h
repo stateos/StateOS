@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    17.12.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -569,7 +569,8 @@ void tmr_stop( tmr_t *tmr ) { tmr_start(tmr, 0, 0); }
  *   E_FAILURE       : timer has not yet been started
  *   E_TIMEOUT       : timer object has not yet completed counting, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 

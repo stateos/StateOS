@@ -2,7 +2,7 @@
 
     @file    StateOS: osonceflag.h
     @author  Rajmund Szymanski
-    @date    01.06.2020
+    @date    22.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -182,7 +182,7 @@ void one_init( one_t *one ) { *one = 0; }
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
  *
  ******************************************************************************/
 

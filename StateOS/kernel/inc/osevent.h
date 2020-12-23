@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    27.06.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -302,7 +302,8 @@ int evt_wait( evt_t *evt, unsigned *event ) { return evt_waitFor(evt, event, INF
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 

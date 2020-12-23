@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -282,7 +282,8 @@ void box_delete( box_t *box ) { box_destroy(box); }
  *   E_SUCCESS       : mailbox data was successfully transferred from the mailbox queue object
  *   E_TIMEOUT       : mailbox queue object is empty, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -383,7 +384,8 @@ int box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFINITE)
  *   E_SUCCESS       : mailbox data was successfully transferred to the mailbox queue object
  *   E_TIMEOUT       : mailbox queue object is full, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -479,7 +481,8 @@ int box_send( box_t *box, const void *data ) { return box_sendFor(box, data, INF
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -500,7 +503,8 @@ void box_pushISR( box_t *box, const void *data ) { box_push(box, data); }
  *
  * Return            : amount of data contained in the mailbox queue
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -521,7 +525,8 @@ unsigned box_countISR( box_t *box ) { return box_count(box); }
  *
  * Return            : amount of free space in the mailbox queue
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -542,7 +547,8 @@ unsigned box_spaceISR( box_t *box ) { return box_space(box); }
  *
  * Return            : size of the mailbox queue
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 

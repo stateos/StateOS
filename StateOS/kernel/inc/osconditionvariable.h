@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -320,7 +320,8 @@ int cnd_wait( cnd_t *cnd, mtx_t *mtx ) { return cnd_waitFor(cnd, mtx, INFINITE);
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -340,7 +341,7 @@ void cnd_giveISR( cnd_t *cnd, bool all ) { cnd_give(cnd, all); }
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
  *
  ******************************************************************************/
 
@@ -358,7 +359,7 @@ void cnd_notifyOne( cnd_t *cnd ) { cnd_give(cnd, false); }
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
  *
  ******************************************************************************/
 

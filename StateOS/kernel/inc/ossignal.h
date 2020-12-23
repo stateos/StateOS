@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -267,7 +267,8 @@ void sig_delete( sig_t *sig ) { sig_destroy(sig); }
  *   E_SUCCESS       : variable 'singno' contains the lowest number of expected signal from the set of all pending signals
  *   E_TIMEOUT       : no expected signal has been set, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -369,7 +370,8 @@ int sig_wait( sig_t *sig, unsigned sigset, unsigned *signo ) { return sig_waitFo
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -394,7 +396,8 @@ void sig_giveISR( sig_t *sig, unsigned signo ) { sig_give(sig, signo); }
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 

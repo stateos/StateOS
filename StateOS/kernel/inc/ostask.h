@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    17.12.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1206,7 +1206,8 @@ void cur_suspend( void ) { tsk_suspend(System.cur); }
  *   E_SUCCESS       : task was successfully resumed
  *   E_FAILURE       : task cannot be resumed
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 

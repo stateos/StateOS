@@ -2,7 +2,7 @@
 
     @file    StateOS: osstreambuffer.h
     @author  Rajmund Szymanski
-    @date    28.11.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -291,7 +291,8 @@ void stm_delete( stm_t *stm ) { stm_destroy(stm); }
  *   E_SUCCESS       : variable 'read' contains the number of bytes read from the stream buffer
  *   E_TIMEOUT       : stream buffer object is empty, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -400,7 +401,8 @@ int stm_wait( stm_t *stm, void *data, size_t size, size_t *read ) { return stm_w
  *   E_FAILURE       : size of the stream data is out of the limit
  *   E_TIMEOUT       : not enough space in the stream buffer, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -505,7 +507,8 @@ int stm_send( stm_t *stm, const void *data, size_t size ) { return stm_sendFor(s
  *   E_SUCCESS       : stream data was successfully transferred to the stream buffer object
  *   E_FAILURE       : size of the stream data is out of the limit
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -526,7 +529,8 @@ int stm_pushISR( stm_t *stm, const void *data, size_t size ) { return stm_push(s
  *
  * Return            : amount of data contained in the stream buffer
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -547,7 +551,8 @@ size_t stm_countISR( stm_t *stm ) { return stm_count(stm); }
  *
  * Return            : amount of free space in the stream buffer
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -568,7 +573,8 @@ size_t stm_spaceISR( stm_t *stm ) { return stm_space(stm); }
  *
  * Return            : size of the stream buffer
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 

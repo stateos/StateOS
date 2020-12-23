@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    05.12.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -300,7 +300,8 @@ void sem_delete( sem_t *sem ) { sem_destroy(sem); }
  *   E_SUCCESS       : semaphore object was successfully locked
  *   E_TIMEOUT       : semaphore object can't be locked immediately, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -398,7 +399,8 @@ int sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
  *   E_SUCCESS       : semaphore object was successfully unlocked
  *   E_TIMEOUT       : semaphore object can't be unlocked immediately, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 

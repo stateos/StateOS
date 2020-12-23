@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    28.11.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -292,7 +292,8 @@ void msg_delete( msg_t *msg ) { msg_destroy(msg); }
  *   E_FAILURE       : not enough space in the buffer
  *   E_TIMEOUT       : message buffer object is empty, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -404,7 +405,8 @@ int msg_wait( msg_t *msg, void *data, size_t size, size_t *read ) { return msg_w
  *   E_FAILURE       : size of the message data is out of the limit
  *   E_TIMEOUT       : not enough space in the message buffer, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -509,7 +511,8 @@ int msg_send( msg_t *msg, const void *data, size_t size ) { return msg_sendFor(m
  *   E_SUCCESS       : message data was successfully transferred to the message buffer object
  *   E_FAILURE       : size of the message data is out of the limit
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -530,7 +533,8 @@ int msg_pushISR( msg_t *msg, const void *data, size_t size ) { return msg_push(m
  *
  * Return            : amount of data contained in the message buffer
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -551,7 +555,8 @@ size_t msg_countISR( msg_t *msg ) { return msg_count(msg); }
  *
  * Return            : amount of free space in the message buffer
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -572,7 +577,8 @@ size_t msg_spaceISR( msg_t *msg ) { return msg_space(msg); }
  *
  * Return            : size of the message buffer
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -593,7 +599,8 @@ size_t msg_limitISR( msg_t *msg ) { return msg_limit(msg); }
  *
  * Return            : size of first message in the message buffer
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    27.06.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -301,7 +301,8 @@ void mem_delete( mem_t *mem ) { mem_destroy(mem); }
  *   E_SUCCESS       : pointer to memory object was successfully transferred to the data pointer
  *   E_TIMEOUT       : memory pool object is empty
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -402,7 +403,8 @@ int mem_wait( mem_t *mem, void **data ) { return lst_wait(&mem->lst, data); }
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 

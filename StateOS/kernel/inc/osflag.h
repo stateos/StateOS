@@ -2,7 +2,7 @@
 
     @file    StateOS: osflag.h
     @author  Rajmund Szymanski
-    @date    01.12.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -275,7 +275,8 @@ void flg_delete( flg_t *flg ) { flg_destroy(flg); }
  *   0               : required flags have been set
  *   another value   : remaining flags, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -389,7 +390,8 @@ int flg_wait( flg_t *flg, unsigned flags, unsigned mode ) { return flg_waitFor(f
  *
  * Return            : flags after setting
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -414,7 +416,8 @@ unsigned flg_giveISR( flg_t *flg, unsigned flags ) { return flg_give(flg, flags)
  *
  * Return            : flags before clearing
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -435,7 +438,8 @@ unsigned flg_clearISR( flg_t *flg, unsigned flags ) { return flg_clear(flg, flag
  *
  * Return            : current flags in flag object
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 

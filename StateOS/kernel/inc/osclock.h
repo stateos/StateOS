@@ -2,7 +2,7 @@
 
     @file    StateOS: osclock.h
     @author  Rajmund Szymanski
-    @date    17.05.2020
+    @date    23.12.2020
     @brief   This file implements steady clock for StateOS.
 
  ******************************************************************************
@@ -49,7 +49,8 @@ extern "C" {
  *
  * Return            : current value of system counter
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
