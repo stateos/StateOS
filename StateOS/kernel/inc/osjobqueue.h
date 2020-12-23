@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -272,7 +272,8 @@ void job_delete( job_t *job ) { job_destroy(job); }
  *   E_SUCCESS       : job data was successfully transferred from the job queue object
  *   E_TIMEOUT       : job queue object is empty, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -370,7 +371,8 @@ int job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
  *   E_SUCCESS       : job data was successfully transferred to the job queue object
  *   E_TIMEOUT       : job queue object is full, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -466,7 +468,8 @@ int job_send( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, INFINITE);
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -487,7 +490,8 @@ void job_pushISR( job_t *job, fun_t *fun ) { job_push(job, fun); }
  *
  * Return            : amount of data contained in the job queue
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -508,7 +512,8 @@ unsigned job_countISR( job_t *job ) { return job_count(job); }
  *
  * Return            : amount of free space in the job queue
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -529,7 +534,8 @@ unsigned job_spaceISR( job_t *job ) { return job_space(job); }
  *
  * Return            : size of the job queue
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -603,21 +609,21 @@ struct JobQueueT : public __job
 	void     reset    ( void )                        {        job_reset    (this); }
 	void     kill     ( void )                        {        job_kill     (this); }
 	void     destroy  ( void )                        {        job_destroy  (this); }
+	int      take     ( void )                        { return job_take     (this); }
+	int      tryWait  ( void )                        { return job_tryWait  (this); }
+	int      takeISR  ( void )                        { return job_takeISR  (this); }
 	template<typename T>
 	int      waitFor  ( const T _delay )              { return job_waitFor  (this, Clock::count(_delay)); }
 	template<typename T>
 	int      waitUntil( const T _time )               { return job_waitUntil(this, Clock::until(_time)); }
 	int      wait     ( void )                        { return job_wait     (this); }
-	int      take     ( void )                        { return job_take     (this); }
-	int      tryWait  ( void )                        { return job_tryWait  (this); }
-	int      takeISR  ( void )                        { return job_takeISR  (this); }
+	int      give     ( fun_t *_fun )                 { return job_give     (this, _fun); }
+	int      giveISR  ( fun_t *_fun )                 { return job_giveISR  (this, _fun); }
 	template<typename T>
 	int      sendFor  ( fun_t *_fun, const T _delay ) { return job_sendFor  (this, _fun, Clock::count(_delay)); }
 	template<typename T>
 	int      sendUntil( fun_t *_fun, const T _time )  { return job_sendUntil(this, _fun, Clock::until(_time)); }
 	int      send     ( fun_t *_fun )                 { return job_send     (this, _fun); }
-	int      give     ( fun_t *_fun )                 { return job_give     (this, _fun); }
-	int      giveISR  ( fun_t *_fun )                 { return job_giveISR  (this, _fun); }
 	void     push     ( fun_t *_fun )                 {        job_push     (this, _fun); }
 	void     pushISR  ( fun_t *_fun )                 {        job_pushISR  (this, _fun); }
 	unsigned count    ( void )                        { return job_count    (this); }

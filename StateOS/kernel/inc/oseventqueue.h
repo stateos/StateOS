@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    27.06.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -273,7 +273,8 @@ void evq_delete( evq_t *evq ) { evq_destroy(evq); }
  *   E_SUCCESS       : event value was successfully transferred from the event queue object
  *   E_TIMEOUT       : event queue object is empty, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -374,7 +375,8 @@ int evq_wait( evq_t *evq, unsigned *event ) { return evq_waitFor(evq, event, INF
  *   E_SUCCESS       : event value was successfully transferred to the event queue object
  *   E_TIMEOUT       : event queue object is full, try again
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -470,7 +472,8 @@ int evq_send( evq_t *evq, unsigned event ) { return evq_sendFor(evq, event, INFI
  *
  * Return            : none
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -491,7 +494,8 @@ void evq_pushISR( evq_t *evq, unsigned event ) { evq_push(evq, event); }
  *
  * Return            : amount of data contained in the event queue
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -512,7 +516,8 @@ unsigned evq_countISR( evq_t *evq ) { return evq_count(evq); }
  *
  * Return            : amount of free space in the event queue
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -533,7 +538,8 @@ unsigned evq_spaceISR( evq_t *evq ) { return evq_space(evq); }
  *
  * Return            : size of the event queue
  *
- * Note              : may be used both in thread and handler mode
+ * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ *                     use ISR alias in blockable interrupt handlers
  *
  ******************************************************************************/
 
