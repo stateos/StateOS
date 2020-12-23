@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    02.07.2020
+    @date    23.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -240,11 +240,75 @@ unsigned sem_getValue( sem_t *sem )
 
 	sys_lock();
 	{
+#if OS_ATOMICS
+		val = atomic_load(&sem->count);
+#else
 		val = sem->count;
+#endif
 	}
 	sys_unlock();
 
 	return val;
 }
 
+#if OS_ATOMICS
+/* -------------------------------------------------------------------------- */
+int sem_takeAsync( sem_t *sem )
+/* -------------------------------------------------------------------------- */
+{
+	int result = E_TIMEOUT;
+
+	assert(sem);
+	assert(sem->obj.res!=RELEASED);
+	assert(sem->count<=sem->limit);
+
+	sys_lock();
+	{
+		if (atomic_load(&sem->count) > 0)
+		{
+			atomic_fetch_sub(&sem->count, 1);
+			result = E_SUCCESS;
+		}
+	}
+	sys_unlock();
+
+	return result;
+}
+
+/* -------------------------------------------------------------------------- */
+int sem_waitAsync( sem_t *sem )
+/* -------------------------------------------------------------------------- */
+{
+	assert_tsk_context();
+
+	while (sem_takeAsync(sem) != E_SUCCESS)
+		core_ctx_switch();
+
+	return E_SUCCESS;
+}
+
+/* -------------------------------------------------------------------------- */
+int sem_giveAsync( sem_t *sem )
+/* -------------------------------------------------------------------------- */
+{
+	int result = E_TIMEOUT;
+
+	assert(sem);
+	assert(sem->obj.res!=RELEASED);
+	assert(sem->count<=sem->limit);
+
+	sys_lock();
+	{
+		if (atomic_load(&sem->count) < sem->limit)
+		{
+			atomic_fetch_add(&sem->count, 1);
+			result = E_SUCCESS;
+		}
+	}
+	sys_unlock();
+
+	return result;
+}
+
+#endif//OS_ATOMICS
 /* -------------------------------------------------------------------------- */

@@ -261,6 +261,7 @@ void job_delete( job_t *job ) { job_destroy(job); }
  * Name              : job_take
  * Alias             : job_tryWait
  * ISR alias         : job_takeISR
+ * Async alias       : job_takeAsync
  *
  * Description       : try to transfer job data from the job queue object and execute the job procedure,
  *                     don't wait if the job queue object is empty
@@ -272,8 +273,9 @@ void job_delete( job_t *job ) { job_destroy(job); }
  *   E_SUCCESS       : job data was successfully transferred from the job queue object
  *   E_TIMEOUT       : job queue object is empty, try again
  *
- * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -284,6 +286,10 @@ int job_tryWait( job_t *job ) { return job_take(job); }
 
 __STATIC_INLINE
 int job_takeISR( job_t *job ) { return job_take(job); }
+
+#if OS_ATOMICS
+int job_takeAsync( job_t *job );
+#endif
 
 /******************************************************************************
  *
@@ -336,6 +342,7 @@ int job_waitUntil( job_t *job, cnt_t time );
 /******************************************************************************
  *
  * Name              : job_wait
+ * Async alias       : job_waitAsync
  *
  * Description       : try to transfer job data from the job queue object and execute the job procedure,
  *                     wait indefinitely while the job queue object is empty
@@ -345,20 +352,26 @@ int job_waitUntil( job_t *job, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : job data was successfully transferred from the job queue object
- *   E_STOPPED       : job queue object was reseted
- *   E_DELETED       : job queue object was deleted
+ *   E_STOPPED       : job queue object was reseted (unavailable for async version)
+ *   E_DELETED       : job queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 int job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
 
+#if OS_ATOMICS
+int job_waitAsync( job_t *job );
+#endif
+
 /******************************************************************************
  *
  * Name              : job_give
  * ISR alias         : job_giveISR
+ * Async alias       : job_giveAsync
  *
  * Description       : try to transfer job data to the job queue object,
  *                     don't wait if the job queue object is full
@@ -371,8 +384,9 @@ int job_wait( job_t *job ) { return job_waitFor(job, INFINITE); }
  *   E_SUCCESS       : job data was successfully transferred to the job queue object
  *   E_TIMEOUT       : job queue object is full, try again
  *
- * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -380,6 +394,10 @@ int job_give( job_t *job, fun_t *fun );
 
 __STATIC_INLINE
 int job_giveISR( job_t *job, fun_t *fun ) { return job_give(job, fun); }
+
+#if OS_ATOMICS
+int job_giveAsync( job_t *job, fun_t *fun );
+#endif
 
 /******************************************************************************
  *
@@ -434,6 +452,7 @@ int job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
 /******************************************************************************
  *
  * Name              : job_send
+ * Async alias       : job_sendAsync
  *
  * Description       : try to transfer job data to the job queue object,
  *                     wait indefinitely while the job queue object is full
@@ -444,15 +463,20 @@ int job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : job data was successfully transferred to the job queue object
- *   E_STOPPED       : job queue object was reseted
- *   E_DELETED       : job queue object was deleted
+ *   E_STOPPED       : job queue object was reseted (unavailable for async version)
+ *   E_DELETED       : job queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 int job_send( job_t *job, fun_t *fun ) { return job_sendFor(job, fun, INFINITE); }
+
+#if OS_ATOMICS
+int job_sendAsync( job_t *job, fun_t *fun );
+#endif
 
 /******************************************************************************
  *
@@ -632,6 +656,12 @@ struct JobQueueT : public __job
 	unsigned spaceISR ( void )                        { return job_spaceISR (this); }
 	unsigned limit    ( void )                        { return job_limit    (this); }
 	unsigned limitISR ( void )                        { return job_limitISR (this); }
+#if OS_ATOMICS
+	int      takeAsync( void )                        { return job_takeAsync(this); }
+	int      waitAsync( void )                        { return job_waitAsync(this); }
+	int      giveAsync( fun_t *_fun )                 { return job_giveAsync(this, _fun); }
+	int      sendAsync( fun_t *_fun )                 { return job_sendAsync(this, _fun); }
+#endif
 
 	private:
 	fun_t *data_[limit_];

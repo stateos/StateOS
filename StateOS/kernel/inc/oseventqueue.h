@@ -261,6 +261,7 @@ void evq_delete( evq_t *evq ) { evq_destroy(evq); }
  * Name              : evq_take
  * Alias             : evq_tryWait
  * ISR alias         : evq_takeISR
+ * Async alias       : evq_takeAsync
  *
  * Description       : try to transfer event value from the event queue object,
  *                     don't wait if the event queue object is empty
@@ -273,8 +274,9 @@ void evq_delete( evq_t *evq ) { evq_destroy(evq); }
  *   E_SUCCESS       : event value was successfully transferred from the event queue object
  *   E_TIMEOUT       : event queue object is empty, try again
  *
- * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -285,6 +287,10 @@ int evq_tryWait( evq_t *evq, unsigned *event ) { return evq_take(evq, event); }
 
 __STATIC_INLINE
 int evq_takeISR( evq_t *evq, unsigned *event ) { return evq_take(evq, event); }
+
+#if OS_ATOMICS
+int evq_takeAsync( evq_t *evq, unsigned *event );
+#endif
 
 /******************************************************************************
  *
@@ -339,6 +345,7 @@ int evq_waitUntil( evq_t *evq, unsigned *event, cnt_t time );
 /******************************************************************************
  *
  * Name              : evq_wait
+ * Async alias       : evq_waitAsync
  *
  * Description       : try to transfer event value from the event queue object,
  *                     wait indefinitely while the event queue object is empty
@@ -349,20 +356,26 @@ int evq_waitUntil( evq_t *evq, unsigned *event, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : event value was successfully transferred from the event queue object
- *   E_STOPPED       : event queue object was reseted
- *   E_DELETED       : event queue object was deleted
+ *   E_STOPPED       : event queue object was reseted (unavailable for async version)
+ *   E_DELETED       : event queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 int evq_wait( evq_t *evq, unsigned *event ) { return evq_waitFor(evq, event, INFINITE); }
 
+#if OS_ATOMICS
+int evq_waitAsync( evq_t *evq, unsigned *event );
+#endif
+
 /******************************************************************************
  *
  * Name              : evq_give
  * ISR alias         : evq_giveISR
+ * Async alias       : evq_giveAsync
  *
  * Description       : try to transfer event value to the event queue object,
  *                     don't wait if the event queue object is full
@@ -375,8 +388,9 @@ int evq_wait( evq_t *evq, unsigned *event ) { return evq_waitFor(evq, event, INF
  *   E_SUCCESS       : event value was successfully transferred to the event queue object
  *   E_TIMEOUT       : event queue object is full, try again
  *
- * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -384,6 +398,10 @@ int evq_give( evq_t *evq, unsigned event );
 
 __STATIC_INLINE
 int evq_giveISR( evq_t *evq, unsigned event ) { return evq_give(evq, event); }
+
+#if OS_ATOMICS
+int evq_giveAsync( evq_t *evq, unsigned event );
+#endif
 
 /******************************************************************************
  *
@@ -438,6 +456,7 @@ int evq_sendUntil( evq_t *evq, unsigned event, cnt_t time );
 /******************************************************************************
  *
  * Name              : evq_send
+ * Async alias       : evq_sendAsync
  *
  * Description       : try to transfer event value to the event queue object,
  *                     wait indefinitely while the event queue object is full
@@ -448,15 +467,20 @@ int evq_sendUntil( evq_t *evq, unsigned event, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : event value was successfully transferred to the event queue object
- *   E_STOPPED       : event queue object was reseted
- *   E_DELETED       : event queue object was deleted
+ *   E_STOPPED       : event queue object was reseted (unavailable for async version)
+ *   E_DELETED       : event queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 int evq_send( evq_t *evq, unsigned event ) { return evq_sendFor(evq, event, INFINITE); }
+
+#if OS_ATOMICS
+int evq_sendAsync( evq_t *evq, unsigned event );
+#endif
 
 /******************************************************************************
  *
@@ -636,6 +660,12 @@ struct EventQueueT : public __evq
 	unsigned spaceISR ( void )                             { return evq_spaceISR (this); }
 	unsigned limit    ( void )                             { return evq_limit    (this); }
 	unsigned limitISR ( void )                             { return evq_limitISR (this); }
+#if OS_ATOMICS
+	int      takeAsync( unsigned *_event )                 { return evq_takeAsync(this, _event); }
+	int      waitAsync( unsigned *_event )                 { return evq_waitAsync(this, _event); }
+	int      giveAsync( unsigned  _event )                 { return evq_giveAsync(this, _event); }
+	int      sendAsync( unsigned  _event )                 { return evq_sendAsync(this, _event); }
+#endif
 
 	private:
 	unsigned data_[limit_];

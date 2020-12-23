@@ -270,6 +270,7 @@ void box_delete( box_t *box ) { box_destroy(box); }
  * Name              : box_take
  * Alias             : box_tryWait
  * ISR alias         : box_takeISR
+ * Async alias       : box_takeAsync
  *
  * Description       : try to transfer mailbox data from the mailbox queue object,
  *                     don't wait if the mailbox queue object is empty
@@ -282,8 +283,9 @@ void box_delete( box_t *box ) { box_destroy(box); }
  *   E_SUCCESS       : mailbox data was successfully transferred from the mailbox queue object
  *   E_TIMEOUT       : mailbox queue object is empty, try again
  *
- * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -294,6 +296,10 @@ int box_tryWait( box_t *box, void *data ) { return box_take(box, data); }
 
 __STATIC_INLINE
 int box_takeISR( box_t *box, void *data ) { return box_take(box, data); }
+
+#if OS_ATOMICS
+int box_takeAsync( box_t *box, void *data );
+#endif
 
 /******************************************************************************
  *
@@ -348,6 +354,7 @@ int box_waitUntil( box_t *box, void *data, cnt_t time );
 /******************************************************************************
  *
  * Name              : box_wait
+ * Async alias       : box_waitAsync
  *
  * Description       : try to transfer mailbox data from the mailbox queue object,
  *                     wait indefinitely while the mailbox queue object is empty
@@ -358,20 +365,26 @@ int box_waitUntil( box_t *box, void *data, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : mailbox data was successfully transferred from the mailbox queue object
- *   E_STOPPED       : mailbox queue object was reseted
- *   E_DELETED       : mailbox queue object was deleted
+ *   E_STOPPED       : mailbox queue object was reseted (unavailable for async version)
+ *   E_DELETED       : mailbox queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 int box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFINITE); }
 
+#if OS_ATOMICS
+int box_waitAsync( box_t *box, void *data );
+#endif
+
 /******************************************************************************
  *
  * Name              : box_give
  * ISR alias         : box_giveISR
+ * Async alias       : box_giveAsync
  *
  * Description       : try to transfer mailbox data to the mailbox queue object,
  *                     don't wait if the mailbox queue object is full
@@ -384,8 +397,9 @@ int box_wait( box_t *box, void *data ) { return box_waitFor(box, data, INFINITE)
  *   E_SUCCESS       : mailbox data was successfully transferred to the mailbox queue object
  *   E_TIMEOUT       : mailbox queue object is full, try again
  *
- * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -393,6 +407,10 @@ int box_give( box_t *box, const void *data );
 
 __STATIC_INLINE
 int box_giveISR( box_t *box, const void *data ) { return box_give(box, data); }
+
+#if OS_ATOMICS
+int box_giveAsync( box_t *box, const void *data );
+#endif
 
 /******************************************************************************
  *
@@ -447,6 +465,7 @@ int box_sendUntil( box_t *box, const void *data, cnt_t time );
 /******************************************************************************
  *
  * Name              : box_send
+ * Async alias       : box_sendAsync
  *
  * Description       : try to transfer mailbox data to the mailbox queue object,
  *                     wait indefinitely while the mailbox queue object is full
@@ -457,15 +476,20 @@ int box_sendUntil( box_t *box, const void *data, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : mailbox data was successfully transferred to the mailbox queue object
- *   E_STOPPED       : mailbox queue object was reseted
- *   E_DELETED       : mailbox queue object was deleted
+ *   E_STOPPED       : mailbox queue object was reseted (unavailable for async version)
+ *   E_DELETED       : mailbox queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
 __STATIC_INLINE
 int box_send( box_t *box, const void *data ) { return box_sendFor(box, data, INFINITE); }
+
+#if OS_ATOMICS
+int box_sendAsync( box_t *box, const void *data );
+#endif
 
 /******************************************************************************
  *
@@ -647,6 +671,12 @@ struct MailBoxQueueT : public __box
 	unsigned spaceISR (       void )                        { return box_spaceISR (this); }
 	unsigned limit    (       void )                        { return box_limit    (this); }
 	unsigned limitISR (       void )                        { return box_limitISR (this); }
+#if OS_ATOMICS
+	int      takeAsync(       void *_data )                 { return box_takeAsync(this, _data); }
+	int      waitAsync(       void *_data )                 { return box_waitAsync(this, _data); }
+	int      giveAsync( const void *_data )                 { return box_giveAsync(this, _data); }
+	int      sendAsync( const void *_data )                 { return box_sendAsync(this, _data); }
+#endif
 
 	private:
 	char data_[limit_ * size_];

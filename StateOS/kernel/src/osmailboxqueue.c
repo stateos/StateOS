@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.c
     @author  Rajmund Szymanski
-    @date    02.07.2020
+    @date    23.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -139,10 +139,14 @@ void priv_box_get( box_t *box, char *data )
 	size_t size = box->size;
 	size_t i = box->head;
 
-	box->count -= size;
 	while (size--)
 		*data++ = box->data[i++];
 	box->head = (i < box->limit) ? i : 0;
+#if OS_ATOMICS
+	atomic_fetch_sub(&box->count, box->size);
+#else
+	box->count -= box->size;
+#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -153,10 +157,14 @@ void priv_box_put( box_t *box, const char *data )
 	size_t size = box->size;
 	size_t i = box->tail;
 
-	box->count += size;
 	while (size--)
 		box->data[i++] = *data++;
 	box->tail = (i < box->limit) ? i : 0;
+#if OS_ATOMICS
+	atomic_fetch_add(&box->count, box->size);
+#else
+	box->count += box->size;
+#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -164,9 +172,14 @@ static
 void priv_box_skip( box_t *box )
 /* -------------------------------------------------------------------------- */
 {
+	size_t i = box->head + box->size;
+
+	box->head = (i < box->limit) ? i : 0;
+#if OS_ATOMICS
+	atomic_fetch_sub(&box->count, box->size);
+#else
 	box->count -= box->size;
-	box->head  += box->size;
-	if (box->head == box->limit) box->head = 0;
+#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -415,7 +428,11 @@ unsigned box_count( box_t *box )
 
 	sys_lock();
 	{
+#if OS_ATOMICS
+		count = atomic_load(&box->count) / box->size;
+#else
 		count = box->count / box->size;
+#endif
 	}
 	sys_unlock();
 
@@ -433,7 +450,11 @@ unsigned box_space( box_t *box )
 
 	sys_lock();
 	{
+#if OS_ATOMICS
+		space = (box->limit - atomic_load(&box->count)) / box->size;
+#else
 		space = (box->limit - box->count) / box->size;
+#endif
 	}
 	sys_unlock();
 
@@ -458,4 +479,80 @@ unsigned box_limit( box_t *box )
 	return limit;
 }
 
+#if OS_ATOMICS
+/* -------------------------------------------------------------------------- */
+int box_takeAsync( box_t *box, void *data )
+/* -------------------------------------------------------------------------- */
+{
+	int result = E_TIMEOUT;
+
+	assert(box);
+	assert(box->obj.res!=RELEASED);
+	assert(box->data);
+	assert(box->limit);
+	assert(data);
+
+	sys_lock();
+	{
+		if (atomic_load(&box->count) > 0)
+		{
+			priv_box_get(box, data);
+			result = E_SUCCESS;
+		}
+	}
+	sys_unlock();
+
+	return result;
+}
+
+/* -------------------------------------------------------------------------- */
+int box_waitAsync( box_t *box, void *data )
+/* -------------------------------------------------------------------------- */
+{
+	assert_tsk_context();
+
+	while (box_takeAsync(box, data) != E_SUCCESS)
+		core_ctx_switch();
+
+	return E_SUCCESS;
+}
+
+/* -------------------------------------------------------------------------- */
+int box_giveAsync( box_t *box, const void *data )
+/* -------------------------------------------------------------------------- */
+{
+	int result = E_TIMEOUT;
+
+	assert(box);
+	assert(box->obj.res!=RELEASED);
+	assert(box->data);
+	assert(box->limit);
+	assert(data);
+
+	sys_lock();
+	{
+		if (atomic_load(&box->count) < box->limit)
+		{
+			priv_box_put(box, data);
+			result = E_SUCCESS;
+		}
+	}
+	sys_unlock();
+
+	return result;
+}
+
+/* -------------------------------------------------------------------------- */
+int box_sendAsync( box_t *box, const void *data )
+/* -------------------------------------------------------------------------- */
+{
+	assert_tsk_context();
+
+	while (box_giveAsync(box, data) != E_SUCCESS)
+		core_ctx_switch();
+
+	return E_SUCCESS;
+}
+
+#endif//OS_ATOMICS
 /* -------------------------------------------------------------------------- */

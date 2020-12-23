@@ -289,6 +289,7 @@ void sem_delete( sem_t *sem ) { sem_destroy(sem); }
  * Name              : sem_take
  * Alias             : sem_tryWait
  * ISR alias         : sem_takeISR
+ * Async alias       : sem_takeAsync
  *
  * Description       : try to lock the semaphore object,
  *                     don't wait if the semaphore object can't be locked immediately
@@ -300,8 +301,9 @@ void sem_delete( sem_t *sem ) { sem_destroy(sem); }
  *   E_SUCCESS       : semaphore object was successfully locked
  *   E_TIMEOUT       : semaphore object can't be locked immediately, try again
  *
- * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -312,6 +314,10 @@ int sem_tryWait( sem_t *sem ) { return sem_take(sem); }
 
 __STATIC_INLINE
 int sem_takeISR( sem_t *sem ) { return sem_take(sem); }
+
+#if OS_ATOMICS
+int sem_takeAsync( sem_t *sem );
+#endif
 
 /******************************************************************************
  *
@@ -364,6 +370,7 @@ int sem_waitUntil( sem_t *sem, cnt_t time );
 /******************************************************************************
  *
  * Name              : sem_wait
+ * Async alias       : sem_waitAsync
  *
  * Description       : try to lock the semaphore object,
  *                     wait indefinitely if the semaphore object can't be locked immediately
@@ -373,8 +380,8 @@ int sem_waitUntil( sem_t *sem, cnt_t time );
  *
  * Return
  *   E_SUCCESS       : semaphore object was successfully locked
- *   E_STOPPED       : semaphore object was reseted
- *   E_DELETED       : semaphore object was deleted
+ *   E_STOPPED       : semaphore object was reseted (unavailable for async version)
+ *   E_DELETED       : semaphore object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
  *
@@ -383,11 +390,16 @@ int sem_waitUntil( sem_t *sem, cnt_t time );
 __STATIC_INLINE
 int sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
 
+#if OS_ATOMICS
+int sem_waitAsync( sem_t *sem );
+#endif
+
 /******************************************************************************
  *
  * Name              : sem_give
  * Alias             : sem_post
  * ISR alias         : sem_giveISR
+ * Async alias       : sem_giveAsync
  *
  * Description       : try to unlock the semaphore object,
  *                     don't wait if the semaphore object can't be unlocked immediately
@@ -399,8 +411,9 @@ int sem_wait( sem_t *sem ) { return sem_waitFor(sem, INFINITE); }
  *   E_SUCCESS       : semaphore object was successfully unlocked
  *   E_TIMEOUT       : semaphore object can't be unlocked immediately, try again
  *
- * Note              : can be used in both thread and handler mode (for blockable interrupts)
+ * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
+ *                     use Async alias for communication with unblockable interrupt handlers
  *
  ******************************************************************************/
 
@@ -411,6 +424,10 @@ int sem_post( sem_t *sem ) { return sem_give(sem); }
 
 __STATIC_INLINE
 int sem_giveISR( sem_t *sem ) { return sem_give(sem); }
+
+#if OS_ATOMICS
+int sem_giveAsync( sem_t *sem );
+#endif
 
 /******************************************************************************
  *
@@ -564,6 +581,11 @@ struct Semaphore : public __sem
 	int      post     ( void )           { return sem_post     (this); }
 	int      giveISR  ( void )           { return sem_giveISR  (this); }
 	unsigned getValue ( void )           { return sem_getValue (this); }
+#if OS_ATOMICS
+	int      takeAsync( void )           { return sem_takeAsync(this); }
+	int      waitAsync( void )           { return sem_waitAsync(this); }
+	int      giveAsync( void )           { return sem_giveAsync(this); }
+#endif
 };
 
 #endif//__cplusplus

@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    02.07.2020
+    @date    23.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -138,8 +138,11 @@ fun_t *priv_job_get( job_t *job )
 	fun_t *fun = job->data[i++];
 
 	job->head = (i < job->limit) ? i : 0;
+#if OS_ATOMICS
+	atomic_fetch_sub(&job->count, 1);
+#else
 	job->count--;
-
+#endif
 	return fun;
 }
 
@@ -153,7 +156,11 @@ void priv_job_put( job_t *job, fun_t *fun )
 	job->data[i++] = fun;
 
 	job->tail = (i < job->limit) ? i : 0;
+#if OS_ATOMICS
+	atomic_fetch_add(&job->count, 1);
+#else
 	job->count++;
+#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -164,7 +171,11 @@ void priv_job_skip( job_t *job )
 	unsigned i = job->head + 1;
 
 	job->head = (i < job->limit) ? i : 0;
+#if OS_ATOMICS
+	atomic_fetch_sub(&job->count, 1);
+#else
 	job->count--;
+#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -418,7 +429,11 @@ unsigned job_count( job_t *job )
 
 	sys_lock();
 	{
+#if OS_ATOMICS
+		count = atomic_load(&job->count);
+#else
 		count = job->count;
+#endif
 	}
 	sys_unlock();
 
@@ -436,7 +451,11 @@ unsigned job_space( job_t *job )
 
 	sys_lock();
 	{
+#if OS_ATOMICS
+		space = job->limit - atomic_load(&job->count);
+#else
 		space = job->limit - job->count;
+#endif
 	}
 	sys_unlock();
 
@@ -461,4 +480,82 @@ unsigned job_limit( job_t *job )
 	return limit;
 }
 
+#if OS_ATOMICS
+/* -------------------------------------------------------------------------- */
+int job_takeAsync( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	fun_t *fun;
+	int result = E_TIMEOUT;
+
+	assert(job);
+	assert(job->obj.res!=RELEASED);
+	assert(job->data);
+	assert(job->limit);
+
+	sys_lock();
+	{
+		if (atomic_load(&job->count) > 0)
+		{
+			fun = priv_job_get(job);
+			result = E_SUCCESS;
+		}
+	}
+	sys_unlock();
+
+	if (result == E_SUCCESS)
+		fun();
+
+	return result;
+}
+
+/* -------------------------------------------------------------------------- */
+int job_waitAsync( job_t *job )
+/* -------------------------------------------------------------------------- */
+{
+	assert_tsk_context();
+
+	while (job_takeAsync(job) != E_SUCCESS)
+		core_ctx_switch();
+
+	return E_SUCCESS;
+}
+
+/* -------------------------------------------------------------------------- */
+int job_giveAsync( job_t *job, fun_t *fun )
+/* -------------------------------------------------------------------------- */
+{
+	int result = E_TIMEOUT;
+
+	assert(job);
+	assert(job->obj.res!=RELEASED);
+	assert(job->data);
+	assert(job->limit);
+
+	sys_lock();
+	{
+		if (atomic_load(&job->count) < job->limit)
+		{
+			priv_job_put(job, fun);
+			result = E_SUCCESS;
+		}
+	}
+	sys_unlock();
+
+	return result;
+}
+
+/* -------------------------------------------------------------------------- */
+int job_sendAsync( job_t *job, fun_t *fun )
+/* -------------------------------------------------------------------------- */
+{
+	assert_tsk_context();
+
+	while (job_giveAsync(job, fun) != E_SUCCESS)
+		core_ctx_switch();
+
+	return E_SUCCESS;
+}
+
+#endif//OS_ATOMICS
 /* -------------------------------------------------------------------------- */
