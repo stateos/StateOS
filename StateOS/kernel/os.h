@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    06.07.2020
+    @date    23.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -32,7 +32,7 @@
 #ifndef __STATEOS
 
 #define __STATEOS_MAJOR       6
-#define __STATEOS_MINOR       7
+#define __STATEOS_MINOR       8
 #define __STATEOS_BUILD       0
 
 #define __STATEOS       ((((__STATEOS_MAJOR)&0xFFUL)<<24)|(((__STATEOS_MINOR)&0xFFUL)<<16)|((__STATEOS_BUILD)&0xFFFFUL))

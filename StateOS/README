@@ -48,6 +48,7 @@ Features:
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
 6.8
+- updated os version
 - preventing sign-conversion warnings
 - added core_tsk_exec procedure as an alternative for core_tsk_loop
 - task behavior on return from the task function is now configurable using the OS_TASK_EXIT config constant
