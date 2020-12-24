@@ -256,6 +256,7 @@ unsigned sem_getValue( sem_t *sem )
 int sem_takeAsync( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned count;
 	int result = E_TIMEOUT;
 
 	assert(sem);
@@ -264,11 +265,10 @@ int sem_takeAsync( sem_t *sem )
 
 	sys_lock();
 	{
-		if (atomic_load(&sem->count) > 0)
-		{
-			atomic_fetch_sub(&sem->count, 1);
-			result = E_SUCCESS;
-		}
+		count = atomic_load(&sem->count);
+		while (count > 0 && result != E_SUCCESS)
+			if (atomic_compare_exchange_weak(&sem->count, &count, count - 1))
+				result = E_SUCCESS;
 	}
 	sys_unlock();
 
@@ -291,6 +291,7 @@ int sem_waitAsync( sem_t *sem )
 int sem_giveAsync( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
+	unsigned count;
 	int result = E_TIMEOUT;
 
 	assert(sem);
@@ -299,11 +300,10 @@ int sem_giveAsync( sem_t *sem )
 
 	sys_lock();
 	{
-		if (atomic_load(&sem->count) < sem->limit)
-		{
-			atomic_fetch_add(&sem->count, 1);
-			result = E_SUCCESS;
-		}
+		count = atomic_load(&sem->count);
+		while (count < sem->limit && result != E_SUCCESS)
+			if (atomic_compare_exchange_weak(&sem->count, &count, count + 1))
+				result = E_SUCCESS;
 	}
 	sys_unlock();
 
