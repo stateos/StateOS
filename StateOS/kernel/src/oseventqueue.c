@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.c
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    26.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -138,11 +138,8 @@ unsigned priv_evq_get( evq_t *evq )
 	unsigned event = evq->data[i++];
 
 	evq->head = (i < evq->limit) ? i : 0;
-#if OS_ATOMICS
-	atomic_fetch_sub(&evq->count, 1);
-#else
 	evq->count--;
-#endif
+
 	return event;
 }
 
@@ -156,11 +153,7 @@ void priv_evq_put( evq_t *evq, const unsigned event )
 	evq->data[i++] = event;
 
 	evq->tail = (i < evq->limit) ? i : 0;
-#if OS_ATOMICS
-	atomic_fetch_add(&evq->count, 1);
-#else
 	evq->count++;
-#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -171,11 +164,7 @@ void priv_evq_skip( evq_t *evq )
 	unsigned i = evq->head + 1;
 
 	evq->head = (i < evq->limit) ? i : 0;
-#if OS_ATOMICS
-	atomic_fetch_sub(&evq->count, 1);
-#else
 	evq->count--;
-#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -427,11 +416,7 @@ unsigned evq_count( evq_t *evq )
 
 	sys_lock();
 	{
-#if OS_ATOMICS
-		count = atomic_load(&evq->count);
-#else
 		count = evq->count;
-#endif
 	}
 	sys_unlock();
 
@@ -449,11 +434,7 @@ unsigned evq_space( evq_t *evq )
 
 	sys_lock();
 	{
-#if OS_ATOMICS
-		space = evq->limit - atomic_load(&evq->count);
-#else
 		space = evq->limit - evq->count;
-#endif
 	}
 	sys_unlock();
 
@@ -478,7 +459,25 @@ unsigned evq_limit( evq_t *evq )
 	return limit;
 }
 
+/* -------------------------------------------------------------------------- */
+
 #if OS_ATOMICS
+
+/* -------------------------------------------------------------------------- */
+static
+unsigned priv_evq_getAsync( evq_t *evq )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned i = evq->head;
+
+	unsigned event = evq->data[i++];
+
+	evq->head = (i < evq->limit) ? i : 0;
+	atomic_fetch_sub((atomic_uint *)&evq->count, 1);
+
+	return event;
+}
+
 /* -------------------------------------------------------------------------- */
 int evq_takeAsync( evq_t *evq, unsigned *event )
 /* -------------------------------------------------------------------------- */
@@ -493,9 +492,9 @@ int evq_takeAsync( evq_t *evq, unsigned *event )
 
 	sys_lock();
 	{
-		if (atomic_load(&evq->count) > 0)
+		if (atomic_load((atomic_uint *)&evq->count) > 0)
 		{
-			tmp = priv_evq_get(evq);
+			tmp = priv_evq_getAsync(evq);
 			if (event != NULL)
 				*event = tmp;
 			result = E_SUCCESS;
@@ -519,6 +518,19 @@ int evq_waitAsync( evq_t *evq, unsigned *event )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+void priv_evq_putAsync( evq_t *evq, const unsigned event )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned i = evq->tail;
+
+	evq->data[i++] = event;
+
+	evq->tail = (i < evq->limit) ? i : 0;
+	atomic_fetch_add((atomic_uint *)&evq->count, 1);
+}
+
+/* -------------------------------------------------------------------------- */
 int evq_giveAsync( evq_t *evq, unsigned event )
 /* -------------------------------------------------------------------------- */
 {
@@ -531,9 +543,9 @@ int evq_giveAsync( evq_t *evq, unsigned event )
 
 	sys_lock();
 	{
-		if (atomic_load(&evq->count) < evq->limit)
+		if (atomic_load((atomic_uint *)&evq->count) < evq->limit)
 		{
-			priv_evq_put(evq, event);
+			priv_evq_putAsync(evq, event);
 			result = E_SUCCESS;
 		}
 	}
@@ -554,5 +566,6 @@ int evq_sendAsync( evq_t *evq, unsigned event )
 	return E_SUCCESS;
 }
 
-#endif//OS_ATOMICS
 /* -------------------------------------------------------------------------- */
+
+#endif//OS_ATOMICS

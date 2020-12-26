@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.h
     @author  Rajmund Szymanski
-    @date    14.12.2020
+    @date    26.12.2020
     @brief   This file defines set of kernel functions for StateOS.
 
  ******************************************************************************
@@ -35,6 +35,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include "oscore.h"
+
+#if OS_ATOMICS
+#ifndef __cplusplus
+#include <stdatomic.h>
+#else
+#include <atomic>
+#endif
+#endif
 
 /* -------------------------------------------------------------------------- *
  *                              FOR INTERNAL USE                              *

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.c
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    26.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -240,24 +240,36 @@ unsigned sem_getValue( sem_t *sem )
 
 	sys_lock();
 	{
-#if OS_ATOMICS
-		val = atomic_load(&sem->count);
-#else
 		val = sem->count;
-#endif
 	}
 	sys_unlock();
 
 	return val;
 }
 
+/* -------------------------------------------------------------------------- */
+
 #if OS_ATOMICS
+
+/* -------------------------------------------------------------------------- */
+static
+int priv_sem_takeAsync( sem_t *sem )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned count = atomic_load((atomic_uint *)&sem->count);
+
+	while (count > 0)
+		if (atomic_compare_exchange_weak((atomic_uint *)&sem->count, &count, count - 1))
+			return E_SUCCESS;
+
+	return E_TIMEOUT;
+}
+
 /* -------------------------------------------------------------------------- */
 int sem_takeAsync( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned count;
-	int result = E_TIMEOUT;
+	int result;
 
 	assert(sem);
 	assert(sem->obj.res!=RELEASED);
@@ -265,10 +277,7 @@ int sem_takeAsync( sem_t *sem )
 
 	sys_lock();
 	{
-		count = atomic_load(&sem->count);
-		while (count > 0 && result != E_SUCCESS)
-			if (atomic_compare_exchange_weak(&sem->count, &count, count - 1))
-				result = E_SUCCESS;
+		result = priv_sem_takeAsync(sem);
 	}
 	sys_unlock();
 
@@ -288,11 +297,24 @@ int sem_waitAsync( sem_t *sem )
 }
 
 /* -------------------------------------------------------------------------- */
+static
+int priv_sem_giveAsync( sem_t *sem )
+/* -------------------------------------------------------------------------- */
+{
+	unsigned count = atomic_load((atomic_uint *)&sem->count);
+
+	while (count < sem->limit)
+		if (atomic_compare_exchange_weak((atomic_uint *)&sem->count, &count, count + 1))
+			return E_SUCCESS;
+
+	return E_TIMEOUT;
+}
+
+/* -------------------------------------------------------------------------- */
 int sem_giveAsync( sem_t *sem )
 /* -------------------------------------------------------------------------- */
 {
-	unsigned count;
-	int result = E_TIMEOUT;
+	int result;
 
 	assert(sem);
 	assert(sem->obj.res!=RELEASED);
@@ -300,15 +322,13 @@ int sem_giveAsync( sem_t *sem )
 
 	sys_lock();
 	{
-		count = atomic_load(&sem->count);
-		while (count < sem->limit && result != E_SUCCESS)
-			if (atomic_compare_exchange_weak(&sem->count, &count, count + 1))
-				result = E_SUCCESS;
+		result = priv_sem_giveAsync(sem);
 	}
 	sys_unlock();
 
 	return result;
 }
 
-#endif//OS_ATOMICS
 /* -------------------------------------------------------------------------- */
+
+#endif//OS_ATOMICS
