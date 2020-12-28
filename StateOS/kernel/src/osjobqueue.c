@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.c
     @author  Rajmund Szymanski
-    @date    26.12.2020
+    @date    27.12.2020
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -228,7 +228,7 @@ int priv_job_take( job_t *job, fun_t **fun )
 int job_take( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t *fun;
+	fun_t *fun = NULL;
 	int result;
 
 	assert(job);
@@ -242,7 +242,7 @@ int job_take( job_t *job )
 	}
 	sys_unlock();
 
-	if (result == E_SUCCESS)
+	if (fun != NULL)
 		fun();
 
 	return result;
@@ -484,7 +484,7 @@ fun_t *priv_job_getAsync( job_t *job )
 int job_takeAsync( job_t *job )
 /* -------------------------------------------------------------------------- */
 {
-	fun_t *fun;
+	fun_t *fun = NULL;
 	int result = E_TIMEOUT;
 
 	assert(job);
@@ -502,7 +502,7 @@ int job_takeAsync( job_t *job )
 	}
 	sys_unlock();
 
-	if (result == E_SUCCESS)
+	if (fun != NULL)
 		fun();
 
 	return result;
