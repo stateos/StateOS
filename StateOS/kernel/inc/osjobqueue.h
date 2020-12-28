@@ -2,7 +2,7 @@
 
     @file    StateOS: osjobqueue.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    28.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -275,7 +275,7 @@ void job_delete( job_t *job ) { job_destroy(job); }
  *
  * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
@@ -356,7 +356,7 @@ int job_waitUntil( job_t *job, cnt_t time );
  *   E_DELETED       : job queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
@@ -386,7 +386,7 @@ int job_waitAsync( job_t *job );
  *
  * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
@@ -467,7 +467,7 @@ int job_sendUntil( job_t *job, fun_t *fun, cnt_t time );
  *   E_DELETED       : job queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 

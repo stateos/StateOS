@@ -2,7 +2,7 @@
 
     @file    StateOS: oseventqueue.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    28.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -276,7 +276,7 @@ void evq_delete( evq_t *evq ) { evq_destroy(evq); }
  *
  * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
@@ -360,7 +360,7 @@ int evq_waitUntil( evq_t *evq, unsigned *event, cnt_t time );
  *   E_DELETED       : event queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
@@ -390,7 +390,7 @@ int evq_waitAsync( evq_t *evq, unsigned *event );
  *
  * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
@@ -471,7 +471,7 @@ int evq_sendUntil( evq_t *evq, unsigned event, cnt_t time );
  *   E_DELETED       : event queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 

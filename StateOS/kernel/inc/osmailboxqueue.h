@@ -2,7 +2,7 @@
 
     @file    StateOS: osmailboxqueue.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    28.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -285,7 +285,7 @@ void box_delete( box_t *box ) { box_destroy(box); }
  *
  * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
@@ -369,7 +369,7 @@ int box_waitUntil( box_t *box, void *data, cnt_t time );
  *   E_DELETED       : mailbox queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
@@ -399,7 +399,7 @@ int box_waitAsync( box_t *box, void *data );
  *
  * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
@@ -480,7 +480,7 @@ int box_sendUntil( box_t *box, const void *data, cnt_t time );
  *   E_DELETED       : mailbox queue object was deleted (unavailable for async version)
  *
  * Note              : use only in thread mode
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 

@@ -2,7 +2,7 @@
 
     @file    StateOS: ossemaphore.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    28.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -303,7 +303,7 @@ void sem_delete( sem_t *sem ) { sem_destroy(sem); }
  *
  * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
@@ -413,7 +413,7 @@ int sem_waitAsync( sem_t *sem );
  *
  * Note              : can be used in both thread and handler mode
  *                     use ISR alias in blockable interrupt handlers
- *                     use Async alias for communication with unblockable interrupt handlers
+ *                     use Async alias for communication with unmasked interrupt handlers
  *
  ******************************************************************************/
 
