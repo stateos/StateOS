@@ -2,7 +2,7 @@
 
     @file    StateOS: osspinlock.h
     @author  Rajmund Szymanski
-    @date    19.12.2020
+    @date    27.12.2020
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -182,7 +182,11 @@ bool core_spn_tryLock( spn_t *spn )
 __STATIC_INLINE
 void core_spn_lock( spn_t *spn )
 {
+#if OS_ATOMICS
 	while (!core_spn_tryLock(spn));
+#else
+	(void) spn;
+#endif
 }
 
 /******************************************************************************
