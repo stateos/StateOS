@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    17.02.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -675,13 +675,14 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
  * Alias             : wrk_new
  *
  * Description       : create and initialize complete work area for task object
- *                     and start the task
  *
  * Parameters
  *   prio            : initial task priority (any unsigned int value)
  *   state           : task state (initial task function) doesn't have to be noreturn-type
  *                     it will be executed into an infinite system-implemented loop
  *   size            : size of task private stack (in bytes)
+ *   detached        : create as detached?
+ *   autostart       : specifies whether the task runs immediately after initialization
  *
  * Return            : pointer to task object
  *   NULL            : object not created (not enough free memory)
@@ -690,32 +691,13 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
  *
  ******************************************************************************/
 
-tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size );
+tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size, bool detached, bool autostart );
 
 __STATIC_INLINE
-tsk_t *wrk_new( unsigned prio, fun_t *state, size_t size ) { return wrk_create(prio, state, size); }
-
-/******************************************************************************
- *
- * Name              : wrk_detached
- *
- * Description       : create and initialize complete work area for detached task object
- *                     and start the task
- *
- * Parameters
- *   prio            : initial task priority (any unsigned int value)
- *   state           : task state (initial task function) doesn't have to be noreturn-type
- *                     it will be executed into an infinite system-implemented loop
- *   size            : size of task private stack (in bytes)
- *
- * Return            : pointer to task object
- *   NULL            : object not created (not enough free memory)
- *
- * Note              : use only in thread mode
- *
- ******************************************************************************/
-
-tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size );
+tsk_t *wrk_new( unsigned prio, fun_t *state, size_t size, bool detached, bool autostart )
+{
+	return wrk_create(prio, state, size, detached, autostart);
+}
 
 /******************************************************************************
  *
@@ -738,10 +720,16 @@ tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size );
  ******************************************************************************/
 
 __STATIC_INLINE
-tsk_t *tsk_create( unsigned prio, fun_t *state ) { return wrk_create(prio, state, OS_STACK_SIZE); }
+tsk_t *tsk_create( unsigned prio, fun_t *state )
+{
+	return wrk_create(prio, state, OS_STACK_SIZE, false, true);
+}
 
 __STATIC_INLINE
-tsk_t *tsk_new   ( unsigned prio, fun_t *state ) { return wrk_create(prio, state, OS_STACK_SIZE); }
+tsk_t *tsk_new( unsigned prio, fun_t *state )
+{
+	return wrk_create(prio, state, OS_STACK_SIZE, false, true);
+}
 
 /******************************************************************************
  *
@@ -763,30 +751,10 @@ tsk_t *tsk_new   ( unsigned prio, fun_t *state ) { return wrk_create(prio, state
  ******************************************************************************/
 
 __STATIC_INLINE
-tsk_t *tsk_detached( unsigned prio, fun_t *state ) { return wrk_detached(prio, state, OS_STACK_SIZE); }
-
-/******************************************************************************
- *
- * Name              : thd_create
- *
- * Description       : create and initialize complete work area for task object
- *                     don't start the task
- *
- * Parameters
- *   prio            : initial task priority (any unsigned int value)
- *   state           : task state (initial task function) doesn't have to be noreturn-type
- *                     it will be executed into an infinite system-implemented loop
- *   size            : size of task private stack (in bytes)
- *   detached        : create as detached?
- *
- * Return            : pointer to task object
- *   NULL            : object not created (not enough free memory)
- *
- * Note              : for internal use
- *
- ******************************************************************************/
-
-tsk_t *thd_create( unsigned prio, fun_t *state, size_t size, bool detached );
+tsk_t *tsk_detached( unsigned prio, fun_t *state )
+{
+	return wrk_create(prio, state, OS_STACK_SIZE, true, true);
+}
 
 /******************************************************************************
  *

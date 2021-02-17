@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.c
     @author  Rajmund Szymanski
-    @date    17.12.2020
+    @date    17.02.2021
     @brief   This file provides set of functions for StateOS.
 
  ******************************************************************************
@@ -104,67 +104,23 @@ void tsk_init( tsk_t *tsk, unsigned prio, fun_t *state, stk_t *stack, size_t siz
 }
 
 /* -------------------------------------------------------------------------- */
-tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size )
+tsk_t *wrk_create( unsigned prio, fun_t *state, size_t size, bool detached, bool autostart )
 /* -------------------------------------------------------------------------- */
 {
 	tsk_t *tsk;
 
 	assert_tsk_context();
-	assert(state);
-	assert(size>sizeof(ctx_t));
-
-	sys_lock();
-	{
-		tsk = priv_wrk_create(prio, state, size, false);
-		if (tsk)
-		{
-			core_ctx_init(tsk);
-			core_tsk_insert(tsk);
-		}
-	}
-	sys_unlock();
-
-	return tsk;
-}
-
-/* -------------------------------------------------------------------------- */
-tsk_t *wrk_detached( unsigned prio, fun_t *state, size_t size )
-/* -------------------------------------------------------------------------- */
-{
-	tsk_t *tsk;
-
-	assert_tsk_context();
-	assert(state);
-	assert(size>sizeof(ctx_t));
-
-	sys_lock();
-	{
-		tsk = priv_wrk_create(prio, state, size, true);
-		if (tsk)
-		{
-			core_ctx_init(tsk);
-			core_tsk_insert(tsk);
-		}
-	}
-	sys_unlock();
-
-	return tsk;
-}
-
-
-/* -------------------------------------------------------------------------- */
-tsk_t *thd_create( unsigned prio, fun_t *state, size_t size, bool detached )
-/* -------------------------------------------------------------------------- */
-{
-	tsk_t *tsk;
-
-	assert_tsk_context();
-	assert(state);
 	assert(size>sizeof(ctx_t));
 
 	sys_lock();
 	{
 		tsk = priv_wrk_create(prio, state, size, detached);
+		if (tsk && autostart)
+		{
+			assert(state);
+			core_ctx_init(tsk);
+			core_tsk_insert(tsk);
+		}
 	}
 	sys_unlock();
 

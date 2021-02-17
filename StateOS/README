@@ -49,6 +49,8 @@ Features:
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
 6.8
+- upgraded wrk_create function
+- removed thd_create and wrk_detached functions
 - updated os version
 - preventing sign-conversion warnings
 - added core_tsk_exec procedure as an alternative for core_tsk_loop
