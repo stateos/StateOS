@@ -18,7 +18,7 @@ static void proc8()
 static void proc7()
 {
 	int result;
-	tsk_t *tsk8 = wrk_create(8, proc8, 512);
+	tsk_t *tsk8 = wrk_create(8, proc8, 512, false, true);
 
 	         tsk_start(tsk8);                     ASSERT_dead(tsk8);
 	result = tsk_join(tsk8);                      ASSERT_success(result);
@@ -28,7 +28,7 @@ static void proc7()
 static void proc6()
 {
 	int result;
-	tsk_t *tsk7 = wrk_create(7, proc7, 256);
+	tsk_t *tsk7 = wrk_create(7, proc7, 256, false, true);
 
 	         tsk_start(tsk7);                     ASSERT_dead(tsk7);
 	result = tsk_join(tsk7);                      ASSERT_success(result);
