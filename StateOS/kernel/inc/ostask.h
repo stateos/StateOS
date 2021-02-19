@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    17.02.2021
+    @date    19.02.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1480,10 +1480,19 @@ struct TaskT : public baseTask, public baseStack<size_>
 	template<class F>
 	TaskT( const unsigned _prio, F&& _state ):
 	baseTask{_prio, _state, baseStack<size_>::stack_, sizeof(baseStack<size_>::stack_)} {}
+
+	template<class F>
+	TaskT( F&& _state ):
+	TaskT<size_>{OS_MAIN_PRIO, _state} {}
+
 #if __cplusplus >= 201402
 	template<typename F, typename... A>
 	TaskT( const unsigned _prio, F&& _state, A&&... _args ):
-	baseTask{_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...), baseStack<size_>::stack_, sizeof(baseStack<size_>::stack_)} {}
+	TaskT<size_>{_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...)} {}
+
+	template<typename F, typename... A, std::enable_if_t<std::is_function<F>::value>>
+	TaskT( F&& _state, A&&... _args ):
+	TaskT<size_>{OS_MAIN_PRIO, std::forward<F>(_state), std::forward<A>(_args)...} {}
 #endif
 
 	TaskT( TaskT<size_>&& ) = default;
@@ -1523,11 +1532,23 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return { _prio, _state };
 	}
 
+	template<class F> static
+	TaskT<size_> Make( F&& _state )
+	{
+		return Make(OS_MAIN_PRIO, _state);
+	}
+
 #if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	TaskT<size_> Make( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		return Make(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+	}
+
+	template<typename F, typename... A, std::enable_if_t<std::is_function<F>::value>> static
+	TaskT<size_> Make( F&& _state, A&&... _args )
+	{
+		return Make(OS_MAIN_PRIO, std::forward<F>(_state), std::forward<A>(_args)...);
 	}
 #endif
 
@@ -1556,11 +1577,23 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return tsk;
 	}
 
+	template<class F> static
+	TaskT<size_> Start( F&& _state )
+	{
+		return Start(OS_MAIN_PRIO, _state);
+	}
+
 #if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	TaskT<size_> Start( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		return Start(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+	}
+
+	template<typename F, typename... A, std::enable_if_t<std::is_function<F>::value>> static
+	TaskT<size_> Start( F&& _state, A&&... _args )
+	{
+		return Start(OS_MAIN_PRIO, std::forward<F>(_state), std::forward<A>(_args)...);
 	}
 #endif
 
@@ -1596,11 +1629,23 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return Ptr(tsk);
 	}
 
+	template<class F> static
+	Ptr Create( F&& _state )
+	{
+		return Create(OS_MAIN_PRIO, _state);
+	}
+
 #if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	Ptr Create( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		return Create(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+	}
+
+	template<typename F, typename... A, std::enable_if_t<std::is_function<F>::value>> static
+	Ptr Create( F&& _state, A&&... _args )
+	{
+		return Create(OS_MAIN_PRIO, std::forward<F>(_state), std::forward<A>(_args)...);
 	}
 #endif
 
@@ -1637,11 +1682,23 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return Ptr(tsk);
 	}
 
+	template<class F> static
+	Ptr Detached( F&& _state )
+	{
+		return Detached(OS_MAIN_PRIO, _state);
+	}
+
 #if __cplusplus >= 201402
 	template<typename F, typename... A> static
 	Ptr Detached( const unsigned _prio, F&& _state, A&&... _args )
 	{
 		return Detached(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
+	}
+
+	template<typename F, typename... A, std::enable_if_t<std::is_function<F>::value>> static
+	Ptr Detached( F&& _state, A&&... _args )
+	{
+		return Detached(OS_MAIN_PRIO, std::forward<F>(_state), std::forward<A>(_args)...);
 	}
 #endif
 };
