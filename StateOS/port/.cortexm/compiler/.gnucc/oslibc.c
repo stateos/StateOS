@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    16.12.2020
+    @date    21.02.2021
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -93,95 +93,28 @@ caddr_t _sbrk_r( struct _reent *reent, size_t size )
 
 #if !defined(USE_SEMIHOST) && !defined(USE_NOHOST)
 
-__WEAK
-int _open_r( struct _reent *reent, const char *path, int flags, int mode )
+/* -------------------------------------------------------------------------- */
+
+static
+int __enosys()
 {
-	(void) reent;
-	(void) path;
-	(void) flags;
-	(void) mode;
 	errno = ENOSYS; // procedure not implemented
 	return -1;
 }
 
-__WEAK
-int _close_r( struct _reent *reent, int file )
-{
-	(void) reent;
-	(void) file;
-	errno = ENOSYS; // procedure not implemented
-	return -1;
-}
+/* -------------------------------------------------------------------------- */
 
-__WEAK
-int _lseek_r( struct _reent *reent, int file, int pos, int whence )
-{
-	(void) reent;
-	(void) file;
-	(void) pos;
-	(void) whence;
-	errno = ENOSYS; // procedure not implemented
-	return -1;
-}
+int   _open_r( struct _reent *, const char *, int, int ) __attribute__((weak, alias("__enosys")));
+int  _close_r( struct _reent *, int )                    __attribute__((weak, alias("__enosys")));
+int  _lseek_r( struct _reent *, int, int, int )          __attribute__((weak, alias("__enosys")));
+int   _read_r( struct _reent *, int, char *, size_t )    __attribute__((weak, alias("__enosys")));
+int  _write_r( struct _reent *, int, char *, size_t )    __attribute__((weak, alias("__enosys")));
+int _isatty_r( struct _reent *, int )                    __attribute__((weak, alias("__enosys")));
+int  _fstat_r( struct _reent *, int, struct stat * )     __attribute__((weak, alias("__enosys")));
+int _getpid_r( struct _reent * )                         __attribute__((weak, alias("__enosys")));
+int   _kill_r( struct _reent *, int, int )               __attribute__((weak, alias("__enosys")));
 
-__WEAK
-int _read_r( struct _reent *reent, int file, char *buf, size_t size )
-{
-	(void) reent;
-	(void) file;
-	(void) buf;
-	(void) size;
-	errno = ENOSYS; // procedure not implemented
-	return -1;
-}
-
-__WEAK
-int _write_r( struct _reent *reent, int file, char *buf, size_t size )
-{
-	(void) reent;
-	(void) file;
-	(void) buf;
-	(void) size;
-	errno = ENOSYS; // procedure not implemented
-	return -1;
-}
-
-__WEAK
-int _isatty_r( struct _reent *reent, int file )
-{
-	(void) reent;
-	(void) file;
-	errno = ENOSYS; // procedure not implemented
-	return -1;
-}
-
-__WEAK
-int _fstat_r( struct _reent *reent, int file, struct stat *st )
-{
-	(void) reent;
-	(void) file;
-	(void) st;
-	errno = ENOSYS; // procedure not implemented
-	return -1;
-}
-
-__WEAK
-int _getpid_r( struct _reent *reent )
-{
-	(void) reent;
-	errno = ENOSYS; // procedure not implemented
-	return -1;
-}
-
-__WEAK
-int _kill_r( struct _reent *reent, int pid, int sig )
-{
-	(void) reent;
-	(void) pid;
-	(void) sig;
-	errno = ENOSYS; // procedure not implemented
-	return -1;
-}
+/* -------------------------------------------------------------------------- */
 
 #endif // !USE_SEMIHOST && !USE_NOHOST
 

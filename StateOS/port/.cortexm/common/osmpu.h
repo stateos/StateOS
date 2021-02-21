@@ -2,7 +2,7 @@
 
     @file    StateOS: osmpu.h
     @author  Rajmund Szymanski
-    @date    01.12.2020
+    @date    21.02.2021
     @brief   This file defines set of memory protection unit functions for StateOS.
 
  ******************************************************************************
@@ -40,15 +40,15 @@
 #define OS_GUARD_SIZE    32 /* ARM_MPU_REGION_SIZE_32B */
 #endif
 
-#if defined (OS_GUARD_SIZE) && ((OS_GUARD_SIZE) >= 32) && ((OS_GUARD_SIZE) == ((OS_GUARD_SIZE) & ~((OS_GUARD_SIZE) - 1)))
-
 #ifndef __MPU_USED
+#if defined (OS_GUARD_SIZE) && ((OS_GUARD_SIZE) >= 32) && ((OS_GUARD_SIZE) == ((OS_GUARD_SIZE) & ~((OS_GUARD_SIZE) - 1)))
 #define __MPU_USED        1
+#endif
 #elif   __MPU_USED
 #error  __MPU_USED is an internal os definition!
 #endif//__MPU_USED
 
-#if     __MPU_USED == 1
+#if defined (__MPU_USED) && (__MPU_USED == 1)
 
 #ifdef __cplusplus
 extern "C" {
@@ -195,6 +195,5 @@ void port_mpu_stackUpdate( const void *stk )
 /* -------------------------------------------------------------------------- */
 
 #endif//__MPU_USED
-#endif//OS_GUARD_SIZE
 #endif//__MPU_PRESENT
 #endif//__STATEOSMPU_H
