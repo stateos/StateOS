@@ -2,7 +2,7 @@
 
     @file    StateOS: oslibc.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    22.02.2021
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -35,6 +35,8 @@
 /* -------------------------------------------------------------------------- */
 
 #if !defined(__MICROLIB)
+
+/* -------------------------------------------------------------------------- */
 
 __USED
 void *__user_perthread_libspace( void )
