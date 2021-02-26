@@ -2,7 +2,7 @@
 
     @file    StateOS: osonceflag.h
     @author  Rajmund Szymanski
-    @date    22.12.2020
+    @date    26.02.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -186,7 +186,19 @@ void one_init( one_t *one ) { *one = 0; }
  *
  ******************************************************************************/
 
-void one_call( one_t *one, fun_t *fun );
+__STATIC_INLINE
+void one_call( one_t *one, fun_t *fun )
+{
+	one_t flag;
+	assert(one);
+	assert(fun);
+#if OS_ATOMICS
+	flag = __STD atomic_exchange((__STD atomic_uint_fast8_t *)one, _ONE_DONE());
+#else
+	sys_lock(); flag = *one; *one = _ONE_DONE(); sys_unlock();
+#endif
+	if (flag == _ONE_INIT()) fun();
+}
 
 #ifdef __cplusplus
 }
@@ -222,16 +234,12 @@ struct OnceFlag
 	void call( F&& _fun )
 	{
 		one_t flag;
-
-		{
-			CriticalSection cri;
-
-			flag = flg_;
-			flg_ = _ONE_DONE();
-		}
-
-		if (flag == _ONE_INIT())
-			_fun();
+	#if OS_ATOMICS
+		flag = __STD atomic_exchange((__STD atomic_uint_fast8_t *)&flg_, _ONE_DONE());
+	#else
+		{ CriticalSection cri; flag = flg_; flg_ = _ONE_DONE(); }
+	#endif
+		if (flag == _ONE_INIT()) _fun();
 	}
 
 	template<typename F, typename... A>
