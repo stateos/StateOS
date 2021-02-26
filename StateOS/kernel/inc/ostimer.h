@@ -2,7 +2,7 @@
 
     @file    StateOS: ostimer.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    26.02.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -135,7 +135,7 @@ extern "C" {
                        void tmr##__fun( void );                                                   \
                        tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                                 \
                        tmr_id tmr = & tmr##__tmr;                                                   \
-         __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_start(tmr, delay, period); } \
+         __CONSTRUCTOR void tmr##__start( void ) { core_sys_init(); tmr_start(tmr, delay, period); } \
                        void tmr##__fun( void )
 #endif
 
@@ -159,7 +159,7 @@ extern "C" {
                        void tmr##__fun( void );                                               \
                        tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                             \
                        tmr_id tmr = & tmr##__tmr;                                               \
-         __CONSTRUCTOR void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
+         __CONSTRUCTOR void tmr##__start( void ) { core_sys_init(); tmr_startUntil(tmr, time); } \
                        void tmr##__fun( void )
 #endif
 
@@ -224,7 +224,7 @@ extern "C" {
                 static void tmr##__fun( void );                                                   \
                 static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                                 \
                 static tmr_id tmr = & tmr##__tmr;                                                   \
-  __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_start(tmr, delay, period); } \
+  __CONSTRUCTOR static void tmr##__start( void ) { core_sys_init(); tmr_start(tmr, delay, period); } \
                 static void tmr##__fun( void )
 #endif
 
@@ -248,8 +248,8 @@ extern "C" {
                 static void tmr##__fun( void );                                               \
                 static tmr_t tmr##__tmr = _TMR_INIT( tmr##__fun );                             \
                 static tmr_id tmr = & tmr##__tmr;                                               \
-  __CONSTRUCTOR static void tmr##__start( void ) { port_sys_init(); tmr_startUntil(tmr, time); } \
-                static  void tmr##__fun( void )
+  __CONSTRUCTOR static void tmr##__start( void ) { core_sys_init(); tmr_startUntil(tmr, time); } \
+                static void tmr##__fun( void )
 #endif
 
 /******************************************************************************

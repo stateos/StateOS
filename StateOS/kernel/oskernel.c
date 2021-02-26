@@ -2,7 +2,7 @@
 
     @file    StateOS: oskernel.c
     @author  Rajmund Szymanski
-    @date    17.12.2020
+    @date    26.02.2021
     @brief   This file provides set of variables and functions for StateOS.
 
  ******************************************************************************
@@ -33,6 +33,7 @@
 #include "inc/ostimer.h"
 #include "inc/ostask.h"
 #include "inc/osmutex.h"
+#include "inc/osonceflag.h"
 
 /* -------------------------------------------------------------------------- */
 // SYSTEM INTERNAL SERVICES
@@ -670,6 +671,19 @@ void core_mtx_reset( mtx_t *mtx, int event )
 
 /* -------------------------------------------------------------------------- */
 // OTHER SYSTEM SERVICES
+/* -------------------------------------------------------------------------- */
+
+#ifdef __CONSTRUCTOR
+
+void core_sys_init()
+{
+	static one_t init = ONE_INIT();
+
+	one_call(&init, port_sys_init);
+}
+
+#endif
+
 /* -------------------------------------------------------------------------- */
 
 #if HW_TIMER_SIZE == 0

@@ -2,7 +2,7 @@
 
     @file    StateOS: osport.c
     @author  Rajmund Szymanski
-    @date    29.03.2020
+    @date    26.02.2021
     @brief   StateOS port file for STM32L1 uC.
 
  ******************************************************************************
@@ -35,17 +35,6 @@
 
 void port_sys_init( void )
 {
-/******************************************************************************
- Make sure that the system timer has not yet been initialized
- This is only needed for compilers supporting the "constructor" function attribute or its equivalent
-*******************************************************************************/
-
-	if (NVIC_GetPriority(PendSV_IRQn)) return;
-
-/******************************************************************************
- End of check
-*******************************************************************************/
-
 #if HW_TIMER_SIZE == 0
 
 /******************************************************************************

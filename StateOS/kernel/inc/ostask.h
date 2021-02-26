@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    21.02.2021
+    @date    26.02.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -345,7 +345,7 @@ extern "C" {
 #define             OS_WRK_START( tsk, prio, size )                              \
                        void tsk##__fun( void );                                   \
                     OS_WRK( tsk, prio, tsk##__fun, size );                         \
-         __CONSTRUCTOR void tsk##__run( void ) { port_sys_init(); tsk_start(tsk); } \
+         __CONSTRUCTOR void tsk##__run( void ) { core_sys_init(); tsk_start(tsk); } \
                        void tsk##__fun( void )
 #endif
 
@@ -479,7 +479,7 @@ extern "C" {
 #define         static_WRK_START( tsk, prio, size )                              \
                 static void tsk##__fun( void );                                   \
                 static_WRK( tsk, prio, tsk##__fun, size );                         \
-  __CONSTRUCTOR static void tsk##__run( void ) { port_sys_init(); tsk_start(tsk); } \
+  __CONSTRUCTOR static void tsk##__run( void ) { core_sys_init(); tsk_start(tsk); } \
                 static void tsk##__fun( void )
 #endif
 
