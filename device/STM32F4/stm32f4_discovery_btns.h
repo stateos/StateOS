@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    stm32f4_discovery_btns.h
  * @author  Rajmund Szymanski
- * @date    24.12.2018
+ * @date    01.01.2021
  * @brief   This file contains definitions for STM32F4-Discovery Kit.
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
 #define __STM32F4_DISCOVERY_BTNS_H
 
 #include <stdbool.h>
-#include <stm32f4_io.h>
+#include "stm32f4_io.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -26,7 +26,7 @@ extern "C" {
 static inline
 void BTN_Init( void )
 {
-	GPIO_Init(GPIOA, GPIO_Pin_0, GPIO_Input_PullDown);
+	GPIO_Init(GPIOA, GPIO_Pins(0), GPIO_Input_PullDown);
 }
 
 /* -------------------------------------------------------------------------- */

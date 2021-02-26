@@ -1,25 +1,27 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     16.01.2020
+#date     16.02.2021
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
-CLANG      := c:/sys/arm/armclang/bin/
-GNUCC      := c:/sys/gcc/arm/bin/arm-none-eabi-
-OPENOCD    := c:/sys/tools/openocd/bin/openocd
-STLINK     := c:/sys/tools/st-link/st-link_cli -Q -c SWD UR
-QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
+CLANG      := C:/Sys/arm/armclang/bin/
+GNUCC      := C:/Sys/gcc/arm/bin/arm-none-eabi-
+OPENOCD    := C:/Sys/tools/openocd/bin/openocd
+STLINK     := C:/Sys/tools/st-link/st-link_cli -Q -c SWD UR
+CUBE       := C:/Sys/tools/cube/stm32_programmer_cli -q -c port=SWD mode=UR
+QEMU       := C:/Sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
 
 #----------------------------------------------------------#
 
-PROJECT    ?= $(notdir $(CURDIR))
-DEFS       ?= __MICROLIB DEBUG
+PROJECT    ?=
+DEFS       ?= DEBUG
 DIRS       ?=
 INCS       ?=
 LIBS       ?=
 KEYS       ?= .cmsis_os .nasa_osal
-OPTF       ?= 2 # z
+OPTF       ?=
+STDC       ?= 17
 SCRIPT     ?=
 
 #----------------------------------------------------------#
@@ -66,7 +68,7 @@ else
 SCRIPT     :=  $(firstword $(foreach d,$(VPATH),$(wildcard $d$(SCRIPT))))
 endif
 ifeq ($(strip $(PROJECT)),)
-PROJECT    :=     $(notdir $(CURDIR))
+PROJECT    := $(firstword $(notdir $(CURDIR)))
 endif
 
 AS_SRCS    := $(AS_SRCS:%.s=)
@@ -93,21 +95,25 @@ TXTS       := $(OBJS:.o=.txt)
 COMMON_F    = --target=arm-arm-none-eabi -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -ffast-math
 COMMON_F   += -mfloat-abi=$(if $(filter qemu,$(MAKECMDGOALS)),soft,hard)
 COMMON_F   += -O$(OPTF) -ffunction-sections -fdata-sections
-COMMON_F   += -Wall -Wextra -Wshadow # -Wpedantic
+COMMON_F   += -Wall -Wextra -Wshadow#-Wpedantic -Wsign-conversion
 COMMON_F   += -MD -MP
 
 AS_FLAGS    =
-C_FLAGS     =
-CXX_FLAGS   = -fno-rtti -fno-exceptions # -fno-use-cxa-atexit -Wzero-as-null-pointer-constant
+ifneq ($(filter USE_GNU,$(DEFS)),)
+C_FLAGS     = -std=gnu$(STDC:20=2x)
+CXX_FLAGS   = -std=gnu++$(STDC:20=2a)
+else
+C_FLAGS     = -std=c$(STDC:20=2x)
+CXX_FLAGS   = -std=c++$(STDC:20=2a)
+endif
+CXX_FLAGS  += -fno-rtti -fno-exceptions -Wzero-as-null-pointer-constant
 LD_FLAGS    = --strict --scatter=$(SCRIPT) --symbols --list_mapping_symbols
 LD_FLAGS   += --map --info common,sizes,summarysizes,totals,veneers,unused --list=$(MAP) # --callgraph
 
 #----------------------------------------------------------#
 
-ifneq ($(strip $(CXX_SRCS)),)
-DEFS       += __USES_CXX
-endif
-ifneq ($(filter __MICROLIB,$(DEFS)),)
+ifeq  ($(filter USE_STDLIB,$(DEFS)),)
+DEFS       += __MICROLIB
 LD_FLAGS   += --library_type=microlib
 endif
 ifneq ($(filter USE_LTO,$(DEFS)),)
@@ -116,6 +122,10 @@ LD_FLAGS   += --lto
 endif
 ifneq ($(filter DEBUG,$(DEFS)),)
 COMMON_F   += --debug
+else
+ifeq  ($(filter NDEBUG,$(DEFS)),)
+DEFS       += NDEBUG
+endif
 endif
 
 #----------------------------------------------------------#
@@ -129,6 +139,9 @@ clist=$(subst $(space),$(comma),$(strip $1))
 
 ARM_INC    := $(CLANG)../include
 ARM_LIB    := $(CLANG)../lib
+
+DEFS       := $(DEFS:USE_LTO=)
+DEFS       := $(DEFS:USE_GNU=)
 
 DEFS_F     := $(DEFS:%=-D%)
 LIBS_F     := $(LIBS:%=%.lib)
@@ -232,6 +245,7 @@ clean :
 flash : all $(HEX)
 	$(info Programing device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_EXEC) $(OOCD_EXIT)
+#	$(CUBE) -w $(ELF) -v -hardRst
 #	$(STLINK) -P $(HEX) -V -Rst
 
 server : all
@@ -253,6 +267,7 @@ qemu : all
 reset :
 	$(info Reseting device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_EXEC) $(OOCD_EXIT)
+#	$(CUBE) -hardRst
 #	$(STLINK) -HardRst
 
 .PHONY : all lib clean flash server debug monitor qemu reset

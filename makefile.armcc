@@ -1,25 +1,26 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     16.01.2020
+#date     16.02.2021
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
-ARMCC      := c:/sys/arm/armcc/bin/
-GNUCC      := c:/sys/gcc/arm/bin/arm-none-eabi-
-OPENOCD    := c:/sys/tools/openocd/bin/openocd
-STLINK     := c:/sys/tools/st-link/st-link_cli -Q -c SWD UR
-QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
+ARMCC      := C:/Sys/arm/armcc/bin/
+GNUCC      := C:/Sys/gcc/arm/bin/arm-none-eabi-
+OPENOCD    := C:/Sys/tools/openocd/bin/openocd
+STLINK     := C:/Sys/tools/st-link/st-link_cli -Q -c SWD UR
+CUBE       := C:/Sys/tools/cube/stm32_programmer_cli -q -c port=SWD mode=UR
+QEMU       := C:/Sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
 
 #----------------------------------------------------------#
 
-PROJECT    ?= $(notdir $(CURDIR))
-DEFS       ?= __MICROLIB DEBUG
+PROJECT    ?=
+DEFS       ?= DEBUG
 DIRS       ?=
 INCS       ?=
 LIBS       ?=
 KEYS       ?= .cmsis_os .nasa_osal
-OPTF       ?= 2 # space
+OPTF       ?= 2
 SCRIPT     ?=
 
 #----------------------------------------------------------#
@@ -66,7 +67,7 @@ else
 SCRIPT     :=  $(firstword $(foreach d,$(VPATH),$(wildcard $d$(SCRIPT))))
 endif
 ifeq ($(strip $(PROJECT)),)
-PROJECT    :=     $(notdir $(CURDIR))
+PROJECT    := $(firstword $(notdir $(CURDIR)))
 endif
 
 AS_SRCS    := $(AS_SRCS:%.S=)
@@ -98,22 +99,24 @@ COMMON_F   += --md --depend=$(@:.o=.d) # --feedback=$(FED)
 
 OPTIM_F    := -O$(OPTF) --split_sections --interleave
 
-AS_FLAGS    = # --list=$(@:.o=.lst)
-C_FLAGS     = --c99   --forceinline # --asm --asm_dir=$(@D) # --list --list_dir=$(@D)
+AS_FLAGS    =#--list=$(@:.o=.lst)
+C_FLAGS     = --c99 --forceinline # --asm --asm_dir=$(@D) # --list --list_dir=$(@D)
 CXX_FLAGS   = --cpp11 --forceinline # --asm --asm_dir=$(@D) # --list --list_dir=$(@D)
 LD_FLAGS    = --strict --scatter=$(SCRIPT) --symbols --list_mapping_symbols
 LD_FLAGS   += --map --info common,sizes,summarysizes,totals,veneers,unused --list=$(MAP) # --callgraph
 
 #----------------------------------------------------------#
 
-ifneq ($(strip $(CXX_SRCS)),)
-DEFS       += __USES_CXX
-endif
-ifneq ($(filter __MICROLIB,$(DEFS)),)
+ifeq  ($(filter USE_STDLIB,$(DEFS)),)
+DEFS       += __MICROLIB
 LD_FLAGS   += --library_type=microlib
 endif
 ifneq ($(filter DEBUG,$(DEFS)),)
 COMMON_F   += --debug
+else
+ifeq  ($(filter NDEBUG,$(DEFS)),)
+DEFS       += NDEBUG
+endif
 endif
 
 #----------------------------------------------------------#
@@ -232,6 +235,7 @@ clean :
 flash : all $(HEX)
 	$(info Programing device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_EXEC) $(OOCD_EXIT)
+#	$(CUBE) -w $(ELF) -v -hardRst
 #	$(STLINK) -P $(HEX) -V -Rst
 
 server : all
@@ -253,6 +257,7 @@ qemu : all
 reset :
 	$(info Reseting device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_EXEC) $(OOCD_EXIT)
+#	$(CUBE) -hardRst
 #	$(STLINK) -HardRst
 
 .PHONY : all lib clean flash server debug monitor qemu reset

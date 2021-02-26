@@ -1,25 +1,26 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     17.02.2020
+#date     16.02.2021
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
-IARCC      := c:/sys/icc/arm/bin/
-GNUCC      := c:/sys/gcc/arm/bin/arm-none-eabi-
-OPENOCD    := c:/sys/tools/openocd/bin/openocd
-STLINK     := c:/sys/tools/st-link/st-link_cli -Q -c SWD UR
-QEMU       := c:/sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
+IARCC      := C:/Sys/icc/arm/bin/
+GNUCC      := C:/Sys/gcc/arm/bin/arm-none-eabi-
+OPENOCD    := C:/Sys/tools/openocd/bin/openocd
+STLINK     := C:/Sys/tools/st-link/st-link_cli -Q -c SWD UR
+CUBE       := C:/Sys/tools/cube/stm32_programmer_cli -q -c port=SWD mode=UR
+QEMU       := C:/Sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
 
 #----------------------------------------------------------#
 
-PROJECT    ?= $(notdir $(CURDIR))
+PROJECT    ?=
 DEFS       ?= DEBUG USE_SEMIHOST
 DIRS       ?=
 INCS       ?=
 LIBS       ?=
 KEYS       ?= .cmsis_os .nasa_osal
-OPTF       ?= h # hz
+OPTF       ?=
 SCRIPT     ?=
 
 #----------------------------------------------------------#
@@ -54,7 +55,7 @@ C_EXT      := .c
 CXX_EXT    := .cpp
 
 INC_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $d*.h $d*.hpp))))
-LIB_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $dlib*.a $d*.icf))))
+LIB_DIRS   := $(sort $(dir $(foreach d,$(VPATH),$(wildcard $dlib*.a))))
 OBJ_SRCS   :=              $(foreach d,$(VPATH),$(wildcard $d*.o))
 AS_SRCS    :=              $(foreach d,$(VPATH),$(wildcard $d*$(AS_EXT)))
 C_SRCS     :=              $(foreach d,$(VPATH),$(wildcard $d*$(C_EXT)))
@@ -66,7 +67,7 @@ else
 SCRIPT     :=  $(firstword $(foreach d,$(VPATH),$(wildcard $d$(SCRIPT))))
 endif
 ifeq ($(strip $(PROJECT)),)
-PROJECT    :=     $(notdir $(CURDIR))
+PROJECT    := $(firstword $(notdir $(CURDIR)))
 endif
 
 AS_SRCS    := $(AS_SRCS:%.S=)
@@ -95,7 +96,7 @@ COMMON_F    = --thumb -O$(OPTF) -e --dependencies=m $*.d
 
 AS_FLAGS    = -S -s+ -w+
 C_FLAGS     = --silent
-CXX_FLAGS   = --silent --enable_restrict --c++ --no_rtti --no_exceptions
+CXX_FLAGS   = --silent --c++ --enable_restrict --no_rtti --no_exceptions
 LD_FLAGS    = --silent --config $(SCRIPT) --map $(MAP) --no_exceptions
 ifneq ($(filter main_stack_size%,$(DEFS)),)
 LD_FLAGS   += --config_def $(filter main_stack_size%,$(DEFS))
@@ -106,14 +107,15 @@ endif
 
 #----------------------------------------------------------#
 
-ifneq ($(strip $(CXX_SRCS)),)
-DEFS       += __USES_CXX
-endif
 ifneq ($(filter USE_SEMIHOST,$(DEFS)),)
 LD_FLAGS   += --semihosting
 endif
 ifneq ($(filter DEBUG,$(DEFS)),)
 COMMON_F   += --debug
+else
+ifeq  ($(filter NDEBUG,$(DEFS)),)
+DEFS       += NDEBUG
+endif
 endif
 
 #----------------------------------------------------------#
@@ -218,6 +220,7 @@ clean :
 flash : all $(HEX)
 	$(info Programing device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_SAVE) $(OOCD_EXEC) $(OOCD_EXIT)
+#	$(CUBE) -w $(ELF) -v -hardRst
 #	$(STLINK) -P $(HEX) -V -Rst
 
 server : all
@@ -239,6 +242,7 @@ qemu : all
 reset :
 	$(info Reseting device...)
 	$(OPENOCD) $(OOCD_INIT) $(OOCD_EXEC) $(OOCD_EXIT)
+#	$(CUBE) -hardRst
 #	$(STLINK) -HardRst
 
 .PHONY : all lib clean flash server debug monitor qemu reset

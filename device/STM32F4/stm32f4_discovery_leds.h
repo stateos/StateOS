@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    stm32f4_discovery_leds.h
  * @author  Rajmund Szymanski
- * @date    01.12.2020
+ * @date    27.01.2021
  * @brief   This file contains definitions for STM32F4-Discovery Kit.
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
 #define __STM32F4_DISCOVERY_LEDS_H
 
 #include <stdbool.h>
-#include <stm32f4_io.h>
+#include "stm32f4_io.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -26,7 +26,11 @@ extern "C" {
 #define     LEDR BITBAND(GPIOD->ODR)[14] // red led
 #define     LEDB BITBAND(GPIOD->ODR)[15] // blue led
 
-struct    __LEDs { uint16_t: 12; volatile uint16_t f: 4; uint16_t: 0; uint32_t alignment_for_gcc8; };
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ < 200000
+struct    __LEDs { uint16_t: 12; volatile uint16_t f: 4; uint16_t: 0; };
+#else
+struct    __LEDs { uint16_t: 12; volatile uint16_t f: 4; uint16_t: 0; uint32_t _alignment_; };
+#endif
 
 #define     LEDs (((struct __LEDs *)&(GPIOD->ODR))->f)
 
@@ -39,7 +43,7 @@ struct    __LEDs { uint16_t: 12; volatile uint16_t f: 4; uint16_t: 0; uint32_t a
 static inline
 void LED_Init( void )
 {
-	GPIO_Init(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15, GPIO_Output_PushPull);
+	GPIO_Init(GPIOD, GPIO_Pins(12,13,14,15), GPIO_Output_PushPull);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -127,7 +131,7 @@ void LED_Tick( void )
 static inline
 void USB_LED_Init( void )
 {
-	GPIO_Init(GPIOA, GPIO_Pin_9, GPIO_Output_PushPull);
+	GPIO_Init(GPIOA, GPIO_Pins(9), GPIO_Output_PushPull);
 }
 
 /* -------------------------------------------------------------------------- */
