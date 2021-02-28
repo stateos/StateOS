@@ -2,7 +2,7 @@
 
     @file    StateOS: os.h
     @author  Rajmund Szymanski
-    @date    26.02.2021
+    @date    28.02.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -83,13 +83,20 @@ extern "C" {
  *
  * Return            : none
  *
- * Note              : function core_sys_init should be invoked as a constructor
+ * Note              : function core_sys_init should be invoked as a static constructor
  *                   : otherwise, call sys_init as the first instruction in function main
  *
  ******************************************************************************/
 
 __STATIC_INLINE
-void sys_init( void ) { core_sys_init(); }
+void sys_init( void )
+{
+#ifdef __CONSTRUCTOR
+	core_sys_init();
+#else
+	port_sys_init();
+#endif
+}
 
 #ifdef __cplusplus
 }
