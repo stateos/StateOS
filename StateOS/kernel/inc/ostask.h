@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    26.02.2021
+    @date    02.03.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1490,7 +1490,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 	TaskT( const unsigned _prio, F&& _state, A&&... _args ):
 	TaskT<size_>{_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...)} {}
 
-#if __cplusplus >= 201703
+#if __cplusplus >= 201703 && !defined(__ICCARM__)
 	template<typename F, typename... A, typename = std::enable_if_t<std::is_invocable_v<F, A...>>>
 	TaskT( F&& _state, A&&... _args ):
 	TaskT<size_>{std::bind(std::forward<F>(_state), std::forward<A>(_args)...)} {}
@@ -1547,7 +1547,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return Make(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 
-#if __cplusplus >= 201703
+#if __cplusplus >= 201703 && !defined(__ICCARM__)
 	template<typename F, typename... A, typename = std::enable_if_t<std::is_invocable_v<F, A...>>> static
 	TaskT<size_> Make( F&& _state, A&&... _args )
 	{
@@ -1594,7 +1594,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return Start(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 
-#if __cplusplus >= 201703
+#if __cplusplus >= 201703 && !defined(__ICCARM__)
 	template<typename F, typename... A, typename = std::enable_if_t<std::is_invocable_v<F, A...>>> static
 	TaskT<size_> Start( F&& _state, A&&... _args )
 	{
@@ -1648,7 +1648,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return Create(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 
-#if __cplusplus >= 201703
+#if __cplusplus >= 201703 && !defined(__ICCARM__)
 	template<typename F, typename... A, typename = std::enable_if_t<std::is_invocable_v<F, A...>>> static
 	Ptr Create( F&& _state, A&&... _args )
 	{
@@ -1703,7 +1703,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 		return Detached(_prio, std::bind(std::forward<F>(_state), std::forward<A>(_args)...));
 	}
 
-#if __cplusplus >= 201703
+#if __cplusplus >= 201703 && !defined(__ICCARM__)
 	template<typename F, typename... A, typename = std::enable_if_t<std::is_invocable_v<F, A...>>> static
 	Ptr Detached( F&& _state, A&&... _args )
 	{
