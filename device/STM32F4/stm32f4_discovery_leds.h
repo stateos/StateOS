@@ -216,6 +216,8 @@ struct USB_Led
 	unsigned   operator = ( const unsigned status ) { USB_LED = status; return status; }
 };
 
+using GreenLed = USB_Led;
+
 /* -------------------------------------------------------------------------- */
 
 }     //  namespace
