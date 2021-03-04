@@ -2,7 +2,7 @@
 
     @file    StateOS: osbarrier.h
     @author  Rajmund Szymanski
-    @date    25.06.2020
+    @date    04.03.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -303,6 +303,7 @@ int bar_wait( bar_t *bar ) { return bar_waitFor(bar, INFINITE); }
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+namespace stateos {
 
 /******************************************************************************
  *
@@ -367,6 +368,7 @@ struct Barrier : public __bar
 	int  wait     ( void )           { return bar_wait     (this); }
 };
 
+}     //  namespace
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */

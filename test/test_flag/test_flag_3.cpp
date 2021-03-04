@@ -5,6 +5,8 @@
 #define FLAG2 11U
 #define FLAG3  7U
 
+using namespace stateos;
+
 static auto Flg0 = Flag();
 static auto Flg1 = Flag();
 static auto Flg2 = Flag();

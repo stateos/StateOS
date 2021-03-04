@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 auto Lst0 = ListTT<unsigned>();
 auto Lst1 = ListTT<unsigned>();
 auto Lst2 = ListTT<unsigned>();

@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 static unsigned sent = 0;
 static unsigned received = 0;
 

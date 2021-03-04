@@ -2,7 +2,7 @@
 
     @file    StateOS: ostask.h
     @author  Rajmund Szymanski
-    @date    02.03.2021
+    @date    04.03.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -1295,6 +1295,7 @@ size_t tsk_stackSpace( void )
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+namespace stateos {
 
 /******************************************************************************
  *
@@ -1724,6 +1725,7 @@ struct TaskT : public baseTask, public baseStack<size_>
 
 using Task = TaskT<OS_STACK_SIZE>;
 
+}     //  namespace
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */

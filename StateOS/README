@@ -49,6 +49,7 @@ Features:
 - examples and templates are in separate repositories (https://github.com/stateos)
 ---------
 6.8
+- added namespaces
 - updated onceflag
 - various updates
 - updated sys_init procedure

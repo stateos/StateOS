@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 static void proc3()
 {
 	         for (;;);

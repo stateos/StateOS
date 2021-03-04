@@ -2,7 +2,7 @@
 
     @file    StateOS: ossignal.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    04.03.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -413,6 +413,7 @@ void sig_clearISR( sig_t *sig, unsigned signo ) { sig_clear(sig, signo); }
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+namespace stateos {
 
 /******************************************************************************
  *
@@ -485,6 +486,7 @@ struct Signal : public __sig
 	void clearISR ( unsigned _signo )                                     {        sig_clearISR (this, _signo); }
 };
 
+}     //  namespace
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */

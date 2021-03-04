@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 static auto Tmr0 = Timer(nullptr);
 static auto Tmr1 = Timer(nullptr);
 static auto Tmr2 = Timer(nullptr);

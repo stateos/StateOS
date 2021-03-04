@@ -2,6 +2,8 @@
 
 #define SIZE sizeof(unsigned)
 
+using namespace stateos;
+
 static auto Msg0 = MessageBufferTT<1, unsigned>();
 static auto Msg1 = MessageBufferTT<1, unsigned>();
 static auto Msg2 = MessageBufferTT<1, unsigned>();

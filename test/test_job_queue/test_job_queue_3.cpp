@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 static auto Job0 = JobQueueT<1>();
 static auto Job1 = JobQueueT<1>();
 static auto Job2 = JobQueueT<1>();

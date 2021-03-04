@@ -2,7 +2,7 @@
 
     @file    StateOS: osclock.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    04.03.2021
     @brief   This file implements steady clock for StateOS.
 
  ******************************************************************************
@@ -71,6 +71,8 @@ cnt_t sys_timeISR( void ) { return sys_time(); }
 #include <chrono>
 #endif
 
+namespace stateos {
+
 /******************************************************************************
  *
  * Class             : Clock
@@ -106,6 +108,7 @@ struct Clock
 	rep until( const rep _time )        { return _time; }
 };
 
+}     //  namespace
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */

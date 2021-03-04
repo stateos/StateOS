@@ -2,7 +2,7 @@
 
     @file    StateOS: osmemorypool.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    04.03.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -421,6 +421,7 @@ void mem_giveISR( mem_t *mem, void *data ) { lst_giveISR(&mem->lst, data); }
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+namespace stateos {
 
 /******************************************************************************
  *
@@ -553,6 +554,7 @@ struct MemoryPoolTT : public MemoryPoolT<limit_, sizeof(C)>
 	int  wait     ( C **_data )                 { return mem_wait     (this, reinterpret_cast<void **>(_data)); }
 };
 
+}     //  namespace
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */

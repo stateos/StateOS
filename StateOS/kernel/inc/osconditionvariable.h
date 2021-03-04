@@ -2,7 +2,7 @@
 
     @file    StateOS: osconditionvariable.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    04.03.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -373,6 +373,7 @@ void cnd_notifyAll( cnd_t *cnd ) { cnd_give(cnd, true); }
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+namespace stateos {
 
 /******************************************************************************
  *
@@ -445,6 +446,7 @@ struct ConditionVariable : public __cnd
 	void notifyAll( void )                        {        cnd_notifyAll(this); }
 };
 
+}     //  namespace
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */

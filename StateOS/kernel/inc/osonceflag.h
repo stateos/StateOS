@@ -2,7 +2,7 @@
 
     @file    StateOS: osonceflag.h
     @author  Rajmund Szymanski
-    @date    26.02.2021
+    @date    04.03.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -207,6 +207,7 @@ void one_call( one_t *one, fun_t *fun )
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+namespace stateos {
 
 /******************************************************************************
  *
@@ -258,6 +259,7 @@ struct OnceFlag
 	one_t flg_;
 };
 
+}     //  namespace
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */

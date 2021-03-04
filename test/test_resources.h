@@ -83,11 +83,11 @@ extern tsk_id tsk5;
 
 #ifdef  __cplusplus
 
-extern Task        Tsk0;
-extern Task        Tsk1;
-extern TaskT<512>  Tsk2;
-extern TaskT<1024> Tsk3;
-extern Task        Tsk4;
-extern Task        Tsk5;
+extern stateos::Task        Tsk0;
+extern stateos::Task        Tsk1;
+extern stateos::TaskT<512>  Tsk2;
+extern stateos::TaskT<1024> Tsk3;
+extern stateos::Task        Tsk4;
+extern stateos::Task        Tsk5;
 
 #endif

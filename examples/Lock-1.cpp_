@@ -1,6 +1,9 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
+using namespace device;
+using namespace stateos;
+
 void consumer(FastMutex &mut, Led &led)
 {
 	auto lock = Lock<FastMutex>(mut);

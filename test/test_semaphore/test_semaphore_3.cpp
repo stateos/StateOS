@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 auto Sem0 = Semaphore(0);
 auto Sem1 = Semaphore(0);
 auto Sem2 = Semaphore(0);

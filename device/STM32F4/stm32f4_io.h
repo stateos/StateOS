@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    stm32f4_io.h
  * @author  Rajmund Szymanski
- * @date    24.01.2021
+ * @date    04.03.2021
  * @brief   This file contains macro definitions for the STM32F4XX GPIO ports.
  ******************************************************************************/
 
@@ -26,6 +26,12 @@
        (((bits)&0x0010UL)*0x0010UL)|(((bits)&0x0020UL)*0x0020UL)|(((bits)&0x0040UL)*0x0040UL)|(((bits)&0x0080UL)*0x0080UL)|\
        (((bits)&0x0100UL)*0x0100UL)|(((bits)&0x0200UL)*0x0200UL)|(((bits)&0x0400UL)*0x0400UL)|(((bits)&0x0800UL)*0x0800UL)|\
        (((bits)&0x1000UL)*0x1000UL)|(((bits)&0x2000UL)*0x2000UL)|(((bits)&0x4000UL)*0x4000UL)|(((bits)&0x8000UL)*0x8000UL))
+
+/* -------------------------------------------------------------------------- */
+
+#define REG_SET_BITS(REG, VALUE) do (REG) = (REG) |  (VALUE); while (0)
+#define REG_CLR_BITS(REG, VALUE) do (REG) = (REG) & ~(VALUE); while (0)
+#define REG_REV_BITS(REG, VALUE) do (REG) = (REG) ^  (VALUE); while (0)
 
 /* -------------------------------------------------------------------------- */
 /*
@@ -236,20 +242,20 @@ void __pinini( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	uint32_t high;
 
-	if (0UL != pins*GPIO_OUT(cfg))    gpio->BSRR    = (pins&GPIO_Pin_All)*GPIO_OUT(cfg);
-	if (0UL != pins*GPIO_OTYPE(cfg))  gpio->OTYPER  |= pins*GPIO_OTYPE(cfg);
+	if (0UL != pins*GPIO_OUT(cfg))    gpio->BSRR = (pins & GPIO_Pin_All) * GPIO_OUT(cfg);
+	if (0UL != pins*GPIO_OTYPE(cfg))  REG_SET_BITS(gpio->OTYPER,  pins * GPIO_OTYPE(cfg));
 
 	pins = __stretch(pins);
 
-	if (0UL != pins*GPIO_MODE(cfg))   gpio->MODER   |= pins*GPIO_MODE(cfg);
-	if (0UL != pins*GPIO_OSPEED(cfg)) gpio->OSPEEDR |= pins*GPIO_OSPEED(cfg);
-	if (0UL != pins*GPIO_PUPD(cfg))   gpio->PUPDR   |= pins*GPIO_PUPD(cfg);
+	if (0UL != pins*GPIO_MODE(cfg))   REG_SET_BITS(gpio->MODER,   pins * GPIO_MODE(cfg));
+	if (0UL != pins*GPIO_OSPEED(cfg)) REG_SET_BITS(gpio->OSPEEDR, pins * GPIO_OSPEED(cfg));
+	if (0UL != pins*GPIO_PUPD(cfg))   REG_SET_BITS(gpio->PUPDR,   pins * GPIO_PUPD(cfg));
 
 	high = __stretch(pins >> 16);
 	pins = __stretch(pins);
 
-	if (0UL != pins*GPIO_AF(cfg))     gpio->AFR[0]  |= pins*GPIO_AF(cfg);
-	if (0UL != high*GPIO_AF(cfg))     gpio->AFR[1]  |= high*GPIO_AF(cfg);
+	if (0UL != pins*GPIO_AF(cfg))     REG_SET_BITS(gpio->AFR[0],  pins * GPIO_AF(cfg));
+	if (0UL != high*GPIO_AF(cfg))     REG_SET_BITS(gpio->AFR[1],  high * GPIO_AF(cfg));
 }
 
 /* -------------------------------------------------------------------------- */
@@ -259,23 +265,23 @@ void __pincfg( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
 	uint32_t high;
 
-	gpio->BSRR    = (pins & GPIO_Pin_All) << (16 * GPIO_OUT(~cfg));
+	gpio->BSRR = (pins & GPIO_Pin_All) << (16 * GPIO_OUT(~cfg));
 
-	gpio->OTYPER  = (gpio->OTYPER  & ~(pins * 0x1)) | (pins * GPIO_OTYPE(cfg));
+	MODIFY_REG(gpio->OTYPER,  pins * 0x1, pins * GPIO_OTYPE(cfg));
 
 	pins = __stretch(pins);
 
-	gpio->MODER   = (gpio->MODER   & ~(pins * 0x3)) | (pins * GPIO_MODE(cfg));
-	gpio->OSPEEDR = (gpio->OSPEEDR & ~(pins * 0x3)) | (pins * GPIO_OSPEED(cfg));
-	gpio->PUPDR   = (gpio->PUPDR   & ~(pins * 0x3)) | (pins * GPIO_PUPD(cfg));
+	MODIFY_REG(gpio->MODER,   pins * 0x3, pins * GPIO_MODE(cfg));
+	MODIFY_REG(gpio->OSPEEDR, pins * 0x3, pins * GPIO_OSPEED(cfg));
+	MODIFY_REG(gpio->PUPDR,   pins * 0x3, pins * GPIO_PUPD(cfg));
 
 	high = __stretch(pins>>16);
 	pins = __stretch(pins);
 
 	if (pins)
-	gpio->AFR[0]  = (gpio->AFR[0]  & ~(pins * 0xF)) | (pins * GPIO_AF(cfg));
+	MODIFY_REG(gpio->AFR[0],  pins * 0xF, pins * GPIO_AF(cfg));
 	if (high)
-	gpio->AFR[1]  = (gpio->AFR[1]  & ~(high * 0xF)) | (high * GPIO_AF(cfg));
+	MODIFY_REG(gpio->AFR[1],  high * 0xF, high * GPIO_AF(cfg));
 }
 
 /* -------------------------------------------------------------------------- */
@@ -295,7 +301,7 @@ void __pinlck( GPIO_TypeDef *gpio, uint32_t pins )
 __STATIC_FORCEINLINE
 void GPIO_Init( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
-	RCC->AHB1ENR |= 1U << GPIO_PORT(gpio); RCC->AHB1ENR;
+	REG_SET_BITS(RCC->AHB1ENR, 1UL << GPIO_PORT(gpio)); RCC->AHB1ENR;
 
 	__pinini(gpio, pins, cfg);
 }
@@ -305,7 +311,7 @@ void GPIO_Init( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 static inline
 void GPIO_Config( GPIO_TypeDef *gpio, uint32_t pins, uint32_t cfg )
 {
-	RCC->AHB1ENR |= 1U << GPIO_PORT(gpio); RCC->AHB1ENR;
+	REG_SET_BITS(RCC->AHB1ENR, 1UL << GPIO_PORT(gpio)); RCC->AHB1ENR;
 
 	__pincfg(gpio, pins, cfg);
 }
@@ -327,6 +333,7 @@ void GPIO_Lock( GPIO_TypeDef *gpio, uint32_t pins )
 /* -------------------------------------------------------------------------- */
 
 #ifdef  __cplusplus
+namespace device {
 
 /* -------------------------------------------------------------------------- */
 
@@ -334,7 +341,7 @@ template<const unsigned gpio>
 class PortT
 {
 public:
-	PortT( void ) { RCC->AHB1ENR |= 1U << GPIO_PORT(gpio); RCC->AHB1ENR; }
+	PortT( void ) { REG_SET_BITS(RCC->AHB1ENR, 1UL << GPIO_PORT(gpio)); RCC->AHB1ENR; }
 	
 	void init  ( const unsigned pins, const unsigned cfg ) { __pinini((GPIO_TypeDef *)gpio, pins, cfg); }
 	void config( const unsigned pins, const unsigned cfg ) { __pincfg((GPIO_TypeDef *)gpio, pins, cfg); }
@@ -382,7 +389,7 @@ template<const unsigned gpio, const unsigned pin>
 class PinT
 {
 public:
-	PinT( void ) { RCC->AHB1ENR |= 1U << GPIO_PORT(gpio); RCC->AHB1ENR; }
+	PinT( void ) { REG_SET_BITS(RCC->AHB1ENR, 1UL << GPIO_PORT(gpio)); RCC->AHB1ENR; }
 
 	void init  ( const unsigned cfg ) { __pinini((GPIO_TypeDef *)gpio, 1 << pin, cfg); }
 	void config( const unsigned cfg ) { __pincfg((GPIO_TypeDef *)gpio, 1 << pin, cfg); }
@@ -395,6 +402,7 @@ public:
 
 /* -------------------------------------------------------------------------- */
 
+}     //  namespace
 #endif//__cplusplus
 
 #endif//__STM32F4_IO_H

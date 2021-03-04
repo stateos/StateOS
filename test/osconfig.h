@@ -53,7 +53,7 @@
 // OS_LOCK_LEVEL == 0 or  __CORTEX_M <  3 => entrance to a critical section blocks all interrupts
 // OS_LOCK_LEVEL >  0 and __CORTEX_M >= 3 => entrance to a critical section blocks interrupts with urgency lower or equal (the priority value greater or equal) than OS_LOCK_LEVEL
 // default value: 0
-#define OS_LOCK_LEVEL         0
+#define OS_LOCK_LEVEL         4
 
 // ----------------------------
 // priority of main process
@@ -87,7 +87,7 @@
 // bit size of system timer counter
 // available values: 16, 32, 64
 // default value: 32
-#define OS_TIMER_SIZE        32
+#define OS_TIMER_SIZE        64
 
 // ----------------------------
 // system procedure for starting the task
@@ -95,10 +95,10 @@
 // 0 => task function will be executed into an infinite system-implemented loop
 // 1 => while return from the task function, tsk_exit will be executed
 // default value: 0
-#define OS_TASK_EXIT          0
+#define OS_TASK_EXIT          1
 
 // ----------------------------
 // indicates the use of atomic functions
 // available values: 0, 1
 // default value: 0
-#define OS_ATOMICS            0
+#define OS_ATOMICS            1

@@ -2,7 +2,7 @@
 
     @file    StateOS: osmessagebuffer.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    04.03.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -616,6 +616,7 @@ size_t msg_sizeISR( msg_t *msg ) { return msg_size(msg); }
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+namespace stateos {
 
 /******************************************************************************
  *
@@ -772,6 +773,7 @@ struct MessageBufferTT : public MessageBufferT<limit_*(sizeof(size_t)+sizeof(C))
 	int pushISR  ( const C *_data )                 { return msg_pushISR  (this, _data, sizeof(C)); }
 };
 
+}     //  namespace
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */

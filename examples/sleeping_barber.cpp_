@@ -8,6 +8,9 @@
 #define CUSTOMERS 4 // num of chairs in the waiting room
 #define DELAY   256 // time constant
 
+using namespace device;
+using namespace stateos;
+
 auto led            = Led();
 auto barbers        = Semaphore(0, BARBERS);
 auto customers      = Semaphore(0, CUSTOMERS);

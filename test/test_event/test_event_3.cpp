@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 static auto Evt0 = Event();
 static auto Evt1 = Event();
 static auto Evt2 = Event();

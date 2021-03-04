@@ -2,7 +2,7 @@
 
     @file    StateOS: osevent.h
     @author  Rajmund Szymanski
-    @date    23.12.2020
+    @date    04.03.2021
     @brief   This file contains definitions for StateOS.
 
  ******************************************************************************
@@ -319,6 +319,7 @@ void evt_giveISR( evt_t *evt, unsigned event ) { evt_give(evt, event); }
 /* -------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
+namespace stateos {
 
 /******************************************************************************
  *
@@ -384,6 +385,7 @@ struct Event : public __evt
 	void giveISR  ( unsigned  _event )                 {        evt_giveISR  (this, _event); }
 };
 
+}     //  namespace
 #endif//__cplusplus
 
 /* -------------------------------------------------------------------------- */

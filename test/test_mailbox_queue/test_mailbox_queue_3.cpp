@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 auto Box0 = MailBoxQueueTT<1, unsigned>();
 auto Box1 = MailBoxQueueTT<1, unsigned>();
 auto Box2 = MailBoxQueueTT<1, unsigned>();

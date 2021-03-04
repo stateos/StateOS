@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file    stm32f4_discovery_leds.h
  * @author  Rajmund Szymanski
- * @date    27.01.2021
+ * @date    04.03.2021
  * @brief   This file contains definitions for STM32F4-Discovery Kit.
  ******************************************************************************/
 
@@ -105,10 +105,10 @@ void LED_Toggle( unsigned nr )
 {
 	switch (nr)
 	{
-	case 0: GPIOD->ODR ^= GPIO_ODR_OD12; break;
-	case 1: GPIOD->ODR ^= GPIO_ODR_OD13; break;
-	case 2: GPIOD->ODR ^= GPIO_ODR_OD14; break;
-	case 3: GPIOD->ODR ^= GPIO_ODR_OD15; break;
+	case 0: REG_REV_BITS(GPIOD->ODR, GPIO_ODR_OD12); break;
+	case 1: REG_REV_BITS(GPIOD->ODR, GPIO_ODR_OD13); break;
+	case 2: REG_REV_BITS(GPIOD->ODR, GPIO_ODR_OD14); break;
+	case 3: REG_REV_BITS(GPIOD->ODR, GPIO_ODR_OD15); break;
 	}
 }
 
@@ -171,7 +171,7 @@ void USB_LED_Reset( void )
 static inline
 void USB_LED_Toggle( void )
 {
-	GPIOA->ODR ^= GPIO_ODR_OD9;
+	REG_REV_BITS(GPIOA->ODR, GPIO_ODR_OD9);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -183,8 +183,7 @@ void USB_LED_Toggle( void )
 /* -------------------------------------------------------------------------- */
 
 #ifdef  __cplusplus
-
-#define GreenLed USB_Led
+namespace device {
 
 /* -------------------------------------------------------------------------- */
 
@@ -198,7 +197,7 @@ struct Led
 	void toggle( unsigned nr ) {        LED_Toggle(nr); }
 	void tick  ( void )        {        LED_Tick();     }
 
-	unsigned   operator = ( const unsigned status ) { return LEDs = status & 0xF; }
+	unsigned   operator = ( const unsigned status ) { LEDs = status & 0xF; return status & 0xF; }
 	unsigned & operator []( const unsigned number ) { return (unsigned &)LED[number]; }
 };
 
@@ -214,11 +213,12 @@ struct USB_Led
 	void toggle( void ) {        USB_LED_Toggle(); }
 
 	operator   unsigned & ( void )                  { return (unsigned &) GRN; }
-	unsigned   operator = ( const unsigned status ) { return USB_LED = status; }
+	unsigned   operator = ( const unsigned status ) { USB_LED = status; return status; }
 };
 
 /* -------------------------------------------------------------------------- */
 
+}     //  namespace
 #endif//__cplusplus
 
 #endif//__STM32F4_DISCOVERY_LEDS_H

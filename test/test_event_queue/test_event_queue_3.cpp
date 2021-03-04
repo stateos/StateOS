@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 static auto Evq0 = EventQueueT<1>();
 static auto Evq1 = EventQueueT<1>();
 static auto Evq2 = EventQueueT<1>();

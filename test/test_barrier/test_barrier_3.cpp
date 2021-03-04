@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 auto Bar0 = Barrier(2);
 auto Bar1 = Barrier(2);
 auto Bar2 = Barrier(2);

@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 auto Sig0 = Signal();
 auto Sig1 = Signal();
 auto Sig2 = Signal();

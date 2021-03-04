@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 static auto Mtx0 = Mutex(mtxDefault);
 static auto Mtx1 = Mutex(mtxErrorCheck);
 static auto Mtx2 = Mutex(mtxPrioInherit);

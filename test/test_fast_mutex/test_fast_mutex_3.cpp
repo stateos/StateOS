@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 static auto Mut0 = FastMutex();
 static auto Mut1 = FastMutex();
 static auto Mut2 = FastMutex();

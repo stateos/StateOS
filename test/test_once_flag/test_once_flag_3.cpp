@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 auto One0 = OnceFlag();
 auto One1 = OnceFlag();
 auto One2 = OnceFlag();

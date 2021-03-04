@@ -2,6 +2,8 @@
 
 #define SIZE sizeof(unsigned)
 
+using namespace stateos;
+
 static auto Stm0 = StreamBufferTT<1, unsigned>();
 static auto Stm1 = StreamBufferTT<1, unsigned>();
 static auto Stm2 = StreamBufferTT<1, unsigned>();

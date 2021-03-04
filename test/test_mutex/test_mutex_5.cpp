@@ -1,5 +1,7 @@
 #include "test.h"
 
+using namespace stateos;
+
 auto Mtx0 = Mutex(mtxNormal);
 auto Mtx1 = Mutex(mtxErrorCheck);
 auto Mtx2 = Mutex(mtxRecursive);
