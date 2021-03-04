@@ -9,4 +9,4 @@ install:
   - arm-none-eabi-gcc --version
 
 script:
-  - make all GNUCC=arm-none-eabi- -f makefile.gnucc
+  - make all -f makefile.gnucc

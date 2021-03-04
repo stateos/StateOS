@@ -1,15 +1,15 @@
 #**********************************************************#
 #file     makefile
 #author   Rajmund Szymanski
-#date     17.02.2021
+#date     02.03.2021
 #brief    STM32F4xx makefile.
 #**********************************************************#
 
-GNUCC      := C:/Sys/gcc/arm/bin/arm-none-eabi-
-OPENOCD    := C:/Sys/tools/openocd/bin/openocd
-STLINK     := C:/Sys/tools/st-link/st-link_cli -Q -c SWD UR
-CUBE       := C:/Sys/tools/cube/stm32_programmer_cli -q -c port=SWD mode=UR
-QEMU       := C:/Sys/qemu-arm/bin/qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
+GNUCC      := arm-none-eabi-
+OPENOCD    := penocd
+STLINK     := st-link_cli -Q -c SWD UR
+CUBE       := stm32_programmer_cli -q -c port=SWD mode=UR
+QEMU       := qemu-system-gnuarmeclipse -semihosting -board STM32F4-Discovery
 
 #----------------------------------------------------------#
 
@@ -97,12 +97,12 @@ COMMON_F   += -MD -MP
 COMMON_F   +=#-Wa,-amhls=$(@:.o=.lst)
 
 AS_FLAGS    =
-ifneq ($(filter USE_GNU,$(DEFS)),)
-C_FLAGS     = -std=gnu11
-CXX_FLAGS   = -std=gnu++$(STDC:20=2a)
-else
+ifneq ($(filter USE_ISO,$(DEFS)),)
 C_FLAGS     = -std=c11
 CXX_FLAGS   = -std=c++$(STDC:20=2a)
+else
+C_FLAGS     = -std=gnu11
+CXX_FLAGS   = -std=gnu++$(STDC:20=2a)
 endif
 CXX_FLAGS  += -fno-rtti -fno-exceptions -Wzero-as-null-pointer-constant -fno-use-cxa-atexit
 LD_FLAGS    = -Wl,-Map=$(MAP),--cref,--no-warn-mismatch,--gc-sections
@@ -149,7 +149,7 @@ endif
 #----------------------------------------------------------#
 
 DEFS       := $(DEFS:USE_LTO=)
-DEFS       := $(DEFS:USE_GNU=)
+DEFS       := $(DEFS:USE_ISO=)
 
 DEFS_F     := $(DEFS:%=-D%)
 LIBS       += $(LIB_SRCS:lib%.a=%)

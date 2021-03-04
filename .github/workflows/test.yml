@@ -20,4 +20,4 @@ jobs:
     - name: check arm-none-eabi-gcc version
       run: arm-none-eabi-gcc -v
     - name: make test
-      run: make all GNUCC=arm-none-eabi- -f makefile.gnucc
+      run: make all -f makefile.gnucc
