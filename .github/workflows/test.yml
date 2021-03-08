@@ -2,17 +2,21 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
+
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
+
+  workflow_dispatch:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
+    - name: checkout repository
+      uses: actions/checkout@v2
+    - name: checkout submodules
+      run: git submodule update --init --recursive
     - name: install arm-none-eabi-gcc
       uses: fiam/arm-none-eabi-gcc@v1
       with:
@@ -20,4 +24,4 @@ jobs:
     - name: check arm-none-eabi-gcc version
       run: arm-none-eabi-gcc -v
     - name: make test
-      run: make all -f makefile.gnucc
+      run: bash ./.test.sh
