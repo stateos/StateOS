@@ -16,7 +16,9 @@ jobs:
     - name: checkout repository
       uses: actions/checkout@v2
     - name: checkout submodules
-      run: git submodule update --init --recursive
+      run: git submodule update --init
+    - name: update submodules
+      run: git submodule update --remote
     - name: install arm-none-eabi-gcc
       uses: fiam/arm-none-eabi-gcc@v1
       with:
