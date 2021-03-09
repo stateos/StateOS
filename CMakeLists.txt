@@ -14,7 +14,7 @@ find_package(device  REQUIRED)
 find_package(stateos REQUIRED)
 
 add_executable(test
-	src/main.c
+	src/main.cpp
 )
 
 target_include_directories(test

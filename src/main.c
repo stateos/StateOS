@@ -1,50 +1,25 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-using namespace device;
-using namespace stateos;
+OS_SEM(sem, 0, semBinary);
 
-auto led = Led();
-auto sem = Semaphore::Binary();
-
-struct myTask : public Task
+OS_TSK_DEF(cons, 0)
 {
-	myTask(): Task{0, run} { start(); }
+	sem_wait(sem);
+	LED_Tick();
+}
 
-	virtual
-	void main() = 0;
-
-	private:
-	static void run()
-	{
-		current<myTask>()->main();
-	}
-};
-
-struct Consumer : public myTask
+OS_TSK_DEF(prod, 0)
 {
-	virtual
-	void main() override
-	{
-		sem.wait();
-		led.tick();
-	}
-};
-	
-struct Producer : public myTask
-{
-	virtual
-	void main() override
-	{
-		This::sleepFor(SEC);
-		sem.give();
-	}
-};
-
-auto cons = Consumer();
-auto prod = Producer();
+	tsk_delay(SEC);
+	sem_give(sem);
+}
 
 int main()
 {
-	This::sleep();
+	LED_Init();
+
+	tsk_start(cons);
+	tsk_start(prod);
+	tsk_sleep();
 }

@@ -1,7 +1,7 @@
 PROJECT := test
 DEFS    :=
 INCS    := include
-SRCS    := src/main.c
+SRCS    := src/main.cpp
 LIBS    :=
 SCRIPT  :=
 COMMON  := common

@@ -7,7 +7,7 @@ if [ ! -d examples ]; then
 	exit 0
 fi
 
-for file in examples/*.c_
+for file in examples/*.c
 do
 	rm -f src/main.*
 	echo $file
@@ -15,7 +15,7 @@ do
 	make all -f examples_c.make
 done
 
-for file in examples/*.cpp_
+for file in examples/*.cpp
 do
 	rm -f src/main.*
 	echo $file
