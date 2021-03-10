@@ -7,6 +7,12 @@ on:
     paths-ignore:
       - 'LICENSE'
       - 'README.md'
+      - 'makefile.*'
+      - 'include/*'
+      - 'src/*'
+      - 'CMakeLists.txt'
+      - 'test.make'
+      - 'test/*'
 
   pull_request:
     branches:
@@ -14,6 +20,12 @@ on:
     paths-ignore:
       - 'LICENSE'
       - 'README.md'
+      - 'makefile.*'
+      - 'include/*'
+      - 'src/*'
+      - 'CMakeLists.txt'
+      - 'test.make'
+      - 'test/*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

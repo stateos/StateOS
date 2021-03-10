@@ -7,6 +7,12 @@ on:
     paths-ignore:
       - 'LICENSE'
       - 'README.md'
+      - 'makefile.*'
+      - 'c*.make'
+      - 'test.sh'
+      - 'examples/*'
+      - 'test.make'
+      - 'test/*'
 
   pull_request:
     branches:
@@ -14,6 +20,12 @@ on:
     paths-ignore:
       - 'LICENSE'
       - 'README.md'
+      - 'makefile.*'
+      - 'c*.make'
+      - 'test.sh'
+      - 'examples/*'
+      - 'test.make'
+      - 'test/*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -39,4 +51,4 @@ jobs:
     - name: make test
       run: |
         cmake -S. -Bbuild -GNinja
-        cmake --build build
+        cmake --build build -v
