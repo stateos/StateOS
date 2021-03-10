@@ -1,0 +1,14 @@
+SRCS += test/test_task/test_task.c
+SRCS += test/test_task/test_task_create_0.c
+SRCS += test/test_task/test_task_create_1.c
+SRCS += test/test_task/test_task_create_2.c
+SRCS += test/test_task/test_task_create_3.c
+SRCS += test/test_task/test_task_infinite_loop_1.c
+SRCS += test/test_task/test_task_signal_1.c
+SRCS += test/test_task/test_task_create_4.cpp
+SRCS += test/test_task/test_task_create_5.cpp
+SRCS += test/test_task/test_task_create_6.cpp
+SRCS += test/test_task/test_task_infinite_loop_2.cpp
+SRCS += test/test_task/test_task_infinite_loop_3.cpp
+SRCS += test/test_task/test_task_signal_2.cpp
+SRCS += test/test_task/test_task_signal_3.cpp

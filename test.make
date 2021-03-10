@@ -16,5 +16,9 @@ include $(COMMON)/startup/makefile
 include $(COMMON)/stateos/makefile
 
 #----------------------------------------------------------#
+
+include test/makefile
+
+#----------------------------------------------------------#
 include $(COMMON)/make/makefile
 #----------------------------------------------------------#
