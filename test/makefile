@@ -1,3 +1,9 @@
+INCS    += test/include
+
+SRCS    += test/test.c
+SRCS    += test/test_resources.c
+SRCS    += test/test_resources.cpp
+
 include test/test_alloc/makefile
 include test/test_barrier/makefile
 include test/test_condition_variable/makefile

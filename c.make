@@ -1,6 +1,6 @@
 PROJECT := test
 DEFS    :=
-INCS    := examples
+INCS    := examples/include
 SRCS    := examples/main.c
 LIBS    :=
 SCRIPT  :=

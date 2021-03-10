@@ -1,7 +1,7 @@
 PROJECT := test
 DEFS    :=
-INCS    := test
-SRCS    := test/test.c test/test_resources.c test/test_resources.cpp
+INCS    :=
+SRCS    :=
 LIBS    :=
 SCRIPT  :=
 COMMON  := common
