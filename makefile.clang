@@ -1,4 +1,5 @@
 PROJECT := test
+CLANG   :=
 DEFS    :=
 INCS    := include
 SRCS    := src/main.cpp

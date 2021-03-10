@@ -1,4 +1,5 @@
 PROJECT := test
+ARMCC   :=
 DEFS    :=
 INCS    := include
 SRCS    := src/main.c

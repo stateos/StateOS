@@ -1,4 +1,5 @@
 PROJECT := test
+GNUCC   :=
 DEFS    :=
 INCS    :=
 SRCS    :=

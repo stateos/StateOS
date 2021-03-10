@@ -1,4 +1,5 @@
 PROJECT := test
+IARCC   :=
 DEFS    :=
 INCS    := include
 SRCS    := src/main.c
