@@ -1,5 +1,5 @@
-#include <stm32f4_discovery.h>
-#include <os.h>
+#include "stm32f4_discovery.h"
+#include "os.h"
 
 using namespace device;
 using namespace stateos;

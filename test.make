@@ -1,7 +1,7 @@
 PROJECT := test
 DEFS    :=
-INCS    := include
-SRCS    := src/main.c
+INCS    := test
+SRCS    := test/test.c test/test_resources.c test/test_resources.cpp
 LIBS    :=
 SCRIPT  :=
 COMMON  := common
@@ -14,8 +14,6 @@ include $(COMMON)/cmsis/makefile
 include $(COMMON)/device/nosys/makefile
 include $(COMMON)/startup/makefile
 include $(COMMON)/stateos/makefile
-include $(COMMON)/stateos/nasa/makefile
-include $(COMMON)/stateos/cmsis/makefile
 
 #----------------------------------------------------------#
 include $(COMMON)/make/makefile

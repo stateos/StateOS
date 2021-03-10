@@ -9,16 +9,16 @@ fi
 
 for file in examples/*.c
 do
-	rm -f src/main.*
+	rm -f examples/main.*
 	echo $file
-	cp $file src/main.c
-	make all -f examples_c.make
+	cp $file examples/main.c
+	make all -f c.make
 done
 
 for file in examples/*.cpp
 do
-	rm -f src/main.*
+	rm -f examples/main.*
 	echo $file
-	cp $file src/main.cpp
-	make all -f examples_cpp.make
+	cp $file examples/main.cpp
+	make all -f cpp.make
 done

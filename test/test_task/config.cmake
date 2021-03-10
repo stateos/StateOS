@@ -1,0 +1,19 @@
+include_guard(GLOBAL)
+
+target_sources(test
+	PRIVATE
+	${CMAKE_CURRENT_LIST_DIR}/test_task.c
+	${CMAKE_CURRENT_LIST_DIR}/test_task_create_0.c
+	${CMAKE_CURRENT_LIST_DIR}/test_task_create_1.c
+	${CMAKE_CURRENT_LIST_DIR}/test_task_create_2.c
+	${CMAKE_CURRENT_LIST_DIR}/test_task_create_3.c
+	${CMAKE_CURRENT_LIST_DIR}/test_task_infinite_loop_1.c
+	${CMAKE_CURRENT_LIST_DIR}/test_task_signal_1.c
+	${CMAKE_CURRENT_LIST_DIR}/test_task_create_4.cpp
+	${CMAKE_CURRENT_LIST_DIR}/test_task_create_5.cpp
+	${CMAKE_CURRENT_LIST_DIR}/test_task_create_6.cpp
+	${CMAKE_CURRENT_LIST_DIR}/test_task_infinite_loop_2.cpp
+	${CMAKE_CURRENT_LIST_DIR}/test_task_infinite_loop_3.cpp
+	${CMAKE_CURRENT_LIST_DIR}/test_task_signal_2.cpp
+	${CMAKE_CURRENT_LIST_DIR}/test_task_signal_3.cpp
+)

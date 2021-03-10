@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    03.02.2021
+    @date    16.12.2020
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -29,6 +29,8 @@
 
  ******************************************************************************/
 
+#include "osapi-config.h"
+
 #pragma once
 
 // ----------------------------
@@ -53,7 +55,7 @@
 // OS_LOCK_LEVEL == 0 or  __CORTEX_M <  3 => entrance to a critical section blocks all interrupts
 // OS_LOCK_LEVEL >  0 and __CORTEX_M >= 3 => entrance to a critical section blocks interrupts with urgency lower or equal (the priority value greater or equal) than OS_LOCK_LEVEL
 // default value: 0
-#define OS_LOCK_LEVEL         0
+#define OS_LOCK_LEVEL         4
 
 // ----------------------------
 // priority of main process
@@ -65,7 +67,7 @@
 // OS_HEAP_SIZE == 0 => functions 'xxx_create' use 'malloc' provided with the compiler libraries
 // OS_HEAP_SIZE >  0 => functions 'xxx_create' allocate memory on a dedicated system heap, OS_HEAP_SIZE indicates size of the heap
 // default value: 0
-#define OS_HEAP_SIZE          0
+#define OS_HEAP_SIZE      16384
 
 // ----------------------------
 // default task stack size in bytes
@@ -87,7 +89,7 @@
 // bit size of system timer counter
 // available values: 16, 32, 64
 // default value: 32
-#define OS_TIMER_SIZE        32
+#define OS_TIMER_SIZE        64
 
 // ----------------------------
 // system procedure for starting the task
@@ -95,10 +97,10 @@
 // 0 => task function will be executed into an infinite system-implemented loop
 // 1 => while return from the task function, tsk_exit will be executed
 // default value: 0
-#define OS_TASK_EXIT          0
+#define OS_TASK_EXIT          1
 
 // ----------------------------
 // indicates the use of atomic functions
 // available values: 0, 1
 // default value: 0
-#define OS_ATOMICS            0
+#define OS_ATOMICS            1

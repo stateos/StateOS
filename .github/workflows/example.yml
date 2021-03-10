@@ -1,4 +1,4 @@
-name: CI
+name: Example Tests
 
 on:
   push:
@@ -32,11 +32,5 @@ jobs:
         release: '10-2020-q4'
     - name: check arm-none-eabi-gcc version
       run: arm-none-eabi-gcc -v
-    - name: install dependencies
-      run: |
-        sudo apt-get -y -qq update
-        sudo apt-get -y -qq install cmake ninja-build
     - name: make test
-      run: |
-        cmake -S. -Bbuild -GNinja
-        cmake --build build
+      run: bash ./.test.sh
