@@ -2,34 +2,7 @@ name: Unit Tests
 
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - 'LICENSE'
-      - 'README.md'
-      - 'makefile.*'
-      - 'include/*'
-      - 'src/*'
-      - 'CMakeLists.txt'
-      - 'c*.make'
-      - 'test.sh'
-      - 'examples/*'
-
   pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - 'LICENSE'
-      - 'README.md'
-      - 'makefile.*'
-      - 'include/*'
-      - 'src/*'
-      - 'CMakeLists.txt'
-      - 'c*.make'
-      - 'test.sh'
-      - 'examples/*'
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
