@@ -15,6 +15,8 @@ include $(COMMON)/cmsis/makefile
 include $(COMMON)/device/nosys/makefile
 include $(COMMON)/startup/makefile
 include $(COMMON)/stateos/makefile
+include $(COMMON)/stateos/nasa/makefile
+include $(COMMON)/stateos/cmsis/makefile
 
 #----------------------------------------------------------#
 
