@@ -58,4 +58,4 @@ Building an application for a specific compiler is realised using the appropriat
 
 ### License
 
-This project is licensed under the terms of [the MIT License (MIT)](https://opensource.org/licenses/MIT).
+This project is licensed under the terms of the [MIT License (MIT)](https://opensource.org/licenses/MIT).
