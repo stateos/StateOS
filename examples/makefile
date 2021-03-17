@@ -1,3 +1,3 @@
-INCS    := examples/include
+INCS += examples/include
 
-SRCS    := $(wildcard examples/main.*)
+SRCS += $(wildcard examples/main.*)
