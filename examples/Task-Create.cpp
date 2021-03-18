@@ -9,7 +9,7 @@ int main()
 	auto led = Led();
 	auto sem = Semaphore::Binary();
 	            Task::Create(0, [&]{ sem.wait(); led.tick(); });
-	auto prod = Task::Create(0, [&]{ ThisTask::sleepFor(SEC); sem.give(); });
+	auto prod = Task::Create(0, [&]{ this_task::sleepFor(SEC); sem.give(); });
 	auto tsk = std::move(prod);
 	tsk->join();
 }

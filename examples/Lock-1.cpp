@@ -13,7 +13,7 @@ void consumer(FastMutex &mut, Led &led)
 void producer(FastMutex &mut)
 {
 	auto lock = Lock<FastMutex>(mut);
-	This::sleepFor(SEC);
+	this_task::sleepFor(SEC);
 }
 
 int main()
@@ -22,5 +22,5 @@ int main()
 	FastMutex mut;
 	Task prod = Task::Start(2, [&mut]      { producer(mut); });
 	Task cons = Task::Start(1, [&mut, &led]{ consumer(mut, led); });
-	This::sleep();
+	this_task::sleep();
 }

@@ -24,7 +24,7 @@ void producer()
 
 	for (;;)
 	{
-		ThisTask::sleepFor(SEC);
+		this_task::sleepFor(SEC);
 		sig.give(x);
 		x = (x + 1) % 4;
 	}
@@ -35,5 +35,5 @@ int main()
 	Task::Create(0, consumer);
 	Task::Create(0, producer);
 
-	ThisTask::sleep();
+	this_task::sleep();
 }

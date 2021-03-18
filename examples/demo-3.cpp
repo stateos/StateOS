@@ -6,10 +6,10 @@ using namespace stateos;
 
 void proc( unsigned &led, Clock::time_point timePoint )
 {
-	ThisTask::sleepUntil(timePoint);
+	this_task::sleepUntil(timePoint);
 	for (;;)
 	{
-		ThisTask::sleepNext(std::chrono::milliseconds{500});
+		this_task::sleepNext(std::chrono::milliseconds{500});
 		led++;
 	}
 }
@@ -26,5 +26,5 @@ int main()
 	auto t4 = Task::Start(0, proc, std::ref(led[3]), now + std::chrono::milliseconds{375});
 	auto t5 = Task::Start(0, proc, std::ref(grn),    now + std::chrono::milliseconds{500});
 
-	ThisTask::stop();
+	this_task::stop();
 }

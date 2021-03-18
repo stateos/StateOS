@@ -23,10 +23,10 @@ int main()
 	{
 		for (;;)
 		{
-			ThisTask::sleepFor(SEC);
+			this_task::sleepFor(SEC);
 			sem.give();
 		}
 	});
 
-	ThisTask::sleep();
+	this_task::sleep();
 }

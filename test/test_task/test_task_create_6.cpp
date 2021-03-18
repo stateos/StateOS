@@ -4,7 +4,7 @@ using namespace stateos;
 
 static void proc()
 {
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void test()

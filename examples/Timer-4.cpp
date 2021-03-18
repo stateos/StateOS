@@ -12,13 +12,13 @@ void proc2( void );
 void proc1()
 {
 	led.tick();
-	ThisTimer::flipISR(proc2);
+	this_timer::flipISR(proc2);
 }
 
 void proc2()
 {
 	led.tick();
-	ThisTimer::flipISR(proc1);
+	this_timer::flipISR(proc1);
 }
 
 auto tmr = Timer();
@@ -26,5 +26,5 @@ auto tmr = Timer();
 int main()
 {
 	tmr.startFrom(SEC, SEC, proc1);
-	ThisTask::stop();
+	this_task::stop();
 }

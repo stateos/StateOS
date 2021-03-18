@@ -10,15 +10,15 @@ int main()
 
 	auto cons = Task::Start(0, [&]
 	{
-		ThisTask::action([&](unsigned signo)
+		this_task::action([&](unsigned signo)
 		{
-			ThisTask::flip([&]
+			this_task::flip([&]
 			{
 				led = SIGSET(signo);
-				ThisTask::suspend();
+				this_task::suspend();
 			});
 		});
-		ThisTask::suspend();
+		this_task::suspend();
 	});
 
 	auto prod = Task::Start(0, [&]
@@ -27,11 +27,11 @@ int main()
 
 		for (;;)
 		{
-			ThisTask::sleepNext(SEC);
+			this_task::sleepNext(SEC);
 			cons.signal(x);
 			x = (x + 1) % 4;
 		}
 	});
 
-	ThisTask::suspend();
+	this_task::suspend();
 }

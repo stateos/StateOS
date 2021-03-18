@@ -7,9 +7,9 @@ using namespace stateos;
 auto led = Led();
 auto sem = Semaphore(0);
 auto cons = Task::Start(0, []{ sem.wait(); led.tick(); });
-auto prod = Task::Start(0, []{ ThisTask::sleepFor(SEC); sem.give(); });
+auto prod = Task::Start(0, []{ this_task::sleepFor(SEC); sem.give(); });
 
 int main()
 {
-	ThisTask::stop();
+	this_task::stop();
 }

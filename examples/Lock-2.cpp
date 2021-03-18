@@ -16,7 +16,7 @@ void consumer()
 void producer()
 {
 	auto lock = Lock<Mutex>(mtx);
-	This::sleepFor(SEC);
+	this_task::sleepFor(SEC);
 }
 
 auto prod = Task::Start(2, producer);
@@ -24,5 +24,5 @@ auto cons = Task::Start(1, consumer);
 
 int main()
 {
-	This::sleep();
+	this_task::sleep();
 }

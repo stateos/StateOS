@@ -9,13 +9,13 @@ auto tsk = Task(0, []{});
 
 int main()
 {
-	ThisTask::flip([]
+	this_task::flip([]
 	{
-		ThisTask::sleepNext(SEC);
+		this_task::sleepNext(SEC);
 		tsk.startFrom([]
 		{
 			led.tick();
-			ThisTask::stop();
+			this_task::stop();
 		});
 		tsk.join();
 	});

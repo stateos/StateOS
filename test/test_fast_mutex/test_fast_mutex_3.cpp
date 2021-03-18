@@ -16,7 +16,7 @@ static void proc3()
 	result = Mut3.take();                         ASSERT_failure(result);
 	result = Mut3.give();                         ASSERT_success(result);
 	result = Mut3.give();                         ASSERT_failure(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void proc2()
@@ -31,7 +31,7 @@ static void proc2()
 	result = Tsk3.join();                         ASSERT_success(result);
 	result = Mut2.give();                         ASSERT_success(result);
 	result = Mut2.give();                         ASSERT_failure(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void proc1()
@@ -46,7 +46,7 @@ static void proc1()
 	result = Tsk2.join();                         ASSERT_success(result);
 	result = Mut1.give();                         ASSERT_success(result);
 	result = Mut1.give();                         ASSERT_failure(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void proc0()
@@ -60,7 +60,7 @@ static void proc0()
 	result = Tsk1.join();                         ASSERT_success(result);
 	result = Mut0.give();                         ASSERT_success(result);
 	result = Mut0.give();                         ASSERT_failure(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void test()

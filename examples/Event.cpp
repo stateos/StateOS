@@ -21,7 +21,7 @@ void producer()
 
 	for (;;)
 	{
-		ThisTask::delay(SEC);
+		this_task::delay(SEC);
 		evt.give(x);
 		x = (x << 1) | (x >> 3);
 	}
@@ -35,5 +35,5 @@ int main()
 	cons.start();
 	prod.start();
 
-	ThisTask::stop();
+	this_task::stop();
 }

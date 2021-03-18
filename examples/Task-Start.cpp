@@ -9,7 +9,7 @@ int main()
 	auto led = Led();
 	auto sem = Semaphore::Binary();
 	auto cons = Task::Make (0, [&]{ sem.wait(); led.tick(); });
-	auto prod = Task::Start(0, [&]{ ThisTask::sleepFor(SEC); sem.give(); });
+	auto prod = Task::Start(0, [&]{ this_task::sleepFor(SEC); sem.give(); });
 	cons.start();
 	cons.join();
 }

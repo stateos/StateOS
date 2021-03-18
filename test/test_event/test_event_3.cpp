@@ -16,7 +16,7 @@ static void proc3()
 
 	result = Evt3.wait(&received);                ASSERT_success(result);
 	                                              ASSERT(received == sent);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void proc2()
@@ -29,7 +29,7 @@ static void proc2()
 	                                              ASSERT(received == sent);
 	         Evt3.give(received);
 	result = Tsk3.join();                         ASSERT_success(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void proc1()
@@ -42,7 +42,7 @@ static void proc1()
 	                                              ASSERT(received == sent);
 	         Evt2.give(received);
 	result = Tsk2.join();                         ASSERT_success(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void proc0()
@@ -55,7 +55,7 @@ static void proc0()
 	                                              ASSERT(received == sent);
 	         Evt1.give(received);
 	result = Tsk1.join();                         ASSERT_success(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void test()
@@ -63,8 +63,8 @@ static void test()
 	int result;
 	                                              ASSERT(!Tsk0);
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	         ThisTask::yield();
-	         ThisTask::yield();
+	         this_task::yield();
+	         this_task::yield();
 	         sent = (unsigned)rand();
 	         Evt0.give(sent);
 	result = Tsk0.join();                         ASSERT_success(result);

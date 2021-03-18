@@ -16,5 +16,5 @@ Timer tmr = {proc};
 int main()
 {
 	tmr.startPeriodic(SEC);
-	ThisTask::stop();
+	this_task::stop();
 }

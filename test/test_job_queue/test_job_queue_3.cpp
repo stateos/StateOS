@@ -22,7 +22,7 @@ static void proc3()
 	result = Job3.wait();                         ASSERT_success(result);
 	                                              ASSERT(counter == 4);
 	result = Job2.give(proc);                     ASSERT_success(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void proc2()
@@ -37,7 +37,7 @@ static void proc2()
 	                                              ASSERT(counter == 5);
 	result = Job1.give(proc);                     ASSERT_success(result);
 	result = Tsk3.join();                         ASSERT_success(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void proc1()
@@ -52,7 +52,7 @@ static void proc1()
 	                                              ASSERT(counter == 6);
 	result = Job0.give(proc);                     ASSERT_success(result);
 	result = Tsk2.join();                         ASSERT_success(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void proc0()
@@ -66,7 +66,7 @@ static void proc0()
 	result = Job0.wait();                         ASSERT_success(result);
 	                                              ASSERT(counter == 7);
 	result = Tsk1.join();                         ASSERT_success(result);
-	         ThisTask::stop();
+	         this_task::stop();
 }
 
 static void test()
@@ -74,8 +74,8 @@ static void test()
 	int result;
 	                                              ASSERT(!Tsk0);
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	         ThisTask::yield();
-	         ThisTask::yield();
+	         this_task::yield();
+	         this_task::yield();
 	         counter = 0;
 	result = Job0.give(proc);                     ASSERT_success(result);
 	result = Tsk0.join();                         ASSERT_success(result);

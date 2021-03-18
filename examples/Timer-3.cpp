@@ -8,5 +8,5 @@ int main()
 {
 	auto led = Led();
 	auto tmr = Timer::StartPeriodic(std::chrono::seconds{1}, [&]{ led.tick(); });
-	ThisTask::sleep();
+	this_task::sleep();
 }

@@ -13,7 +13,7 @@ static void proc3()
 
 	result = Bar3.wait();                         ASSERT_success(result);
 	result = Bar2.wait();                         ASSERT_success(result);
-	         This::stop();
+	         this_task::stop();
 }
 
 static void proc2()
@@ -26,7 +26,7 @@ static void proc2()
 	result = Bar2.wait();                         ASSERT_success(result);
 	result = Bar1.wait();                         ASSERT_success(result);
 	result = Tsk3.join();                         ASSERT_success(result);
-	         This::stop();
+	         this_task::stop();
 }
 
 static void proc1()
@@ -39,7 +39,7 @@ static void proc1()
 	result = Bar1.wait();                         ASSERT_success(result);
 	result = Bar0.wait();                         ASSERT_success(result);
 	result = Tsk2.join();                         ASSERT_success(result);
-	         This::stop();
+	         this_task::stop();
 }
 
 static void proc0()
@@ -51,7 +51,7 @@ static void proc0()
 	result = Bar1.wait();                         ASSERT_success(result);
 	result = Bar0.wait();                         ASSERT_success(result);
 	result = Tsk1.join();                         ASSERT_success(result);
-	         This::stop();
+	         this_task::stop();
 }
 
 static void test()
