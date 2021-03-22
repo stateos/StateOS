@@ -10,12 +10,9 @@ COMMON  := common
 #----------------------------------------------------------#
 include $(COMMON)/stateos/make/stm32f4discovery/makefile.clang
 #----------------------------------------------------------#
-
 include $(COMMON)/cmsis/makefile
 include $(COMMON)/device/makefile
 include $(COMMON)/startup/makefile
-include $(COMMON)/stateos/makefile
-
 #----------------------------------------------------------#
 include $(COMMON)/make/makefile
 #----------------------------------------------------------#
