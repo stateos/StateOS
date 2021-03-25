@@ -1,6 +1,6 @@
 # StateOS
-  [![](https://img.shields.io/github/license/stateos/StateOS.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-  [![](https://img.shields.io/github/release/stateos/StateOS.svg?style=for-the-badge)](https://github.com/stateos/StateOS/releases)
+  [![](https://img.shields.io/github/license/stateos/StateOS.svg?style=flat-square&logo)](https://opensource.org/licenses/MIT)
+  [![](https://img.shields.io/github/release/stateos/StateOS.svg?style=flat-square&logo)](https://github.com/stateos/StateOS/releases)
   [![](https://github.com/stateos/StateOS/actions/workflows/test.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/test.yml)
   [![](https://github.com/stateos/StateOS/actions/workflows/example.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/example.yml)
   [![](https://github.com/stateos/StateOS/actions/workflows/unit.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/unit.yml)
