@@ -21,7 +21,7 @@ void consumer()
 void producer()
 {
 	mtx.wait();
-	this_task::delay(SEC);
+	thisTask::delay(SEC);
 	cnd.give(cndOne);
 	mtx.give();
 }
@@ -34,5 +34,5 @@ int main()
 	cons.start();
 	prod.start();
 
-	this_task::stop();
+	thisTask::stop();
 }

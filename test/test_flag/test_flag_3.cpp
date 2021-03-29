@@ -33,7 +33,7 @@ static void proc3()
 	result = Flg3.wait(FLAG3, flgAll+flgProtect+flgIgnore);
 	                                              ASSERT_success(result);
 	         flags = Flg2.give(FLAG2);            ASSERT(flags == FLAG2);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc2()
@@ -47,7 +47,7 @@ static void proc2()
 	result = Flg2.wait(FLAG2, flgAll);            ASSERT_success(result);
 	         flags = Flg1.give(FLAG1);            ASSERT(flags == FLAG1);
 	result = Tsk3.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc1()
@@ -61,7 +61,7 @@ static void proc1()
 	result = Flg1.wait(FLAG1, flgAll);            ASSERT_success(result);
 	         flags = Flg0.give(FLAG0);            ASSERT(flags == FLAG0);
 	result = Tsk2.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc0()
@@ -73,7 +73,7 @@ static void proc0()
 	         give(Flg1, FLAG1, 0);
 	result = Flg0.wait(FLAG0, flgAll);            ASSERT_success(result);
 	result = Tsk1.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void test()
@@ -81,8 +81,8 @@ static void test()
 	int result;
 	                                              ASSERT(!Tsk0);
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	         this_task::yield();
-	         this_task::yield();
+	         thisTask::yield();
+	         thisTask::yield();
 	         give(Flg0, FLAG0, 0);
 	result = Tsk0.join();                         ASSERT_success(result);
 }

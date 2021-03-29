@@ -27,7 +27,7 @@ void producer()
 
 	for (;;)
 	{
-		this_task::delay(SEC);
+		thisTask::delay(SEC);
 
 		mem.wait(&p);
 		*p=x;
@@ -44,5 +44,5 @@ int main()
 	cons.start();
 	prod.start();
 
-	this_task::stop();
+	thisTask::stop();
 }

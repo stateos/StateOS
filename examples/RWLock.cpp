@@ -17,7 +17,7 @@ void consumer( void )
 void producer( void )
 {
 	auto lock = ReadLock(rwl);
-	this_task::sleepNext(1s);
+	thisTask::sleepNext(1s);
 }
 
 int main()

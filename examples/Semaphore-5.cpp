@@ -26,7 +26,7 @@ struct Producer : public Task
 	private:
 	static void run()
 	{
-		this_task::sleepFor(SEC);
+		thisTask::sleepFor(SEC);
 		sem.give();
 	}
 };
@@ -36,5 +36,5 @@ auto prod = Producer();
 
 int main()
 {
-	this_task::sleep();
+	thisTask::sleep();
 }

@@ -21,7 +21,7 @@ void cut_hair()
 	static cnt_t dly = 0;
 
 	dly = (dly + 4) % DELAY;
-	this_task::delay(dly * MSEC);
+	thisTask::delay(dly * MSEC);
 
 	end_of_haircut.give();
 }
@@ -51,7 +51,7 @@ void customer()
 		get_haircut();
 	}
 
-	this_task::destroy();
+	thisTask::destroy();
 }		
 
 int main()
@@ -66,6 +66,6 @@ int main()
 		Task::Create(1, customer);
 
 		cnt_t dly = (unsigned)rand() % DELAY;
-		this_task::delay(dly * MSEC);
+		thisTask::delay(dly * MSEC);
 	}
 }

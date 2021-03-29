@@ -20,7 +20,7 @@ void producer()
 {
 	for (;;)
 	{
-		this_task::sleepFor(SEC);
+		thisTask::sleepFor(SEC);
 		sem.give();
 	}
 }
@@ -33,5 +33,5 @@ int main()
 	cons.start();
 	prod.start();
 
-	this_task::stop();
+	thisTask::stop();
 }

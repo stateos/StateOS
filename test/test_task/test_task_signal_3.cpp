@@ -14,15 +14,15 @@ static void proc2()
 {
 	         sent = (unsigned)rand() % SIG_LIMIT;
 	         Tsk1.signal(sent);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc1()
 {
-	         this_task::action(action);
-	         this_task::suspend();                 ASSERT(sent == received);
-	         this_task::action(nullptr);
-	         this_task::stop();
+	         thisTask::action(action);
+	         thisTask::suspend();                 ASSERT(sent == received);
+	         thisTask::action(nullptr);
+	         thisTask::stop();
 }
 
 static void test()

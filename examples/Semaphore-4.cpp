@@ -17,7 +17,7 @@ void producer(Semaphore &sem)
 {
 	for (;;)
 	{
-		this_task::sleepFor(SEC);
+		thisTask::sleepFor(SEC);
 		sem.give();
 	}
 }
@@ -28,5 +28,5 @@ int main()
 	Semaphore sem;
 	auto cons = Task::Start(0, [&]{ consumer(sem, led); });
 	auto prod = Task::Start(0, [&]{ producer(sem); });
-	this_task::sleep();
+	thisTask::sleep();
 }

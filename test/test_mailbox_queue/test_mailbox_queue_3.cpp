@@ -17,7 +17,7 @@ static void proc3()
 	result = Box3.wait(&received);                ASSERT_success(result);
 	                                              ASSERT(received == sent);
 	result = Box2.give(&received);                ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc2()
@@ -33,7 +33,7 @@ static void proc2()
 	                                              ASSERT(received == sent);
 	result = Box1.give(&received);                ASSERT_success(result);
 	result = Tsk3.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc1()
@@ -49,7 +49,7 @@ static void proc1()
 	                                              ASSERT(received == sent);
 	result = Box0.give(&received);                ASSERT_success(result);
 	result = Tsk2.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc0()
@@ -64,7 +64,7 @@ static void proc0()
 	result = Box0.wait(&received);                ASSERT_success(result);
 	                                              ASSERT(received == sent);
 	result = Tsk1.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void test()

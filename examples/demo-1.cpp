@@ -6,10 +6,10 @@ using namespace stateos;
 
 void proc( unsigned &led, cnt_t timePoint )
 {
-	this_task::sleepUntil(timePoint);
+	thisTask::sleepUntil(timePoint);
 	for (;;)
 	{
-		this_task::sleepNext(SEC/2);
+		thisTask::sleepNext(SEC/2);
 		led++;
 	}
 }
@@ -25,5 +25,5 @@ auto t5 = Task::Start(0, []{ proc(grn,    SEC/8*4); });
 
 int main()
 {
-	this_task::stop();
+	thisTask::stop();
 }

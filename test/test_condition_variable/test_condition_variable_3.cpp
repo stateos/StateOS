@@ -22,7 +22,7 @@ static void proc3()
 	         Cnd2.give(cndOne);
 	result = Mtx2.give();                         ASSERT_success(result);
 	result = Mtx3.give();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc2()
@@ -42,7 +42,7 @@ static void proc2()
 	result = Mtx1.give();                         ASSERT_success(result);
 	result = Mtx2.give();                         ASSERT_success(result);
 	result = Tsk3.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc1()
@@ -62,7 +62,7 @@ static void proc1()
 	result = Mtx0.give();                         ASSERT_success(result);
 	result = Mtx1.give();                         ASSERT_success(result);
 	result = Tsk2.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc0()
@@ -79,7 +79,7 @@ static void proc0()
 	result = Cnd0.wait(Mtx0);                     ASSERT_success(result);
 	result = Mtx0.give();                         ASSERT_success(result);
 	result = Tsk1.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void test()
@@ -87,8 +87,8 @@ static void test()
 	int result;
 	                                              ASSERT(!Tsk0);
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	         this_task::yield();
-	         this_task::yield();
+	         thisTask::yield();
+	         thisTask::yield();
 	result = Mtx0.wait();                         ASSERT_success(result);
 	         Cnd0.give(cndOne);
 	result = Mtx0.give();                         ASSERT_success(result);

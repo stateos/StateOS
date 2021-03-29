@@ -18,7 +18,7 @@ void consumer()
 	led = *p;
 	mem->give(p);
 
-	this_task::stop();
+	thisTask::stop();
 }
 
 void producer()
@@ -29,7 +29,7 @@ void producer()
 	for (;;)
 	{
 		cons = TaskT<512>::Detached(0, consumer);
-		this_task::sleepNext(SEC);
+		thisTask::sleepNext(SEC);
 
 		mem->wait(&p);
 		*p=x;
@@ -44,5 +44,5 @@ int main()
 	mem = MemoryPoolTT<1, unsigned>::Create();
 	prod = TaskT<768>::Create(0, producer);
 
-	this_task::stop();
+	thisTask::stop();
 }

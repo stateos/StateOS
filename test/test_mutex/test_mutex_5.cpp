@@ -13,7 +13,7 @@ static void proc5()
 
 	result = Mtx3.wait();                         ASSERT_owndead(result);
 	result = Mtx3.give();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc4()
@@ -39,7 +39,7 @@ static void proc3()
 	result = Mtx3.give();                         ASSERT_failure(result);
 	result = Tsk4.kill();                         ASSERT_success(result);
 	result = Tsk5.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc2()
@@ -54,7 +54,7 @@ static void proc2()
 	result = Tsk3.join();                         ASSERT_success(result);
 	result = Mtx2.give();                         ASSERT_success(result);
 	result = Mtx2.give();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc1()
@@ -69,7 +69,7 @@ static void proc1()
 	result = Tsk2.join();                         ASSERT_success(result);
 	result = Mtx1.give();                         ASSERT_success(result);
 	result = Mtx1.give();                         ASSERT_failure(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc0()
@@ -83,7 +83,7 @@ static void proc0()
 	result = Tsk1.join();                         ASSERT_success(result);
 	result = Mtx0.give();                         ASSERT_success(result);
 	result = Mtx0.give();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void test()

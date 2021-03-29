@@ -18,7 +18,7 @@ static void proc()
 static void proc3()
 {
 	         One3.call(proc);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc2()
@@ -28,7 +28,7 @@ static void proc2()
 	         Tsk3.startFrom(proc3);               ASSERT(!Tsk3);
 	         One2.call(proc);
 	result = Tsk3.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc1()
@@ -38,7 +38,7 @@ static void proc1()
 	         Tsk2.startFrom(proc2);               ASSERT(!Tsk2);
 	         One1.call(proc);
 	result = Tsk2.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc0()
@@ -48,7 +48,7 @@ static void proc0()
 	         Tsk1.startFrom(proc1);               ASSERT(!Tsk1);
 	         One0.call(proc);                     ASSERT(counter == 1 || counter == 4);
 	result = Tsk1.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void test()

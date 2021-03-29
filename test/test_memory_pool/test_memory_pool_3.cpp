@@ -25,7 +25,7 @@ static void proc3()
 	result = Mem2.wait(&p);                       ASSERT_success(result);
 	         *p = received;
 	         Lst2.give(p);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc2()
@@ -48,7 +48,7 @@ static void proc2()
 	         *p = received;
 	         Lst1.give(p);
 	result = Tsk3.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc1()
@@ -71,7 +71,7 @@ static void proc1()
 	         *p = received;
 	         Lst0.give(p);
 	result = Tsk2.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc0()
@@ -91,7 +91,7 @@ static void proc0()
 	         received = *p;                       ASSERT(sent == received);
              Mem0.give(p);
 	result = Tsk1.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void test()

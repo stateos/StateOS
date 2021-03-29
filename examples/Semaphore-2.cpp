@@ -7,12 +7,12 @@ using namespace stateos;
 auto led = Led();
 auto sem = Semaphore();
 auto cons = Task(0, []{ sem.wait(); led.tick(); });
-auto prod = Task(0, []{ this_task::sleepFor(SEC); sem.give(); });
+auto prod = Task(0, []{ thisTask::sleepFor(SEC); sem.give(); });
 
 int main()
 {
 	cons.start();
 	prod.start();
 
-	this_task::stop();
+	thisTask::stop();
 }

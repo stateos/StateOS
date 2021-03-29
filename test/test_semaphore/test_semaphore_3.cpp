@@ -13,7 +13,7 @@ static void proc3()
 
 	result = Sem3.wait();                         ASSERT_success(result);
 	result = Sem2.give();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc2()
@@ -26,7 +26,7 @@ static void proc2()
 	result = Sem2.wait();                         ASSERT_success(result);
 	result = Sem1.give();                         ASSERT_success(result);
 	result = Tsk3.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc1()
@@ -39,7 +39,7 @@ static void proc1()
 	result = Sem1.wait();                         ASSERT_success(result);
 	result = Sem0.give();                         ASSERT_success(result);
 	result = Tsk2.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc0()
@@ -51,7 +51,7 @@ static void proc0()
 	result = Sem1.give();                         ASSERT_success(result);
 	result = Sem0.wait();                         ASSERT_success(result);
 	result = Tsk1.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void test()
@@ -59,8 +59,8 @@ static void test()
 	int result;
 	                                              ASSERT(!Tsk0);
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	         this_task::yield();
-	         this_task::yield();
+	         thisTask::yield();
+	         thisTask::yield();
 	result = Sem0.give();                         ASSERT_success(result);
 	result = Tsk0.join();                         ASSERT_success(result);
 }

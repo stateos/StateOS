@@ -19,7 +19,7 @@ void producer( Semaphore &sem )
 {
 	for (;;)
 	{
-		this_task::sleepFor(SEC);
+		thisTask::sleepFor(SEC);
 		sem.give();
 	}
 }
@@ -34,5 +34,5 @@ int main()
 	cons.start();
 	prod.start();
 
-	this_task::sleep();
+	thisTask::sleep();
 }

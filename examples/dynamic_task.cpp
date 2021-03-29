@@ -11,17 +11,17 @@ int main()
 	auto sem = Semaphore::Binary();
 	for (;;)
 	{
-		auto tsk0 = new Task(1, []{ this_task::exit(); });
+		auto tsk0 = new Task(1, []{ thisTask::exit(); });
 		tsk0->start();
-		            Task::Create  (1, [&]{ led.tick(); this_task::detach(); this_task::exit(); });
-		            Task::Detached(2, [&]{ led.tick(); sem.wait();         this_task::exit(); });
-		auto tsk1 = Task::Create  (1, [&]{ led.tick(); this_task::suspend(); });
-		auto tsk2 = Task::Create  (0, [&]{ led.tick(); sem.post();         this_task::exit(); });
-		auto tsk3 = Task::Create  (1, [&]{ led.tick();                     this_task::exit(); });
+		            Task::Create  (1, [&]{ led.tick(); thisTask::detach(); thisTask::exit(); });
+		            Task::Detached(2, [&]{ led.tick(); sem.wait();         thisTask::exit(); });
+		auto tsk1 = Task::Create  (1, [&]{ led.tick(); thisTask::suspend(); });
+		auto tsk2 = Task::Create  (0, [&]{ led.tick(); sem.post();         thisTask::exit(); });
+		auto tsk3 = Task::Create  (1, [&]{ led.tick();                     thisTask::exit(); });
 		delete tsk0; // task must be stopped before deletion
 		tsk1->destroy();
 		tsk2->join();
 		tsk3->detach();
-		this_task::sleepNext(1s);
+		thisTask::sleepNext(1s);
 	}
 }

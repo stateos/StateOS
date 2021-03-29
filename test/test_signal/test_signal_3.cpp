@@ -17,7 +17,7 @@ static void proc3()
 	result = Sig3.wait(sigAll, &value);           ASSERT_success(result);
 	                                              ASSERT(value == sent);
 	         Sig2.give(value);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc2()
@@ -33,7 +33,7 @@ static void proc2()
 	                                              ASSERT(value == sent);
 	         Sig1.give(value);
 	result = Tsk3.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc1()
@@ -49,7 +49,7 @@ static void proc1()
 	                                              ASSERT(value == sent);
 	         Sig0.give(value);
 	result = Tsk2.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void proc0()
@@ -64,7 +64,7 @@ static void proc0()
 	result = Sig0.wait(sigAll, &value);           ASSERT_success(result);
 	                                              ASSERT(value == sent);
 	result = Tsk1.join();                         ASSERT_success(result);
-	         this_task::stop();
+	         thisTask::stop();
 }
 
 static void test()
@@ -72,8 +72,8 @@ static void test()
 	int result;
 	                                              ASSERT(!Tsk0);
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
-	         this_task::yield();
-	         this_task::yield();
+	         thisTask::yield();
+	         thisTask::yield();
 	         sent = (unsigned)rand() % SIG_LIMIT;
 	         Sig0.give(sent);
 	result = Tsk0.join();                         ASSERT_success(result);

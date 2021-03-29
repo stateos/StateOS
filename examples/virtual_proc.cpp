@@ -36,7 +36,7 @@ struct Producer : public myTask
 	virtual
 	void main() override
 	{
-		this_task::sleepFor(SEC);
+		thisTask::sleepFor(SEC);
 		sem.give();
 	}
 };
@@ -46,5 +46,5 @@ auto prod = Producer();
 
 int main()
 {
-	this_task::sleep();
+	thisTask::sleep();
 }

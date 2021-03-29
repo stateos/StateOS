@@ -13,7 +13,7 @@ void tickLoop(Semaphore &own, Semaphore &another)
 	{
 		one.call([]{ led = 0; });
 		own.wait();
-		this_task::delay(SEC);
+		thisTask::delay(SEC);
 		led.tick();
 		another.post();
 	}
@@ -27,5 +27,5 @@ auto prod = Task::Start(0, []{ tickLoop(prod_sem, cons_sem); });
 
 int main()
 {
-	this_task::sleep();
+	thisTask::sleep();
 }
