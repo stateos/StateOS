@@ -3,6 +3,7 @@
   [![](https://img.shields.io/github/release/stateos/StateOS.svg?style=flat-square&logo)](https://github.com/stateos/StateOS/releases)
   [![](https://github.com/stateos/StateOS/actions/workflows/test.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/test.yml)
   [![](https://github.com/stateos/StateOS/actions/workflows/example.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/example.yml)
+  [![](https://github.com/stateos/StateOS/actions/workflows/libstdc++.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/libstdc++.yml)
   [![](https://github.com/stateos/StateOS/actions/workflows/unit.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/unit.yml)
 
 StateOS is free, extremely simple and very fast real-time operating system (RTOS) designed for deeply embedded applications.
