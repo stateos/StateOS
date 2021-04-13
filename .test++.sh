@@ -2,12 +2,12 @@
 
 set -e
 
-for file in libstdc++/*.cpp
+for file in stdc++/*.cpp
 do
 	echo $file
-	cp $file libstdc++/main.cpp
-	make -f libstdc++.make all
-	rm -f libstdc++/main.*
+	cp $file stdc++/main.cpp
+	make -f stdc++.make all
+	rm -f stdc++/main.*
 done
 
-make -f libstdc++.make clean
+make -f stdc++.make clean
