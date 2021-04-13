@@ -1,3 +1,3 @@
-INCS += libstdc++/include
+INCS += stdc++/include
 
-SRCS += $(wildcard libstdc++/main.*)
+SRCS += $(wildcard stdc++/main.*)

@@ -1,4 +1,4 @@
-name: Libstdc++ Test
+name: stdc++ Test
 
 on:
   push:

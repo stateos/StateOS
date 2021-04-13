@@ -58,7 +58,7 @@ Building an application for a specific compiler is realised using the appropriat
 - examples and templates are in separate repositories on [GitHub](https://github.com/stateos)
 - archival releases on [sourceforge](https://sourceforge.net/projects/stateos)
 
-### Libstdc++ features
+### Supported stdc++ features
 
 - std::thread, std::jthread, std::this_thread, ...
 - std::mutex, std::shared_mutex, std::condition_variable, ...
