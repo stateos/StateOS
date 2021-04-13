@@ -1,4 +1,4 @@
-name: stdc++ Test
+name: stdc++ test
 
 on:
   push:
