@@ -3,7 +3,7 @@
   [![](https://img.shields.io/github/release/stateos/StateOS.svg?style=flat-square&logo)](https://github.com/stateos/StateOS/releases)
   [![](https://github.com/stateos/StateOS/actions/workflows/test.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/test.yml)
   [![](https://github.com/stateos/StateOS/actions/workflows/example.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/example.yml)
-  [![](https://github.com/stateos/StateOS/actions/workflows/libstdc++.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/libstdc++.yml)
+  [![](https://github.com/stateos/StateOS/actions/workflows/stdc++.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/stdc++.yml)
   [![](https://github.com/stateos/StateOS/actions/workflows/unit.yml/badge.svg)](https://github.com/stateos/StateOS/actions/workflows/unit.yml)
 
 StateOS is free, extremely simple and very fast real-time operating system (RTOS) designed for deeply embedded applications.
@@ -53,7 +53,7 @@ Building an application for a specific compiler is realised using the appropriat
 - cmsis-rtos2 api
 - nasa-osal support
 - c++ wrapper
-- support for libstdc++
+- support for stdc++
 - all documentation is contained within source files, in particular header files
 - examples and templates are in separate repositories on [GitHub](https://github.com/stateos)
 - archival releases on [sourceforge](https://sourceforge.net/projects/stateos)
