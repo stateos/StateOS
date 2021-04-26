@@ -1,29 +1,42 @@
-#include <stm32f4_discovery.h>
+// example from cppreference.com
+// modified by Rajmund Szymanski
+
+#include "stm32f4_discovery.h"
 #include <thread>
 #include <future>
 #include <chrono>
-#include <functional>
-#include <utility>
-#include <cassert>
  
-void worker(std::future<void>& output)
+void work(std::future<void>& output)
 {
-	std::packaged_task<void(bool&)> my_task{ [](bool& done) { done = true; } };
-	auto result = my_task.get_future();
+	std::packaged_task<void(bool&)> tsk{ [](bool& done) { done = true; } };
+	auto result = tsk.get_future();
 	bool done = false;
-	my_task.make_ready_at_thread_exit(done);
-	assert(done);
+	tsk.make_ready_at_thread_exit(done);
+	if (!done)
+		return;
 	auto status = result.wait_for(std::chrono::seconds(0));
-	assert(status == std::future_status::timeout);
+	if (status != std::future_status::timeout)
+		return;
 	output = std::move(result);
 }
  
+void test()
+{
+	using namespace std::chrono_literals;
+	std::future<void> result;
+	std::thread{ work, std::ref(result) }.join();
+	auto status = result.wait_for(0s);
+	if (status != std::future_status::ready) abort();
+}
+
 int main()
 {
+	using namespace std::chrono_literals;
 	device::Led led;
-	std::future<void> result;
-	std::thread{worker, std::ref(result)}.join();
-	auto status = result.wait_for(std::chrono::seconds(0));
-	assert(status == std::future_status::ready);
-	led = 15;
+	for (;;)
+	{
+		test();
+		std::this_thread::sleep_for(100ms);
+		led.tick();
+	}
 }

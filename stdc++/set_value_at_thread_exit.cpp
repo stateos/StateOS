@@ -1,21 +1,31 @@
-#include <stm32f4_discovery.h>
+// example from cppreference.com
+// modified by Rajmund Szymanski
+
+#include "stm32f4_discovery.h"
 #include <thread>
 #include <future>
 #include <chrono>
-#include <cassert>
  
-int main()
+void test()
 {
-	device::Led led;
 	using namespace std::chrono_literals;
 	std::promise<int> p;
 	std::future<int> f = p.get_future();
 	std::thread([&p]
 	{
-		std::this_thread::sleep_for(10ms);
-		p.set_value_at_thread_exit(10);
+		std::this_thread::sleep_for(100ms);
+		p.set_value_at_thread_exit(11);
 	}).detach();
 	f.wait();
-	assert(f.get() == 10);
-	led = 15;
+	if (f.get() != 11) abort();
+}
+
+int main()
+{
+	device::Led led;
+	for (;;)
+	{
+		test();
+		led.tick();
+	}
 }

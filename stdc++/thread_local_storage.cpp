@@ -1,36 +1,32 @@
-#include <stm32f4_discovery.h>
+#include "stm32f4_discovery.h"
 #include <thread>
-#include <cassert>
 
-device::Led led;
+thread_local int i = 2;
 
-thread_local int i = 0;
-
-void f(int newval)
+void work(int val)
 {
-	i = newval;
+	i = ++val;
+	i += 10;
 }
 
-void g()
+void test()
 {
-	++i;
-}
-
-void threadfunc(int id)
-{
-	f(id);
-	g();
+	i = 11;
+	std::thread(work, 23).join();
+	std::thread(work, 17).join();
+	std::thread(work, 19).join();
+	if (i != 11) abort();
 }
 
 int main()
 {
-	i = 9;
-	std::thread t1(threadfunc, 1);
-	std::thread t2(threadfunc, 2);
-	std::thread t3(threadfunc, 3);
-	t1.join();
-	t2.join();
-	t3.join();
-	assert(i == 9);
-	led = 15;
+	using namespace std::chrono_literals;
+	device::Led led;
+	for (;;)
+	{
+		i = 0;
+		test();
+		std::this_thread::sleep_for(100ms);
+		led.tick();
+	}
 }

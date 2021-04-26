@@ -1,38 +1,51 @@
-#include <stm32f4_discovery.h>
-#include <condition_variable>
+// example from cppreference.com
+// modified by Rajmund Szymanski
+
+#include "stm32f4_discovery.h"
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <chrono>
-
-auto led = device::Led();
-auto mtx = std::mutex();
-auto cnd = std::condition_variable();
-
-void consumer()
+ 
+std::mutex m;
+std::condition_variable cv;
+bool ready{ true };
+bool processed{ true };
+ 
+void work()
 {
-	std::unique_lock<std::mutex> lock(mtx);
-	for (;;)
-	{
-		cnd.wait(lock);
-		led.tick();
-	}
+	std::unique_lock<std::mutex> lk(m);
+	cv.wait(lk, []{ return ready; });
+	processed = true;
+	lk.unlock();
+	cv.notify_one();
 }
-
-void producer()
+ 
+void test()
 {
-	for (;;)
+	std::thread t(work);
 	{
-		std::unique_lock<std::mutex> lock(mtx);
-		std::this_thread::sleep_for(std::chrono::seconds{1});
-		cnd.notify_all();
-		std::this_thread::yield();
+		std::lock_guard<std::mutex> lk(m);
+		ready = true;
 	}
+	cv.notify_one();
+	{
+		std::unique_lock<std::mutex> lk(m);
+		cv.wait(lk, []{ return processed; });
+	}
+	t.join();
 }
-
-auto cons = std::thread(consumer);
-auto prod = std::thread(producer);
 
 int main()
 {
-	cons.join();
-	prod.join();
+	using namespace std::chrono_literals;
+	device::Led led;
+	for (;;)
+	{
+		ready = false;
+		processed = false;
+		test();
+		std::this_thread::sleep_for(100ms);
+		led.tick();
+	}
 }

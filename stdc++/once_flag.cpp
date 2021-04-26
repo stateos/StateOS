@@ -3,23 +3,24 @@
 #include <mutex>
 #include <chrono>
 
-struct Tick : device::Led
+void test()
 {
-	void operator()() { tick(); }
-};
+	std::once_flag flg;
+	std::jthread jt([&](std::stop_token st)
+	{
+		do std::call_once(flg, []{});
+		while (!st.stop_requested());
+	});
+}
 
 int main()
 {
-	Tick tick;
-
+	using namespace std::chrono_literals;
+	device::Led led;
 	for (;;)
 	{
-		std::this_thread::sleep_for(std::chrono::seconds{1});
-		std::jthread jt([&](std::stop_token st)
-		{
-			std::once_flag flg;
-			do std::call_once(flg, tick);
-			while (!st.stop_requested());
-		});
+		test();
+		std::this_thread::sleep_for(100ms);
+		led.tick();
 	}
 }
