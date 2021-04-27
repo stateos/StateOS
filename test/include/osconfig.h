@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    16.12.2020
+    @date    27.04.2021
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -60,7 +60,7 @@
 // ----------------------------
 // priority of main process
 // default value: 0 (the same as priority of idle process)
-#define OS_MAIN_PRIO          0
+#define OS_MAIN_PRIO        255
 
 // ----------------------------
 // os heap size in bytes

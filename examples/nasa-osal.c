@@ -6,8 +6,6 @@ uint32 cons, prod;
 
 void consumer(void)
 {
-	OS_TaskRegister();
-
 	for (;;)
 	{
 		OS_BinSemTake(sem);
@@ -17,8 +15,6 @@ void consumer(void)
 
 void producer(void)
 {
-	OS_TaskRegister();
-
 	for (;;)
 	{
 		OS_TaskDelay(1000);
@@ -29,9 +25,10 @@ void producer(void)
 int main()
 {
 	LED_Init();
-	OS_API_Init();
+	OS_Application_Startup();
 	OS_BinSemCreate(&sem, "sem", 0, 0);
-	OS_TaskCreate(&cons, "cons", consumer, 0, 0, 255, 0);
-	OS_TaskCreate(&prod, "prod", producer, 0, 0, 255, 0);
+	OS_TaskCreate(&cons, "cons", consumer, NULL, 256, 1, 0);
+	OS_TaskCreate(&prod, "prod", producer, NULL, 256, 2, 0);
+	OS_Application_Run();
 	OS_TaskExit();
 }
