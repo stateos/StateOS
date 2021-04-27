@@ -74,7 +74,7 @@ static void test()
 	         Tsk0.startFrom(proc0);               ASSERT(!!Tsk0);
 	         thisTask::yield();
 	         thisTask::yield();
-	         sent = (unsigned)rand() % SIG_LIMIT;
+	         sent = (unsigned)rand() % SIGLIM;
 	         Sig0.give(sent);
 	result = Tsk0.join();                         ASSERT_success(result);
 }

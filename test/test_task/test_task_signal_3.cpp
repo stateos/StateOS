@@ -12,7 +12,7 @@ static void action( unsigned signo )
 
 static void proc2()
 {
-	         sent = (unsigned)rand() % SIG_LIMIT;
+	         sent = (unsigned)rand() % SIGLIM;
 	         Tsk1.signal(sent);
 	         thisTask::stop();
 }
