@@ -1,8 +1,8 @@
 #include <stm32f4_discovery.h>
 #include <osapi.h>
 
-uint32 sem;
-uint32 cons, prod;
+osal_id_t sem;
+osal_id_t cons, prod;
 
 void consumer(void)
 {
