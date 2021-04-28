@@ -60,7 +60,7 @@
 // ----------------------------
 // priority of main process
 // default value: 0 (the same as priority of idle process)
-#define OS_MAIN_PRIO        255
+#define OS_MAIN_PRIO          0
 
 // ----------------------------
 // os heap size in bytes
