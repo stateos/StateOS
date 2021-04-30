@@ -104,9 +104,5 @@ extern "C"
 void test_memory_pool_2()
 {
 	TEST_Notify();
-	mem_bind(&mem0);
-	mem_bind(mem1);
-	mem_bind(mem2);
-	mem_bind(mem3);
 	TEST_Call();
 }
