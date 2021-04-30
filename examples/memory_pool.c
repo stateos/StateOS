@@ -38,7 +38,6 @@ int main()
 {
 	LED_Init();
 
-	mem_bind(mem);
 	tsk_start(cons);
 	tsk_start(prod);
 	tsk_stop();
