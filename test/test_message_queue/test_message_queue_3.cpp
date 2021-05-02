@@ -4,10 +4,10 @@
 
 using namespace stateos;
 
-static auto Msg0 = MessageBufferTT<1, unsigned>();
-static auto Msg1 = MessageBufferTT<1, unsigned>();
-static auto Msg2 = MessageBufferTT<1, unsigned>();
-static auto Msg3 = MessageBufferTT<1, unsigned>();
+static auto Msg0 = MessageQueueTT<1, unsigned>();
+static auto Msg1 = MessageQueueTT<1, unsigned>();
+static auto Msg2 = MessageQueueTT<1, unsigned>();
+static auto Msg3 = MessageQueueTT<1, unsigned>();
 
 static unsigned sent;
 
@@ -82,7 +82,7 @@ static void test()
 }
 
 extern "C"
-void test_message_buffer_3()
+void test_message_queue_3()
 {
 	TEST_Notify();
 	TEST_Call();

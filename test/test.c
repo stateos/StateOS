@@ -67,7 +67,7 @@ int main()
 	TEST_AddUnit(test_condition_variable);
 	TEST_AddUnit(test_memory_pool);
 	TEST_AddUnit(test_stream_buffer);
-	TEST_AddUnit(test_message_buffer);
+	TEST_AddUnit(test_message_queue);
 	TEST_AddUnit(test_mailbox_queue);
 	TEST_AddUnit(test_event_queue);
 	TEST_AddUnit(test_job_queue);

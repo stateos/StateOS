@@ -87,8 +87,7 @@ static void test()
 	result = tsk_join(&tsk0);                     ASSERT_success(result);
 }
 
-extern "C"
-void test_message_buffer_2()
+void test_message_queue_1()
 {
 	TEST_Notify();
 	TEST_Call();

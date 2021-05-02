@@ -14,7 +14,7 @@ include test/test_flag/makefile
 include test/test_job_queue/makefile
 include test/test_mailbox_queue/makefile
 include test/test_memory_pool/makefile
-include test/test_message_buffer/makefile
+include test/test_message_queue/makefile
 include test/test_mutex/makefile
 include test/test_once_flag/makefile
 include test/test_semaphore/makefile
