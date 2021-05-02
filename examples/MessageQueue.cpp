@@ -5,7 +5,7 @@ using namespace device;
 using namespace stateos;
 
 auto led = Led();
-auto msg = MessageBufferTT<1, unsigned>();
+auto msg = MessageQueueTT<1, unsigned>();
 
 void consumer()
 {

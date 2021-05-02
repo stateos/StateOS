@@ -5,19 +5,23 @@ OS_MSG(msg, 1, sizeof(unsigned));
 
 OS_TSK_DEF(cons, 0)
 {
+	unsigned dummy;
+
 	for (;;)
 	{
-		msg_wait(msg, NULL, 0, NULL);
+		msg_wait(msg, &dummy, sizeof(dummy), NULL);
 		LED_Tick();
 	}
 }
 
 OS_TSK_DEF(prod, 0)
 {
+	unsigned dummy;
+
 	for (;;)
 	{
 		tsk_delay(SEC);
-		msg_give(msg, NULL, 0);
+		msg_give(msg, &dummy, sizeof(dummy));
 	}
 }
 
