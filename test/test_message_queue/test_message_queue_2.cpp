@@ -2,7 +2,7 @@
 
 #define SIZE sizeof(unsigned)
 
-static_MSG(msg3, 2 * SIZE);
+static_MSG(msg3, 2, SIZE);
 
 static unsigned sent;
 
