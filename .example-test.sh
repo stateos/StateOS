@@ -7,7 +7,7 @@ do
 	echo $file
 	cp $file examples/main.c
 	touch examples/main.c
-	make -f examples.make all
+	make -f .example-test.make all
 	rm -f examples/main.*
 done
 
@@ -16,8 +16,8 @@ do
 	echo $file
 	cp $file examples/main.cpp
 	touch examples/main.cpp
-	make -f examples.make all
+	make -f .example-test.make all
 	rm -f examples/main.*
 done
 
-make -f examples.make clean
+make -f .example-test.make clean

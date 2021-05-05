@@ -46,23 +46,7 @@ jobs:
     - name: check arm-none-eabi-gcc version
       run: arm-none-eabi-gcc -v
     - name: make test
-      run: bash ./.test.sh
-  unit:
-    name: unit test
-    runs-on: ubuntu-latest
-    steps:
-    - name: checkout repository
-      uses: actions/checkout@v2
-    - name: checkout submodules
-      run: git submodule update --init --remote --recursive
-    - name: install arm-none-eabi-gcc
-      uses: fiam/arm-none-eabi-gcc@v1
-      with:
-        release: '10-2020-q4'
-    - name: check arm-none-eabi-gcc version
-      run: arm-none-eabi-gcc -v
-    - name: make test
-      run: make all -f test.make
+      run: bash ./.example-test.sh
   stdcxx:
     name: stdc++ test
     runs-on: ubuntu-latest
@@ -78,4 +62,20 @@ jobs:
     - name: check arm-none-eabi-gcc version
       run: arm-none-eabi-gcc -v
     - name: make test
-      run: bash ./.test++.sh
+      run: bash ./.stdc++-test.sh
+  unit:
+    name: unit test
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v2
+    - name: checkout submodules
+      run: git submodule update --init --remote --recursive
+    - name: install arm-none-eabi-gcc
+      uses: fiam/arm-none-eabi-gcc@v1
+      with:
+        release: '10-2020-q4'
+    - name: check arm-none-eabi-gcc version
+      run: arm-none-eabi-gcc -v
+    - name: make test
+      run: make all -f .unit-test.make

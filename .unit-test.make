@@ -6,7 +6,6 @@ SRCS    :=
 LIBS    :=
 SCRIPT  :=
 COMMON  := common
-
 #----------------------------------------------------------#
 include $(COMMON)/stateos/make/stm32f4discovery/makefile.gnucc
 #----------------------------------------------------------#

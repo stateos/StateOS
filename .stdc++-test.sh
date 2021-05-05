@@ -7,8 +7,8 @@ do
 	echo $file
 	cp $file stdc++/main.cpp
 	touch stdc++/main.cpp
-	make -f stdc++.make all
+	make -f .stdc++-test.make all
 	rm -f stdc++/main.*
 done
 
-make -f stdc++.make clean
+make -f .stdc++-test.make clean
