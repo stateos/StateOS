@@ -2,8 +2,8 @@
 #include <os.h>
 
 sem_t sem;
-tsk_t cons; OS_STK(cons_stk);
-tsk_t prod; OS_STK(prod_stk, 512);
+tsk_t cons; OS_TSK_STACK(cons_stk);
+tsk_t prod; OS_TSK_STACK(prod_stk, 512);
 
 void consumer()
 {
