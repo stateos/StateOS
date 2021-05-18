@@ -17,9 +17,9 @@ include test/test_memory_pool/makefile
 include test/test_message_queue/makefile
 include test/test_mutex/makefile
 include test/test_once_flag/makefile
+include test/test_raw_buffer/makefile
 include test/test_semaphore/makefile
 include test/test_signal/makefile
 include test/test_spin_lock/makefile
-include test/test_stream_buffer/makefile
 include test/test_task/makefile
 include test/test_timer/makefile

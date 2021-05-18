@@ -48,9 +48,9 @@ mem_t  mem0 = MEM_INIT(1, sizeof(unsigned));
 mem_id mem1 = MEM_CREATE(1, sizeof(unsigned));
 OS_MEM(mem2, 1, sizeof(unsigned));
 
-stm_t  stm0 = STM_INIT(1, sizeof(unsigned));
-stm_id stm1 = STM_CREATE(sizeof(unsigned));
-OS_STM(stm2, sizeof(unsigned));
+raw_t  raw0 = RAW_INIT(1, sizeof(unsigned));
+raw_id raw1 = RAW_CREATE(sizeof(unsigned));
+OS_RAW(raw2, sizeof(unsigned));
 
 msg_t  msg0 = MSG_INIT(1, sizeof(unsigned));
 msg_id msg1 = MSG_CREATE(1, sizeof(unsigned));

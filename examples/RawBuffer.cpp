@@ -5,7 +5,7 @@ using namespace device;
 using namespace stateos;
 
 auto led = Led();
-auto stm = StreamBufferTT<1, unsigned>();
+auto raw = RawBufferTT<1, unsigned>();
 
 void consumer()
 {
@@ -13,7 +13,7 @@ void consumer()
 
 	for (;;)
 	{
-		stm.wait(&x);
+		raw.wait(&x);
 		led = x;
 	}
 }
@@ -25,7 +25,7 @@ void producer()
 	for (;;)
 	{
 		thisTask::delay(SEC);
-		stm.send(&x);
+		raw.send(&x);
 		x = (x << 1) | (x >> 3);
 	}
 }
