@@ -50,9 +50,9 @@ extern mem_t  mem0;
 extern mem_id mem1;
 extern mem_id mem2;
 
-extern stm_t  stm0;
-extern stm_id stm1;
-extern stm_id stm2;
+extern raw_t  raw0;
+extern raw_id raw1;
+extern raw_id raw2;
 
 extern msg_t  msg0;
 extern msg_id msg1;
