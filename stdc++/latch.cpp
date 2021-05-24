@@ -52,8 +52,8 @@ int main()
 	device::Led led;
 	for (;;)
 	{
-		test();
 		std::this_thread::sleep_for(std::chrono::milliseconds{100});
+		test();
 		led.tick();
 	}
 }
