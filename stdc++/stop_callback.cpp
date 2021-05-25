@@ -1,3 +1,6 @@
+// example from cppreference.com
+// modified by Rajmund Szymanski
+
 #include "stm32f4_discovery.h"
 #include <thread>
 #include <mutex>
