@@ -2,7 +2,7 @@
 
     @file    StateOS: osconfig.h
     @author  Rajmund Szymanski
-    @date    29.05.2021
+    @date    03.02.2021
     @brief   StateOS config file for STM32F4 uC.
 
  ******************************************************************************
@@ -95,7 +95,7 @@
 // 0 => task function will be executed into an infinite system-implemented loop
 // 1 => while return from the task function, tsk_exit will be executed
 // default value: 0
-#define OS_TASK_EXIT          0
+#define OS_TASK_EXIT          1
 
 // ----------------------------
 // indicates the use of atomic functions
