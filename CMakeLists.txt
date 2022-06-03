@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.18)
 
 set(CMAKE_TOOLCHAIN_FILE "common/stateos/cmake/config-stm32f4discovery-gcc.cmake")
 set(CMAKE_BUILD_TYPE     "Release")
