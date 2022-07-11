@@ -9,13 +9,13 @@ auto mtx = Mutex(mtxDefault);
 
 void consumer()
 {
-	auto lock = Lock<Mutex>(mtx);
+	auto lock = LockGuard(mtx);
 	led.tick();
 }
 
 void producer()
 {
-	auto lock = Lock<Mutex>(mtx);
+	auto lock = LockGuard(mtx);
 	thisTask::sleepFor(SEC);
 }
 

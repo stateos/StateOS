@@ -6,13 +6,13 @@ using namespace stateos;
 
 void consumer(FastMutex &mut, Led &led)
 {
-	auto lock = Lock<FastMutex>(mut);
+	auto lock = FastLock(mut);
 	led.tick();
 }
 
 void producer(FastMutex &mut)
 {
-	auto lock = Lock<FastMutex>(mut);
+	auto lock = FastLock(mut);
 	thisTask::sleepFor(SEC);
 }
 

@@ -10,9 +10,9 @@ auto cnd = ConditionVariable();
 
 void consumer()
 {
-	mtx.wait();
 	for (;;)
 	{
+		auto lck = LockGuard(mtx);
 		cnd.wait(mtx);
 		led.tick();
 	}
@@ -20,10 +20,8 @@ void consumer()
 
 void producer()
 {
-	mtx.wait();
 	thisTask::delay(SEC);
 	cnd.give(cndOne);
-	mtx.give();
 }
 
 auto cons = Task(1, consumer);
