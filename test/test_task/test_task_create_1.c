@@ -9,10 +9,10 @@ static void test()
 {
 	int result;
 
-	tsk_id tsk9 = TSK_CREATE(9, proc);
-	tsk_t *tsk8 = TSK_CREATE(8, proc, 512);
-	tsk_id tsk7 = TSK_CREATE(7, proc);
-	tsk_t *tsk6 = TSK_CREATE(6, proc, 256);
+	tsk_id tsk9 =         TSK_CREATE(9, proc);
+	tsk_t *tsk8 = (tsk_id)TSK_CREATE(8, proc, 512);
+	tsk_id tsk7 =         TSK_CREATE(7, proc);
+	tsk_t *tsk6 = (tsk_id)TSK_CREATE(6, proc, 256);
 
 	         tsk_start(tsk9);                     ASSERT_dead(tsk9);
 	result = tsk_join(tsk9);                      ASSERT_success(result);
