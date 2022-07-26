@@ -27,10 +27,10 @@ int main()
     LED_Init();
     GRN_Init();
 	
-	tsk_start(TSK_CREATE(0, proc));
-	tsk_start(TSK_CREATE(0, proc));
-	tsk_start(TSK_CREATE(0, proc));
-	tsk_start(TSK_CREATE(0, proc));
-	tsk_start(TSK_CREATE(0, proc));
+	tsk_start((tsk_id)TSK_CREATE(0, proc));
+	tsk_start((tsk_id)TSK_CREATE(0, proc));
+	tsk_start((tsk_id)TSK_CREATE(0, proc));
+	tsk_start((tsk_id)TSK_CREATE(0, proc));
+	tsk_start((tsk_id)TSK_CREATE(0, proc));
 	tsk_stop();
 }

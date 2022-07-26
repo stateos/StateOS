@@ -27,7 +27,7 @@ int main()
 {
 	LED_Init();
 
-	tsk_start(TSK_CREATE(0, consumer));
-	tsk_start(TSK_CREATE(0, producer));
+	tsk_start((tsk_id)TSK_CREATE(0, consumer));
+	tsk_start((tsk_id)TSK_CREATE(0, producer));
 	tsk_sleep();
 }
