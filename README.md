@@ -46,6 +46,7 @@ Building an application for a specific compiler is realised using the appropriat
 - event queues
 - job queues
 - timers (one-shot, periodic)
+- hierarchical state machine
 - cmsis-rtos api
 - cmsis-rtos2 api
 - nasa-osal support
