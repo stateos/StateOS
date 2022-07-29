@@ -59,7 +59,7 @@ int main()
 	tsk_t *dispatcher = tsk_create(0, NULL);
 	hsm_t *blinker = hsm_create(10);
 
-	for (int i = 0; i < tabsize; i++) hsm_link(blinker, &tab[i]);
+	for (int i = 0; i < tabsize; i++) hsm_link(&tab[i]);
 
 	hsm_start(blinker, dispatcher, StateOff);
 	hsm_send(blinker, EventSwitch);

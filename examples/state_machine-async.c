@@ -59,7 +59,7 @@ int main()
 {
 	LED_Init();
 
-	for (int i = 0; i < tabsize; i++) hsm_link(blinker, &tab[i]);
+	for (int i = 0; i < tabsize; i++) hsm_link(&tab[i]);
 
 	hsm_startAsync(blinker, dispatcher, StateOff);
 	hsm_sendAsync(blinker, EventSwitch);
