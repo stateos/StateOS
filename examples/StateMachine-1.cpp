@@ -54,7 +54,7 @@ int main()
 {
 	LED_Init();
 
-	for (auto& a: tab) hsm_link(blinker, &a);
+	for (auto& a: tab) hsm_link(&a);
 
 	hsm_start(blinker, dispatcher, StateOff);
 	hsm_send(blinker, EventSwitch);

@@ -65,7 +65,7 @@ int main()
 	hsm_init(&blinker, blinker_queue, sizeof(blinker_queue));
 	wrk_init(&dispatcher, 0, NULL, dispatcher_stack, sizeof(dispatcher_stack));
 
-	for (int i = 0; i < tabsize; i++) hsm_link(&blinker, &tab[i]);
+	for (int i = 0; i < tabsize; i++) hsm_link(&tab[i]);
 
 	hsm_start(&blinker, &dispatcher, &StateOff);
 	hsm_send(&blinker, EventSwitch);
