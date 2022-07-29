@@ -45,10 +45,10 @@ void StateOnHandler(hsm_t *hsm, unsigned event)
 
 hsm_action_t tab[] =
 {
-	_HSM_ACTION_INIT(StateOff, EventInit,   NULL,     StateOffHandler),
-	_HSM_ACTION_INIT(StateOff, EventSwitch, StateOn,  NULL),
-	_HSM_ACTION_INIT(StateOn,  EventSwitch, StateOff, NULL),
-	_HSM_ACTION_INIT(StateOn,  EventTick,   NULL,     StateOnHandler),
+	HSM_ACTION_INIT(StateOff, EventInit,   NULL,     StateOffHandler),
+	HSM_ACTION_INIT(StateOff, EventSwitch, StateOn,  NULL),
+	HSM_ACTION_INIT(StateOn,  EventSwitch, StateOff, NULL),
+	HSM_ACTION_INIT(StateOn,  EventTick,   NULL,     StateOnHandler),
 };
 #define tabsize (int)(sizeof(tab)/sizeof(tab[0]))
 
