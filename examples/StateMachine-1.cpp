@@ -13,54 +13,29 @@ enum
 	EventTick,
 };
 
-OS_TSK(dispatcher, 0, NULL);
-OS_HSM_STATE(StateOff, NULL);
-OS_HSM_STATE(StateOn,  NULL);
-OS_HSM(blinker, 1);
+auto led        = device::Led();
+auto dispatcher = stateos::Task(0, nullptr);
+auto StateOff   = stateos::State();
+auto StateOn    = stateos::State();
+auto blinker    = stateos::StateMachineT<10>();
 
-void StateOffHandler(hsm_t *, unsigned event)
+std::vector<stateos::Action> tab =
 {
-	switch (event)
-	{
-	case EventInit:
-		LEDs = 0;
-		break;
-	default:
-		assert(false); // system shouldn't get here
-	}
-}
-
-void StateOnHandler(hsm_t *, unsigned event)
-{
-	switch (event)
-	{
-	case EventTick:
-		LED_Tick();
-		break;
-	default:
-		assert(false); // system shouldn't get here
-	}
-}
-
-std::vector<hsm_action_t> tab =
-{
-	_HSM_ACTION_INIT(StateOff, EventInit,   NULL,     StateOffHandler),
-	_HSM_ACTION_INIT(StateOff, EventSwitch, StateOn,  NULL),
-	_HSM_ACTION_INIT(StateOn,  EventSwitch, StateOff, NULL),
-	_HSM_ACTION_INIT(StateOn,  EventTick,   NULL,     StateOnHandler),
+	{ StateOff, EventInit,   []( hsm_t *, unsigned ){ led = 0; } },
+	{ StateOff, EventSwitch, StateOn },
+	{ StateOn,  EventSwitch, StateOff },
+	{ StateOn,  EventTick,   []( hsm_t *, unsigned ){ led.tick(); } },
 };
 
 int main()
 {
-	LED_Init();
+	for (auto& a: tab) a.link();
 
-	for (auto& a: tab) hsm_link(&a);
-
-	hsm_start(blinker, dispatcher, StateOff);
-	hsm_send(blinker, EventSwitch);
+	blinker.start(dispatcher, StateOff);
+	blinker.send(EventSwitch);
 	for (;;)
 	{
 		tsk_delay(SEC);
-		hsm_send(blinker, EventTick);
+		blinker.send(EventTick);
 	}
 }

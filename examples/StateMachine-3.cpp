@@ -18,20 +18,15 @@ auto led        = device::Led();
 auto dispatcher = stateos::Task(0, nullptr);
 auto StateOff   = stateos::State();
 auto StateOn    = stateos::State();
-auto blinker    = stateos::StateMachineT<10>();
-
-std::vector<stateos::Action> tab =
-{
-	{ StateOff, EventInit,   []( hsm_t *, unsigned ){ led = 0; } },
+auto blinker    = stateos::StateMachineT<10>
+{{
 	{ StateOff, EventSwitch, StateOn },
 	{ StateOn,  EventSwitch, StateOff },
 	{ StateOn,  EventTick,   []( hsm_t *, unsigned ){ led.tick(); } },
-};
+}};
 
 int main()
 {
-	for (auto& a: tab) a.link();
-
 	blinker.start(dispatcher, StateOff);
 	blinker.send(EventSwitch);
 	for (;;)

@@ -1,6 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 #include <vector>
+#include <chrono>
 
 enum
 {
@@ -35,7 +36,7 @@ int main()
 	blinker.send(EventSwitch);
 	for (;;)
 	{
-		tsk_delay(SEC);
+		stateos::thisTask::delay(std::chrono::seconds(1));
 		blinker.send(EventTick);
 	}
 }
