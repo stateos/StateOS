@@ -1,6 +1,5 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
-#include <vector>
 
 enum
 {
@@ -29,13 +28,13 @@ std::vector<stateos::Action> tab =
 
 int main()
 {
-	for (auto& a: tab) a.link();
+	blinker.add(tab);
 
 	blinker.start(dispatcher, StateOff);
 	blinker.send(EventSwitch);
 	for (;;)
 	{
-		tsk_delay(SEC);
+		stateos::thisTask::delay(SEC);
 		blinker.send(EventTick);
 	}
 }

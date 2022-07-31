@@ -1,6 +1,5 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
-#include <vector>
 #include <chrono>
 
 enum
@@ -20,13 +19,15 @@ auto StateOff   = stateos::State();
 auto StateOn    = stateos::State();
 auto blinker    = stateos::StateMachineT<10>
 {{
+	{ StateOff, EventInit,   []( hsm_t *, unsigned ){ led = 0; } },
 	{ StateOff, EventSwitch, StateOn },
-	{ StateOn,  EventSwitch, StateOff },
-	{ StateOn,  EventTick,   []( hsm_t *, unsigned ){ led.tick(); } },
 }};
 
 int main()
 {
+	blinker.add(StateOn, EventSwitch, StateOff);
+	blinker.add(StateOn, EventTick,   []( hsm_t *, unsigned ){ led.tick(); });
+
 	blinker.start(dispatcher, StateOff);
 	blinker.send(EventSwitch);
 	for (;;)

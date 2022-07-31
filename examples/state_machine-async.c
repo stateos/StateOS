@@ -12,8 +12,8 @@ enum
 	EventTick,
 };
 
-OS_HSM(blinker, 1);
 OS_TSK(dispatcher, 0, NULL);
+OS_HSM(blinker, 1);
 
 OS_HSM_STATE(StateOff, NULL);
 OS_HSM_STATE(StateOn,  NULL);

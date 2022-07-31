@@ -12,8 +12,8 @@ enum
 	EventTick,
 };
 
-hsm_id blinker = HSM_CREATE(1);
 tsk_id dispatcher = TSK_CREATE(0, NULL);
+hsm_id blinker    = HSM_CREATE(1);
 
 hsm_state_id StateOff = HSM_STATE_CREATE(NULL);
 hsm_state_id StateOn  = HSM_STATE_CREATE(NULL);
