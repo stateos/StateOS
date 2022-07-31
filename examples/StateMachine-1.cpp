@@ -18,7 +18,7 @@ auto StateOff   = stateos::State();
 auto StateOn    = stateos::State();
 auto blinker    = stateos::StateMachineT<10>();
 
-std::vector<stateos::Action> tab =
+const std::vector<stateos::Action> tab =
 {
 	{ StateOff, EventInit,   []( hsm_t *, unsigned ){ led = 0; } },
 	{ StateOff, EventSwitch, StateOn },
