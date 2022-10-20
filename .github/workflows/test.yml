@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: checkout submodules
       run: git submodule update --init --remote --recursive
     - name: install dependencies
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: checkout submodules
       run: git submodule update --init --remote --recursive
     - name: install arm-none-eabi-gcc
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: checkout submodules
       run: git submodule update --init --remote --recursive
     - name: install arm-none-eabi-gcc
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: checkout submodules
       run: git submodule update --init --remote --recursive
     - name: install arm-none-eabi-gcc
