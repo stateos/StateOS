@@ -15,8 +15,8 @@ void action( unsigned signo )
 
 void consumer()
 {
-	cur_action(action);
-	cur_suspend();
+	tsk_action(SELF, action);
+	tsk_suspend(SELF);
 }
 
 OS_TSK(cons, 0, consumer);

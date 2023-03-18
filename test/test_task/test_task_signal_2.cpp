@@ -17,9 +17,9 @@ static void proc2()
 
 static void proc1()
 {
-	         cur_action(action);
-	         cur_suspend();                       ASSERT(sent == received);
-	         cur_action(nullptr);
+	         tsk_action(SELF, action);
+	         tsk_suspend(SELF);                   ASSERT(sent == received);
+	         tsk_action(SELF, nullptr);
 	         tsk_stop();
 }
 

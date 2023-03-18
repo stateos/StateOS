@@ -61,7 +61,7 @@ void customer()
 		mtx_unlock(doors);
 	}
 
-	cur_delete();
+	tsk_delete(SELF);
 }		
 
 int main()
