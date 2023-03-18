@@ -10,7 +10,7 @@ static void action( unsigned signo )
 
 static void proc2()
 {
-	         sent = (unsigned)rand() % SIGLIM;
+	         sent = (unsigned)rand() % SIG_LIMIT;
 	         tsk_signal(tsk1, sent);
 	         tsk_stop();
 }
