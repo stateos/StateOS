@@ -1,23 +1,3 @@
-/*
- *  NASA Docket No. GSC-18,370-1, and identified as "Operating System Abstraction Layer"
- *
- *  Copyright (c) 2019 United States Government as represented by
- *  the Administrator of the National Aeronautics and Space Administration.
- *  All Rights Reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 /**
  * \brief Configuration file Operating System Abstraction Layer
  *
@@ -46,8 +26,8 @@
 //#define OSAL_CONFIG_DEBUG_PERMISSIVE_MODE
 #define OSAL_CONFIG_CONSOLE_ASYNC
 
-//#define OSAL_CONFIG_BUGCHECK_DISABLE
-//#define OSAL_CONFIG_BUGCHECK_STRICT
+#define OSAL_CONFIG_BUGCHECK_DISABLE
+#define OSAL_CONFIG_BUGCHECK_STRICT
 
 /*
  * OSAL resource limits from build config
@@ -91,7 +71,14 @@
   */
 #define OS_MAX_MUTEXES                  20
 
- /**
+/**
+  * \brief The maximum number of condition variables to support
+  *
+  * Based on the OSAL_CONFIG_MAX_CONDVARS configuration option
+  */
+#define OS_MAX_CONDVARS                 4
+
+  /**
   * \brief The maximum number of modules to support
   *
   * Based on the OSAL_CONFIG_MAX_MODULES configuration option
@@ -257,6 +244,15 @@
   */
 #define OS_PRINTF_CONSOLE_NAME          ""
 
+ /**
+  * \brief Flags added to all tasks on creation
+  *
+  * Added to the task flags on creation
+  *
+  * Supports adding floating point support for all tasks when the OS requires it
+  */
+#define OS_ADD_TASK_FLAGS               0
+
 /*
  * OSAL fixed resource limits
  *
@@ -288,4 +284,3 @@
 
 
 #endif      /* OSCONFIG_H */
-
