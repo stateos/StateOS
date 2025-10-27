@@ -49,7 +49,6 @@ Building an application for a specific compiler is realised using the appropriat
 - hierarchical state machine
 - cmsis-rtos api
 - cmsis-rtos2 api
-- nasa-osal support
 - c++ wrapper
 - support for std::thread
 - all documentation is contained within source files, in particular header files
