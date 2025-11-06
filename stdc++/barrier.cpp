@@ -10,7 +10,7 @@ device::Led led;
 
 void test()
 {
-	const auto nums = { 0, 1, 2, 3 };
+	const unsigned nums[] = { 0, 1, 2, 3 };
  
 	std::barrier sync_point(std::size(nums), [&nums]{
 		for (auto const num : nums) {
@@ -18,7 +18,7 @@ void test()
 		}
 	});
  
-	auto work = [&sync_point](int num) {
+	auto work = [&sync_point](unsigned num) {
 		sync_point.arrive_and_wait();
 		led.toggle(num);
 		sync_point.arrive_and_wait();
