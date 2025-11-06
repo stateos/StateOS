@@ -4,6 +4,7 @@
 #include "stm32f4_discovery.h"
 #include <thread>
 #include <chrono>
+#include <latch>
 
 void test()
 {
