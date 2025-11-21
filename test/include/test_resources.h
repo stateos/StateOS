@@ -30,10 +30,6 @@ extern sem_t  sem0;
 extern sem_id sem1;
 extern sem_id sem2;
 
-extern mut_t  mut0;
-extern mut_id mut1;
-extern mut_id mut2;
-
 extern mtx_t  mtx0;
 extern mtx_id mtx1;
 extern mtx_id mtx2;

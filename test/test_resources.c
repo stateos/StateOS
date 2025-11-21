@@ -28,10 +28,6 @@ sem_t  sem0 = SEM_INIT(0, semDefault);
 sem_id sem1 = SEM_CREATE(0);
 OS_SEM(sem2, 0);
 
-mut_t  mut0 = MUT_INIT();
-mut_id mut1 = MUT_CREATE();
-OS_MUT(mut2);
-
 mtx_t  mtx0 = MTX_INIT(mtxDefault, 0);
 mtx_id mtx1 = MTX_CREATE(mtxDefault);
 OS_MTX(mtx2, mtxDefault);
