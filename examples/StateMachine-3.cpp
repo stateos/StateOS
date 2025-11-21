@@ -14,10 +14,10 @@ enum
 };
 
 auto led        = device::Led();
-auto dispatcher = stateos::Task(0, nullptr);
-auto StateOff   = stateos::State();
-auto StateOn    = stateos::State();
-auto blinker    = stateos::StateMachineT<10>
+auto dispatcher = os::Task(nullptr);
+auto StateOff   = os::State();
+auto StateOn    = os::State();
+auto blinker    = os::StateMachineT<10>
 {{
 	{ StateOff, EventInit,   []( hsm_t *, unsigned ){ led = 0; } },
 	{ StateOff, EventSwitch, StateOn },
@@ -32,7 +32,7 @@ int main()
 	blinker.send(EventSwitch);
 	for (;;)
 	{
-		stateos::thisTask::delay(std::chrono::seconds(1));
+		os::thisTask::delay(std::chrono::seconds(1));
 		blinker.send(EventTick);
 	}
 }

@@ -32,11 +32,10 @@ Building an application for a specific compiler is realised using the appropriat
 - once flags
 - events
 - signals with protection mask
-- flags (any, all, protect, ignore)
+- flags (any, all, new)
 - barriers
 - semaphores (binary, limited, counting)
 - mutexes with configurable type, protocol and robustness
-- fast mutexes (error checking)
 - condition variables
 - read/write locks
 - memory pools

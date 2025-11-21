@@ -5,7 +5,7 @@ using namespace device;
 using namespace stateos;
 
 auto led = Led();
-auto mtx = Mutex(mtxDefault);
+auto mtx = Mutex();
 
 void consumer()
 {

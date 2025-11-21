@@ -9,7 +9,7 @@ auto sem = Semaphore::Binary();
 
 struct myTask : public Task
 {
-	myTask(): Task{0, run} { start(); }
+	myTask(): Task{run} { start(); }
 
 	virtual
 	void main() = 0;

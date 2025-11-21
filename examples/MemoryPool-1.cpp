@@ -36,8 +36,8 @@ void producer()
 	}
 }
 
-auto cons = Task(0, consumer);
-auto prod = Task(0, producer);
+auto cons = Task(consumer);
+auto prod = Task(producer);
 
 int main()
 {

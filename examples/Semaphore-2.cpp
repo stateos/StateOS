@@ -6,8 +6,8 @@ using namespace stateos;
 
 auto led = Led();
 auto sem = Semaphore();
-auto cons = Task(0, []{ sem.wait(); led.tick(); });
-auto prod = Task(0, []{ thisTask::sleepFor(SEC); sem.give(); });
+auto cons = Task([]{ sem.wait(); led.tick(); });
+auto prod = Task([]{ thisTask::sleepFor(SEC); sem.give(); });
 
 int main()
 {

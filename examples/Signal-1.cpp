@@ -27,8 +27,8 @@ void producer()
 
 int main()
 {
-	auto cons = Task::Start(0, consumer);
-	auto prod = Task::Start(0, producer);
+	auto cons = Task::Start(consumer);
+	auto prod = Task::Start(producer);
 
 	thisTask::sleep();
 }

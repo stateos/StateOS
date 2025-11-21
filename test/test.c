@@ -63,7 +63,6 @@ int main()
 	TEST_AddUnit(test_barrier);
 	TEST_AddUnit(test_semaphore);
 	TEST_AddUnit(test_mutex);
-	TEST_AddUnit(test_fast_mutex);
 	TEST_AddUnit(test_condition_variable);
 	TEST_AddUnit(test_memory_pool);
 	TEST_AddUnit(test_raw_buffer);

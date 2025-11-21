@@ -9,7 +9,7 @@ auto sem = Semaphore(0);
 
 struct Consumer : public Task
 {
-	Consumer(): Task(0, run) { start(); }
+	Consumer(): Task(run) { start(); }
 
 	private:
 	static void run()
@@ -21,7 +21,7 @@ struct Consumer : public Task
 	
 struct Producer : public Task
 {
-	Producer(): Task(0, run) { start(); }
+	Producer(): Task(run) { start(); }
 
 	private:
 	static void run()

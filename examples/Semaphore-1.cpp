@@ -25,8 +25,8 @@ void producer()
 	}
 }
 
-TaskT<256> cons{0, consumer};
-TaskT<256> prod{0, producer};
+TaskT<256> cons{consumer};
+TaskT<256> prod{producer};
 
 int main()
 {

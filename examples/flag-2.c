@@ -5,7 +5,7 @@ OS_FLG(flg, 1);
 
 void consumer()
 {
-	flg_wait(flg, 1, flgProtect+flgIgnore);
+	flg_wait(flg, 1, flgAnyNew);
 	LED_Tick();
 }
 

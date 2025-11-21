@@ -28,8 +28,8 @@ int main()
 {
 	auto sem = Semaphore::Binary();
 
-	auto cons = Task(0, consumer, std::ref(sem));
-	auto prod = Task(0, producer, std::ref(sem));
+	auto cons = Task(consumer, std::ref(sem));
+	auto prod = Task(producer, std::ref(sem));
 
 	cons.start();
 	prod.start();

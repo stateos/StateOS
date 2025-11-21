@@ -5,7 +5,7 @@ using namespace device;
 using namespace stateos;
 
 auto led = Led();
-auto tsk = Task(0, []{});
+auto tsk = Task([]{});
 
 int main()
 {

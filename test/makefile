@@ -9,7 +9,6 @@ include test/test_barrier/makefile
 include test/test_condition_variable/makefile
 include test/test_event/makefile
 include test/test_event_queue/makefile
-include test/test_fast_mutex/makefile
 include test/test_flag/makefile
 include test/test_job_queue/makefile
 include test/test_mailbox_queue/makefile

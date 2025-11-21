@@ -8,7 +8,7 @@ int main()
 {
 	auto sem = Semaphore::Binary();
 
-	auto cons = Task::Start(0, [&]
+	auto cons = Task::Start([&]
 	{
 		Led led;
 
@@ -19,7 +19,7 @@ int main()
 		}
 	});
 
-	auto prod = Task::Start(0, [&]
+	auto prod = Task::Start([&]
 	{
 		for (;;)
 		{

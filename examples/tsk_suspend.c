@@ -3,14 +3,15 @@
 
 OS_TSK_DEF(cons, 0)
 {
-	tsk_suspend(tsk_this());
 	LED_Tick();
 }
 
 OS_TSK_DEF(prod, 0)
 {
+	tsk_suspend(cons);
 	tsk_delay(SEC);
 	tsk_resume(cons);
+	tsk_delay(SEC);
 }
 
 int main()

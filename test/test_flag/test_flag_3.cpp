@@ -30,7 +30,7 @@ static void proc3()
 	unsigned flags;
 	int result;
 
-	result = Flg3.wait(FLAG3, flgAll+flgProtect+flgIgnore);
+	result = Flg3.wait(FLAG3, flgAllNew);
 	                                              ASSERT_success(result);
 	         flags = Flg2.give(FLAG2);            ASSERT(flags == FLAG2);
 	         thisTask::stop();

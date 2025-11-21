@@ -10,8 +10,7 @@ auto evt = Event();
 void consumer()
 {
 	unsigned x;
-
-	evt.wait(&x);
+	evt.wait(x);
 	led = x;
 }
 

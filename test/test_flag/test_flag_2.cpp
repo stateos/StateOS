@@ -25,7 +25,7 @@ static void proc3()
 	unsigned flags;
 	int result;
 
-	result = flg_wait(flg3, FLAG3, flgAll+flgProtect+flgIgnore);
+	result = flg_wait(flg3, FLAG3, flgAllNew);
 	                                              ASSERT_success(result);
 	         flags = flg_give(flg2, FLAG2);       ASSERT(flags == FLAG2);
 	         tsk_stop();

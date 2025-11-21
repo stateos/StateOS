@@ -4,23 +4,23 @@
 using namespace device;
 using namespace stateos;
 
-void consumer(FastMutex &mut, Led &led)
+void consumer(Mutex &mtx, Led &led)
 {
-	auto lock = FastLock(mut);
+	auto lock = UniqueLock(mtx);
 	led.tick();
 }
 
-void producer(FastMutex &mut)
+void producer(Mutex &mtx)
 {
-	auto lock = FastLock(mut);
+	auto lock = UniqueLock(mtx);
 	thisTask::sleepFor(SEC);
 }
 
 int main()
 {
 	Led led;
-	FastMutex mut;
-	Task prod = Task::Start(2, [&mut]      { producer(mut); });
-	Task cons = Task::Start(1, [&mut, &led]{ consumer(mut, led); });
+	Mutex mtx;
+	Task prod = Task::Start(2, [&mtx]      { producer(mtx); });
+	Task cons = Task::Start(1, [&mtx, &led]{ consumer(mtx, led); });
 	thisTask::sleep();
 }

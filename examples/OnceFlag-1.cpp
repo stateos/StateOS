@@ -4,7 +4,7 @@
 using namespace device;
 using namespace stateos;
 
-auto tsk = Task::Start(0, []
+auto tsk = Task::Start([]
 {
 	auto led = Led();
 	auto one = OnceFlag();
