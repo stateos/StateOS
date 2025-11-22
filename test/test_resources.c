@@ -12,7 +12,7 @@ evt_t  evt0 = EVT_INIT();
 evt_id evt1 = EVT_CREATE();
 OS_EVT(evt2);
 
-sig_t  sig0 = SIG_INIT(0);
+sig_t  sig0 = SIG_INIT();
 sig_id sig1 = SIG_CREATE();
 OS_SIG(sig2);
 

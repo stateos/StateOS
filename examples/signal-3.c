@@ -1,14 +1,14 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-sig_id sig = SIG_CREATE(0);
+sig_id sig = SIG_CREATE();
 
 void consumer()
 {
 	unsigned x;
 
 	sig_wait(sig, sigAny, &x);
-	LEDs = x & 0x0FUL;
+	LEDs = x & 0x0F;
 }
 
 void producer()

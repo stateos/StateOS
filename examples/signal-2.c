@@ -1,7 +1,7 @@
 #include <stm32f4_discovery.h>
 #include <os.h>
 
-sig_id sig = SIG_CREATE(0);
+sig_id sig = SIG_CREATE();
 
 void consumer()
 {

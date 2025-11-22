@@ -10,7 +10,7 @@ void consumer()
 	for (;;)
 	{
 		box_wait(box, &x);
-		LEDs = x & 0x0FUL;
+		LEDs = x & 0x0F;
 	}
 }
 

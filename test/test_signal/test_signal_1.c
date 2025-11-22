@@ -1,6 +1,6 @@
 #include "test.h"
 
-static_SIG(sig3, 0);
+static_SIG(sig3);
 
 static unsigned sent;
 
