@@ -7,7 +7,7 @@ StateOS is free, extremely simple and very fast real-time operating system (RTOS
 
 ### Targets
 
-ARM Cortex-M, STM8.
+ARM Cortex-M, STM8, x86 / x86_64 (PC: Windows, Linux; cooperative mode only, for testing purposes).
 
 ### Inspiration
 
